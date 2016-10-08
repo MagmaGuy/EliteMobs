@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ActiveStack:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ActiveStack_jar</output-path>
+    <root id="archive" name="ActiveStack.jar">
+      <element id="module-output" name="ActiveStack" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../Spigot/Spigot-API/target/spigot-api-1.10.2-R0.1-SNAPSHOT.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
