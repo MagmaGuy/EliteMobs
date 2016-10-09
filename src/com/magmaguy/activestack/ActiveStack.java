@@ -90,7 +90,7 @@ public class ActiveStack extends JavaPlugin implements Listener {
 
             }
 
-        }, 1, 20);
+        }, 1, 1);
 
     }
 

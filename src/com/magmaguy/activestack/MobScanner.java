@@ -60,7 +60,7 @@ public class MobScanner implements Listener{
                         if (scanValidEntity(entity))
                         {
 
-                            //todo: remove useless return?
+                            return;
 
                         }
 
