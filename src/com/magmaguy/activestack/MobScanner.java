@@ -98,8 +98,6 @@ public class MobScanner implements Listener{
                 customName(entity);
                 entity.setCustomNameVisible(true);
 
-                getLogger().info("Created supermob");
-
                 return true;
 
             }

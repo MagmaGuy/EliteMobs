@@ -6,8 +6,10 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+    <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="Version 1.0.0&#10;&#10;- Seems to work&#10;- Removed debug code">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/activestack/MobScanner.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/activestack/MobScanner.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/plugin.yml" afterPath="$PROJECT_DIR$/src/plugin.yml" />
     </list>
     <ignored path="ActiveStack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -33,7 +35,7 @@
           <file leaf-file-name="ActiveStack.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/ActiveStack.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="640">
+                <state relative-caret-position="112">
                   <caret line="53" column="80" selection-start-line="53" selection-start-column="80" selection-end-line="53" selection-end-column="80" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -42,11 +44,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="MobScanner.java" pinned="false" current-in-tab="false">
+          <file leaf-file-name="MobScanner.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/MobScanner.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="800">
-                  <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
+                <state relative-caret-position="-1035">
+                  <caret line="98" column="50" selection-start-line="98" selection-start-column="50" selection-end-line="98" selection-end-column="50" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -54,10 +56,10 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="PolarBearHandler.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="PolarBearHandler.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PolarBearHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1376">
+                <state relative-caret-position="1280">
                   <caret line="99" column="0" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -73,6 +75,7 @@
                   <caret line="64" column="88" selection-start-line="64" selection-start-column="88" selection-end-line="64" selection-end-column="88" />
                   <folding>
                     <element signature="e#0#3609#0" expanded="false" />
+                    <element signature="imports" expanded="false" />
                   </folding>
                 </state>
               </provider>
@@ -81,8 +84,8 @@
           <file leaf-file-name="plugin.yml" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/plugin.yml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="48">
-                  <caret line="3" column="42" selection-start-line="3" selection-start-column="42" selection-end-line="3" selection-end-column="42" />
+                <state relative-caret-position="16">
+                  <caret line="1" column="14" selection-start-line="1" selection-start-column="14" selection-end-line="1" selection-end-column="14" />
                   <folding />
                 </state>
               </provider>
@@ -91,11 +94,9 @@
           <file leaf-file-name="EndermiteHandler.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/EndermiteHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="800">
+                <state relative-caret-position="640">
                   <caret line="50" column="48" selection-start-line="50" selection-start-column="48" selection-end-line="50" selection-end-column="48" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                  </folding>
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -103,7 +104,7 @@
           <file leaf-file-name="PigZombieHandler.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PigZombieHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="394">
+                <state relative-caret-position="544">
                   <caret line="62" column="27" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
                   <folding />
                 </state>
@@ -113,12 +114,12 @@
         </leaf>
       </split-first>
       <split-second>
-        <leaf>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="PigZombieHandler.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PigZombieHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="58">
-                  <caret line="62" column="27" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
+                <state relative-caret-position="621">
+                  <caret line="68" column="38" selection-start-line="68" selection-start-column="38" selection-end-line="68" selection-end-column="38" />
                   <folding />
                 </state>
               </provider>
@@ -146,7 +147,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/plugin.yml" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/ItemDropVelocity.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/ZombieHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/test.java" />
@@ -159,7 +159,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/SpiderHandler.java" />
         <option value="$PROJECT_DIR$/src/Silverfish.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/Silverfish.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/MobScanner.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/SilverfishHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/BlazeHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/Witch.java" />
@@ -168,14 +167,16 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/EndermiteHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/ActiveStack.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PolarBearHandler.java" />
+        <option value="$PROJECT_DIR$/src/plugin.yml" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/activestack/MobScanner.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
+    <option name="x" value="2552" />
     <option name="y" value="-8" />
-    <option name="width" value="2576" />
-    <option name="height" value="1426" />
+    <option name="width" value="1936" />
+    <option name="height" value="1066" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -202,8 +203,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -589,12 +590,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="2576" height="1426" extended-state="6" />
+    <frame x="2552" y="-8" width="1936" height="1066" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -604,18 +604,19 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25437203" sideWeight="0.48801237" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15405117" sideWeight="0.48338693" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Statistic" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32869297" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25437203" sideWeight="0.5119876" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15405117" sideWeight="0.51661307" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32869297" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -630,6 +631,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Version 1.0.0&#10;&#10;- Seems to work&#10;- Removed debug code" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.0.0&#10;&#10;- Seems to work&#10;- Removed debug code" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -653,6 +658,71 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/ActiveStack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="528">
+          <caret line="53" column="80" selection-start-line="53" selection-start-column="80" selection-end-line="53" selection-end-column="80" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/MobScanner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1232">
+          <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PolarBearHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1184">
+          <caret line="99" column="0" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/BlazeHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="592">
+          <caret line="64" column="88" selection-start-line="64" selection-start-column="88" selection-end-line="64" selection-end-column="88" />
+          <folding>
+            <element signature="e#0#3609#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="3" column="42" selection-start-line="3" selection-start-column="42" selection-end-line="3" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/EndermiteHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="640">
+          <caret line="50" column="48" selection-start-line="50" selection-start-column="48" selection-end-line="50" selection-end-column="48" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PigZombieHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="62" column="27" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/ActiveStack.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="192">
@@ -679,6 +749,7 @@
           <caret line="64" column="88" selection-start-line="64" selection-start-column="88" selection-end-line="64" selection-end-column="88" />
           <folding>
             <element signature="e#0#3609#0" expanded="false" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -696,7 +767,7 @@
         <state relative-caret-position="1616">
           <caret line="126" column="0" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -706,7 +777,7 @@
         <state relative-caret-position="640">
           <caret line="68" column="49" selection-start-line="68" selection-start-column="49" selection-end-line="68" selection-end-column="49" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -715,9 +786,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -747,6 +816,7 @@
           <caret line="64" column="88" selection-start-line="64" selection-start-column="88" selection-end-line="64" selection-end-column="88" />
           <folding>
             <element signature="e#0#3609#0" expanded="false" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -764,7 +834,7 @@
         <state relative-caret-position="1616">
           <caret line="126" column="0" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -774,7 +844,7 @@
         <state relative-caret-position="640">
           <caret line="68" column="49" selection-start-line="68" selection-start-column="49" selection-end-line="68" selection-end-column="49" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -783,9 +853,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -815,6 +883,7 @@
           <caret line="64" column="88" selection-start-line="64" selection-start-column="88" selection-end-line="64" selection-end-column="88" />
           <folding>
             <element signature="e#0#3609#0" expanded="false" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -832,7 +901,7 @@
         <state relative-caret-position="1616">
           <caret line="126" column="0" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -842,7 +911,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -866,14 +935,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/test.java" />
-    <entry file="file://$PROJECT_DIR$/src/plugin.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="3" column="42" selection-start-line="3" selection-start-column="42" selection-end-line="3" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/ItemDropVelocity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="432">
@@ -951,6 +1012,7 @@
           <caret line="64" column="88" selection-start-line="64" selection-start-column="88" selection-end-line="64" selection-end-column="88" />
           <folding>
             <element signature="e#0#3609#0" expanded="false" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -960,7 +1022,7 @@
         <state relative-caret-position="1098">
           <caret line="153" column="4" selection-start-line="153" selection-start-column="4" selection-end-line="153" selection-end-column="4" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -970,6 +1032,24 @@
         <state relative-caret-position="1208">
           <caret line="126" column="0" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
           <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/EndermiteHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="640">
+          <caret line="50" column="48" selection-start-line="50" selection-start-column="48" selection-end-line="50" selection-end-column="48" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PolarBearHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1280">
+          <caret line="99" column="0" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
+          <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
@@ -977,16 +1057,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PigZombieHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
+        <state relative-caret-position="544">
           <caret line="62" column="27" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/EndermiteHandler.java">
+    <entry file="file://$PROJECT_DIR$/src/plugin.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="800">
-          <caret line="50" column="48" selection-start-line="50" selection-start-column="48" selection-end-line="50" selection-end-column="48" />
+        <state relative-caret-position="16">
+          <caret line="1" column="14" selection-start-line="1" selection-start-column="14" selection-end-line="1" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/ActiveStack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="53" column="80" selection-start-line="53" selection-start-column="80" selection-end-line="53" selection-end-column="80" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -995,28 +1083,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/MobScanner.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="800">
-          <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/ActiveStack.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="53" column="80" selection-start-line="53" selection-start-column="80" selection-end-line="53" selection-end-column="80" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/activestack/Mobs/PolarBearHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1376">
-          <caret line="99" column="0" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
+        <state relative-caret-position="-1035">
+          <caret line="98" column="50" selection-start-line="98" selection-start-column="50" selection-end-line="98" selection-end-column="50" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
