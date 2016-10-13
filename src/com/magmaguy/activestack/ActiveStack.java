@@ -53,6 +53,8 @@ public class ActiveStack extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new EndermiteHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new PolarBearHandler(this), this);
 
+        this.getServer().getPluginManager().registerEvents(new MobSpawner(this), this);
+
     }
 
 
