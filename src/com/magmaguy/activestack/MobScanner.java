@@ -48,10 +48,9 @@ public class MobScanner implements Listener{
             for (Entity entity : world.getEntities())
             {
 
-                if(entity instanceof Zombie || entity instanceof Skeleton || entity instanceof PigZombie ||
-                        entity instanceof Creeper || entity instanceof Spider || entity instanceof Enderman ||
-                        entity instanceof CaveSpider || entity instanceof Silverfish || entity instanceof Blaze ||
-                        entity instanceof Witch || entity instanceof Endermite || entity instanceof PolarBear)
+                ValidMobFilter validMobFilter = new ValidMobFilter();
+
+                if (validMobFilter.ValidMobFilter(entity))
                 {
 
                     if (!entity.hasMetadata("removed"))
