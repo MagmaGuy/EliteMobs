@@ -94,8 +94,6 @@ public class MobSpawner implements Listener{
 
                             Damageable damageableMob = (Damageable) entity;
 
-
-                            getLogger().info(damageableMob.getMaxHealth() + " " + supermobLevel);
                             damageableMob.setMaxHealth(damageableMob.getMaxHealth() * supermobLevel);
                             damageableMob.setHealth(damageableMob.getMaxHealth());
 
@@ -233,7 +231,6 @@ public class MobSpawner implements Listener{
 
         }
 
-        getLogger().info(armorRating + "");
         return armorRating;
 
     }
@@ -265,9 +262,8 @@ public class MobSpawner implements Listener{
 
     private int threatLevelCalculator (int armorRating, int xpRating, int potionEffectRating, int supermobRating) {
 
-        int threatLevel = (armorRating * 2) + xpRating + (potionEffectRating * 5) + (supermobRating * 5);
+        int threatLevel = armorRating + xpRating + (potionEffectRating * 5) + (supermobRating * 5);
 
-        getLogger().info(threatLevel + "");
         return threatLevel;
 
     }
@@ -278,7 +274,8 @@ public class MobSpawner implements Listener{
         Random random = new Random();
 
         double supermobLevelPercent = 0.01 + (0.2 - 0.01) * random.nextDouble();
-        int supermobLevel = (int) (supermobLevelPercent * threatLevel);
+
+        int supermobLevel = (int) (supermobLevelPercent * threatLevel) + threatLevel;
 
         if (supermobLevel < 1)
         {
@@ -287,7 +284,6 @@ public class MobSpawner implements Listener{
 
         }
 
-        getLogger().info("level " + supermobLevel + " mob spawned? " + threatLevel + " * " + supermobLevelPercent);
         return supermobLevel;
 
     }
