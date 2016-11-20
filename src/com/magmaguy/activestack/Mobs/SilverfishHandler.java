@@ -29,7 +29,7 @@ package com.magmaguy.activestack.Mobs;/*
  */
 
 import com.magmaguy.activestack.ActiveStack;
-import com.magmaguy.activestack.MobScanner;
+import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.event.EventHandler;
@@ -65,8 +65,7 @@ public class SilverfishHandler implements Listener{
             Silverfish silverFish = (Silverfish) event.getEntity();
 
             double damage = event.getFinalDamage();
-            //health is hardcoded here, maybe change it at some point
-            double dropChance = damage / MobScanner.silverfishHealth;
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(silverFish);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;

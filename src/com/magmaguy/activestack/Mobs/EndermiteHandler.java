@@ -1,7 +1,7 @@
 package com.magmaguy.activestack.Mobs;
 
 import com.magmaguy.activestack.ActiveStack;
-import com.magmaguy.activestack.MobScanner;
+import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import org.bukkit.entity.Endermite;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
@@ -37,8 +37,7 @@ public class EndermiteHandler implements Listener{
             Endermite endermite = (Endermite) event.getEntity();
 
             double damage = event.getFinalDamage();
-            //health is hardcoded here, maybe change it at some point
-            double dropChance = damage / MobScanner.endermiteHealth;
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(endermite);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;

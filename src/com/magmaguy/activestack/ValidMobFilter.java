@@ -35,7 +35,8 @@ public class ValidMobFilter {
                 entity instanceof Blaze ||
                 entity instanceof Witch ||
                 entity instanceof Endermite ||
-                entity instanceof PolarBear)
+                entity instanceof PolarBear ||
+                entity instanceof ZombieVillager)
         {
 
             return true;
