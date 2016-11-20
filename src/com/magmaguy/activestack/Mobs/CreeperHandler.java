@@ -16,8 +16,8 @@
 package com.magmaguy.activestack.Mobs;
 
 import com.magmaguy.activestack.ActiveStack;
+import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
-import com.magmaguy.activestack.MobScanner;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
@@ -56,8 +56,7 @@ public class CreeperHandler implements Listener{
             Creeper creeper = (Creeper) event.getEntity();
 
             double damage = event.getFinalDamage();
-            //health is hardcoded here
-            double dropChance = damage / MobScanner.creeperHealth;
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(creeper);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;

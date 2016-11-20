@@ -16,8 +16,8 @@
 package com.magmaguy.activestack.Mobs;
 
 import com.magmaguy.activestack.ActiveStack;
+import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
-import com.magmaguy.activestack.MobScanner;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.event.EventHandler;
@@ -57,8 +57,7 @@ public class PigZombieHandler implements Listener{
             PigZombie pigZombie = (PigZombie) event.getEntity();
 
             double damage = event.getFinalDamage();
-            //health is hardcoded here, maybe change it at some point
-            double dropChance = damage / MobScanner.pigZombieHealth;
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(pigZombie);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;

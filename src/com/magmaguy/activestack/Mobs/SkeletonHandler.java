@@ -16,8 +16,8 @@
 package com.magmaguy.activestack.Mobs;
 
 import com.magmaguy.activestack.ActiveStack;
+import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
-import com.magmaguy.activestack.MobScanner;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Skeleton;
@@ -57,8 +57,7 @@ public class SkeletonHandler implements Listener{
             Skeleton skeleton = (Skeleton) event.getEntity();
 
             double damage = event.getFinalDamage();
-            //health is hardcoded here, maybe change it at some point
-            double dropChance = damage / MobScanner.skeletonHealth;
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(skeleton);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;

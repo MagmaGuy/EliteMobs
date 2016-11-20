@@ -16,8 +16,8 @@
 package com.magmaguy.activestack.Mobs;
 
 import com.magmaguy.activestack.ActiveStack;
+import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
-import com.magmaguy.activestack.MobScanner;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
@@ -44,6 +44,7 @@ public class ZombieHandler implements Listener{
 
     }
 
+
     @EventHandler
     public void onHit(EntityDamageEvent event)
     {
@@ -56,8 +57,7 @@ public class ZombieHandler implements Listener{
             Zombie zombie = (Zombie) event.getEntity();
 
             double damage = event.getFinalDamage();
-            //health is hardcoded here, maybe change it at some point
-            double dropChance = damage / MobScanner.zombieHealth;
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(zombie);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;

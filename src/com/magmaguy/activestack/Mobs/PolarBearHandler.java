@@ -16,8 +16,8 @@
 package com.magmaguy.activestack.Mobs;
 
 import com.magmaguy.activestack.ActiveStack;
+import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
-import com.magmaguy.activestack.MobScanner;
 import org.bukkit.Material;
 import org.bukkit.entity.PolarBear;
 import org.bukkit.event.EventHandler;
@@ -54,8 +54,7 @@ public class PolarBearHandler implements Listener{
             PolarBear polarBear = (PolarBear) event.getEntity();
 
             double damage = event.getFinalDamage();
-            //health is hardcoded here, maybe change it at some point
-            double dropChance = damage / MobScanner.polarBearHealth;
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(polarBear);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;

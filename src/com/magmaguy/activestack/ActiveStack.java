@@ -19,6 +19,10 @@ package com.magmaguy.activestack;
  * Created by MagmaGuy on 07/10/2016.
  */
 
+import com.magmaguy.activestack.MinorPowers.AttackGravity;
+import com.magmaguy.activestack.MinorPowers.AttackPush;
+import com.magmaguy.activestack.MinorPowers.InvulnerabilityArrow;
+import com.magmaguy.activestack.MinorPowers.InvulnerabilityFire;
 import com.magmaguy.activestack.Mobs.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -39,7 +43,7 @@ public class ActiveStack extends JavaPlugin implements Listener {
         repeatingTaskRunner();
 
         this.getServer().getPluginManager().registerEvents(this, this);
-        this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
+
         this.getServer().getPluginManager().registerEvents(new ZombieHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new SkeletonHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new PigZombieHandler(this), this);
@@ -53,7 +57,13 @@ public class ActiveStack extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new EndermiteHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new PolarBearHandler(this), this);
 
-        this.getServer().getPluginManager().registerEvents(new MobSpawner(this), this);
+        this.getServer().getPluginManager().registerEvents(new AttackGravity(this), this);
+        this.getServer().getPluginManager().registerEvents(new AttackPush(this), this);
+        this.getServer().getPluginManager().registerEvents(new InvulnerabilityArrow(this), this);
+        this.getServer().getPluginManager().registerEvents(new InvulnerabilityFire(this), this);
+
+        this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
+        //this.getServer().getPluginManager().registerEvents(new MobSpawner(this), this); CURRENTLY BROKEN
 
     }
 

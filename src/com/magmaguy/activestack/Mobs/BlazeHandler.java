@@ -16,8 +16,8 @@
 package com.magmaguy.activestack.Mobs;
 
 import com.magmaguy.activestack.ActiveStack;
+import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
-import com.magmaguy.activestack.MobScanner;
 import org.bukkit.Material;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.ExperienceOrb;
@@ -56,8 +56,7 @@ public class BlazeHandler implements Listener{
             Blaze blaze = (Blaze) event.getEntity();
 
             double damage = event.getFinalDamage();
-            //health is hardcoded here, maybe change it at some point
-            double dropChance = damage / MobScanner.blazeHealth;
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(blaze);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;

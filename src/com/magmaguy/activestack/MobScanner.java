@@ -15,13 +15,20 @@
 
 package com.magmaguy.activestack;
 
+import com.magmaguy.activestack.MinorPowers.*;
+import com.magmaguy.activestack.PowerStances.ParticleEffects;
 import org.bukkit.World;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
 
 import static com.magmaguy.activestack.ActiveStack.worldList;
 import static org.bukkit.Bukkit.getLogger;
@@ -38,6 +45,8 @@ public class MobScanner implements Listener{
         this.plugin = (ActiveStack) plugin;
 
     }
+
+    public static final int maxSuperMobLevel = 50;
 
 
     public void scanMobs(){
@@ -65,6 +74,13 @@ public class MobScanner implements Listener{
 
                     }
 
+                    if(entity.hasMetadata("SuperMob"))
+                    {
+
+                        powerHandler(entity);
+
+                    }
+
                 }
 
             }
@@ -81,23 +97,30 @@ public class MobScanner implements Listener{
         for (Entity secondEntity : entity.getNearbyEntities(range, range, range))
         {
 
-            if (entity.getType() == secondEntity.getType() && !entity.hasMetadata("removed"))
+            if (entity.getType() == secondEntity.getType() && !entity.hasMetadata("removed")
+                    && !entity.hasMetadata("forbidden") && !secondEntity.hasMetadata("forbidden"))
             {
 
-                //remove duplicate
-                secondEntity.remove();
-                secondEntity.setMetadata("removed", new FixedMetadataValue(plugin, true));
+                //If the sum of both entities is above level 50, don't add both entities together
+                if (levelCap(entity, secondEntity))
+                {
 
-                //setup new supermob
-                double newHealth = ((Damageable) entity).getHealth() + ((Damageable) secondEntity).getHealth();
+                    //remove duplicate
+                    secondEntity.remove();
+                    secondEntity.setMetadata("removed", new FixedMetadataValue(plugin, true));
 
-                ((Damageable) entity).setMaxHealth(newHealth);
-                ((Damageable) entity).setHealth(((Damageable) entity).getMaxHealth());
+                    //setup new supermob
+                    double newHealth = ((Damageable) entity).getHealth() + ((Damageable) secondEntity).getHealth();
 
-                customName(entity);
-                entity.setCustomNameVisible(true);
+                    ((Damageable) entity).setMaxHealth(newHealth);
+                    ((Damageable) entity).setHealth(((Damageable) entity).getMaxHealth());
 
-                return true;
+                    customName(entity);
+                    entity.setCustomNameVisible(true);
+
+                    return true;
+
+                }
 
             }
 
@@ -108,88 +131,60 @@ public class MobScanner implements Listener{
     }
 
 
-    public static final int zombieHealth = 20;
-    public static final int skeletonHealth = 20;
-    public static final int pigZombieHealth = 20;
-    public static final int creeperHealth = 20;
-    public static final int spiderHealth = 16;
-    public static final int endermanHealth = 40;
-    public static final int caveSpiderHealth = 12;
-    public static final int silverfishHealth = 8;
-    public static final int blazeHealth = 20;
-    public static final int witchHealth = 26;
-    public static final int endermiteHealth = 8;
-    public static final int polarBearHealth = 30;
-
     public void customName(Entity entity){
 
-        switch (entity.getType())
-        {
+        double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity);
+
+        int mobLevel = (int) Math.ceil(((Damageable) entity).getMaxHealth() / defaultMaxHealth);
+
+        switch (entity.getType()) {
             case ZOMBIE:
-                int mobLevelZombie = (int) Math.ceil(((Zombie)entity).getHealth() / zombieHealth);
-                entity.setCustomName("Level " + mobLevelZombie + " Zombie");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelZombie));
+                entity.setCustomName("Level " + mobLevel + " Zombie");
+                break;
+            case ZOMBIE_VILLAGER:
+                entity.setCustomName("Level " + mobLevel + " Zombie Villager");
                 break;
             case SKELETON:
-                int mobLevelSkeleton = (int) Math.ceil(((Skeleton)entity).getHealth() / skeletonHealth);
-                entity.setCustomName("Level " + mobLevelSkeleton + " Skeleton");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelSkeleton));
+                entity.setCustomName("Level " + mobLevel + " Skeleton");
                 break;
             case PIG_ZOMBIE:
-                int mobLevelPigZombie = (int) Math.ceil(((PigZombie)entity).getHealth() / pigZombieHealth);
-                entity.setCustomName("Level " + mobLevelPigZombie + " Zombie Pigman");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelPigZombie));
+                entity.setCustomName("Level " + mobLevel + " Zombie Pigman");
                 break;
             case CREEPER:
-                int mobLevelCreeper = (int) Math.ceil(((Creeper)entity).getHealth() / creeperHealth);
-                entity.setCustomName("Level " + mobLevelCreeper + " Creeper");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelCreeper));
+                entity.setCustomName("Level " + mobLevel + " Creeper");
                 break;
             case SPIDER:
-                int mobLevelSpider = (int) Math.ceil(((Spider)entity).getHealth() / spiderHealth);
-                entity.setCustomName("Level " + mobLevelSpider + " Spider");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelSpider));
+                entity.setCustomName("Level " + mobLevel + " Spider");
                 break;
             case ENDERMAN:
-                int mobLevelEnderman = (int) Math.ceil(((Enderman)entity).getHealth() / endermanHealth);
-                entity.setCustomName("Level " + mobLevelEnderman + " Enderman");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelEnderman));
+                entity.setCustomName("Level " + mobLevel + " Enderman");
                 break;
             case CAVE_SPIDER:
-                int mobLevelCaveSpider = (int) Math.ceil(((CaveSpider)entity).getHealth() / caveSpiderHealth);
-                entity.setCustomName("Level " + mobLevelCaveSpider + " Cave Spider");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelCaveSpider));
+                entity.setCustomName("Level " + mobLevel + " Cave Spider");
                 break;
             case SILVERFISH:
-                int mobLevelSilverfish = (int) Math.ceil(((Silverfish)entity).getHealth() / silverfishHealth);
-                entity.setCustomName("Level " + mobLevelSilverfish + " Silverfish");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelSilverfish));
+                entity.setCustomName("Level " + mobLevel + " Silverfish");
                 break;
             case BLAZE:
-                int mobLevelBlaze = (int) Math.ceil(((Blaze)entity).getHealth() / blazeHealth);
-                entity.setCustomName("Level " + mobLevelBlaze + " Blaze");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelBlaze));
+                entity.setCustomName("Level " + mobLevel + " Blaze");
                 break;
             case WITCH:
-                int mobLevelWitch = (int) Math.ceil(((Witch)entity).getHealth() / witchHealth);
-                entity.setCustomName("Level " + mobLevelWitch + " Witch");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelWitch));
+                entity.setCustomName("Level " + mobLevel + " Witch");
                 break;
             case ENDERMITE:
-                int mobLevelEndermite = (int) Math.ceil(((Endermite)entity).getHealth() / endermiteHealth);
-                entity.setCustomName("Level " + mobLevelEndermite + " Endermite");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelEndermite));
+                entity.setCustomName("Level " + mobLevel + " Endermite");
                 break;
             case POLAR_BEAR:
-                int mobLevelPolarBear = (int) Math.ceil(((PolarBear)entity).getHealth() / polarBearHealth);
-                entity.setCustomName("Level " + mobLevelPolarBear + " Polar Bear");
-                entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevelPolarBear));
+                entity.setCustomName("Level " + mobLevel + " Polar Bear");
                 break;
             default:
                 getLogger().info("Error: Couldn't assign custom mob name due to unexpected boss mob (talk to the dev!)");
                 getLogger().info("Missing mob type: " + entity.getType());
                 break;
         }
+
+        entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevel));
+
 
     }
 
@@ -200,6 +195,134 @@ public class MobScanner implements Listener{
         {
 
             customName(event.getEntity());
+
+        }
+
+    }
+
+
+    public boolean levelCap(Entity entity1, Entity entity2){
+
+        Damageable damageable1 = (Damageable) entity1;
+        Damageable damageable2 = (Damageable) entity2;
+
+        double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity1);
+
+        if (damageable1.getMaxHealth() + damageable2.getMaxHealth() > defaultMaxHealth * maxSuperMobLevel)
+        {
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+
+    public void powerHandler(Entity entity)
+    {
+
+        int availableMinorPowers = 0;
+        int availableMajorPowers = 0;
+
+        if (entity.hasMetadata("SuperMob"))
+        {
+
+            if (entity.getMetadata("SuperMob").get(0).asInt() >= 5)
+            {
+
+            int superMobLevel = entity.getMetadata("SuperMob").get(0).asInt();
+
+            availableMinorPowers = (superMobLevel - 5) / 10 + 1;
+            availableMajorPowers = superMobLevel / 10;
+
+            }
+
+        }
+
+        if (availableMinorPowers >= 1)
+        {
+
+            int currentMinorPowerAmount = 0;
+
+            ArrayList <MinorPowers> minorPowerArray = new ArrayList();
+            minorPowerArray.add(new InvulnerabilityFire(plugin));
+            minorPowerArray.add(new InvulnerabilityArrow(plugin));
+            minorPowerArray.add(new AttackGravity(plugin));
+            minorPowerArray.add(new AttackPush(plugin));
+            minorPowerArray.add(new MovementSpeed(plugin));
+
+            if (entity.hasMetadata("MinorPowerAmount"))
+            {
+
+                currentMinorPowerAmount = entity.getMetadata("MinorPowerAmount").get(0).asInt();
+
+                Iterator<MinorPowers> iterator = minorPowerArray.iterator();
+
+                while(iterator.hasNext())
+                {
+
+                    MinorPowers minorPower = iterator.next();
+
+                    if (minorPower.existingPowers(entity))
+                    {
+
+                        iterator.remove();
+
+                    }
+
+                }
+
+            }
+
+            int missingMinorPowerAmount = availableMinorPowers - currentMinorPowerAmount;
+
+            if (missingMinorPowerAmount > 0 && minorPowerArray.size() > 0)
+            {
+
+                for (int i = 0; i < missingMinorPowerAmount; i++)
+                {
+
+                    if (minorPowerArray.size() > 0)
+                    {
+
+                        Random random = new Random();
+                        int randomizer = random.nextInt(minorPowerArray.size());
+                        MinorPowers selectedMinorPower = minorPowerArray.get(randomizer);
+                        minorPowerArray.remove(minorPowerArray.get(randomizer));
+                        //weird shit's going on here, read debug code
+
+                        getLogger().info("added " + selectedMinorPower);
+
+                        if (entity.hasMetadata("MinorPowerAmount"))
+                        {
+
+                            int oldMinorPowerAmount = entity.getMetadata("MinorPowerAmount").get(0).asInt();
+                            int newMinorPowerAmount = oldMinorPowerAmount + 1;
+
+                            entity.setMetadata("MinorPowerAmount", new FixedMetadataValue(plugin, newMinorPowerAmount));
+
+                        } else {
+
+                            entity.setMetadata("MinorPowerAmount", new FixedMetadataValue(plugin, 1));
+
+                        }
+
+                        selectedMinorPower.applyPowers(entity);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        if (availableMajorPowers >= 1)
+        {
+
+            //Todo: Add major powers
 
         }
 
