@@ -20,26 +20,29 @@ import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Stray;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
 import java.util.Random;
 
 import static org.bukkit.Material.*;
 
 /**
- * Created by MagmaGuy on 08/10/2016.
+ * Created by MagmaGuy on 28/11/2016.
  */
-public class SkeletonHandler implements Listener{
+public class StrayHandler implements Listener {
 
     private ActiveStack plugin;
 
-    public SkeletonHandler (Plugin plugin){
+    public StrayHandler (Plugin plugin){
 
         this.plugin = (ActiveStack) plugin;
 
@@ -49,15 +52,15 @@ public class SkeletonHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event){
 
-        if(event.getEntity() instanceof Skeleton && event.getEntity().hasMetadata("MagmasSuperMob"))
+        if(event.getEntity() instanceof Stray && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();
 
-            Skeleton skeleton = (Skeleton) event.getEntity();
+            Stray stray = (Stray) event.getEntity();
 
             double damage = event.getFinalDamage();
-            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(skeleton);
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(stray);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;
@@ -66,6 +69,8 @@ public class SkeletonHandler implements Listener{
             ItemStack arrowStack = new ItemStack(ARROW, random.nextInt(3));
             //dropped item chance = 9%
             ItemStack bowStack = new ItemStack(BOW, 1);
+            ItemStack tippedArrowStack = new ItemStack(TIPPED_ARROW, 1);
+            ((PotionMeta)tippedArrowStack).setBasePotionData(new PotionData(PotionType.SLOWNESS));
 
             for (int i = 0; i < dropMinAmount; i++)
             {
@@ -73,14 +78,14 @@ public class SkeletonHandler implements Listener{
                 if (boneStack.getAmount() != 0)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    stray.getWorld().dropItem(stray.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (arrowStack.getAmount() != 0)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    stray.getWorld().dropItem(stray.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
@@ -88,11 +93,18 @@ public class SkeletonHandler implements Listener{
                 if (random.nextDouble() < 0.03)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    stray.getWorld().dropItem(stray.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                ExperienceOrb xpDrop = skeleton.getWorld().spawn(skeleton.getLocation(), ExperienceOrb.class);
+                if (random.nextDouble() < 0.5)
+                {
+
+                    stray.getWorld().dropItem(stray.getLocation(), tippedArrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+
+                }
+
+                ExperienceOrb xpDrop = stray.getWorld().spawn(stray.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(5);
 
             }
@@ -103,14 +115,14 @@ public class SkeletonHandler implements Listener{
                 if (boneStack.getAmount() != 0)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    stray.getWorld().dropItem(stray.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (arrowStack.getAmount() != 0)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    stray.getWorld().dropItem(stray.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
@@ -118,11 +130,18 @@ public class SkeletonHandler implements Listener{
                 if (random.nextDouble() < 0.03)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    stray.getWorld().dropItem(stray.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                ExperienceOrb xpDrop = skeleton.getWorld().spawn(skeleton.getLocation(), ExperienceOrb.class);
+                if (random.nextDouble() < 0.5)
+                {
+
+                    stray.getWorld().dropItem(stray.getLocation(), tippedArrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+
+                }
+
+                ExperienceOrb xpDrop = stray.getWorld().spawn(stray.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(5);
 
             }
@@ -140,10 +159,10 @@ public class SkeletonHandler implements Listener{
 
             Arrow arrow = (Arrow) event.getDamager();
 
-            if (arrow.getShooter() instanceof Skeleton && ((Skeleton) arrow.getShooter()).hasMetadata("MagmasSuperMob"))
+            if (arrow.getShooter() instanceof Stray && ((Stray) arrow.getShooter()).hasMetadata("MagmasSuperMob"))
             {
 
-                event.setDamage(event.getDamage() * ((Skeleton) arrow.getShooter()).getMetadata("MagmasSuperMob").get(0).asInt());
+                event.setDamage(event.getDamage() * ((Stray) arrow.getShooter()).getMetadata("MagmasSuperMob").get(0).asInt());
 
             }
 

@@ -45,7 +45,7 @@ public class WitchHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event){
 
-        if (event.getEntity() instanceof Witch && event.getEntity().hasMetadata("SuperMob"))
+        if (event.getEntity() instanceof Witch && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();

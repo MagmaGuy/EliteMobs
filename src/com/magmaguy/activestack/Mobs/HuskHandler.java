@@ -19,7 +19,7 @@ import com.magmaguy.activestack.ActiveStack;
 import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
 import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.Husk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -32,13 +32,13 @@ import java.util.Random;
 import static org.bukkit.Material.*;
 
 /**
- * Created by MagmaGuy on 07/10/2016.
+ * Created by MagmaGuy on 28/11/2016.
  */
-public class ZombieHandler implements Listener{
+public class HuskHandler implements Listener {
 
     private ActiveStack plugin;
 
-    public ZombieHandler (Plugin plugin) {
+    public HuskHandler (Plugin plugin) {
 
         this.plugin = (ActiveStack) plugin;
 
@@ -49,15 +49,15 @@ public class ZombieHandler implements Listener{
     public void onHit(EntityDamageEvent event)
     {
 
-        if(event.getEntity() instanceof Zombie && event.getEntity().hasMetadata("MagmasSuperMob"))
+        if(event.getEntity() instanceof Husk && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();
 
-            Zombie zombie = (Zombie) event.getEntity();
+            Husk husk = (Husk) event.getEntity();
 
             double damage = event.getFinalDamage();
-            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(zombie);
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(husk);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;
@@ -75,32 +75,32 @@ public class ZombieHandler implements Listener{
                 if (rottenFleshStack.getAmount() != 0)
                 {
 
-                    zombie.getWorld().dropItem(zombie.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    husk.getWorld().dropItem(husk.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (random.nextDouble() < 0.03)
                 {
 
-                    zombie.getWorld().dropItem(zombie.getLocation(), ironStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    husk.getWorld().dropItem(husk.getLocation(), ironStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (random.nextDouble() < 0.03)
                 {
 
-                    zombie.getWorld().dropItem(zombie.getLocation(), carrotStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    husk.getWorld().dropItem(husk.getLocation(), carrotStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (random.nextDouble() < 0.03)
                 {
 
-                    zombie.getWorld().dropItem(zombie.getLocation(), potatoesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    husk.getWorld().dropItem(husk.getLocation(), potatoesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                ExperienceOrb xpDrop = zombie.getWorld().spawn(zombie.getLocation(), ExperienceOrb.class);
+                ExperienceOrb xpDrop = husk.getWorld().spawn(husk.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(5);
 
             }
@@ -111,32 +111,32 @@ public class ZombieHandler implements Listener{
                 if (rottenFleshStack.getAmount() != 0)
                 {
 
-                    zombie.getWorld().dropItem(zombie.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    husk.getWorld().dropItem(husk.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (random.nextDouble() < 0.03)
                 {
 
-                    zombie.getWorld().dropItem(zombie.getLocation(), ironStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    husk.getWorld().dropItem(husk.getLocation(), ironStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (random.nextDouble() < 0.03)
                 {
 
-                    zombie.getWorld().dropItem(zombie.getLocation(), carrotStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    husk.getWorld().dropItem(husk.getLocation(), carrotStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (random.nextDouble() < 0.03)
                 {
 
-                    zombie.getWorld().dropItem(zombie.getLocation(), potatoesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    husk.getWorld().dropItem(husk.getLocation(), potatoesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                ExperienceOrb xpDrop = zombie.getWorld().spawn(zombie.getLocation(), ExperienceOrb.class);
+                ExperienceOrb xpDrop = husk.getWorld().spawn(husk.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(5);
 
             }
@@ -149,7 +149,7 @@ public class ZombieHandler implements Listener{
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event){
 
-        if (event.getDamager() instanceof Zombie && event.getDamager().hasMetadata("MagmasSuperMob"))
+        if (event.getDamager() instanceof Husk && event.getDamager().hasMetadata("MagmasSuperMob"))
         {
 
             event.setDamage(event.getFinalDamage() * event.getDamager().getMetadata("MagmasSuperMob").get(0).asInt());

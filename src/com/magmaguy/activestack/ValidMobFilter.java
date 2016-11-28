@@ -41,9 +41,11 @@ public class ValidMobFilter {
 
             return true;
 
-        }
+        } else {
 
-        return false;
+            return false;
+
+        }
 
     }
 

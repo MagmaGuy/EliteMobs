@@ -19,11 +19,9 @@ package com.magmaguy.activestack;
  * Created by MagmaGuy on 07/10/2016.
  */
 
-import com.magmaguy.activestack.MinorPowers.AttackGravity;
-import com.magmaguy.activestack.MinorPowers.AttackPush;
-import com.magmaguy.activestack.MinorPowers.InvulnerabilityArrow;
-import com.magmaguy.activestack.MinorPowers.InvulnerabilityFire;
+import com.magmaguy.activestack.MinorPowers.*;
 import com.magmaguy.activestack.Mobs.*;
+import com.magmaguy.activestack.PowerStances.ParticleEffects;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
@@ -45,7 +43,10 @@ public class ActiveStack extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(this, this);
 
         this.getServer().getPluginManager().registerEvents(new ZombieHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new HuskHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new SkeletonHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new WitherSkeletonHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new StrayHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new PigZombieHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new CreeperHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new SpiderHandler(this), this);
@@ -61,9 +62,12 @@ public class ActiveStack extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new AttackPush(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityArrow(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityFire(this), this);
+        this.getServer().getPluginManager().registerEvents(new InvulnerabilityFallDamage(this), this);
 
         this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
         //this.getServer().getPluginManager().registerEvents(new MobSpawner(this), this); CURRENTLY BROKEN
+
+        this.getServer().getPluginManager().registerEvents(new ParticleEffects(this), this);
 
     }
 

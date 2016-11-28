@@ -47,7 +47,7 @@ public class SpiderHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event){
 
-        if (event.getEntity() instanceof Spider && event.getEntity().hasMetadata("SuperMob"))
+        if (event.getEntity() instanceof Spider && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();
@@ -115,10 +115,10 @@ public class SpiderHandler implements Listener{
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
 
-        if (event.getDamager() instanceof Spider && event.getDamager().hasMetadata("SuperMob"))
+        if (event.getDamager() instanceof Spider && event.getDamager().hasMetadata("MagmasSuperMob"))
         {
 
-            event.setDamage(event.getFinalDamage() * event.getDamager().getMetadata("SuperMob").get(0).asInt());
+            event.setDamage(event.getFinalDamage() * event.getDamager().getMetadata("MagmasSuperMob").get(0).asInt());
 
         }
 
