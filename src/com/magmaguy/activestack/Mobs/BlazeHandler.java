@@ -48,7 +48,7 @@ public class BlazeHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event){
 
-        if (event.getEntity() instanceof Blaze && event.getEntity().hasMetadata("SuperMob"))
+        if (event.getEntity() instanceof Blaze && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();
@@ -106,10 +106,10 @@ public class BlazeHandler implements Listener{
 
             Fireball fireball = (Fireball) event.getDamager();
 
-            if (fireball.getShooter() instanceof  Blaze && ((Blaze) fireball.getShooter()).hasMetadata("SuperMob"))
+            if (fireball.getShooter() instanceof  Blaze && ((Blaze) fireball.getShooter()).hasMetadata("MagmasSuperMob"))
             {
 
-                event.setDamage(event.getDamage() * ((Blaze) fireball.getShooter()).getMetadata("SuperMob").get(0).asInt());
+                event.setDamage(event.getDamage() * ((Blaze) fireball.getShooter()).getMetadata("MagmasSuperMob").get(0).asInt());
 
             }
 

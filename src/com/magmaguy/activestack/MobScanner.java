@@ -16,10 +16,10 @@
 package com.magmaguy.activestack;
 
 import com.magmaguy.activestack.MinorPowers.*;
-import com.magmaguy.activestack.PowerStances.ParticleEffects;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -74,7 +74,7 @@ public class MobScanner implements Listener{
 
                     }
 
-                    if(entity.hasMetadata("SuperMob"))
+                    if(entity.hasMetadata("MagmasSuperMob"))
                     {
 
                         powerHandler(entity);
@@ -109,7 +109,7 @@ public class MobScanner implements Listener{
                     secondEntity.remove();
                     secondEntity.setMetadata("removed", new FixedMetadataValue(plugin, true));
 
-                    //setup new supermob
+                    //setup new MagmasSuperMob
                     double newHealth = ((Damageable) entity).getHealth() + ((Damageable) secondEntity).getHealth();
 
                     ((Damageable) entity).setMaxHealth(newHealth);
@@ -183,15 +183,14 @@ public class MobScanner implements Listener{
                 break;
         }
 
-        entity.setMetadata("SuperMob", new FixedMetadataValue(plugin, mobLevel));
-
+        entity.setMetadata("MagmasSuperMob", new FixedMetadataValue(plugin, mobLevel));
 
     }
 
     @EventHandler
     public void onSuperMobDamage(EntityDamageEvent event){
 
-        if(event.getEntity().hasMetadata("SuperMob"))
+        if(event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             customName(event.getEntity());
@@ -226,13 +225,14 @@ public class MobScanner implements Listener{
         int availableMinorPowers = 0;
         int availableMajorPowers = 0;
 
-        if (entity.hasMetadata("SuperMob"))
+        if (entity.hasMetadata("MagmasSuperMob") && entity.isValid() && ((LivingEntity) entity).getHealth() > 0)
         {
 
-            if (entity.getMetadata("SuperMob").get(0).asInt() >= 5)
+
+            if (entity.getMetadata("MagmasSuperMob").get(0).asInt() >= 5)
             {
 
-            int superMobLevel = entity.getMetadata("SuperMob").get(0).asInt();
+            int superMobLevel = entity.getMetadata("MagmasSuperMob").get(0).asInt();
 
             availableMinorPowers = (superMobLevel - 5) / 10 + 1;
             availableMajorPowers = superMobLevel / 10;
@@ -252,6 +252,7 @@ public class MobScanner implements Listener{
             minorPowerArray.add(new AttackGravity(plugin));
             minorPowerArray.add(new AttackPush(plugin));
             minorPowerArray.add(new MovementSpeed(plugin));
+            minorPowerArray.add(new InvulnerabilityFallDamage(plugin));
 
             if (entity.hasMetadata("MinorPowerAmount"))
             {

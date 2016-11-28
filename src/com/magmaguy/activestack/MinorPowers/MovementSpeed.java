@@ -16,9 +16,9 @@
 package com.magmaguy.activestack.MinorPowers;
 
 import com.magmaguy.activestack.ActiveStack;
+import com.magmaguy.activestack.PowerStances.ParticleEffects;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -27,7 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Created by MagmaGuy on 05/11/2016.
  */
-public class MovementSpeed extends MinorPowers implements Listener {
+public class MovementSpeed extends MinorPowers {
 
     private ActiveStack plugin;
 
@@ -43,6 +43,8 @@ public class MovementSpeed extends MinorPowers implements Listener {
 
         entity.setMetadata("MovementSpeed", new FixedMetadataValue(plugin, true));
         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999 * 20, 2));
+        ParticleEffects particleEffects = new ParticleEffects(plugin);
+        particleEffects.movementSpeedEffect(entity);
 
     }
 

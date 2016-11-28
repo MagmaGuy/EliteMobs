@@ -57,7 +57,7 @@ public class SilverfishHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof Silverfish && event.getEntity().hasMetadata("SuperMob"))
+        if (event.getEntity() instanceof Silverfish && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();
@@ -96,10 +96,10 @@ public class SilverfishHandler implements Listener{
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
 
-        if (event.getDamager() instanceof Silverfish && event.getDamager().hasMetadata("SuperMob"))
+        if (event.getDamager() instanceof Silverfish && event.getDamager().hasMetadata("MagmasSuperMob"))
         {
 
-            event.setDamage(event.getFinalDamage() * event.getDamager().getMetadata("SuperMob").get(0).asInt());
+            event.setDamage(event.getFinalDamage() * event.getDamager().getMetadata("MagmasSuperMob").get(0).asInt());
 
         }
 

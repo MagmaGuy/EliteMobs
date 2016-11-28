@@ -48,7 +48,7 @@ public class CreeperHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("SuperMob"))
+        if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();
@@ -101,10 +101,10 @@ public class CreeperHandler implements Listener{
     @EventHandler
     public void explosionPrimeEvent (ExplosionPrimeEvent event){
 
-        if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("SuperMob"))
+        if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
-            event.setRadius(event.getRadius() * event.getEntity().getMetadata("SuperMob").get(0).asInt());
+            event.setRadius(event.getRadius() * event.getEntity().getMetadata("MagmasSuperMob").get(0).asInt());
 
         }
 

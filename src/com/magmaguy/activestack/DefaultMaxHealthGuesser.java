@@ -40,8 +40,11 @@ import static org.bukkit.Bukkit.getLogger;
 public class DefaultMaxHealthGuesser {
 
     public static final double zombieHealth = 20;
+    public static final double huskHealth = 20;
     public static final double zombieVillagerHealth = 20;
     public static final double skeletonHealth = 20;
+    public static final double witherSkeletonHealth = 20;
+    public static final double strayHealth = 20;
     public static final double pigZombieHealth = 20;
     public static final double creeperHealth = 20;
     public static final double spiderHealth = 16;
@@ -62,10 +65,16 @@ public class DefaultMaxHealthGuesser {
         {
             case ZOMBIE:
                 return zombieHealth;
+            case HUSK:
+                return huskHealth;
             case ZOMBIE_VILLAGER:
                 return zombieVillagerHealth;
             case SKELETON:
                 return skeletonHealth;
+            case WITHER_SKELETON:
+                return witherSkeletonHealth;
+            case STRAY:
+                return strayHealth;
             case PIG_ZOMBIE:
                 return pigZombieHealth;
             case CREEPER:

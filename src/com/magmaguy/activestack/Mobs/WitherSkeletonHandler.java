@@ -20,7 +20,7 @@ import com.magmaguy.activestack.DefaultMaxHealthGuesser;
 import com.magmaguy.activestack.ItemDropVelocity;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -33,13 +33,13 @@ import java.util.Random;
 import static org.bukkit.Material.*;
 
 /**
- * Created by MagmaGuy on 08/10/2016.
+ * Created by MagmaGuy on 28/11/2016.
  */
-public class SkeletonHandler implements Listener{
+public class WitherSkeletonHandler implements Listener {
 
     private ActiveStack plugin;
 
-    public SkeletonHandler (Plugin plugin){
+    public WitherSkeletonHandler (Plugin plugin){
 
         this.plugin = (ActiveStack) plugin;
 
@@ -49,20 +49,20 @@ public class SkeletonHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event){
 
-        if(event.getEntity() instanceof Skeleton && event.getEntity().hasMetadata("MagmasSuperMob"))
+        if(event.getEntity() instanceof WitherSkeleton && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();
 
-            Skeleton skeleton = (Skeleton) event.getEntity();
+            WitherSkeleton witherSkeleton = (WitherSkeleton) event.getEntity();
 
             double damage = event.getFinalDamage();
-            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(skeleton);
+            double dropChance = damage / DefaultMaxHealthGuesser.defaultMaxHealthGuesser(witherSkeleton);
             double dropRandomizer = random.nextDouble();
             //this rounds down
             int dropMinAmount = (int) dropChance;
 
-            ItemStack boneStack = new ItemStack(BONE, random.nextInt(3));
+            ItemStack coalStack = new ItemStack(COAL, random.nextInt(1));
             ItemStack arrowStack = new ItemStack(ARROW, random.nextInt(3));
             //dropped item chance = 9%
             ItemStack bowStack = new ItemStack(BOW, 1);
@@ -70,17 +70,17 @@ public class SkeletonHandler implements Listener{
             for (int i = 0; i < dropMinAmount; i++)
             {
 
-                if (boneStack.getAmount() != 0)
+                if (coalStack.getAmount() != 0)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), coalStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (arrowStack.getAmount() != 0)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
@@ -88,11 +88,11 @@ public class SkeletonHandler implements Listener{
                 if (random.nextDouble() < 0.03)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                ExperienceOrb xpDrop = skeleton.getWorld().spawn(skeleton.getLocation(), ExperienceOrb.class);
+                ExperienceOrb xpDrop = witherSkeleton.getWorld().spawn(witherSkeleton.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(5);
 
             }
@@ -100,17 +100,17 @@ public class SkeletonHandler implements Listener{
             if (dropChance > dropRandomizer)
             {
 
-                if (boneStack.getAmount() != 0)
+                if (coalStack.getAmount() != 0)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), coalStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 if (arrowStack.getAmount() != 0)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
@@ -118,11 +118,11 @@ public class SkeletonHandler implements Listener{
                 if (random.nextDouble() < 0.03)
                 {
 
-                    skeleton.getWorld().dropItem(skeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                    witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                ExperienceOrb xpDrop = skeleton.getWorld().spawn(skeleton.getLocation(), ExperienceOrb.class);
+                ExperienceOrb xpDrop = witherSkeleton.getWorld().spawn(witherSkeleton.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(5);
 
             }
@@ -140,10 +140,10 @@ public class SkeletonHandler implements Listener{
 
             Arrow arrow = (Arrow) event.getDamager();
 
-            if (arrow.getShooter() instanceof Skeleton && ((Skeleton) arrow.getShooter()).hasMetadata("MagmasSuperMob"))
+            if (arrow.getShooter() instanceof WitherSkeleton && ((WitherSkeleton) arrow.getShooter()).hasMetadata("MagmasSuperMob"))
             {
 
-                event.setDamage(event.getDamage() * ((Skeleton) arrow.getShooter()).getMetadata("MagmasSuperMob").get(0).asInt());
+                event.setDamage(event.getDamage() * ((WitherSkeleton) arrow.getShooter()).getMetadata("MagmasSuperMob").get(0).asInt());
 
             }
 

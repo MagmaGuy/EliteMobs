@@ -46,7 +46,7 @@ public class PolarBearHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event){
 
-        if(event.getEntity() instanceof PolarBear && event.getEntity().hasMetadata("SuperMob"))
+        if(event.getEntity() instanceof PolarBear && event.getEntity().hasMetadata("MagmasSuperMob"))
         {
 
             Random random = new Random();
@@ -106,10 +106,10 @@ public class PolarBearHandler implements Listener{
     public void onDamage (EntityDamageByEntityEvent event)
     {
 
-        if(event.getDamager() instanceof PolarBear && event.getDamager().hasMetadata("SuperMob"))
+        if(event.getDamager() instanceof PolarBear && event.getDamager().hasMetadata("MagmasSuperMob"))
         {
 
-            event.setDamage(event.getFinalDamage() * event.getDamager().getMetadata("SuperMob").get(0).asInt());
+            event.setDamage(event.getFinalDamage() * event.getDamager().getMetadata("MagmasSuperMob").get(0).asInt());
 
         }
 
