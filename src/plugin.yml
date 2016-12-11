@@ -1,4 +1,4 @@
-name: ActiveStack
-version: 1.2.0
+name: MagmasMobs
+version: 1.0.0
 author: MagmaGuy
-main: com.magmaguy.activestack.ActiveStack
+main: com.magmaguy.magmasmobs.MagmasMobs
