@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ActiveStack.iml" filepath="$PROJECT_DIR$/ActiveStack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MagmasMobs.iml" filepath="$PROJECT_DIR$/MagmasMobs.iml" />
     </modules>
   </component>
 </project>
