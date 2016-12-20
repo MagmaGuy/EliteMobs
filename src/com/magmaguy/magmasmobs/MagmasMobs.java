@@ -19,12 +19,15 @@ package com.magmaguy.magmasmobs;
  * Created by MagmaGuy on 07/10/2016.
  */
 
-import com.magmaguy.magmasmobs.MinorPowers.*;
-import com.magmaguy.magmasmobs.MobScanner.MobScanner;
-import com.magmaguy.magmasmobs.MobSpawner.MobSpawner;
-import com.magmaguy.magmasmobs.Mobs.*;
-import com.magmaguy.magmasmobs.PowerStances.ParticleEffects;
-import com.magmaguy.magmasmobs.SuperDrops.SuperDropsParser;
+import com.magmaguy.magmasmobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
+import com.magmaguy.magmasmobs.collateralminecraftchanges.PreventSpawnerMobEggInteraction;
+import com.magmaguy.magmasmobs.minorpowers.*;
+import com.magmaguy.magmasmobs.mobs.aggressive.*;
+import com.magmaguy.magmasmobs.mobs.passive.*;
+import com.magmaguy.magmasmobs.mobscanner.MobScanner;
+import com.magmaguy.magmasmobs.mobspawner.MobSpawner;
+import com.magmaguy.magmasmobs.powerstances.ParticleEffects;
+import com.magmaguy.magmasmobs.superdrops.SuperDropsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -42,17 +45,23 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
         getLogger().info("MagmasMobs - Enabled!");
 
+        //Load loot from config
         loadConfiguration();
-        SuperDropsParser superDrops = new SuperDropsParser(this);
+
+        //Parse loot
+        SuperDropsHandler superDrops = new SuperDropsHandler(this);
         superDrops.superDropParser();
 
-        getLogger().info(superDrops.lootList + "");
-
+        //Get world list
         worldScanner();
+
+        //Start the repeating tasks such as scanners
         repeatingTaskRunner();
 
+        //Hook up all listeners, some depend on config
         this.getServer().getPluginManager().registerEvents(this, this);
 
+        //Aggressive mobs
         this.getServer().getPluginManager().registerEvents(new ZombieHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new HuskHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new SkeletonHandler(this), this);
@@ -69,20 +78,62 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new EndermiteHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new PolarBearHandler(this), this);
 
+        //Passive mobs
+        this.getServer().getPluginManager().registerEvents(new ChickenHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new CowHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new IronGolemHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new MushroomCowHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new PigHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new SheepHandler(this), this);
+
+        //Mob damage
         this.getServer().getPluginManager().registerEvents(new SuperMobDamageHandler(this), this);
 
+        //Mob powers
         this.getServer().getPluginManager().registerEvents(new AttackGravity(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackPush(this), this);
+        this.getServer().getPluginManager().registerEvents(new AttackPoison(this), this);
+        this.getServer().getPluginManager().registerEvents(new AttackWither(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityArrow(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityFire(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityFallDamage(this), this);
 
+        //Mob scanner
         this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
-        this.getServer().getPluginManager().registerEvents(new MobSpawner(this), this);
 
+        //Natural SuperMob Spawning
+        if (getConfig().getBoolean("Natural SuperMob spawning"))
+        {
+
+            this.getServer().getPluginManager().registerEvents(new MobSpawner(this), this);
+
+            getLogger().info("MagmasMobs - Natural SuperMob Spawning enabled!");
+
+        }
+
+        //Visual effects
         this.getServer().getPluginManager().registerEvents(new ParticleEffects(this), this);
 
-        this.getServer().getPluginManager().registerEvents(new SuperDropsParser(this), this);
+        //Loot
+        if (getConfig().getBoolean("Enable loot"))
+        {
+
+            getLogger().info("MagmasMobs - SuperMob loot enabled!");
+
+            this.getServer().getPluginManager().registerEvents(new SuperDropsHandler(this), this);
+
+        }
+
+        //Minecraft behavior canceller
+        if (getConfig().getBoolean("Prevent players from changing mob spawners using eggs"))
+        {
+
+            getLogger().info("MagmasMobs - Mob egg interact on mob spawner canceller enabled!");
+
+            this.getServer().getPluginManager().registerEvents(new PreventSpawnerMobEggInteraction(this), this);
+
+        }
+        this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(this), this);
 
     }
 
@@ -96,13 +147,19 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
                 if (entity.hasMetadata("MagmasSuperMob") ||
                         entity.hasMetadata("VisualEffect") ||
-                        entity.hasMetadata("removed") ||
-                        entity.hasMetadata("forbidden"))
+                        entity.hasMetadata("MagmasPassiveSupermob") ||
+                        entity.hasMetadata("forbidden") ||
+                        entity.hasMetadata("NaturalEntity"))
                 {
 
                     Bukkit.getScheduler().cancelTask(processID);
 
                     entity.remove();
+                    entity.removeMetadata("MagmasSuperMob", this);
+                    entity.removeMetadata("VisualEffect", this);
+                    entity.removeMetadata("NaturalEntity", this);
+                    entity.removeMetadata("MagmasPassiveSupermob", this);
+                    entity.removeMetadata("forbidden", this);
 
                 }
 
