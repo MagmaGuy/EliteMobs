@@ -46,6 +46,7 @@ import org.bukkit.util.Vector;
 import java.util.List;
 
 import static com.magmaguy.magmasmobs.MagmasMobs.worldList;
+import static org.bukkit.Bukkit.getLogger;
 
 /**
  * Created by MagmaGuy on 04/11/2016.

@@ -135,6 +135,9 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         }
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(this), this);
 
+        //Commands
+        this.getCommand("magmasmobs").setExecutor(new CommandHandler());
+
     }
 
 
@@ -147,7 +150,6 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
                 if (entity.hasMetadata("MagmasSuperMob") ||
                         entity.hasMetadata("VisualEffect") ||
-                        entity.hasMetadata("MagmasPassiveSupermob") ||
                         entity.hasMetadata("forbidden") ||
                         entity.hasMetadata("NaturalEntity"))
                 {
@@ -158,8 +160,14 @@ public class MagmasMobs extends JavaPlugin implements Listener {
                     entity.removeMetadata("MagmasSuperMob", this);
                     entity.removeMetadata("VisualEffect", this);
                     entity.removeMetadata("NaturalEntity", this);
-                    entity.removeMetadata("MagmasPassiveSupermob", this);
                     entity.removeMetadata("forbidden", this);
+
+                }
+
+                if (entity.hasMetadata("MagmasPassiveSupermob"))
+                {
+
+                    entity.removeMetadata("MagmasPassiveSupermob", this);
 
                 }
 
