@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/MagmasMobs_jar</output-path>
     <root id="archive" name="MagmasMobs.jar">
       <element id="module-output" name="MagmasMobs" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../buildtools/Spigot/Spigot-API/target/spigot-api-1.11-R0.1-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../buildtools/Spigot/Spigot-API/target/spigot-api-1.11.2-R0.1-SNAPSHOT.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
