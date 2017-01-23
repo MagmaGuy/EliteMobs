@@ -47,6 +47,7 @@ public class ChunkUnloadMetadataPurge implements Listener {
             if (entity.hasMetadata("MagmasSuperMob"))
             {
 
+                entity.remove();
                 entity.removeMetadata("MagmasSuperMob", plugin);
 
             }
@@ -54,20 +55,15 @@ public class ChunkUnloadMetadataPurge implements Listener {
             if (entity.hasMetadata("VisualEffect"))
             {
 
+                entity.remove();
                 entity.removeMetadata("VisualEffect", plugin);
-
-            }
-
-            if (entity.hasMetadata("MagmasPassiveSupermob"))
-            {
-
-                entity.removeMetadata("MagmasPassiveSupermob", plugin);
 
             }
 
             if (entity.hasMetadata("forbidden"))
             {
 
+                entity.remove();
                 entity.removeMetadata("forbidden", plugin);
 
             }
@@ -75,6 +71,7 @@ public class ChunkUnloadMetadataPurge implements Listener {
             if (entity.hasMetadata("NaturalEntity"))
             {
 
+                entity.remove();
                 entity.removeMetadata("NaturalEntity", plugin);
 
             }

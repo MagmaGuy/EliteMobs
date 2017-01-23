@@ -2,3 +2,7 @@ name: MagmasMobs
 version: 1.0.0
 author: MagmaGuy
 main: com.magmaguy.magmasmobs.MagmasMobs
+commands:
+  magmasmobs:
+    description: Tells a player the statistics of the
+    usage: /magmasmobs

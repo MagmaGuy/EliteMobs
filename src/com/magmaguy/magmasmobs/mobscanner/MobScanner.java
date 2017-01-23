@@ -13,32 +13,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.magmasmobs.mobscanner;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
 import com.magmaguy.magmasmobs.mobs.passive.ChickenHandler;
+import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
@@ -79,13 +64,7 @@ public class MobScanner implements Listener{
                 if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity))
                 {
 
-
-                    if (scanValidAgressiveLivingEntity(entity))
-                    {
-
-                        //return;
-
-                    }
+                    scanValidAggressiveLivingEntity(entity);
 
                     if(entity.hasMetadata("MagmasSuperMob"))
                     {
@@ -94,6 +73,8 @@ public class MobScanner implements Listener{
 
                         powerHandler.powerHandler(entity);
 
+                        armorHandler(entity);
+
                     }
 
                 }
@@ -101,12 +82,7 @@ public class MobScanner implements Listener{
                 if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && !entity.hasMetadata("MagmasPassiveSupermob"))
                 {
 
-                    if (scanValidPassiveLivingEntity(entity))
-                    {
-
-                        //return;
-
-                    }
+                    scanValidPassiveLivingEntity(entity);
 
                 }
 
@@ -122,7 +98,7 @@ public class MobScanner implements Listener{
 
     private int aggressiveRange = 2;
 
-    public boolean scanValidAgressiveLivingEntity(Entity entity){
+    public void scanValidAggressiveLivingEntity(Entity entity){
 
         for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange))
         {
@@ -153,7 +129,7 @@ public class MobScanner implements Listener{
 
                     customAggressiveName(entity);
 
-                    return true;
+                    return;
 
                 }
 
@@ -169,14 +145,12 @@ public class MobScanner implements Listener{
 
         }
 
-        return false;
-
     }
 
     private int passiveRange = 15;
     private int passiveStacking = 50;
 
-    public boolean scanValidPassiveLivingEntity(Entity entity){
+    public void scanValidPassiveLivingEntity(Entity entity){
 
         List<LivingEntity> animalContainer = new ArrayList<>();
 
@@ -207,7 +181,7 @@ public class MobScanner implements Listener{
                     ((LivingEntity)entity).setHealth(((LivingEntity)entity).getMaxHealth());
                     customPassiveName(entity);
 
-                    return true;
+                    return;
 
                 }
 
@@ -222,8 +196,6 @@ public class MobScanner implements Listener{
             customPassiveName(entity);
 
         }
-
-        return false;
 
     }
 
@@ -362,6 +334,160 @@ public class MobScanner implements Listener{
         }
 
         return true;
+
+    }
+
+
+    public void armorHandler (Entity entity)
+    {
+
+        if (entity instanceof Zombie || entity instanceof ZombieVillager || entity instanceof PigZombie ||
+                entity instanceof Skeleton || entity instanceof WitherSkeleton)
+        {
+
+            int mobLevel = entity.getMetadata("MagmasSuperMob").get(0).asInt();
+
+            if (mobLevel >= 2)
+            {
+
+                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+
+            }
+
+            if (mobLevel >= 4)
+            {
+
+                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
+
+            }
+
+            if (mobLevel >= 6)
+            {
+
+                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+
+            }
+
+            if (mobLevel >= 8)
+            {
+
+                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+
+            }
+
+            if (mobLevel >= 12)
+            {
+
+                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
+
+            }
+
+            if (mobLevel >= 14)
+            {
+
+                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.GOLD_BOOTS));
+
+            }
+
+            if (mobLevel >= 16)
+            {
+
+                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.GOLD_LEGGINGS));
+
+            }
+
+            if (mobLevel >= 18)
+            {
+
+                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.GOLD_CHESTPLATE));
+
+            }
+
+            if (mobLevel >= 22)
+            {
+
+                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+
+            }
+
+            if (mobLevel >= 24)
+            {
+
+                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+
+            }
+
+            if (mobLevel >= 26)
+            {
+
+                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+
+            }
+
+            if (mobLevel >= 28)
+            {
+
+                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+
+            }
+
+            if (mobLevel >= 32)
+            {
+
+                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+
+            }
+
+            if (mobLevel >= 34)
+            {
+
+                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+
+            }
+
+            if (mobLevel >= 36)
+            {
+
+                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+
+            }
+
+            if (mobLevel >= 38)
+            {
+
+                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+
+            }
+
+            if (mobLevel >= 42)
+            {
+
+                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+
+            }
+
+            if (mobLevel >= 44)
+            {
+
+                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+
+            }
+
+            if (mobLevel >= 46)
+            {
+
+                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+
+            }
+
+            if (mobLevel >= 48)
+            {
+
+                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+
+            }
+
+        }
 
     }
 
