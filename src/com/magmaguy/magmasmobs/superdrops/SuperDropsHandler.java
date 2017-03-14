@@ -151,7 +151,7 @@ public class SuperDropsHandler implements Listener {
 
                     int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
 
-                    PotionEffect potionEffect = new PotionEffect(potionEffectType, 20 ,potionEffectAmplifier);
+                    PotionEffect potionEffect = new PotionEffect(potionEffectType, 40 ,potionEffectAmplifier);
 
                     parsedPotionEffect.add(potionEffect);
 
