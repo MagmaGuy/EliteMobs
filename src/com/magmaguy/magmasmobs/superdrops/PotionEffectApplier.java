@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import static com.magmaguy.magmasmobs.superdrops.SuperDropsHandler.potionEffectItemList;
 
@@ -91,10 +92,19 @@ public class PotionEffectApplier {
 
         for (PotionEffect potionEffect : potionEffectItemList.get(key)) {
 
-            //Bypass due to minecraft not reapplying time correctly
-            player.removePotionEffect(potionEffect.getType());
+            //night vision getting deleted and put back is extremely jarring, bypass
+            if (potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)){
 
-            player.addPotionEffect(potionEffect);
+                player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20 * 60, 1));
+
+            } else {
+
+                //Bypass due to minecraft not reapplying time correctly
+                player.removePotionEffect(potionEffect.getType());
+
+                player.addPotionEffect(potionEffect);
+
+            }
 
         }
 
