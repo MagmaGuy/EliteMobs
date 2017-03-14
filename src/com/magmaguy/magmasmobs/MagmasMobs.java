@@ -27,6 +27,7 @@ import com.magmaguy.magmasmobs.mobs.passive.*;
 import com.magmaguy.magmasmobs.mobscanner.MobScanner;
 import com.magmaguy.magmasmobs.mobspawner.MobSpawner;
 import com.magmaguy.magmasmobs.powerstances.ParticleEffects;
+import com.magmaguy.magmasmobs.superdrops.PotionEffectApplier;
 import com.magmaguy.magmasmobs.superdrops.SuperDropsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -41,7 +42,7 @@ import java.util.List;
 public class MagmasMobs extends JavaPlugin implements Listener {
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
 
         getLogger().info("MagmasMobs - Enabled!");
 
@@ -102,8 +103,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
 
         //Natural SuperMob Spawning
-        if (getConfig().getBoolean("Natural SuperMob spawning"))
-        {
+        if (getConfig().getBoolean("Natural SuperMob spawning")) {
 
             this.getServer().getPluginManager().registerEvents(new MobSpawner(this), this);
 
@@ -115,8 +115,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new ParticleEffects(this), this);
 
         //Loot
-        if (getConfig().getBoolean("Enable loot"))
-        {
+        if (getConfig().getBoolean("Enable loot")) {
 
             getLogger().info("MagmasMobs - SuperMob loot enabled!");
 
@@ -125,8 +124,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         }
 
         //Minecraft behavior canceller
-        if (getConfig().getBoolean("Prevent players from changing mob spawners using eggs"))
-        {
+        if (getConfig().getBoolean("Prevent players from changing mob spawners using eggs")) {
 
             getLogger().info("MagmasMobs - Mob egg interact on mob spawner canceller enabled!");
 
@@ -136,13 +134,13 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(this), this);
 
         //Commands
-        this.getCommand("magmasmobs").setExecutor(new CommandHandler());
+        this.getCommand("magmasmobs").setExecutor(new CommandHandler(this));
 
     }
 
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
 
         for (World world : worldList) {
 
@@ -151,8 +149,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
                 if (entity.hasMetadata("MagmasSuperMob") ||
                         entity.hasMetadata("VisualEffect") ||
                         entity.hasMetadata("forbidden") ||
-                        entity.hasMetadata("NaturalEntity"))
-                {
+                        entity.hasMetadata("NaturalEntity")) {
 
                     Bukkit.getScheduler().cancelTask(processID);
 
@@ -164,8 +161,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
                 }
 
-                if (entity.hasMetadata("MagmasPassiveSupermob"))
-                {
+                if (entity.hasMetadata("MagmasPassiveSupermob")) {
 
                     entity.removeMetadata("MagmasPassiveSupermob", this);
 
@@ -182,10 +178,9 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
     public static List<World> worldList = new ArrayList();
 
-    public void worldScanner(){
+    public void worldScanner() {
 
-        for (World world : Bukkit.getWorlds())
-        {
+        for (World world : Bukkit.getWorlds()) {
 
             worldList.add(world);
 
@@ -196,15 +191,17 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
     private int processID;
 
-    public void repeatingTaskRunner(){
+    public void repeatingTaskRunner() {
 
         MobScanner mobScanner = new MobScanner(this);
+        PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
 
         processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 
             public void run() {
 
                 mobScanner.scanMobs();
+                potionEffectApplier.potionEffectApplier();
 
             }
 
@@ -213,8 +210,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
     }
 
 
-    public void loadConfiguration()
-    {
+    public void loadConfiguration() {
 
         //check defaults
         getConfig().addDefault("Natural SuperMob spawning", true);
@@ -236,8 +232,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
     }
 
 
-    public void reloadConfiguration()
-    {
+    public void reloadConfiguration() {
 
         reloadConfig();
 

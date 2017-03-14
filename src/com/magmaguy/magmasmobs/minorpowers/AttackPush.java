@@ -32,15 +32,14 @@ public class AttackPush extends MinorPowers implements Listener {
 
     private MagmasMobs plugin;
 
-    public AttackPush(Plugin plugin){
+    public AttackPush(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
     @Override
-    public void applyPowers(Entity entity)
-    {
+    public void applyPowers(Entity entity) {
 
         entity.setMetadata("AttackPush", new FixedMetadataValue(plugin, true));
         ParticleEffects particleEffects = new ParticleEffects(plugin);
@@ -49,11 +48,9 @@ public class AttackPush extends MinorPowers implements Listener {
     }
 
     @Override
-    public boolean existingPowers(Entity entity)
-    {
+    public boolean existingPowers(Entity entity) {
 
-        if (entity.hasMetadata("AttackPush"))
-        {
+        if (entity.hasMetadata("AttackPush")) {
 
             return true;
 
@@ -64,14 +61,12 @@ public class AttackPush extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void attackPush (EntityDamageByEntityEvent event)
-    {
+    public void attackPush(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        if (damager.hasMetadata("AttackPush"))
-        {
+        if (damager.hasMetadata("AttackPush")) {
 
             int pushbackStrength = 2;
 

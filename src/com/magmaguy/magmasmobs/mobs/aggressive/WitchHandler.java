@@ -46,11 +46,11 @@ import java.util.Random;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class WitchHandler implements Listener{
+public class WitchHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public WitchHandler (Plugin plugin){
+    public WitchHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -58,10 +58,9 @@ public class WitchHandler implements Listener{
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof Witch && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Witch && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -81,53 +80,45 @@ public class WitchHandler implements Listener{
             ItemStack sugarStack = new ItemStack(Material.SUGAR, random.nextInt(2) + 1);
             ItemStack stickStack = new ItemStack(Material.STICK, random.nextInt(2) + 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), glassBottleStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), glowstoneDustStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), sulphurStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), redstoneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), spiderEyesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), sugarStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.25)
-                {
+                if (random.nextDouble() < 0.25) {
 
                     witch.getWorld().dropItem(witch.getLocation(), stickStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -135,53 +126,45 @@ public class WitchHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), glassBottleStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), glowstoneDustStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), sulphurStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), redstoneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), spiderEyesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.12)
-                {
+                if (random.nextDouble() < 0.12) {
 
                     witch.getWorld().dropItem(witch.getLocation(), sugarStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.25)
-                {
+                if (random.nextDouble() < 0.25) {
 
                     witch.getWorld().dropItem(witch.getLocation(), stickStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

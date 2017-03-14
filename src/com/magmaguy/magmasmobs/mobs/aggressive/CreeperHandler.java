@@ -48,11 +48,11 @@ import static org.bukkit.Material.SULPHUR;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class CreeperHandler implements Listener{
+public class CreeperHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public CreeperHandler(Plugin plugin){
+    public CreeperHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -62,8 +62,7 @@ public class CreeperHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -77,11 +76,9 @@ public class CreeperHandler implements Listener{
 
             ItemStack sulphurStack = new ItemStack(SULPHUR, random.nextInt(3));
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (sulphurStack.getAmount() != 0)
-                {
+                if (sulphurStack.getAmount() != 0) {
 
                     creeper.getWorld().dropItem(creeper.getLocation(), sulphurStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -92,11 +89,9 @@ public class CreeperHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (sulphurStack.getAmount() != 0)
-                {
+                if (sulphurStack.getAmount() != 0) {
 
                     creeper.getWorld().dropItem(creeper.getLocation(), sulphurStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

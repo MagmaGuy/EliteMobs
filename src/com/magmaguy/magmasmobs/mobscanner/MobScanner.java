@@ -37,11 +37,11 @@ import static org.bukkit.Bukkit.getLogger;
 /**
  * Created by MagmaGuy on 07/10/2016.
  */
-public class MobScanner implements Listener{
+public class MobScanner implements Listener {
 
     private MagmasMobs plugin;
 
-    public MobScanner(Plugin plugin){
+    public MobScanner(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -49,25 +49,21 @@ public class MobScanner implements Listener{
 
     public static final int maxSuperMobLevel = 50;
 
-    public void scanMobs(){
+    public void scanMobs() {
 
-        for (World world : worldList)
-        {
+        for (World world : worldList) {
 
             Iterator<LivingEntity> iterator = world.getLivingEntities().iterator();
 
-            while (iterator.hasNext())
-            {
+            while (iterator.hasNext()) {
 
                 Entity entity = iterator.next();
 
-                if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity))
-                {
+                if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
                     scanValidAggressiveLivingEntity(entity);
 
-                    if(entity.hasMetadata("MagmasSuperMob"))
-                    {
+                    if (entity.hasMetadata("MagmasSuperMob")) {
 
                         PowerHandler powerHandler = new PowerHandler(plugin);
 
@@ -79,8 +75,7 @@ public class MobScanner implements Listener{
 
                 }
 
-                if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && !entity.hasMetadata("MagmasPassiveSupermob"))
-                {
+                if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && !entity.hasMetadata("MagmasPassiveSupermob")) {
 
                     scanValidPassiveLivingEntity(entity);
 
@@ -98,22 +93,18 @@ public class MobScanner implements Listener{
 
     private int aggressiveRange = 2;
 
-    public void scanValidAggressiveLivingEntity(Entity entity){
+    public void scanValidAggressiveLivingEntity(Entity entity) {
 
-        for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange))
-        {
+        for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange)) {
 
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
-                    && !entity.hasMetadata("forbidden") && !secondEntity.hasMetadata("forbidden"))
-            {
+                    && !entity.hasMetadata("forbidden") && !secondEntity.hasMetadata("forbidden")) {
 
                 //If the sum of both entities is above level 50, don't add both entities together
-                if (levelCap(entity, secondEntity))
-                {
+                if (levelCap(entity, secondEntity)) {
                     //remove duplicate
                     secondEntity.remove();
-                    if (secondEntity.hasMetadata("MagmasSuperMob"))
-                    {
+                    if (secondEntity.hasMetadata("MagmasSuperMob")) {
 
                         secondEntity.removeMetadata("MagmasSuperMob", plugin);
 
@@ -137,9 +128,8 @@ public class MobScanner implements Listener{
 
         }
 
-        if (((Damageable)entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) &&
-                !entity.hasMetadata("MagmasSuperMob"))
-        {
+        if (((Damageable) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) &&
+                !entity.hasMetadata("MagmasSuperMob")) {
 
             customAggressiveName(entity);
 
@@ -150,35 +140,31 @@ public class MobScanner implements Listener{
     private int passiveRange = 15;
     private int passiveStacking = 50;
 
-    public void scanValidPassiveLivingEntity(Entity entity){
+    public void scanValidPassiveLivingEntity(Entity entity) {
 
         List<LivingEntity> animalContainer = new ArrayList<>();
 
-        for (Entity secondEntity : entity.getNearbyEntities(passiveRange, passiveRange, passiveRange))
-        {
+        for (Entity secondEntity : entity.getNearbyEntities(passiveRange, passiveRange, passiveRange)) {
 
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
-                    && !secondEntity.hasMetadata("MagmasPassiveSupermob"))
-            {
+                    && !secondEntity.hasMetadata("MagmasPassiveSupermob")) {
 
                 animalContainer.add((LivingEntity) secondEntity);
 
-                if (animalContainer.size() == passiveStacking && !entity.hasMetadata("MagmasPassiveSupermob"))
-                {
+                if (animalContainer.size() == passiveStacking && !entity.hasMetadata("MagmasPassiveSupermob")) {
 
                     Iterator<LivingEntity> animalSlaughterer = animalContainer.iterator();
 
                     boolean firstAnimal = true;
 
-                    for (LivingEntity livingEntity: animalContainer)
-                    {
+                    for (LivingEntity livingEntity : animalContainer) {
 
                         livingEntity.remove();
 
                     }
 
-                    ((LivingEntity)entity).setMaxHealth(((LivingEntity)entity).getMaxHealth() * passiveStacking);
-                    ((LivingEntity)entity).setHealth(((LivingEntity)entity).getMaxHealth());
+                    ((LivingEntity) entity).setMaxHealth(((LivingEntity) entity).getMaxHealth() * passiveStacking);
+                    ((LivingEntity) entity).setHealth(((LivingEntity) entity).getMaxHealth());
                     customPassiveName(entity);
 
                     return;
@@ -189,9 +175,8 @@ public class MobScanner implements Listener{
 
         }
 
-        if (((Damageable)entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) &&
-                !entity.hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (((Damageable) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) &&
+                !entity.hasMetadata("MagmasPassiveSupermob")) {
 
             customPassiveName(entity);
 
@@ -200,7 +185,7 @@ public class MobScanner implements Listener{
     }
 
 
-    public void customAggressiveName(Entity entity){
+    public void customAggressiveName(Entity entity) {
 
         double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity);
 
@@ -268,11 +253,9 @@ public class MobScanner implements Listener{
     }
 
 
-    public void customPassiveName(Entity entity)
-    {
+    public void customPassiveName(Entity entity) {
 
-        switch (entity.getType())
-        {
+        switch (entity.getType()) {
 
             case CHICKEN:
                 entity.setCustomName("Super Chicken");
@@ -305,11 +288,9 @@ public class MobScanner implements Listener{
     }
 
     @EventHandler
-    public void onSuperMobDamage(EntityDamageEvent event)
-    {
+    public void onSuperMobDamage(EntityDamageEvent event) {
 
-        if(event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             customAggressiveName(event.getEntity());
 
@@ -318,16 +299,14 @@ public class MobScanner implements Listener{
     }
 
 
-    public boolean levelCap(Entity entity1, Entity entity2)
-    {
+    public boolean levelCap(Entity entity1, Entity entity2) {
 
         Damageable damageable1 = (Damageable) entity1;
         Damageable damageable2 = (Damageable) entity2;
 
         double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity1);
 
-        if (damageable1.getMaxHealth() + damageable2.getMaxHealth() > defaultMaxHealth * maxSuperMobLevel)
-        {
+        if (damageable1.getMaxHealth() + damageable2.getMaxHealth() > defaultMaxHealth * maxSuperMobLevel) {
 
             return false;
 
@@ -338,152 +317,130 @@ public class MobScanner implements Listener{
     }
 
 
-    public void armorHandler (Entity entity)
-    {
+    public void armorHandler(Entity entity) {
 
         if (entity instanceof Zombie || entity instanceof ZombieVillager || entity instanceof PigZombie ||
-                entity instanceof Skeleton || entity instanceof WitherSkeleton)
-        {
+                entity instanceof Skeleton || entity instanceof WitherSkeleton) {
 
             int mobLevel = entity.getMetadata("MagmasSuperMob").get(0).asInt();
 
-            if (mobLevel >= 2)
-            {
+            if (mobLevel >= 2) {
 
-                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
-
-            }
-
-            if (mobLevel >= 4)
-            {
-
-                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
+                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
 
             }
 
-            if (mobLevel >= 6)
-            {
+            if (mobLevel >= 4) {
 
-                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-
-            }
-
-            if (mobLevel >= 8)
-            {
-
-                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+                ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
 
             }
 
-            if (mobLevel >= 12)
-            {
+            if (mobLevel >= 6) {
 
-                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
-
-            }
-
-            if (mobLevel >= 14)
-            {
-
-                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.GOLD_BOOTS));
+                ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
 
             }
 
-            if (mobLevel >= 16)
-            {
+            if (mobLevel >= 8) {
 
-                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.GOLD_LEGGINGS));
-
-            }
-
-            if (mobLevel >= 18)
-            {
-
-                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.GOLD_CHESTPLATE));
+                ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
 
             }
 
-            if (mobLevel >= 22)
-            {
+            if (mobLevel >= 12) {
 
-                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
-
-            }
-
-            if (mobLevel >= 24)
-            {
-
-                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
 
             }
 
-            if (mobLevel >= 26)
-            {
+            if (mobLevel >= 14) {
 
-                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
-
-            }
-
-            if (mobLevel >= 28)
-            {
-
-                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+                ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.GOLD_BOOTS));
 
             }
 
-            if (mobLevel >= 32)
-            {
+            if (mobLevel >= 16) {
 
-                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
-
-            }
-
-            if (mobLevel >= 34)
-            {
-
-                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+                ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.GOLD_LEGGINGS));
 
             }
 
-            if (mobLevel >= 36)
-            {
+            if (mobLevel >= 18) {
 
-                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-
-            }
-
-            if (mobLevel >= 38)
-            {
-
-                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+                ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.GOLD_CHESTPLATE));
 
             }
 
-            if (mobLevel >= 42)
-            {
+            if (mobLevel >= 22) {
 
-                ((LivingEntity)entity).getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-
-            }
-
-            if (mobLevel >= 44)
-            {
-
-                ((LivingEntity)entity).getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
 
             }
 
-            if (mobLevel >= 46)
-            {
+            if (mobLevel >= 24) {
 
-                ((LivingEntity)entity).getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+                ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
 
             }
 
-            if (mobLevel >= 48)
-            {
+            if (mobLevel >= 26) {
 
-                ((LivingEntity)entity).getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+                ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+
+            }
+
+            if (mobLevel >= 28) {
+
+                ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+
+            }
+
+            if (mobLevel >= 32) {
+
+                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+
+            }
+
+            if (mobLevel >= 34) {
+
+                ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+
+            }
+
+            if (mobLevel >= 36) {
+
+                ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+
+            }
+
+            if (mobLevel >= 38) {
+
+                ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+
+            }
+
+            if (mobLevel >= 42) {
+
+                ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+
+            }
+
+            if (mobLevel >= 44) {
+
+                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+
+            }
+
+            if (mobLevel >= 46) {
+
+                ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+
+            }
+
+            if (mobLevel >= 48) {
+
+                ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 
             }
 

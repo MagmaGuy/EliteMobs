@@ -31,15 +31,14 @@ public class MovementSpeed extends MinorPowers {
 
     private MagmasMobs plugin;
 
-    public MovementSpeed(Plugin plugin){
+    public MovementSpeed(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
     @Override
-    public void applyPowers(Entity entity)
-    {
+    public void applyPowers(Entity entity) {
 
         entity.setMetadata("MovementSpeed", new FixedMetadataValue(plugin, true));
         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999 * 20, 2));
@@ -49,11 +48,9 @@ public class MovementSpeed extends MinorPowers {
     }
 
     @Override
-    public boolean existingPowers(Entity entity)
-    {
+    public boolean existingPowers(Entity entity) {
 
-        if (entity.hasMetadata("MovementSpeed"))
-        {
+        if (entity.hasMetadata("MovementSpeed")) {
 
             return true;
 

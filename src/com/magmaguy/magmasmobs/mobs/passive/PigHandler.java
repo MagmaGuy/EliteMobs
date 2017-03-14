@@ -34,21 +34,20 @@ import static org.bukkit.Material.PORK;
 /**
  * Created by MagmaGuy on 19/12/2016.
  */
-public class PigHandler implements Listener{
+public class PigHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public PigHandler(Plugin plugin){
+    public PigHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
     @EventHandler
-    public void superDrops (EntityDamageByEntityEvent event){
+    public void superDrops(EntityDamageByEntityEvent event) {
 
-        if (event.getEntity() instanceof Pig && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof Pig && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             Random random = new Random();
 
@@ -63,8 +62,7 @@ public class PigHandler implements Listener{
 
             ItemStack porkchopStack = new ItemStack(PORK, random.nextInt(3) + 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
                 pig.getWorld().dropItem(pig.getLocation(), porkchopStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -73,8 +71,7 @@ public class PigHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
                 pig.getWorld().dropItem(pig.getLocation(), porkchopStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -88,14 +85,13 @@ public class PigHandler implements Listener{
     }
 
     @EventHandler
-    public void onDeath(EntityDeathEvent event){
+    public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity() instanceof Pig && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof Pig && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             Pig pig = (Pig) event.getEntity();
 
-            ItemStack pigMonsterEgg = new ItemStack (MONSTER_EGG, 2, (short) 90);
+            ItemStack pigMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 90);
             pig.getWorld().dropItem(pig.getLocation(), pigMonsterEgg);
 
             event.getEntity().removeMetadata("MagmasPassiveSupermob", plugin);

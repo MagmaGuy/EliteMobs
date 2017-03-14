@@ -33,11 +33,11 @@ import static org.bukkit.Material.*;
 /**
  * Created by MagmaGuy on 19/12/2016.
  */
-public class CowHandler implements Listener{
+public class CowHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public CowHandler(Plugin plugin){
+    public CowHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -45,10 +45,9 @@ public class CowHandler implements Listener{
 
 
     @EventHandler
-    public void superDrops (EntityDamageByEntityEvent event){
+    public void superDrops(EntityDamageByEntityEvent event) {
 
-        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             Random random = new Random();
 
@@ -63,18 +62,16 @@ public class CowHandler implements Listener{
 
             ItemStack beefStack = new ItemStack(RAW_BEEF, (random.nextInt(3) + 1));
             //leather can drop 0, meaning that it could create visual artifacts. Have to filter that out.
-            ItemStack leatherStack = new ItemStack (LEATHER , (random.nextInt(2)));
+            ItemStack leatherStack = new ItemStack(LEATHER, (random.nextInt(2)));
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
                 cow.getWorld().dropItem(cow.getLocation(), beefStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 ExperienceOrb xpDrop = cow.getWorld().spawn(cow.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(random.nextInt(3) + 1);
 
-                if (leatherStack.getAmount() != 0)
-                {
+                if (leatherStack.getAmount() != 0) {
 
                     cow.getWorld().dropItem(cow.getLocation(), leatherStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -82,16 +79,14 @@ public class CowHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
                 cow.getWorld().dropItem(cow.getLocation(), beefStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 ExperienceOrb xpDrop = cow.getWorld().spawn(cow.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(random.nextInt(3) + 1);
 
-                if (leatherStack.getAmount() != 0)
-                {
+                if (leatherStack.getAmount() != 0) {
 
                     cow.getWorld().dropItem(cow.getLocation(), leatherStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -105,10 +100,9 @@ public class CowHandler implements Listener{
 
 
     @EventHandler
-    public void onDeath(EntityDeathEvent event){
+    public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             Cow cow = (Cow) event.getEntity();
 

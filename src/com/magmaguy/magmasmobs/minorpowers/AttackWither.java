@@ -34,7 +34,7 @@ public class AttackWither extends MinorPowers implements Listener {
 
     private MagmasMobs plugin;
 
-    public AttackWither(Plugin plugin){
+    public AttackWither(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -52,8 +52,7 @@ public class AttackWither extends MinorPowers implements Listener {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        if (entity.hasMetadata("AttackWither"))
-        {
+        if (entity.hasMetadata("AttackWither")) {
 
             return true;
 
@@ -64,14 +63,12 @@ public class AttackWither extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void onHit(EntityDamageByEntityEvent event)
-    {
+    public void onHit(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        if (damager.hasMetadata("AttackWither") && damagee instanceof Player)
-        {
+        if (damager.hasMetadata("AttackWither") && damagee instanceof Player) {
 
             ((Player) damagee).addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 50, 1));
 

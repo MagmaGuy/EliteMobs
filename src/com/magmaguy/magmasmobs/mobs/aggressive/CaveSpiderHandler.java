@@ -47,11 +47,11 @@ import java.util.Random;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class CaveSpiderHandler implements Listener{
+public class CaveSpiderHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public CaveSpiderHandler (Plugin plugin){
+    public CaveSpiderHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -59,10 +59,9 @@ public class CaveSpiderHandler implements Listener{
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof CaveSpider && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof CaveSpider && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -77,18 +76,15 @@ public class CaveSpiderHandler implements Listener{
             ItemStack stringStack = new ItemStack(Material.STRING, random.nextInt(3));
             ItemStack spiderEyeStack = new ItemStack(Material.SPIDER_EYE, 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (stringStack.getAmount() != 0)
-                {
+                if (stringStack.getAmount() != 0) {
 
                     caveSpider.getWorld().dropItem(caveSpider.getLocation(), stringStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.33)
-                {
+                if (random.nextDouble() < 0.33) {
 
                     caveSpider.getWorld().dropItem(caveSpider.getLocation(), spiderEyeStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -99,18 +95,15 @@ public class CaveSpiderHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (stringStack.getAmount() != 0)
-                {
+                if (stringStack.getAmount() != 0) {
 
                     caveSpider.getWorld().dropItem(caveSpider.getLocation(), stringStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.33)
-                {
+                if (random.nextDouble() < 0.33) {
 
                     caveSpider.getWorld().dropItem(caveSpider.getLocation(), spiderEyeStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

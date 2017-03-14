@@ -37,9 +37,9 @@ import org.bukkit.entity.*;
  */
 public class ValidAgressiveMobFilter {
 
-    public static boolean ValidAgressiveMobFilter(Entity entity){
+    public static boolean ValidAgressiveMobFilter(Entity entity) {
 
-        if(entity instanceof Zombie ||
+        if (entity instanceof Zombie ||
                 entity instanceof Skeleton ||
                 entity instanceof PigZombie ||
                 entity instanceof Creeper ||
@@ -51,8 +51,7 @@ public class ValidAgressiveMobFilter {
                 entity instanceof Witch ||
                 entity instanceof Endermite ||
                 entity instanceof PolarBear ||
-                entity instanceof ZombieVillager)
-        {
+                entity instanceof ZombieVillager) {
 
             return true;
 

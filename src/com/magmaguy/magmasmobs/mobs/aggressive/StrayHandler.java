@@ -55,7 +55,7 @@ public class StrayHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public StrayHandler (Plugin plugin){
+    public StrayHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -63,10 +63,9 @@ public class StrayHandler implements Listener {
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if(event.getEntity() instanceof Stray && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Stray && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -89,33 +88,28 @@ public class StrayHandler implements Listener {
             meta.setBasePotionData(new PotionData(PotionType.SLOWNESS));
             tippedArrowStack.setItemMeta(meta);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (boneStack.getAmount() != 0)
-                {
+                if (boneStack.getAmount() != 0) {
 
                     stray.getWorld().dropItem(stray.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (arrowStack.getAmount() != 0)
-                {
+                if (arrowStack.getAmount() != 0) {
 
                     stray.getWorld().dropItem(stray.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 //lowered chance to drop from 9% to 3% to account for it never dropping damaged bows
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     stray.getWorld().dropItem(stray.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.5)
-                {
+                if (random.nextDouble() < 0.5) {
 
                     stray.getWorld().dropItem(stray.getLocation(), tippedArrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -126,33 +120,28 @@ public class StrayHandler implements Listener {
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (boneStack.getAmount() != 0)
-                {
+                if (boneStack.getAmount() != 0) {
 
                     stray.getWorld().dropItem(stray.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (arrowStack.getAmount() != 0)
-                {
+                if (arrowStack.getAmount() != 0) {
 
                     stray.getWorld().dropItem(stray.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 //lowered chance to drop from 9% to 3% to account for it never dropping damaged bows
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     stray.getWorld().dropItem(stray.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.5)
-                {
+                if (random.nextDouble() < 0.5) {
 
                     stray.getWorld().dropItem(stray.getLocation(), tippedArrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

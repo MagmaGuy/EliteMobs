@@ -33,21 +33,20 @@ import static org.bukkit.Material.RED_ROSE;
 /**
  * Created by MagmaGuy on 19/12/2016.
  */
-public class IronGolemHandler implements Listener{
+public class IronGolemHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public IronGolemHandler(Plugin plugin){
+    public IronGolemHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
     @EventHandler
-    public void superDrops (EntityDamageByEntityEvent event){
+    public void superDrops(EntityDamageByEntityEvent event) {
 
-        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             Random random = new Random();
 
@@ -63,8 +62,7 @@ public class IronGolemHandler implements Listener{
             ItemStack ironStack = new ItemStack(IRON_INGOT, random.nextInt(3) + 4);
             ItemStack poppyStack = new ItemStack(RED_ROSE, random.nextInt(3));
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
                 ironGolem.getWorld().dropItem(ironGolem.getLocation(), ironStack);
                 ironGolem.getWorld().dropItem(ironGolem.getLocation(), poppyStack);
@@ -74,8 +72,7 @@ public class IronGolemHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
                 ironGolem.getWorld().dropItem(ironGolem.getLocation(), ironStack);
                 ironGolem.getWorld().dropItem(ironGolem.getLocation(), poppyStack);
@@ -90,11 +87,9 @@ public class IronGolemHandler implements Listener{
     }
 
     @EventHandler
-    public void onAttack (EntityDamageByEntityEvent event)
-    {
+    public void onAttack(EntityDamageByEntityEvent event) {
 
-        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             event.setDamage(event.getDamage() * 50);
 
@@ -103,11 +98,9 @@ public class IronGolemHandler implements Listener{
     }
 
     @EventHandler
-    public void onDeath (EntityDeathEvent event)
-    {
+    public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             event.getEntity().removeMetadata("MagmasPassiveSupermob", plugin);
 

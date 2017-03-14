@@ -40,7 +40,7 @@ public class ChickenHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public ChickenHandler(Plugin plugin){
+    public ChickenHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -48,10 +48,9 @@ public class ChickenHandler implements Listener {
 
 
     @EventHandler
-    public void superDrops (EntityDamageByEntityEvent event){
+    public void superDrops(EntityDamageByEntityEvent event) {
 
-        if (event.getEntity() instanceof Chicken && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof Chicken && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             Random random = new Random();
 
@@ -67,8 +66,7 @@ public class ChickenHandler implements Listener {
             ItemStack featherStack = new ItemStack(FEATHER, (random.nextInt(2) + 1));
             ItemStack poultryStack = new ItemStack(RAW_CHICKEN, 1);
 
-            for(int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
                 chicken.getWorld().dropItem(chicken.getLocation(), featherStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
                 chicken.getWorld().dropItem(chicken.getLocation(), poultryStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
@@ -78,8 +76,7 @@ public class ChickenHandler implements Listener {
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
                 chicken.getWorld().dropItem(chicken.getLocation(), featherStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
                 chicken.getWorld().dropItem(chicken.getLocation(), poultryStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
@@ -109,29 +106,25 @@ public class ChickenHandler implements Listener {
     }
 
 
-    public static void superEggs (Entity entity){
+    public static void superEggs(Entity entity) {
 
         List<Chicken> tempChickenList = new ArrayList<>();
 
-        if(entity instanceof Chicken && entity.hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (entity instanceof Chicken && entity.hasMetadata("MagmasPassiveSupermob")) {
 
             tempChickenList.add((Chicken) entity);
 
         }
 
-        if (tempChickenList.size() > 0)
-        {
+        if (tempChickenList.size() > 0) {
 
             Random random = new Random();
             int eggChance = random.nextInt(200);
 
             //there should be a 0.1 chance of eggs spawning every second
-            if(eggChance == 1)
-            {
+            if (eggChance == 1) {
 
-                for (Chicken chicken : tempChickenList)
-                {
+                for (Chicken chicken : tempChickenList) {
 
                     ItemStack eggStack = new ItemStack(EGG, 1);
 

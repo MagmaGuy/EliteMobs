@@ -40,17 +40,14 @@ public class PreventSpawnerMobEggInteraction implements Listener {
     }
 
     @EventHandler
-    public void onInteract (PlayerInteractEvent event)
-    {
+    public void onInteract(PlayerInteractEvent event) {
 
         Player player = event.getPlayer();
 
-        if (event.getAction().equals(RIGHT_CLICK_BLOCK))
-        {
+        if (event.getAction().equals(RIGHT_CLICK_BLOCK)) {
 
-            if (event.getClickedBlock().getType().equals(Material.MOB_SPAWNER ) &&
-                    player.getEquipment().getItemInMainHand().getType().equals(Material.MONSTER_EGG))
-            {
+            if (event.getClickedBlock().getType().equals(Material.MOB_SPAWNER) &&
+                    player.getEquipment().getItemInMainHand().getType().equals(Material.MONSTER_EGG)) {
 
                 event.setCancelled(true);
                 getLogger().info("MagmasMobs - Mob spawner change cancelled.");

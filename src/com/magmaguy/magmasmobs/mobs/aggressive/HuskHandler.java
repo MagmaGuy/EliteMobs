@@ -52,7 +52,7 @@ public class HuskHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public HuskHandler (Plugin plugin) {
+    public HuskHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -60,11 +60,9 @@ public class HuskHandler implements Listener {
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event)
-    {
+    public void onHit(EntityDamageEvent event) {
 
-        if(event.getEntity() instanceof Husk && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Husk && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -83,32 +81,27 @@ public class HuskHandler implements Listener {
             ItemStack carrotStack = new ItemStack(CARROT_ITEM, 1);
             ItemStack potatoesStack = new ItemStack(POTATO_ITEM, 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (rottenFleshStack.getAmount() != 0)
-                {
+                if (rottenFleshStack.getAmount() != 0) {
 
                     husk.getWorld().dropItem(husk.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     husk.getWorld().dropItem(husk.getLocation(), ironStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     husk.getWorld().dropItem(husk.getLocation(), carrotStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     husk.getWorld().dropItem(husk.getLocation(), potatoesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -119,32 +112,27 @@ public class HuskHandler implements Listener {
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (rottenFleshStack.getAmount() != 0)
-                {
+                if (rottenFleshStack.getAmount() != 0) {
 
                     husk.getWorld().dropItem(husk.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     husk.getWorld().dropItem(husk.getLocation(), ironStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     husk.getWorld().dropItem(husk.getLocation(), carrotStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     husk.getWorld().dropItem(husk.getLocation(), potatoesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

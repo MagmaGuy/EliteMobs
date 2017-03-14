@@ -46,16 +46,15 @@ import org.bukkit.util.Vector;
 import java.util.List;
 
 import static com.magmaguy.magmasmobs.MagmasMobs.worldList;
-import static org.bukkit.Bukkit.getLogger;
 
 /**
  * Created by MagmaGuy on 04/11/2016.
  */
-public class ParticleEffects implements Listener{
+public class ParticleEffects implements Listener {
 
     private MagmasMobs plugin;
 
-    public ParticleEffects(Plugin plugin){
+    public ParticleEffects(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -66,8 +65,7 @@ public class ParticleEffects implements Listener{
     private final Vector verticalVelocity = new Vector(0, 0.1, 0);
 
     //Particle effect
-    private void particleEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double offset, Particle particle1, Particle particle2, int particleAmount)
-    {
+    private void particleEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double offset, Particle particle1, Particle particle2, int particleAmount) {
 
         PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
 
@@ -82,8 +80,7 @@ public class ParticleEffects implements Listener{
                 entity.getWorld().spawnParticle(particle1, location1.getX(), location1.getY(), location1.getZ(), particleAmount, 0.0, 0.0, 0.0, 0.01);
                 entity.getWorld().spawnParticle(particle2, location2.getX(), location2.getY(), location2.getZ(), particleAmount, 0.0, 0.0, 0.0, 0.01);
 
-                if (!entity.isValid())
-                {
+                if (!entity.isValid()) {
 
                     Bukkit.getScheduler().cancelTask(processID);
 
@@ -97,8 +94,7 @@ public class ParticleEffects implements Listener{
 
 
     //Item effect
-    private void itemEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double offset, Material material1, Material material2)
-    {
+    private void itemEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double offset, Material material1, Material material2) {
 
         PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
 
@@ -117,8 +113,7 @@ public class ParticleEffects implements Listener{
                 ItemStack itemStack1 = new ItemStack(material1, 1);
                 ItemStack itemStack2 = new ItemStack(material2, 1);
 
-                if (floatable1 == null && floatable2 == null)
-                {
+                if (floatable1 == null && floatable2 == null) {
 
                     floatable1 = entity.getWorld().dropItem(location1, itemStack1);
 
@@ -145,8 +140,7 @@ public class ParticleEffects implements Listener{
                 floatable2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
                 floatable2.setVelocity(verticalVelocity);
 
-                if (!entity.isValid())
-                {
+                if (!entity.isValid()) {
 
                     floatable1.remove();
                     floatable2.remove();
@@ -162,8 +156,7 @@ public class ParticleEffects implements Listener{
 
     }
 
-    private void itemEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double offset, ItemStack itemStack1, ItemStack itemStack2)
-    {
+    private void itemEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double offset, ItemStack itemStack1, ItemStack itemStack2) {
 
         PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
 
@@ -180,8 +173,7 @@ public class ParticleEffects implements Listener{
                 Location location2 = particleLocations.get(1);
 
 
-                if (floatable1 == null && floatable2 == null)
-                {
+                if (floatable1 == null && floatable2 == null) {
 
                     floatable1 = entity.getWorld().dropItem(location1, itemStack1);
 
@@ -208,8 +200,7 @@ public class ParticleEffects implements Listener{
                 floatable2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
                 floatable2.setVelocity(verticalVelocity);
 
-                if (!entity.isValid())
-                {
+                if (!entity.isValid()) {
 
                     floatable1.remove();
                     floatable2.remove();
@@ -226,12 +217,9 @@ public class ParticleEffects implements Listener{
     }
 
 
+    public void attackGravityEffect(Entity entity) {
 
-    public void attackGravityEffect (Entity entity)
-    {
-
-        if (entity.hasMetadata("AttackGravity"))
-        {
+        if (entity.hasMetadata("AttackGravity")) {
 
             itemEffect(entity, 1.0, 0.5, 20, 2, Material.ELYTRA, Material.ELYTRA);
             metadataKiller(entity, "AttackGravity");
@@ -241,11 +229,9 @@ public class ParticleEffects implements Listener{
     }
 
 
-    public void attackPoisonEffect(Entity entity)
-    {
+    public void attackPoisonEffect(Entity entity) {
 
-        if (entity.hasMetadata("AttackPoison"))
-        {
+        if (entity.hasMetadata("AttackPoison")) {
 
             itemEffect(entity, 1.0, 0.5, 20, 2, Material.EMERALD, Material.EMERALD);
             metadataKiller(entity, "AttackPoison");
@@ -255,11 +241,9 @@ public class ParticleEffects implements Listener{
     }
 
 
-    public void attackPushEffect(Entity entity)
-    {
+    public void attackPushEffect(Entity entity) {
 
-        if (entity.hasMetadata("AttackPush"))
-        {
+        if (entity.hasMetadata("AttackPush")) {
 
             itemEffect(entity, 1.0, 0.5, 20, 2, Material.PISTON_BASE, Material.PISTON_BASE);
             metadataKiller(entity, "AttackPush");
@@ -269,13 +253,11 @@ public class ParticleEffects implements Listener{
     }
 
 
-    public void attackWitherEffect(Entity entity)
-    {
+    public void attackWitherEffect(Entity entity) {
 
-        if (entity.hasMetadata("AttackWither"))
-        {
+        if (entity.hasMetadata("AttackWither")) {
 
-            ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short)1);
+            ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
 
             itemEffect(entity, 1.0, 0.5, 20, 2, itemStack, itemStack);
             metadataKiller(entity, "AttackWither");
@@ -285,11 +267,9 @@ public class ParticleEffects implements Listener{
     }
 
 
-    public void invulnerabilityArrowEffect(Entity entity)
-    {
+    public void invulnerabilityArrowEffect(Entity entity) {
 
-        if (entity.hasMetadata("InvulnerabilityArrow"))
-        {
+        if (entity.hasMetadata("InvulnerabilityArrow")) {
 
             itemEffect(entity, 1.0, 1.0, 20, 0, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW);
             metadataKiller(entity, "InvulnerabilityArrow");
@@ -299,11 +279,9 @@ public class ParticleEffects implements Listener{
     }
 
 
-    public void invulnerabilityFallDamageEffect (Entity entity)
-    {
+    public void invulnerabilityFallDamageEffect(Entity entity) {
 
-        if (entity.hasMetadata("InvulnerabilityFallDamage"))
-        {
+        if (entity.hasMetadata("InvulnerabilityFallDamage")) {
 
             itemEffect(entity, 1.0, 0.5, 20, 2, Material.FEATHER, Material.FEATHER);
             metadataKiller(entity, "InvulnerabilityFallDamage");
@@ -312,11 +290,9 @@ public class ParticleEffects implements Listener{
     }
 
 
-    public void invulnerabilityFireEffect(Entity entity)
-    {
+    public void invulnerabilityFireEffect(Entity entity) {
 
-        if (entity.hasMetadata("InvulnerabilityFire"))
-        {
+        if (entity.hasMetadata("InvulnerabilityFire")) {
 
             particleEffect(entity, 1.0, 1.0, 20, 2, Particle.FLAME, Particle.FLAME, 5);
             metadataKiller(entity, "InvulnerabilityFire");
@@ -326,11 +302,9 @@ public class ParticleEffects implements Listener{
     }
 
 
-    public void movementSpeedEffect(Entity entity)
-    {
+    public void movementSpeedEffect(Entity entity) {
 
-        if (entity.hasMetadata("MovementSpeed"))
-        {
+        if (entity.hasMetadata("MovementSpeed")) {
 
             itemEffect(entity, 1.0, 0.5, 20, 2, Material.GOLD_BOOTS, Material.GOLD_BOOTS);
             metadataKiller(entity, "MovementSpeed");
@@ -339,14 +313,11 @@ public class ParticleEffects implements Listener{
     }
 
 
-
     //Events
     @EventHandler
-    public void lastAntiPickupSafeguard(PlayerPickupItemEvent event)
-    {
+    public void lastAntiPickupSafeguard(PlayerPickupItemEvent event) {
 
-        if (event.getItem().hasMetadata("VisualEffect"))
-        {
+        if (event.getItem().hasMetadata("VisualEffect")) {
 
             event.getItem().remove();
             event.getItem().removeMetadata("VisualEffect", plugin);
@@ -358,11 +329,9 @@ public class ParticleEffects implements Listener{
 
 
     @EventHandler
-    public void antiHopperPickupSafeguard(InventoryPickupItemEvent event)
-    {
+    public void antiHopperPickupSafeguard(InventoryPickupItemEvent event) {
 
-        if (event.getItem().hasMetadata("VisualEffect"))
-        {
+        if (event.getItem().hasMetadata("VisualEffect")) {
 
             event.getItem().remove();
             event.getItem().removeMetadata("VisualEffect", plugin);
@@ -373,11 +342,9 @@ public class ParticleEffects implements Listener{
     }
 
 
-    private void metadataKiller (Entity entity, String metadataName)
-    {
+    private void metadataKiller(Entity entity, String metadataName) {
 
-        if (!entity.isValid())
-        {
+        if (!entity.isValid()) {
 
             entity.removeMetadata(metadataName, plugin);
 
@@ -386,18 +353,15 @@ public class ParticleEffects implements Listener{
     }
 
 
-    public void droppedItemsFlush()
-    {
+    public void droppedItemsFlush() {
 
         for (World world : worldList)
 
         {
 
-            for (Entity entity : world.getEntities())
-            {
+            for (Entity entity : world.getEntities()) {
 
-                if (entity.hasMetadata("VisualEffect"))
-                {
+                if (entity.hasMetadata("VisualEffect")) {
 
                     entity.remove();
                     entity.removeMetadata("VisualEffect", plugin);

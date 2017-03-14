@@ -22,16 +22,14 @@ import org.bukkit.entity.*;
  */
 public class ValidPassiveMobFilter {
 
-    public static boolean ValidPassiveMobFilter(Entity entity)
-    {
+    public static boolean ValidPassiveMobFilter(Entity entity) {
 
-        if(entity instanceof Chicken ||
+        if (entity instanceof Chicken ||
                 entity instanceof Cow ||
                 entity instanceof IronGolem ||
                 entity instanceof MushroomCow ||
-                entity instanceof  Pig ||
-                entity instanceof Sheep)
-        {
+                entity instanceof Pig ||
+                entity instanceof Sheep) {
 
             return true;
 
