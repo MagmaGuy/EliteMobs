@@ -39,7 +39,7 @@ import java.util.Random;
  */
 public class ItemDropVelocity {
 
-    public static Vector ItemDropVelocity(){
+    public static Vector ItemDropVelocity() {
 
         Random random = new Random();
 
@@ -52,4 +52,5 @@ public class ItemDropVelocity {
         return velocity;
 
     }
+
 }

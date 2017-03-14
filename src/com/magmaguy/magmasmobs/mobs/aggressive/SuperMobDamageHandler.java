@@ -41,18 +41,17 @@ import org.bukkit.plugin.Plugin;
 /**
  * Created by MagmaGuy on 11/12/2016.
  */
-public class SuperMobDamageHandler implements Listener{
+public class SuperMobDamageHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public SuperMobDamageHandler(Plugin plugin){
+    public SuperMobDamageHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
-    public static double damageMath (double initialDamage)
-    {
+    public static double damageMath(double initialDamage) {
 
         double finalDamage = (initialDamage * 55) / (initialDamage + 50);
 
@@ -61,11 +60,9 @@ public class SuperMobDamageHandler implements Listener{
     }
 
     @EventHandler
-    public void onHit(EntityDamageByEntityEvent event)
-    {
+    public void onHit(EntityDamageByEntityEvent event) {
 
-        if (event.getDamager().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getDamager().hasMetadata("MagmasSuperMob")) {
 
             event.setDamage(damageMath(event.getDamage() * event.getDamager().getMetadata("MagmasSuperMob").get(0).asInt()));
 
@@ -73,8 +70,7 @@ public class SuperMobDamageHandler implements Listener{
 
             Fireball fireball = (Fireball) event.getDamager();
 
-            if (fireball.getShooter() instanceof Blaze && ((Blaze) fireball.getShooter()).hasMetadata("MagmasSuperMob"))
-            {
+            if (fireball.getShooter() instanceof Blaze && ((Blaze) fireball.getShooter()).hasMetadata("MagmasSuperMob")) {
 
                 event.setDamage(damageMath(event.getDamage() * ((Blaze) fireball.getShooter()).getMetadata("MagmasSuperMob").get(0).asInt()));
 
@@ -84,8 +80,7 @@ public class SuperMobDamageHandler implements Listener{
 
             Arrow arrow = (Arrow) event.getDamager();
 
-            if (arrow.getShooter() instanceof Skeleton && ((Skeleton) arrow.getShooter()).hasMetadata("MagmasSuperMob"))
-            {
+            if (arrow.getShooter() instanceof Skeleton && ((Skeleton) arrow.getShooter()).hasMetadata("MagmasSuperMob")) {
 
                 event.setDamage(damageMath(event.getDamage() * ((Skeleton) arrow.getShooter()).getMetadata("MagmasSuperMob").get(0).asInt()));
 
@@ -104,12 +99,11 @@ public class SuperMobDamageHandler implements Listener{
     }
 
     @EventHandler
-    public void explosionPrimeEvent (ExplosionPrimeEvent event){
+    public void explosionPrimeEvent(ExplosionPrimeEvent event) {
 
-        if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
-            event.setRadius((float)damageMath(event.getRadius() * event.getEntity().getMetadata("MagmasSuperMob").get(0).asInt()));
+            event.setRadius((float) damageMath(event.getRadius() * event.getEntity().getMetadata("MagmasSuperMob").get(0).asInt()));
 
         }
 

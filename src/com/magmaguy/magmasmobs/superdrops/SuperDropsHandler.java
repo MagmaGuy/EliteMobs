@@ -55,15 +55,20 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+
+import static org.bukkit.Bukkit.getLogger;
 
 /**
  * Created by MagmaGuy on 29/11/2016.
  */
-public class SuperDropsHandler implements Listener{
+public class SuperDropsHandler implements Listener {
 
     private MagmasMobs plugin;
 
@@ -74,15 +79,14 @@ public class SuperDropsHandler implements Listener{
     }
 
     public static List<ItemStack> lootList = new ArrayList();
+    public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
 
-    public void superDropParser()
-    {
+    public void superDropParser() {
 
         List<String> lootCount = lootCounter();
 
 
-        for (String lootEntry : lootCount)
-        {
+        for (String lootEntry : lootCount) {
 
             StringBuilder path = new StringBuilder();
 
@@ -101,13 +105,9 @@ public class SuperDropsHandler implements Listener{
             itemMeta.setDisplayName(itemName);
             itemMeta.setLore(itemLore);
 
-            //todo: add enchants and potion effects
+            if (itemEnchantments != null) {
 
-            if (itemEnchantments != null)
-            {
-
-                for (Object object : itemEnchantments)
-                {
+                for (Object object : itemEnchantments) {
 
                     String string = object.toString();
 
@@ -128,28 +128,59 @@ public class SuperDropsHandler implements Listener{
 
             lootList.add(itemStack);
 
+            List <PotionEffect> parsedPotionEffect = new ArrayList();
+
+            //Add potion effects to a separate list to reduce i/o operations
+            if (potionEffects != null) {
+
+                for (Object object : potionEffects){
+
+                    String string = object.toString();
+
+                    String[] parsedString = string.split(",");
+
+                    String potionEffectTypeString = parsedString[0];
+                    PotionEffectType potionEffectType = PotionEffectType.getByName(potionEffectTypeString);
+
+                    //this is a really bad way of doing things, two wrongs make a right
+                    if(parsedString.length % 2 != 0){
+
+                        getLogger().info("Your item " + itemName + " has a problematic potions effect entry.");
+
+                    }
+
+                    int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
+
+                    PotionEffect potionEffect = new PotionEffect(potionEffectType, 20 ,potionEffectAmplifier);
+
+                    parsedPotionEffect.add(potionEffect);
+
+                    getLogger().info("added potion effect, maybe");
+
+                }
+
+                potionEffectItemList.put(itemStack, parsedPotionEffect);
+
+            }
+
         }
 
     }
 
-    public List<String> lootCounter()
-    {
+
+    public List<String> lootCounter() {
 
         List<String> lootCount = new ArrayList();
 
-        for (String configIterator : plugin.getConfig().getKeys(true))
-        {
+        for (String configIterator : plugin.getConfig().getKeys(true)) {
 
             int dotCount = 0;
 
-            if (configIterator.contains("Loot."))
-            {
+            if (configIterator.contains("Loot.")) {
 
-                for(int i = 0; i < configIterator.length(); i++)
-                {
+                for (int i = 0; i < configIterator.length(); i++) {
 
-                    if (configIterator.charAt(i) == '.')
-                    {
+                    if (configIterator.charAt(i) == '.') {
 
                         dotCount++;
 
@@ -157,8 +188,7 @@ public class SuperDropsHandler implements Listener{
 
                 }
 
-                if (dotCount == 1)
-                {
+                if (dotCount == 1) {
 
                     lootCount.add(configIterator);
 
@@ -173,8 +203,7 @@ public class SuperDropsHandler implements Listener{
 
     }
 
-    public String automatedStringBuilder(String previousPath, String append)
-    {
+    public String automatedStringBuilder(String previousPath, String append) {
 
         StringBuilder automatedStringBuilder = new StringBuilder();
 
@@ -188,8 +217,7 @@ public class SuperDropsHandler implements Listener{
 
     }
 
-    public String itemTypeHandler(String previousPath)
-    {
+    public String itemTypeHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Type");
 
@@ -199,8 +227,7 @@ public class SuperDropsHandler implements Listener{
 
     }
 
-    public String itemNameHandler(String previousPath)
-    {
+    public String itemNameHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Name");
 
@@ -210,8 +237,7 @@ public class SuperDropsHandler implements Listener{
 
     }
 
-    public List itemLoreHandler(String previousPath)
-    {
+    public List itemLoreHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Lore");
 
@@ -221,8 +247,7 @@ public class SuperDropsHandler implements Listener{
 
     }
 
-    public List itemEnchantmentHandler (String previousPath)
-    {
+    public List itemEnchantmentHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
 
@@ -232,8 +257,7 @@ public class SuperDropsHandler implements Listener{
 
     }
 
-    public List itemPotionEffectHandler (String previousPath)
-    {
+    public List itemPotionEffectHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Potion Effects");
 
@@ -244,8 +268,7 @@ public class SuperDropsHandler implements Listener{
     }
 
     @EventHandler
-    public void onDeath (EntityDeathEvent event)
-    {
+    public void onDeath(EntityDeathEvent event) {
 
         Entity entity = event.getEntity();
 
@@ -253,35 +276,36 @@ public class SuperDropsHandler implements Listener{
 
         if (entity.hasMetadata("NaturalEntity") &&
                 entity.hasMetadata("MagmasSuperMob") &&
-                entity.getMetadata("MagmasSuperMob").get(0).asInt() > 4)
-        {
+                entity.getMetadata("MagmasSuperMob").get(0).asInt() > 4) {
 
-            if (random.nextDouble() > 0.25)
-            {
+            getLogger().info("supermob dead");
+
+            if (random.nextDouble() > 0.25) {
 
                 int randomDrop = random.nextInt(lootList.size());
 
                 entity.getWorld().dropItem(entity.getLocation(), lootList.get(randomDrop));
+                getLogger().info("dropping item");
 
 
             }
 
             //double drops
-            if (random.nextDouble() > (entity.getMetadata("MagmasSuperMob").get(0).asInt() * 0.01))
-            {
+            if (random.nextDouble() > (entity.getMetadata("MagmasSuperMob").get(0).asInt() * 0.01)) {
 
                 int randomDrop = random.nextInt(lootList.size());
 
                 entity.getWorld().dropItem(entity.getLocation(), lootList.get(randomDrop));
+                getLogger().info("dropping item");
 
             }
 
             entity.removeMetadata("MagmasSuperMob", plugin);
 
-            if (entity.hasMetadata("NaturalEntity"))
-            {
+            if (entity.hasMetadata("NaturalEntity")) {
 
                 entity.removeMetadata("NaturalEntity", plugin);
+                getLogger().info("removing metadata");
 
             }
 

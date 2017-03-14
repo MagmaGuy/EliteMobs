@@ -47,7 +47,7 @@ import java.util.Random;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class EndermanHandler implements Listener{
+public class EndermanHandler implements Listener {
 
     private MagmasMobs plugin;
 
@@ -59,10 +59,9 @@ public class EndermanHandler implements Listener{
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof Enderman && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Enderman && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -76,11 +75,9 @@ public class EndermanHandler implements Listener{
 
             ItemStack enderPearlStack = new ItemStack(Material.ENDER_PEARL, random.nextInt(1) + 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (enderPearlStack.getAmount() != 0)
-                {
+                if (enderPearlStack.getAmount() != 0) {
 
                     enderman.getWorld().dropItem(enderman.getLocation(), enderPearlStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -91,11 +88,9 @@ public class EndermanHandler implements Listener{
 
             }
 
-            if (dropChance > droprandomizer)
-            {
+            if (dropChance > droprandomizer) {
 
-                if (enderPearlStack.getAmount() != 0)
-                {
+                if (enderPearlStack.getAmount() != 0) {
 
                     enderman.getWorld().dropItem(enderman.getLocation(), enderPearlStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

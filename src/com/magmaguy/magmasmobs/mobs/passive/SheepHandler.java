@@ -38,18 +38,16 @@ public class SheepHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public SheepHandler(Plugin plugin){
+    public SheepHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
     @EventHandler
-    public void superDrops (EntityDamageByEntityEvent event)
-    {
+    public void superDrops(EntityDamageByEntityEvent event) {
 
-        if (event.getEntity().hasMetadata("SuperSheep"))
-        {
+        if (event.getEntity().hasMetadata("SuperSheep")) {
 
             Random random = new Random();
 
@@ -120,16 +118,14 @@ public class SheepHandler implements Listener {
                     break;
             }
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
                 sheep.getWorld().dropItem(sheep.getLocation(), muttonStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
                 sheep.getWorld().dropItem(sheep.getLocation(), woolStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
                 sheep.getWorld().dropItem(sheep.getLocation(), muttonStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
                 sheep.getWorld().dropItem(sheep.getLocation(), woolStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
@@ -141,7 +137,7 @@ public class SheepHandler implements Listener {
     }
 
     @EventHandler
-    public void onDeath(EntityDeathEvent event){
+    public void onDeath(EntityDeathEvent event) {
 
         if (event.getEntity() instanceof Sheep && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
 
@@ -149,7 +145,7 @@ public class SheepHandler implements Listener {
 
             Sheep sheep = (Sheep) event.getEntity();
 
-            ItemStack sheepMonsterEgg = new ItemStack (MONSTER_EGG, 2, (short) 91);
+            ItemStack sheepMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 91);
             sheep.getWorld().dropItem(sheep.getLocation(), sheepMonsterEgg);
 
         }
@@ -157,15 +153,13 @@ public class SheepHandler implements Listener {
     }
 
     @EventHandler
-    public void onShear(PlayerShearEntityEvent event){
+    public void onShear(PlayerShearEntityEvent event) {
 
-        if (event.getEntity() instanceof Sheep && event.getEntity().hasMetadata("MagmasPassiveSupermob"))
-        {
+        if (event.getEntity() instanceof Sheep && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
 
             Sheep sheep = (Sheep) event.getEntity();
 
-            for (int i = 0; i < 50; i++)
-            {
+            for (int i = 0; i < 50; i++) {
 
                 sheep.getWorld().dropItem(sheep.getLocation(), woolStackRandomizer(sheep)).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -175,7 +169,7 @@ public class SheepHandler implements Listener {
 
     }
 
-    public ItemStack woolStackRandomizer (Sheep sheep){
+    public ItemStack woolStackRandomizer(Sheep sheep) {
 
 
         Random random = new Random();

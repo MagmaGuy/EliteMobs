@@ -34,19 +34,17 @@ public class PowerStanceMath {
 
     private MagmasMobs plugin;
 
-    public PowerStanceMath(Plugin plugin){
+    public PowerStanceMath(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
-    public List<Location> cylindricalPowerStance(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical)
-    {
+    public List<Location> cylindricalPowerStance(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical) {
 
         //this code assumes the existence of two rotating points
 
-        if (entity.hasMetadata("CylindricalPowerStance"))
-        {
+        if (entity.hasMetadata("CylindricalPowerStance")) {
 
             int currentPosition = entity.getMetadata("CylindricalPowerStance").get(0).asInt();
 
@@ -68,14 +66,12 @@ public class PowerStanceMath {
 
     }
 
-    private List<Location> cylindricalPowerStanceMath (Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, int offset)
-    {
+    private List<Location> cylindricalPowerStanceMath(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, int offset) {
 
         List<Location> coordinateLocations = new ArrayList<>();
 
         speedHorizontal = speedHorizontal * 18 + offset * 18;
-        if (speedVertical != 0)
-        {
+        if (speedVertical != 0) {
 
             speedVertical = speedVertical * 18 + offset * 18;
 

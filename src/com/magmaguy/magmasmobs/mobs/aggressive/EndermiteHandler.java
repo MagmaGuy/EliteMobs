@@ -29,11 +29,11 @@ import java.util.Random;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class EndermiteHandler implements Listener{
+public class EndermiteHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public EndermiteHandler (Plugin plugin){
+    public EndermiteHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -43,8 +43,7 @@ public class EndermiteHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof Endermite && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Endermite && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -58,16 +57,14 @@ public class EndermiteHandler implements Listener{
 
             //there are no drops for this mob, XP aside
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
                 ExperienceOrb xpDrop = endermite.getWorld().spawn(endermite.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(3);
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
                 ExperienceOrb xpDrop = endermite.getWorld().spawn(endermite.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(3);

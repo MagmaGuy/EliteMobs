@@ -48,11 +48,11 @@ import static org.bukkit.Material.*;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class SkeletonHandler implements Listener{
+public class SkeletonHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public SkeletonHandler (Plugin plugin){
+    public SkeletonHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -60,10 +60,9 @@ public class SkeletonHandler implements Listener{
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if(event.getEntity() instanceof Skeleton && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Skeleton && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -80,26 +79,22 @@ public class SkeletonHandler implements Listener{
             //dropped item chance = 9%
             ItemStack bowStack = new ItemStack(BOW, 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (boneStack.getAmount() != 0)
-                {
+                if (boneStack.getAmount() != 0) {
 
                     skeleton.getWorld().dropItem(skeleton.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (arrowStack.getAmount() != 0)
-                {
+                if (arrowStack.getAmount() != 0) {
 
                     skeleton.getWorld().dropItem(skeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 //lowered chance to drop from 9% to 3% to account for it never dropping damaged bows
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     skeleton.getWorld().dropItem(skeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -110,26 +105,22 @@ public class SkeletonHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (boneStack.getAmount() != 0)
-                {
+                if (boneStack.getAmount() != 0) {
 
                     skeleton.getWorld().dropItem(skeleton.getLocation(), boneStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (arrowStack.getAmount() != 0)
-                {
+                if (arrowStack.getAmount() != 0) {
 
                     skeleton.getWorld().dropItem(skeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 //lowered chance to drop from 9% to 3% to account for it never dropping damaged bows
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     skeleton.getWorld().dropItem(skeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

@@ -81,11 +81,11 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 /**
  * Created by MagmaGuy on 10/10/2016.
  */
-public class MobSpawner implements Listener{
+public class MobSpawner implements Listener {
 
     private MagmasMobs plugin;
 
-    public MobSpawner(Plugin plugin){
+    public MobSpawner(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -95,32 +95,28 @@ public class MobSpawner implements Listener{
     private int range = 50;
 
     @EventHandler
-    public void onSpawn(CreatureSpawnEvent event){
+    public void onSpawn(CreatureSpawnEvent event) {
 
-        if (event.getSpawnReason() == NATURAL)
-        {
+        if (event.getSpawnReason() == NATURAL) {
 
             Entity entity = event.getEntity();
 
             ValidAgressiveMobFilter validAgressiveMobFilter = new ValidAgressiveMobFilter();
 
-            if(validAgressiveMobFilter.ValidAgressiveMobFilter(entity))
-            {
+            if (validAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
                 Random random = new Random();
 
-                //20% chance of turning a mob into a supermob
-                if (random.nextDouble() < 0.20)
-                {
+                entity.setMetadata("NaturalEntity", new FixedMetadataValue(plugin, true));
 
-                    entity.setMetadata("NaturalEntity", new FixedMetadataValue(plugin, true));
+                //20% chance of turning a mob into a supermob
+                if (random.nextDouble() < 0.20) {
 
                     List<Entity> scanEntity = entity.getNearbyEntities(range, range, range);
 
                     int amountOfPlayersTogether = 0;
 
-                    for (Entity scannedEntity : scanEntity)
-                    {
+                    for (Entity scannedEntity : scanEntity) {
 
                         amountOfPlayersTogether++;
 
@@ -137,7 +133,7 @@ public class MobSpawner implements Listener{
                             int potionEffectRating = player.getActivePotionEffects().size();
 
                             int supermobRating = 0;
-                            supermobRating = supermobRating(player, supermobRating,  range);
+                            supermobRating = supermobRating(player, supermobRating, range);
 
                             int threathLevel = 0;
                             threathLevel = threatLevelCalculator(armorRating, potionEffectRating, supermobRating);
@@ -146,15 +142,13 @@ public class MobSpawner implements Listener{
 
                             Damageable damageableMob = (Damageable) entity;
 
-                            if (threathLevel == 0)
-                            {
+                            if (threathLevel == 0) {
 
                                 return;
 
                             }
 
-                            if (amountOfPlayersTogether == 1)
-                            {
+                            if (amountOfPlayersTogether == 1) {
 
                                 damageableMob.setMaxHealth(damageableMob.getMaxHealth() * supermobLevel);
                                 damageableMob.setHealth(damageableMob.getMaxHealth());
@@ -179,17 +173,15 @@ public class MobSpawner implements Listener{
     }
 
 
-    private int armorRatingHandler(Player player, int armorRating){
+    private int armorRatingHandler(Player player, int armorRating) {
 
         armorRating = 0;
 
-        if (player.getEquipment().getHelmet() != null)
-        {
+        if (player.getEquipment().getHelmet() != null) {
 
             Material helmetMaterial = player.getEquipment().getHelmet().getType();
 
-            if (helmetMaterial == LEATHER_HELMET)
-            {
+            if (helmetMaterial == LEATHER_HELMET) {
 
                 armorRating = armorRating + 1;
 
@@ -213,8 +205,7 @@ public class MobSpawner implements Listener{
 
         }
 
-        if (player.getEquipment().getChestplate() != null)
-        {
+        if (player.getEquipment().getChestplate() != null) {
 
             Material chestplateMaterial = player.getEquipment().getChestplate().getType();
 
@@ -242,8 +233,7 @@ public class MobSpawner implements Listener{
 
         }
 
-        if (player.getEquipment().getLeggings() != null)
-        {
+        if (player.getEquipment().getLeggings() != null) {
 
             Material leggingsMaterial = player.getEquipment().getLeggings().getType();
 
@@ -271,8 +261,7 @@ public class MobSpawner implements Listener{
 
         }
 
-        if (player.getEquipment().getBoots() != null)
-        {
+        if (player.getEquipment().getBoots() != null) {
 
             Material bootsMaterial = player.getEquipment().getBoots().getType();
 
@@ -305,23 +294,20 @@ public class MobSpawner implements Listener{
     }
 
 
-    private int supermobRating(Player player, int supermobRating, double range){
+    private int supermobRating(Player player, int supermobRating, double range) {
 
-        for (Entity nearPlayer : player.getNearbyEntities(range, range, range))
-        {
+        for (Entity nearPlayer : player.getNearbyEntities(range, range, range)) {
 
             if (nearPlayer.hasMetadata("SuperChicken") ||
                     nearPlayer.hasMetadata("SuperCow") ||
                     nearPlayer.hasMetadata("SuperIronGolem") ||
                     nearPlayer.hasMetadata("SuperMushroomCow") ||
                     nearPlayer.hasMetadata("SuperPig") ||
-                    nearPlayer.hasMetadata("SuperSheep"))
-            {
+                    nearPlayer.hasMetadata("SuperSheep")) {
 
                 supermobRating++;
 
-                if (supermobRating > 10)
-                {
+                if (supermobRating > 10) {
 
                     return supermobRating;
 
@@ -336,7 +322,7 @@ public class MobSpawner implements Listener{
     }
 
 
-    private int threatLevelCalculator (int armorRating, int potionEffectRating, int supermobRating) {
+    private int threatLevelCalculator(int armorRating, int potionEffectRating, int supermobRating) {
 
         int threatLevel = armorRating / 2 + potionEffectRating + supermobRating;
 
@@ -345,7 +331,7 @@ public class MobSpawner implements Listener{
     }
 
 
-    private int levelCalculator (int threatLevel){
+    private int levelCalculator(int threatLevel) {
 
         return threatLevel;
 

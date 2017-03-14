@@ -48,11 +48,11 @@ import static org.bukkit.Material.*;
 /**
  * Created by MagmaGuy on 07/10/2016.
  */
-public class ZombieHandler implements Listener{
+public class ZombieHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public ZombieHandler (Plugin plugin) {
+    public ZombieHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -60,11 +60,9 @@ public class ZombieHandler implements Listener{
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event)
-    {
+    public void onHit(EntityDamageEvent event) {
 
-        if(event.getEntity() instanceof Zombie && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Zombie && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -83,32 +81,27 @@ public class ZombieHandler implements Listener{
             ItemStack carrotStack = new ItemStack(CARROT_ITEM, 1);
             ItemStack potatoesStack = new ItemStack(POTATO_ITEM, 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (rottenFleshStack.getAmount() != 0)
-                {
+                if (rottenFleshStack.getAmount() != 0) {
 
                     zombie.getWorld().dropItem(zombie.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     zombie.getWorld().dropItem(zombie.getLocation(), ironStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     zombie.getWorld().dropItem(zombie.getLocation(), carrotStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     zombie.getWorld().dropItem(zombie.getLocation(), potatoesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -119,32 +112,27 @@ public class ZombieHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (rottenFleshStack.getAmount() != 0)
-                {
+                if (rottenFleshStack.getAmount() != 0) {
 
                     zombie.getWorld().dropItem(zombie.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     zombie.getWorld().dropItem(zombie.getLocation(), ironStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     zombie.getWorld().dropItem(zombie.getLocation(), carrotStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     zombie.getWorld().dropItem(zombie.getLocation(), potatoesStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

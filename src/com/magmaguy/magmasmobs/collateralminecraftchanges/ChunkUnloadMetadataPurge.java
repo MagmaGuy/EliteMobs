@@ -30,7 +30,7 @@ public class ChunkUnloadMetadataPurge implements Listener {
 
     private MagmasMobs plugin;
 
-    public ChunkUnloadMetadataPurge(Plugin plugin){
+    public ChunkUnloadMetadataPurge(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -38,38 +38,32 @@ public class ChunkUnloadMetadataPurge implements Listener {
 
 
     @EventHandler
-    public void onUnload (ChunkUnloadEvent event)
-    {
+    public void onUnload(ChunkUnloadEvent event) {
 
-        for (Entity entity : event.getChunk().getEntities())
-        {
+        for (Entity entity : event.getChunk().getEntities()) {
 
-            if (entity.hasMetadata("MagmasSuperMob"))
-            {
+            if (entity.hasMetadata("MagmasSuperMob")) {
 
                 entity.remove();
                 entity.removeMetadata("MagmasSuperMob", plugin);
 
             }
 
-            if (entity.hasMetadata("VisualEffect"))
-            {
+            if (entity.hasMetadata("VisualEffect")) {
 
                 entity.remove();
                 entity.removeMetadata("VisualEffect", plugin);
 
             }
 
-            if (entity.hasMetadata("forbidden"))
-            {
+            if (entity.hasMetadata("forbidden")) {
 
                 entity.remove();
                 entity.removeMetadata("forbidden", plugin);
 
             }
 
-            if (entity.hasMetadata("NaturalEntity"))
-            {
+            if (entity.hasMetadata("NaturalEntity")) {
 
                 entity.remove();
                 entity.removeMetadata("NaturalEntity", plugin);

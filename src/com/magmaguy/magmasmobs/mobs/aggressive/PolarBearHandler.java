@@ -46,11 +46,11 @@ import java.util.Random;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class PolarBearHandler implements Listener{
+public class PolarBearHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public PolarBearHandler(Plugin plugin){
+    public PolarBearHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -58,10 +58,9 @@ public class PolarBearHandler implements Listener{
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if(event.getEntity() instanceof PolarBear && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof PolarBear && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -77,16 +76,13 @@ public class PolarBearHandler implements Listener{
             //can't add salmon drops because spigot doesn't have them yet, so bonus fish
             ItemStack rawSalmonStack = new ItemStack(Material.RAW_FISH, random.nextInt(2) + 1);
 
-            for (int i = 0 ; i < dropMinAmount; i++)
-            {
-                if (random.nextDouble() < 0.75)
-                {
+            for (int i = 0; i < dropMinAmount; i++) {
+                if (random.nextDouble() < 0.75) {
                     polarBear.getWorld().dropItem(polarBear.getLocation(), rawFishStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.25)
-                {
+                if (random.nextDouble() < 0.25) {
 
                     polarBear.getWorld().dropItem(polarBear.getLocation(), rawSalmonStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -94,16 +90,13 @@ public class PolarBearHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
-                if (random.nextDouble() < 0.75)
-                {
+            if (dropChance > dropRandomizer) {
+                if (random.nextDouble() < 0.75) {
                     polarBear.getWorld().dropItem(polarBear.getLocation(), rawFishStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.25)
-                {
+                if (random.nextDouble() < 0.25) {
 
                     polarBear.getWorld().dropItem(polarBear.getLocation(), rawSalmonStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

@@ -49,11 +49,11 @@ import java.util.Random;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class BlazeHandler implements Listener{
+public class BlazeHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public BlazeHandler (Plugin plugin){
+    public BlazeHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -61,10 +61,9 @@ public class BlazeHandler implements Listener{
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof Blaze && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Blaze && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -77,12 +76,10 @@ public class BlazeHandler implements Listener{
             int dropMinAmount = (int) dropChance;
 
             ItemStack blazeRodStack = new ItemStack(Material.BLAZE_ROD, random.nextInt(2));
-            
-            for (int i = 0; i < dropMinAmount; i++)
-            {
-                
-                if (blazeRodStack.getAmount() != 0)
-                {
+
+            for (int i = 0; i < dropMinAmount; i++) {
+
+                if (blazeRodStack.getAmount() != 0) {
 
                     blaze.getWorld().dropItem(blaze.getLocation(), blazeRodStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -93,11 +90,9 @@ public class BlazeHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (blazeRodStack.getAmount() != 0)
-                {
+                if (blazeRodStack.getAmount() != 0) {
 
                     blaze.getWorld().dropItem(blaze.getLocation(), blazeRodStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -114,15 +109,13 @@ public class BlazeHandler implements Listener{
 
 
     @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event){
+    public void onDamage(EntityDamageByEntityEvent event) {
 
-        if (event.getDamager() instanceof Fireball)
-        {
+        if (event.getDamager() instanceof Fireball) {
 
             Fireball fireball = (Fireball) event.getDamager();
 
-            if (fireball.getShooter() instanceof  Blaze && ((Blaze) fireball.getShooter()).hasMetadata("MagmasSuperMob"))
-            {
+            if (fireball.getShooter() instanceof Blaze && ((Blaze) fireball.getShooter()).hasMetadata("MagmasSuperMob")) {
 
                 event.setDamage(event.getDamage() * ((Blaze) fireball.getShooter()).getMetadata("MagmasSuperMob").get(0).asInt());
 

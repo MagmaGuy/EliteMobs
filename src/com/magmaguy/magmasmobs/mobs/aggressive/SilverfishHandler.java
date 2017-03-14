@@ -57,11 +57,11 @@ import java.util.Random;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class SilverfishHandler implements Listener{
+public class SilverfishHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public SilverfishHandler(Plugin plugin){
+    public SilverfishHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -71,8 +71,7 @@ public class SilverfishHandler implements Listener{
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof Silverfish && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof Silverfish && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -86,16 +85,14 @@ public class SilverfishHandler implements Listener{
 
             //this has no drops aside from xp
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
                 ExperienceOrb xpDrop = silverFish.getWorld().spawn(silverFish.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(5);
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
                 ExperienceOrb xpDrop = silverFish.getWorld().spawn(silverFish.getLocation(), ExperienceOrb.class);
                 xpDrop.setExperience(5);

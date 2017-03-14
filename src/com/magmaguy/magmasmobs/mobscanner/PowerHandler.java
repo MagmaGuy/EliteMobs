@@ -33,23 +33,20 @@ public class PowerHandler {
 
     private MagmasMobs plugin;
 
-    public PowerHandler(Plugin plugin){
+    public PowerHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
-    public void powerHandler(Entity entity)
-    {
+    public void powerHandler(Entity entity) {
 
         int availableMinorPowers = 0;
         int availableMajorPowers = 0;
 
-        if (entity.hasMetadata("MagmasSuperMob") && entity.isValid() && ((LivingEntity) entity).getHealth() > 0)
-        {
+        if (entity.hasMetadata("MagmasSuperMob") && entity.isValid() && ((LivingEntity) entity).getHealth() > 0) {
 
-            if (entity.getMetadata("MagmasSuperMob").get(0).asInt() >= 5)
-            {
+            if (entity.getMetadata("MagmasSuperMob").get(0).asInt() >= 5) {
 
                 int superMobLevel = entity.getMetadata("MagmasSuperMob").get(0).asInt();
 
@@ -60,8 +57,7 @@ public class PowerHandler {
 
         }
 
-        if (availableMinorPowers >= 1)
-        {
+        if (availableMinorPowers >= 1) {
 
             int currentMinorPowerAmount = 0;
 
@@ -75,20 +71,17 @@ public class PowerHandler {
             minorPowerArray.add(new MovementSpeed(plugin));
             minorPowerArray.add(new InvulnerabilityFallDamage(plugin));
 
-            if (entity.hasMetadata("MinorPowerAmount"))
-            {
+            if (entity.hasMetadata("MinorPowerAmount")) {
 
                 currentMinorPowerAmount = entity.getMetadata("MinorPowerAmount").get(0).asInt();
 
                 Iterator<MinorPowers> minorPowerIterator = minorPowerArray.iterator();
 
-                while(minorPowerIterator.hasNext())
-                {
+                while (minorPowerIterator.hasNext()) {
 
                     MinorPowers minorPower = minorPowerIterator.next();
 
-                    if (minorPower.existingPowers(entity))
-                    {
+                    if (minorPower.existingPowers(entity)) {
 
                         minorPowerIterator.remove();
 
@@ -100,22 +93,18 @@ public class PowerHandler {
 
             int missingMinorPowerAmount = availableMinorPowers - currentMinorPowerAmount;
 
-            if (missingMinorPowerAmount > 0 && minorPowerArray.size() > 0)
-            {
+            if (missingMinorPowerAmount > 0 && minorPowerArray.size() > 0) {
 
-                for (int i = 0; i < missingMinorPowerAmount; i++)
-                {
+                for (int i = 0; i < missingMinorPowerAmount; i++) {
 
-                    if (minorPowerArray.size() > 0)
-                    {
+                    if (minorPowerArray.size() > 0) {
 
                         Random random = new Random();
                         int randomizer = random.nextInt(minorPowerArray.size());
                         MinorPowers selectedMinorPower = minorPowerArray.get(randomizer);
                         minorPowerArray.remove(minorPowerArray.get(randomizer));
 
-                        if (entity.hasMetadata("MinorPowerAmount"))
-                        {
+                        if (entity.hasMetadata("MinorPowerAmount")) {
 
                             int oldMinorPowerAmount = entity.getMetadata("MinorPowerAmount").get(0).asInt();
                             int newMinorPowerAmount = oldMinorPowerAmount + 1;
@@ -138,8 +127,7 @@ public class PowerHandler {
 
         }
 
-        if (availableMajorPowers >= 1)
-        {
+        if (availableMajorPowers >= 1) {
 
             //Todo: Add major powers
 

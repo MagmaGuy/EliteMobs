@@ -78,13 +78,11 @@ public class DefaultMaxHealthGuesser {
     public static final double pigHealth = 10;
     public static final double sheepHealth = 8;
 
-    public static double defaultMaxHealthGuesser(Entity entity)
-    {
+    public static double defaultMaxHealthGuesser(Entity entity) {
 
         //TODO: replace this with a better method if one is found
 
-        switch (entity.getType())
-        {
+        switch (entity.getType()) {
             case ZOMBIE:
                 return zombieHealth;
             case HUSK:

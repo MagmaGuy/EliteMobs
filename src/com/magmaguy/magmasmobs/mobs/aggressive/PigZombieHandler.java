@@ -49,11 +49,11 @@ import static org.bukkit.Material.ROTTEN_FLESH;
 /**
  * Created by MagmaGuy on 08/10/2016.
  */
-public class PigZombieHandler implements Listener{
+public class PigZombieHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public PigZombieHandler(Plugin plugin){
+    public PigZombieHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -61,10 +61,9 @@ public class PigZombieHandler implements Listener{
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof PigZombieHandler && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof PigZombieHandler && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -79,18 +78,15 @@ public class PigZombieHandler implements Listener{
             ItemStack rottenFleshStack = new ItemStack(ROTTEN_FLESH, random.nextInt(1) + 1);
             ItemStack goldNuggetStack = new ItemStack(GOLD_NUGGET, 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (rottenFleshStack.getAmount() != 0)
-                {
+                if (rottenFleshStack.getAmount() != 0) {
 
                     pigZombie.getWorld().dropItem(pigZombie.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.3)
-                {
+                if (random.nextDouble() < 0.3) {
 
                     pigZombie.getWorld().dropItem(pigZombie.getLocation(), goldNuggetStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -101,18 +97,15 @@ public class PigZombieHandler implements Listener{
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (rottenFleshStack.getAmount() != 0)
-                {
+                if (rottenFleshStack.getAmount() != 0) {
 
                     pigZombie.getWorld().dropItem(pigZombie.getLocation(), rottenFleshStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (random.nextDouble() < 0.3)
-                {
+                if (random.nextDouble() < 0.3) {
 
                     pigZombie.getWorld().dropItem(pigZombie.getLocation(), goldNuggetStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

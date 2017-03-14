@@ -52,7 +52,7 @@ public class WitherSkeletonHandler implements Listener {
 
     private MagmasMobs plugin;
 
-    public WitherSkeletonHandler (Plugin plugin){
+    public WitherSkeletonHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -60,10 +60,9 @@ public class WitherSkeletonHandler implements Listener {
 
 
     @EventHandler
-    public void onHit(EntityDamageEvent event){
+    public void onHit(EntityDamageEvent event) {
 
-        if(event.getEntity() instanceof WitherSkeleton && event.getEntity().hasMetadata("MagmasSuperMob"))
-        {
+        if (event.getEntity() instanceof WitherSkeleton && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -80,26 +79,22 @@ public class WitherSkeletonHandler implements Listener {
             //dropped item chance = 9%
             ItemStack bowStack = new ItemStack(BOW, 1);
 
-            for (int i = 0; i < dropMinAmount; i++)
-            {
+            for (int i = 0; i < dropMinAmount; i++) {
 
-                if (coalStack.getAmount() != 0)
-                {
+                if (coalStack.getAmount() != 0) {
 
                     witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), coalStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (arrowStack.getAmount() != 0)
-                {
+                if (arrowStack.getAmount() != 0) {
 
                     witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 //lowered chance to drop from 9% to 3% to account for it never dropping damaged bows
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
@@ -110,26 +105,22 @@ public class WitherSkeletonHandler implements Listener {
 
             }
 
-            if (dropChance > dropRandomizer)
-            {
+            if (dropChance > dropRandomizer) {
 
-                if (coalStack.getAmount() != 0)
-                {
+                if (coalStack.getAmount() != 0) {
 
                     witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), coalStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
-                if (arrowStack.getAmount() != 0)
-                {
+                if (arrowStack.getAmount() != 0) {
 
                     witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), arrowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
 
                 //lowered chance to drop from 9% to 3% to account for it never dropping damaged bows
-                if (random.nextDouble() < 0.03)
-                {
+                if (random.nextDouble() < 0.03) {
 
                     witherSkeleton.getWorld().dropItem(witherSkeleton.getLocation(), bowStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 

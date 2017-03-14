@@ -30,19 +30,18 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Created by MagmaGuy on 05/11/2016.
  */
-public class AttackGravity extends MinorPowers implements Listener  {
+public class AttackGravity extends MinorPowers implements Listener {
 
     private MagmasMobs plugin;
 
-    public AttackGravity(Plugin plugin){
+    public AttackGravity(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
     @Override
-    public void applyPowers(Entity entity)
-    {
+    public void applyPowers(Entity entity) {
 
         entity.setMetadata("AttackGravity", new FixedMetadataValue(plugin, true));
         ParticleEffects particleEffects = new ParticleEffects(plugin);
@@ -51,11 +50,9 @@ public class AttackGravity extends MinorPowers implements Listener  {
     }
 
     @Override
-    public boolean existingPowers(Entity entity)
-    {
+    public boolean existingPowers(Entity entity) {
 
-        if (entity.hasMetadata("AttackGravity"))
-        {
+        if (entity.hasMetadata("AttackGravity")) {
 
             return true;
 
@@ -66,14 +63,12 @@ public class AttackGravity extends MinorPowers implements Listener  {
     }
 
     @EventHandler
-    public void attackGravity (EntityDamageByEntityEvent event)
-    {
+    public void attackGravity(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        if (damager.hasMetadata("AttackGravity") && damagee instanceof Player)
-        {
+        if (damager.hasMetadata("AttackGravity") && damagee instanceof Player) {
 
             ((Player) damagee).addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 1));
 

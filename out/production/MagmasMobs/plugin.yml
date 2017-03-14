@@ -6,3 +6,24 @@ commands:
   magmasmobs:
     description: Tells a player the statistics of the
     usage: /magmasmobs
+    aliases: [mm]
+permissions:
+  magmasmobs.*:
+    description: Gives access to all magmasmobs commands
+    children:
+      magmasmobs.stats: true
+      magmasmobs.getloot: true
+      magmasmobs.reloadconfig: true
+      magmasmobs.giveloot: true
+  magmasmobs.stats:
+    description: Allows players to run /magmasmobs stats
+    default: op
+  magmasmobs.getloot:
+    description: Allow players to run /magmasmobs getloot
+    default: op
+  magmasmobs.reload.config:
+    decription: Allow players to run /magmasmobs reload config
+    default: op
+  magmasmobs.giveloot:
+    description: Allow players to run /magmasmobs giveloot [playername] random/[loot name]
+    default: op
