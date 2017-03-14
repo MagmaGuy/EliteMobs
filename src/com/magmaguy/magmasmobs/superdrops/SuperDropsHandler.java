@@ -291,7 +291,7 @@ public class SuperDropsHandler implements Listener {
             }
 
             //double drops
-            if (random.nextDouble() > (entity.getMetadata("MagmasSuperMob").get(0).asInt() * 0.01)) {
+            if (random.nextDouble() < (entity.getMetadata("MagmasSuperMob").get(0).asInt() * 0.01)) {
 
                 int randomDrop = random.nextInt(lootList.size());
 
