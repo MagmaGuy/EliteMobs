@@ -116,7 +116,7 @@ public class MobScanner implements Listener {
                     ((Damageable) entity).setMaxHealth(newMaxHealth);
 
                     double newHealth = ((Damageable) entity).getHealth() + ((Damageable) secondEntity).getHealth();
-                    ((Damageable) entity).setHealth(((Damageable) entity).getMaxHealth());
+                    ((Damageable) entity).setHealth(newHealth);
 
                     customAggressiveName(entity);
 
