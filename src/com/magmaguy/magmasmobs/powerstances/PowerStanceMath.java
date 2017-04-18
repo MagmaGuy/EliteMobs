@@ -18,14 +18,15 @@ package com.magmaguy.magmasmobs.powerstances;
 import com.magmaguy.magmasmobs.MagmasMobs;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import static org.bukkit.Bukkit.getLogger;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+
 
 /**
  * Created by MagmaGuy on 04/11/2016.
@@ -40,43 +41,26 @@ public class PowerStanceMath {
 
     }
 
-    public List<Location> cylindricalPowerStance(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical) {
+    public List<Location> cylindricalPowerStance(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, float counter) {
 
-        //this code assumes the existence of two rotating points
+        //this code assumes the existence of two translating points
+        List<Location> locations = cylindricalPowerStanceMath(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
 
-        if (entity.hasMetadata("CylindricalPowerStance")) {
-
-            int currentPosition = entity.getMetadata("CylindricalPowerStance").get(0).asInt();
-
-            List<Location> locations = cylindricalPowerStanceMath(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, currentPosition);
-
-            int newPosition = currentPosition + 1;
-
-            entity.setMetadata("CylindricalPowerStance", new FixedMetadataValue(plugin, newPosition));
-
-            return locations;
-
-        } else {
-
-            entity.setMetadata("CylindricalPowerStance", new FixedMetadataValue(plugin, 1));
-
-            return cylindricalPowerStanceMath(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, 1);
-
-        }
+        return locations;
 
     }
 
-    private List<Location> cylindricalPowerStanceMath(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, int offset) {
+    private List<Location> cylindricalPowerStanceMath(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, float counter) {
 
         List<Location> coordinateLocations = new ArrayList<>();
 
-        speedHorizontal = speedHorizontal * 18 + offset * 18;
+        speedHorizontal = speedHorizontal * 18 + counter * 18;
+
         if (speedVertical != 0) {
 
-            speedVertical = speedVertical * 18 + offset * 18;
+            speedVertical = speedVertical * 18 + counter * 18;
 
         }
-
 
         double x1 = (0.5 * cos(speedHorizontal) - sin(speedHorizontal) * radiusHorizontal);
         double y1 = cos(speedVertical) * radiusVertical;

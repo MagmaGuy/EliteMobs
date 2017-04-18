@@ -201,11 +201,21 @@ public class MagmasMobs extends JavaPlugin implements Listener {
             public void run() {
 
                 mobScanner.scanMobs();
-                potionEffectApplier.potionEffectApplier();
 
             }
 
         }, 1, 1);
+
+        processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+
+            public void run() {
+
+                potionEffectApplier.potionEffectApplier();
+
+            }
+
+        }, 20, 20);
+
 
     }
 
@@ -220,7 +230,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Loot.Zombie Slayer.Item Name", "Zombie Slayer");
         getConfig().addDefault("Loot.Zombie Slayer.Item Lore", Arrays.asList("Slays zombies Bigly."));
         getConfig().addDefault("Loot.Zombie Slayer.Enchantments", Arrays.asList("DAMAGE_ALL,5", "DAMAGE_UNDEAD,5"));
-        getConfig().addDefault("Loot.Zombie Slayer.Potion Effects", Arrays.asList("potions", "man"));
+        getConfig().addDefault("Loot.Zombie Slayer.Potion Effects", Arrays.asList("GLOWING,1"));
         getConfig().options().copyDefaults(true);
 
         //save the config when changed

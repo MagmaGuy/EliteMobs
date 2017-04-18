@@ -128,12 +128,12 @@ public class SuperDropsHandler implements Listener {
 
             lootList.add(itemStack);
 
-            List <PotionEffect> parsedPotionEffect = new ArrayList();
+            List<PotionEffect> parsedPotionEffect = new ArrayList();
 
             //Add potion effects to a separate list to reduce i/o operations
             if (potionEffects != null) {
 
-                for (Object object : potionEffects){
+                for (Object object : potionEffects) {
 
                     String string = object.toString();
 
@@ -143,7 +143,7 @@ public class SuperDropsHandler implements Listener {
                     PotionEffectType potionEffectType = PotionEffectType.getByName(potionEffectTypeString);
 
                     //this is a really bad way of doing things, two wrongs make a right
-                    if(parsedString.length % 2 != 0){
+                    if (parsedString.length % 2 != 0) {
 
                         getLogger().info("Your item " + itemName + " has a problematic potions effect entry.");
 
@@ -151,7 +151,7 @@ public class SuperDropsHandler implements Listener {
 
                     int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
 
-                    PotionEffect potionEffect = new PotionEffect(potionEffectType, 40 ,potionEffectAmplifier);
+                    PotionEffect potionEffect = new PotionEffect(potionEffectType, 40, potionEffectAmplifier);
 
                     parsedPotionEffect.add(potionEffect);
 
