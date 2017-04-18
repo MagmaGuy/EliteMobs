@@ -56,6 +56,13 @@ public class ChunkUnloadMetadataPurge implements Listener {
 
             }
 
+            if (entity.hasMetadata("CylindricalPowerStance")) {
+
+                entity.remove();
+                entity.removeMetadata("CylindricalPowerStance", plugin);
+
+            }
+
             if (entity.hasMetadata("forbidden")) {
 
                 entity.remove();

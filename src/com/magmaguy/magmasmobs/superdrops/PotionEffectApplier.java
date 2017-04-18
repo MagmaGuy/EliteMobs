@@ -28,7 +28,7 @@ import static com.magmaguy.magmasmobs.superdrops.SuperDropsHandler.potionEffectI
  */
 public class PotionEffectApplier {
 
-    public void potionEffectApplier (){
+    public void potionEffectApplier() {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
 
@@ -77,7 +77,7 @@ public class PotionEffectApplier {
         for (ItemStack itemStackIteration : potionEffectItemList.keySet()) {
 
             if (itemStackIteration.getType().equals(itemStack.getType()) &&
-                    itemStackIteration.getItemMeta().equals(itemStack.getItemMeta())){
+                    itemStackIteration.getItemMeta().equals(itemStack.getItemMeta())) {
 
                 ItemStack defaultStack = itemStackIteration;
                 effectApplier(defaultStack, player);
@@ -88,12 +88,12 @@ public class PotionEffectApplier {
 
     }
 
-    private void effectApplier(ItemStack key, Player player){
+    private void effectApplier(ItemStack key, Player player) {
 
         for (PotionEffect potionEffect : potionEffectItemList.get(key)) {
 
             //night vision getting deleted and put back is extremely jarring, bypass
-            if (potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)){
+            if (potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)) {
 
                 player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20 * 60, 1));
 
