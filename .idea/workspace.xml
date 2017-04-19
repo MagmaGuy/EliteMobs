@@ -7,27 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/ArmorHandler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/DamageHandler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/HealthHandler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/LevelHandler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/NameHandler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerFormula.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/MobScanner$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/SuperMobDamageHandler.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/SuperMobDamageHandler.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/artifacts/MagmasMobs_jar/MagmasMobs.jar" afterPath="$PROJECT_DIR$/out/artifacts/MagmasMobs_jar/MagmasMobs.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MagmasMobs$1.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MagmasMobs$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MagmasMobs.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MagmasMobs.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/MobScanner.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/MobScanner.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/BlazeHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/BlazeHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/PowerStances/ParticleEffects$1.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/PowerStances/ParticleEffects$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/PowerStances/ParticleEffects$2.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/PowerStances/ParticleEffects$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/PowerStances/ParticleEffects.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/PowerStances/ParticleEffects.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/BlazeHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/BlazeHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/MobScanner.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/MobScanner.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/ParticleEffects.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/ParticleEffects.java" />
     </list>
     <ignored path="ActiveStack.iws" />
@@ -61,7 +41,7 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="DamageHandler.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="DamageHandler.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/DamageHandler.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="459">
@@ -89,6 +69,19 @@
                 <state relative-caret-position="432">
                   <caret line="49" column="0" lean-forward="true" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
                   <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ParticleEffects.java" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/ParticleEffects.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="781">
+                  <caret line="306" column="42" lean-forward="false" selection-start-line="306" selection-start-column="42" selection-end-line="306" selection-end-column="42" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                    <element signature="e#9799#9807#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -225,7 +218,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/superdrops/ItemDropVelocity.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/collateralminecraftchanges/ChunkUnloadMetadataPurge.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/PowerStanceMath.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/ParticleEffects.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/ArmorHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/NameHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerFormula.java" />
@@ -235,6 +227,7 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/BlazeHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/DamageHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/ParticleEffects.java" />
       </list>
     </option>
   </component>
@@ -891,7 +884,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492492338177</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Major overhaul to the health and damage of supermobs&#10;- Fixed bug where blazes were doing too much damage&#10;- Armor is now far more important than it used to be&#10;- Cleaned up the scanner&#10;-">
+      <created>1492588770434</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1492588770434</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TodoView">
@@ -905,6 +905,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1426" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32869297" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -921,7 +922,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13712242" sideWeight="0.76411444" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13712242" sideWeight="0.76411444" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Statistic" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32869297" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18870842" sideWeight="0.49841017" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -957,7 +958,8 @@
     <MESSAGE value="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Fixed loot odds being inverted" />
     <MESSAGE value="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Now applying the correct newHealth" />
     <MESSAGE value="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Major overhaul to the trail effects, they're now smooth and don't cause lag issues" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Major overhaul to the trail effects, they're now smooth and don't cause lag issues" />
+    <MESSAGE value="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Major overhaul to the health and damage of supermobs&#10;- Fixed bug where blazes were doing too much damage&#10;- Armor is now far more important than it used to be&#10;- Cleaned up the scanner&#10;-" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Major overhaul to the health and damage of supermobs&#10;- Fixed bug where blazes were doing too much damage&#10;- Armor is now far more important than it used to be&#10;- Cleaned up the scanner&#10;-" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1156,17 +1158,6 @@
         <state relative-caret-position="156">
           <caret line="56" column="43" lean-forward="false" selection-start-line="56" selection-start-column="31" selection-end-line="56" selection-end-column="43" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/ParticleEffects.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-867">
-          <caret line="50" column="5" lean-forward="true" selection-start-line="50" selection-start-column="5" selection-end-line="50" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#9792#9800#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1374,6 +1365,17 @@
           <caret line="56" column="0" lean-forward="true" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/ParticleEffects.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="781">
+          <caret line="306" column="42" lean-forward="false" selection-start-line="306" selection-start-column="42" selection-end-line="306" selection-end-column="42" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#9799#9807#0" expanded="true" />
           </folding>
         </state>
       </provider>

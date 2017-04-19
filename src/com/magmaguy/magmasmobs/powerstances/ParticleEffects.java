@@ -302,7 +302,9 @@ public class ParticleEffects implements Listener {
 
 
     @EventHandler
-    private void metadataKiller(EntityDeathEvent event, Entity entity, String metadataName) {
+    public void metadataKiller(EntityDeathEvent event) {
+
+        Entity entity = event.getEntity();
 
         List<String> metadataList = new ArrayList<String>();
         metadataList.add("AttackGravity");
