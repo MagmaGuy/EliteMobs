@@ -22,6 +22,7 @@ package com.magmaguy.magmasmobs;
 import com.magmaguy.magmasmobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
 import com.magmaguy.magmasmobs.collateralminecraftchanges.PreventSpawnerMobEggInteraction;
 import com.magmaguy.magmasmobs.minorpowers.*;
+import com.magmaguy.magmasmobs.mobcustomizer.DamageHandler;
 import com.magmaguy.magmasmobs.mobs.aggressive.*;
 import com.magmaguy.magmasmobs.mobs.passive.*;
 import com.magmaguy.magmasmobs.mobscanner.MobScanner;
@@ -88,7 +89,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new SheepHandler(this), this);
 
         //Mob damage
-        this.getServer().getPluginManager().registerEvents(new SuperMobDamageHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new DamageHandler(this), this);
 
         //Mob powers
         this.getServer().getPluginManager().registerEvents(new AttackGravity(this), this);

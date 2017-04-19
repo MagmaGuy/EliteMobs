@@ -24,6 +24,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +32,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.bukkit.Bukkit.getLogger;
@@ -190,7 +192,6 @@ public class ParticleEffects implements Listener {
         if (entity.hasMetadata("AttackGravity")) {
 
             itemEffect(entity, 1.0, 1.0, 20, 2, Material.ELYTRA, Material.ELYTRA);
-            metadataKiller(entity, "AttackGravity");
 
         }
 
@@ -202,7 +203,6 @@ public class ParticleEffects implements Listener {
         if (entity.hasMetadata("AttackPoison")) {
 
             itemEffect(entity, 1.0, 1.0, 20, 2, Material.EMERALD, Material.EMERALD);
-            metadataKiller(entity, "AttackPoison");
 
         }
 
@@ -214,7 +214,6 @@ public class ParticleEffects implements Listener {
         if (entity.hasMetadata("AttackPush")) {
 
             itemEffect(entity, 1.0, 1.0, 20, 2, Material.PISTON_BASE, Material.PISTON_BASE);
-            metadataKiller(entity, "AttackPush");
 
         }
 
@@ -228,7 +227,6 @@ public class ParticleEffects implements Listener {
             ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
 
             itemEffect(entity, 1.0, 1.0, 20, 2, itemStack, itemStack);
-            metadataKiller(entity, "AttackWither");
 
         }
 
@@ -240,7 +238,6 @@ public class ParticleEffects implements Listener {
         if (entity.hasMetadata("InvulnerabilityArrow")) {
 
             itemEffect(entity, 1.0, 1.0, 20, 2, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW);
-            metadataKiller(entity, "InvulnerabilityArrow");
 
         }
 
@@ -252,7 +249,6 @@ public class ParticleEffects implements Listener {
         if (entity.hasMetadata("InvulnerabilityFallDamage")) {
 
             itemEffect(entity, 1.0, 0.5, 20, 2, Material.FEATHER, Material.FEATHER);
-            metadataKiller(entity, "InvulnerabilityFallDamage");
         }
 
     }
@@ -263,7 +259,6 @@ public class ParticleEffects implements Listener {
         if (entity.hasMetadata("InvulnerabilityFire")) {
 
             particleEffect(entity, 1.0, 1.0, 20, 2, Particle.FLAME, Particle.FLAME, 5);
-            metadataKiller(entity, "InvulnerabilityFire");
 
         }
 
@@ -275,7 +270,7 @@ public class ParticleEffects implements Listener {
         if (entity.hasMetadata("MovementSpeed")) {
 
             itemEffect(entity, 1.0, 1.0, 20, 2, Material.GOLD_BOOTS, Material.GOLD_BOOTS);
-            metadataKiller(entity, "MovementSpeed");
+
         }
 
     }
@@ -306,11 +301,25 @@ public class ParticleEffects implements Listener {
     }
 
 
-    private void metadataKiller(Entity entity, String metadataName) {
+    @EventHandler
+    private void metadataKiller(EntityDeathEvent event, Entity entity, String metadataName) {
 
-        if (!entity.isValid()) {
+        List<String> metadataList = new ArrayList<String>();
+        metadataList.add("AttackGravity");
+        metadataList.add("AttackPoison");
+        metadataList.add("AttackPush");
+        metadataList.add("AttackWither");
+        metadataList.add("InvulnerabilityArrow");
+        metadataList.add("InvulnerabilityFallDamage");
+        metadataList.add("MovementSpeed");
 
-            entity.removeMetadata(metadataName, plugin);
+        for (String string : metadataList) {
+
+            if (entity.hasMetadata(string)) {
+
+                entity.removeMetadata(string, plugin);
+
+            }
 
         }
 
