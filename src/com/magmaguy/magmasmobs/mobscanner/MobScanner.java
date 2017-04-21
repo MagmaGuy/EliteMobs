@@ -66,6 +66,15 @@ public class MobScanner implements Listener {
 
                 if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
+                    //scan for naturally spawned supermobs
+                    if (entity.hasMetadata("MagmasSuperMob") && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
+
+                        HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata("MagmasSuperMob").get(0).asInt());
+                        customAggressiveName(entity, plugin);
+
+                    }
+
+                    //scan for stacked supermobs
                     scanValidAggressiveLivingEntity(entity);
 
                     if (entity.hasMetadata("MagmasSuperMob")) {
@@ -80,6 +89,7 @@ public class MobScanner implements Listener {
 
                 }
 
+                //scan for passive mobs
                 if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && !entity.hasMetadata("MagmasPassiveSupermob")) {
 
                     scanValidPassiveLivingEntity(entity);
@@ -107,6 +117,13 @@ public class MobScanner implements Listener {
 
                 //If the sum of both entities is above level 50, don't add both entities together
                 if (levelCap(entity, secondEntity)) {
+
+                    if (!entity.hasMetadata("NaturalEntity") || !secondEntity.hasMetadata("NaturalEntity")){
+
+                        entity.removeMetadata("NaturalEntity", plugin);
+
+                    }
+
                     //remove duplicate
                     secondEntity.remove();
 
@@ -114,9 +131,7 @@ public class MobScanner implements Listener {
 
                     //setup new MagmasSuperMob
                     LevelHandler.LevelHandler(entity, secondEntity, plugin);
-
                     HealthHandler.aggressiveHealthHandler(entity, secondEntity);
-
                     customAggressiveName(entity, plugin);
 
                     if (secondEntity.hasMetadata("MagmasSuperMob")) {

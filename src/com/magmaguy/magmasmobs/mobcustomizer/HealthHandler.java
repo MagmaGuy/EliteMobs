@@ -43,8 +43,6 @@ public class HealthHandler {
 
             damageableEntity.setHealth(adjustedAddedHealth);
 
-            getLogger().info("added health " + adjustedAddedHealth);
-
         } else if (entity.hasMetadata("MagmasSuperMob") && deletedEntity.hasMetadata("MagmasSuperMob")) {
 
             if (damageableEntity.getHealth() + damageableDeleted.getHealth() > damageableEntity.getMaxHealth()) {
@@ -66,6 +64,15 @@ public class HealthHandler {
         ((Damageable) entity).setMaxHealth(((LivingEntity) entity).getMaxHealth() * passiveStacking);
 
         ((Damageable) entity).setHealth(((LivingEntity) entity).getMaxHealth());
+
+    }
+
+    public static void naturalAgressiveHealthHandler (Entity entity, int supermobLevel) {
+
+        Damageable damageable = (Damageable) entity;
+
+        damageable.setMaxHealth(PowerFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), supermobLevel));
+        damageable.setHealth(damageable.getMaxHealth());
 
     }
 
