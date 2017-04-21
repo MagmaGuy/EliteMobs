@@ -25,6 +25,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
@@ -52,7 +53,6 @@ public class ParticleEffects implements Listener {
 
 
     private int processID;
-    private final Vector verticalVelocity = new Vector(0, 0.1, 0);
 
     //Particle processing
     private void particleEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, Particle particle1, Particle particle2, int particleAmount) {
@@ -69,8 +69,9 @@ public class ParticleEffects implements Listener {
                 Location location1 = particleLocations.get(0);
                 Location location2 = particleLocations.get(1);
 
-                entity.getWorld().spawnParticle(particle1, location1.getX(), location1.getY(), location1.getZ(), particleAmount, 0.0, 0.0, 0.0, 0.01);
-                entity.getWorld().spawnParticle(particle2, location2.getX(), location2.getY(), location2.getZ(), particleAmount, 0.0, 0.0, 0.0, 0.01);
+                entity.getWorld().spawnParticle(particle1, location1, particleAmount, 0.0, 0.0, 0.0, 0.01);
+                entity.getWorld().spawnParticle(particle2, location2, particleAmount, 0.0, 0.0, 0.0, 0.01);
+
 
                 if (!entity.isValid()) {
 
@@ -110,12 +111,12 @@ public class ParticleEffects implements Listener {
                     Location newLocation1 = particleLocations.get(0);
                     Location newLocation2 = particleLocations.get(1);
 
-                    floatable1.teleport(newLocation1);
+//                    floatable1.teleport(newLocation1);
                     floatable1.setPickupDelay(Integer.MAX_VALUE);
                     floatable1.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
 
 
-                    floatable2.teleport(newLocation2);
+//                    floatable2.teleport(newLocation2);
                     floatable2.setPickupDelay(Integer.MAX_VALUE);
                     floatable2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
 
@@ -130,24 +131,24 @@ public class ParticleEffects implements Listener {
                     Location oldLocation2 = oldParticleLocations.get(1);
 
 
-                    if (counter % (4 * 10) == 0) {
-
-                        floatable1.teleport(oldLocation1.add(new Vector(-1,1,-0.5)));
-                        floatable2.teleport(oldLocation2.add(new Vector(-1,1,-0.5)));
-
-                    }
+//                    if (counter % (4 * 10) == 0) {
+//
+//                        floatable1.teleport(oldLocation1.add(new Vector(-1,1,-0.5)));
+//                        floatable2.teleport(oldLocation2.add(new Vector(-1,1,-0.5)));
+//
+//                    }
 
                     floatable1.setGravity(false);
-                    Vector vector1 = (newLocation1.add(new Vector(-1,1,-0.5)).subtract(floatable1.getLocation()).toVector());
+//                    Vector vector1 = (newLocation1.add(new Vector(-1,1,-0.5)).subtract(floatable1.getLocation()).toVector());
+                    Vector vector1 = (newLocation1.subtract(floatable1.getLocation()).toVector());
                     vector1 = vector1.multiply(0.3);
                     floatable1.setVelocity(vector1);
-                    floatable1.setTicksLived(1);
 
                     floatable2.setGravity(false);
-                    Vector vector2 = (newLocation2.add(new Vector(-1,1,-0.5)).subtract(floatable2.getLocation()).toVector());
+//                    Vector vector2 = (newLocation2.add(new Vector(-1,1,-0.5)).subtract(floatable2.getLocation()).toVector());
+                    Vector vector2 = (newLocation2.subtract(floatable2.getLocation()).toVector());
                     vector2 = vector2.multiply(0.3);
                     floatable2.setVelocity(vector2);
-                    floatable2.setTicksLived(1);
 
                 }
 
@@ -237,7 +238,7 @@ public class ParticleEffects implements Listener {
 
         if (entity.hasMetadata("InvulnerabilityArrow")) {
 
-            itemEffect(entity, 1.0, 1.0, 20, 2, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW);
+            itemEffect(entity, 1.0, 1, 20, 0, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW);
 
         }
 
@@ -248,7 +249,7 @@ public class ParticleEffects implements Listener {
 
         if (entity.hasMetadata("InvulnerabilityFallDamage")) {
 
-            itemEffect(entity, 1.0, 0.5, 20, 2, Material.FEATHER, Material.FEATHER);
+            itemEffect(entity, 1.0, 1, 20, 2, Material.FEATHER, Material.FEATHER);
         }
 
     }
@@ -269,7 +270,7 @@ public class ParticleEffects implements Listener {
 
         if (entity.hasMetadata("MovementSpeed")) {
 
-            itemEffect(entity, 1.0, 1.0, 20, 2, Material.GOLD_BOOTS, Material.GOLD_BOOTS);
+            itemEffect(entity, 1.0, 1.0, 0, 2, Material.GOLD_BOOTS, Material.GOLD_BOOTS);
 
         }
 
@@ -322,6 +323,17 @@ public class ParticleEffects implements Listener {
                 entity.removeMetadata(string, plugin);
 
             }
+
+        }
+
+    }
+
+    @EventHandler
+    public void antiItemDespawn (ItemDespawnEvent event) {
+
+        if (event.getEntity().hasMetadata("VisualEffect")) {
+
+            event.setCancelled(true);
 
         }
 

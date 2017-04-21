@@ -54,11 +54,11 @@ public class PowerStanceMath {
 
         List<Location> coordinateLocations = new ArrayList<>();
 
-        speedHorizontal = speedHorizontal * 18 + counter * 18;
+        speedHorizontal = speedHorizontal * 12 + counter * 12;
 
         if (speedVertical != 0) {
 
-            speedVertical = speedVertical * 18 + counter * 18;
+            speedVertical = speedVertical * 12 + counter * 12;
 
         }
 

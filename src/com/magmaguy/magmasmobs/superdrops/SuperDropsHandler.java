@@ -278,7 +278,6 @@ public class SuperDropsHandler implements Listener {
                 entity.hasMetadata("MagmasSuperMob") &&
                 entity.getMetadata("MagmasSuperMob").get(0).asInt() > 4) {
 
-            getLogger().info("supermob dead");
 
             if (random.nextDouble() > 0.25) {
 
