@@ -20,8 +20,6 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
-import static org.bukkit.Bukkit.getLogger;
-
 /**
  * Created by MagmaGuy on 18/04/2017.
  */

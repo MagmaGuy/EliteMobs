@@ -39,6 +39,7 @@ public class ValidAgressiveMobFilter {
 
     public static boolean ValidAgressiveMobFilter(Entity entity) {
 
+        //TODO: allow individual config deselection of allowed entities
         if (entity instanceof Zombie ||
                 entity instanceof Skeleton ||
                 entity instanceof PigZombie ||

@@ -20,6 +20,7 @@ package com.magmaguy.magmasmobs;
  */
 
 import com.magmaguy.magmasmobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
+import com.magmaguy.magmasmobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.magmasmobs.collateralminecraftchanges.PreventSpawnerMobEggInteraction;
 import com.magmaguy.magmasmobs.minorpowers.*;
 import com.magmaguy.magmasmobs.mobcustomizer.DamageHandler;
@@ -132,6 +133,9 @@ public class MagmasMobs extends JavaPlugin implements Listener {
             this.getServer().getPluginManager().registerEvents(new PreventSpawnerMobEggInteraction(this), this);
 
         }
+
+        this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(), this);//TODO: make this optional
+
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(this), this);
 
         //Commands

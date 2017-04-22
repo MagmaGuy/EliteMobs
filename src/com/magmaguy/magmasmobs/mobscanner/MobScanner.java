@@ -20,14 +20,11 @@ import com.magmaguy.magmasmobs.mobcustomizer.ArmorHandler;
 import com.magmaguy.magmasmobs.mobcustomizer.HealthHandler;
 import com.magmaguy.magmasmobs.mobcustomizer.LevelHandler;
 import com.magmaguy.magmasmobs.mobs.passive.ChickenHandler;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -37,7 +34,6 @@ import java.util.List;
 import static com.magmaguy.magmasmobs.MagmasMobs.worldList;
 import static com.magmaguy.magmasmobs.mobcustomizer.NameHandler.customAggressiveName;
 import static com.magmaguy.magmasmobs.mobcustomizer.NameHandler.customPassiveName;
-import static org.bukkit.Bukkit.getLogger;
 
 /**
  * Created by MagmaGuy on 07/10/2016.

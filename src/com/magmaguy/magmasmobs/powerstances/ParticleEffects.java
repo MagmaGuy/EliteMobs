@@ -36,8 +36,6 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.bukkit.Bukkit.getLogger;
-
 /**
  * Created by MagmaGuy on 04/11/2016.
  */
@@ -111,12 +109,9 @@ public class ParticleEffects implements Listener {
                     Location newLocation1 = particleLocations.get(0);
                     Location newLocation2 = particleLocations.get(1);
 
-//                    floatable1.teleport(newLocation1);
                     floatable1.setPickupDelay(Integer.MAX_VALUE);
                     floatable1.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
 
-
-//                    floatable2.teleport(newLocation2);
                     floatable2.setPickupDelay(Integer.MAX_VALUE);
                     floatable2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
 
@@ -130,22 +125,33 @@ public class ParticleEffects implements Listener {
                     Location oldLocation1 = oldParticleLocations.get(0);
                     Location oldLocation2 = oldParticleLocations.get(1);
 
+                    //Respawn item to avoid too much client-side visual drifting
+                    if (counter % (4 * 60 * 3) == 0) {
 
-//                    if (counter % (4 * 10) == 0) {
-//
-//                        floatable1.teleport(oldLocation1.add(new Vector(-1,1,-0.5)));
-//                        floatable2.teleport(oldLocation2.add(new Vector(-1,1,-0.5)));
-//
-//                    }
+                        Location location1 = floatable1.getLocation();
+                        floatable1.remove();
+                        floatable1.removeMetadata("VisualEffect", plugin);
+
+                        floatable1 = entity.getWorld().dropItem(location1, itemStack1);
+                        floatable1.setPickupDelay(Integer.MAX_VALUE);
+                        floatable1.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+
+                        Location location2 = floatable2.getLocation();
+                        floatable2.remove();
+                        floatable2.removeMetadata("VisualEffect", plugin);
+
+                        floatable2 = entity.getWorld().dropItem(location2, itemStack2);
+                        floatable2.setPickupDelay(Integer.MAX_VALUE);
+                        floatable2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+
+                    }
 
                     floatable1.setGravity(false);
-//                    Vector vector1 = (newLocation1.add(new Vector(-1,1,-0.5)).subtract(floatable1.getLocation()).toVector());
                     Vector vector1 = (newLocation1.subtract(floatable1.getLocation()).toVector());
                     vector1 = vector1.multiply(0.3);
                     floatable1.setVelocity(vector1);
 
                     floatable2.setGravity(false);
-//                    Vector vector2 = (newLocation2.add(new Vector(-1,1,-0.5)).subtract(floatable2.getLocation()).toVector());
                     Vector vector2 = (newLocation2.subtract(floatable2.getLocation()).toVector());
                     vector2 = vector2.multiply(0.3);
                     floatable2.setVelocity(vector2);
@@ -156,11 +162,9 @@ public class ParticleEffects implements Listener {
 
                     floatable1.remove();
                     floatable1.removeMetadata("VisualEffect", plugin);
-                    floatable1.removeMetadata("CylindricalPowerStance", plugin);
 
                     floatable2.remove();
                     floatable2.removeMetadata("VisualEffect", plugin);
-                    floatable2.removeMetadata("CylindricalPowerStance", plugin);
 
                     Bukkit.getScheduler().cancelTask(processID);
 

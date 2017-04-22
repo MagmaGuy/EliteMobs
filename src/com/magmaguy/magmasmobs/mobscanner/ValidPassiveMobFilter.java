@@ -24,6 +24,7 @@ public class ValidPassiveMobFilter {
 
     public static boolean ValidPassiveMobFilter(Entity entity) {
 
+        //TODO: allow individual config deselection of allowed entities
         if (entity instanceof Chicken ||
                 entity instanceof Cow ||
                 entity instanceof IronGolem ||

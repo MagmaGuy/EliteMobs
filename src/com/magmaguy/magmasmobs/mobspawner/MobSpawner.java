@@ -61,7 +61,6 @@
 package com.magmaguy.magmasmobs.mobspawner;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.mobcustomizer.HealthHandler;
 import com.magmaguy.magmasmobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Material;
 import org.bukkit.entity.Damageable;
@@ -76,7 +75,6 @@ import org.bukkit.plugin.Plugin;
 import java.util.List;
 import java.util.Random;
 
-import static org.bukkit.Bukkit.getLogger;
 import static org.bukkit.Material.*;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
