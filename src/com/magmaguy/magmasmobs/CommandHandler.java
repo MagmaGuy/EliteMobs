@@ -63,7 +63,6 @@ public class CommandHandler implements CommandExecutor {
             player.sendMessage("/magmasmobs reload config");
             player.sendMessage("/magmasmobs getloot [loot name]");
             player.sendMessage("/magmasmobs giveloot [player name] random/[loot name]");
-            getLogger().info("test");
 
             return true;
 
@@ -191,6 +190,29 @@ public class CommandHandler implements CommandExecutor {
             player.sendMessage("/magmasmobs giveloot [player name] random/[loot name]");
 
             return true;
+
+        }
+
+        if (sender instanceof Player)
+        {
+
+            Player player = ((Player) sender).getPlayer();
+
+            player.sendMessage("Command not recognized. Valid commands:");
+            player.sendMessage("/magmasmobs stats");
+            player.sendMessage("/magmasmobs reload config");
+            player.sendMessage("/magmasmobs getloot [loot name]");
+            player.sendMessage("/magmasmobs giveloot [player name] random/[loot name]");
+
+            return true;
+
+        } else if (sender instanceof ConsoleCommandSender) {
+
+            getLogger().info("Command not recognized. Valid commands:");
+            getLogger().info("magmasmobs stats");
+            getLogger().info("magmasmobs reload config");
+            getLogger().info("magmasmobs getloot [loot name]");
+            getLogger().info("magmasmobs giveloot [player name] random/[loot name]");
 
         }
 

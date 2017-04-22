@@ -15,8 +15,6 @@
 
 package com.magmaguy.magmasmobs.mobcustomizer;
 
-import com.magmaguy.magmasmobs.mobscanner.DefaultMaxHealthGuesser;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;

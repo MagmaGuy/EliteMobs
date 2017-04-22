@@ -22,7 +22,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
-import static org.bukkit.Bukkit.getLogger;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;

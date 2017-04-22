@@ -15,8 +15,6 @@
 
 package com.magmaguy.magmasmobs.mobcustomizer;
 
-import static org.bukkit.Bukkit.getLogger;
-
 /**
  * Created by MagmaGuy on 18/04/2017.
  */

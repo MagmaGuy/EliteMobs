@@ -16,15 +16,12 @@
 package com.magmaguy.magmasmobs.mobcustomizer;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.plugin.Plugin;
-import org.yaml.snakeyaml.events.Event;
 
 /**
  * Created by MagmaGuy on 18/04/2017.
