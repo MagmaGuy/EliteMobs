@@ -16,6 +16,7 @@
 package com.magmaguy.magmasmobs.powerstances;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
+import com.mysql.fabric.xmlrpc.base.Array;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,6 +37,8 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.bukkit.Bukkit.getLogger;
+
 /**
  * Created by MagmaGuy on 04/11/2016.
  */
@@ -52,7 +55,7 @@ public class ParticleEffects implements Listener {
 
     private int processID;
 
-    //Particle processing
+    //Secondary effect particle processing
     private void particleEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, Particle particle1, Particle particle2, int particleAmount) {
 
         PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
@@ -85,86 +88,180 @@ public class ParticleEffects implements Listener {
 
     }
 
+    //Secondary effect item processing
+    public void itemEffect(Entity entity) {
 
-    //Generic item processing
-    private void itemEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, ItemStack itemStack1, ItemStack itemStack2) {
+        if (entity.hasMetadata("VisualEffect")){
+
+            return;
+
+        }
 
         PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
+
+        double radiusHorizontal = 1;
+        double radiusVertical = 1;
+        double speedHorizontal = 20;
+        double speedVertical = 2;
+
+        int amountPerTrack = 2;
+
+        entity.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+
+        //contains all items around a given entity
+        List<Item> items = new ArrayList<Item>();
 
         processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
             float counter = 0;
 
-            Item floatable1;
-            Item floatable2;
-
             public void run() {
 
-                if (floatable1 == null && floatable2 == null) {
+                int effectQuantity = 0;
+                int effectIteration = 0;
 
-                    floatable1 = entity.getWorld().dropItem(entity.getLocation(), itemStack1);
-                    floatable2 = entity.getWorld().dropItem(entity.getLocation(), itemStack2);
+                //count amount of active effects
+                if(entity.hasMetadata("AttackGravity")) {
 
-                    List<Location> particleLocations = powerStanceMath.cylindricalPowerStance(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
-                    Location newLocation1 = particleLocations.get(0);
-                    Location newLocation2 = particleLocations.get(1);
+                    effectQuantity++;
 
-                    floatable1.setPickupDelay(Integer.MAX_VALUE);
-                    floatable1.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+                }
 
-                    floatable2.setPickupDelay(Integer.MAX_VALUE);
-                    floatable2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+                if(entity.hasMetadata("AttackPoison")) {
 
-                } else {
+                    effectQuantity++;
 
-                    List<Location> particleLocations = powerStanceMath.cylindricalPowerStance(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
-                    Location newLocation1 = particleLocations.get(0);
-                    Location newLocation2 = particleLocations.get(1);
 
-                    List<Location> oldParticleLocations = powerStanceMath.cylindricalPowerStance(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter - 1);
-                    Location oldLocation1 = oldParticleLocations.get(0);
-                    Location oldLocation2 = oldParticleLocations.get(1);
+                }
 
-                    //Respawn item to avoid too much client-side visual drifting
-                    if (counter % (4 * 60 * 3) == 0) {
+                if(entity.hasMetadata("AttackPush")) {
 
-                        Location location1 = floatable1.getLocation();
-                        floatable1.remove();
-                        floatable1.removeMetadata("VisualEffect", plugin);
+                    effectQuantity++;
 
-                        floatable1 = entity.getWorld().dropItem(location1, itemStack1);
-                        floatable1.setPickupDelay(Integer.MAX_VALUE);
-                        floatable1.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
 
-                        Location location2 = floatable2.getLocation();
-                        floatable2.remove();
-                        floatable2.removeMetadata("VisualEffect", plugin);
+                }
 
-                        floatable2 = entity.getWorld().dropItem(location2, itemStack2);
-                        floatable2.setPickupDelay(Integer.MAX_VALUE);
-                        floatable2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+                if(entity.hasMetadata("AttackWither")) {
 
-                    }
+                    effectQuantity++;
 
-                    floatable1.setGravity(false);
-                    Vector vector1 = (newLocation1.subtract(floatable1.getLocation()).toVector());
-                    vector1 = vector1.multiply(0.3);
-                    floatable1.setVelocity(vector1);
 
-                    floatable2.setGravity(false);
-                    Vector vector2 = (newLocation2.subtract(floatable2.getLocation()).toVector());
-                    vector2 = vector2.multiply(0.3);
-                    floatable2.setVelocity(vector2);
+                }
+
+                if(entity.hasMetadata("InvulnerabilityArrow")) {
+
+                    effectQuantity++;
+
+
+                }
+
+                if(entity.hasMetadata("InvulnerabilityFallDamage")) {
+
+                    effectQuantity++;
+
+
+                }
+
+                if(entity.hasMetadata("MovementSpeed")) {
+
+                    effectQuantity++;
+
+
+                }
+
+                //apply new positioning
+                if (entity.hasMetadata("AttackGravity")) {
+
+                    effectIteration++;
+
+                    ItemStack effectItem1 = new ItemStack(Material.ELYTRA, 1);
+                    ItemStack effectItem2 = new ItemStack(Material.ELYTRA, 1);
+
+                    itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+                }
+
+                if(entity.hasMetadata("AttackPoison")) {
+
+                    effectIteration++;
+
+                    ItemStack effectItem1 = new ItemStack(Material.EMERALD, 1);
+                    ItemStack effectItem2 = new ItemStack(Material.EMERALD, 1);
+
+                    itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+
+                }
+
+                if(entity.hasMetadata("AttackPush")) {
+
+                    effectIteration++;
+
+                    ItemStack effectItem1 = new ItemStack(Material.PISTON_BASE, 1);
+                    ItemStack effectItem2 = new ItemStack(Material.PISTON_BASE, 1);
+
+                    itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+                }
+
+                if(entity.hasMetadata("AttackWither")) {
+
+                    effectIteration++;
+
+                    ItemStack effectItem1 = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
+                    ItemStack effectItem2 = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
+
+                    itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+
+                }
+
+                if(entity.hasMetadata("InvulnerabilityArrow")) {
+
+                    effectIteration++;
+
+                    ItemStack effectItem1 = new ItemStack(Material.SPECTRAL_ARROW, 1);
+                    ItemStack effectItem2 = new ItemStack(Material.TIPPED_ARROW, 1);
+
+                    itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+
+                }
+
+                if(entity.hasMetadata("InvulnerabilityFallDamage")) {
+
+                    effectIteration++;
+
+                    ItemStack effectItem1 = new ItemStack(Material.FEATHER, 1);
+                    ItemStack effectItem2 = new ItemStack(Material.FEATHER, 1);
+
+                    itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+
+                }
+
+                if(entity.hasMetadata("MovementSpeed")) {
+
+                    effectIteration++;
+
+                    ItemStack effectItem1 = new ItemStack(Material.GOLD_BOOTS, 1);
+                    ItemStack effectItem2 = new ItemStack(Material.GOLD_BOOTS, 1);
+
+                    itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
 
                 }
 
                 if (!entity.isValid()) {
 
-                    floatable1.remove();
-                    floatable1.removeMetadata("VisualEffect", plugin);
+                    for (Item currentItem : items) {
 
-                    floatable2.remove();
-                    floatable2.removeMetadata("VisualEffect", plugin);
+                        currentItem.remove();
+                        currentItem.removeMetadata("VisualEffect", plugin);
+
+                    }
+
+                    entity.removeMetadata("VisualEffect", plugin);
 
                     Bukkit.getScheduler().cancelTask(processID);
 
@@ -179,102 +276,129 @@ public class ParticleEffects implements Listener {
 
     }
 
-    //Material item effect preprocessor
-    private void itemEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, Material material1, Material material2) {
+    public void itemProcessor (List<Item> items, int effectQuantity, int effectIteration, ItemStack effectItem1,
+                               ItemStack effectItem2, int amountPerTrack, Entity entity, double radiusHorizontal,
+                               double radiusVertical, double speedHorizontal, double speedVertical, float counter) {
+
+        boolean effectAlreadyPresent = false;
+
+        for (Item currentItem : items){
+
+            if (currentItem.getItemStack().equals(effectItem1)) {
+
+                effectAlreadyPresent = true;
+                break;
+
+            }
+
+        }
 
         PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
 
-        ItemStack itemStack1 = new ItemStack(material1, 1);
-        ItemStack itemStack2 = new ItemStack(material2, 1);
+        //divided number is based on the amount of counts it takes for the effect to do a full cycle (counter * 12) may change, may be worth putting on constructor? Finnicky math
+        int adjustedCounter = 30 / amountPerTrack;
+        //assuming 2 items per track, dividing the 30 of a full cycle by 2 to operate start positions over 180 degrees
+        int currentItemOffset = (int) Math.ceil((15 / effectQuantity) * effectIteration);
 
-        itemEffect(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, itemStack1, itemStack2);
+        if (!effectAlreadyPresent) {
 
-    }
+            int repeatedCycles = 0;
 
+            while (repeatedCycles != amountPerTrack){
 
-    public void attackGravityEffect(Entity entity) {
+                Item item1 = entity.getWorld().dropItem(entity.getLocation(), effectItem1);
+                Item item2 = entity.getWorld().dropItem(entity.getLocation(), effectItem2);
 
-        if (entity.hasMetadata("AttackGravity")) {
+                item1.setPickupDelay(Integer.MAX_VALUE);
+                item1.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
 
-            itemEffect(entity, 1.0, 1.0, 20, 2, Material.ELYTRA, Material.ELYTRA);
+                item2.setPickupDelay(Integer.MAX_VALUE);
+                item2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+
+                items.add(item1);
+                items.add(item2);
+
+                adjustedCounter += adjustedCounter;
+
+                repeatedCycles++;
+
+            }
+
+        } else {
+
+            int repeatedCycles = 0;
+
+            while (repeatedCycles != amountPerTrack) {
+
+                List<Location> particleLocations = powerStanceMath.cylindricalPowerStance(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter + adjustedCounter + currentItemOffset);
+                Location newLocation1 = particleLocations.get(0);
+                Location newLocation2 = particleLocations.get(1);
+
+                //Respawn item to avoid too much client-side visual drifting
+                if (counter % (4 * 3) == 0) {
+
+//                    List<Location> oldParticleLocations = powerStanceMath.cylindricalPowerStance(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter + adjustedCounter - 1 + currentItemOffset);
+//                    Location oldLocation1 = oldParticleLocations.get(0);
+//                    Location oldLocation2 = oldParticleLocations.get(1);
+
+                    Item item1 = items.get(((effectIteration-1)*4)+repeatedCycles*amountPerTrack);
+                    Item item2 = items.get(((effectIteration-1)*4)+1+repeatedCycles*amountPerTrack);
+
+                    int index1 = items.indexOf(item1);
+                    int index2 = items.indexOf(item2);
+
+                    items.remove(item1);
+                    items.remove(item2);
+
+                    Location location1 = item1.getLocation();
+                    item1.remove();
+                    item1.removeMetadata("VisualEffect", plugin);
+
+                    item1 = entity.getWorld().dropItem(location1, effectItem1);
+                    items.add(index1, item1);
+                    item1.setPickupDelay(Integer.MAX_VALUE);
+                    item1.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+
+                    Location location2 = item2.getLocation();
+                    item2.remove();
+                    item2.removeMetadata("VisualEffect", plugin);
+
+                    item2 = entity.getWorld().dropItem(location2, effectItem2);
+                    items.add(index2, item2);
+                    item2.setPickupDelay(Integer.MAX_VALUE);
+                    item2.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
+
+                }
+
+                //there are 4 items in 1 run. 2 items processed at a time (for two tracks)
+                Item item1 = items.get(((effectIteration-1)*4)+repeatedCycles*amountPerTrack);
+                Item item2 = items.get(((effectIteration-1)*4)+1+repeatedCycles*amountPerTrack);
+
+                item1.setGravity(false);
+                Vector vector1 = (newLocation1.subtract(item1.getLocation()).toVector());
+                vector1 = vector1.multiply(0.3);
+                item1.setVelocity(vector1);
+
+                item2.setGravity(false);
+                Vector vector2 = (newLocation2.subtract(item2.getLocation()).toVector());
+                vector2 = vector2.multiply(0.3);
+                item2.setVelocity(vector2);
+
+                adjustedCounter += adjustedCounter;
+
+                repeatedCycles++;
+
+            }
 
         }
 
     }
-
-
-    public void attackPoisonEffect(Entity entity) {
-
-        if (entity.hasMetadata("AttackPoison")) {
-
-            itemEffect(entity, 1.0, 1.0, 20, 2, Material.EMERALD, Material.EMERALD);
-
-        }
-
-    }
-
-
-    public void attackPushEffect(Entity entity) {
-
-        if (entity.hasMetadata("AttackPush")) {
-
-            itemEffect(entity, 1.0, 1.0, 20, 2, Material.PISTON_BASE, Material.PISTON_BASE);
-
-        }
-
-    }
-
-
-    public void attackWitherEffect(Entity entity) {
-
-        if (entity.hasMetadata("AttackWither")) {
-
-            ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
-
-            itemEffect(entity, 1.0, 1.0, 20, 2, itemStack, itemStack);
-
-        }
-
-    }
-
-
-    public void invulnerabilityArrowEffect(Entity entity) {
-
-        if (entity.hasMetadata("InvulnerabilityArrow")) {
-
-            itemEffect(entity, 1.0, 1, 20, 0, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW);
-
-        }
-
-    }
-
-
-    public void invulnerabilityFallDamageEffect(Entity entity) {
-
-        if (entity.hasMetadata("InvulnerabilityFallDamage")) {
-
-            itemEffect(entity, 1.0, 1, 20, 2, Material.FEATHER, Material.FEATHER);
-        }
-
-    }
-
 
     public void invulnerabilityFireEffect(Entity entity) {
 
         if (entity.hasMetadata("InvulnerabilityFire")) {
 
             particleEffect(entity, 1.0, 1.0, 20, 2, Particle.FLAME, Particle.FLAME, 5);
-
-        }
-
-    }
-
-
-    public void movementSpeedEffect(Entity entity) {
-
-        if (entity.hasMetadata("MovementSpeed")) {
-
-            itemEffect(entity, 1.0, 1.0, 0, 2, Material.GOLD_BOOTS, Material.GOLD_BOOTS);
 
         }
 
