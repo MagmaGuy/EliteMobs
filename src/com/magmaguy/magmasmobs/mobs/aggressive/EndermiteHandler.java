@@ -16,7 +16,7 @@
 package com.magmaguy.magmasmobs.mobs.aggressive;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.mobscanner.DefaultMaxHealthGuesser;
+import com.magmaguy.magmasmobs.mobcustomizer.DefaultMaxHealthGuesser;
 import org.bukkit.entity.Endermite;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;

@@ -16,7 +16,7 @@
 package com.magmaguy.magmasmobs.minorpowers;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.powerstances.ParticleEffects;
+import com.magmaguy.magmasmobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -42,8 +42,8 @@ public class MovementSpeed extends MinorPowers {
 
         entity.setMetadata("MovementSpeed", new FixedMetadataValue(plugin, true));
         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999 * 20, 2));
-        ParticleEffects particleEffects = new ParticleEffects(plugin);
-        particleEffects.movementSpeedEffect(entity);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        minorPowerPowerStance.itemEffect(entity);
 
     }
 

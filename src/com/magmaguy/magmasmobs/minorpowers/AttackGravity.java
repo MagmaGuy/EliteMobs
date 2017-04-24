@@ -16,7 +16,7 @@
 package com.magmaguy.magmasmobs.minorpowers;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.powerstances.ParticleEffects;
+import com.magmaguy.magmasmobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,8 +44,8 @@ public class AttackGravity extends MinorPowers implements Listener {
     public void applyPowers(Entity entity) {
 
         entity.setMetadata("AttackGravity", new FixedMetadataValue(plugin, true));
-        ParticleEffects particleEffects = new ParticleEffects(plugin);
-        particleEffects.attackGravityEffect(entity);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        minorPowerPowerStance.itemEffect(entity);
 
     }
 

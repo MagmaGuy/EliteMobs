@@ -58,17 +58,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.magmasmobs.mobspawner;
+package com.magmaguy.magmasmobs.naturalmobspawner;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Material;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
@@ -76,17 +73,15 @@ import java.util.List;
 import java.util.Random;
 
 import static org.bukkit.Material.*;
-import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
-import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 
 /**
  * Created by MagmaGuy on 10/10/2016.
  */
-public class MobSpawner implements Listener {
+public class NaturalMobSpawner implements Listener {
 
     private MagmasMobs plugin;
 
-    public MobSpawner(Plugin plugin) {
+    public NaturalMobSpawner(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
@@ -95,72 +90,52 @@ public class MobSpawner implements Listener {
 
     private int range = 50;
 
-    @EventHandler
-    public void onSpawn(CreatureSpawnEvent event) {
+    public void naturalMobProcessor (Entity entity) {
 
-        if (event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM) {
+        Random random = new Random();
 
-            Entity entity = event.getEntity();
+        List<Entity> scanEntity = entity.getNearbyEntities(range, range, range);
 
-            ValidAgressiveMobFilter validAgressiveMobFilter = new ValidAgressiveMobFilter();
+        int amountOfPlayersTogether = 0;
 
-            if (validAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
+        for (Entity scannedEntity : scanEntity) {
 
-                Random random = new Random();
+            amountOfPlayersTogether++;
 
-                entity.setMetadata("NaturalEntity", new FixedMetadataValue(plugin, true));
+            if (scannedEntity instanceof Player) //vanishnopacket support
+            {
 
-                //20% chance of turning a mob into a supermob
-                if (random.nextDouble() < 0.20) {
+                Player player = (Player) scannedEntity;
+                int armorRating = 0;
 
-                    List<Entity> scanEntity = entity.getNearbyEntities(range, range, range);
+                armorRating = armorRatingHandler(player, armorRating);
 
-                    int amountOfPlayersTogether = 0;
+                int potionEffectRating = player.getActivePotionEffects().size();
 
-                    for (Entity scannedEntity : scanEntity) {
+                int supermobRating = 0;
+                supermobRating = supermobRating(player, supermobRating, range);
 
-                        amountOfPlayersTogether++;
+                int threathLevel = 0;
+                threathLevel = threatLevelCalculator(armorRating, potionEffectRating, supermobRating);
 
-                        if (scannedEntity instanceof Player) //vanishnopacket support
-                        {
+                int supermobLevel = levelCalculator(threathLevel);
 
-                            Player player = (Player) scannedEntity;
-                            int armorRating = 0;
+                Damageable damageableMob = (Damageable) entity;
 
-                            armorRating = armorRatingHandler(player, armorRating);
+                if (threathLevel == 0) {
 
-                            int potionEffectRating = player.getActivePotionEffects().size();
+                    return;
 
-                            int supermobRating = 0;
-                            supermobRating = supermobRating(player, supermobRating, range);
+                }
 
-                            int threathLevel = 0;
-                            threathLevel = threatLevelCalculator(armorRating, potionEffectRating, supermobRating);
+                //Just set up the metadata, scanner will pick it up and apply the correct stats
+                if (amountOfPlayersTogether == 1) {
 
-                            int supermobLevel = levelCalculator(threathLevel);
+                    entity.setMetadata("MagmasSuperMob", new FixedMetadataValue(plugin, supermobLevel));
 
-                            Damageable damageableMob = (Damageable) entity;
+                } else if (amountOfPlayersTogether > 1 && random.nextDouble() < 20) {
 
-                            if (threathLevel == 0) {
-
-                                return;
-
-                            }
-
-                            //Just set up the metadata, scanner will pick it up and apply the correct stats
-                            if (amountOfPlayersTogether == 1) {
-
-                                entity.setMetadata("MagmasSuperMob", new FixedMetadataValue(plugin, supermobLevel));
-
-                            } else if (amountOfPlayersTogether > 1 && random.nextDouble() < 20) {
-
-                                entity.setMetadata("MagmasSuperMob", new FixedMetadataValue(plugin, supermobLevel));
-
-                            }
-
-                        }
-
-                    }
+                    entity.setMetadata("MagmasSuperMob", new FixedMetadataValue(plugin, supermobLevel));
 
                 }
 

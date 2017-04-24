@@ -126,6 +126,8 @@ public class SuperDropsHandler implements Listener {
 
             itemStack.setItemMeta(itemMeta);
 
+            getLogger().info("loot added");
+
             lootList.add(itemStack);
 
             List<PotionEffect> parsedPotionEffect = new ArrayList();
@@ -279,7 +281,7 @@ public class SuperDropsHandler implements Listener {
                 entity.getMetadata("MagmasSuperMob").get(0).asInt() > 4) {
 
 
-            if (random.nextDouble() > 0.25) {
+            if (random.nextDouble() < plugin.getConfig().getDouble("Aggressive SuperMobs flat loot drop rate %") / 100) {
 
                 int randomDrop = random.nextInt(lootList.size());
 
@@ -290,7 +292,8 @@ public class SuperDropsHandler implements Listener {
             }
 
             //double drops
-            if (random.nextDouble() < (entity.getMetadata("MagmasSuperMob").get(0).asInt() * 0.01)) {
+            if (plugin.getConfig().getBoolean("Aggressive SuperMobs can drop additional loot with drop % based on SuperMob level (higher is more likely)") &&
+                    random.nextDouble() < (entity.getMetadata("MagmasSuperMob").get(0).asInt() / 100)) {
 
                 int randomDrop = random.nextInt(lootList.size());
 

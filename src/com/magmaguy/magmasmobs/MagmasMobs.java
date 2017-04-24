@@ -27,8 +27,9 @@ import com.magmaguy.magmasmobs.mobcustomizer.DamageHandler;
 import com.magmaguy.magmasmobs.mobs.aggressive.*;
 import com.magmaguy.magmasmobs.mobs.passive.*;
 import com.magmaguy.magmasmobs.mobscanner.MobScanner;
-import com.magmaguy.magmasmobs.mobspawner.MobSpawner;
-import com.magmaguy.magmasmobs.powerstances.ParticleEffects;
+import com.magmaguy.magmasmobs.naturalmobspawner.NaturalMobMetadataAssigner;
+import com.magmaguy.magmasmobs.naturalmobspawner.NaturalMobSpawner;
+import com.magmaguy.magmasmobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.magmasmobs.superdrops.PotionEffectApplier;
 import com.magmaguy.magmasmobs.superdrops.SuperDropsHandler;
 import org.bukkit.Bukkit;
@@ -107,34 +108,43 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         //Natural SuperMob Spawning
         if (getConfig().getBoolean("Natural SuperMob spawning")) {
 
-            this.getServer().getPluginManager().registerEvents(new MobSpawner(this), this);
+            this.getServer().getPluginManager().registerEvents(new NaturalMobSpawner(this), this);
 
             getLogger().info("MagmasMobs - Natural SuperMob Spawning enabled!");
 
         }
 
+        //Natural Mob Metadata Assigner
+        this.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(this), this);
+
         //Visual effects
-        this.getServer().getPluginManager().registerEvents(new ParticleEffects(this), this);
+        this.getServer().getPluginManager().registerEvents(new MinorPowerPowerStance(this), this);
 
         //Loot
-        if (getConfig().getBoolean("Enable loot")) {
-
-            getLogger().info("MagmasMobs - SuperMob loot enabled!");
+        if (getConfig().getBoolean("Aggressive SuperMobs can drop config loot (level 5 SuperMobs and up)")) {
 
             this.getServer().getPluginManager().registerEvents(new SuperDropsHandler(this), this);
+
+            getLogger().info("MagmasMobs - SuperMob loot enabled!");
 
         }
 
         //Minecraft behavior canceller
         if (getConfig().getBoolean("Prevent players from changing mob spawners using eggs")) {
 
-            getLogger().info("MagmasMobs - Mob egg interact on mob spawner canceller enabled!");
-
             this.getServer().getPluginManager().registerEvents(new PreventSpawnerMobEggInteraction(this), this);
+
+            getLogger().info("MagmasMobs - Mob egg interact on mob spawner canceller enabled!");
 
         }
 
-        this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(), this);//TODO: make this optional
+        if (getConfig().getBoolean("Prevent creepers from killing passive mobs")) {
+
+            this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(this), this);
+
+            getLogger().info("MagmasMobs - Creeper passive mob collateral damage canceller enabled!");
+
+        }
 
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(this), this);
 
@@ -228,9 +238,26 @@ public class MagmasMobs extends JavaPlugin implements Listener {
     public void loadConfiguration() {
 
         //check defaults
-        getConfig().addDefault("Natural SuperMob spawning", true);
+        getConfig().addDefault("Allow aggressive SuperMobs", true);
+        getConfig().addDefault("Valid aggressive SuperMobs",Arrays.asList("Blaze", "CaveSpider", "Creeper",
+                "Enderman", "Endermite", "IronGolem", "PigZombie", "PolarBear", "Silverfish", "Skeleton",
+                "Spider", "Witch", "Zombie"));
+        getConfig().addDefault("Valid aggressive SuperMobs powers", Arrays.asList("AttackGravity", "AttackPoison",
+                "AttackPush", "AttackWither", "InvulnerabilityArrow", "InvulnerabilityFallDamage", "InvulnerabilityFire", "MovementSpeed"));
+        getConfig().addDefault("Allow Passive SuperMobs", true);
+        getConfig().addDefault("Valid Passive SuperMobs", Arrays.asList("Chicken", "Cow", "MushroomCow",
+                "Pig", "Sheep"));
+        getConfig().addDefault("Natural aggressive SuperMob spawning", true);
+        getConfig().addDefault("Percentage (%) of aggressive mobs that get converted to SuperMobs when they spawn", 20);
+        getConfig().addDefault("Aggressive mob stacking", true);
+        getConfig().addDefault("Aggressive SuperMobs can drop config loot (level 5 SuperMobs and up)", true);
+        getConfig().addDefault("Aggressive SuperMobs flat loot drop rate %", 50);
+        getConfig().addDefault("Aggressive SuperMobs can drop additional loot with drop % based on SuperMob level (higher is more likely)", true);
         getConfig().addDefault("Prevent players from changing mob spawners using eggs", true);
-        getConfig().addDefault("Enable loot", true);
+        getConfig().addDefault("Prevent creepers from killing passive mobs", true);
+        getConfig().addDefault("SuperCreeper explosion nerf multiplier", 1.0);
+        getConfig().addDefault("Turn on visual effects for natural or plugin-spawned SuperMobs", true);
+        getConfig().addDefault("Turn off visual effects for non-natural or non-plugin-spawned SuperMobs", true);
         getConfig().addDefault("Loot.Zombie Slayer.Item Type", "DIAMOND_SWORD");
         getConfig().addDefault("Loot.Zombie Slayer.Item Name", "Zombie Slayer");
         getConfig().addDefault("Loot.Zombie Slayer.Item Lore", Arrays.asList("Slays zombies Bigly."));

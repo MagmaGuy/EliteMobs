@@ -38,7 +38,7 @@ public class DamageHandler implements Listener{
 
     public static double damageMath(double initialDamage, int superMobLevel) {
 
-        double finalDamage = PowerFormula.PowerFormula(initialDamage,superMobLevel);
+        double finalDamage = ScalingFormula.PowerFormula(initialDamage,superMobLevel);
 
         return finalDamage;
 
@@ -89,7 +89,7 @@ public class DamageHandler implements Listener{
 
         if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
-            event.setRadius((float) damageMath(event.getRadius(), event.getEntity().getMetadata("MagmasSuperMob").get(0).asInt()));
+            event.setRadius((float) damageMath(event.getRadius(), (int) Math.ceil(event.getEntity().getMetadata("MagmasSuperMob").get(0).asInt() * plugin.getConfig().getDouble("SuperCreeper explosion nerf multiplier"))));
 
         }
 

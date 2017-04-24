@@ -30,29 +30,36 @@
 
 package com.magmaguy.magmasmobs.mobscanner;
 
+import com.magmaguy.magmasmobs.MagmasMobs;
 import org.bukkit.entity.*;
+import org.bukkit.plugin.Plugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by MagmaGuy on 10/10/2016.
  */
-public class ValidAgressiveMobFilter {
+public class ValidAgressiveMobFilter{
 
-    public static boolean ValidAgressiveMobFilter(Entity entity) {
+        private MagmasMobs plugin;
 
+        public static boolean ValidAgressiveMobFilter(Entity entity, List list) {
         //TODO: allow individual config deselection of allowed entities
-        if (entity instanceof Zombie ||
-                entity instanceof Skeleton ||
-                entity instanceof PigZombie ||
-                entity instanceof Creeper ||
-                entity instanceof Spider ||
-                entity instanceof Enderman ||
-                entity instanceof CaveSpider ||
-                entity instanceof Silverfish ||
-                entity instanceof Blaze ||
-                entity instanceof Witch ||
-                entity instanceof Endermite ||
-                entity instanceof PolarBear ||
-                entity instanceof ZombieVillager) {
+        if (entity instanceof Blaze && list.contains("Blaze")||
+                entity instanceof CaveSpider && list.contains("CaveSpider")||
+                entity instanceof Creeper && list.contains("Creeper")||
+                entity instanceof Enderman && list.contains("Enderman")||
+                entity instanceof Endermite && list.contains("Endermite")||
+                entity instanceof IronGolem && list.contains("IronGolem")||
+                entity instanceof PigZombie && list.contains("PigZombie")||
+                entity instanceof PolarBear && list.contains("PolarBear")||
+                entity instanceof Silverfish && list.contains("Silverfish")||
+                entity instanceof Skeleton && list.contains("Skeleton")||
+                entity instanceof Spider && list.contains("Spider")||
+                entity instanceof Witch && list.contains("Witch")||
+                entity instanceof ZombieVillager && list.contains("Zombie") ||
+                entity instanceof Zombie && list.contains("Zombie")) {
 
             return true;
 
