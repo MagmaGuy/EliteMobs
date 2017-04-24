@@ -18,7 +18,7 @@ package com.magmaguy.magmasmobs.mobcustomizer;
 /**
  * Created by MagmaGuy on 18/04/2017.
  */
-public class PowerFormula {
+public class ScalingFormula {
 
     public static double PowerFormula (double baseAmount, int superMobLevel) {
 

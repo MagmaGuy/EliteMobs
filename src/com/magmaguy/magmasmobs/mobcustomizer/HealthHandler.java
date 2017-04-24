@@ -15,7 +15,6 @@
 
 package com.magmaguy.magmasmobs.mobcustomizer;
 
-import com.magmaguy.magmasmobs.mobscanner.DefaultMaxHealthGuesser;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -30,12 +29,12 @@ public class HealthHandler {
         Damageable damageableEntity = ((Damageable) entity);
         Damageable damageableDeleted = ((Damageable) deletedEntity);
 
-        damageableEntity.setMaxHealth(PowerFormula.PowerFormula (DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata("MagmasSuperMob").get(0).asInt()));
+        damageableEntity.setMaxHealth(ScalingFormula.PowerFormula (DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata("MagmasSuperMob").get(0).asInt()));
 
         if (entity.hasMetadata("MagmasSuperMob") && !deletedEntity.hasMetadata("MagmasSuperMob")) {
 
-            double adjustedAddedHealth = damageableEntity.getHealth() + PowerFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity),
-                    entity.getMetadata("MagmasSuperMob").get(0).asInt()) - PowerFormula.PowerFormula
+            double adjustedAddedHealth = damageableEntity.getHealth() + ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity),
+                    entity.getMetadata("MagmasSuperMob").get(0).asInt()) - ScalingFormula.PowerFormula
                     (DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata("MagmasSuperMob").get(0).asInt() - 1) -
                     (damageableDeleted.getMaxHealth() - damageableDeleted.getHealth());
 
@@ -69,7 +68,7 @@ public class HealthHandler {
 
         Damageable damageable = (Damageable) entity;
 
-        damageable.setMaxHealth(PowerFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), supermobLevel));
+        damageable.setMaxHealth(ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), supermobLevel));
         damageable.setHealth(damageable.getMaxHealth());
 
     }

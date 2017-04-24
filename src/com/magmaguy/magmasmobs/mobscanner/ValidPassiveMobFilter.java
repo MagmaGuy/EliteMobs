@@ -17,20 +17,21 @@ package com.magmaguy.magmasmobs.mobscanner;
 
 import org.bukkit.entity.*;
 
+import java.util.List;
+
 /**
  * Created by MagmaGuy on 19/12/2016.
  */
 public class ValidPassiveMobFilter {
 
-    public static boolean ValidPassiveMobFilter(Entity entity) {
+    public static boolean ValidPassiveMobFilter(Entity entity, List list) {
 
         //TODO: allow individual config deselection of allowed entities
-        if (entity instanceof Chicken ||
-                entity instanceof Cow ||
-                entity instanceof IronGolem ||
-                entity instanceof MushroomCow ||
-                entity instanceof Pig ||
-                entity instanceof Sheep) {
+        if (entity instanceof Chicken && list.contains("Chicken") ||
+                entity instanceof Cow && list.contains("Cow") ||
+                entity instanceof MushroomCow && list.contains("MushroomCow")||
+                entity instanceof Pig && list.contains("Pig") ||
+                entity instanceof Sheep && list.contains("Sheep")) {
 
             return true;
 

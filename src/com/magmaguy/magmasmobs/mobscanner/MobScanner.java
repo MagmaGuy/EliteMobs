@@ -16,9 +16,7 @@
 package com.magmaguy.magmasmobs.mobscanner;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.mobcustomizer.ArmorHandler;
-import com.magmaguy.magmasmobs.mobcustomizer.HealthHandler;
-import com.magmaguy.magmasmobs.mobcustomizer.LevelHandler;
+import com.magmaguy.magmasmobs.mobcustomizer.*;
 import com.magmaguy.magmasmobs.mobs.passive.ChickenHandler;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
@@ -60,7 +58,9 @@ public class MobScanner implements Listener {
 
                 Entity entity = iterator.next();
 
-                if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
+                List aggressiveList = plugin.getConfig().getList("Valid aggressive SuperMobs");
+
+                if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity, aggressiveList)) {
 
                     //scan for naturally spawned supermobs
                     if (entity.hasMetadata("MagmasSuperMob") && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
@@ -71,29 +71,39 @@ public class MobScanner implements Listener {
                     }
 
                     //scan for stacked supermobs
-                    scanValidAggressiveLivingEntity(entity);
+                    if (plugin.getConfig().getBoolean("Allow aggressive SuperMobs")) {
 
-                    if (entity.hasMetadata("MagmasSuperMob")) {
+                        scanValidAggressiveLivingEntity(entity);
 
-                        PowerHandler powerHandler = new PowerHandler(plugin);
+                        if (entity.hasMetadata("MagmasSuperMob")) {
 
-                        powerHandler.powerHandler(entity);
+                            PowerHandler powerHandler = new PowerHandler(plugin);
 
-                        ArmorHandler.ArmorHandler(entity);
+                            powerHandler.powerHandler(entity);
+
+                            ArmorHandler.ArmorHandler(entity);
+
+                        }
 
                     }
 
                 }
 
                 //scan for passive mobs
-                if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && !entity.hasMetadata("MagmasPassiveSupermob")) {
+                if (plugin.getConfig().getBoolean("Allow Passive SuperMobs")){
 
-                    scanValidPassiveLivingEntity(entity);
+                    List passiveList = plugin.getConfig().getList("Valid Passive SuperMobs");
+
+                    if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity, passiveList) && !entity.hasMetadata("MagmasPassiveSupermob")) {
+
+                        scanValidPassiveLivingEntity(entity);
+
+                    }
+
+                    //spawn chicken eggs, really wish there were an event for this
+                    ChickenHandler.superEggs(entity);
 
                 }
-
-                //spawn chicken eggs, really wish there were an event for this
-                ChickenHandler.superEggs(entity);
 
             }
 
@@ -122,8 +132,6 @@ public class MobScanner implements Listener {
 
                     //remove duplicate
                     secondEntity.remove();
-
-                    //secondEntity.setMetadata("removed", new FixedMetadataValue(plugin, true)); TODO:Check if this still works
 
                     //setup new MagmasSuperMob
                     LevelHandler.LevelHandler(entity, secondEntity, plugin);

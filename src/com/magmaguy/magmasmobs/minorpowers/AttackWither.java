@@ -16,7 +16,7 @@
 package com.magmaguy.magmasmobs.minorpowers;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.powerstances.ParticleEffects;
+import com.magmaguy.magmasmobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,8 +44,8 @@ public class AttackWither extends MinorPowers implements Listener {
     public void applyPowers(Entity entity) {
 
         entity.setMetadata("AttackWither", new FixedMetadataValue(plugin, true));
-        ParticleEffects particleEffects = new ParticleEffects(plugin);
-        particleEffects.attackWitherEffect(entity);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        minorPowerPowerStance.itemEffect(entity);
 
     }
 

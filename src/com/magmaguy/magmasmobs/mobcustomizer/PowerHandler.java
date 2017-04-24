@@ -13,7 +13,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.magmasmobs.mobscanner;
+/*
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.magmaguy.magmasmobs.mobcustomizer;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
 import com.magmaguy.magmasmobs.minorpowers.*;
@@ -62,14 +77,59 @@ public class PowerHandler {
             int currentMinorPowerAmount = 0;
 
             ArrayList<MinorPowers> minorPowerArray = new ArrayList();
-            minorPowerArray.add(new InvulnerabilityFire(plugin));
-            minorPowerArray.add(new InvulnerabilityArrow(plugin));
-            minorPowerArray.add(new AttackGravity(plugin));
-            minorPowerArray.add(new AttackPush(plugin));
-            minorPowerArray.add(new AttackPoison(plugin));
-            minorPowerArray.add(new AttackWither(plugin));
-            minorPowerArray.add(new MovementSpeed(plugin));
-            minorPowerArray.add(new InvulnerabilityFallDamage(plugin));
+
+            if (plugin.getConfig().getList("Valid aggressive SuperMobs powers").contains("AttackGravity")) {
+
+                minorPowerArray.add(new AttackGravity(plugin));
+
+            }
+
+            if (plugin.getConfig().getList("Valid aggressive SuperMobs powers").contains("AttackPoison")) {
+
+                minorPowerArray.add(new AttackPoison(plugin));
+
+            }
+
+            if (plugin.getConfig().getList("Valid aggressive SuperMobs powers").contains("AttackPush")) {
+
+                minorPowerArray.add(new AttackPush(plugin));
+
+            }
+
+            if (plugin.getConfig().getList("Valid aggressive SuperMobs powers").contains("AttackWither")) {
+
+                minorPowerArray.add(new AttackWither(plugin));
+
+            }
+
+            if (plugin.getConfig().getList("Valid aggressive SuperMobs powers").contains("InvulnerabilityArrow")) {
+
+                minorPowerArray.add(new InvulnerabilityArrow(plugin));
+
+            }
+
+            if (plugin.getConfig().getList("Valid aggressive SuperMobs powers").contains("InvulnerabilityFallDamage")) {
+
+                minorPowerArray.add(new InvulnerabilityFallDamage(plugin));
+
+            }
+
+            if (plugin.getConfig().getList("Valid aggressive SuperMobs powers").contains("InvulnerabilityFire")) {
+
+                minorPowerArray.add(new InvulnerabilityFire(plugin));
+
+            }
+
+            if (plugin.getConfig().getList("Valid aggressive SuperMobs powers").contains("MovementSpeed")) {
+
+                minorPowerArray.add(new MovementSpeed(plugin));
+
+            }
+
+
+
+
+
 
             if (entity.hasMetadata("MinorPowerAmount")) {
 

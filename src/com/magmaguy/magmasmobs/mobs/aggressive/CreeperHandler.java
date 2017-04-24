@@ -31,7 +31,7 @@
 package com.magmaguy.magmasmobs.mobs.aggressive;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
-import com.magmaguy.magmasmobs.mobscanner.DefaultMaxHealthGuesser;
+import com.magmaguy.magmasmobs.mobcustomizer.DefaultMaxHealthGuesser;
 import com.magmaguy.magmasmobs.superdrops.ItemDropVelocity;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.ExperienceOrb;

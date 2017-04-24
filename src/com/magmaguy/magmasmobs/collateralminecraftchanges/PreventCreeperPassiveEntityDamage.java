@@ -15,16 +15,26 @@
 
 package com.magmaguy.magmasmobs.collateralminecraftchanges;
 
+import com.magmaguy.magmasmobs.MagmasMobs;
 import com.magmaguy.magmasmobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Created by MagmaGuy on 22/04/2017.
  */
 public class PreventCreeperPassiveEntityDamage implements Listener{
+
+    private MagmasMobs plugin;
+
+    public PreventCreeperPassiveEntityDamage(Plugin plugin) {
+
+        this.plugin = (MagmasMobs) plugin;
+
+    }
 
     //This cancels all creeper and entity-caused explosion damage on passive mobs
     @EventHandler
@@ -32,7 +42,7 @@ public class PreventCreeperPassiveEntityDamage implements Listener{
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
 
-            if (ValidPassiveMobFilter.ValidPassiveMobFilter(event.getEntity()) ||
+            if (ValidPassiveMobFilter.ValidPassiveMobFilter(event.getEntity(), plugin.getConfig().getList("Valid Passive SuperMobs"))||
                     event.getEntity() instanceof Horse || event.getEntity() instanceof Villager ||
                     event.getEntity() instanceof Bat || event.getEntity() instanceof ArmorStand ||
                     event.getEntity() instanceof Rabbit) {
