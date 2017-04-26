@@ -34,13 +34,21 @@ import com.magmaguy.magmasmobs.superdrops.PotionEffectApplier;
 import com.magmaguy.magmasmobs.superdrops.SuperDropsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.libs.jline.internal.InputStreamReader;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 public class MagmasMobs extends JavaPlugin implements Listener {
 
@@ -51,6 +59,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
         //Load loot from config
         loadConfiguration();
+        initCustomConfig();
 
         //Parse loot
         SuperDropsHandler superDrops = new SuperDropsHandler(this);
@@ -157,14 +166,23 @@ public class MagmasMobs extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
 
+        List<String> metadataList = new ArrayList<String>();
+        metadataList.add("AttackGravity");
+        metadataList.add("AttackPoison");
+        metadataList.add("AttackPush");
+        metadataList.add("AttackWither");
+        metadataList.add("InvulnerabilityArrow");
+        metadataList.add("InvulnerabilityFallDamage");
+        metadataList.add("MovementSpeed");
+
         for (World world : worldList) {
 
             for (Entity entity : world.getEntities()) {
 
-                if (entity.hasMetadata("MagmasSuperMob") ||
-                        entity.hasMetadata("VisualEffect") ||
+                if (entity.hasMetadata("MagmasSuperMob") && !(entity instanceof IronGolem) ||
+                        entity.hasMetadata("VisualEffect") && !(entity instanceof IronGolem) ||
                         entity.hasMetadata("forbidden") ||
-                        entity.hasMetadata("NaturalEntity")) {
+                        entity.hasMetadata("NaturalEntity") && !(entity instanceof IronGolem)) {
 
                     Bukkit.getScheduler().cancelTask(processID);
 
@@ -174,11 +192,40 @@ public class MagmasMobs extends JavaPlugin implements Listener {
                     entity.removeMetadata("NaturalEntity", this);
                     entity.removeMetadata("forbidden", this);
 
+                    for (String string : metadataList) {
+
+                        if (entity.hasMetadata(string)) {
+
+                            entity.removeMetadata(string, this);
+
+                        }
+
+                    }
+
                 }
 
                 if (entity.hasMetadata("MagmasPassiveSupermob")) {
 
                     entity.removeMetadata("MagmasPassiveSupermob", this);
+
+                }
+
+                if (entity.hasMetadata("MagmasSuperMob") && entity instanceof IronGolem) {
+
+                    for (String string : metadataList) {
+
+                        if (entity.hasMetadata(string)) {
+
+                            entity.removeMetadata(string, this);
+
+                        }
+
+                    }
+
+                    entity.removeMetadata("MagmasSuperMob", this);
+                    entity.removeMetadata("VisualEffect", this);
+                    entity.removeMetadata("NaturalEntity", this);
+                    entity.removeMetadata("forbidden", this);
 
                 }
 
@@ -208,6 +255,9 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
     public void repeatingTaskRunner() {
 
+        //eggs need to scale with stacked amount
+        int passiveStackAmount = this.getConfig().getInt("Passive SuperMob stack amount");
+
         MobScanner mobScanner = new MobScanner(this);
         PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
 
@@ -215,7 +265,7 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
             public void run() {
 
-                mobScanner.scanMobs();
+                mobScanner.scanMobs(passiveStackAmount);
 
             }
 
@@ -250,6 +300,8 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Natural aggressive SuperMob spawning", true);
         getConfig().addDefault("Percentage (%) of aggressive mobs that get converted to SuperMobs when they spawn", 20);
         getConfig().addDefault("Aggressive mob stacking", true);
+        getConfig().addDefault("Aggressive mob stacking cap", 50);
+        getConfig().addDefault("Passive SuperMob stack amount", 50);
         getConfig().addDefault("Aggressive SuperMobs can drop config loot (level 5 SuperMobs and up)", true);
         getConfig().addDefault("Aggressive SuperMobs flat loot drop rate %", 50);
         getConfig().addDefault("Aggressive SuperMobs can drop additional loot with drop % based on SuperMob level (higher is more likely)", true);
@@ -258,11 +310,6 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("SuperCreeper explosion nerf multiplier", 1.0);
         getConfig().addDefault("Turn on visual effects for natural or plugin-spawned SuperMobs", true);
         getConfig().addDefault("Turn off visual effects for non-natural or non-plugin-spawned SuperMobs", true);
-        getConfig().addDefault("Loot.Zombie Slayer.Item Type", "DIAMOND_SWORD");
-        getConfig().addDefault("Loot.Zombie Slayer.Item Name", "Zombie Slayer");
-        getConfig().addDefault("Loot.Zombie Slayer.Item Lore", Arrays.asList("Slays zombies Bigly."));
-        getConfig().addDefault("Loot.Zombie Slayer.Enchantments", Arrays.asList("DAMAGE_ALL,5", "DAMAGE_UNDEAD,5"));
-        getConfig().addDefault("Loot.Zombie Slayer.Potion Effects", Arrays.asList("GLOWING,1"));
         getConfig().options().copyDefaults(true);
 
         //save the config when changed
@@ -277,9 +324,74 @@ public class MagmasMobs extends JavaPlugin implements Listener {
     public void reloadConfiguration() {
 
         reloadConfig();
+        reloadCustomConfig();
 
         getLogger().info("MagmasMobs config reloaded!");
 
     }
+
+    public void initCustomConfig() {
+
+        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Type", "DIAMOND_SWORD");
+        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Name", "Zombie Slayer");
+        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Lore", Arrays.asList("Slays zombies Bigly."));
+        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Enchantments", Arrays.asList("DAMAGE_ALL,5", "DAMAGE_UNDEAD,5"));
+        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Potion Effects", Arrays.asList("GLOWING,1"));
+
+        this.getCustomConfig().options().copyDefaults(true);
+        this.saveDefaultCustomConfig();
+        this.saveCustomConfig();
+
+    }
+
+    private FileConfiguration customConfig = null;
+    private File customConfigFile = null;
+
+    public void reloadCustomConfig() {
+        if (customConfigFile == null) {
+            customConfigFile = new File(this.getDataFolder(), "loot.yml");
+        }
+        customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
+
+        // Look for defaults in the jar
+        Reader defConfigStream = null;
+        try {
+            defConfigStream = new InputStreamReader(this.getResource("loot.yml"), "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        if (defConfigStream != null) {
+            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(customConfigFile);
+            customConfig.setDefaults(defConfig);
+        }
+    }
+
+    public FileConfiguration getCustomConfig() {
+        if (customConfig == null) {
+            reloadCustomConfig();
+        }
+        return customConfig;
+    }
+
+    public void saveCustomConfig() {
+        if (customConfig == null || customConfigFile == null) {
+            return;
+        }
+        try {
+            getCustomConfig().save(customConfigFile);
+        } catch (IOException ex) {
+            this.getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, ex);
+        }
+    }
+
+    public void saveDefaultCustomConfig() {
+        if (customConfigFile == null) {
+            customConfigFile = new File(this.getDataFolder(), "loot.yml");
+        }
+        if (!customConfigFile.exists()) {
+            this.saveResource("loot.yml", false);
+        }
+    }
+    // End Custom Config
 
 }

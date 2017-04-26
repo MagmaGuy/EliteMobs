@@ -13,7 +13,8 @@ permissions:
     children:
       magmasmobs.stats: true
       magmasmobs.getloot: true
-      magmasmobs.reloadconfig: true
+      magmasmobs.reload.config: true
+      magmasmobs.reload.loot: true
       magmasmobs.giveloot: true
   magmasmobs.stats:
     description: Allows players to run /magmasmobs stats
@@ -24,6 +25,9 @@ permissions:
   magmasmobs.reload.config:
     decription: Allow players to run /magmasmobs reload config
     default: op
+  magmasmobs.reload.loot:
+      decription: Allow players to run /magmasmobs reload loot
+      default: op
   magmasmobs.giveloot:
     description: Allow players to run /magmasmobs giveloot [playername] random/[loot name]
     default: op

@@ -21,8 +21,10 @@ import com.magmaguy.magmasmobs.mobs.passive.ChickenHandler;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Listener;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import java.util.List;
 import static com.magmaguy.magmasmobs.MagmasMobs.worldList;
 import static com.magmaguy.magmasmobs.mobcustomizer.NameHandler.customAggressiveName;
 import static com.magmaguy.magmasmobs.mobcustomizer.NameHandler.customPassiveName;
+import static org.bukkit.Bukkit.getLogger;
 
 /**
  * Created by MagmaGuy on 07/10/2016.
@@ -46,9 +49,7 @@ public class MobScanner implements Listener {
 
     }
 
-    public static final int maxSuperMobLevel = 50;
-
-    public void scanMobs() {
+    public void scanMobs(int passiveStackAmount) {
 
         for (World world : worldList) {
 
@@ -101,7 +102,16 @@ public class MobScanner implements Listener {
                     }
 
                     //spawn chicken eggs, really wish there were an event for this
-                    ChickenHandler.superEggs(entity);
+                    ChickenHandler.superEggs(entity, passiveStackAmount);
+
+                }
+
+                //scan for iron golems with missing metadata
+                if (!entity.hasMetadata("MagmasSuperMob") && entity instanceof IronGolem &&
+                        ((IronGolem) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
+
+                    entity.setMetadata("MagmasSuperMob", new FixedMetadataValue(plugin, ScalingFormula.reversePowerFormula(((IronGolem) entity).getMaxHealth(), DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity))));
+                    customAggressiveName(entity, plugin);
 
                 }
 
@@ -155,9 +165,10 @@ public class MobScanner implements Listener {
     }
 
     private int passiveRange = 15;
-    private int passiveStacking = 50;
 
     public void scanValidPassiveLivingEntity(Entity entity) {
+
+        int passiveStacking = plugin.getConfig().getInt("Passive SuperMob stack amount");
 
         List<LivingEntity> animalContainer = new ArrayList<>();
 
@@ -207,11 +218,11 @@ public class MobScanner implements Listener {
         Damageable damageable1 = (Damageable) entity1;
         Damageable damageable2 = (Damageable) entity2;
 
-        if (damageable1.hasMetadata("MagmasSuperMob") && damageable1.getMetadata("MagmasSuperMob").get(0).asInt() >= 50) {
+        if (damageable1.hasMetadata("MagmasSuperMob") && damageable1.getMetadata("MagmasSuperMob").get(0).asInt() >= plugin.getConfig().getInt("Aggressive mob stacking cap")) {
 
             return false;
 
-        } else if (damageable2.hasMetadata("MagmasSuperMob") && damageable2.getMetadata("MagmasSuperMob").get(0).asInt() >= 50) {
+        } else if (damageable2.hasMetadata("MagmasSuperMob") && damageable2.getMetadata("MagmasSuperMob").get(0).asInt() >= plugin.getConfig().getInt("Aggressive mob stacking cap")) {
 
             return false;
 
