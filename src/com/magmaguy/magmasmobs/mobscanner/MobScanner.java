@@ -13,6 +13,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.magmaguy.magmasmobs.mobscanner;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
@@ -34,7 +49,6 @@ import java.util.List;
 import static com.magmaguy.magmasmobs.MagmasMobs.worldList;
 import static com.magmaguy.magmasmobs.mobcustomizer.NameHandler.customAggressiveName;
 import static com.magmaguy.magmasmobs.mobcustomizer.NameHandler.customPassiveName;
-import static org.bukkit.Bukkit.getLogger;
 
 /**
  * Created by MagmaGuy on 07/10/2016.
@@ -42,6 +56,9 @@ import static org.bukkit.Bukkit.getLogger;
 public class MobScanner implements Listener {
 
     private MagmasMobs plugin;
+    private int aggressiveRange = 2;
+    private int passiveRange = 15;
+
 
     public MobScanner(Plugin plugin) {
 
@@ -121,9 +138,6 @@ public class MobScanner implements Listener {
 
     }
 
-
-    private int aggressiveRange = 2;
-
     public void scanValidAggressiveLivingEntity(Entity entity) {
 
         for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange)) {
@@ -163,8 +177,6 @@ public class MobScanner implements Listener {
         }
 
     }
-
-    private int passiveRange = 15;
 
     public void scanValidPassiveLivingEntity(Entity entity) {
 

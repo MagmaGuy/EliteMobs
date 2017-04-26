@@ -13,7 +13,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.magmasmobs.mobs.passive;
+/*
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.magmaguy.magmasmobs.mobs.aggressive;
 
 import com.magmaguy.magmasmobs.MagmasMobs;
 import org.bukkit.entity.ExperienceOrb;
@@ -21,7 +51,6 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -46,7 +75,7 @@ public class IronGolemHandler implements Listener {
     @EventHandler
     public void superDrops(EntityDamageByEntityEvent event) {
 
-        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
+        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasSuperMob")) {
 
             Random random = new Random();
 
@@ -86,26 +115,26 @@ public class IronGolemHandler implements Listener {
 
     }
 
-    @EventHandler
-    public void onAttack(EntityDamageByEntityEvent event) {
-
-        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
-
-            event.setDamage(event.getDamage() * 50);
-
-        }
-
-    }
-
-    @EventHandler
-    public void onDeath(EntityDeathEvent event) {
-
-        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
-
-            event.getEntity().removeMetadata("MagmasPassiveSupermob", plugin);
-
-        }
-
-    }
+//    @EventHandler
+//    public void onAttack(EntityDamageByEntityEvent event) {
+//
+//        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
+//
+//            event.setDamage(event.getDamage() * 50);
+//
+//        }
+//
+//    }
+//
+//    @EventHandler
+//    public void onDeath(EntityDeathEvent event) {
+//
+//        if (event.getEntity() instanceof IronGolem && event.getEntity().hasMetadata("MagmasPassiveSupermob")) {
+//
+//            event.getEntity().removeMetadata("MagmasPassiveSupermob", plugin);
+//
+//        }
+//
+//    }
 
 }
