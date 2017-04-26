@@ -105,8 +105,7 @@ public class ChickenHandler implements Listener {
 
     }
 
-
-    public static void superEggs(Entity entity) {
+    public static void superEggs(Entity entity, int passiveStackAmount) {
 
         List<Chicken> tempChickenList = new ArrayList<>();
 
@@ -119,9 +118,10 @@ public class ChickenHandler implements Listener {
         if (tempChickenList.size() > 0) {
 
             Random random = new Random();
-            int eggChance = random.nextInt(200);
+            int eggChance = random.nextInt(12000/passiveStackAmount);
 
-            //there should be a 0.1 chance of eggs spawning every second
+            //Chicken lay eggs every 5-10 minutes, assuming 10 min that's 12000 ticks
+            //should spawn 1 by 1 but the odds of it spawning are scaled to fit config passivemob stack size
             if (eggChance == 1) {
 
                 for (Chicken chicken : tempChickenList) {

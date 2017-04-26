@@ -70,21 +70,18 @@ import static org.bukkit.Bukkit.getLogger;
  */
 public class SuperDropsHandler implements Listener {
 
+    public static List<ItemStack> lootList = new ArrayList();
+    public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
     private MagmasMobs plugin;
-
     public SuperDropsHandler(Plugin plugin) {
 
         this.plugin = (MagmasMobs) plugin;
 
     }
 
-    public static List<ItemStack> lootList = new ArrayList();
-    public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
-
     public void superDropParser() {
 
         List<String> lootCount = lootCounter();
-
 
         for (String lootEntry : lootCount) {
 
@@ -126,8 +123,6 @@ public class SuperDropsHandler implements Listener {
 
             itemStack.setItemMeta(itemMeta);
 
-            getLogger().info("loot added");
-
             lootList.add(itemStack);
 
             List<PotionEffect> parsedPotionEffect = new ArrayList();
@@ -157,8 +152,6 @@ public class SuperDropsHandler implements Listener {
 
                     parsedPotionEffect.add(potionEffect);
 
-                    getLogger().info("added potion effect, maybe");
-
                 }
 
                 potionEffectItemList.put(itemStack, parsedPotionEffect);
@@ -174,7 +167,7 @@ public class SuperDropsHandler implements Listener {
 
         List<String> lootCount = new ArrayList();
 
-        for (String configIterator : plugin.getConfig().getKeys(true)) {
+        for (String configIterator : plugin.getCustomConfig().getKeys(true)) {
 
             int dotCount = 0;
 
@@ -223,7 +216,7 @@ public class SuperDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Type");
 
-        String itemType = plugin.getConfig().getString(path);
+        String itemType = plugin.getCustomConfig().getString(path);
 
         return itemType;
 
@@ -233,7 +226,7 @@ public class SuperDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Name");
 
-        String itemName = plugin.getConfig().getString(path);
+        String itemName = plugin.getCustomConfig().getString(path);
 
         return itemName;
 
@@ -243,7 +236,7 @@ public class SuperDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Lore");
 
-        List itemLore = plugin.getConfig().getList(path);
+        List itemLore = plugin.getCustomConfig().getList(path);
 
         return itemLore;
 
@@ -253,7 +246,7 @@ public class SuperDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
 
-        List enchantments = plugin.getConfig().getList(path);
+        List enchantments = plugin.getCustomConfig().getList(path);
 
         return enchantments;
 
@@ -263,7 +256,7 @@ public class SuperDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Potion Effects");
 
-        List potionEffects = plugin.getConfig().getList(path);
+        List potionEffects = plugin.getCustomConfig().getList(path);
 
         return potionEffects;
 
@@ -286,8 +279,6 @@ public class SuperDropsHandler implements Listener {
                 int randomDrop = random.nextInt(lootList.size());
 
                 entity.getWorld().dropItem(entity.getLocation(), lootList.get(randomDrop));
-                getLogger().info("dropping item");
-
 
             }
 
@@ -298,7 +289,6 @@ public class SuperDropsHandler implements Listener {
                 int randomDrop = random.nextInt(lootList.size());
 
                 entity.getWorld().dropItem(entity.getLocation(), lootList.get(randomDrop));
-                getLogger().info("dropping item");
 
             }
 
@@ -307,7 +297,6 @@ public class SuperDropsHandler implements Listener {
             if (entity.hasMetadata("NaturalEntity")) {
 
                 entity.removeMetadata("NaturalEntity", plugin);
-                getLogger().info("removing metadata");
 
             }
 

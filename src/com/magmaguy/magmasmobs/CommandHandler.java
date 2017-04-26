@@ -17,6 +17,7 @@ package com.magmaguy.magmasmobs;
 
 import com.magmaguy.magmasmobs.superdrops.SuperDropsHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,6 +36,7 @@ import java.util.Random;
 import static com.magmaguy.magmasmobs.MagmasMobs.worldList;
 import static com.magmaguy.magmasmobs.superdrops.SuperDropsHandler.lootList;
 import static org.bukkit.Bukkit.getLogger;
+import static org.bukkit.Bukkit.getServer;
 
 /**
  * Created by MagmaGuy on 21/01/2017.
@@ -51,125 +53,190 @@ public class CommandHandler implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
 
+        switch(args.length) {
 
-        if (args.length == 0 && sender instanceof Player) {
+            //just /magmasmobs
+            case 0:
 
-            Player player = (Player) sender;
-
-            player.sendMessage("Valid commands:");
-            player.sendMessage("/magmasmobs stats");
-            player.sendMessage("/magmasmobs reload config");
-            player.sendMessage("/magmasmobs getloot [loot name]");
-            player.sendMessage("/magmasmobs giveloot [player name] random/[loot name]");
-
-            return true;
-
-        } else if (args[0].equalsIgnoreCase("stats") && sender instanceof Player
-                && sender.hasPermission("magmasmobs.stats")) {
-
-            Player player = (Player) sender;
-            statsHandler(player);
-            return true;
-
-        } else if (args[0].equalsIgnoreCase("stats") && sender instanceof Player
-                && !sender.hasPermission("magmasmobs.stats")) {
-
-            Player player = (Player) sender;
-            player.sendMessage("I'm afraid I can't let you do that, " + player.getDisplayName() + ".");
-            player.sendMessage("You need the following permission: " + "magmasmobs.stats");
-
-        } else if (args[0].equalsIgnoreCase("reload") && sender instanceof Player
-                && args[1].equalsIgnoreCase("config")
-                && sender.hasPermission("magmasmobs.reload.config")) {
-
-            Player player = (Player) sender;
-            Bukkit.getPluginManager().getPlugin("MagmasMobs").reloadConfig();
-            SuperDropsHandler superDropsHandler = new SuperDropsHandler(plugin);
-            superDropsHandler.superDropParser();
-            getLogger().info("MagmasMobs config reloaded!");
-            player.sendTitle("MagmasMobs config reloaded!", "hehehe butts.");
-
-            return true;
-        } else if (args[0].equalsIgnoreCase("reload") && sender instanceof Player
-                && args[1].equalsIgnoreCase("config")
-                && !sender.hasPermission("magmasmobs.reload.config")) {
-
-            Player player = (Player) sender;
-            player.sendMessage("I'm afraid I can't let you do that, " + player.getDisplayName() + ".");
-            player.sendMessage("You need the following permission: " + " magmasmobs.reload.config");
-
-        } else if (args[0].equalsIgnoreCase("getloot") && sender instanceof Player && sender.hasPermission("magmasmobs.getloot")
-                && args.length == 2 || args[0].equalsIgnoreCase("gl") && sender instanceof Player
-                && sender.hasPermission("magmasmobs.getloot") && args.length == 2) {
-
-            Player player = (Player) sender;
-
-            if (getLootHandler(player, args[1])) {
-
+                validCommands(commandSender);
                 return true;
 
-            } else {
+            // /magmasmobs stats
+            case 1:
 
-                player.sendTitle("", "Could not find that item name.");
+                if (args[0].equalsIgnoreCase("stats") && commandSender instanceof Player &&
+                        commandSender.hasPermission("magmasmobs.stats") || args[0].equalsIgnoreCase("stats")
+                        && commandSender instanceof ConsoleCommandSender){
 
+                    statsHandler(commandSender);
+                    return true;
+
+                } else if (args[0].equalsIgnoreCase("stats") && commandSender instanceof Player
+                    && !commandSender.hasPermission("magmasmobs.stats")) {
+
+                    Player player = (Player) commandSender;
+                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                            "You need the following permission: " + "magmasmobs.stats");
+                    return true;
+
+                }
+
+                validCommands(commandSender);
                 return true;
 
-            }
+            // /magmasmobs reload config | /magmasmobs reload loot | /magmasmobs
+            case 2:
 
-        } else if (args[0].equalsIgnoreCase("getloot") && !sender.hasPermission("magmasmobs.getloot")
-                && args.length == 2 || args[0].equalsIgnoreCase("gl")
-                && !sender.hasPermission("magmasmobs.getloot") && args.length == 2) {
+                //valid /magmasmobs reload config
+                if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
+                        args[1].equalsIgnoreCase("config") &&
+                        commandSender.hasPermission("magmasmobs.reload.config")) {
 
-            Player player = (Player) sender;
-            player.sendMessage("I'm afraid I can't let you do that, " + player.getDisplayName() + ".");
-            player.sendMessage("You need the following permission: " + " magmasmobs.getloot");
+                    Player player = (Player) commandSender;
+                    Bukkit.getPluginManager().getPlugin("MagmasMobs").reloadConfig();
+                    plugin.reloadCustomConfig();
+                    SuperDropsHandler superDropsHandler = new SuperDropsHandler(plugin);
+                    superDropsHandler.superDropParser();
+                    getLogger().info("MagmasMobs config reloaded!");
+                    player.sendTitle("MagmasMobs config reloaded!", "hehehe butts.");
 
-        } else if (args.length == 3) {
+                    return true;
 
-            if (sender instanceof ConsoleCommandSender || sender instanceof Player
-                    && sender.hasPermission("magmasmobs.giveloot")) {
+                //invalid /magmasmobs reload config
+                } else if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
+                        args[1].equalsIgnoreCase("config") &&
+                        !commandSender.hasPermission("magmasmobs.reload.config")) {
 
-                if (args[0].equalsIgnoreCase("giveloot")) {
+                    Player player = (Player) commandSender;
+                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                            "You need the following permission: " + " magmasmobs.reload.config");
 
-                    if (validPlayer(args[1])) {
+                    return true;
 
-                        Player receiver = Bukkit.getServer().getPlayer(args[1]);
+                //valid /magmasmobs reload loot
+                } else if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player
+                    && args[1].equalsIgnoreCase("loot")
+                    && commandSender.hasPermission("magmasmobs.reload.loot")) {
 
-                        if (args[2].equalsIgnoreCase("random") || args[2].equalsIgnoreCase("r")) {
+                    Player player = (Player) commandSender;
+                    plugin.reloadCustomConfig();
+                    getLogger().info("MagmasMobs loot reloaded!");
+                    player.sendTitle("MagmasMobs loot reloaded!", "hehehe booty.");
 
-                            Random random = new Random();
+                    return true;
 
-                            int index = random.nextInt(lootList.size());
+                //invalid /magmasmobs reload loot
+                } else if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
+                        args[1].equalsIgnoreCase("loot") &&
+                        !commandSender.hasPermission("magmasmobs.reload.loot")) {
 
-                            ItemStack itemStack = new ItemStack(lootList.get(index));
+                    Player player = (Player) commandSender;
+                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                            "You need the following permission: " + " magmasmobs.reload.loot");
 
-                            receiver.getInventory().addItem(itemStack);
+                    return true;
 
-                            return true;
+                //valid /magmasmobs getloot | /magmasmobs gl
+                } else if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
+                        commandSender.hasPermission("magmasmobs.getloot")|| args[0].equalsIgnoreCase("gl")
+                        && commandSender instanceof Player && commandSender.hasPermission("magmasmobs.getloot")) {
 
-                        } else if (getLootHandler(receiver, args[2])) {
+                    Player player = (Player) commandSender;
 
-                            return true;
+                    if (getLootHandler(player, args[1])) {
 
-                        }
+                        return true;
 
                     } else {
 
-                        if (sender instanceof ConsoleCommandSender) {
+                        player.sendTitle("", "Could not find that item name.");
 
-                            getLogger().info("Can't give loot to player - player not found.");
+                        return true;
 
-                            return true;
+                    }
 
-                        } else if (sender instanceof Player) {
+                //invalid /magmasmobs getloot | /magmasmobs gl
+                } else if (args[0].equalsIgnoreCase("getloot") && !commandSender.hasPermission("magmasmobs.getloot")
+                        || args[0].equalsIgnoreCase("gl") && !commandSender.hasPermission("magmasmobs.getloot")) {
 
-                            Player player = (Player) sender;
+                    Player player = (Player) commandSender;
+                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                            "You need the following permission: " + " magmasmobs.getloot");
 
-                            player.sendMessage("Can't give loot to player - player not found.");
+                    return true;
 
-                            return true;
+                }
+
+                validCommands(commandSender);
+                return true;
+
+            // /magmasmobs giveloot [player] [loot]
+            case 3:
+
+                if (commandSender instanceof ConsoleCommandSender || commandSender instanceof Player
+                        && commandSender.hasPermission("magmasmobs.giveloot")) {
+
+                    if (args[0].equalsIgnoreCase("giveloot")) {
+
+                        if (validPlayer(args[1])) {
+
+                            Player receiver = Bukkit.getServer().getPlayer(args[1]);
+
+                            if (args[2].equalsIgnoreCase("random") || args[2].equalsIgnoreCase("r")) {
+
+                                Random random = new Random();
+
+                                int index = random.nextInt(lootList.size());
+
+                                ItemStack itemStack = new ItemStack(lootList.get(index));
+
+                                receiver.getInventory().addItem(itemStack);
+
+                                return true;
+
+                            } else if (getLootHandler(receiver, args[2])) {
+
+                                return true;
+
+                            } else if (!getLootHandler(receiver, args[2])) {
+
+                                if (commandSender instanceof ConsoleCommandSender) {
+
+                                    getLogger().info("Can't give loot to player - loot not found.");
+
+                                    return true;
+
+                                } else if (commandSender instanceof Player) {
+
+                                    Player player = (Player) commandSender;
+
+                                    player.sendTitle("Can't give loot to player - loot not found.","");
+
+                                    return true;
+
+                                }
+
+                            }
+
+                        } else {
+
+                            if (commandSender instanceof ConsoleCommandSender) {
+
+                                getLogger().info("Can't give loot to player - player not found.");
+
+                                return true;
+
+                            } else if (commandSender instanceof Player) {
+
+                                Player player = (Player) commandSender;
+
+                                player.sendTitle("Can't give loot to player - player not found.","");
+
+                                return true;
+
+                            }
 
                         }
 
@@ -177,50 +244,45 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-            }
+                validCommands(commandSender);
+                return true;
 
-        } else if (sender instanceof Player) {
+            //invalid commands
+            default:
 
-            Player player = ((Player) sender).getPlayer();
-
-            player.sendMessage("Command not recognized. Valid commands:");
-            player.sendMessage("/magmasmobs stats");
-            player.sendMessage("/magmasmobs reload config");
-            player.sendMessage("/magmasmobs getloot [loot name]");
-            player.sendMessage("/magmasmobs giveloot [player name] random/[loot name]");
-
-            return true;
+                validCommands(commandSender);
+                return true;
 
         }
 
-        if (sender instanceof Player)
-        {
+    }
 
-            Player player = ((Player) sender).getPlayer();
+    private void validCommands(CommandSender commandSender){
 
-            player.sendMessage("Command not recognized. Valid commands:");
+        if (commandSender instanceof Player) {
+
+            Player player = (Player) commandSender;
+
+            player.sendMessage("Valid commands:");
             player.sendMessage("/magmasmobs stats");
             player.sendMessage("/magmasmobs reload config");
+            player.sendMessage("/magmasmobs reload loot");
             player.sendMessage("/magmasmobs getloot [loot name]");
-            player.sendMessage("/magmasmobs giveloot [player name] random/[loot name]");
+            player.sendMessage("/magmasmobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
 
-            return true;
-
-        } else if (sender instanceof ConsoleCommandSender) {
+        }else if (commandSender instanceof ConsoleCommandSender) {
 
             getLogger().info("Command not recognized. Valid commands:");
             getLogger().info("magmasmobs stats");
             getLogger().info("magmasmobs reload config");
-            getLogger().info("magmasmobs getloot [loot name]");
-            getLogger().info("magmasmobs giveloot [player name] random/[loot name]");
+            getLogger().info("magmasmobs reload loot");
+            getLogger().info("magmasmobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
 
         }
 
-        return false;
-
     }
 
-    private void statsHandler(Player player) {
+    private void statsHandler(CommandSender commandSender) {
 
         int mobLevelSavingsCount = 0;
         int totalMobCount = 0;
@@ -232,6 +294,7 @@ public class CommandHandler implements CommandExecutor {
         int endermanCount = 0;
         int endermiteCount = 0;
         int huskCount = 0;
+        int ironGolemCount = 0;
         int pigZombieCount = 0;
         int polarBearCount = 0;
         int silverfishCount = 0;
@@ -245,7 +308,6 @@ public class CommandHandler implements CommandExecutor {
 
         int chickenCount = 0;
         int cowCount = 0;
-        int ironGolemCount = 0;
         int mushroomCowCount = 0;
         int pigCount = 0;
         int sheepCount = 0;
@@ -314,6 +376,9 @@ public class CommandHandler implements CommandExecutor {
                             case POLAR_BEAR:
                                 polarBearCount++;
                                 break;
+                            case IRON_GOLEM:
+                                ironGolemCount++;
+                                break;
                             default:
                                 getLogger().info("Error: Couldn't assign custom mob name due to unexpected aggressive boss mob (talk to the dev!)");
                                 getLogger().info("Missing mob type: " + livingEntity.getType());
@@ -325,7 +390,7 @@ public class CommandHandler implements CommandExecutor {
 
                         //passive supermobs only stack at 50 right now
                         //TODO: redo this count at some other stage of this plugin's development
-                        mobLevelSavingsCount += 50;
+                        mobLevelSavingsCount += plugin.getConfig().getInt("Passive SuperMob stack amount");
                         passiveCount++;
 
                         switch (livingEntity.getType()) {
@@ -335,9 +400,6 @@ public class CommandHandler implements CommandExecutor {
                                 break;
                             case COW:
                                 cowCount++;
-                                break;
-                            case IRON_GOLEM:
-                                ironGolemCount++;
                                 break;
                             case MUSHROOM_COW:
                                 mushroomCowCount++;
@@ -363,56 +425,117 @@ public class CommandHandler implements CommandExecutor {
 
         }
 
-        player.sendMessage("§5§m-----------------------------------------------------");
-        player.sendMessage("§a§lMagmasMobs stats:");
-        player.sendMessage("There are currently §l§6" + totalMobCount + " §f§rSuperMobs replacing §l§e" +
-                mobLevelSavingsCount + " §f§rregular mobs.");
+        if (commandSender instanceof Player) {
 
-        if (aggressiveCount > 0) {
+            Player player = (Player) commandSender;
 
-            String aggressiveCountMessage = "§c" + aggressiveCount + " §4Aggressive SuperMobs: §f";
+            player.sendMessage("§5§m-----------------------------------------------------");
+            player.sendMessage("§a§lMagmasMobs stats:");
+            player.sendMessage("There are currently §l§6" + totalMobCount + " §f§rSuperMobs replacing §l§e" +
+                    mobLevelSavingsCount + " §f§rregular mobs.");
 
-            HashMap unsortedMobCount = new HashMap();
+            if (aggressiveCount > 0) {
 
-            unsortedMobCountFilter(unsortedMobCount, blazeCount, "blazes");
-            unsortedMobCountFilter(unsortedMobCount, caveSpiderCount, "cave spiders");
-            unsortedMobCountFilter(unsortedMobCount, creeperCount, "creepers");
-            unsortedMobCountFilter(unsortedMobCount, endermanCount, "endermen");
-            unsortedMobCountFilter(unsortedMobCount, endermiteCount, "endermites");
-            unsortedMobCountFilter(unsortedMobCount, huskCount, "husks");
-            unsortedMobCountFilter(unsortedMobCount, pigZombieCount, "zombiepigmen");
-            unsortedMobCountFilter(unsortedMobCount, polarBearCount, "polar bears");
-            unsortedMobCountFilter(unsortedMobCount, silverfishCount, "silverfish");
-            unsortedMobCountFilter(unsortedMobCount, skeletonCount, "skeletons");
-            unsortedMobCountFilter(unsortedMobCount, spiderCount, "spiders");
-            unsortedMobCountFilter(unsortedMobCount, strayCount, "strays");
-            unsortedMobCountFilter(unsortedMobCount, witchCount, "witches");
-            unsortedMobCountFilter(unsortedMobCount, witherSkeletonCount, "wither skeletons");
-            unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombies");
-            unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
+                String aggressiveCountMessage = "§c" + aggressiveCount + " §4Aggressive SuperMobs: §f";
 
-            player.sendMessage(messageStringAppender(aggressiveCountMessage, unsortedMobCount));
+                HashMap unsortedMobCount = new HashMap();
+
+                unsortedMobCountFilter(unsortedMobCount, blazeCount, "blazes");
+                unsortedMobCountFilter(unsortedMobCount, caveSpiderCount, "cave spiders");
+                unsortedMobCountFilter(unsortedMobCount, creeperCount, "creepers");
+                unsortedMobCountFilter(unsortedMobCount, endermanCount, "endermen");
+                unsortedMobCountFilter(unsortedMobCount, endermiteCount, "endermites");
+                unsortedMobCountFilter(unsortedMobCount, huskCount, "husks");
+                unsortedMobCountFilter(unsortedMobCount, pigZombieCount, "zombiepigmen");
+                unsortedMobCountFilter(unsortedMobCount, polarBearCount, "polar bears");
+                unsortedMobCountFilter(unsortedMobCount, silverfishCount, "silverfish");
+                unsortedMobCountFilter(unsortedMobCount, skeletonCount, "skeletons");
+                unsortedMobCountFilter(unsortedMobCount, spiderCount, "spiders");
+                unsortedMobCountFilter(unsortedMobCount, strayCount, "strays");
+                unsortedMobCountFilter(unsortedMobCount, witchCount, "witches");
+                unsortedMobCountFilter(unsortedMobCount, witherSkeletonCount, "wither skeletons");
+                unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombies");
+                unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
+
+                player.sendMessage(messageStringAppender(aggressiveCountMessage, unsortedMobCount));
+
+            }
+
+            if (passiveCount > 0) {
+
+                String passiveCountMessage = "§b" + passiveCount + " §3Passive SuperMobs: §f";
+
+                HashMap unsortedMobCount = new HashMap();
+
+                unsortedMobCountFilter(unsortedMobCount, chickenCount, "chickens");
+                unsortedMobCountFilter(unsortedMobCount, cowCount, "cows");
+                unsortedMobCountFilter(unsortedMobCount, ironGolemCount, "iron golems");
+                unsortedMobCountFilter(unsortedMobCount, mushroomCowCount, "mushroom cows");
+                unsortedMobCountFilter(unsortedMobCount, pigCount, "pigs");
+                unsortedMobCountFilter(unsortedMobCount, sheepCount, "sheep");
+
+                player.sendMessage(messageStringAppender(passiveCountMessage, unsortedMobCount));
+
+            }
+
+            player.sendMessage("§5§m-----------------------------------------------------");
+
+        } else if (commandSender instanceof ConsoleCommandSender) {
+
+            getServer().getConsoleSender().sendMessage( "§5§m-------------------------------------------------------------");
+            getServer().getConsoleSender().sendMessage("§a§lMagmasMobs stats:");
+            getServer().getConsoleSender().sendMessage("There are currently §l§6" + totalMobCount + " §f§rSuperMobs replacing §l§e" +
+                    mobLevelSavingsCount + " §f§rregular mobs.");
+
+            if (aggressiveCount > 0) {
+
+                String aggressiveCountMessage = "§c" + aggressiveCount + " §4Aggressive SuperMobs: §f";
+
+                HashMap unsortedMobCount = new HashMap();
+
+                unsortedMobCountFilter(unsortedMobCount, blazeCount, "blazes");
+                unsortedMobCountFilter(unsortedMobCount, caveSpiderCount, "cave spiders");
+                unsortedMobCountFilter(unsortedMobCount, creeperCount, "creepers");
+                unsortedMobCountFilter(unsortedMobCount, endermanCount, "endermen");
+                unsortedMobCountFilter(unsortedMobCount, endermiteCount, "endermites");
+                unsortedMobCountFilter(unsortedMobCount, huskCount, "husks");
+                unsortedMobCountFilter(unsortedMobCount, ironGolemCount, "iron golems");
+                unsortedMobCountFilter(unsortedMobCount, pigZombieCount, "zombiepigmen");
+                unsortedMobCountFilter(unsortedMobCount, polarBearCount, "polar bears");
+                unsortedMobCountFilter(unsortedMobCount, silverfishCount, "silverfish");
+                unsortedMobCountFilter(unsortedMobCount, skeletonCount, "skeletons");
+                unsortedMobCountFilter(unsortedMobCount, spiderCount, "spiders");
+                unsortedMobCountFilter(unsortedMobCount, strayCount, "strays");
+                unsortedMobCountFilter(unsortedMobCount, witchCount, "witches");
+                unsortedMobCountFilter(unsortedMobCount, witherSkeletonCount, "wither skeletons");
+                unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombies");
+                unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
+
+                getServer().getConsoleSender().sendMessage(messageStringAppender(aggressiveCountMessage, unsortedMobCount));
+
+            }
+
+            if (passiveCount > 0) {
+
+                String passiveCountMessage = "§b" + passiveCount + " §3Passive SuperMobs: §f";
+
+                HashMap unsortedMobCount = new HashMap();
+
+                unsortedMobCountFilter(unsortedMobCount, chickenCount, "chickens");
+                unsortedMobCountFilter(unsortedMobCount, cowCount, "cows");
+                unsortedMobCountFilter(unsortedMobCount, mushroomCowCount, "mushroom cows");
+                unsortedMobCountFilter(unsortedMobCount, pigCount, "pigs");
+                unsortedMobCountFilter(unsortedMobCount, sheepCount, "sheep");
+
+                getServer().getConsoleSender().sendMessage(messageStringAppender(passiveCountMessage, unsortedMobCount));
+
+            }
+
+            getServer().getConsoleSender().sendMessage("§5§m-------------------------------------------------------------");
 
         }
 
-        if (passiveCount > 0) {
 
-            String passiveCountMessage = "§b" + passiveCount + " §3Passive SuperMobs: §f";
-
-            HashMap unsortedMobCount = new HashMap();
-
-            unsortedMobCountFilter(unsortedMobCount, chickenCount, "chickens");
-            unsortedMobCountFilter(unsortedMobCount, cowCount, "cows");
-            unsortedMobCountFilter(unsortedMobCount, ironGolemCount, "iron golems");
-            unsortedMobCountFilter(unsortedMobCount, mushroomCowCount, "mushroom cows");
-            unsortedMobCountFilter(unsortedMobCount, pigCount, "pigs");
-            unsortedMobCountFilter(unsortedMobCount, sheepCount, "sheep");
-
-            player.sendMessage(messageStringAppender(passiveCountMessage, unsortedMobCount));
-
-        }
-
-        player.sendMessage("§5§m-----------------------------------------------------");
 
     }
 
@@ -420,9 +543,15 @@ public class CommandHandler implements CommandExecutor {
 
         for (ItemStack itemStack : lootList) {
 
-            getLogger().info(itemStack.getItemMeta().getDisplayName() + "");
-
             String itemRawName = itemStack.getItemMeta().getDisplayName();
+
+            //TODO: shouldn't happen, weird
+            if (itemRawName == null) {
+
+                return false;
+
+            }
+
             String itemProcessedName = itemRawName.replaceAll(" ", "_").toLowerCase();
 
             if (itemProcessedName.equalsIgnoreCase(args1) && player.isValid()) {
@@ -432,7 +561,6 @@ public class CommandHandler implements CommandExecutor {
                 return true;
 
             }
-
 
         }
 

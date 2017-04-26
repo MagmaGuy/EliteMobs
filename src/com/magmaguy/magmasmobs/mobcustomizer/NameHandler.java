@@ -80,7 +80,7 @@ public class NameHandler {
                 entity.setCustomName("Level " + mobLevel + " Polar Bear");
                 break;
             case IRON_GOLEM:
-                entity.setCustomName("Level " + mobLevel + "Iron Golem");
+                entity.setCustomName("Level " + mobLevel + " Iron Golem");
                 break;
             default:
                 getLogger().info("Error: Couldn't assign custom mob name due to unexpected aggressive boss mob (talk to the dev!)");

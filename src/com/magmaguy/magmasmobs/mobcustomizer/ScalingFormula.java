@@ -18,11 +18,17 @@ package com.magmaguy.magmasmobs.mobcustomizer;
 /**
  * Created by MagmaGuy on 18/04/2017.
  */
-public class ScalingFormula {
+public class ScalingFormula{
 
     public static double PowerFormula (double baseAmount, int superMobLevel) {
 
-        return 8.25 * baseAmount * Math.pow(Math.log10(superMobLevel), 2) + baseAmount;
+        return 8.25 * baseAmount * Math.pow((Math.log10(superMobLevel)), 2) + baseAmount;
+
+    }
+
+    public static double reversePowerFormula (double currentValue, double baseAmount) {
+
+        return Math.pow(10, (Math.sqrt((currentValue - baseAmount) / (8.25 * baseAmount))));
 
     }
 
