@@ -7,39 +7,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/DefaultMaxHealthGuesser$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/DefaultMaxHealthGuesser.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/PowerHandler.class" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MinorPowers/InvulnerabilityFire.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MinorPowers/InvulnerabilityFire.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/MobScanner.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/MobScanner.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/ValidAgressiveMobFilter.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/ValidAgressiveMobFilter.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/ValidPassiveMobFilter.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MobScanner/ValidPassiveMobFilter.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/BlazeHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/BlazeHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/CaveSpiderHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/CaveSpiderHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/CreeperHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/CreeperHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/EndermanHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/EndermanHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/EndermiteHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/EndermiteHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/HuskHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/HuskHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/PigZombieHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/PigZombieHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/PolarBearHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/PolarBearHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/SilverfishHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/SilverfishHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/SkeletonHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/SkeletonHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/SpiderHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/SpiderHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/StrayHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/StrayHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/WitchHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/WitchHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/WitherSkeletonHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/WitherSkeletonHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/ZombieHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/aggressive/ZombieHandler.class" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/IronGolemHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/IronGolemHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/artifacts/MagmasMobs_jar/MagmasMobs.jar" afterPath="$PROJECT_DIR$/out/artifacts/MagmasMobs_jar/MagmasMobs.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/CollateralMinecraftChanges/ChunkUnloadMetadataPurge.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/CollateralMinecraftChanges/ChunkUnloadMetadataPurge.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/CommandHandler$1.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/CommandHandler$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/CommandHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/CommandHandler.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MagmasMobs$1.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MagmasMobs$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MagmasMobs.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/MagmasMobs.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/passive/ChickenHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/Mobs/passive/ChickenHandler.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/SuperDrops/SuperDropsHandler.class" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/SuperDrops/SuperDropsHandler.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/MagmasMobs/plugin.yml" afterPath="$PROJECT_DIR$/out/production/MagmasMobs/plugin.yml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/CommandHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/CommandHandler.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/collateralminecraftchanges/ChunkUnloadMetadataPurge.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/collateralminecraftchanges/ChunkUnloadMetadataPurge.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/NameHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/NameHandler.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/ScalingFormula.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/ScalingFormula.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/ChickenHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/ChickenHandler.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/MobScanner.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/MobScanner.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/superdrops/SuperDropsHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/superdrops/SuperDropsHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/plugin.yml" afterPath="$PROJECT_DIR$/src/plugin.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/ValidAgressiveMobFilter.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/ValidAgressiveMobFilter.java" />
     </list>
     <ignored path="ActiveStack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -59,17 +42,17 @@
     <favorites_list name="ActiveStack" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.42830712">
+    <splitter split-orientation="horizontal" split-proportion="0.43802035">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="MagmasMobs.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="MagmasMobs.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2017">
-                  <caret line="303" column="61" lean-forward="false" selection-start-line="303" selection-start-column="32" selection-end-line="303" selection-end-column="61" />
+                <state relative-caret-position="561">
+                  <caret line="304" column="61" lean-forward="false" selection-start-line="304" selection-start-column="32" selection-end-line="304" selection-end-column="61" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#7552#7560#0" expanded="true" />
+                    <element signature="e#7595#7603#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -80,6 +63,50 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="0">
                   <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="AttackGravity.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/AttackGravity.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="320">
+                  <caret line="43" column="27" lean-forward="false" selection-start-line="43" selection-start-column="16" selection-end-line="43" selection-end-column="27" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="NameHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/NameHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="272">
+                  <caret line="30" column="57" lean-forward="false" selection-start-line="30" selection-start-column="43" selection-end-line="30" selection-end-column="57" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="PowerHandler.java" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="2160">
+                  <caret line="144" column="72" lean-forward="false" selection-start-line="144" selection-start-column="57" selection-end-line="144" selection-end-column="72" />
+                  <folding>
+                    <element signature="e#0#5443#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="MinorPowers.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/MinorPowers.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="144">
+                  <caret line="22" column="22" lean-forward="false" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
                   <folding />
                 </state>
               </provider>
@@ -102,8 +129,30 @@
           <file leaf-file-name="CommandHandler.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/CommandHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="265">
-                  <caret line="486" column="54" lean-forward="false" selection-start-line="486" selection-start-column="43" selection-end-line="486" selection-end-column="54" />
+                <state relative-caret-position="7296">
+                  <caret line="489" column="120" lean-forward="false" selection-start-line="489" selection-start-column="120" selection-end-line="489" selection-end-column="120" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="IronGolemHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/IronGolemHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="144">
+                  <caret line="50" column="13" lean-forward="false" selection-start-line="50" selection-start-column="13" selection-end-line="50" selection-end-column="13" />
+                  <folding>
+                    <element signature="e#0#4323#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="BlazeHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/BlazeHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="368">
+                  <caret line="63" column="95" lean-forward="false" selection-start-line="63" selection-start-column="81" selection-end-line="63" selection-end-column="95" />
                   <folding />
                 </state>
               </provider>
@@ -132,9 +181,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>d</find>
-      <find>dead</find>
-      <find>a</find>
       <find>added</find>
       <find>added hea</find>
       <find>added heal</find>
@@ -153,8 +199,6 @@
       <find>saveDefaultConfig</find>
       <find>config</find>
       <find>getLogger</find>
-      <find>customConfigFile</find>
-      <find>getConfig</find>
       <find>giveloot</find>
       <find>consolecommandsender</find>
       <find>ironGolemCount</find>
@@ -162,6 +206,11 @@
       <find>validPlayer</find>
       <find>getLootHandler</find>
       <find>sendmessage</find>
+      <find>applyPowers</find>
+      <find>getConfig</find>
+      <find>customPassiveName</find>
+      <find>customConfigFile</find>
+      <find>selectedMinorPower</find>
     </findStrings>
     <replaceStrings>
       <replace>MagmasSuperMob</replace>
@@ -196,14 +245,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/MushroomCow.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/PigHandle.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/DefaultMaxHealthGuesser.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/ChickenEggs.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/IronGolem.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/PowerHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/CowHandler.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/IronGolemHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/MushroomCowHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/PigHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/SheepHandler.java" />
@@ -237,7 +284,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/naturalmobspawner/NaturalMobMetadataAssigner.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/NameHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/powerstances/MinorPowerPowerStance.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/collateralminecraftchanges/ChunkUnloadMetadataPurge.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/ScalingFormula.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/ChickenHandler.java" />
@@ -246,6 +292,9 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/superdrops/SuperDropsHandler.java" />
         <option value="$PROJECT_DIR$/src/plugin.yml" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/passive/IronGolemHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/IronGolemHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/magmasmobs/CommandHandler.java" />
       </list>
     </option>
@@ -324,72 +373,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="magmasmobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="magmasmobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="superdrops" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="magmasmobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="powerstances" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="magmasmobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="naturalmobspawner" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -508,28 +491,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="minorpowers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="magmasmobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="collateralminecraftchanges" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -974,7 +935,14 @@
       <option name="project" value="LOCAL" />
       <updated>1493032622038</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Version 0.0.26&#10;&#10;- Loot is now its own yml file&#10;- Added more config options&#10;- Tweaked config-related variables&#10;- Reworked all commands, fixed miscellaneous bugs in them&#10;- Tweaked few settings to fully implement iron golems as aggressive stacking entities">
+      <created>1493181655447</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1493181655448</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TodoView">
@@ -993,7 +961,7 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32869297" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3232792" sideWeight="0.49841017" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3232792" sideWeight="0.49841017" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -1048,7 +1016,8 @@
     <MESSAGE value="Version 1.0.0&#10;&#10;- Now properly accounting for invalid commands" />
     <MESSAGE value="Version 0.0.23&#10;&#10;- There have been 23 commits pushed to GitHub, so I might as well call this version 23. Not ready for 1.0.0 yet.&#10;- Rewrote all of the visual effects, now they support larger amounts of items per track and minor power visual effects stack on the same track while keeping the same distance between them." />
     <MESSAGE value="Version 0.0.25&#10;&#10;- Remembered how to count&#10;- Added config options for many, many things, untested so they probably don't work properly yet&#10;- Config-related tweaks to the code, which now allows weirder scenarios with entire sections disabled" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 0.0.25&#10;&#10;- Remembered how to count&#10;- Added config options for many, many things, untested so they probably don't work properly yet&#10;- Config-related tweaks to the code, which now allows weirder scenarios with entire sections disabled" />
+    <MESSAGE value="Version 0.0.26&#10;&#10;- Loot is now its own yml file&#10;- Added more config options&#10;- Tweaked config-related variables&#10;- Reworked all commands, fixed miscellaneous bugs in them&#10;- Tweaked few settings to fully implement iron golems as aggressive stacking entities" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 0.0.26&#10;&#10;- Loot is now its own yml file&#10;- Added more config options&#10;- Tweaked config-related variables&#10;- Reworked all commands, fixed miscellaneous bugs in them&#10;- Tweaked few settings to fully implement iron golems as aggressive stacking entities" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1075,21 +1044,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/out/production/MagmasMobs/com/magmaguy/magmasmobs/minorpowers/AttackGravity.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/InvulnerabilityFire.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
-          <caret line="59" column="24" lean-forward="false" selection-start-line="59" selection-start-column="24" selection-end-line="59" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/ArmorHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
@@ -1237,14 +1191,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/MovementSpeed.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="45" column="43" lean-forward="false" selection-start-line="45" selection-start-column="43" selection-end-line="45" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/AttackWither.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="384">
@@ -1287,22 +1233,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/BlazeHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1072">
-          <caret line="107" column="1" lean-forward="true" selection-start-line="107" selection-start-column="1" selection-end-line="107" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/AttackGravity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="54" column="50" lean-forward="false" selection-start-line="54" selection-start-column="50" selection-end-line="54" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/DamageHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1003">
@@ -1310,14 +1240,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/MinorPowers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="22" column="22" lean-forward="false" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1356,27 +1278,7 @@
         <state relative-caret-position="496">
           <caret line="59" column="67" lean-forward="false" selection-start-line="59" selection-start-column="67" selection-end-line="59" selection-end-column="67" />
           <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1235">
-          <caret line="13" column="3" lean-forward="false" selection-start-line="13" selection-start-column="3" selection-end-line="13" selection-end-column="3" />
-          <folding>
-            <element signature="e#0#5447#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/ValidPassiveMobFilter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="33" column="65" lean-forward="false" selection-start-line="33" selection-start-column="65" selection-end-line="33" selection-end-column="65" />
-          <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1419,24 +1321,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/NameHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/MobScanner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="170" column="8" lean-forward="false" selection-start-line="170" selection-start-column="8" selection-end-line="170" selection-end-column="8" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/DefaultMaxHealthGuesser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="811">
@@ -1469,6 +1353,25 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="304" column="61" lean-forward="false" selection-start-line="304" selection-start-column="32" selection-end-line="304" selection-end-column="61" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#7595#7603#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MagmasMobs.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/superdrops/SuperDropsHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3440">
@@ -1485,21 +1388,90 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/MagmasMobs.java">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/BlazeHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2017">
-          <caret line="303" column="61" lean-forward="false" selection-start-line="303" selection-start-column="32" selection-end-line="303" selection-end-column="61" />
+        <state relative-caret-position="368">
+          <caret line="63" column="95" lean-forward="false" selection-start-line="63" selection-start-column="81" selection-end-line="63" selection-end-column="95" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/ValidPassiveMobFilter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="33" column="65" lean-forward="false" selection-start-line="33" selection-start-column="65" selection-end-line="33" selection-end-column="65" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#7552#7560#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobs/aggressive/IronGolemHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="50" column="13" lean-forward="false" selection-start-line="50" selection-start-column="13" selection-end-line="50" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#4323#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobscanner/MobScanner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="170" column="0" lean-forward="true" selection-start-line="170" selection-start-column="0" selection-end-line="170" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/MovementSpeed.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="45" column="43" lean-forward="false" selection-start-line="45" selection-start-column="43" selection-end-line="45" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/AttackGravity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="43" column="27" lean-forward="false" selection-start-line="43" selection-start-column="16" selection-end-line="43" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/NameHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="30" column="57" lean-forward="false" selection-start-line="30" selection-start-column="43" selection-end-line="30" selection-end-column="57" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/minorpowers/MinorPowers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="22" column="22" lean-forward="false" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/mobcustomizer/PowerHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2160">
+          <caret line="144" column="72" lean-forward="false" selection-start-line="144" selection-start-column="57" selection-end-line="144" selection-end-column="72" />
+          <folding>
+            <element signature="e#0#5443#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/magmasmobs/CommandHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="486" column="54" lean-forward="false" selection-start-line="486" selection-start-column="43" selection-end-line="486" selection-end-column="54" />
+        <state relative-caret-position="7296">
+          <caret line="489" column="120" lean-forward="false" selection-start-line="489" selection-start-column="120" selection-end-line="489" selection-end-column="120" />
           <folding />
         </state>
       </provider>

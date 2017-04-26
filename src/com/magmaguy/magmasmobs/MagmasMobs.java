@@ -13,6 +13,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.magmaguy.magmasmobs;
 
 /**
@@ -42,15 +57,21 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
 public class MagmasMobs extends JavaPlugin implements Listener {
+
+    public static List<World> worldList = new ArrayList();
+    private int processID;
+    private FileConfiguration customConfig = null;
+    private File customConfigFile = null;
 
     @Override
     public void onEnable() {
@@ -162,7 +183,6 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
     }
 
-
     @Override
     public void onDisable() {
 
@@ -237,9 +257,6 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
     }
 
-
-    public static List<World> worldList = new ArrayList();
-
     public void worldScanner() {
 
         for (World world : Bukkit.getWorlds()) {
@@ -249,9 +266,6 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         }
 
     }
-
-
-    private int processID;
 
     public void repeatingTaskRunner() {
 
@@ -283,7 +297,6 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
 
     }
-
 
     public void loadConfiguration() {
 
@@ -320,7 +333,6 @@ public class MagmasMobs extends JavaPlugin implements Listener {
 
     }
 
-
     public void reloadConfiguration() {
 
         reloadConfig();
@@ -343,9 +355,6 @@ public class MagmasMobs extends JavaPlugin implements Listener {
         this.saveCustomConfig();
 
     }
-
-    private FileConfiguration customConfig = null;
-    private File customConfigFile = null;
 
     public void reloadCustomConfig() {
         if (customConfigFile == null) {
