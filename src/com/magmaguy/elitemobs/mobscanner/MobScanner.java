@@ -43,6 +43,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EliteMobs;
@@ -98,8 +113,9 @@ public class MobScanner implements Listener {
 
                 if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity, aggressiveList)) {
 
-                    //scan for naturally spawned EliteMobs
-                    if (entity.hasMetadata(metadataHandler.eliteMobMD) && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
+                    //scan for naturally/command/plugin spawned EliteMobs
+                    if (entity.hasMetadata(metadataHandler.eliteMobMD) && entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt() != 1
+                            && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
                         HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt());
                         customAggressiveName(entity, plugin);
