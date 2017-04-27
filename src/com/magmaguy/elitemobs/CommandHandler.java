@@ -491,7 +491,6 @@ public class CommandHandler implements CommandExecutor {
         if (entityType == EntityType.CHICKEN || entityType == EntityType.COW || entityType == EntityType.MUSHROOM_COW ||
                 entityType == EntityType.PIG || entityType == EntityType.SHEEP) {
 
-            getLogger().info("HIIHGSAIRFD" + plugin.getConfig().getInt("Passive EliteMob stack amount"));
             HealthHandler.passiveHealthHandler(entity, plugin.getConfig().getInt("Passive EliteMob stack amount"));
             NameHandler.customPassiveName(entity, plugin);
 
