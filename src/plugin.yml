@@ -1,33 +1,37 @@
-name: MagmasMobs
+name: EliteMobs
 version: 1.0.0
 author: MagmaGuy
-main: com.magmaguy.magmasmobs.MagmasMobs
+main: com.magmaguy.elitemobs.EliteMobs
 commands:
-  magmasmobs:
+  elitemobs:
     description: Tells a player the statistics of the
-    usage: /magmasmobs
-    aliases: [mm]
+    usage: /elitemobs
+    aliases: [em]
 permissions:
-  magmasmobs.*:
-    description: Gives access to all magmasmobs commands
+  elitemobs.*:
+    description: Gives access to all elitemobs commands
     children:
-      magmasmobs.stats: true
-      magmasmobs.getloot: true
-      magmasmobs.reload.config: true
-      magmasmobs.reload.loot: true
-      magmasmobs.giveloot: true
-  magmasmobs.stats:
-    description: Allows players to run /magmasmobs stats
+      elitemobs.stats: true
+      elitemobs.getloot: true
+      elitemobs.reload.config: true
+      elitemobs.reload.loot: true
+      elitemobs.giveloot: true
+      elitemobs.spawnmob: true
+  elitemobs.stats:
+    description: Allows players to run /elitemobs stats
     default: op
-  magmasmobs.getloot:
-    description: Allow players to run /magmasmobs getloot
+  elitemobs.getloot:
+    description: Allow players to run /elitemobs getloot
     default: op
-  magmasmobs.reload.config:
-    decription: Allow players to run /magmasmobs reload config
+  elitemobs.reload.config:
+    decription: Allow players to run /elitemobs reload config
     default: op
-  magmasmobs.reload.loot:
-      decription: Allow players to run /magmasmobs reload loot
+  elitemobs.reload.loot:
+      decription: Allow players to run /elitemobs reload loot
       default: op
-  magmasmobs.giveloot:
-    description: Allow players to run /magmasmobs giveloot [playername] random/[loot name]
+  elitemobs.giveloot:
+    description: Allow players to run /elitemobs giveloot [playername] random/[loot name]
+    default: op
+  elitemobs.spawnmob:
+    description: Allow players to run /elitemobs spawnmob [mobType] [mobLevel]
     default: op
