@@ -63,6 +63,12 @@ public class PowerHandler {
 
             int currentMinorPowerAmount = 0;
 
+            if (entity.hasMetadata("custom")) {
+
+                return;
+
+            }
+
             ArrayList<MinorPowers> minorPowerArray = new ArrayList();
 
             if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackFire")) {

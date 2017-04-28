@@ -32,6 +32,7 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.superdrops.SuperDropsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,6 +48,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -299,7 +302,7 @@ public class CommandHandler implements CommandExecutor {
         Location location = null;
         String entityInput = null;
         int mobLevel = 0;
-        List<String> mobPower = null;
+        List<String> mobPower = new ArrayList<>();
 
         if (commandSender instanceof Player) {
 
@@ -380,6 +383,25 @@ public class CommandHandler implements CommandExecutor {
                                 args[3] + ", z:" + args[4] + ") is not valid");
                         getConsoleSender().sendMessage("Valid command syntax: /elitemobs spawnmob worldName xCoord yCoord " +
                                 "zCoord mobLevel mobPower mobPower(you can keep adding these mobPowers as many as you'd like)");
+
+                    }
+
+                    if (args.length > 6) {
+
+                        int index = 0;
+
+                        for (String arg : args) {
+
+                            //mob powers start after arg 2
+                            if (index > 2) {
+
+                                mobPower.add(arg);
+
+                            }
+
+                            index++;
+
+                        }
 
                     }
 
@@ -506,7 +528,118 @@ public class CommandHandler implements CommandExecutor {
 
         }
 
+
         //todo: add a way to select the powers mobs get, get alt system to spawn unstackable EliteMobs with fixed powers
+
+        if (mobPower.size() > 0) {
+
+            boolean inputError = false;
+
+            int powerCount = 0;
+
+            for (String string : mobPower) {
+
+                switch (string) {
+
+                    case "fireattack":
+                        entity.setMetadata(metadataHandler.attackFireMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "freeze":
+                        entity.setMetadata(metadataHandler.attackFreezeMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "shulker":
+                        entity.setMetadata(metadataHandler.attackGravityMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "poison":
+                        entity.setMetadata(metadataHandler.attackPoisonMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "knockback":
+                        entity.setMetadata(metadataHandler.attackPushMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "web":
+                        entity.setMetadata(metadataHandler.attackFreezeMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "wither":
+                        entity.setMetadata(metadataHandler.attackWitherMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "loot":
+                        entity.setMetadata(metadataHandler.bonusLootMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "invisibility":
+                        entity.setMetadata(metadataHandler.invisibilityMD, new FixedMetadataValue(plugin, true));
+                        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
+                        powerCount++;
+                        break;
+                    case "arrowresist":
+                        entity.setMetadata(metadataHandler.invulnerabilityArrowMD, new FixedMetadataValue(plugin, true));
+                        break;
+                    case "fallresist":
+                        entity.setMetadata(metadataHandler.invulnerabilityFallDamageMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "fireresist":
+                        entity.setMetadata(metadataHandler.invulnerabilityFireMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "custom":
+                        entity.setMetadata(metadataHandler.custom, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case "fast":
+                        entity.setMetadata(metadataHandler.movementSpeedMD, new FixedMetadataValue(plugin, true));
+                        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
+                        powerCount++;
+                        break;
+                    default:
+                        if (commandSender instanceof Player) {
+
+                            Player player = (Player) commandSender;
+
+                            player.sendMessage(string + " is not a valid power.");
+
+                        } else if (commandSender instanceof ConsoleCommandSender) {
+
+                            getConsoleSender().sendMessage(string + " is not a valid power.");
+
+                        }
+
+                        inputError = true;
+
+                }
+
+            }
+
+            entity.setMetadata(metadataHandler.minorPowerAmountMD, new FixedMetadataValue(plugin, powerCount));
+            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+            minorPowerPowerStance.itemEffect(entity);
+
+            if (inputError) {
+
+                if (commandSender instanceof Player) {
+
+                    Player player = (Player) commandSender;
+
+                    player.sendMessage("Valid powers: fireattack freeze shulker poison knockback web wither loot invisibility " +
+                            "arrowresist fallresist fireresist fast custom");
+
+                } else if (commandSender instanceof ConsoleCommandSender) {
+
+                    getConsoleSender().sendMessage("Valid powers: fireattack freeze shulker poison knockback web wither loot invisibility " +
+                            "arrowresist fallresist fireresist fast");
+
+                }
+
+            }
+
+        }
 
     }
 
