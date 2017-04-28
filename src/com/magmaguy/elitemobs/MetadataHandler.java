@@ -45,6 +45,7 @@ public class MetadataHandler {
     public final String attackPushMD = "AttackPush";
     public final String attackWebMD = "AttackWeb";
     public final String attackWitherMD = "AttackWither";
+    public final String bonusLootMD = "BonusLoot";
     public final String invulnerabilityArrowMD = "InvulnerabilityArrow";
     public final String invulnerabilityFallDamageMD = "InvulnerabilityFallDamage";
     public final String invulnerabilityFireMD = "InvulnerabilityFire";
@@ -75,6 +76,7 @@ public class MetadataHandler {
         metadataList.add(attackPushMD);
         metadataList.add(attackWebMD);
         metadataList.add(attackWitherMD);
+        metadataList.add(bonusLootMD);
         metadataList.add(invulnerabilityArrowMD);
         metadataList.add(invulnerabilityFallDamageMD);
         metadataList.add(invulnerabilityFireMD);

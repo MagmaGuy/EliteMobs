@@ -115,6 +115,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new AttackWeb(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackPoison(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackWither(this), this);
+        this.getServer().getPluginManager().registerEvents(new BonusLoot(this), this);
         this.getServer().getPluginManager().registerEvents(new Invisibility(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityArrow(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityFire(this), this);
@@ -239,7 +240,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
                 "Enderman", "Endermite", "IronGolem", "PigZombie", "PolarBear", "Silverfish", "Skeleton",
                 "Spider", "Witch", "Zombie"));
         getConfig().addDefault("Valid aggressive EliteMobs powers", Arrays.asList("AttackFire", "AttackFreeze",
-                "AttackGravity", "AttackPoison", "AttackPush", "AttackWeb", "AttackWither", "InvulnerabilityArrow",
+                "AttackGravity", "AttackPoison", "AttackPush", "AttackWeb", "AttackWither", "BonusLoot", "InvulnerabilityArrow",
                 "InvulnerabilityFallDamage", "InvulnerabilityFire", "MovementSpeed", "Invisibility"));
         getConfig().addDefault("Allow Passive EliteMobs", true);
         getConfig().addDefault("Valid Passive EliteMobs", Arrays.asList("Chicken", "Cow", "MushroomCow",
