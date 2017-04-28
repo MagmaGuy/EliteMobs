@@ -13,21 +13,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs;
 
 /**
@@ -124,14 +109,15 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Minor mob powers
         this.getServer().getPluginManager().registerEvents(new AttackFire(this), this);
+        this.getServer().getPluginManager().registerEvents(new AttackFreeze(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackGravity(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackPush(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackPoison(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackWither(this), this);
+        this.getServer().getPluginManager().registerEvents(new Invisibility(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityArrow(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityFire(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityFallDamage(this), this);
-        this.getServer().getPluginManager().registerEvents(new Invisibility(this), this);
 
         //Mob scanner
         this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
@@ -251,9 +237,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Valid aggressive EliteMobs", Arrays.asList("Blaze", "CaveSpider", "Creeper",
                 "Enderman", "Endermite", "IronGolem", "PigZombie", "PolarBear", "Silverfish", "Skeleton",
                 "Spider", "Witch", "Zombie"));
-        getConfig().addDefault("Valid aggressive EliteMobs powers", Arrays.asList("AttackFire", "AttackGravity",
-                "AttackPoison", "AttackPush", "AttackWither", "InvulnerabilityArrow", "InvulnerabilityFallDamage",
-                "InvulnerabilityFire", "MovementSpeed", "Invisibility"));
+        getConfig().addDefault("Valid aggressive EliteMobs powers", Arrays.asList("AttackFire", "AttackFreeze",
+                "AttackGravity", "AttackPoison", "AttackPush", "AttackWither", "InvulnerabilityArrow",
+                "InvulnerabilityFallDamage", "InvulnerabilityFire", "MovementSpeed", "Invisibility"));
         getConfig().addDefault("Allow Passive EliteMobs", true);
         getConfig().addDefault("Valid Passive EliteMobs", Arrays.asList("Chicken", "Cow", "MushroomCow",
                 "Pig", "Sheep"));
