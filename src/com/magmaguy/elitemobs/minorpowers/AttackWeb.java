@@ -71,11 +71,19 @@ public class AttackWeb extends MinorPowers implements Listener {
 
             if (!damagee.hasMetadata("WebCooldown")) {
 
+                Location iceBlockLocation = damagee.getLocation();
+
+                //if a block spawned by the plugin is already in place, skip effect
+                if (iceBlockLocation.getBlock().hasMetadata("TemporaryBlock")) {
+
+                    return;
+
+                }
+
                 processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
                     int counter = 0;
 
-                    Location iceBlockLocation;
                     Material originalMaterial;
 
                     @Override
@@ -84,15 +92,18 @@ public class AttackWeb extends MinorPowers implements Listener {
                         if (counter == 0) {
 
                             damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
-                            iceBlockLocation = damagee.getLocation();
+                            //make sure the block isn't already placed by the plugin
                             originalMaterial = damagee.getLocation().getBlock().getType();
                             iceBlockLocation.getBlock().setType(Material.WEB);
+                            iceBlockLocation.getBlock().setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+
 
                         }
 
                         if (counter == 20 * 4) {
 
                             iceBlockLocation.getBlock().setType(originalMaterial);
+                            iceBlockLocation.getBlock().removeMetadata("TemporaryBlock", plugin);
 
                         }
 
@@ -118,11 +129,19 @@ public class AttackWeb extends MinorPowers implements Listener {
 
                 if (!damagee.hasMetadata("WebCooldown")) {
 
+                    Location iceBlockLocation = damagee.getLocation();
+
+                    //if a block spawned by the plugin is already in place, skip effect
+                    if (iceBlockLocation.getBlock().hasMetadata("TemporaryBlock")) {
+
+                        return;
+
+                    }
+
                     processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
                         int counter = 0;
 
-                        Location iceBlockLocation;
                         Material originalMaterial;
 
                         @Override
@@ -131,15 +150,18 @@ public class AttackWeb extends MinorPowers implements Listener {
                             if (counter == 0) {
 
                                 damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
-                                iceBlockLocation = damagee.getLocation();
+                                //make sure the block isn't already placed by the plugin
                                 originalMaterial = damagee.getLocation().getBlock().getType();
                                 iceBlockLocation.getBlock().setType(Material.WEB);
+                                iceBlockLocation.getBlock().setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+
 
                             }
 
                             if (counter == 20 * 4) {
 
                                 iceBlockLocation.getBlock().setType(originalMaterial);
+                                iceBlockLocation.getBlock().removeMetadata("TemporaryBlock", plugin);
 
                             }
 

@@ -222,6 +222,14 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
+                    if (effectQuantity == 0) {
+
+                        entity.removeMetadata(metadataHandler.visualEffect, plugin);
+
+                        Bukkit.getScheduler().cancelTask(processID);
+
+                    }
+
                     //apply new positioning
 
                     if (entity.hasMetadata(metadataHandler.attackFireMD)) {

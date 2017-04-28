@@ -37,6 +37,7 @@ public class MetadataHandler {
     public final String minorPowerAmountMD = "MinorPowerAmount";
     public final String visualEffect = "VisualEffect";
     public final String forbidden = "Forbidden";
+    public final String custom = "Custom";
     //Powers
     public final String attackFireMD = "AttackFire";
     public final String attackFreezeMD = "AttackFreeze";

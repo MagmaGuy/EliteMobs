@@ -75,11 +75,19 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
             if (!damagee.hasMetadata("FrozenCooldown")) {
 
+                Location iceBlockLocation = damagee.getLocation();
+
+                //if a block spawned by the plugin is already in place, skip effect
+                if (iceBlockLocation.getBlock().hasMetadata("TemporaryBlock")) {
+
+                    return;
+
+                }
+
                 processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
                     int counter = 0;
 
-                    Location iceBlockLocation;
                     Material originalMaterial;
 
                     @Override
@@ -89,9 +97,9 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
                             damagee.setMetadata("Frozen", new FixedMetadataValue(plugin, true));
                             damagee.setMetadata("FrozenCooldown", new FixedMetadataValue(plugin, true));
-                            iceBlockLocation = damagee.getLocation();
                             originalMaterial = damagee.getLocation().getBlock().getType();
                             iceBlockLocation.getBlock().setType(Material.PACKED_ICE);
+                            iceBlockLocation.getBlock().setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
 
                         }
 
@@ -99,6 +107,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
                             damagee.removeMetadata("Frozen", plugin);
                             iceBlockLocation.getBlock().setType(originalMaterial);
+                            iceBlockLocation.getBlock().removeMetadata("TemporaryBlock", plugin);
 
                         }
 
@@ -124,6 +133,15 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
                 if (!damagee.hasMetadata("FrozenCooldown")) {
 
+                    Location iceBlockLocation = damagee.getLocation();
+
+                    //if a block spawned by the plugin is already in place, skip effect
+                    if (iceBlockLocation.getBlock().hasMetadata("TemporaryBlock")) {
+
+                        return;
+
+                    }
+
                     processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
                         int counter = 0;
@@ -138,9 +156,9 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
                                 damagee.setMetadata("Frozen", new FixedMetadataValue(plugin, true));
                                 damagee.setMetadata("FrozenCooldown", new FixedMetadataValue(plugin, true));
-                                iceBlockLocation = damagee.getLocation();
                                 originalMaterial = damagee.getLocation().getBlock().getType();
                                 iceBlockLocation.getBlock().setType(Material.PACKED_ICE);
+                                iceBlockLocation.getBlock().setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
 
                             }
 
@@ -148,6 +166,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
                                 damagee.removeMetadata("Frozen", plugin);
                                 iceBlockLocation.getBlock().setType(originalMaterial);
+                                iceBlockLocation.getBlock().removeMetadata("TemporaryBlock", plugin);
 
                             }
 
@@ -157,7 +176,6 @@ public class AttackFreeze extends MinorPowers implements Listener {
                                 Bukkit.getScheduler().cancelTask(processID);
 
                             }
-
                             counter++;
 
                         }
