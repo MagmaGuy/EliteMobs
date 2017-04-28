@@ -95,6 +95,12 @@ public class PowerHandler {
 
             }
 
+            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackWeb")) {
+
+                minorPowerArray.add(new AttackWeb(plugin));
+
+            }
+
             if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackWither")) {
 
                 minorPowerArray.add(new AttackWither(plugin));
