@@ -22,24 +22,24 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class AttackFreeze extends MinorPowers implements Listener {
+public class AttackWeb extends MinorPowers implements Listener {
 
+    String powerMetadata = metadataHandler.attackWebMD;
     private EliteMobs plugin;
+    MetadataHandler metadataHandler = new MetadataHandler(plugin);
     private int processID;
 
-    public AttackFreeze(Plugin plugin) {
+    public AttackWeb(Plugin plugin) {
 
         this.plugin = (EliteMobs) plugin;
 
@@ -48,8 +48,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        entity.setMetadata(metadataHandler.attackFreezeMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
 
@@ -58,22 +57,19 @@ public class AttackFreeze extends MinorPowers implements Listener {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        return entity.hasMetadata(metadataHandler.attackFreezeMD);
+        return entity.hasMetadata(powerMetadata);
 
     }
 
     @EventHandler
-    public void attackFreeze(EntityDamageByEntityEvent event) {
+    public void attackWeb(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
+        if (damager.hasMetadata(powerMetadata)) {
 
-        if (damager.hasMetadata(metadataHandler.attackFreezeMD)) {
-
-            if (!damagee.hasMetadata("FrozenCooldown")) {
+            if (!damagee.hasMetadata("WebCooldown")) {
 
                 processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -87,24 +83,22 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
                         if (counter == 0) {
 
-                            damagee.setMetadata("Frozen", new FixedMetadataValue(plugin, true));
-                            damagee.setMetadata("FrozenCooldown", new FixedMetadataValue(plugin, true));
+                            damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
                             iceBlockLocation = damagee.getLocation();
                             originalMaterial = damagee.getLocation().getBlock().getType();
-                            iceBlockLocation.getBlock().setType(Material.PACKED_ICE);
+                            iceBlockLocation.getBlock().setType(Material.WEB);
 
                         }
 
-                        if (counter == 40) {
+                        if (counter == 20 * 4) {
 
-                            damagee.removeMetadata("Frozen", plugin);
                             iceBlockLocation.getBlock().setType(originalMaterial);
 
                         }
 
                         if (counter == 20 * 7) {
 
-                            damagee.removeMetadata("FrozenCooldown", plugin);
+                            damagee.removeMetadata("WebCooldown", plugin);
                             Bukkit.getScheduler().cancelTask(processID);
 
                         }
@@ -120,9 +114,9 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         if (damager instanceof Projectile) {
 
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, metadataHandler.attackFreezeMD)) {
+            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
 
-                if (!damagee.hasMetadata("FrozenCooldown")) {
+                if (!damagee.hasMetadata("WebCooldown")) {
 
                     processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -136,28 +130,25 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
                             if (counter == 0) {
 
-                                damagee.setMetadata("Frozen", new FixedMetadataValue(plugin, true));
-                                damagee.setMetadata("FrozenCooldown", new FixedMetadataValue(plugin, true));
+                                damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
                                 iceBlockLocation = damagee.getLocation();
                                 originalMaterial = damagee.getLocation().getBlock().getType();
-                                iceBlockLocation.getBlock().setType(Material.PACKED_ICE);
+                                iceBlockLocation.getBlock().setType(Material.WEB);
 
                             }
 
-                            if (counter == 40) {
+                            if (counter == 20 * 4) {
 
-                                damagee.removeMetadata("Frozen", plugin);
                                 iceBlockLocation.getBlock().setType(originalMaterial);
 
                             }
 
                             if (counter == 20 * 7) {
 
-                                damagee.removeMetadata("FrozenCooldown", plugin);
+                                damagee.removeMetadata("WebCooldown", plugin);
                                 Bukkit.getScheduler().cancelTask(processID);
 
                             }
-
                             counter++;
 
                         }
@@ -167,19 +158,6 @@ public class AttackFreeze extends MinorPowers implements Listener {
                 }
 
             }
-
-        }
-
-    }
-
-    @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-
-        Player player = event.getPlayer();
-
-        if (player.hasMetadata("Frozen")) {
-
-            event.setCancelled(true);
 
         }
 
