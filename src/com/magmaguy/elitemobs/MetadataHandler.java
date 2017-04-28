@@ -53,6 +53,7 @@ public class MetadataHandler {
     public final String visualEffect = "VisualEffect";
     public final String forbidden = "Forbidden";
     //Powers
+    public final String attackFireMD = "AttackFire";
     public final String attackGravityMD = "AttackGravity";
     public final String attackPoisonMD = "AttackPoison";
     public final String attackPushMD = "AttackPush";

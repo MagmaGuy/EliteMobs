@@ -34,7 +34,8 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -81,9 +82,19 @@ public class AttackPoison extends MinorPowers implements Listener {
         Entity damagee = event.getEntity();
 
         MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        if (damager.hasMetadata(metadataHandler.attackPoisonMD) && damagee instanceof Player) {
+        if (damager.hasMetadata(metadataHandler.attackPoisonMD) && damagee instanceof LivingEntity) {
 
-            ((Player) damagee).addPotionEffect(new PotionEffect(PotionEffectType.POISON, 50, 1));
+            ((LivingEntity) damagee).addPotionEffect(new PotionEffect(PotionEffectType.POISON, 50, 1));
+
+        }
+
+        if (damager instanceof Projectile) {
+
+            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, metadataHandler.attackPoisonMD)) {
+
+                ((LivingEntity) damagee).addPotionEffect(new PotionEffect(PotionEffectType.POISON, 50, 1));
+
+            }
 
         }
 
