@@ -62,6 +62,7 @@ public class MetadataHandler {
     public final String invulnerabilityFallDamageMD = "InvulnerabilityFallDamage";
     public final String invulnerabilityFireMD = "InvulnerabilityFire";
     public final String movementSpeedMD = "MovementSpeed";
+    public final String invisibilityMD = "Invisibility";
     private EliteMobs plugin;
 
     public MetadataHandler(Plugin plugin) {
