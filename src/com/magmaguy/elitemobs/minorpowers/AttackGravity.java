@@ -34,7 +34,8 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -82,9 +83,19 @@ public class AttackGravity extends MinorPowers implements Listener {
 
         MetadataHandler metadataHandler = new MetadataHandler(plugin);
 
-        if (damager.hasMetadata(metadataHandler.attackGravityMD) && damagee instanceof Player) {
+        if (damager.hasMetadata(metadataHandler.attackGravityMD) && damagee instanceof LivingEntity) {
 
-            ((Player) damagee).addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 1));
+            ((LivingEntity) damagee).addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 1));
+
+        }
+
+        if (damager instanceof Projectile) {
+
+            if (ProjectileMetadataDetector.projectileMetadataDetector(((Projectile) damager), metadataHandler.attackGravityMD)) {
+
+                ((LivingEntity) damagee).addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 1));
+
+            }
 
         }
 

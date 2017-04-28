@@ -33,33 +33,33 @@ package com.magmaguy.elitemobs.minorpowers;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
 
 /**
- * Created by MagmaGuy on 05/11/2016.
+ * Created by MagmaGuy on 28/04/2017.
  */
-public class AttackPush extends MinorPowers implements Listener {
+public class AttackFire extends MinorPowers implements Listener {
 
     private EliteMobs plugin;
 
-    public AttackPush(Plugin plugin) {
+    public AttackFire(Plugin plugin) {
 
         this.plugin = (EliteMobs) plugin;
 
     }
 
+
     @Override
     public void applyPowers(Entity entity) {
 
         MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        entity.setMetadata(metadataHandler.attackPushMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(metadataHandler.attackFireMD, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
 
@@ -67,43 +67,23 @@ public class AttackPush extends MinorPowers implements Listener {
 
     @Override
     public boolean existingPowers(Entity entity) {
-
         MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        return entity.hasMetadata(metadataHandler.attackPushMD);
-
+        return entity.hasMetadata(metadataHandler.attackFireMD);
     }
 
     @EventHandler
-    public void attackPush(EntityDamageByEntityEvent event) {
+    public void attackFire(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
         MetadataHandler metadataHandler = new MetadataHandler(plugin);
 
-        if (damager.hasMetadata(metadataHandler.attackPushMD)) {
+        if (damager.hasMetadata(metadataHandler.attackFireMD)) {
 
-            int pushbackStrength = 2;
+            damagee.setFireTicks(40);
 
-            Vector pushbackDirection = damagee.getLocation().toVector().subtract(damager.getLocation().toVector());
-            Vector pushbackApplied = pushbackDirection.normalize().multiply(pushbackStrength);
-
-            damagee.setVelocity(pushbackApplied);
-
-        }
-
-        if (damager instanceof Projectile) {
-
-            if (ProjectileMetadataDetector.projectileMetadataDetector(((Projectile) damager), metadataHandler.attackPushMD)) {
-
-                int pushbackStrength = 2;
-
-                Vector pushbackDirection = damagee.getLocation().toVector().subtract(damager.getLocation().toVector());
-                Vector pushbackApplied = pushbackDirection.normalize().multiply(pushbackStrength);
-
-                damagee.setVelocity(pushbackApplied);
-
-            }
+            Bukkit.getLogger().info("fire");
 
         }
 

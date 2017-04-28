@@ -80,6 +80,12 @@ public class PowerHandler {
 
             ArrayList<MinorPowers> minorPowerArray = new ArrayList();
 
+            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackFire")) {
+
+                minorPowerArray.add(new AttackFire(plugin));
+
+            }
+
             if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackGravity")) {
 
                 minorPowerArray.add(new AttackGravity(plugin));

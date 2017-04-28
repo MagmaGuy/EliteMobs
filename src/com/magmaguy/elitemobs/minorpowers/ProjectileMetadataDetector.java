@@ -30,45 +30,36 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 
 /**
- * Created by MagmaGuy on 05/11/2016.
+ * Created by MagmaGuy on 28/04/2017.
  */
-public class MovementSpeed extends MinorPowers {
+public class ProjectileMetadataDetector {
 
-    private EliteMobs plugin;
+    Plugin plugin = Bukkit.getPluginManager().getPlugin("EliteMobs");
 
-    public MovementSpeed(Plugin plugin) {
+    public static boolean projectileMetadataDetector(Projectile projectile, String metadata) {
 
-        this.plugin = (EliteMobs) plugin;
+        ProjectileSource trueDamager = projectile.getShooter();
 
-    }
+        if (trueDamager instanceof Blaze || trueDamager instanceof Skeleton || trueDamager instanceof Witch ||
+                trueDamager instanceof Stray) {
 
-    @Override
-    public void applyPowers(Entity entity) {
+            Entity trueDamagerEntity = (Entity) trueDamager;
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        entity.setMetadata(metadataHandler.movementSpeedMD, new FixedMetadataValue(plugin, true));
-        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
-        minorPowerPowerStance.itemEffect(entity);
+            if (trueDamagerEntity.hasMetadata(metadata)) {
 
-    }
+                return true;
 
-    @Override
-    public boolean existingPowers(Entity entity) {
+            }
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        return entity.hasMetadata(metadataHandler.movementSpeedMD);
+        }
+
+        return false;
 
     }
 

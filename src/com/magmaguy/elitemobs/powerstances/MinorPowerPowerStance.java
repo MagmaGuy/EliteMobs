@@ -157,6 +157,12 @@ public class MinorPowerPowerStance implements Listener {
                     int effectIteration = 0;
 
                     //count amount of active effects
+                    if (entity.hasMetadata(metadataHandler.attackFireMD)) {
+
+                        effectQuantity++;
+
+                    }
+
                     if (entity.hasMetadata(metadataHandler.attackGravityMD)) {
 
                         effectQuantity++;
@@ -206,6 +212,18 @@ public class MinorPowerPowerStance implements Listener {
                     }
 
                     //apply new positioning
+
+                    if (entity.hasMetadata(metadataHandler.attackFireMD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.LAVA_BUCKET, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.LAVA_BUCKET, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+                    }
+
                     if (entity.hasMetadata(metadataHandler.attackGravityMD)) {
 
                         effectIteration++;
