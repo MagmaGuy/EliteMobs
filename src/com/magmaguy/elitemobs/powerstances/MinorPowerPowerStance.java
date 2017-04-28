@@ -13,20 +13,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 package com.magmaguy.elitemobs.powerstances;
 
@@ -163,6 +149,12 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(metadataHandler.attackFreezeMD)) {
+
+                        effectQuantity++;
+
+                    }
+
                     if (entity.hasMetadata(metadataHandler.attackGravityMD)) {
 
                         effectQuantity++;
@@ -190,6 +182,12 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(metadataHandler.invisibilityMD)) {
+
+                        effectQuantity++;
+
+                    }
+
                     if (entity.hasMetadata(metadataHandler.invulnerabilityArrowMD)) {
 
                         effectQuantity++;
@@ -210,12 +208,6 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.invisibilityMD)) {
-
-                        effectQuantity++;
-
-                    }
-
                     //apply new positioning
 
                     if (entity.hasMetadata(metadataHandler.attackFireMD)) {
@@ -224,6 +216,17 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack effectItem1 = new ItemStack(Material.LAVA_BUCKET, 1);
                         ItemStack effectItem2 = new ItemStack(Material.LAVA_BUCKET, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+                    }
+
+                    if (entity.hasMetadata(metadataHandler.attackFreezeMD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.PACKED_ICE, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.FROSTED_ICE, 1);
 
                         itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
 
@@ -275,6 +278,18 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(metadataHandler.invisibilityMD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.THIN_GLASS, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.THIN_GLASS, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+
+                    }
+
                     if (entity.hasMetadata(metadataHandler.invulnerabilityArrowMD)) {
 
                         effectIteration++;
@@ -305,18 +320,6 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack effectItem1 = new ItemStack(Material.GOLD_BOOTS, 1);
                         ItemStack effectItem2 = new ItemStack(Material.GOLD_BOOTS, 1);
-
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
-
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.invisibilityMD)) {
-
-                        effectIteration++;
-
-                        ItemStack effectItem1 = new ItemStack(Material.THIN_GLASS, 1);
-                        ItemStack effectItem2 = new ItemStack(Material.THIN_GLASS, 1);
 
                         itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
 
