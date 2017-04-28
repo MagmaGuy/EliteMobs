@@ -189,6 +189,13 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(metadataHandler.bonusLootMD)) {
+
+                        effectQuantity++;
+
+
+                    }
+
                     if (entity.hasMetadata(metadataHandler.invisibilityMD)) {
 
                         effectQuantity++;
@@ -296,6 +303,18 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(metadataHandler.bonusLootMD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.CHEST, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.CHEST, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
+
+                    }
+
                     if (entity.hasMetadata(metadataHandler.invisibilityMD)) {
 
                         effectIteration++;
@@ -378,7 +397,7 @@ public class MinorPowerPowerStance implements Listener {
 
         for (Item currentItem : items){
 
-            if (currentItem.getItemStack().equals(effectItem1)) {
+            if (currentItem.getItemStack().getType().equals(effectItem1.getType())) {
 
                 effectAlreadyPresent = true;
                 break;

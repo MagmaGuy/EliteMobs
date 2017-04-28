@@ -107,6 +107,12 @@ public class PowerHandler {
 
             }
 
+            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("BonusLoot")) {
+
+                minorPowerArray.add(new BonusLoot(plugin));
+
+            }
+
             if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("Invisibility")) {
 
                 minorPowerArray.add(new Invisibility(plugin));
