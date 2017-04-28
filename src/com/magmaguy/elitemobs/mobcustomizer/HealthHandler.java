@@ -103,7 +103,6 @@ public class HealthHandler {
         Damageable damageable = (Damageable) entity;
 
         damageable.setMaxHealth(ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), eliteMobLevel));
-        Bukkit.getLogger().info("max health " + ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), eliteMobLevel) + "  level " + eliteMobLevel);
         damageable.setHealth(damageable.getMaxHealth());
 
     }
