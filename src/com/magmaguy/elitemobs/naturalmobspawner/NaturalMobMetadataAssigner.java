@@ -32,11 +32,15 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
@@ -77,8 +81,58 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                 entity.setMetadata(metadataHandler.naturalMob, new FixedMetadataValue(plugin, true));
 
-                //20% chance of turning a mob into a EliteMob
-                if (random.nextDouble() < plugin.getConfig().getDouble("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn") / 100) {
+                //20% chance of turning a mob into a EliteMob unless special gear is equipped
+                int huntingGearChanceAdder = 0;
+
+                for (Entity surroundingEntity : entity.getNearbyEntities(100, 100, 100)) {
+
+                    if (surroundingEntity instanceof Player) {
+
+                        Player player = (Player) surroundingEntity;
+
+                        ItemStack helmet = player.getInventory().getHelmet();
+                        ItemStack chestplate = player.getInventory().getChestplate();
+                        ItemStack leggings = player.getInventory().getLeggings();
+                        ItemStack boots = player.getInventory().getBoots();
+                        ItemStack heldItem = player.getInventory().getItemInMainHand();
+
+                        for (ItemStack itemStack : EliteDropsHandler.lootList) {
+
+                            if (helmet != null && itemStack.getItemMeta().equals(helmet.getItemMeta()) &&
+                                    helmet.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting helmet")) {
+
+                                huntingGearChanceAdder++;
+
+                            } else if (chestplate != null && chestplate.getItemMeta().equals(itemStack.getItemMeta())
+                                    && chestplate.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting chestplate")) {
+
+                                huntingGearChanceAdder++;
+
+                            } else if (leggings != null && leggings.getItemMeta().equals(itemStack.getItemMeta())
+                                    && leggings.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting leggings")) {
+
+                                huntingGearChanceAdder++;
+
+                            } else if (boots != null && boots.getItemMeta().equals(itemStack.getItemMeta())
+                                    && boots.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting boots")) {
+
+                                huntingGearChanceAdder++;
+
+                            } else if (heldItem != null && heldItem.getType() != Material.AIR && heldItem.getItemMeta().equals(itemStack.getItemMeta())
+                                    && heldItem.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting bow")) {
+
+                                huntingGearChanceAdder++;
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                if (random.nextDouble() < plugin.getConfig().getDouble("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn") / 100
+                        + huntingGearChanceAdder * 10) {
 
                     NaturalMobSpawner naturalMobSpawner = new NaturalMobSpawner(plugin);
                     naturalMobSpawner.naturalMobProcessor(entity);

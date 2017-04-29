@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 1.1.0
+version: 1.2.0
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 commands:
@@ -33,5 +33,5 @@ permissions:
     description: Allow players to run /elitemobs giveloot [playername] random/[loot name]
     default: op
   elitemobs.spawnmob:
-    description: Allow players to run /elitemobs spawnmob [mobType] [mobLevel]
+    description: Allow players to run /elitemobs spawnmob [mobType] [mobLevel] [mobPower] [mobPower(just keep adding until done)]
     default: op

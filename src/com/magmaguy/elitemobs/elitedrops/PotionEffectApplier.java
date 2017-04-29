@@ -28,7 +28,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.superdrops;
+package com.magmaguy.elitemobs.elitedrops;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -36,7 +36,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import static com.magmaguy.elitemobs.superdrops.SuperDropsHandler.potionEffectItemList;
+import static com.magmaguy.elitemobs.elitedrops.EliteDropsHandler.potionEffectItemList;
 
 /**
  * Created by MagmaGuy on 14/03/2017.

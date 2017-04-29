@@ -32,7 +32,7 @@ package com.magmaguy.elitemobs.mobs.passive;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.superdrops.ItemDropVelocity;
+import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;

@@ -30,10 +30,10 @@
 
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import com.magmaguy.elitemobs.superdrops.SuperDropsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -54,7 +54,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.*;
 
 import static com.magmaguy.elitemobs.EliteMobs.worldList;
-import static com.magmaguy.elitemobs.superdrops.SuperDropsHandler.lootList;
+import static com.magmaguy.elitemobs.elitedrops.EliteDropsHandler.lootList;
 import static org.bukkit.Bukkit.*;
 
 /**
@@ -136,8 +136,8 @@ public class CommandHandler implements CommandExecutor {
                     Player player = (Player) commandSender;
                     Bukkit.getPluginManager().getPlugin("EliteMobs").reloadConfig();
                     plugin.reloadCustomConfig();
-                    SuperDropsHandler superDropsHandler = new SuperDropsHandler(plugin);
-                    superDropsHandler.superDropParser();
+                    EliteDropsHandler eliteDropsHandler = new EliteDropsHandler(plugin);
+                    eliteDropsHandler.superDropParser();
                     getLogger().info("EliteMobs config reloaded!");
                     player.sendTitle("EliteMobs config reloaded!", "hehehe butts.");
 
@@ -562,7 +562,7 @@ public class CommandHandler implements CommandExecutor {
                         powerCount++;
                         break;
                     case "web":
-                        entity.setMetadata(metadataHandler.attackFreezeMD, new FixedMetadataValue(plugin, true));
+                        entity.setMetadata(metadataHandler.attackWebMD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
                     case "wither":

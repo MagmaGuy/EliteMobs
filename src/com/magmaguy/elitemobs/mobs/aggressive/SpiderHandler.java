@@ -47,8 +47,8 @@ package com.magmaguy.elitemobs.mobs.aggressive;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultMaxHealthGuesser;
-import com.magmaguy.elitemobs.superdrops.ItemDropVelocity;
 import org.bukkit.Material;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Spider;

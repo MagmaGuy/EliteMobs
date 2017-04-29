@@ -28,7 +28,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.superdrops;
+package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -54,12 +54,13 @@ import static org.bukkit.Bukkit.getLogger;
 /**
  * Created by MagmaGuy on 29/11/2016.
  */
-public class SuperDropsHandler implements Listener {
+public class EliteDropsHandler implements Listener {
 
     public static List<ItemStack> lootList = new ArrayList();
     public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
     private EliteMobs plugin;
-    public SuperDropsHandler(Plugin plugin) {
+
+    public EliteDropsHandler(Plugin plugin) {
 
         this.plugin = (EliteMobs) plugin;
 

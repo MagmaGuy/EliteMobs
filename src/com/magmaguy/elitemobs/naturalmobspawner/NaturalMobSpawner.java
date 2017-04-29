@@ -96,7 +96,7 @@ import static org.bukkit.Material.*;
 public class NaturalMobSpawner implements Listener {
 
     private EliteMobs plugin;
-    private int range = 50;
+    private int range = 100;
 
 
     public NaturalMobSpawner(Plugin plugin) {

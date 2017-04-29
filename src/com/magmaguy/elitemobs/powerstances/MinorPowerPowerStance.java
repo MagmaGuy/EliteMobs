@@ -457,12 +457,16 @@ public class MinorPowerPowerStance implements Listener {
                 Location newLocation1 = particleLocations.get(0);
                 Location newLocation2 = particleLocations.get(1);
 
-                //Respawn item to avoid too much client-side visual drifting
-                if (counter % (4 * 3) == 0) {
+                Location worldMovePrevent1 = items.get(((effectIteration - 1) * 4) + repeatedCycles * amountPerTrack).getLocation();
+                Location worldMovePrevent2 = items.get(((effectIteration - 1) * 4) + 1 + repeatedCycles * amountPerTrack).getLocation();
 
-//                    List<Location> oldParticleLocations = powerStanceMath.cylindricalPowerStance(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter + adjustedCounter - 1 + currentItemOffset);
-//                    Location oldLocation1 = oldParticleLocations.get(0);
-//                    Location oldLocation2 = oldParticleLocations.get(1);
+                //Respawn item to avoid too much client-side visual drifting, avoid errors due to portals and entities going through them
+                if (counter % (4 * 3) == 0 || !worldMovePrevent1.getWorld().equals(newLocation1.getWorld()) || !worldMovePrevent2.getWorld().equals(newLocation2.getWorld())) {
+
+                    List<Location> oldParticleLocations = powerStanceMath.cylindricalPowerStance(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter + adjustedCounter - 1 + currentItemOffset);
+                    Location oldLocation1 = oldParticleLocations.get(0);
+                    Location oldLocation2 = oldParticleLocations.get(1);
+
 
                     Item item1 = items.get(((effectIteration-1)*4)+repeatedCycles*amountPerTrack);
                     Item item2 = items.get(((effectIteration-1)*4)+1+repeatedCycles*amountPerTrack);
@@ -473,20 +477,20 @@ public class MinorPowerPowerStance implements Listener {
                     items.remove(item1);
                     items.remove(item2);
 
-                    Location location1 = item1.getLocation();
+//                    Location location1 = item1.getLocation();
                     item1.remove();
                     item1.removeMetadata(metadataHandler.visualEffect, plugin);
 
-                    item1 = entity.getWorld().dropItem(location1, effectItem1);
+                    item1 = entity.getWorld().dropItem(oldLocation1, effectItem1);
                     items.add(index1, item1);
                     item1.setPickupDelay(Integer.MAX_VALUE);
                     item1.setMetadata(metadataHandler.visualEffect, new FixedMetadataValue(plugin, true));
 
-                    Location location2 = item2.getLocation();
+//                    Location location2 = item2.getLocation();
                     item2.remove();
                     item2.removeMetadata(metadataHandler.visualEffect, plugin);
 
-                    item2 = entity.getWorld().dropItem(location2, effectItem2);
+                    item2 = entity.getWorld().dropItem(oldLocation2, effectItem2);
                     items.add(index2, item2);
                     item2.setPickupDelay(Integer.MAX_VALUE);
                     item2.setMetadata(metadataHandler.visualEffect, new FixedMetadataValue(plugin, true));

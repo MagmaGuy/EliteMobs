@@ -34,9 +34,9 @@ import org.bukkit.plugin.Plugin;
  */
 public class AttackWeb extends MinorPowers implements Listener {
 
-    String powerMetadata = metadataHandler.attackWebMD;
     private EliteMobs plugin;
     MetadataHandler metadataHandler = new MetadataHandler(plugin);
+    String powerMetadata = metadataHandler.attackWebMD;
     private int processID;
 
     public AttackWeb(Plugin plugin) {
@@ -117,7 +117,7 @@ public class AttackWeb extends MinorPowers implements Listener {
 
                     }
 
-                }, 1, 1);
+                }, 2, 1);
 
             }
 

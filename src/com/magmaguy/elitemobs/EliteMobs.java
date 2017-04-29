@@ -22,6 +22,8 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventSpawnerMobEggInteraction;
+import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.minorpowers.*;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
 import com.magmaguy.elitemobs.mobs.aggressive.*;
@@ -30,8 +32,6 @@ import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobSpawner;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import com.magmaguy.elitemobs.superdrops.PotionEffectApplier;
-import com.magmaguy.elitemobs.superdrops.SuperDropsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -67,7 +67,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         initCustomConfig();
 
         //Parse loot
-        SuperDropsHandler superDrops = new SuperDropsHandler(this);
+        EliteDropsHandler superDrops = new EliteDropsHandler(this);
         superDrops.superDropParser();
 
         //Get world list
@@ -142,7 +142,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Loot
         if (getConfig().getBoolean("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)")) {
 
-            this.getServer().getPluginManager().registerEvents(new SuperDropsHandler(this), this);
+            this.getServer().getPluginManager().registerEvents(new EliteDropsHandler(this), this);
 
             getLogger().info("EliteMobs - EliteMob loot enabled!");
 
@@ -281,9 +281,45 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Type", "DIAMOND_SWORD");
         this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Name", "Zombie Slayer");
+        //Loot example
         this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Lore", Arrays.asList("Slays zombies Bigly."));
         this.getCustomConfig().addDefault("Loot.Zombie Slayer.Enchantments", Arrays.asList("DAMAGE_ALL,5", "DAMAGE_UNDEAD,5"));
         this.getCustomConfig().addDefault("Loot.Zombie Slayer.Potion Effects", Arrays.asList("GLOWING,1"));
+        //hunting helmet
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Item Type", "DIAMOND_HELMET");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Item Name", "Elite Mob Hunting Helmet");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Item Lore", Arrays.asList("Wearing this helmet will",
+                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only for the most tenacious minds."));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Enchantments", Arrays.asList("VANISHING_CURSE,1"));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Potion Effects", Arrays.asList("NIGHT_VISION,1"));
+        //hunting chestplate
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Item Type", "DIAMOND_CHESTPLATE");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Item Name", "Elite Mob Hunting Chestplate");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Item Lore", Arrays.asList("Wearing this chestplate will",
+                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only for the bravest souls."));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Enchantments", Arrays.asList("VANISHING_CURSE,1"));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Potion Effects", Arrays.asList("HEALTH_BOOST,1"));
+        //hunting leggings
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Item Type", "DIAMOND_LEGGINGS");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Item Name", "Elite Mob Hunting Leggings");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Item Lore", Arrays.asList("Wearing these leggings will",
+                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only for those who aim the highest."));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Enchantments", Arrays.asList("VANISHING_CURSE,1"));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Potion Effects", Arrays.asList("JUMP,2"));
+        //hunting boots
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Item Type", "DIAMOND_BOOTS");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Item Name", "Elite Mob Hunting Boots");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Item Lore", Arrays.asList("Wearing these boots will",
+                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only for those fleetest of foot."));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Enchantments", Arrays.asList("VANISHING_CURSE,1"));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Potion Effects", Arrays.asList("SPEED,2"));
+        //hunting bow
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Item Type", "BOW");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Item Name", "Elite Mob Hunting Bow");
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Item Lore", Arrays.asList("Wielding this bow will",
+                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only natural-born hunters."));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Enchantments", Arrays.asList("VANISHING_CURSE,1", "ARROW_DAMAGE,3"));
+        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Potion Effects", Arrays.asList("DAMAGE_RESISTANCE,1"));
 
         this.getCustomConfig().options().copyDefaults(true);
         this.saveDefaultCustomConfig();

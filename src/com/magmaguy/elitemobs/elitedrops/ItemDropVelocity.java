@@ -28,7 +28,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.superdrops;
+package com.magmaguy.elitemobs.elitedrops;
 
 import org.bukkit.util.Vector;
 
