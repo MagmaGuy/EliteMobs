@@ -108,6 +108,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new DamageHandler(this), this);
 
         //Minor mob powers
+        this.getServer().getPluginManager().registerEvents(new AttackBlinding(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackConfusing(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackFire(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackFreeze(this), this);

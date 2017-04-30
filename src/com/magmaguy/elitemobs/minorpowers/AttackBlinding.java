@@ -32,14 +32,14 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Created by MagmaGuy on 30/04/2017.
  */
-public class AttackConfusing extends MinorPowers implements Listener {
+public class AttackBlinding extends MinorPowers implements Listener{
 
     private EliteMobs plugin;
 
     MetadataHandler metadataHandler = new MetadataHandler(plugin);
-    String powerMetadata = metadataHandler.attackConfusingMD;
+    String powerMetadata = metadataHandler.attackBlindingMD;
 
-    public AttackConfusing(Plugin plugin) {
+    public AttackBlinding(Plugin plugin) {
 
         this.plugin = (EliteMobs) plugin;
 
@@ -50,7 +50,7 @@ public class AttackConfusing extends MinorPowers implements Listener {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
-        minorPowerPowerStance.attackConfusing(entity);
+        minorPowerPowerStance.itemEffect(entity);
 
     }
 
@@ -62,7 +62,7 @@ public class AttackConfusing extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void attackConfusing (EntityDamageByEntityEvent event) {
+    public void attackBlinding (EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
@@ -73,7 +73,7 @@ public class AttackConfusing extends MinorPowers implements Listener {
 
                 Player player = (Player) damagee;
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*10, 3));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20*5, 3));
 
             }
 
@@ -83,12 +83,14 @@ public class AttackConfusing extends MinorPowers implements Listener {
 
                 Player player = (Player) damagee;
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*10, 3));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20*5, 3));
 
             }
 
         }
 
+
     }
+
 
 }
