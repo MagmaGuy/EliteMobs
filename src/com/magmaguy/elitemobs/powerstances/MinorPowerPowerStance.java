@@ -45,7 +45,8 @@ public class MinorPowerPowerStance implements Listener {
 
     private EliteMobs plugin;
     private int processID;
-
+    MetadataHandler metadataHandler = new MetadataHandler(plugin);
+    PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
 
     public MinorPowerPowerStance(Plugin plugin) {
 
@@ -53,12 +54,15 @@ public class MinorPowerPowerStance implements Listener {
 
     }
 
+    private final double radiusHorizontal = 1;
+    private final double radiusVertical = 1;
+    private final double speedHorizontal = 20;
+    private final double speedVertical = 2;
+
     //Secondary effect particle processing
-    private void particleEffect(Entity entity, double radiusHorizontal, double radiusVertical, double speedHorizontal, double speedVertical, Particle particle1, Particle particle2, int particleAmount) {
+    private void particleEffect(Entity entity, Particle particle, int particleAmount, double v, double v1, double v2, double v3) {
 
         if (plugin.getConfig().getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
-
-            MetadataHandler metadataHandler = new MetadataHandler(plugin);
 
             if (plugin.getConfig().getBoolean("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs")
                     && !entity.hasMetadata(metadataHandler.naturalMob)) {
@@ -67,8 +71,6 @@ public class MinorPowerPowerStance implements Listener {
 
             }
 
-            PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
-
             processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
                 float counter = 0;
@@ -76,12 +78,12 @@ public class MinorPowerPowerStance implements Listener {
                 public void run() {
 
                     List<Location> particleLocations = powerStanceMath.cylindricalPowerStance(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+
                     Location location1 = particleLocations.get(0);
                     Location location2 = particleLocations.get(1);
 
-                    entity.getWorld().spawnParticle(particle1, location1, particleAmount, 0.0, 0.0, 0.0, 0.01);
-                    entity.getWorld().spawnParticle(particle2, location2, particleAmount, 0.0, 0.0, 0.0, 0.01);
-
+                    entity.getWorld().spawnParticle(particle, location1, particleAmount, v, v1, v2, v3);
+                    entity.getWorld().spawnParticle(particle, location2, particleAmount, v, v1, v2, v3);
 
                     if (!entity.isValid()) {
 
@@ -96,6 +98,18 @@ public class MinorPowerPowerStance implements Listener {
             }, 1L, 1L);
 
         }
+
+    }
+
+    public void invulnerabilityFireEffect(Entity entity) {
+
+        particleEffect(entity, Particle.FLAME, 5, 0, 0, 0, 0.01);
+
+    }
+
+    public void attackConfusing(Entity entity) {
+
+        particleEffect(entity, Particle.SPELL_MOB, 5, 0, 0, 0, 0.01);
 
     }
 
@@ -119,13 +133,6 @@ public class MinorPowerPowerStance implements Listener {
 
             }
 
-            PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
-
-            double radiusHorizontal = 1;
-            double radiusVertical = 1;
-            double speedHorizontal = 20;
-            double speedVertical = 2;
-
             int amountPerTrack = 2;
 
             entity.setMetadata("VisualEffect", new FixedMetadataValue(plugin, true));
@@ -143,90 +150,13 @@ public class MinorPowerPowerStance implements Listener {
                     int effectIteration = 0;
 
                     //count amount of active effects
-                    if (entity.hasMetadata(metadataHandler.attackFireMD)) {
+                    for (String string : metadataHandler.minorPowerList()) {
 
-                        effectQuantity++;
+                        if (entity.hasMetadata(string)) {
 
-                    }
+                            effectQuantity++;
 
-                    if (entity.hasMetadata(metadataHandler.attackFreezeMD)) {
-
-                        effectQuantity++;
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.attackGravityMD)) {
-
-                        effectQuantity++;
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.attackPoisonMD)) {
-
-                        effectQuantity++;
-
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.attackPushMD)) {
-
-                        effectQuantity++;
-
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.attackWebMD)) {
-
-                        effectQuantity++;
-
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.attackWitherMD)) {
-
-                        effectQuantity++;
-
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.bonusLootMD)) {
-
-                        effectQuantity++;
-
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.invisibilityMD)) {
-
-                        effectQuantity++;
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.invulnerabilityArrowMD)) {
-
-                        effectQuantity++;
-
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.invulnerabilityFallDamageMD)) {
-
-                        effectQuantity++;
-
-
-                    }
-
-                    if (entity.hasMetadata(metadataHandler.movementSpeedMD)) {
-
-                        effectQuantity++;
-
-                    }
-
-                    if (effectQuantity == 0) {
-
-                        entity.removeMetadata(metadataHandler.visualEffect, plugin);
-
-                        Bukkit.getScheduler().cancelTask(processID);
+                        }
 
                     }
 
@@ -239,7 +169,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.LAVA_BUCKET, 1);
                         ItemStack effectItem2 = new ItemStack(Material.LAVA_BUCKET, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
                     }
 
@@ -250,7 +180,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.PACKED_ICE, 1);
                         ItemStack effectItem2 = new ItemStack(Material.FROSTED_ICE, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
                     }
 
@@ -261,7 +191,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.ELYTRA, 1);
                         ItemStack effectItem2 = new ItemStack(Material.ELYTRA, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
                     }
 
@@ -272,7 +202,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.EMERALD, 1);
                         ItemStack effectItem2 = new ItemStack(Material.EMERALD, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
 
                     }
@@ -284,7 +214,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.PISTON_BASE, 1);
                         ItemStack effectItem2 = new ItemStack(Material.PISTON_BASE, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
                     }
 
@@ -295,7 +225,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.WEB, 1);
                         ItemStack effectItem2 = new ItemStack(Material.WEB, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
                     }
 
@@ -306,7 +236,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
                         ItemStack effectItem2 = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
 
                     }
@@ -318,7 +248,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.CHEST, 1);
                         ItemStack effectItem2 = new ItemStack(Material.CHEST, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
 
                     }
@@ -330,7 +260,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.THIN_GLASS, 1);
                         ItemStack effectItem2 = new ItemStack(Material.THIN_GLASS, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
 
                     }
@@ -342,7 +272,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.SPECTRAL_ARROW, 1);
                         ItemStack effectItem2 = new ItemStack(Material.TIPPED_ARROW, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
 
                     }
@@ -354,7 +284,19 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.FEATHER, 1);
                         ItemStack effectItem2 = new ItemStack(Material.FEATHER, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
+
+
+                    }
+
+                    if (entity.hasMetadata(metadataHandler.invulnerabilityKnockbackMD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.ANVIL, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.ANVIL, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
 
                     }
@@ -366,7 +308,7 @@ public class MinorPowerPowerStance implements Listener {
                         ItemStack effectItem1 = new ItemStack(Material.GOLD_BOOTS, 1);
                         ItemStack effectItem2 = new ItemStack(Material.GOLD_BOOTS, 1);
 
-                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter);
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
 
                     }
@@ -398,8 +340,7 @@ public class MinorPowerPowerStance implements Listener {
     }
 
     public void itemProcessor (List<Item> items, int effectQuantity, int effectIteration, ItemStack effectItem1,
-                               ItemStack effectItem2, int amountPerTrack, Entity entity, double radiusHorizontal,
-                               double radiusVertical, double speedHorizontal, double speedVertical, float counter) {
+                               ItemStack effectItem2, int amountPerTrack, Entity entity, float counter) {
 
         boolean effectAlreadyPresent = false;
 
@@ -413,8 +354,6 @@ public class MinorPowerPowerStance implements Listener {
             }
 
         }
-
-        PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
 
         //divided number is based on the amount of counts it takes for the effect to do a full cycle (counter * 12) may change, may be worth putting on constructor? Finnicky math
         int adjustedCounter = 30 / amountPerTrack;
@@ -521,25 +460,9 @@ public class MinorPowerPowerStance implements Listener {
 
     }
 
-    //TODO: particle effects to a new format
-    public void invulnerabilityFireEffect(Entity entity) {
-
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (entity.hasMetadata(metadataHandler.invulnerabilityFireMD)) {
-
-            particleEffect(entity, 1.0, 1.0, 20, 2, Particle.FLAME, Particle.FLAME, 5);
-
-        }
-
-    }
-
-
     //Events
     @EventHandler
     public void lastAntiPickupSafeguard(PlayerPickupItemEvent event) {
-
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
 
         if (event.getItem().hasMetadata(metadataHandler.visualEffect)) {
 
@@ -552,8 +475,6 @@ public class MinorPowerPowerStance implements Listener {
 
     @EventHandler
     public void antiHopperPickupSafeguard(InventoryPickupItemEvent event) {
-
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
 
         if (event.getItem().hasMetadata(metadataHandler.visualEffect)) {
 
@@ -568,8 +489,6 @@ public class MinorPowerPowerStance implements Listener {
     public void metadataKiller(EntityDeathEvent event) {
 
         Entity entity = event.getEntity();
-
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
 
         List<String> metadataList = new ArrayList<String>();
         metadataList.add(metadataHandler.attackGravityMD);
@@ -594,8 +513,6 @@ public class MinorPowerPowerStance implements Listener {
 
     @EventHandler
     public void antiItemDespawn (ItemDespawnEvent event) {
-
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
 
         if (event.getEntity().hasMetadata(metadataHandler.visualEffect)) {
 

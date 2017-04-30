@@ -19,22 +19,26 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
- * Created by MagmaGuy on 28/04/2017.
+ * Created by MagmaGuy on 30/04/2017.
  */
-public class AttackFire extends MinorPowers implements Listener {
+public class AttackConfusing extends MinorPowers implements Listener {
 
     private EliteMobs plugin;
-    MetadataHandler metadataHandler = new MetadataHandler(plugin);
 
-    public AttackFire(Plugin plugin) {
+    MetadataHandler metadataHandler = new MetadataHandler(plugin);
+    String powerMetadata = metadataHandler.attackConfusingMD;
+
+    public AttackConfusing(Plugin plugin) {
 
         this.plugin = (EliteMobs) plugin;
 
@@ -43,38 +47,37 @@ public class AttackFire extends MinorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(metadataHandler.attackFireMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
-        minorPowerPowerStance.itemEffect(entity);
+        minorPowerPowerStance.attackConfusing(entity);
 
     }
 
     @Override
     public boolean existingPowers(Entity entity) {
-        return entity.hasMetadata(metadataHandler.attackFireMD);
+
+        return entity.hasMetadata(powerMetadata);
+
     }
 
     @EventHandler
-    public void attackFire(EntityDamageByEntityEvent event) {
+    public void attackConfusing (EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        if (damager.hasMetadata(metadataHandler.attackFireMD)) {
+        if (damager.hasMetadata(powerMetadata)) {
 
-            damagee.setFireTicks(40);
+            if (damagee instanceof Player) {
 
-        }
+                Player player = (Player) damagee;
 
-        if (damager instanceof Projectile) {
-
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, metadataHandler.attackFireMD)) {
-
-                damagee.setFireTicks(40);
+                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*10, 3));
 
             }
 
         }
+
 
     }
 
