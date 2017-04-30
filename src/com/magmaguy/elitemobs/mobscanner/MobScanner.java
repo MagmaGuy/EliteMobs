@@ -123,7 +123,8 @@ public class MobScanner implements Listener {
                     }
 
                     //scan for stacked EliteMobs
-                    if (plugin.getConfig().getBoolean("Allow aggressive EliteMobs")) {
+                    if (plugin.getConfig().getBoolean("Allow aggressive EliteMobs") &&
+                            plugin.getConfig().getBoolean("Aggressive mob stacking")) {
 
                         scanValidAggressiveLivingEntity(entity);
 

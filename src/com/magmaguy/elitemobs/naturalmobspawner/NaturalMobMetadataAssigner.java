@@ -67,6 +67,13 @@ public class NaturalMobMetadataAssigner implements Listener {
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {
 
+        if (!plugin.getConfig().getBoolean("Natural aggressive EliteMob spawning") ||
+                !plugin.getConfig().getBoolean("Allow aggressive EliteMobs")){
+
+            return;
+
+        }
+
         if (event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM) {
 
             Entity entity = event.getEntity();
