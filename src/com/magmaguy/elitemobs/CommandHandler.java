@@ -541,6 +541,12 @@ public class CommandHandler implements CommandExecutor {
 
                 switch (string) {
 
+                    case "confusing":
+                        entity.setMetadata(metadataHandler.attackConfusingMD, new FixedMetadataValue(plugin, true));
+                        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+                        minorPowerPowerStance.attackConfusing(entity);
+                        powerCount++;
+                        break;
                     case "fireattack":
                         entity.setMetadata(metadataHandler.attackFireMD, new FixedMetadataValue(plugin, true));
                         powerCount++;
@@ -587,15 +593,21 @@ public class CommandHandler implements CommandExecutor {
                         break;
                     case "fireresist":
                         entity.setMetadata(metadataHandler.invulnerabilityFireMD, new FixedMetadataValue(plugin, true));
+                        MinorPowerPowerStance minorPowerPowerStance1 = new MinorPowerPowerStance(plugin);
+                        minorPowerPowerStance1.invulnerabilityFireEffect(entity);
                         powerCount++;
                         break;
-                    case "custom":
-                        entity.setMetadata(metadataHandler.custom, new FixedMetadataValue(plugin, true));
+                    case "heavy":
+                        entity.setMetadata(metadataHandler.invulnerabilityKnockbackMD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
                     case "fast":
                         entity.setMetadata(metadataHandler.movementSpeedMD, new FixedMetadataValue(plugin, true));
                         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
+                        powerCount++;
+                        break;
+                    case "custom":
+                        entity.setMetadata(metadataHandler.custom, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
                     default:
@@ -627,8 +639,8 @@ public class CommandHandler implements CommandExecutor {
 
                     Player player = (Player) commandSender;
 
-                    player.sendMessage("Valid powers: fireattack freeze shulker poison knockback web wither loot invisibility " +
-                            "arrowresist fallresist fireresist fast custom");
+                    player.sendMessage("Valid powers: confusing fireattack freeze shulker poison knockback web wither loot invisibility " +
+                            "arrowresist fallresist fireresist heavy fast custom");
 
                 } else if (commandSender instanceof ConsoleCommandSender) {
 

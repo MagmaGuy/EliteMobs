@@ -17,12 +17,14 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.minorpowers.*;
+import com.magmaguy.elitemobs.minorpowers.MinorPowers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -71,81 +73,37 @@ public class PowerHandler {
 
             ArrayList<MinorPowers> minorPowerArray = new ArrayList();
 
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackFire")) {
+            for (String string : metadataHandler.minorPowerList()) {
 
-                minorPowerArray.add(new AttackFire(plugin));
+                if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains(string)){
 
-            }
+                    try {
 
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackFreeze")) {
+                        String earlyPath = "com.magmaguy.elitemobs.minorpowers.";
 
-                minorPowerArray.add(new AttackFreeze(plugin));
+                        String finalString = earlyPath + string;
 
-            }
+                        Class<?> clazz = Class.forName(finalString);
 
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackGravity")) {
+                        Constructor <?> constructor = clazz.getConstructor(Plugin.class);
 
-                minorPowerArray.add(new AttackGravity(plugin));
+                        Object instance = constructor.newInstance(plugin);
 
-            }
+                        minorPowerArray.add((MinorPowers) instance);
 
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackPoison")) {
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
 
-                minorPowerArray.add(new AttackPoison(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackPush")) {
-
-                minorPowerArray.add(new AttackPush(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackWeb")) {
-
-                minorPowerArray.add(new AttackWeb(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("AttackWither")) {
-
-                minorPowerArray.add(new AttackWither(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("BonusLoot")) {
-
-                minorPowerArray.add(new BonusLoot(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("Invisibility")) {
-
-                minorPowerArray.add(new Invisibility(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("InvulnerabilityArrow")) {
-
-                minorPowerArray.add(new InvulnerabilityArrow(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("InvulnerabilityFallDamage")) {
-
-                minorPowerArray.add(new InvulnerabilityFallDamage(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("InvulnerabilityFire")) {
-
-                minorPowerArray.add(new InvulnerabilityFire(plugin));
-
-            }
-
-            if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains("MovementSpeed")) {
-
-                minorPowerArray.add(new MovementSpeed(plugin));
+                }
 
             }
 

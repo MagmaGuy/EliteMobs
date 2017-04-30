@@ -40,6 +40,7 @@ public class MetadataHandler {
     public final String forbidden = "Forbidden";
     public final String custom = "Custom";
     //Powers
+    public final String attackConfusingMD = "AttackConfusing";
     public final String attackFireMD = "AttackFire";
     public final String attackFreezeMD = "AttackFreeze";
     public final String attackGravityMD = "AttackGravity";
@@ -51,6 +52,7 @@ public class MetadataHandler {
     public final String invulnerabilityArrowMD = "InvulnerabilityArrow";
     public final String invulnerabilityFallDamageMD = "InvulnerabilityFallDamage";
     public final String invulnerabilityFireMD = "InvulnerabilityFire";
+    public final String invulnerabilityKnockbackMD = "InvulnerabilityKnockback";
     public final String movementSpeedMD = "MovementSpeed";
     public final String invisibilityMD = "Invisibility";
     private EliteMobs plugin;
@@ -75,6 +77,7 @@ public class MetadataHandler {
         metadataList.add(minorPowerAmountMD);
         metadataList.add(visualEffect);
         metadataList.add(forbidden);
+        metadataList.add(attackConfusingMD);
         metadataList.add(attackFireMD);
         metadataList.add(attackFreezeMD);
         metadataList.add(attackGravityMD);
@@ -86,11 +89,36 @@ public class MetadataHandler {
         metadataList.add(invulnerabilityArrowMD);
         metadataList.add(invulnerabilityFallDamageMD);
         metadataList.add(invulnerabilityFireMD);
+        metadataList.add(invulnerabilityKnockbackMD);
         metadataList.add(movementSpeedMD);
         metadataList.add(invisibilityMD);
 
         metadataList.add(frozen);
         metadataList.add(frozenCooldown);
+
+        return metadataList;
+
+    }
+
+    public List<String> minorPowerList(){
+
+        List<String> metadataList = new ArrayList<>();
+
+        metadataList.add(attackConfusingMD);
+        metadataList.add(attackFireMD);
+        metadataList.add(attackFreezeMD);
+        metadataList.add(attackGravityMD);
+        metadataList.add(attackPoisonMD);
+        metadataList.add(attackPushMD);
+        metadataList.add(attackWebMD);
+        metadataList.add(attackWitherMD);
+        metadataList.add(bonusLootMD);
+        metadataList.add(invulnerabilityArrowMD);
+        metadataList.add(invulnerabilityFallDamageMD);
+        metadataList.add(invulnerabilityFireMD);
+        metadataList.add(invulnerabilityKnockbackMD);
+        metadataList.add(movementSpeedMD);
+        metadataList.add(invisibilityMD);
 
         return metadataList;
 

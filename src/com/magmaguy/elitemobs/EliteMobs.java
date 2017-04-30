@@ -108,6 +108,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new DamageHandler(this), this);
 
         //Minor mob powers
+        this.getServer().getPluginManager().registerEvents(new AttackConfusing(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackFire(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackFreeze(this), this);
         this.getServer().getPluginManager().registerEvents(new AttackGravity(this), this);
@@ -119,6 +120,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new Invisibility(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityArrow(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityFire(this), this);
+        this.getServer().getPluginManager().registerEvents(new InvulnerabilityKnockback(this), this);
         this.getServer().getPluginManager().registerEvents(new InvulnerabilityFallDamage(this), this);
 
         //Mob scanner
@@ -234,14 +236,14 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
     public void loadConfiguration() {
 
+        MetadataHandler metadataHandler = new MetadataHandler(this);
+
         //check defaults
         getConfig().addDefault("Allow aggressive EliteMobs", true);
         getConfig().addDefault("Valid aggressive EliteMobs", Arrays.asList("Blaze", "CaveSpider", "Creeper",
                 "Enderman", "Endermite", "IronGolem", "PigZombie", "PolarBear", "Silverfish", "Skeleton",
                 "Spider", "Witch", "Zombie"));
-        getConfig().addDefault("Valid aggressive EliteMobs powers", Arrays.asList("AttackFire", "AttackFreeze",
-                "AttackGravity", "AttackPoison", "AttackPush", "AttackWeb", "AttackWither", "BonusLoot", "InvulnerabilityArrow",
-                "InvulnerabilityFallDamage", "InvulnerabilityFire", "MovementSpeed", "Invisibility"));
+        getConfig().addDefault("Valid aggressive EliteMobs powers", metadataHandler.minorPowerList());
         getConfig().addDefault("Allow Passive EliteMobs", true);
         getConfig().addDefault("Valid Passive EliteMobs", Arrays.asList("Chicken", "Cow", "MushroomCow",
                 "Pig", "Sheep"));
@@ -251,7 +253,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Aggressive mob stacking cap", 50);
         getConfig().addDefault("Passive EliteMob stack amount", 50);
         getConfig().addDefault("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)", true);
-        getConfig().addDefault("Aggressive EliteMobs flat loot drop rate %", 50);
+        getConfig().addDefault("Aggressive EliteMobs flat loot drop rate %", 75);
         getConfig().addDefault("Aggressive EliteMobs can drop additional loot with drop % based on EliteMobs level (higher is more likely)", true);
         getConfig().addDefault("Prevent players from changing mob spawners using eggs", true);
         getConfig().addDefault("Prevent creepers from killing passive mobs", true);
