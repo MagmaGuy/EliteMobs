@@ -541,6 +541,10 @@ public class CommandHandler implements CommandExecutor {
 
                 switch (string) {
 
+                    case "blinding":
+                        entity.setMetadata(metadataHandler.attackBlindingMD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
                     case "confusing":
                         entity.setMetadata(metadataHandler.attackConfusingMD, new FixedMetadataValue(plugin, true));
                         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);

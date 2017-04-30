@@ -40,6 +40,7 @@ public class MetadataHandler {
     public final String forbidden = "Forbidden";
     public final String custom = "Custom";
     //Powers
+    public final String attackBlindingMD = "AttackBlinding";
     public final String attackConfusingMD = "AttackConfusing";
     public final String attackFireMD = "AttackFire";
     public final String attackFreezeMD = "AttackFreeze";
@@ -104,6 +105,7 @@ public class MetadataHandler {
 
         List<String> metadataList = new ArrayList<>();
 
+        metadataList.add(attackBlindingMD);
         metadataList.add(attackConfusingMD);
         metadataList.add(attackFireMD);
         metadataList.add(attackFreezeMD);

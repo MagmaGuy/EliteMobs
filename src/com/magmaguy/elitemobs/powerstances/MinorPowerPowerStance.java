@@ -162,6 +162,17 @@ public class MinorPowerPowerStance implements Listener {
 
                     //apply new positioning
 
+                    if (entity.hasMetadata(metadataHandler.attackBlindingMD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.EYE_OF_ENDER, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.EYE_OF_ENDER, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
+
+                    }
+
                     if (entity.hasMetadata(metadataHandler.attackFireMD)) {
 
                         effectIteration++;
