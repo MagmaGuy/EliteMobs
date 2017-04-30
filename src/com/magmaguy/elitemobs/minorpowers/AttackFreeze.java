@@ -19,8 +19,8 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -39,6 +39,8 @@ public class AttackFreeze extends MinorPowers implements Listener {
     private EliteMobs plugin;
     private int processID;
 
+    MetadataHandler metadataHandler = new MetadataHandler(plugin);
+
     public AttackFreeze(Plugin plugin) {
 
         this.plugin = (EliteMobs) plugin;
@@ -48,7 +50,6 @@ public class AttackFreeze extends MinorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
         entity.setMetadata(metadataHandler.attackFreezeMD, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
@@ -58,7 +59,6 @@ public class AttackFreeze extends MinorPowers implements Listener {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
         return entity.hasMetadata(metadataHandler.attackFreezeMD);
 
     }
@@ -69,54 +69,53 @@ public class AttackFreeze extends MinorPowers implements Listener {
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
+        Block block = damagee.getLocation().getBlock();
+        Material originalMaterial = block.getType();
+
+        if (damagee.hasMetadata(metadataHandler.frozenCooldown)) {
+
+            return;
+
+        }
+
+        //if a block spawned by the plugin is already in place, skip effect
+        if (block.hasMetadata("TemporaryBlock")) {
+
+            return;
+
+        }
 
         if (damager.hasMetadata(metadataHandler.attackFreezeMD)) {
 
-            if (!damagee.hasMetadata("FrozenCooldown")) {
+            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
-                Location iceBlockLocation = damagee.getLocation();
+                int counter = 0;
 
-                //if a block spawned by the plugin is already in place, skip effect
-                if (iceBlockLocation.getBlock().hasMetadata("TemporaryBlock")) {
+                @Override
+                public void run() {
 
-                    return;
+                    iceEffectApplier(counter, damagee, originalMaterial, block);
+                    counter++;
 
                 }
+
+            }, 1, 1);
+
+
+        }
+
+        if (damager instanceof Projectile) {
+
+            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, metadataHandler.attackFreezeMD)) {
 
                 processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
                     int counter = 0;
 
-                    Material originalMaterial;
-
                     @Override
                     public void run() {
 
-                        if (counter == 0) {
-
-                            damagee.setMetadata("Frozen", new FixedMetadataValue(plugin, true));
-                            damagee.setMetadata("FrozenCooldown", new FixedMetadataValue(plugin, true));
-                            originalMaterial = damagee.getLocation().getBlock().getType();
-                            iceBlockLocation.getBlock().setType(Material.PACKED_ICE);
-                            iceBlockLocation.getBlock().setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
-
-                        }
-
-                        if (counter == 40) {
-
-                            damagee.removeMetadata("Frozen", plugin);
-                            iceBlockLocation.getBlock().setType(originalMaterial);
-                            iceBlockLocation.getBlock().removeMetadata("TemporaryBlock", plugin);
-
-                        }
-
-                        if (counter == 20 * 7) {
-
-                            damagee.removeMetadata("FrozenCooldown", plugin);
-                            Bukkit.getScheduler().cancelTask(processID);
-
-                        }
+                        iceEffectApplier(counter, damagee, originalMaterial, block);
                         counter++;
 
                     }
@@ -125,66 +124,43 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
             }
 
+
         }
 
-        if (damager instanceof Projectile) {
+    }
 
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, metadataHandler.attackFreezeMD)) {
+    public void iceEffectApplier(int counter, Entity damagee, Material originalMaterial, Block block) {
 
-                if (!damagee.hasMetadata("FrozenCooldown")) {
+        if (counter == 0) {
 
-                    Location iceBlockLocation = damagee.getLocation();
+            damagee.setMetadata(metadataHandler.frozen, new FixedMetadataValue(plugin, true));
+            damagee.setMetadata(metadataHandler.frozenCooldown, new FixedMetadataValue(plugin, true));
+            block.setType(Material.PACKED_ICE);
+            block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
 
-                    //if a block spawned by the plugin is already in place, skip effect
-                    if (iceBlockLocation.getBlock().hasMetadata("TemporaryBlock")) {
+            if (damagee instanceof Player) {
 
-                        return;
+                Player player = (Player) damagee;
 
-                    }
-
-                    processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-                        int counter = 0;
-
-                        Location iceBlockLocation;
-                        Material originalMaterial;
-
-                        @Override
-                        public void run() {
-
-                            if (counter == 0) {
-
-                                damagee.setMetadata("Frozen", new FixedMetadataValue(plugin, true));
-                                damagee.setMetadata("FrozenCooldown", new FixedMetadataValue(plugin, true));
-                                originalMaterial = damagee.getLocation().getBlock().getType();
-                                iceBlockLocation.getBlock().setType(Material.PACKED_ICE);
-                                iceBlockLocation.getBlock().setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
-
-                            }
-
-                            if (counter == 40) {
-
-                                damagee.removeMetadata("Frozen", plugin);
-                                iceBlockLocation.getBlock().setType(originalMaterial);
-                                iceBlockLocation.getBlock().removeMetadata("TemporaryBlock", plugin);
-
-                            }
-
-                            if (counter == 20 * 7) {
-
-                                damagee.removeMetadata("FrozenCooldown", plugin);
-                                Bukkit.getScheduler().cancelTask(processID);
-
-                            }
-                            counter++;
-
-                        }
-
-                    }, 1, 1);
-
-                }
+                player.sendTitle("","Frozen!");
 
             }
+
+        }
+
+        if (counter == 40) {
+
+            damagee.removeMetadata(metadataHandler.frozen, plugin);
+
+            block.setType(originalMaterial);
+            block.removeMetadata("TemporaryBlock", plugin);
+
+        }
+
+        if (counter == 20 * 7) {
+
+            damagee.removeMetadata(metadataHandler.frozenCooldown, plugin);
+            Bukkit.getScheduler().cancelTask(processID);
 
         }
 
@@ -195,7 +171,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         Player player = event.getPlayer();
 
-        if (player.hasMetadata("Frozen")) {
+        if (player.hasMetadata(metadataHandler.frozen)) {
 
             event.setCancelled(true);
 

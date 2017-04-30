@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -54,6 +55,10 @@ public class MetadataHandler {
     public final String invisibilityMD = "Invisibility";
     private EliteMobs plugin;
 
+    //powerEffects
+    public final String frozen = "Frozen";
+    public final String frozenCooldown = "FrozenCooldown";
+
     public MetadataHandler(Plugin plugin) {
 
         this.plugin = (EliteMobs) plugin;
@@ -84,6 +89,9 @@ public class MetadataHandler {
         metadataList.add(movementSpeedMD);
         metadataList.add(invisibilityMD);
 
+        metadataList.add(frozen);
+        metadataList.add(frozenCooldown);
+
         return metadataList;
 
     }
@@ -110,6 +118,13 @@ public class MetadataHandler {
                     plugin.getConfig().getList("Valid aggressive EliteMobs"))) {
 
                 entity.remove();
+
+            }
+
+            if (entity instanceof Player) {
+
+
+                entity.removeMetadata(string, plugin);
 
             }
 
