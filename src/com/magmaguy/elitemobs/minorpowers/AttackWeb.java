@@ -19,8 +19,8 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -67,59 +67,44 @@ public class AttackWeb extends MinorPowers implements Listener {
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
+        Block block = damagee.getLocation().getBlock();
+        Material originalMaterial = block.getType();
+
+        if (damager.hasMetadata(metadataHandler.attackFreezeMD) || damager instanceof Projectile &&
+                ProjectileMetadataDetector.projectileMetadataDetector((Projectile)damager , metadataHandler.attackFreezeMD)) {
+
+            return;
+
+        }
+
+        if (damagee.hasMetadata("WebCooldown")) {
+
+            return;
+
+        }
+
         if (damager.hasMetadata(powerMetadata)) {
 
-            if (!damagee.hasMetadata("WebCooldown")) {
+            //if a block spawned by the plugin is already in place, skip effect
+            if (block.hasMetadata("TemporaryBlock")) {
 
-                Location iceBlockLocation = damagee.getLocation();
+                return;
 
-                //if a block spawned by the plugin is already in place, skip effect
-                if (iceBlockLocation.getBlock().hasMetadata("TemporaryBlock")) {
+            }
 
-                    return;
+            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+
+                int counter = 0;
+
+                @Override
+                public void run() {
+
+                    webEffectApplier(counter, damagee, originalMaterial, block);
+                    counter++;
 
                 }
 
-                processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-                    int counter = 0;
-
-                    Material originalMaterial;
-
-                    @Override
-                    public void run() {
-
-                        if (counter == 0) {
-
-                            damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
-                            //make sure the block isn't already placed by the plugin
-                            originalMaterial = damagee.getLocation().getBlock().getType();
-                            iceBlockLocation.getBlock().setType(Material.WEB);
-                            iceBlockLocation.getBlock().setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
-
-
-                        }
-
-                        if (counter == 20 * 4) {
-
-                            iceBlockLocation.getBlock().setType(originalMaterial);
-                            iceBlockLocation.getBlock().removeMetadata("TemporaryBlock", plugin);
-
-                        }
-
-                        if (counter == 20 * 7) {
-
-                            damagee.removeMetadata("WebCooldown", plugin);
-                            Bukkit.getScheduler().cancelTask(processID);
-
-                        }
-                        counter++;
-
-                    }
-
-                }, 2, 1);
-
-            }
+            }, 2, 1);
 
         }
 
@@ -127,59 +112,52 @@ public class AttackWeb extends MinorPowers implements Listener {
 
             if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
 
-                if (!damagee.hasMetadata("WebCooldown")) {
+                processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
-                    Location iceBlockLocation = damagee.getLocation();
+                    int counter = 0;
 
-                    //if a block spawned by the plugin is already in place, skip effect
-                    if (iceBlockLocation.getBlock().hasMetadata("TemporaryBlock")) {
+                    @Override
+                    public void run() {
 
-                        return;
+                        webEffectApplier(counter, damagee, originalMaterial, block);
+                        counter++;
 
                     }
 
-                    processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-                        int counter = 0;
-
-                        Material originalMaterial;
-
-                        @Override
-                        public void run() {
-
-                            if (counter == 0) {
-
-                                damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
-                                //make sure the block isn't already placed by the plugin
-                                originalMaterial = damagee.getLocation().getBlock().getType();
-                                iceBlockLocation.getBlock().setType(Material.WEB);
-                                iceBlockLocation.getBlock().setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
-
-
-                            }
-
-                            if (counter == 20 * 4) {
-
-                                iceBlockLocation.getBlock().setType(originalMaterial);
-                                iceBlockLocation.getBlock().removeMetadata("TemporaryBlock", plugin);
-
-                            }
-
-                            if (counter == 20 * 7) {
-
-                                damagee.removeMetadata("WebCooldown", plugin);
-                                Bukkit.getScheduler().cancelTask(processID);
-
-                            }
-                            counter++;
-
-                        }
-
-                    }, 1, 1);
-
-                }
+                }, 1, 1);
 
             }
+
+        }
+
+
+    }
+
+    private void webEffectApplier(int counter, Entity damagee, Material originalMaterial, Block block) {
+
+        if (counter == 0) {
+
+            damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
+            //make sure the block isn't already placed by the plugin
+            originalMaterial = block.getType();
+            block.setType(Material.WEB);
+
+            block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+
+        }
+
+        if (counter == 20 * 4) {
+
+            block.setType(originalMaterial);
+
+            block.removeMetadata("TemporaryBlock", plugin);
+
+        }
+
+        if (counter == 20 * 7) {
+
+            damagee.removeMetadata("WebCooldown", plugin);
+            Bukkit.getScheduler().cancelTask(processID);
 
         }
 
