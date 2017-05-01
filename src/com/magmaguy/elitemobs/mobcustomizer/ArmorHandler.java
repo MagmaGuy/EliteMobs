@@ -13,25 +13,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -46,8 +30,7 @@ public class ArmorHandler {
         if (entity instanceof Zombie || entity instanceof ZombieVillager || entity instanceof PigZombie ||
                 entity instanceof Skeleton || entity instanceof WitherSkeleton) {
 
-            MetadataHandler metadataHandler = new MetadataHandler(Bukkit.getPluginManager().getPlugin("EliteMobs"));
-            int mobLevel = entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt();
+            int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
             if (mobLevel >= 2) {
 

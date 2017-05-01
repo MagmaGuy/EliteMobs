@@ -15,9 +15,9 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -31,19 +31,13 @@ import org.bukkit.plugin.Plugin;
  */
 public class AttackFire extends MinorPowers implements Listener {
 
-    private EliteMobs plugin;
-    MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-    public AttackFire(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.ATTACK_FIRE_MD;
 
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(metadataHandler.attackFireMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
 
@@ -51,7 +45,7 @@ public class AttackFire extends MinorPowers implements Listener {
 
     @Override
     public boolean existingPowers(Entity entity) {
-        return entity.hasMetadata(metadataHandler.attackFireMD);
+        return entity.hasMetadata(powerMetadata);
     }
 
     @EventHandler
@@ -60,7 +54,7 @@ public class AttackFire extends MinorPowers implements Listener {
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        if (damager.hasMetadata(metadataHandler.attackFireMD)) {
+        if (damager.hasMetadata(powerMetadata)) {
 
             damagee.setFireTicks(40);
 
@@ -68,7 +62,7 @@ public class AttackFire extends MinorPowers implements Listener {
 
         if (damager instanceof Projectile) {
 
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, metadataHandler.attackFireMD)) {
+            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
 
                 damagee.setFireTicks(40);
 

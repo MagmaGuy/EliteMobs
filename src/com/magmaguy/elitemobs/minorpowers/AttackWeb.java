@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
@@ -34,16 +33,9 @@ import org.bukkit.plugin.Plugin;
  */
 public class AttackWeb extends MinorPowers implements Listener {
 
-    private EliteMobs plugin;
-    MetadataHandler metadataHandler = new MetadataHandler(plugin);
-    String powerMetadata = metadataHandler.attackWebMD;
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.ATTACK_WEB_MD;
     private int processID;
-
-    public AttackWeb(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
 
     @Override
     public void applyPowers(Entity entity) {
@@ -70,8 +62,8 @@ public class AttackWeb extends MinorPowers implements Listener {
         Block block = damagee.getLocation().getBlock();
         Material originalMaterial = block.getType();
 
-        if (damager.hasMetadata(metadataHandler.attackFreezeMD) || damager instanceof Projectile &&
-                ProjectileMetadataDetector.projectileMetadataDetector((Projectile)damager , metadataHandler.attackFreezeMD)) {
+        if (damager.hasMetadata(MetadataHandler.ATTACK_FREEZE_MD) || damager instanceof Projectile &&
+                ProjectileMetadataDetector.projectileMetadataDetector((Projectile)damager , MetadataHandler.ATTACK_FREEZE_MD)) {
 
             return;
 

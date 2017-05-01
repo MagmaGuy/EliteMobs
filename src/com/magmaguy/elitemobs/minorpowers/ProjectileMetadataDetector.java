@@ -15,17 +15,13 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
 public class ProjectileMetadataDetector {
-
-    Plugin plugin = Bukkit.getPluginManager().getPlugin("EliteMobs");
 
     public static boolean projectileMetadataDetector(Projectile projectile, String metadata) {
 

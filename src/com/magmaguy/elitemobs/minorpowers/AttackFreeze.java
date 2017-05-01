@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
@@ -36,21 +35,15 @@ import org.bukkit.plugin.Plugin;
  */
 public class AttackFreeze extends MinorPowers implements Listener {
 
-    private EliteMobs plugin;
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.ATTACK_FREEZE_MD;
+
     private int processID;
-
-    MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-    public AttackFreeze(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
 
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(metadataHandler.attackFreezeMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
 
@@ -59,7 +52,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        return entity.hasMetadata(metadataHandler.attackFreezeMD);
+        return entity.hasMetadata(powerMetadata);
 
     }
 
@@ -72,7 +65,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
         Block block = damagee.getLocation().getBlock();
         Material originalMaterial = block.getType();
 
-        if (damagee.hasMetadata(metadataHandler.frozenCooldown)) {
+        if (damagee.hasMetadata(MetadataHandler.FROZEN_COOLDOWN)) {
 
             return;
 
@@ -85,7 +78,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         }
 
-        if (damager.hasMetadata(metadataHandler.attackFreezeMD)) {
+        if (damager.hasMetadata(powerMetadata)) {
 
             processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -106,7 +99,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         if (damager instanceof Projectile) {
 
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, metadataHandler.attackFreezeMD)) {
+            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
 
                 processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -133,8 +126,8 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         if (counter == 0) {
 
-            damagee.setMetadata(metadataHandler.frozen, new FixedMetadataValue(plugin, true));
-            damagee.setMetadata(metadataHandler.frozenCooldown, new FixedMetadataValue(plugin, true));
+            damagee.setMetadata(MetadataHandler.FROZEN, new FixedMetadataValue(plugin, true));
+            damagee.setMetadata(MetadataHandler.FROZEN_COOLDOWN, new FixedMetadataValue(plugin, true));
             block.setType(Material.PACKED_ICE);
             block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
 
@@ -150,7 +143,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         if (counter == 40) {
 
-            damagee.removeMetadata(metadataHandler.frozen, plugin);
+            damagee.removeMetadata(MetadataHandler.FROZEN, plugin);
 
             block.setType(originalMaterial);
             block.removeMetadata("TemporaryBlock", plugin);
@@ -159,7 +152,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         if (counter == 20 * 7) {
 
-            damagee.removeMetadata(metadataHandler.frozenCooldown, plugin);
+            damagee.removeMetadata(MetadataHandler.FROZEN_COOLDOWN, plugin);
             Bukkit.getScheduler().cancelTask(processID);
 
         }
@@ -171,7 +164,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         Player player = event.getPlayer();
 
-        if (player.hasMetadata(metadataHandler.frozen)) {
+        if (player.hasMetadata(MetadataHandler.FROZEN)) {
 
             event.setCancelled(true);
 

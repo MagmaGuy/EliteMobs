@@ -13,51 +13,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EliteMobs;
@@ -99,8 +54,6 @@ public class MobScanner implements Listener {
 
     public void scanMobs(int passiveStackAmount) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
         for (World world : worldList) {
 
             Iterator<LivingEntity> iterator = world.getLivingEntities().iterator();
@@ -114,10 +67,10 @@ public class MobScanner implements Listener {
                 if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity, aggressiveList)) {
 
                     //scan for naturally/command/plugin spawned EliteMobs
-                    if (entity.hasMetadata(metadataHandler.eliteMobMD) && entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt() != 1
+                    if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() != 1
                             && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
-                        HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt());
+                        HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
                         customAggressiveName(entity, plugin);
 
                     }
@@ -128,7 +81,7 @@ public class MobScanner implements Listener {
 
                         scanValidAggressiveLivingEntity(entity);
 
-                        if (entity.hasMetadata(metadataHandler.eliteMobMD)) {
+                        if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
 
                             PowerHandler powerHandler = new PowerHandler(plugin);
@@ -148,7 +101,7 @@ public class MobScanner implements Listener {
 
                     List passiveList = plugin.getConfig().getList("Valid Passive EliteMobs");
 
-                    if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity, passiveList) && !entity.hasMetadata(metadataHandler.passiveEliteMobMD)) {
+                    if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity, passiveList) && !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
                         scanValidPassiveLivingEntity(entity);
 
@@ -160,10 +113,10 @@ public class MobScanner implements Listener {
                 }
 
                 //scan for iron golems with missing metadata
-                if (!entity.hasMetadata(metadataHandler.eliteMobMD) && entity instanceof IronGolem &&
+                if (!entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity instanceof IronGolem &&
                         ((IronGolem) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
-                    entity.setMetadata(metadataHandler.eliteMobMD, new FixedMetadataValue(plugin, ScalingFormula.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
+                    entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, ScalingFormula.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
                             DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity))));
                     customAggressiveName(entity, plugin);
 
@@ -177,19 +130,17 @@ public class MobScanner implements Listener {
 
     public void scanValidAggressiveLivingEntity(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
         for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange)) {
 
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
-                    && !entity.hasMetadata(metadataHandler.forbidden) && !secondEntity.hasMetadata(metadataHandler.forbidden)) {
+                    && !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD) && !secondEntity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
 
                 //If the sum of both entities is above level 50, don't add both entities together
                 if (levelCap(entity, secondEntity)) {
 
-                    if (!entity.hasMetadata(metadataHandler.naturalMob) || !secondEntity.hasMetadata(metadataHandler.naturalMob)) {
+                    if (!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) || !secondEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
-                        entity.removeMetadata(metadataHandler.naturalMob, plugin);
+                        entity.removeMetadata(MetadataHandler.NATURAL_MOB_MD, plugin);
 
                     }
 
@@ -201,9 +152,9 @@ public class MobScanner implements Listener {
                     HealthHandler.aggressiveHealthHandler(entity, secondEntity);
                     customAggressiveName(entity, plugin);
 
-                    if (secondEntity.hasMetadata(metadataHandler.eliteMobMD)) {
+                    if (secondEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-                        secondEntity.removeMetadata(metadataHandler.eliteMobMD, plugin);
+                        secondEntity.removeMetadata(MetadataHandler.ELITE_MOB_MD, plugin);
 
                     }
 
@@ -219,8 +170,6 @@ public class MobScanner implements Listener {
 
     public void scanValidPassiveLivingEntity(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
         int passiveStacking = plugin.getConfig().getInt("Passive EliteMob stack amount");
 
         List<LivingEntity> animalContainer = new ArrayList<>();
@@ -228,11 +177,11 @@ public class MobScanner implements Listener {
         for (Entity secondEntity : entity.getNearbyEntities(passiveRange, passiveRange, passiveRange)) {
 
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
-                    && !secondEntity.hasMetadata(metadataHandler.passiveEliteMobMD)) {
+                    && !secondEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
                 animalContainer.add((LivingEntity) secondEntity);
 
-                if (animalContainer.size() == passiveStacking && !entity.hasMetadata(metadataHandler.passiveEliteMobMD)) {
+                if (animalContainer.size() == passiveStacking && !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
                     Iterator<LivingEntity> animalSlaughterer = animalContainer.iterator();
 
@@ -257,7 +206,7 @@ public class MobScanner implements Listener {
         }
 
         if (((Damageable) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) &&
-                !entity.hasMetadata(metadataHandler.passiveEliteMobMD)) {
+                !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
             customPassiveName(entity, plugin);
 
@@ -271,13 +220,11 @@ public class MobScanner implements Listener {
         Damageable damageable1 = (Damageable) entity1;
         Damageable damageable2 = (Damageable) entity2;
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (damageable1.hasMetadata(metadataHandler.eliteMobMD) && damageable1.getMetadata(metadataHandler.eliteMobMD).get(0).asInt() >= plugin.getConfig().getInt("Aggressive mob stacking cap")) {
+        if (damageable1.hasMetadata(MetadataHandler.ELITE_MOB_MD) && damageable1.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= plugin.getConfig().getInt("Aggressive mob stacking cap")) {
 
             return false;
 
-        } else if (damageable2.hasMetadata(metadataHandler.eliteMobMD) && damageable2.getMetadata(metadataHandler.eliteMobMD).get(0).asInt() >= plugin.getConfig().getInt("Aggressive mob stacking cap")) {
+        } else if (damageable2.hasMetadata(MetadataHandler.ELITE_MOB_MD) && damageable2.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= plugin.getConfig().getInt("Aggressive mob stacking cap")) {
 
             return false;
 

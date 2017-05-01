@@ -23,8 +23,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -47,12 +45,11 @@ public class PowerHandler {
         int availableMinorPowers = 0;
         int availableMajorPowers = 0;
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        if (entity.hasMetadata(metadataHandler.eliteMobMD) && entity.isValid() && ((LivingEntity) entity).getHealth() > 0) {
+        if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity.isValid() && ((LivingEntity) entity).getHealth() > 0) {
 
-            if (entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt() >= 5) {
+            if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= 5) {
 
-                int EliteMobLevel = entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt();
+                int EliteMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
                 availableMinorPowers = (EliteMobLevel - 5) / 10 + 1;
                 availableMajorPowers = EliteMobLevel / 10;
@@ -65,13 +62,15 @@ public class PowerHandler {
 
             int currentMinorPowerAmount = 0;
 
-            if (entity.hasMetadata("custom")) {
+            if (entity.hasMetadata("CUSTOM_MD")) {
 
                 return;
 
             }
 
             ArrayList<MinorPowers> minorPowerArray = new ArrayList();
+
+            MetadataHandler metadataHandler = new MetadataHandler();
 
             for (String string : metadataHandler.minorPowerList()) {
 
@@ -85,21 +84,15 @@ public class PowerHandler {
 
                         Class<?> clazz = Class.forName(finalString);
 
-                        Constructor <?> constructor = clazz.getConstructor(Plugin.class);
-
-                        Object instance = constructor.newInstance(plugin);
+                        Object instance = clazz.newInstance();
 
                         minorPowerArray.add((MinorPowers) instance);
 
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
                     } catch (InstantiationException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
                         e.printStackTrace();
                     }
 
@@ -140,16 +133,16 @@ public class PowerHandler {
                         MinorPowers selectedMinorPower = minorPowerArray.get(randomizer);
                         minorPowerArray.remove(minorPowerArray.get(randomizer));
 
-                        if (entity.hasMetadata(metadataHandler.minorPowerAmountMD)) {
+                        if (entity.hasMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD)) {
 
-                            int oldMinorPowerAmount = entity.getMetadata(metadataHandler.minorPowerAmountMD).get(0).asInt();
+                            int oldMinorPowerAmount = entity.getMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD).get(0).asInt();
                             int newMinorPowerAmount = oldMinorPowerAmount + 1;
 
-                            entity.setMetadata(metadataHandler.minorPowerAmountMD, new FixedMetadataValue(plugin, newMinorPowerAmount));
+                            entity.setMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, newMinorPowerAmount));
 
                         } else {
 
-                            entity.setMetadata(metadataHandler.minorPowerAmountMD, new FixedMetadataValue(plugin, 1));
+                            entity.setMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, 1));
 
                         }
 

@@ -13,66 +13,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.naturalmobspawner;
 
 import com.magmaguy.elitemobs.EliteMobs;
@@ -143,16 +83,14 @@ public class NaturalMobSpawner implements Listener {
 
                 }
 
-                MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
                 //Just set up the metadata, scanner will pick it up and apply the correct stats
                 if (amountOfPlayersTogether == 1) {
 
-                    entity.setMetadata(metadataHandler.eliteMobMD, new FixedMetadataValue(plugin, EliteMobLevel));
+                    entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, EliteMobLevel));
 
                 } else if (amountOfPlayersTogether > 1 && random.nextDouble() < 20) {
 
-                    entity.setMetadata(metadataHandler.eliteMobMD, new FixedMetadataValue(plugin, EliteMobLevel));
+                    entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, EliteMobLevel));
 
                 }
 
@@ -288,9 +226,7 @@ public class NaturalMobSpawner implements Listener {
 
         for (Entity nearPlayer : player.getNearbyEntities(range, range, range)) {
 
-            MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-            if (nearPlayer.hasMetadata(metadataHandler.passiveEliteMobMD)) {
+            if (nearPlayer.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
                 EliteMobRating++;
 

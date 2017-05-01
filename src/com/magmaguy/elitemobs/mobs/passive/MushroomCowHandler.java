@@ -13,21 +13,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobs.passive;
 
 import com.magmaguy.elitemobs.EliteMobs;
@@ -64,9 +49,7 @@ public class MushroomCowHandler implements Listener {
     @EventHandler
     public void superDrops(EntityDamageByEntityEvent event) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(metadataHandler.passiveEliteMobMD)) {
+        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
             Random random = new Random();
 
@@ -122,13 +105,11 @@ public class MushroomCowHandler implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(metadataHandler.passiveEliteMobMD)) {
+        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
             ItemStack mushroomCowMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 96);
 
-            event.getEntity().removeMetadata(metadataHandler.passiveEliteMobMD, plugin);
+            event.getEntity().removeMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD, plugin);
 
         }
 
@@ -138,9 +119,7 @@ public class MushroomCowHandler implements Listener {
     @EventHandler
     public void onShear(PlayerShearEntityEvent event) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(metadataHandler.passiveEliteMobMD)) {
+        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
             MushroomCow mushroomCow = (MushroomCow) event.getEntity();
 

@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
@@ -32,70 +33,68 @@ public class MetadataHandler {
     //if you're wondering why I thought this was needed, it's because I got tired of finding and replacing
     //individual metadata strings and stuff breaking due to it
 
-    public final String eliteMobMD = "EliteMob";
-    public final String passiveEliteMobMD = "PassiveEliteMob";
-    public final String naturalMob = "NaturalMob";
-    public final String minorPowerAmountMD = "MinorPowerAmount";
-    public final String visualEffect = "VisualEffect";
-    public final String forbidden = "Forbidden";
-    public final String custom = "Custom";
+    //plugin name
+    public final static String ELITE_MOBS = "EliteMobs";
+    //plugin metadata
+    public final static String ELITE_MOB_MD = "EliteMob";
+    public final static String PASSIVE_ELITE_MOB_MD = "PassiveEliteMob";
+    public final static String NATURAL_MOB_MD = "NaturalMob";
+    public final static String MINOR_POWER_AMOUNT_MD = "MinorPowerAmount";
+    public final static String VISUAL_EFFECT_MD = "VisualEffect";
+    public final static String FORBIDDEN_MD = "Forbidden";
+    public final static String CUSTOM_MD = "Custom";
     //Powers
-    public final String attackBlindingMD = "AttackBlinding";
-    public final String attackConfusingMD = "AttackConfusing";
-    public final String attackFireMD = "AttackFire";
-    public final String attackFreezeMD = "AttackFreeze";
-    public final String attackGravityMD = "AttackGravity";
-    public final String attackPoisonMD = "AttackPoison";
-    public final String attackPushMD = "AttackPush";
-    public final String attackWebMD = "AttackWeb";
-    public final String attackWitherMD = "AttackWither";
-    public final String bonusLootMD = "BonusLoot";
-    public final String invulnerabilityArrowMD = "InvulnerabilityArrow";
-    public final String invulnerabilityFallDamageMD = "InvulnerabilityFallDamage";
-    public final String invulnerabilityFireMD = "InvulnerabilityFire";
-    public final String invulnerabilityKnockbackMD = "InvulnerabilityKnockback";
-    public final String movementSpeedMD = "MovementSpeed";
-    public final String invisibilityMD = "Invisibility";
-    private EliteMobs plugin;
+    public final static String ATTACK_BLINDING_MD = "AttackBlinding";
+    public final static String ATTACK_CONFUSING_MD = "AttackConfusing";
+    public final static String ATTACK_FIRE_MD = "AttackFire";
+    public final static String ATTACK_FREEZE_MD = "AttackFreeze";
+    public final static String ATTACK_GRAVITY_MD = "AttackGravity";
+    public final static String ATTACK_POISON_MD = "AttackPoison";
+    public final static String ATTACK_PUSH_MD = "AttackPush";
+    public final static String ATTACK_WEB_MD = "AttackWeb";
+    public final static String ATTACK_WITHER_MD = "AttackWither";
+    public final static String BONUS_LOOT_MD = "BonusLoot";
+    public final static String INVULNERABILITY_ARROW_MD = "InvulnerabilityArrow";
+    public final static String INVULNERABILITY_FALL_DAMAGE_MD = "InvulnerabilityFallDamage";
+    public final static String INVULNERABILITY_FIRE_MD = "InvulnerabilityFire";
+    public final static String INVULNERABILITY_KNOCKBACK_MD = "InvulnerabilityKnockback";
+    public final static String MOVEMENT_SPEED_MD = "MovementSpeed";
+    public final static String INVISIBILITY_MD = "Invisibility";
 
     //powerEffects
-    public final String frozen = "Frozen";
-    public final String frozenCooldown = "FrozenCooldown";
+    public final static String FROZEN = "Frozen";
+    public final static String FROZEN_COOLDOWN = "FrozenCooldown";
 
-    public MetadataHandler(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
 
     public List<String> metadataList() {
 
         List<String> metadataList = new ArrayList<>();
 
-        metadataList.add(eliteMobMD);
-        metadataList.add(passiveEliteMobMD);
-        metadataList.add(naturalMob);
-        metadataList.add(minorPowerAmountMD);
-        metadataList.add(visualEffect);
-        metadataList.add(forbidden);
-        metadataList.add(attackConfusingMD);
-        metadataList.add(attackFireMD);
-        metadataList.add(attackFreezeMD);
-        metadataList.add(attackGravityMD);
-        metadataList.add(attackPoisonMD);
-        metadataList.add(attackPushMD);
-        metadataList.add(attackWebMD);
-        metadataList.add(attackWitherMD);
-        metadataList.add(bonusLootMD);
-        metadataList.add(invulnerabilityArrowMD);
-        metadataList.add(invulnerabilityFallDamageMD);
-        metadataList.add(invulnerabilityFireMD);
-        metadataList.add(invulnerabilityKnockbackMD);
-        metadataList.add(movementSpeedMD);
-        metadataList.add(invisibilityMD);
+        metadataList.add(ELITE_MOB_MD);
+        metadataList.add(PASSIVE_ELITE_MOB_MD);
+        metadataList.add(NATURAL_MOB_MD);
+        metadataList.add(MINOR_POWER_AMOUNT_MD);
+        metadataList.add(VISUAL_EFFECT_MD);
+        metadataList.add(FORBIDDEN_MD);
+        metadataList.add(ATTACK_CONFUSING_MD);
+        metadataList.add(ATTACK_FIRE_MD);
+        metadataList.add(ATTACK_FREEZE_MD);
+        metadataList.add(ATTACK_GRAVITY_MD);
+        metadataList.add(ATTACK_POISON_MD);
+        metadataList.add(ATTACK_PUSH_MD);
+        metadataList.add(ATTACK_WEB_MD);
+        metadataList.add(ATTACK_WITHER_MD);
+        metadataList.add(BONUS_LOOT_MD);
+        metadataList.add(INVULNERABILITY_ARROW_MD);
+        metadataList.add(INVULNERABILITY_FALL_DAMAGE_MD);
+        metadataList.add(INVULNERABILITY_FIRE_MD);
+        metadataList.add(INVULNERABILITY_KNOCKBACK_MD);
+        metadataList.add(MOVEMENT_SPEED_MD);
+        metadataList.add(INVISIBILITY_MD);
 
-        metadataList.add(frozen);
-        metadataList.add(frozenCooldown);
+        metadataList.add(FROZEN);
+        metadataList.add(FROZEN_COOLDOWN);
 
         return metadataList;
 
@@ -105,22 +104,22 @@ public class MetadataHandler {
 
         List<String> metadataList = new ArrayList<>();
 
-        metadataList.add(attackBlindingMD);
-        metadataList.add(attackConfusingMD);
-        metadataList.add(attackFireMD);
-        metadataList.add(attackFreezeMD);
-        metadataList.add(attackGravityMD);
-        metadataList.add(attackPoisonMD);
-        metadataList.add(attackPushMD);
-        metadataList.add(attackWebMD);
-        metadataList.add(attackWitherMD);
-        metadataList.add(bonusLootMD);
-        metadataList.add(invulnerabilityArrowMD);
-        metadataList.add(invulnerabilityFallDamageMD);
-        metadataList.add(invulnerabilityFireMD);
-        metadataList.add(invulnerabilityKnockbackMD);
-        metadataList.add(movementSpeedMD);
-        metadataList.add(invisibilityMD);
+        metadataList.add(ATTACK_BLINDING_MD);
+        metadataList.add(ATTACK_CONFUSING_MD);
+        metadataList.add(ATTACK_FIRE_MD);
+        metadataList.add(ATTACK_FREEZE_MD);
+        metadataList.add(ATTACK_GRAVITY_MD);
+        metadataList.add(ATTACK_POISON_MD);
+        metadataList.add(ATTACK_PUSH_MD);
+        metadataList.add(ATTACK_WEB_MD);
+        metadataList.add(ATTACK_WITHER_MD);
+        metadataList.add(BONUS_LOOT_MD);
+        metadataList.add(INVULNERABILITY_ARROW_MD);
+        metadataList.add(INVULNERABILITY_FALL_DAMAGE_MD);
+        metadataList.add(INVULNERABILITY_FIRE_MD);
+        metadataList.add(INVULNERABILITY_KNOCKBACK_MD);
+        metadataList.add(MOVEMENT_SPEED_MD);
+        metadataList.add(INVISIBILITY_MD);
 
         return metadataList;
 
@@ -128,13 +127,11 @@ public class MetadataHandler {
 
     public void flushMetadata(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
         for (String string : metadataList()) {
 
             if (entity.hasMetadata(string)) {
 
-                if (!(entity instanceof IronGolem) && entity.hasMetadata(metadataHandler.visualEffect)) {
+                if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD)) {
 
                     entity.remove();
 

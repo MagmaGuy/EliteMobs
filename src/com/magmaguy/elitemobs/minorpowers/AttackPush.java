@@ -30,9 +30,9 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -47,19 +47,13 @@ import org.bukkit.util.Vector;
  */
 public class AttackPush extends MinorPowers implements Listener {
 
-    private EliteMobs plugin;
-
-    public AttackPush(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.ATTACK_PUSH_MD;
 
     @Override
     public void applyPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        entity.setMetadata(metadataHandler.attackPushMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
 
@@ -68,8 +62,7 @@ public class AttackPush extends MinorPowers implements Listener {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        return entity.hasMetadata(metadataHandler.attackPushMD);
+        return entity.hasMetadata(powerMetadata);
 
     }
 
@@ -79,9 +72,7 @@ public class AttackPush extends MinorPowers implements Listener {
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (damager.hasMetadata(metadataHandler.attackPushMD)) {
+        if (damager.hasMetadata(powerMetadata)) {
 
             int pushbackStrength = 2;
 
@@ -94,7 +85,7 @@ public class AttackPush extends MinorPowers implements Listener {
 
         if (damager instanceof Projectile) {
 
-            if (ProjectileMetadataDetector.projectileMetadataDetector(((Projectile) damager), metadataHandler.attackPushMD)) {
+            if (ProjectileMetadataDetector.projectileMetadataDetector(((Projectile) damager), powerMetadata)) {
 
                 int pushbackStrength = 2;
 

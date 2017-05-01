@@ -15,9 +15,9 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -34,16 +34,9 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class AttackBlinding extends MinorPowers implements Listener{
 
-    private EliteMobs plugin;
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.ATTACK_BLINDING_MD;
 
-    MetadataHandler metadataHandler = new MetadataHandler(plugin);
-    String powerMetadata = metadataHandler.attackBlindingMD;
-
-    public AttackBlinding(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
 
     @Override
     public void applyPowers(Entity entity) {
