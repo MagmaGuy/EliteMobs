@@ -45,7 +45,6 @@ public class MinorPowerPowerStance implements Listener {
 
     private EliteMobs plugin;
     private int processID;
-    MetadataHandler metadataHandler = new MetadataHandler(plugin);
     PowerStanceMath powerStanceMath = new PowerStanceMath(plugin);
 
     public MinorPowerPowerStance(Plugin plugin) {
@@ -65,7 +64,7 @@ public class MinorPowerPowerStance implements Listener {
         if (plugin.getConfig().getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
 
             if (plugin.getConfig().getBoolean("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs")
-                    && !entity.hasMetadata(metadataHandler.naturalMob)) {
+                    && !entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
                 return;
 
@@ -116,18 +115,16 @@ public class MinorPowerPowerStance implements Listener {
     //Secondary effect item processing
     public void itemEffect(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
         if (plugin.getConfig().getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
 
             if (plugin.getConfig().getBoolean("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs")
-                    && !entity.hasMetadata(metadataHandler.naturalMob)) {
+                    && !entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
                 return;
 
             }
 
-            if (entity.hasMetadata(metadataHandler.visualEffect)) {
+            if (entity.hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)) {
 
                 return;
 
@@ -149,6 +146,8 @@ public class MinorPowerPowerStance implements Listener {
                     int effectQuantity = 0;
                     int effectIteration = 0;
 
+                    MetadataHandler metadataHandler = new MetadataHandler();
+
                     //count amount of active effects
                     for (String string : metadataHandler.minorPowerList()) {
 
@@ -162,7 +161,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     //apply new positioning
 
-                    if (entity.hasMetadata(metadataHandler.attackBlindingMD)) {
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_BLINDING_MD)) {
 
                         effectIteration++;
 
@@ -173,7 +172,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.attackFireMD)) {
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_FIRE_MD)) {
 
                         effectIteration++;
 
@@ -184,7 +183,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.attackFreezeMD)) {
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_FREEZE_MD)) {
 
                         effectIteration++;
 
@@ -195,7 +194,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.attackGravityMD)) {
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_GRAVITY_MD)) {
 
                         effectIteration++;
 
@@ -206,7 +205,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.attackPoisonMD)) {
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_POISON_MD)) {
 
                         effectIteration++;
 
@@ -218,7 +217,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.attackPushMD)) {
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_PUSH_MD)) {
 
                         effectIteration++;
 
@@ -229,7 +228,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.attackWebMD)) {
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_WEB_MD)) {
 
                         effectIteration++;
 
@@ -240,7 +239,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.attackWitherMD)) {
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_WITHER_MD)) {
 
                         effectIteration++;
 
@@ -252,7 +251,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.bonusLootMD)) {
+                    if (entity.hasMetadata(MetadataHandler.BONUS_LOOT_MD)) {
 
                         effectIteration++;
 
@@ -264,7 +263,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.invisibilityMD)) {
+                    if (entity.hasMetadata(MetadataHandler.INVISIBILITY_MD)) {
 
                         effectIteration++;
 
@@ -276,7 +275,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.invulnerabilityArrowMD)) {
+                    if (entity.hasMetadata(MetadataHandler.INVULNERABILITY_ARROW_MD)) {
 
                         effectIteration++;
 
@@ -288,7 +287,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.invulnerabilityFallDamageMD)) {
+                    if (entity.hasMetadata(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD)) {
 
                         effectIteration++;
 
@@ -300,7 +299,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.invulnerabilityKnockbackMD)) {
+                    if (entity.hasMetadata(MetadataHandler.INVULNERABILITY_KNOCKBACK_MD)) {
 
                         effectIteration++;
 
@@ -312,7 +311,7 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                    if (entity.hasMetadata(metadataHandler.movementSpeedMD)) {
+                    if (entity.hasMetadata(MetadataHandler.MOVEMENT_SPEED_MD)) {
 
                         effectIteration++;
 
@@ -329,11 +328,11 @@ public class MinorPowerPowerStance implements Listener {
                         for (Item currentItem : items) {
 
                             currentItem.remove();
-                            currentItem.removeMetadata(metadataHandler.visualEffect, plugin);
+                            currentItem.removeMetadata(MetadataHandler.VISUAL_EFFECT_MD, plugin);
 
                         }
 
-                        entity.removeMetadata(metadataHandler.visualEffect, plugin);
+                        entity.removeMetadata(MetadataHandler.VISUAL_EFFECT_MD, plugin);
 
                         Bukkit.getScheduler().cancelTask(processID);
 
@@ -371,8 +370,6 @@ public class MinorPowerPowerStance implements Listener {
         //assuming 2 items per track, dividing the 30 of a full cycle by 2 to operate start positions over 180 degrees
         int currentItemOffset = (int) Math.ceil((15 / effectQuantity) * effectIteration);
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
         if (!effectAlreadyPresent) {
 
             int repeatedCycles = 0;
@@ -383,10 +380,10 @@ public class MinorPowerPowerStance implements Listener {
                 Item item2 = entity.getWorld().dropItem(entity.getLocation(), effectItem2);
 
                 item1.setPickupDelay(Integer.MAX_VALUE);
-                item1.setMetadata(metadataHandler.visualEffect, new FixedMetadataValue(plugin, true));
+                item1.setMetadata(MetadataHandler.VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, true));
 
                 item2.setPickupDelay(Integer.MAX_VALUE);
-                item2.setMetadata(metadataHandler.visualEffect, new FixedMetadataValue(plugin, true));
+                item2.setMetadata(MetadataHandler.VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, true));
 
                 items.add(item1);
                 items.add(item2);
@@ -429,21 +426,21 @@ public class MinorPowerPowerStance implements Listener {
 
 //                    Location location1 = item1.getLocation();
                     item1.remove();
-                    item1.removeMetadata(metadataHandler.visualEffect, plugin);
+                    item1.removeMetadata(MetadataHandler.VISUAL_EFFECT_MD, plugin);
 
                     item1 = entity.getWorld().dropItem(oldLocation1, effectItem1);
                     items.add(index1, item1);
                     item1.setPickupDelay(Integer.MAX_VALUE);
-                    item1.setMetadata(metadataHandler.visualEffect, new FixedMetadataValue(plugin, true));
+                    item1.setMetadata(MetadataHandler.VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, true));
 
 //                    Location location2 = item2.getLocation();
                     item2.remove();
-                    item2.removeMetadata(metadataHandler.visualEffect, plugin);
+                    item2.removeMetadata(MetadataHandler.VISUAL_EFFECT_MD, plugin);
 
                     item2 = entity.getWorld().dropItem(oldLocation2, effectItem2);
                     items.add(index2, item2);
                     item2.setPickupDelay(Integer.MAX_VALUE);
-                    item2.setMetadata(metadataHandler.visualEffect, new FixedMetadataValue(plugin, true));
+                    item2.setMetadata(MetadataHandler.VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, true));
 
                 }
 
@@ -475,7 +472,7 @@ public class MinorPowerPowerStance implements Listener {
     @EventHandler
     public void lastAntiPickupSafeguard(PlayerPickupItemEvent event) {
 
-        if (event.getItem().hasMetadata(metadataHandler.visualEffect)) {
+        if (event.getItem().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)) {
 
             event.setCancelled(true);
 
@@ -487,7 +484,7 @@ public class MinorPowerPowerStance implements Listener {
     @EventHandler
     public void antiHopperPickupSafeguard(InventoryPickupItemEvent event) {
 
-        if (event.getItem().hasMetadata(metadataHandler.visualEffect)) {
+        if (event.getItem().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)) {
 
             event.setCancelled(true);
 
@@ -502,13 +499,13 @@ public class MinorPowerPowerStance implements Listener {
         Entity entity = event.getEntity();
 
         List<String> metadataList = new ArrayList<String>();
-        metadataList.add(metadataHandler.attackGravityMD);
-        metadataList.add(metadataHandler.attackPoisonMD);
-        metadataList.add(metadataHandler.attackPushMD);
-        metadataList.add(metadataHandler.attackWitherMD);
-        metadataList.add(metadataHandler.invulnerabilityArrowMD);
-        metadataList.add(metadataHandler.invulnerabilityFallDamageMD);
-        metadataList.add(metadataHandler.movementSpeedMD);
+        metadataList.add(MetadataHandler.ATTACK_GRAVITY_MD);
+        metadataList.add(MetadataHandler.ATTACK_POISON_MD);
+        metadataList.add(MetadataHandler.ATTACK_PUSH_MD);
+        metadataList.add(MetadataHandler.ATTACK_WITHER_MD);
+        metadataList.add(MetadataHandler.INVULNERABILITY_ARROW_MD);
+        metadataList.add(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD);
+        metadataList.add(MetadataHandler.MOVEMENT_SPEED_MD);
 
         for (String string : metadataList) {
 
@@ -525,7 +522,7 @@ public class MinorPowerPowerStance implements Listener {
     @EventHandler
     public void antiItemDespawn (ItemDespawnEvent event) {
 
-        if (event.getEntity().hasMetadata(metadataHandler.visualEffect)) {
+        if (event.getEntity().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)) {
 
             event.setCancelled(true);
 

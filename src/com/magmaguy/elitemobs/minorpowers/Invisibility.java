@@ -15,12 +15,11 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -29,21 +28,15 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class Invisibility extends MinorPowers implements Listener {
+public class Invisibility extends MinorPowers {
 
-    private EliteMobs plugin;
-
-    public Invisibility(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.INVISIBILITY_MD;
 
     @Override
     public void applyPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        entity.setMetadata(metadataHandler.invisibilityMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
@@ -53,8 +46,7 @@ public class Invisibility extends MinorPowers implements Listener {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        return entity.hasMetadata(metadataHandler.attackFireMD);
+        return entity.hasMetadata(powerMetadata);
 
     }
 

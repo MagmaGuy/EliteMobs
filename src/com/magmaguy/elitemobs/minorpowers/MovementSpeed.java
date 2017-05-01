@@ -15,9 +15,9 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -30,19 +30,13 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class MovementSpeed extends MinorPowers {
 
-    private EliteMobs plugin;
-
-    public MovementSpeed(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.MOVEMENT_SPEED_MD;
 
     @Override
     public void applyPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        entity.setMetadata(metadataHandler.movementSpeedMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
@@ -52,8 +46,7 @@ public class MovementSpeed extends MinorPowers {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        return entity.hasMetadata(metadataHandler.movementSpeedMD);
+        return entity.hasMetadata(powerMetadata);
 
     }
 

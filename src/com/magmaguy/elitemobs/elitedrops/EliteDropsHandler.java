@@ -13,21 +13,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.EliteMobs;
@@ -256,11 +241,9 @@ public class EliteDropsHandler implements Listener {
 
         Random random = new Random();
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (entity.hasMetadata(metadataHandler.naturalMob) &&
-                entity.hasMetadata(metadataHandler.eliteMobMD) &&
-                entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt() > 4) {
+        if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
+                entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
+                entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() > 4) {
 
 
             if (random.nextDouble() < plugin.getConfig().getDouble("Aggressive EliteMobs flat loot drop rate %") / 100) {
@@ -273,7 +256,7 @@ public class EliteDropsHandler implements Listener {
 
             //double drops
             if (plugin.getConfig().getBoolean("Aggressive EliteMobs can drop additional loot with drop % based on EliteMob level (higher is more likely)") &&
-                    random.nextDouble() < (entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt() / 100)) {
+                    random.nextDouble() < (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 100)) {
 
                 int randomDrop = random.nextInt(lootList.size());
 
@@ -281,11 +264,11 @@ public class EliteDropsHandler implements Listener {
 
             }
 
-            entity.removeMetadata(metadataHandler.eliteMobMD, plugin);
+            entity.removeMetadata(MetadataHandler.ELITE_MOB_MD, plugin);
 
-            if (entity.hasMetadata(metadataHandler.naturalMob)) {
+            if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
-                entity.removeMetadata(metadataHandler.naturalMob, plugin);
+                entity.removeMetadata(MetadataHandler.NATURAL_MOB_MD, plugin);
 
             }
 

@@ -15,10 +15,10 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,17 +33,8 @@ import java.util.Random;
  */
 public class BonusLoot extends MinorPowers implements Listener {
 
-    private EliteMobs plugin;
-    MetadataHandler metadataHandler = new MetadataHandler(plugin);
-    String powerMetadata = metadataHandler.bonusLootMD;
-
-
-
-    public BonusLoot(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.BONUS_LOOT_MD;
 
     @Override
     public void applyPowers(Entity entity) {

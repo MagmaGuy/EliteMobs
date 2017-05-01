@@ -13,40 +13,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -61,20 +30,18 @@ public class HealthHandler {
         Damageable damageableEntity = ((Damageable) entity);
         Damageable damageableDeleted = ((Damageable) deletedEntity);
 
-        MetadataHandler metadataHandler = new MetadataHandler(Bukkit.getPluginManager().getPlugin("EliteMobs"));
+        damageableEntity.setMaxHealth(ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
 
-        damageableEntity.setMaxHealth(ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt()));
-
-        if (entity.hasMetadata(metadataHandler.eliteMobMD) && !deletedEntity.hasMetadata(metadataHandler.eliteMobMD)) {
+        if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && !deletedEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             double adjustedAddedHealth = damageableEntity.getHealth() + ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity),
-                    entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt()) - ScalingFormula.PowerFormula
-                    (DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata(metadataHandler.eliteMobMD).get(0).asInt() - 1) -
+                    entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()) - ScalingFormula.PowerFormula
+                    (DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() - 1) -
                     (damageableDeleted.getMaxHealth() - damageableDeleted.getHealth());
 
             damageableEntity.setHealth(adjustedAddedHealth);
 
-        } else if (entity.hasMetadata(metadataHandler.eliteMobMD) && deletedEntity.hasMetadata(metadataHandler.eliteMobMD)) {
+        } else if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && deletedEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             if (damageableEntity.getHealth() + damageableDeleted.getHealth() > damageableEntity.getMaxHealth()) {
 

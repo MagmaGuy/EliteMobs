@@ -13,21 +13,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobs.passive;
 
 import com.magmaguy.elitemobs.EliteMobs;
@@ -63,9 +48,7 @@ public class CowHandler implements Listener {
     @EventHandler
     public void superDrops(EntityDamageByEntityEvent event) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata(metadataHandler.passiveEliteMobMD)) {
+        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
             Random random = new Random();
 
@@ -120,16 +103,14 @@ public class CowHandler implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-
-        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata(metadataHandler.passiveEliteMobMD)) {
+        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
             Cow cow = (Cow) event.getEntity();
 
             ItemStack cowMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 92);
             cow.getWorld().dropItem(cow.getLocation(), cowMonsterEgg);
 
-            event.getEntity().removeMetadata(metadataHandler.passiveEliteMobMD, plugin);
+            event.getEntity().removeMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD, plugin);
 
         }
 

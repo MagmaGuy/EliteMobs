@@ -22,9 +22,9 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventSpawnerMobEggInteraction;
+import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
-import com.magmaguy.elitemobs.minorpowers.*;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
 import com.magmaguy.elitemobs.mobs.aggressive.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
@@ -108,21 +108,37 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new DamageHandler(this), this);
 
         //Minor mob powers
-        this.getServer().getPluginManager().registerEvents(new AttackBlinding(this), this);
-        this.getServer().getPluginManager().registerEvents(new AttackConfusing(this), this);
-        this.getServer().getPluginManager().registerEvents(new AttackFire(this), this);
-        this.getServer().getPluginManager().registerEvents(new AttackFreeze(this), this);
-        this.getServer().getPluginManager().registerEvents(new AttackGravity(this), this);
-        this.getServer().getPluginManager().registerEvents(new AttackPush(this), this);
-        this.getServer().getPluginManager().registerEvents(new AttackWeb(this), this);
-        this.getServer().getPluginManager().registerEvents(new AttackPoison(this), this);
-        this.getServer().getPluginManager().registerEvents(new AttackWither(this), this);
-        this.getServer().getPluginManager().registerEvents(new BonusLoot(this), this);
-        this.getServer().getPluginManager().registerEvents(new Invisibility(this), this);
-        this.getServer().getPluginManager().registerEvents(new InvulnerabilityArrow(this), this);
-        this.getServer().getPluginManager().registerEvents(new InvulnerabilityFire(this), this);
-        this.getServer().getPluginManager().registerEvents(new InvulnerabilityKnockback(this), this);
-        this.getServer().getPluginManager().registerEvents(new InvulnerabilityFallDamage(this), this);
+        MetadataHandler metadataHandler = new MetadataHandler();
+        for (String string : metadataHandler.minorPowerList()){
+
+            //don't load powers that require no even listeners
+            if (!(string.equalsIgnoreCase("MovementSpeed"))
+                    && !(string.equalsIgnoreCase("Invisibility"))) {
+
+                try {
+
+                    String earlypath = "com.magmaguy.elitemobs.minorpowers.";
+                    String finalString = earlypath + string;
+
+                    Class<?> clazz = Class.forName(finalString);
+
+                    Object instance = clazz.newInstance();
+
+                    this.getServer().getPluginManager().registerEvents((Listener) instance, this);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+
+        }
 
         //Mob scanner
         this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
@@ -178,7 +194,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
 
-        MetadataHandler metadataHandler = new MetadataHandler(this);
+        MetadataHandler metadataHandler = new MetadataHandler();
 
         for (World world : worldList) {
 
@@ -237,7 +253,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
     public void loadConfiguration() {
 
-        MetadataHandler metadataHandler = new MetadataHandler(this);
+        MetadataHandler metadataHandler = new MetadataHandler();
 
         //check defaults
         getConfig().addDefault("Allow aggressive EliteMobs", true);

@@ -15,9 +15,9 @@
 
 package com.magmaguy.elitemobs.minorpowers;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -34,19 +34,13 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class AttackPoison extends MinorPowers implements Listener {
 
-    private EliteMobs plugin;
-
-    public AttackPoison(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    String powerMetadata = MetadataHandler.ATTACK_POISON_MD;
 
     @Override
     public void applyPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        entity.setMetadata(metadataHandler.attackPoisonMD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
         minorPowerPowerStance.itemEffect(entity);
 
@@ -55,8 +49,7 @@ public class AttackPoison extends MinorPowers implements Listener {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        return entity.hasMetadata(metadataHandler.attackPoisonMD);
+        return entity.hasMetadata(powerMetadata);
 
     }
 
@@ -66,8 +59,7 @@ public class AttackPoison extends MinorPowers implements Listener {
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
-        MetadataHandler metadataHandler = new MetadataHandler(plugin);
-        if (damager.hasMetadata(metadataHandler.attackPoisonMD) && damagee instanceof LivingEntity) {
+        if (damager.hasMetadata(powerMetadata) && damagee instanceof LivingEntity) {
 
             ((LivingEntity) damagee).addPotionEffect(new PotionEffect(PotionEffectType.POISON, 50, 1));
 
@@ -75,7 +67,7 @@ public class AttackPoison extends MinorPowers implements Listener {
 
         if (damager instanceof Projectile) {
 
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, metadataHandler.attackPoisonMD)) {
+            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
 
                 ((LivingEntity) damagee).addPotionEffect(new PotionEffect(PotionEffectType.POISON, 50, 1));
 
