@@ -42,7 +42,7 @@ public class PreventCreeperPassiveEntityDamage implements Listener{
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
 
-            if (ValidPassiveMobFilter.ValidPassiveMobFilter(event.getEntity(), plugin.getConfig().getList("Valid Passive EliteMobs")) ||
+            if (ValidPassiveMobFilter.ValidPassiveMobFilter(event.getEntity()) ||
                     event.getEntity() instanceof Horse || event.getEntity() instanceof Villager ||
                     event.getEntity() instanceof Bat || event.getEntity() instanceof ArmorStand ||
                     event.getEntity() instanceof Rabbit) {

@@ -141,8 +141,7 @@ public class MetadataHandler {
 
             }
 
-            if (!(entity instanceof IronGolem) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity,
-                    plugin.getConfig().getList("Valid aggressive EliteMobs"))) {
+            if (!(entity instanceof IronGolem) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
                 entity.remove();
 

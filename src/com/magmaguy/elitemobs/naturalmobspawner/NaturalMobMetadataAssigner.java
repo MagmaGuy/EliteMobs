@@ -65,7 +65,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
             ValidAgressiveMobFilter validAgressiveMobFilter = new ValidAgressiveMobFilter();
 
-            if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity, plugin.getConfig().getList("Valid aggressive EliteMobs"))) {
+            if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
                 Random random = new Random();
 

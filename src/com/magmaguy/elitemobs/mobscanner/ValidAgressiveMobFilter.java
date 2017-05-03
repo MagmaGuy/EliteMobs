@@ -16,9 +16,10 @@
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.MetadataHandler;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.*;
-
-import java.util.List;
 
 /**
  * Created by MagmaGuy on 10/10/2016.
@@ -27,22 +28,24 @@ public class ValidAgressiveMobFilter{
 
     private EliteMobs plugin;
 
-        public static boolean ValidAgressiveMobFilter(Entity entity, List list) {
-        //TODO: allow individual config deselection of allowed entities
-            return entity instanceof Blaze && list.contains("Blaze") ||
-                    entity instanceof CaveSpider && list.contains("CaveSpider") ||
-                    entity instanceof Creeper && list.contains("Creeper") ||
-                    entity instanceof Enderman && list.contains("Enderman") ||
-                    entity instanceof Endermite && list.contains("Endermite") ||
-                    entity instanceof IronGolem && list.contains("IronGolem") ||
-                    entity instanceof PigZombie && list.contains("PigZombie") ||
-                    entity instanceof PolarBear && list.contains("PolarBear") ||
-                    entity instanceof Silverfish && list.contains("Silverfish") ||
-                    entity instanceof Skeleton && list.contains("Skeleton") ||
-                    entity instanceof Spider && list.contains("Spider") ||
-                    entity instanceof Witch && list.contains("Witch") ||
-                    entity instanceof ZombieVillager && list.contains("Zombie") ||
-                    entity instanceof Zombie && list.contains("Zombie");
+        public static boolean ValidAgressiveMobFilter(Entity entity) {
+
+            Configuration config = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
+
+            return entity instanceof Blaze && config.getBoolean("Valid aggressive EliteMobs.Blaze") ||
+                    entity instanceof CaveSpider && config.getBoolean("Valid aggressive EliteMobs.CaveSpider") ||
+                    entity instanceof Creeper && config.getBoolean("Valid aggressive EliteMobs.Creeper") ||
+                    entity instanceof Enderman && config.getBoolean("Valid aggressive EliteMobs.Enderman") ||
+                    entity instanceof Endermite && config.getBoolean("Valid aggressive EliteMobs.Endermite") ||
+                    entity instanceof IronGolem && config.getBoolean("Valid aggressive EliteMobs.IronGolem") ||
+                    entity instanceof PigZombie && config.getBoolean("Valid aggressive EliteMobs.PigZombie") ||
+                    entity instanceof PolarBear && config.getBoolean("Valid aggressive EliteMobs.PolarBear") ||
+                    entity instanceof Silverfish && config.getBoolean("Valid aggressive EliteMobs.Silverfish") ||
+                    entity instanceof Skeleton && config.getBoolean("Valid aggressive EliteMobs.Skeleton") ||
+                    entity instanceof Spider && config.getBoolean("Valid aggressive EliteMobs.Spider") ||
+                    entity instanceof Witch && config.getBoolean("Valid aggressive EliteMobs.Witch") ||
+                    entity instanceof ZombieVillager && config.getBoolean("Valid aggressive EliteMobs.Zombie") ||
+                    entity instanceof Zombie && config.getBoolean("Valid aggressive EliteMobs.Zombie");
 
         }
 

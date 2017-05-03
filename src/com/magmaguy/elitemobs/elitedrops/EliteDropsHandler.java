@@ -15,8 +15,9 @@
 
 package com.magmaguy.elitemobs.elitedrops;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.LootCustomConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -43,13 +44,9 @@ public class EliteDropsHandler implements Listener {
 
     public static List<ItemStack> lootList = new ArrayList();
     public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
-    private EliteMobs plugin;
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
-    public EliteDropsHandler(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    LootCustomConfig lootCustomConfig = new LootCustomConfig();
 
     public void superDropParser() {
 
@@ -68,6 +65,8 @@ public class EliteDropsHandler implements Listener {
             List itemLore = itemLoreHandler(previousPath);
             List itemEnchantments = itemEnchantmentHandler(previousPath);
             List potionEffects = itemPotionEffectHandler(previousPath);
+
+            Bukkit.getLogger().info("ERROR " + itemType + "  " + previousPath);
 
             ItemStack itemStack = new ItemStack(Material.getMaterial(itemType), 1);
             ItemMeta itemMeta = itemStack.getItemMeta();
@@ -139,7 +138,7 @@ public class EliteDropsHandler implements Listener {
 
         List<String> lootCount = new ArrayList();
 
-        for (String configIterator : plugin.getCustomConfig().getKeys(true)) {
+        for (String configIterator : lootCustomConfig.getLootConfig().getKeys(true)) {
 
             int dotCount = 0;
 
@@ -188,7 +187,7 @@ public class EliteDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Type");
 
-        String itemType = plugin.getCustomConfig().getString(path);
+        String itemType = lootCustomConfig.getLootConfig().getString(path);
 
         return itemType;
 
@@ -198,7 +197,7 @@ public class EliteDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Name");
 
-        String itemName = plugin.getCustomConfig().getString(path);
+        String itemName = lootCustomConfig.getLootConfig().getString(path);
 
         return itemName;
 
@@ -208,7 +207,7 @@ public class EliteDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Lore");
 
-        List itemLore = plugin.getCustomConfig().getList(path);
+        List itemLore = lootCustomConfig.getLootConfig().getList(path);
 
         return itemLore;
 
@@ -218,7 +217,7 @@ public class EliteDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
 
-        List enchantments = plugin.getCustomConfig().getList(path);
+        List enchantments = lootCustomConfig.getLootConfig().getList(path);
 
         return enchantments;
 
@@ -228,7 +227,7 @@ public class EliteDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Potion Effects");
 
-        List potionEffects = plugin.getCustomConfig().getList(path);
+        List potionEffects = lootCustomConfig.getLootConfig().getList(path);
 
         return potionEffects;
 
