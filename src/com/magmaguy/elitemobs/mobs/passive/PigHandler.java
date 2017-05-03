@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Pig;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -43,7 +44,7 @@ public class PigHandler implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
         if (event.getEntity() instanceof Pig && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {

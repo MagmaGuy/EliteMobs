@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.mobs.passive;
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -29,7 +30,7 @@ public class PassiveEliteMobDeathHandler implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
         if (event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {

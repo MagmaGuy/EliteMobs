@@ -22,6 +22,7 @@ import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -79,7 +80,7 @@ public class ChickenHandler implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
         if (event.getEntity() instanceof Chicken && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
