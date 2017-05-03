@@ -21,7 +21,6 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
-import com.magmaguy.elitemobs.collateralminecraftchanges.PreventSpawnerMobEggInteraction;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
@@ -101,6 +100,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MushroomCowHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new PigHandler(this), this);
         this.getServer().getPluginManager().registerEvents(new SheepHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new PassiveEliteMobDeathHandler(), this);
 
         //Mob damage
         this.getServer().getPluginManager().registerEvents(new DamageHandler(this), this);
@@ -166,14 +166,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
         }
 
         //Minecraft behavior canceller
-        if (getConfig().getBoolean("Prevent players from changing mob spawners using eggs")) {
-
-            this.getServer().getPluginManager().registerEvents(new PreventSpawnerMobEggInteraction(this), this);
-
-            getLogger().info("EliteMobs - Mob egg interact on mob spawner canceller enabled!");
-
-        }
-
         if (getConfig().getBoolean("Prevent creepers from killing passive mobs")) {
 
             this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(this), this);
@@ -253,9 +245,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //check defaults
         getConfig().addDefault("Allow aggressive EliteMobs", true);
-//        getConfig().addDefault("Valid aggressive EliteMobs", Arrays.asList("Blaze", "CaveSpider", "Creeper",
-//                "Enderman", "Endermite", "IronGolem", "PigZombie", "PolarBear", "Silverfish", "Skeleton",
-//                "Spider", "Witch", "Zombie"));
         getConfig().addDefault("Valid aggressive EliteMobs.Blaze", true);
         getConfig().addDefault("Valid aggressive EliteMobs.CaveSpider", true);
         getConfig().addDefault("Valid aggressive EliteMobs.Creeper", true);
@@ -270,8 +259,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Valid aggressive EliteMobs.Witch", true);
         getConfig().addDefault("Valid aggressive EliteMobs.Zombie", true);
         getConfig().addDefault("Allow Passive EliteMobs", true);
-//        getConfig().addDefault("Valid Passive EliteMobs", Arrays.asList("Chicken", "Cow", "MushroomCow",
-//                "Pig", "Sheep"));
         getConfig().addDefault("Valid passive EliteMobs.Chicken", true);
         getConfig().addDefault("Valid passive EliteMobs.Cow", true);
         getConfig().addDefault("Valid passive EliteMobs.MushroomCow", true);
@@ -285,7 +272,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)", true);
         getConfig().addDefault("Aggressive EliteMobs flat loot drop rate %", 75);
         getConfig().addDefault("Aggressive EliteMobs can drop additional loot with drop % based on EliteMobs level (higher is more likely)", true);
-        getConfig().addDefault("Prevent players from changing mob spawners using eggs", true);
         getConfig().addDefault("Prevent creepers from killing passive mobs", true);
         getConfig().addDefault("SuperCreeper explosion nerf multiplier", 1.0);
         getConfig().addDefault("Turn on visual effects for natural or plugin-spawned EliteMobs", true);

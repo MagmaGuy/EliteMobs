@@ -23,7 +23,6 @@ import org.bukkit.entity.MushroomCow;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -96,20 +95,6 @@ public class MushroomCowHandler implements Listener {
 
             }
 
-
-        }
-
-    }
-
-
-    @EventHandler
-    public void onDeath(EntityDeathEvent event) {
-
-        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
-
-            ItemStack mushroomCowMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 96);
-
-            event.getEntity().removeMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD, plugin);
 
         }
 

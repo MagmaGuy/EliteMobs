@@ -23,13 +23,11 @@ import org.bukkit.entity.Pig;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
-import static org.bukkit.Material.MONSTER_EGG;
 import static org.bukkit.Material.PORK;
 
 /**
@@ -80,22 +78,6 @@ public class PigHandler implements Listener {
                 xpDrop.setExperience(random.nextInt(3) + 1);
 
             }
-
-        }
-
-    }
-
-    @EventHandler
-    public void onDeath(EntityDeathEvent event) {
-
-        if (event.getEntity() instanceof Pig && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
-
-            Pig pig = (Pig) event.getEntity();
-
-            ItemStack pigMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 90);
-            pig.getWorld().dropItem(pig.getLocation(), pigMonsterEgg);
-
-            event.getEntity().removeMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD, plugin);
 
         }
 
