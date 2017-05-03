@@ -24,7 +24,6 @@ import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -118,20 +117,6 @@ public class ChickenHandler implements Listener {
                 xpDrop.setExperience(random.nextInt(3) + 1);
 
             }
-
-        }
-
-    }
-
-    @EventHandler
-    public void onDeath(EntityDeathEvent event) {
-
-        if (event.getEntity() instanceof Chicken && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
-
-            ItemStack chickenMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 93);
-            event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), chickenMonsterEgg);
-
-            event.getEntity().removeMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD, plugin);
 
         }
 

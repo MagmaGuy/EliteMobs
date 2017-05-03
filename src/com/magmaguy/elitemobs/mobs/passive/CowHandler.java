@@ -23,13 +23,13 @@ import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
-import static org.bukkit.Material.*;
+import static org.bukkit.Material.LEATHER;
+import static org.bukkit.Material.RAW_BEEF;
 
 /**
  * Created by MagmaGuy on 19/12/2016.
@@ -94,23 +94,6 @@ public class CowHandler implements Listener {
                 }
 
             }
-
-        }
-
-    }
-
-
-    @EventHandler
-    public void onDeath(EntityDeathEvent event) {
-
-        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
-
-            Cow cow = (Cow) event.getEntity();
-
-            ItemStack cowMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 92);
-            cow.getWorld().dropItem(cow.getLocation(), cowMonsterEgg);
-
-            event.getEntity().removeMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD, plugin);
 
         }
 
