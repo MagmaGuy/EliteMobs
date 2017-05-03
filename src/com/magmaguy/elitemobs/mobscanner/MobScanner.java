@@ -97,6 +97,16 @@ public class MobScanner implements Listener {
                 //scan for passive mobs
                 if (plugin.getConfig().getBoolean("Allow Passive EliteMobs")) {
 
+                    //scan for passive mobs that might have lost their metadata
+                    if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity)
+                            && ((LivingEntity) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)
+                            &&((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * plugin.getConfig().getInt("Passive EliteMob stack amount")) {
+
+                        customPassiveName(entity, plugin);
+
+                    }
+
+                    //scan for new passive supermobs
                     if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
                         scanValidPassiveLivingEntity(entity);
@@ -186,10 +196,6 @@ public class MobScanner implements Listener {
 
                 if (animalContainer.size() == passiveStacking && !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
-                    Iterator<LivingEntity> animalSlaughterer = animalContainer.iterator();
-
-                    boolean firstAnimal = true;
-
                     for (LivingEntity livingEntity : animalContainer) {
 
                         livingEntity.remove();
@@ -205,13 +211,6 @@ public class MobScanner implements Listener {
                 }
 
             }
-
-        }
-
-        if (((Damageable) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) &&
-                !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
-
-            customPassiveName(entity, plugin);
 
         }
 

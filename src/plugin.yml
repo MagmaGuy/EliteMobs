@@ -35,3 +35,5 @@ permissions:
   elitemobs.spawnmob:
     description: Allow players to run /elitemobs spawnmob [mobType] [mobLevel] [mobPower] [mobPower(just keep adding until done)]
     default: op
+  elitemobs.scoreboard:
+    description: Shows a scoreboard with info about the elite mob a player might be standing next to
