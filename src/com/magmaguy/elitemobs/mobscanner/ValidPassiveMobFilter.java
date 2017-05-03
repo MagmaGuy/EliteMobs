@@ -15,23 +15,25 @@
 
 package com.magmaguy.elitemobs.mobscanner;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.*;
-
-import java.util.List;
 
 /**
  * Created by MagmaGuy on 19/12/2016.
  */
 public class ValidPassiveMobFilter {
 
-    public static boolean ValidPassiveMobFilter(Entity entity, List list) {
+    public static boolean ValidPassiveMobFilter(Entity entity) {
 
-        //TODO: allow individual config deselection of allowed entities
-        return entity instanceof Chicken && list.contains("Chicken") ||
-                entity instanceof Cow && list.contains("Cow") ||
-                entity instanceof MushroomCow && list.contains("MushroomCow") ||
-                entity instanceof Pig && list.contains("Pig") ||
-                entity instanceof Sheep && list.contains("Sheep");
+        Configuration config = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
+
+        return entity instanceof Chicken && config.getBoolean("Valid passive EliteMobs.Chicken")||
+                entity instanceof Cow && config.getBoolean("Valid passive EliteMobs.Cow") ||
+                entity instanceof MushroomCow && config.getBoolean("Valid passive EliteMobs.MushroomCow") ||
+                entity instanceof Pig && config.getBoolean("Valid passive EliteMobs.Pig") ||
+                entity instanceof Sheep && config.getBoolean("Valid passive EliteMobs.Sheep");
 
     }
 

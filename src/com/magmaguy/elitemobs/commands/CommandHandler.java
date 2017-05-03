@@ -16,6 +16,8 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.config.LootCustomConfig;
+import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -114,8 +116,11 @@ public class CommandHandler implements CommandExecutor {
 
                     Player player = (Player) commandSender;
                     Bukkit.getPluginManager().getPlugin("EliteMobs").reloadConfig();
-                    plugin.reloadCustomConfig();
-                    EliteDropsHandler eliteDropsHandler = new EliteDropsHandler(plugin);
+                    MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
+                    mobPowersCustomConfig.reloadCustomConfig();
+                    LootCustomConfig lootCustomConfig = new LootCustomConfig();
+                    lootCustomConfig.reloadLootConfig();
+                    EliteDropsHandler eliteDropsHandler = new EliteDropsHandler();
                     eliteDropsHandler.superDropParser();
                     getLogger().info("EliteMobs config reloaded!");
                     player.sendTitle("EliteMobs config reloaded!", "hehehe butts.");
@@ -139,7 +144,8 @@ public class CommandHandler implements CommandExecutor {
                         && commandSender.hasPermission("elitemobs.reload.loot")) {
 
                     Player player = (Player) commandSender;
-                    plugin.reloadCustomConfig();
+                    LootCustomConfig lootCustomConfig = new LootCustomConfig();
+                    lootCustomConfig.reloadLootConfig();
                     getLogger().info("EliteMobs loot reloaded!");
                     player.sendTitle("EliteMobs loot reloaded!", "hehehe booty.");
 

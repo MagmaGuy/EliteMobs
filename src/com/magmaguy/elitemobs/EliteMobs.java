@@ -23,6 +23,8 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurg
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventSpawnerMobEggInteraction;
 import com.magmaguy.elitemobs.commands.CommandHandler;
+import com.magmaguy.elitemobs.config.LootCustomConfig;
+import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
@@ -35,20 +37,13 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.jline.internal.InputStreamReader;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 
 public class EliteMobs extends JavaPlugin implements Listener {
 
@@ -64,10 +59,13 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Load loot from config
         loadConfiguration();
-        initCustomConfig();
+        MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
+        mobPowersCustomConfig.initializeMobPowersConfig();
+        LootCustomConfig lootCustomConfig = new LootCustomConfig();
+        lootCustomConfig.LootCustomConfig();
 
         //Parse loot
-        EliteDropsHandler superDrops = new EliteDropsHandler(this);
+        EliteDropsHandler superDrops = new EliteDropsHandler();
         superDrops.superDropParser();
 
         //Get world list
@@ -161,7 +159,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Loot
         if (getConfig().getBoolean("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)")) {
 
-            this.getServer().getPluginManager().registerEvents(new EliteDropsHandler(this), this);
+            this.getServer().getPluginManager().registerEvents(new EliteDropsHandler(), this);
 
             getLogger().info("EliteMobs - EliteMob loot enabled!");
 
@@ -253,17 +251,32 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
     public void loadConfiguration() {
 
-        MetadataHandler metadataHandler = new MetadataHandler();
-
         //check defaults
         getConfig().addDefault("Allow aggressive EliteMobs", true);
-        getConfig().addDefault("Valid aggressive EliteMobs", Arrays.asList("Blaze", "CaveSpider", "Creeper",
-                "Enderman", "Endermite", "IronGolem", "PigZombie", "PolarBear", "Silverfish", "Skeleton",
-                "Spider", "Witch", "Zombie"));
-        getConfig().addDefault("Valid aggressive EliteMobs powers", metadataHandler.minorPowerList());
+//        getConfig().addDefault("Valid aggressive EliteMobs", Arrays.asList("Blaze", "CaveSpider", "Creeper",
+//                "Enderman", "Endermite", "IronGolem", "PigZombie", "PolarBear", "Silverfish", "Skeleton",
+//                "Spider", "Witch", "Zombie"));
+        getConfig().addDefault("Valid aggressive EliteMobs.Blaze", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.CaveSpider", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.Creeper", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.Enderman", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.Endermite", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.IronGolem", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.PigZombie", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.PolarBear", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.Silverfish", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.Skeleton", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.Spider", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.Witch", true);
+        getConfig().addDefault("Valid aggressive EliteMobs.Zombie", true);
         getConfig().addDefault("Allow Passive EliteMobs", true);
-        getConfig().addDefault("Valid Passive EliteMobs", Arrays.asList("Chicken", "Cow", "MushroomCow",
-                "Pig", "Sheep"));
+//        getConfig().addDefault("Valid Passive EliteMobs", Arrays.asList("Chicken", "Cow", "MushroomCow",
+//                "Pig", "Sheep"));
+        getConfig().addDefault("Valid passive EliteMobs.Chicken", true);
+        getConfig().addDefault("Valid passive EliteMobs.Cow", true);
+        getConfig().addDefault("Valid passive EliteMobs.MushroomCow", true);
+        getConfig().addDefault("Valid passive EliteMobs.Pig", true);
+        getConfig().addDefault("Valid passive EliteMobs.Sheep", true);
         getConfig().addDefault("Natural aggressive EliteMob spawning", true);
         getConfig().addDefault("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn", 20);
         getConfig().addDefault("Aggressive mob stacking", true);
@@ -290,107 +303,13 @@ public class EliteMobs extends JavaPlugin implements Listener {
     public void reloadConfiguration() {
 
         reloadConfig();
-        reloadCustomConfig();
+        MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
+        mobPowersCustomConfig.reloadCustomConfig();
+        LootCustomConfig lootCustomConfig = new LootCustomConfig();
+        lootCustomConfig.reloadLootConfig();
 
         getLogger().info("EliteMobs config reloaded!");
 
     }
-
-    public void initCustomConfig() {
-
-        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Type", "DIAMOND_SWORD");
-        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Name", "Zombie Slayer");
-        //Loot example
-        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Item Lore", Arrays.asList("Slays zombies Bigly."));
-        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Enchantments", Arrays.asList("DAMAGE_ALL,5", "DAMAGE_UNDEAD,5"));
-        this.getCustomConfig().addDefault("Loot.Zombie Slayer.Potion Effects", Arrays.asList("GLOWING,1"));
-        //hunting helmet
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Item Type", "DIAMOND_HELMET");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Item Name", "Elite Mob Hunting Helmet");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Item Lore", Arrays.asList("Wearing this helmet will",
-                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only for the most tenacious minds."));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Enchantments", Arrays.asList("VANISHING_CURSE,1"));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Helmet.Potion Effects", Arrays.asList("NIGHT_VISION,1"));
-        //hunting chestplate
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Item Type", "DIAMOND_CHESTPLATE");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Item Name", "Elite Mob Hunting Chestplate");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Item Lore", Arrays.asList("Wearing this chestplate will",
-                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only for the bravest souls."));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Enchantments", Arrays.asList("VANISHING_CURSE,1"));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Chestplate.Potion Effects", Arrays.asList("HEALTH_BOOST,1"));
-        //hunting leggings
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Item Type", "DIAMOND_LEGGINGS");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Item Name", "Elite Mob Hunting Leggings");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Item Lore", Arrays.asList("Wearing these leggings will",
-                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only for those who aim the highest."));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Enchantments", Arrays.asList("VANISHING_CURSE,1"));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Leggings.Potion Effects", Arrays.asList("JUMP,2"));
-        //hunting boots
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Item Type", "DIAMOND_BOOTS");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Item Name", "Elite Mob Hunting Boots");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Item Lore", Arrays.asList("Wearing these boots will",
-                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only for those fleetest of foot."));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Enchantments", Arrays.asList("VANISHING_CURSE,1"));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Boots.Potion Effects", Arrays.asList("SPEED,2"));
-        //hunting bow
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Item Type", "BOW");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Item Name", "Elite Mob Hunting Bow");
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Item Lore", Arrays.asList("Wielding this bow will",
-                "increase the number of", "high level Elite Mobs", "that spawn around you!", "Only natural-born hunters."));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Enchantments", Arrays.asList("VANISHING_CURSE,1", "ARROW_DAMAGE,3"));
-        this.getCustomConfig().addDefault("Loot.Elite Mob Hunting Bow.Potion Effects", Arrays.asList("DAMAGE_RESISTANCE,1"));
-
-        this.getCustomConfig().options().copyDefaults(true);
-        this.saveDefaultCustomConfig();
-        this.saveCustomConfig();
-
-    }
-
-    public void reloadCustomConfig() {
-        if (customConfigFile == null) {
-            customConfigFile = new File(this.getDataFolder(), "loot.yml");
-        }
-        customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
-
-        // Look for defaults in the jar
-        Reader defConfigStream = null;
-        try {
-            defConfigStream = new InputStreamReader(this.getResource("loot.yml"), "UTF8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        if (defConfigStream != null) {
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(customConfigFile);
-            customConfig.setDefaults(defConfig);
-        }
-    }
-
-    public FileConfiguration getCustomConfig() {
-        if (customConfig == null) {
-            reloadCustomConfig();
-        }
-        return customConfig;
-    }
-
-    public void saveCustomConfig() {
-        if (customConfig == null || customConfigFile == null) {
-            return;
-        }
-        try {
-            getCustomConfig().save(customConfigFile);
-        } catch (IOException ex) {
-            this.getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, ex);
-        }
-    }
-
-    public void saveDefaultCustomConfig() {
-        if (customConfigFile == null) {
-            customConfigFile = new File(this.getDataFolder(), "loot.yml");
-        }
-        if (!customConfigFile.exists()) {
-            this.saveResource("loot.yml", false);
-        }
-    }
-    // End Custom Config
 
 }

@@ -62,9 +62,7 @@ public class MobScanner implements Listener {
 
                 Entity entity = iterator.next();
 
-                List aggressiveList = plugin.getConfig().getList("Valid aggressive EliteMobs");
-
-                if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity, aggressiveList)) {
+                if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
                     //scan for naturally/command/plugin spawned EliteMobs
                     if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() != 1
@@ -99,9 +97,7 @@ public class MobScanner implements Listener {
                 //scan for passive mobs
                 if (plugin.getConfig().getBoolean("Allow Passive EliteMobs")) {
 
-                    List passiveList = plugin.getConfig().getList("Valid Passive EliteMobs");
-
-                    if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity, passiveList) && !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+                    if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
                         scanValidPassiveLivingEntity(entity);
 
@@ -174,10 +170,17 @@ public class MobScanner implements Listener {
 
         List<LivingEntity> animalContainer = new ArrayList<>();
 
+        if (((LivingEntity) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
+
+            return;
+
+        }
+
         for (Entity secondEntity : entity.getNearbyEntities(passiveRange, passiveRange, passiveRange)) {
 
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
-                    && !secondEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+                    && !secondEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) &&
+                    ((LivingEntity) secondEntity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
                 animalContainer.add((LivingEntity) secondEntity);
 

@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.minorpowers.MinorPowers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -74,7 +75,9 @@ public class PowerHandler {
 
             for (String string : metadataHandler.minorPowerList()) {
 
-                if (plugin.getConfig().getList("Valid aggressive EliteMobs powers").contains(string)){
+                MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
+
+                if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)){
 
                     try {
 
