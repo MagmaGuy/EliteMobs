@@ -33,14 +33,13 @@ import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobSpawner;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.scoreboard.ScoreboardHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,8 +47,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
     public static List<World> worldList = new ArrayList();
     private int processID;
-    private FileConfiguration customConfig = null;
-    private File customConfigFile = null;
 
     @Override
     public void onEnable() {
@@ -233,6 +230,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
             public void run() {
 
                 potionEffectApplier.potionEffectApplier();
+                ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
+                scoreboardHandler.scanSight();
 
             }
 

@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -45,7 +46,7 @@ public class SheepHandler implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
         if (event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && event.getEntity() instanceof Sheep) {
