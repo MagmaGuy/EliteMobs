@@ -133,7 +133,7 @@ public class SpawnMobCommandHandler {
                         getConsoleSender().sendMessage("At least one of the coordinates (x:" + args[2] + ", y:" +
                                 args[3] + ", z:" + args[4] + ") is not valid");
                         getConsoleSender().sendMessage("Valid command syntax: /elitemobs spawnmob worldName xCoord yCoord " +
-                                "zCoord mobLevel mobPower mobPower(you can keep adding these mobPowers as many as you'd like)");
+                                "zCoord mobType mobLevel mobPower mobPower(you can keep adding these mobPowers as many as you'd like)");
 
                     }
 
@@ -286,80 +286,111 @@ public class SpawnMobCommandHandler {
 
             int powerCount = 0;
 
+            MetadataHandler metadataHandler = new MetadataHandler();
+
             for (String string : mobPower) {
 
                 switch (string) {
 
-                    case "blinding":
+                    case MetadataHandler.ATTACK_BLINDING_H:
                         entity.setMetadata(MetadataHandler.ATTACK_BLINDING_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "confusing":
+                    case MetadataHandler.ATTACK_CONFUSING_H:
                         entity.setMetadata(MetadataHandler.ATTACK_CONFUSING_MD, new FixedMetadataValue(plugin, true));
                         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
                         minorPowerPowerStance.attackConfusing(entity);
                         powerCount++;
                         break;
-                    case "fireattack":
+                    case MetadataHandler.ATTACK_FIRE_H:
                         entity.setMetadata(MetadataHandler.ATTACK_FIRE_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "freeze":
+                    case MetadataHandler.ATTACK_FREEZE_H:
                         entity.setMetadata(MetadataHandler.ATTACK_FREEZE_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "shulker":
+                    case MetadataHandler.ATTACK_GRAVITY_H:
                         entity.setMetadata(MetadataHandler.ATTACK_GRAVITY_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "poison":
+                    case MetadataHandler.ATTACK_POISON_H:
                         entity.setMetadata(MetadataHandler.ATTACK_POISON_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "knockback":
+                    case MetadataHandler.ATTACK_PUSH_H:
                         entity.setMetadata(MetadataHandler.ATTACK_PUSH_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "web":
+                    case MetadataHandler.ATTACK_WEB_H:
                         entity.setMetadata(MetadataHandler.ATTACK_WEB_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "wither":
+                    case MetadataHandler.ATTACK_WITHER_H:
                         entity.setMetadata(MetadataHandler.ATTACK_WITHER_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "loot":
+                    case MetadataHandler.BONUS_LOOT_H:
                         entity.setMetadata(MetadataHandler.BONUS_LOOT_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "invisibility":
+                    case MetadataHandler.DOUBLE_HEALTH_H:
+                        entity.setMetadata(MetadataHandler.DOUBLE_HEALTH_MD, new FixedMetadataValue(plugin, true));
+                        Entity finalEntity = entity;
+                        //wait until the scanner picks up the entity and assigns the correct default health
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+
+                            @Override
+
+                            public void run() {
+
+                                LivingEntity livingEntity = (LivingEntity) finalEntity;
+
+                                livingEntity.setMaxHealth(livingEntity.getMaxHealth() * 2);
+
+                                if (livingEntity.getMaxHealth() < livingEntity.getHealth() * 2) {
+
+                                    livingEntity.setHealth(livingEntity.getMaxHealth());
+
+                                } else {
+
+                                    ((LivingEntity) finalEntity).setHealth(((LivingEntity) finalEntity).getHealth() * 2);
+
+                                }
+
+                            }
+
+                        }, 1);
+                        powerCount++;
+                        break;
+                    case MetadataHandler.INVISIBILITY_H:
                         entity.setMetadata(MetadataHandler.INVISIBILITY_MD, new FixedMetadataValue(plugin, true));
                         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
                         powerCount++;
                         break;
-                    case "arrowresist":
+                    case MetadataHandler.INVULNERABILITY_ARROW_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_ARROW_MD, new FixedMetadataValue(plugin, true));
                         break;
-                    case "fallresist":
+                    case MetadataHandler.INVULNERABILITY_FALL_DAMAGE_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "fireresist":
+                    case MetadataHandler.INVULNERABILITY_FIRE_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_FIRE_MD, new FixedMetadataValue(plugin, true));
-                        MinorPowerPowerStance minorPowerPowerStance1 = new MinorPowerPowerStance(plugin);
-                        minorPowerPowerStance1.invulnerabilityFireEffect(entity);
+                        MinorPowerPowerStance minorPowerPowerStance2 = new MinorPowerPowerStance(plugin);
+                        minorPowerPowerStance2.invulnerabilityFireEffect(entity);
                         powerCount++;
                         break;
-                    case "heavy":
+                    case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_KNOCKBACK_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
-                    case "fast":
+                    case MetadataHandler.MOVEMENT_SPEED_H:
                         entity.setMetadata(MetadataHandler.MOVEMENT_SPEED_MD, new FixedMetadataValue(plugin, true));
                         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
                         powerCount++;
                         break;
-                    case "CUSTOM_MD":
+                    case "custom":
                         entity.setMetadata(MetadataHandler.CUSTOM_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
@@ -392,13 +423,11 @@ public class SpawnMobCommandHandler {
 
                     Player player = (Player) commandSender;
 
-                    player.sendMessage("Valid powers: confusing fireattack freeze shulker poison knockback web wither loot invisibility " +
-                            "arrowresist fallresist fireresist heavy fast CUSTOM_MD");
+                    player.sendMessage("Valid powers: " + metadataHandler.minorPowerListHumanFormat() + " custom");
 
                 } else if (commandSender instanceof ConsoleCommandSender) {
 
-                    getConsoleSender().sendMessage("Valid powers: fireattack freeze shulker poison knockback web wither loot invisibility " +
-                            "arrowresist fallresist fireresist fast");
+                    getConsoleSender().sendMessage("Valid powers: " + metadataHandler.minorPowerListHumanFormat() + " custom");
 
                 }
 

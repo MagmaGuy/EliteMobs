@@ -42,7 +42,7 @@ public class LootGUI implements Listener{
 
     public void lootGUI (Player player) {
 
-        Inventory fakeChestInventory = Bukkit.createInventory(player, 54, "EliteMobs loot.yml");
+        Inventory fakeChestInventory = Bukkit.createInventory(null, 54, "EliteMobs loot.yml");
         tierConstructor(fakeChestInventory);
         headerConstructor(fakeChestInventory);
         lootNavigationConstructor(fakeChestInventory);
@@ -268,7 +268,6 @@ public class LootGUI implements Listener{
 
             } else if (itemDisplayName.equals("EliteMobs by MagmaGuy")) {
 
-                //todo: something with this?
                 filter = false;
                 currentLootPage = 1;
                 lootGUI(player);
