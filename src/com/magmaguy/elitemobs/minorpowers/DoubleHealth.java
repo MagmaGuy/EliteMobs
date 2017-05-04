@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -34,42 +35,52 @@ public class DoubleHealth extends MinorPowers {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        if (!(entity instanceof IronGolem)) {
 
-        //wait until the scanner picks up the entity and assigns the correct default health
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
 
-            @Override
+            //wait until the scanner picks up the entity and assigns the correct default health
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
-            public void run() {
+                @Override
 
-                LivingEntity livingEntity = (LivingEntity) entity;
+                public void run() {
 
-                livingEntity.setMaxHealth(livingEntity.getMaxHealth() * 2);
+                    LivingEntity livingEntity = (LivingEntity) entity;
 
-                if (livingEntity.getMaxHealth() < livingEntity.getHealth() * 2) {
+                    livingEntity.setMaxHealth(livingEntity.getMaxHealth() * 2);
 
-                    livingEntity.setHealth(livingEntity.getMaxHealth());
+                    if (livingEntity.getMaxHealth() < livingEntity.getHealth() * 2) {
 
-                } else {
+                        livingEntity.setHealth(livingEntity.getMaxHealth());
 
-                    ((LivingEntity) entity).setHealth(((LivingEntity) entity).getHealth() * 2);
+                    } else {
+
+                        ((LivingEntity) entity).setHealth(((LivingEntity) entity).getHealth() * 2);
+
+                    }
 
                 }
 
-            }
+            }, 1);
 
-        }, 1);
+            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+            minorPowerPowerStance.itemEffect(entity);
 
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
-        minorPowerPowerStance.itemEffect(entity);
+        }
 
     }
 
     @Override
     public boolean existingPowers(Entity entity) {
 
-        return entity.hasMetadata(powerMetadata);
+        if (!(entity instanceof IronGolem)) {
+
+            return entity.hasMetadata(powerMetadata);
+
+        }
+
+        return false;
 
     }
 

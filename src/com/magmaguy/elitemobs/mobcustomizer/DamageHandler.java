@@ -17,7 +17,9 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.entity.*;
+import com.magmaguy.elitemobs.minorpowers.ProjectileMetadataDetector;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -50,33 +52,29 @@ public class DamageHandler implements Listener{
 
         if (event.getDamager().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-            event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
+            if (event.getDamager().hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
 
-        } else if (event.getDamager() instanceof Fireball) {
-
-            Fireball fireball = (Fireball) event.getDamager();
-
-            if (fireball.getShooter() instanceof Blaze && ((Blaze) fireball.getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
-
-                event.setDamage(damageMath(event.getFinalDamage(), ((Blaze) fireball.getShooter()).getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
+                event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()) * 2);
+                return;
 
             }
 
-        } else if (event.getDamager() instanceof Arrow) {
+            event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
 
-            Arrow arrow = (Arrow) event.getDamager();
+        }
 
-            if (arrow.getShooter() instanceof Skeleton && ((Skeleton) arrow.getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+        if (event.getDamager() instanceof Projectile) {
 
-                event.setDamage(damageMath(event.getFinalDamage(), ((Skeleton) arrow.getShooter()).getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
+            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile)event.getDamager(), MetadataHandler.ELITE_MOB_MD)) {
 
-            } else if (arrow.getShooter() instanceof Stray && ((Stray) arrow.getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+                if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile)event.getDamager(), MetadataHandler.DOUBLE_DAMAGE_MD)) {
 
-                event.setDamage(damageMath(event.getFinalDamage(), ((Stray) arrow.getShooter()).getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
+                    event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()) * 2);
+                    return;
 
-            } else if (arrow.getShooter() instanceof WitherSkeleton && ((WitherSkeleton) arrow.getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+                }
 
-                event.setDamage(damageMath(event.getFinalDamage(), ((WitherSkeleton) arrow.getShooter()).getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
+                event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
 
             }
 
