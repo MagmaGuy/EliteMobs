@@ -263,6 +263,18 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.DIAMOND_SWORD, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.DIAMOND_SWORD, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
+
+
+                    }
+
                     if (entity.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
 
                         effectIteration++;

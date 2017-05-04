@@ -24,10 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -334,33 +331,41 @@ public class SpawnMobCommandHandler {
                         entity.setMetadata(MetadataHandler.BONUS_LOOT_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
+                    case MetadataHandler.DOUBLE_DAMAGE_H:
+                        entity.setMetadata(MetadataHandler.DOUBLE_DAMAGE_MD, new FixedMetadataValue(plugin, true));
+                        break;
                     case MetadataHandler.DOUBLE_HEALTH_H:
-                        entity.setMetadata(MetadataHandler.DOUBLE_HEALTH_MD, new FixedMetadataValue(plugin, true));
-                        Entity finalEntity = entity;
-                        //wait until the scanner picks up the entity and assigns the correct default health
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                        if (!(entity instanceof IronGolem)) {
 
-                            @Override
+                            entity.setMetadata(MetadataHandler.DOUBLE_HEALTH_MD, new FixedMetadataValue(plugin, true));
+                            Entity finalEntity = entity;
+                            //wait until the scanner picks up the entity and assigns the correct default health
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
-                            public void run() {
+                                @Override
 
-                                LivingEntity livingEntity = (LivingEntity) finalEntity;
+                                public void run() {
 
-                                livingEntity.setMaxHealth(livingEntity.getMaxHealth() * 2);
+                                    LivingEntity livingEntity = (LivingEntity) finalEntity;
 
-                                if (livingEntity.getMaxHealth() < livingEntity.getHealth() * 2) {
+                                    livingEntity.setMaxHealth(livingEntity.getMaxHealth() * 2);
 
-                                    livingEntity.setHealth(livingEntity.getMaxHealth());
+                                    if (livingEntity.getMaxHealth() < livingEntity.getHealth() * 2) {
 
-                                } else {
+                                        livingEntity.setHealth(livingEntity.getMaxHealth());
 
-                                    ((LivingEntity) finalEntity).setHealth(((LivingEntity) finalEntity).getHealth() * 2);
+                                    } else {
+
+                                        ((LivingEntity) finalEntity).setHealth(((LivingEntity) finalEntity).getHealth() * 2);
+
+                                    }
 
                                 }
 
-                            }
+                            }, 1);
 
-                        }, 1);
+                        }
+
                         powerCount++;
                         break;
                     case MetadataHandler.INVISIBILITY_H:

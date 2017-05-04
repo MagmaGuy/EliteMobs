@@ -46,7 +46,7 @@ public class ScoreboardHandler implements Listener {
 
                 Location eyeLocation = player.getEyeLocation();
 
-                Collection<Entity> nearbyEntities = eyeLocation.getWorld().getNearbyEntities(eyeLocation, 5, 5, 5);
+                Collection<Entity> nearbyEntities = eyeLocation.getWorld().getNearbyEntities(eyeLocation, 7, 7, 7);
 
                 for (Entity entity : nearbyEntities) {
 
@@ -165,7 +165,7 @@ public class ScoreboardHandler implements Listener {
 
             }
 
-        }, 20, 20);
+        }, 4, 4);
 
     }
 

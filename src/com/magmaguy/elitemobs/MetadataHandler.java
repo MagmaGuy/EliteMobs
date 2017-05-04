@@ -54,6 +54,7 @@ public class MetadataHandler {
     public final static String ATTACK_WEB_MD = "AttackWeb";
     public final static String ATTACK_WITHER_MD = "AttackWither";
     public final static String BONUS_LOOT_MD = "BonusLoot";
+    public final static String DOUBLE_DAMAGE_MD = "DoubleDamage";
     public final static String DOUBLE_HEALTH_MD = "DoubleHealth";
     public final static String INVULNERABILITY_ARROW_MD = "InvulnerabilityArrow";
     public final static String INVULNERABILITY_FALL_DAMAGE_MD = "InvulnerabilityFallDamage";
@@ -72,6 +73,7 @@ public class MetadataHandler {
     public final static String ATTACK_WEB_H = "Webbing";
     public final static String ATTACK_WITHER_H = "Withering";
     public final static String BONUS_LOOT_H = "Treasure";
+    public final static String DOUBLE_DAMAGE_H = "Berserker";
     public final static String DOUBLE_HEALTH_H = "Tank";
     public final static String INVULNERABILITY_ARROW_H = "Arrowproof";
     public final static String INVULNERABILITY_FALL_DAMAGE_H = "Light";
@@ -105,6 +107,7 @@ public class MetadataHandler {
         metadataList.add(ATTACK_WEB_MD);
         metadataList.add(ATTACK_WITHER_MD);
         metadataList.add(BONUS_LOOT_MD);
+        metadataList.add(DOUBLE_DAMAGE_MD);
         metadataList.add(DOUBLE_HEALTH_MD);
         metadataList.add(INVULNERABILITY_ARROW_MD);
         metadataList.add(INVULNERABILITY_FALL_DAMAGE_MD);
@@ -134,6 +137,7 @@ public class MetadataHandler {
         metadataList.add(ATTACK_WEB_MD);
         metadataList.add(ATTACK_WITHER_MD);
         metadataList.add(BONUS_LOOT_MD);
+        metadataList.add(DOUBLE_DAMAGE_MD);
         metadataList.add(DOUBLE_HEALTH_MD);
         metadataList.add(INVULNERABILITY_ARROW_MD);
         metadataList.add(INVULNERABILITY_FALL_DAMAGE_MD);
@@ -160,6 +164,7 @@ public class MetadataHandler {
         metadataList.add(ATTACK_WEB_H);
         metadataList.add(ATTACK_WITHER_H);
         metadataList.add(BONUS_LOOT_H);
+        metadataList.add(DOUBLE_DAMAGE_H);
         metadataList.add(DOUBLE_HEALTH_H);
         metadataList.add(INVULNERABILITY_ARROW_H);
         metadataList.add(INVULNERABILITY_FALL_DAMAGE_H);
