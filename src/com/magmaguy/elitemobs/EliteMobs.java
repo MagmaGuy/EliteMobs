@@ -22,6 +22,7 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
+import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
@@ -101,6 +102,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Mob damage
         this.getServer().getPluginManager().registerEvents(new DamageHandler(this), this);
+
+        //getloot GUI
+        this.getServer().getPluginManager().registerEvents(new LootGUI(), this);
 
         //Minor mob powers
         MetadataHandler metadataHandler = new MetadataHandler();
