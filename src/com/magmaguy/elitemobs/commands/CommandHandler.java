@@ -80,7 +80,7 @@ public class CommandHandler implements CommandExecutor {
                 validCommands(commandSender);
                 return true;
 
-            // /elitemobs stats
+            // /elitemobs stats | /elitemobs getloot (for GUI menu)
             case 1:
 
                 if (args[0].equalsIgnoreCase("stats") && commandSender instanceof Player &&
@@ -114,7 +114,7 @@ public class CommandHandler implements CommandExecutor {
                 validCommands(commandSender);
                 return true;
 
-            // /elitemobs reload config | /elitemobs reload loot | /elitemobs
+            // /elitemobs reload config | /elitemobs reload loot | /elitemobs giveloot [player] (for GUI menu)
             case 2:
 
                 //valid /elitemobs reload config
@@ -175,8 +175,6 @@ public class CommandHandler implements CommandExecutor {
                         commandSender.hasPermission("elitemobs.getloot") || args[0].equalsIgnoreCase("gl")
                         && commandSender instanceof Player && commandSender.hasPermission("elitemobs.getloot")) {
 
-
-
                     Player player = (Player) commandSender;
 
                     GetLootCommandHandler getLootCommandHandler = new GetLootCommandHandler();
@@ -193,9 +191,6 @@ public class CommandHandler implements CommandExecutor {
 
                     }
 
-
-
-
                     //invalid /elitemobs getloot | /elitemobs gl
                 } else if (args[0].equalsIgnoreCase("getloot") && !commandSender.hasPermission("elitemobs.getloot")
                         || args[0].equalsIgnoreCase("gl") && !commandSender.hasPermission("elitemobs.getloot")) {
@@ -205,6 +200,21 @@ public class CommandHandler implements CommandExecutor {
                             "You need the following permission: " + " elitemobs.getloot");
 
                     return true;
+
+                } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof Player
+                    && commandSender.hasPermission("elitemobs.giveloot")) {
+
+                    if (args[0].equalsIgnoreCase("giveloot")) {
+
+                        if (validPlayer(args[1])) {
+
+                            Player receiver = Bukkit.getServer().getPlayer(args[1]);
+
+                            //TODO: add GUI to giveloot command
+
+                        }
+
+                    }
 
                 }
 
@@ -309,8 +319,10 @@ public class CommandHandler implements CommandExecutor {
             player.sendMessage("/elitemobs stats");
             player.sendMessage("/elitemobs reload config");
             player.sendMessage("/elitemobs reload loot");
+            player.sendMessage("/elitemobs getloot (alone to get GUI)");
             player.sendMessage("/elitemobs getloot [loot name]");
             player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
+            player.sendMessage("/elitemobs spawnmob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
 
         } else if (commandSender instanceof ConsoleCommandSender) {
 
@@ -319,6 +331,7 @@ public class CommandHandler implements CommandExecutor {
             getLogger().info("elitemobs reload config");
             getLogger().info("elitemobs reload loot");
             getLogger().info("elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
+            getLogger().info("elitemobs spawnmob [worldName] [x] [y] [z] [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
 
         }
 
@@ -339,7 +352,8 @@ public class CommandHandler implements CommandExecutor {
 
         }
 
-        return false;
+        //TODO: hunt downstuff that errors when this is changed to false
+        return true;
 
     }
 

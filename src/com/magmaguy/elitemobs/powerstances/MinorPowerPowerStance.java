@@ -100,15 +100,15 @@ public class MinorPowerPowerStance implements Listener {
 
     }
 
-    public void invulnerabilityFireEffect(Entity entity) {
-
-        particleEffect(entity, Particle.FLAME, 5, 0, 0, 0, 0.01);
-
-    }
-
     public void attackConfusing(Entity entity) {
 
         particleEffect(entity, Particle.SPELL_MOB, 5, 0, 0, 0, 0.01);
+
+    }
+
+    public void invulnerabilityFireEffect(Entity entity) {
+
+        particleEffect(entity, Particle.FLAME, 5, 0, 0, 0, 0.01);
 
     }
 
@@ -257,6 +257,18 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack effectItem1 = new ItemStack(Material.CHEST, 1);
                         ItemStack effectItem2 = new ItemStack(Material.CHEST, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
+
+
+                    }
+
+                    if (entity.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.SHIELD, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.SHIELD, 1);
 
                         itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 

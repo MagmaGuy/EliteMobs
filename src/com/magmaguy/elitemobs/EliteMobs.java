@@ -112,7 +112,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
             //don't load powers that require no even listeners
             if (!(string.equalsIgnoreCase("MovementSpeed"))
-                    && !(string.equalsIgnoreCase("Invisibility"))) {
+                    && !(string.equalsIgnoreCase("Invisibility"))
+                    && !(string.equalsIgnoreCase("DoubleHealth"))) {
 
                 try {
 
