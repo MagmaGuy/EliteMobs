@@ -188,7 +188,7 @@ public class MinorPowerPowerStance implements Listener {
                         effectIteration++;
 
                         ItemStack effectItem1 = new ItemStack(Material.PACKED_ICE, 1);
-                        ItemStack effectItem2 = new ItemStack(Material.FROSTED_ICE, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.ICE, 1);
 
                         itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 

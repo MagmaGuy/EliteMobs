@@ -101,6 +101,14 @@ public class CommandHandler implements CommandExecutor {
                             "You need the following permission: " + "elitemobs.stats");
                     return true;
 
+                } else if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
+                        commandSender.hasPermission("elitemobs.getloot") || args[0].equalsIgnoreCase("gl")
+                        && commandSender instanceof Player && commandSender.hasPermission("elitemobs.getloot")) {
+
+                    LootGUI lootGUI = new LootGUI();
+                    lootGUI.lootGUI((Player)commandSender);
+                    return true;
+
                 }
 
                 validCommands(commandSender);
@@ -140,7 +148,7 @@ public class CommandHandler implements CommandExecutor {
 
                     //valid /elitemobs reload loot
                 } else if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player
-                    && args[1].equalsIgnoreCase("loot")
+                        && args[1].equalsIgnoreCase("loot")
                         && commandSender.hasPermission("elitemobs.reload.loot")) {
 
                     Player player = (Player) commandSender;
@@ -167,6 +175,8 @@ public class CommandHandler implements CommandExecutor {
                         commandSender.hasPermission("elitemobs.getloot") || args[0].equalsIgnoreCase("gl")
                         && commandSender instanceof Player && commandSender.hasPermission("elitemobs.getloot")) {
 
+
+
                     Player player = (Player) commandSender;
 
                     GetLootCommandHandler getLootCommandHandler = new GetLootCommandHandler();
@@ -182,6 +192,9 @@ public class CommandHandler implements CommandExecutor {
                         return true;
 
                     }
+
+
+
 
                     //invalid /elitemobs getloot | /elitemobs gl
                 } else if (args[0].equalsIgnoreCase("getloot") && !commandSender.hasPermission("elitemobs.getloot")
