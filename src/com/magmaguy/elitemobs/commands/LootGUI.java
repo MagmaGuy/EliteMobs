@@ -28,6 +28,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,7 +41,8 @@ public class LootGUI implements Listener{
     boolean filter = false;
     int filterRank = 0;
 
-    List <Integer> lootSlots = new ArrayList<>();
+    List <Integer> lootSlots = new ArrayList<>(Arrays.asList(10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,
+            32,33,34,37,38,39,40,41,42,43,46,47,48,49,50,51,52));
 
     public void lootGUI (Player player) {
 
@@ -147,53 +149,6 @@ public class LootGUI implements Listener{
     }
 
     private void lootConstructor (Inventory inventory) {
-
-        lootSlots = new ArrayList<>();
-
-        //line 1
-        lootSlots.add(10);
-        lootSlots.add(11);
-        lootSlots.add(12);
-        lootSlots.add(13);
-        lootSlots.add(14);
-        lootSlots.add(15);
-        lootSlots.add(16);
-
-        //line 2
-        lootSlots.add(19);
-        lootSlots.add(20);
-        lootSlots.add(21);
-        lootSlots.add(22);
-        lootSlots.add(23);
-        lootSlots.add(24);
-        lootSlots.add(25);
-
-        //line 3
-        lootSlots.add(28);
-        lootSlots.add(29);
-        lootSlots.add(30);
-        lootSlots.add(31);
-        lootSlots.add(32);
-        lootSlots.add(33);
-        lootSlots.add(34);
-
-        //line 4
-        lootSlots.add(37);
-        lootSlots.add(38);
-        lootSlots.add(39);
-        lootSlots.add(40);
-        lootSlots.add(41);
-        lootSlots.add(42);
-        lootSlots.add(43);
-
-        //line 5
-        lootSlots.add(46);
-        lootSlots.add(47);
-        lootSlots.add(48);
-        lootSlots.add(49);
-        lootSlots.add(50);
-        lootSlots.add(51);
-        lootSlots.add(52);
 
         int counter = 1;
 

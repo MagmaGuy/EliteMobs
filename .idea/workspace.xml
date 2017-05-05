@@ -7,26 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/ConfigValues.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/StatsCommandHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/StatsCommandHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/elitedrops/EliteDropsHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/elitedrops/EliteDropsHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleDamage.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleDamage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleHealth.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleHealth.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DamageHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DamageHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/HealthHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/HealthHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/MobScanner.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/MobScanner.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidPassiveMobFilter.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidPassiveMobFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/naturalmobspawner/NaturalMobMetadataAssigner.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/naturalmobspawner/NaturalMobMetadataAssigner.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MinorPowerPowerStance.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MinorPowerPowerStance.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/plugin.yml" afterPath="$PROJECT_DIR$/src/plugin.yml" />
     </list>
     <ignored path="ActiveStack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -46,7 +28,7 @@
     <favorites_list name="ActiveStack" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.657845">
+    <splitter split-orientation="horizontal" split-proportion="0.5477316">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="EliteMobs.java" pinned="false" current-in-tab="false">
@@ -73,8 +55,10 @@
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="256">
-                  <caret line="41" column="37" lean-forward="true" selection-start-line="41" selection-start-column="37" selection-end-line="41" selection-end-column="37" />
-                  <folding />
+                  <caret line="40" column="37" lean-forward="false" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="37" />
+                  <folding>
+                    <element signature="imports" expanded="false" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -89,12 +73,38 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="HealthHandler.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="HealthHandler.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/HealthHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="624">
-                  <caret line="88" column="13" lean-forward="false" selection-start-line="88" selection-start-column="13" selection-end-line="88" selection-end-column="13" />
+                <state relative-caret-position="0">
+                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
                   <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="GetLootCommandHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/GetLootCommandHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="144">
+                  <caret line="25" column="13" lean-forward="false" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="LootGUI.java" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="192">
+                  <caret line="150" column="56" lean-forward="false" selection-start-line="150" selection-start-column="56" selection-end-line="150" selection-end-column="56" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                    <element signature="method#lootGUI#0;class#LootGUI#0" expanded="false" />
+                    <element signature="method#headerConstructor#0;class#LootGUI#0" expanded="false" />
+                    <element signature="method#tierConstructor#0;class#LootGUI#0" expanded="false" />
+                    <element signature="method#lootNavigationConstructor#0;class#LootGUI#0" expanded="false" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -116,7 +126,7 @@
           <file leaf-file-name="MetadataHandler.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="891">
+                <state relative-caret-position="1275">
                   <caret line="110" column="33" lean-forward="false" selection-start-line="110" selection-start-column="33" selection-end-line="110" selection-end-column="33" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -238,7 +248,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/PigHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/SheepHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java" />
         <option value="$PROJECT_DIR$/src/plugin.yml" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleHealth.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleDamage.java" />
@@ -257,6 +266,7 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/MobScanner.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/HealthHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java" />
       </list>
     </option>
   </component>
@@ -404,6 +414,28 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="mobcustomizer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MagmasMobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MagmasMobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="elitemobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="commands" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1016,7 +1048,14 @@
       <option name="project" value="LOCAL" />
       <updated>1493919814801</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Version 1.4.8&#10;&#10;- Reduced amount of I/O operations on config files&#10;- Reduced amount of reflection operations when scanning for minor powers (big source of slowdown)&#10;- Made Tank power mobs have half damage&#10;- Made Berserker power mobs half health&#10;- Simplified health math&#10;- Spawnmob commands now pull from a list of strings, need to find a way to make it non-capitalized&#10;- Other miscellaneous minor performance tweaks">
+      <created>1493984009669</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1493984009669</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1077,7 +1116,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Version 0.0.23&#10;&#10;- There have been 23 commits pushed to GitHub, so I might as well call this version 23. Not ready for 1.0.0 yet.&#10;- Rewrote all of the visual effects, now they support larger amounts of items per track and minor power visual effects stack on the same track while keeping the same distance between them." />
     <MESSAGE value="Version 0.0.25&#10;&#10;- Remembered how to count&#10;- Added config options for many, many things, untested so they probably don't work properly yet&#10;- Config-related tweaks to the code, which now allows weirder scenarios with entire sections disabled" />
     <MESSAGE value="Version 0.0.26&#10;&#10;- Loot is now its own yml file&#10;- Added more config options&#10;- Tweaked config-related variables&#10;- Reworked all commands, fixed miscellaneous bugs in them&#10;- Tweaked few settings to fully implement iron golems as aggressive stacking entities" />
     <MESSAGE value="Version 0.0.27&#10;&#10;- Fixed iron golem extra stats&#10;- Added initial spawnmob command&#10;- Last planned features before 1.0.0 are now done, only (possible) bugfixes left before upload" />
@@ -1102,12 +1140,13 @@
     <MESSAGE value="Version 1.4.5&#10;&#10;- Added initial chest GUI elements to the getloot command" />
     <MESSAGE value="Version 1.4.6&#10;&#10;- Added tank minorpower" />
     <MESSAGE value="Version 1.4.7&#10;&#10;- Added berserker minor power&#10;- Past two minor powers are incomplete" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.4.7&#10;&#10;- Added berserker minor power&#10;- Past two minor powers are incomplete" />
+    <MESSAGE value="Version 1.4.8&#10;&#10;- Reduced amount of I/O operations on config files&#10;- Reduced amount of reflection operations when scanning for minor powers (big source of slowdown)&#10;- Made Tank power mobs have half damage&#10;- Made Berserker power mobs half health&#10;- Simplified health math&#10;- Spawnmob commands now pull from a list of strings, need to find a way to make it non-capitalized&#10;- Other miscellaneous minor performance tweaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.4.8&#10;&#10;- Reduced amount of I/O operations on config files&#10;- Reduced amount of reflection operations when scanning for minor powers (big source of slowdown)&#10;- Made Tank power mobs have half damage&#10;- Made Berserker power mobs half health&#10;- Simplified health math&#10;- Spawnmob commands now pull from a list of strings, need to find a way to make it non-capitalized&#10;- Other miscellaneous minor performance tweaks" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="15" />
+      <option name="time" value="17" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1227,14 +1266,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/GetLootCommandHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="25" column="13" lean-forward="false" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackConfusing.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="304">
@@ -1333,22 +1364,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3280">
-          <caret line="304" column="0" lean-forward="false" selection-start-line="304" selection-start-column="0" selection-end-line="304" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DamageHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="708">
           <caret line="109" column="185" lean-forward="false" selection-start-line="109" selection-start-column="185" selection-end-line="109" selection-end-column="185" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1471,7 +1492,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="891">
+        <state relative-caret-position="1275">
           <caret line="110" column="33" lean-forward="false" selection-start-line="110" selection-start-column="33" selection-end-line="110" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1498,8 +1519,10 @@
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="256">
-          <caret line="41" column="37" lean-forward="true" selection-start-line="41" selection-start-column="37" selection-end-line="41" selection-end-column="37" />
-          <folding />
+          <caret line="40" column="37" lean-forward="false" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="37" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1521,9 +1544,31 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/HealthHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="624">
-          <caret line="88" column="13" lean-forward="false" selection-start-line="88" selection-start-column="13" selection-end-line="88" selection-end-column="13" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/GetLootCommandHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="25" column="13" lean-forward="false" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="150" column="56" lean-forward="false" selection-start-line="150" selection-start-column="56" selection-end-line="150" selection-end-column="56" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#lootGUI#0;class#LootGUI#0" expanded="false" />
+            <element signature="method#headerConstructor#0;class#LootGUI#0" expanded="false" />
+            <element signature="method#tierConstructor#0;class#LootGUI#0" expanded="false" />
+            <element signature="method#lootNavigationConstructor#0;class#LootGUI#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
