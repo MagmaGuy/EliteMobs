@@ -17,8 +17,9 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.minorpowers.ProjectileMetadataDetector;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -52,29 +53,45 @@ public class DamageHandler implements Listener{
 
         if (event.getDamager().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
+            int mobLevel = event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+
             if (event.getDamager().hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
 
-                event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()) * 2);
-                return;
+                mobLevel = (int) Math.floor(mobLevel * 2);
 
             }
 
-            event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
+            if (event.getDamager().hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
+
+                mobLevel = (int) Math.floor(mobLevel / 2);
+
+            }
+
+            event.setDamage(damageMath(event.getFinalDamage(), mobLevel));
 
         }
 
         if (event.getDamager() instanceof Projectile) {
 
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile)event.getDamager(), MetadataHandler.ELITE_MOB_MD)) {
+            Entity trueDamager = (Entity) ((Projectile) event.getDamager()).getShooter();
 
-                if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile)event.getDamager(), MetadataHandler.DOUBLE_DAMAGE_MD)) {
+            if (trueDamager.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-                    event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()) * 2);
-                    return;
+                int mobLevel = trueDamager.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+
+                if (trueDamager.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
+
+                    mobLevel = (int) Math.floor(mobLevel * 2);
 
                 }
 
-                event.setDamage(damageMath(event.getFinalDamage(), event.getDamager().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
+                if (trueDamager.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
+
+                    mobLevel = (int) Math.floor(mobLevel / 2);
+
+                }
+
+                event.setDamage(damageMath(event.getFinalDamage(), mobLevel));
 
             }
 
@@ -88,7 +105,7 @@ public class DamageHandler implements Listener{
 
         if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-            event.setRadius((float) damageMath(event.getRadius(), (int) Math.ceil(event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() * plugin.getConfig().getDouble("SuperCreeper explosion nerf multiplier"))));
+            event.setRadius((float) damageMath(event.getRadius(), (int) Math.ceil(event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() * ConfigValues.defaultConfig.getDouble("SuperCreeper explosion nerf multiplier"))));
 
         }
 

@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurg
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
@@ -61,6 +62,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         mobPowersCustomConfig.initializeMobPowersConfig();
         LootCustomConfig lootCustomConfig = new LootCustomConfig();
         lootCustomConfig.LootCustomConfig();
+        ConfigValues configValues = new ConfigValues();
+        configValues.initializeConfigValues();
 
         //Parse loot
         EliteDropsHandler superDrops = new EliteDropsHandler();
@@ -114,7 +117,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
             //don't load powers that require no even listeners
             if (!(string.equalsIgnoreCase("MovementSpeed"))
                     && !(string.equalsIgnoreCase("Invisibility"))
-                    && !(string.equalsIgnoreCase("DoubleHealth"))) {
+                    && !(string.equalsIgnoreCase("DoubleHealth"))
+                    && !(string.equalsIgnoreCase("DoubleDamage"))) {
 
                 try {
 
@@ -137,15 +141,13 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
             }
 
-
-
         }
 
         //Mob scanner
         this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
 
         //Natural EliteMobs Spawning
-        if (getConfig().getBoolean("Natural EliteMob spawning")) {
+        if (ConfigValues.defaultConfig.getBoolean("Natural EliteMob spawning")) {
 
             this.getServer().getPluginManager().registerEvents(new NaturalMobSpawner(this), this);
 
@@ -160,7 +162,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MinorPowerPowerStance(this), this);
 
         //Loot
-        if (getConfig().getBoolean("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)")) {
+        if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)")) {
 
             this.getServer().getPluginManager().registerEvents(new EliteDropsHandler(), this);
 
@@ -169,7 +171,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         }
 
         //Minecraft behavior canceller
-        if (getConfig().getBoolean("Prevent creepers from killing passive mobs")) {
+        if (ConfigValues.defaultConfig.getBoolean("Prevent creepers from killing passive mobs")) {
 
             this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(this), this);
 
@@ -222,10 +224,11 @@ public class EliteMobs extends JavaPlugin implements Listener {
     public void repeatingTaskRunner() {
 
         //eggs need to scale with stacked amount
-        int passiveStackAmount = this.getConfig().getInt("Passive EliteMob stack amount");
+        int passiveStackAmount = ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
 
         MobScanner mobScanner = new MobScanner(this);
         PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
+        ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
 
         processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 
@@ -242,7 +245,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
             public void run() {
 
                 potionEffectApplier.potionEffectApplier();
-                ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
                 scoreboardHandler.scanSight();
 
             }

@@ -29,29 +29,36 @@ public class HealthHandler {
 
         Damageable damageableEntity = ((Damageable) entity);
         Damageable damageableDeleted = ((Damageable) deletedEntity);
+        double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity);
+        int newEliteMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-        damageableEntity.setMaxHealth(ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()));
+        if (entity.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
 
-        if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && !deletedEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+            newEliteMobLevel = (int) Math.floor(newEliteMobLevel / 2);
 
-            double adjustedAddedHealth = damageableEntity.getHealth() + ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity),
-                    entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt()) - ScalingFormula.PowerFormula
-                    (DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() - 1) -
-                    (damageableDeleted.getMaxHealth() - damageableDeleted.getHealth());
+            if (newEliteMobLevel < 1) {
 
-            damageableEntity.setHealth(adjustedAddedHealth);
-
-        } else if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && deletedEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
-
-            if (damageableEntity.getHealth() + damageableDeleted.getHealth() > damageableEntity.getMaxHealth()) {
-
-                damageableEntity.setHealth(damageableEntity.getMaxHealth());
-
-            } else {
-
-                damageableEntity.setHealth(damageableEntity.getHealth() + ((Damageable) deletedEntity).getHealth());
+                newEliteMobLevel = 1;
 
             }
+
+        }
+
+        if (entity.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
+
+            newEliteMobLevel = (int) Math.floor(newEliteMobLevel * 2);
+
+        }
+
+        damageableEntity.setMaxHealth(ScalingFormula.PowerFormula(defaultMaxHealth, newEliteMobLevel));
+
+        if (damageableEntity.getHealth() + damageableDeleted.getHealth() > damageableEntity.getMaxHealth()) {
+
+            damageableEntity.setHealth(damageableEntity.getMaxHealth());
+
+        } else {
+
+            damageableEntity.setHealth(damageableEntity.getHealth() + damageableDeleted.getHealth());
 
         }
 
@@ -68,8 +75,28 @@ public class HealthHandler {
     public static void naturalAgressiveHealthHandler(Entity entity, int eliteMobLevel) {
 
         Damageable damageable = (Damageable) entity;
+        double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity);
+        int newEliteMobLevel = eliteMobLevel;
 
-        damageable.setMaxHealth(ScalingFormula.PowerFormula(DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity), eliteMobLevel));
+        if (entity.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
+
+            newEliteMobLevel = (int) Math.floor(newEliteMobLevel / 2);
+
+            if (newEliteMobLevel < 1) {
+
+                newEliteMobLevel = 1;
+
+            }
+
+        }
+
+        if (entity.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
+
+            newEliteMobLevel = (int) Math.floor(newEliteMobLevel * 2);
+
+        }
+
+        damageable.setMaxHealth(ScalingFormula.PowerFormula(defaultMaxHealth, newEliteMobLevel));
         damageable.setHealth(damageable.getMaxHealth());
 
     }

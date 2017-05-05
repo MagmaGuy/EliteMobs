@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Material;
@@ -52,8 +53,8 @@ public class NaturalMobMetadataAssigner implements Listener {
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (!plugin.getConfig().getBoolean("Natural aggressive EliteMob spawning") ||
-                !plugin.getConfig().getBoolean("Allow aggressive EliteMobs")){
+        if (!ConfigValues.defaultConfig.getBoolean("Natural aggressive EliteMob spawning") ||
+                !ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs")){
 
             return;
 
@@ -121,7 +122,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                 }
 
-                if (random.nextDouble() < plugin.getConfig().getDouble("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn") / 100
+                if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn") / 100
                         + huntingGearChanceAdder * 10) {
 
                     NaturalMobSpawner naturalMobSpawner = new NaturalMobSpawner(plugin);

@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -415,7 +416,7 @@ public class EliteDropsHandler implements Listener {
                 entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() > 4) {
 
 
-            if (random.nextDouble() < plugin.getConfig().getDouble("Aggressive EliteMobs flat loot drop rate %") / 100) {
+            if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100) {
 
                 int randomDrop = random.nextInt(lootList.size());
 
@@ -424,7 +425,7 @@ public class EliteDropsHandler implements Listener {
             }
 
             //double drops
-            if (plugin.getConfig().getBoolean("Aggressive EliteMobs can drop additional loot with drop % based on EliteMob level (higher is more likely)") &&
+            if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop additional loot with drop % based on EliteMob level (higher is more likely)") &&
                     random.nextDouble() < (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 100)) {
 
                 int randomDrop = random.nextInt(lootList.size());

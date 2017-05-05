@@ -242,12 +242,16 @@ public class MetadataHandler {
                 return ATTACK_WEB_H;
             case ATTACK_WITHER_MD:
                 return ATTACK_WITHER_H;
+            case DOUBLE_DAMAGE_MD:
+                return DOUBLE_DAMAGE_H;
+            case DOUBLE_HEALTH_MD:
+                return DOUBLE_HEALTH_H;
             case BONUS_LOOT_MD:
                 return BONUS_LOOT_H;
             case INVULNERABILITY_ARROW_MD:
                 return INVULNERABILITY_ARROW_H;
             case INVULNERABILITY_FALL_DAMAGE_MD:
-                return INVULNERABILITY_ARROW_H;
+                return INVULNERABILITY_FALL_DAMAGE_H;
             case INVULNERABILITY_FIRE_MD:
                 return INVULNERABILITY_FIRE_H;
             case INVULNERABILITY_KNOCKBACK_MD:

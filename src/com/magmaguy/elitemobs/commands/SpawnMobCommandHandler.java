@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
@@ -261,7 +262,7 @@ public class SpawnMobCommandHandler {
         if (entityType == EntityType.CHICKEN || entityType == EntityType.COW || entityType == EntityType.MUSHROOM_COW ||
                 entityType == EntityType.PIG || entityType == EntityType.SHEEP) {
 
-            HealthHandler.passiveHealthHandler(entity, plugin.getConfig().getInt("Passive EliteMob stack amount"));
+            HealthHandler.passiveHealthHandler(entity, ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount"));
             NameHandler.customPassiveName(entity, plugin);
 
             return;
@@ -332,40 +333,15 @@ public class SpawnMobCommandHandler {
                         powerCount++;
                         break;
                     case MetadataHandler.DOUBLE_DAMAGE_H:
-                        entity.setMetadata(MetadataHandler.DOUBLE_DAMAGE_MD, new FixedMetadataValue(plugin, true));
+                        if (!(entity instanceof IronGolem)) {
+                            entity.setMetadata(MetadataHandler.DOUBLE_DAMAGE_MD, new FixedMetadataValue(plugin, true));
+                        }
+                        powerCount++;
                         break;
                     case MetadataHandler.DOUBLE_HEALTH_H:
                         if (!(entity instanceof IronGolem)) {
-
                             entity.setMetadata(MetadataHandler.DOUBLE_HEALTH_MD, new FixedMetadataValue(plugin, true));
-                            Entity finalEntity = entity;
-                            //wait until the scanner picks up the entity and assigns the correct default health
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-                                @Override
-
-                                public void run() {
-
-                                    LivingEntity livingEntity = (LivingEntity) finalEntity;
-
-                                    livingEntity.setMaxHealth(livingEntity.getMaxHealth() * 2);
-
-                                    if (livingEntity.getMaxHealth() < livingEntity.getHealth() * 2) {
-
-                                        livingEntity.setHealth(livingEntity.getMaxHealth());
-
-                                    } else {
-
-                                        ((LivingEntity) finalEntity).setHealth(((LivingEntity) finalEntity).getHealth() * 2);
-
-                                    }
-
-                                }
-
-                            }, 1);
-
                         }
-
                         powerCount++;
                         break;
                     case MetadataHandler.INVISIBILITY_H:
@@ -375,6 +351,7 @@ public class SpawnMobCommandHandler {
                         break;
                     case MetadataHandler.INVULNERABILITY_ARROW_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_ARROW_MD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
                         break;
                     case MetadataHandler.INVULNERABILITY_FALL_DAMAGE_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD, new FixedMetadataValue(plugin, true));

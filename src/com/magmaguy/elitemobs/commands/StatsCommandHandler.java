@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -137,7 +138,7 @@ public class StatsCommandHandler {
                                 ironGolemCount++;
                                 break;
                             default:
-                                getLogger().info("Error: Couldn't assign CUSTOM_MD mob name due to unexpected aggressive boss mob (talk to the dev!)");
+                                getLogger().info("Error: Couldn't assign custom mob name due to unexpected aggressive boss mob (talk to the dev!)");
                                 getLogger().info("Missing mob type: " + livingEntity.getType());
                                 break;
                         }
@@ -147,7 +148,7 @@ public class StatsCommandHandler {
 
                         //passive EliteMobs only stack at 50 right now
                         //TODO: redo this count at some other stage of this plugin's development
-                        mobLevelSavingsCount += plugin.getConfig().getInt("Passive EliteMob stack amount");
+                        mobLevelSavingsCount += ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
                         passiveCount++;
 
                         switch (livingEntity.getType()) {
@@ -168,7 +169,7 @@ public class StatsCommandHandler {
                                 sheepCount++;
                                 break;
                             default:
-                                getLogger().info("Error: Couldn't assign CUSTOM_MD mob name due to unexpected passive boss mob (talk to the dev!)");
+                                getLogger().info("Error: Couldn't assign custom mob name due to unexpected passive boss mob (talk to the dev!)");
                                 getLogger().info("Missing mob type: " + livingEntity.getType());
                                 break;
 
