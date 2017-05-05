@@ -16,8 +16,7 @@
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.*;
 
@@ -30,7 +29,7 @@ public class ValidAgressiveMobFilter{
 
         public static boolean ValidAgressiveMobFilter(Entity entity) {
 
-            Configuration config = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
+            Configuration config = ConfigValues.defaultConfig;
 
             return entity instanceof Blaze && config.getBoolean("Valid aggressive EliteMobs.Blaze") ||
                     entity instanceof CaveSpider && config.getBoolean("Valid aggressive EliteMobs.CaveSpider") ||

@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.mobcustomizer.*;
 import com.magmaguy.elitemobs.mobs.passive.ChickenHandler;
 import org.bukkit.World;
@@ -52,6 +53,8 @@ public class MobScanner implements Listener {
 
     }
 
+    PowerHandler powerHandler = new PowerHandler();
+
     public void scanMobs(int passiveStackAmount) {
 
         for (World world : worldList) {
@@ -70,21 +73,20 @@ public class MobScanner implements Listener {
 
                         HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
                         customAggressiveName(entity, plugin);
+                        PowerHandler.powerHandler(entity);
+                        ArmorHandler.ArmorHandler(entity);
 
                     }
 
                     //scan for stacked EliteMobs
-                    if (plugin.getConfig().getBoolean("Allow aggressive EliteMobs") &&
-                            plugin.getConfig().getBoolean("Aggressive mob stacking")) {
+                    if (ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") &&
+                            ConfigValues.defaultConfig.getBoolean("Aggressive mob stacking")) {
 
                         scanValidAggressiveLivingEntity(entity);
 
                         if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-
-                            PowerHandler powerHandler = new PowerHandler(plugin);
-
-                            powerHandler.powerHandler(entity);
+                            PowerHandler.powerHandler(entity);
 
                             ArmorHandler.ArmorHandler(entity);
 
@@ -95,12 +97,12 @@ public class MobScanner implements Listener {
                 }
 
                 //scan for passive mobs
-                if (plugin.getConfig().getBoolean("Allow Passive EliteMobs")) {
+                if (ConfigValues.defaultConfig.getBoolean("Allow Passive EliteMobs")) {
 
                     //scan for passive mobs that might have lost their metadata
                     if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity)
                             && ((LivingEntity) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)
-                            &&((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * plugin.getConfig().getInt("Passive EliteMob stack amount")) {
+                            &&((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount")) {
 
                         customPassiveName(entity, plugin);
 
@@ -138,8 +140,7 @@ public class MobScanner implements Listener {
 
         for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange)) {
 
-            if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
-                    && !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD) && !secondEntity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
+            if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()) {
 
                 //If the sum of both entities is above level 50, don't add both entities together
                 if (levelCap(entity, secondEntity)) {
@@ -176,7 +177,7 @@ public class MobScanner implements Listener {
 
     public void scanValidPassiveLivingEntity(Entity entity) {
 
-        int passiveStacking = plugin.getConfig().getInt("Passive EliteMob stack amount");
+        int passiveStacking = ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
 
         List<LivingEntity> animalContainer = new ArrayList<>();
 
@@ -222,11 +223,13 @@ public class MobScanner implements Listener {
         Damageable damageable1 = (Damageable) entity1;
         Damageable damageable2 = (Damageable) entity2;
 
-        if (damageable1.hasMetadata(MetadataHandler.ELITE_MOB_MD) && damageable1.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= plugin.getConfig().getInt("Aggressive mob stacking cap")) {
+        if (damageable1.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
+                damageable1.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap")) {
 
             return false;
 
-        } else if (damageable2.hasMetadata(MetadataHandler.ELITE_MOB_MD) && damageable2.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= plugin.getConfig().getInt("Aggressive mob stacking cap")) {
+        } else if (damageable2.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
+                damageable2.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap")) {
 
             return false;
 

@@ -19,14 +19,14 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Listener;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 /**
  * Created by MagmaGuy on 04/05/2017.
  */
-public class DoubleDamage extends MinorPowers implements Listener {
+public class DoubleDamage extends MinorPowers {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.DOUBLE_DAMAGE_MD;
@@ -34,9 +34,13 @@ public class DoubleDamage extends MinorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
-        minorPowerPowerStance.itemEffect(entity);
+        if (!(entity instanceof IronGolem)) {
+
+            entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+            minorPowerPowerStance.itemEffect(entity);
+
+        }
 
     }
 

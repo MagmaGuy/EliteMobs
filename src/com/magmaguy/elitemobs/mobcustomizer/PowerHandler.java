@@ -15,10 +15,10 @@
 
 package com.magmaguy.elitemobs.mobcustomizer;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.minorpowers.MinorPowers;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -33,15 +33,10 @@ import java.util.Random;
  */
 public class PowerHandler {
 
-    private EliteMobs plugin;
+    private static Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    private static ArrayList<MinorPowers> minorPowerArray = new ArrayList();
 
-    public PowerHandler(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
-
-    public void powerHandler(Entity entity) {
+    public static void powerHandler(Entity entity) {
 
         int availableMinorPowers = 0;
         int availableMajorPowers = 0;
@@ -69,37 +64,9 @@ public class PowerHandler {
 
             }
 
-            ArrayList<MinorPowers> minorPowerArray = new ArrayList();
+            if (minorPowerArray.isEmpty()) {
 
-            MetadataHandler metadataHandler = new MetadataHandler();
-
-            for (String string : metadataHandler.minorPowerList()) {
-
-                MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
-
-                if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)){
-
-                    try {
-
-                        String earlyPath = "com.magmaguy.elitemobs.minorpowers.";
-
-                        String finalString = earlyPath + string;
-
-                        Class<?> clazz = Class.forName(finalString);
-
-                        Object instance = clazz.newInstance();
-
-                        minorPowerArray.add((MinorPowers) instance);
-
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-
-                }
+                minorPowerArrayInitializer();
 
             }
 
@@ -166,4 +133,42 @@ public class PowerHandler {
         }
 
     }
+
+
+    public static void minorPowerArrayInitializer () {
+
+        MetadataHandler metadataHandler = new MetadataHandler();
+
+        for (String string : metadataHandler.minorPowerList()) {
+
+            MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
+
+            if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)){
+
+                try {
+
+                    String earlyPath = "com.magmaguy.elitemobs.minorpowers.";
+
+                    String finalString = earlyPath + string;
+
+                    Class<?> clazz = Class.forName(finalString);
+
+                    Object instance = clazz.newInstance();
+
+                    minorPowerArray.add((MinorPowers) instance);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+
+    }
+
 }

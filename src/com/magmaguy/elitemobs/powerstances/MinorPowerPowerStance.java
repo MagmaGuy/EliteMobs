@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -61,9 +62,9 @@ public class MinorPowerPowerStance implements Listener {
     //Secondary effect particle processing
     private void particleEffect(Entity entity, Particle particle, int particleAmount, double v, double v1, double v2, double v3) {
 
-        if (plugin.getConfig().getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
+        if (ConfigValues.defaultConfig.getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
 
-            if (plugin.getConfig().getBoolean("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs")
+            if (ConfigValues.defaultConfig.getBoolean("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs")
                     && !entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
                 return;
@@ -115,9 +116,9 @@ public class MinorPowerPowerStance implements Listener {
     //Secondary effect item processing
     public void itemEffect(Entity entity) {
 
-        if (plugin.getConfig().getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
+        if (ConfigValues.defaultConfig.getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
 
-            if (plugin.getConfig().getBoolean("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs")
+            if (ConfigValues.defaultConfig.getBoolean("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs")
                     && !entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
                 return;
@@ -267,8 +268,8 @@ public class MinorPowerPowerStance implements Listener {
 
                         effectIteration++;
 
-                        ItemStack effectItem1 = new ItemStack(Material.DIAMOND_SWORD, 1);
-                        ItemStack effectItem2 = new ItemStack(Material.DIAMOND_SWORD, 1);
+                        ItemStack effectItem1 = new ItemStack(Material.GOLD_SWORD, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.GOLD_SWORD, 1);
 
                         itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 

@@ -20,7 +20,6 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
@@ -38,32 +37,6 @@ public class DoubleHealth extends MinorPowers {
         if (!(entity instanceof IronGolem)) {
 
             entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-
-            //wait until the scanner picks up the entity and assigns the correct default health
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-                @Override
-
-                public void run() {
-
-                    LivingEntity livingEntity = (LivingEntity) entity;
-
-                    livingEntity.setMaxHealth(livingEntity.getMaxHealth() * 2);
-
-                    if (livingEntity.getMaxHealth() < livingEntity.getHealth() * 2) {
-
-                        livingEntity.setHealth(livingEntity.getMaxHealth());
-
-                    } else {
-
-                        ((LivingEntity) entity).setHealth(((LivingEntity) entity).getHealth() * 2);
-
-                    }
-
-                }
-
-            }, 1);
-
             MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
             minorPowerPowerStance.itemEffect(entity);
 

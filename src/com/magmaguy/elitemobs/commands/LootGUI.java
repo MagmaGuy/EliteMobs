@@ -40,6 +40,8 @@ public class LootGUI implements Listener{
     boolean filter = false;
     int filterRank = 0;
 
+    List <Integer> lootSlots = new ArrayList<>();
+
     public void lootGUI (Player player) {
 
         Inventory fakeChestInventory = Bukkit.createInventory(null, 54, "EliteMobs loot.yml");
@@ -146,7 +148,7 @@ public class LootGUI implements Listener{
 
     private void lootConstructor (Inventory inventory) {
 
-        List <Integer> lootSlots = new ArrayList<>();
+        lootSlots = new ArrayList<>();
 
         //line 1
         lootSlots.add(10);
@@ -226,70 +228,80 @@ public class LootGUI implements Listener{
     @EventHandler
     public void onClick (InventoryClickEvent event) {
 
-        if (event.getInventory().getName().equalsIgnoreCase("EliteMobs loot.yml")){
 
-            if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
+
+            if (event.getInventory().getName().equalsIgnoreCase("EliteMobs loot.yml")){
+
+                if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
+
+                    event.setCancelled(true);
+                    return;
+
+                }
+
+                String itemDisplayName = event.getCurrentItem().getItemMeta().getDisplayName();
+                Player player = (Player) event.getWhoClicked();
+
+                if (itemDisplayName != null) {
+
+                    if (itemDisplayName.equals("Next Loot Page")) {
+
+                        currentLootPage++;
+                        lootGUI(player);
+
+                    } else if (itemDisplayName.equals("Previous Loot Page")) {
+
+                        if (currentLootPage > 1) {
+
+                            currentLootPage--;
+                            lootGUI(player);
+
+                        }
+
+                    } else if (itemDisplayName.equals("Next Item Ranks")) {
+
+                        currentHeaderPage++;
+                        lootGUI(player);
+
+                    } else if (itemDisplayName.equals("Previous Item Ranks")) {
+
+                        if (currentHeaderPage > 1) {
+
+                            currentHeaderPage--;
+                            lootGUI(player);
+
+                        }
+
+                    } else if (itemDisplayName.equals("EliteMobs by MagmaGuy")) {
+
+                        filter = false;
+                        currentLootPage = 1;
+                        lootGUI(player);
+
+                    } else if (event.getCurrentItem().getItemMeta().getLore().get(0).equals("Filter by items of this rank.")) {
+
+                        filter = true;
+                        String[] lore = itemDisplayName.split("\\s");
+                        filterRank = Integer.valueOf(lore[1]);
+                        currentLootPage = 1;
+                        lootGUI(player);
+
+                    }
+
+                }
+
+                 if (lootSlots.contains(event.getSlot())) {
+
+                    player.getInventory().addItem(event.getCurrentItem());
+
+                }
 
                 event.setCancelled(true);
-                return;
 
             }
-
-            String itemDisplayName = event.getCurrentItem().getItemMeta().getDisplayName();
-            Player player = (Player) event.getWhoClicked();
-
-            if (itemDisplayName.equals("Next Loot Page")) {
-
-                currentLootPage++;
-                lootGUI(player);
-
-            } else if (itemDisplayName.equals("Previous Loot Page")) {
-
-                if (currentLootPage > 1) {
-
-                    currentLootPage--;
-                    lootGUI(player);
-
-                }
-
-            } else if (itemDisplayName.equals("Next Item Ranks")) {
-
-                currentHeaderPage++;
-                lootGUI(player);
-
-            } else if (itemDisplayName.equals("Previous Item Ranks")) {
-
-                if (currentHeaderPage > 1) {
-
-                    currentHeaderPage--;
-                    lootGUI(player);
-
-                }
-
-            } else if (itemDisplayName.equals("EliteMobs by MagmaGuy")) {
-
-                filter = false;
-                currentLootPage = 1;
-                lootGUI(player);
-
-            } else if (event.getCurrentItem().getItemMeta().getLore().get(0).equals("Filter by items of this rank.")) {
-
-                filter = true;
-                String[] lore = itemDisplayName.split("\\s");
-                filterRank = Integer.valueOf(lore[1]);
-                currentLootPage = 1;
-                lootGUI(player);
-
-            } else {
-
-                player.getInventory().addItem(event.getCurrentItem());
-
-            }
-
-            event.setCancelled(true);
 
         }
 
-    }
+
 
 }

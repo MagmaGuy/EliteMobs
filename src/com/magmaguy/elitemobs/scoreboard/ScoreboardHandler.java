@@ -42,11 +42,12 @@ public class ScoreboardHandler implements Listener {
         for (Player player : Bukkit.getOnlinePlayers()) {
 
             if (player.hasPermission("elitemobs.scoreboard") && playerHasScoreboard.containsKey(player) &&
-                    (Boolean) playerHasScoreboard.get(player) == false || !playerHasScoreboard.containsKey(player)) {
+                    (Boolean) playerHasScoreboard.get(player) == false || !playerHasScoreboard.containsKey(player) &&
+                    player.hasPermission("elitemobs.scoreboard")) {
 
-                Location eyeLocation = player.getEyeLocation();
+                Location playerLocation = player.getLocation();
 
-                Collection<Entity> nearbyEntities = eyeLocation.getWorld().getNearbyEntities(eyeLocation, 7, 7, 7);
+                Collection<Entity> nearbyEntities = playerLocation.getWorld().getNearbyEntities(playerLocation, 7, 7, 7);
 
                 for (Entity entity : nearbyEntities) {
 
@@ -79,9 +80,7 @@ public class ScoreboardHandler implements Listener {
 
             public void run() {
 
-                Collection<Entity> nearbyEntities = entity.getWorld().getNearbyEntities(entity.getLocation(), 5, 5, 5);
-
-                if (!entity.isValid() || !nearbyEntities.contains(player)) {
+                if (!entity.isValid() || player.getLocation().distance(entity.getLocation()) > 7) {
 
                     player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
                     playerHasScoreboard.put(player, false);
@@ -125,9 +124,11 @@ public class ScoreboardHandler implements Listener {
 
                     if (entity.hasMetadata(string)) {
 
+                        String finalString = metadataHandler.machineToHumanTranslator(string);
+
                         if (powCount > 13) {
 
-                            Score score = objective.getScore(ChatColor.GREEN + string);
+                            Score score = objective.getScore(ChatColor.GREEN + finalString);
 
                             if (counter + iterator < powCount) {
 
@@ -144,7 +145,7 @@ public class ScoreboardHandler implements Listener {
 
                         } else {
 
-                            Score score = objective.getScore(ChatColor.GREEN + string);
+                            Score score = objective.getScore(ChatColor.GREEN + finalString);
                             score.setScore(counter);
 
                         }
