@@ -18,9 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -73,25 +71,34 @@ public class DamageHandler implements Listener{
 
         if (event.getDamager() instanceof Projectile) {
 
-            Entity trueDamager = (Entity) ((Projectile) event.getDamager()).getShooter();
 
-            if (trueDamager.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-                int mobLevel = trueDamager.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+            if (((Projectile) event.getDamager()).getShooter() instanceof Skeleton ||
+                    ((Projectile) event.getDamager()).getShooter() instanceof Blaze ||
+                    ((Projectile) event.getDamager()).getShooter() instanceof Stray) {
 
-                if (trueDamager.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
+                Entity trueDamager = (Entity) ((Projectile) event.getDamager()).getShooter();
 
-                    mobLevel = (int) Math.floor(mobLevel * 2);
+                if (trueDamager.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+
+                    int mobLevel = trueDamager.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+
+                    if (trueDamager.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
+
+                        mobLevel = (int) Math.floor(mobLevel * 2);
+
+                    }
+
+                    if (trueDamager.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
+
+                        mobLevel = (int) Math.floor(mobLevel / 2);
+
+                    }
+
+                    event.setDamage(damageMath(event.getFinalDamage(), mobLevel));
 
                 }
 
-                if (trueDamager.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
-
-                    mobLevel = (int) Math.floor(mobLevel / 2);
-
-                }
-
-                event.setDamage(damageMath(event.getFinalDamage(), mobLevel));
 
             }
 
