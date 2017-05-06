@@ -291,6 +291,10 @@ public class SpawnMobCommandHandler {
 
                 switch (string) {
 
+                    case MetadataHandler.ATTACK_ARROW_H:
+                        entity.setMetadata(MetadataHandler.ATTACK_ARROW_MD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
                     case MetadataHandler.ATTACK_BLINDING_H:
                         entity.setMetadata(MetadataHandler.ATTACK_BLINDING_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
@@ -303,6 +307,10 @@ public class SpawnMobCommandHandler {
                         break;
                     case MetadataHandler.ATTACK_FIRE_H:
                         entity.setMetadata(MetadataHandler.ATTACK_FIRE_MD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
+                    case MetadataHandler.ATTACK_FIREBALL_H:
+                        entity.setMetadata(MetadataHandler.ATTACK_FIREBALL_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
                     case MetadataHandler.ATTACK_FREEZE_H:
