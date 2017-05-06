@@ -329,6 +329,10 @@ public class SpawnMobCommandHandler {
                         entity.setMetadata(MetadataHandler.ATTACK_PUSH_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
+                    case MetadataHandler.ATTACK_WEAKNESS_H:
+                        entity.setMetadata(MetadataHandler.ATTACK_WEAKNESS_MD, new FixedMetadataValue(plugin, true));
+                        powerCount++;
+                        break;
                     case MetadataHandler.ATTACK_WEB_H:
                         entity.setMetadata(MetadataHandler.ATTACK_WEB_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
@@ -379,6 +383,10 @@ public class SpawnMobCommandHandler {
                     case MetadataHandler.MOVEMENT_SPEED_H:
                         entity.setMetadata(MetadataHandler.MOVEMENT_SPEED_MD, new FixedMetadataValue(plugin, true));
                         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
+                        powerCount++;
+                        break;
+                    case MetadataHandler.TAUNT_H:
+                        entity.setMetadata(MetadataHandler.TAUNT_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
                     case "custom":

@@ -41,6 +41,7 @@ public class MetadataHandler {
     public final static String NATURAL_MOB_MD = "NaturalMob";
     public final static String MINOR_POWER_AMOUNT_MD = "MinorPowerAmount";
     public final static String VISUAL_EFFECT_MD = "VisualEffect";
+    public final static String CUSTOM_NAME = "CustomName";
     public final static String FORBIDDEN_MD = "Forbidden";
     public final static String CUSTOM_MD = "Custom";
     //Powers
@@ -53,6 +54,7 @@ public class MetadataHandler {
     public final static String ATTACK_GRAVITY_MD = "AttackGravity";
     public final static String ATTACK_POISON_MD = "AttackPoison";
     public final static String ATTACK_PUSH_MD = "AttackPush";
+    public final static String ATTACK_WEAKNESS_MD = "AttackWeakness";
     public final static String ATTACK_WEB_MD = "AttackWeb";
     public final static String ATTACK_WITHER_MD = "AttackWither";
     public final static String BONUS_LOOT_MD = "BonusLoot";
@@ -64,6 +66,7 @@ public class MetadataHandler {
     public final static String INVULNERABILITY_KNOCKBACK_MD = "InvulnerabilityKnockback";
     public final static String MOVEMENT_SPEED_MD = "MovementSpeed";
     public final static String INVISIBILITY_MD = "Invisibility";
+    public final static String TAUNT_MD = "Taunt";
     //Powers human format
     public final static String ATTACK_ARROW_H = "Archer";
     public final static String ATTACK_BLINDING_H = "Blindness";
@@ -74,6 +77,7 @@ public class MetadataHandler {
     public final static String ATTACK_GRAVITY_H = "Levitation";
     public final static String ATTACK_POISON_H = "Poisonous";
     public final static String ATTACK_PUSH_H = "Knockback";
+    public final static String ATTACK_WEAKNESS_H = "Exhausting";
     public final static String ATTACK_WEB_H = "Webbing";
     public final static String ATTACK_WITHER_H = "Withering";
     public final static String BONUS_LOOT_H = "Treasure";
@@ -85,6 +89,8 @@ public class MetadataHandler {
     public final static String INVULNERABILITY_KNOCKBACK_H = "Heavy";
     public final static String MOVEMENT_SPEED_H = "Fast";
     public final static String INVISIBILITY_H = "Invisible";
+    public final static String TAUNT_H = "Taunt";
+
 
     //powerEffects
     public final static String FROZEN = "Frozen";
@@ -101,6 +107,7 @@ public class MetadataHandler {
         metadataList.add(NATURAL_MOB_MD);
         metadataList.add(MINOR_POWER_AMOUNT_MD);
         metadataList.add(VISUAL_EFFECT_MD);
+        metadataList.add(CUSTOM_NAME);
         metadataList.add(FORBIDDEN_MD);
         metadataList.add(ATTACK_ARROW_MD);
         metadataList.add(ATTACK_CONFUSING_MD);
@@ -110,6 +117,7 @@ public class MetadataHandler {
         metadataList.add(ATTACK_GRAVITY_MD);
         metadataList.add(ATTACK_POISON_MD);
         metadataList.add(ATTACK_PUSH_MD);
+        metadataList.add(ATTACK_WEAKNESS_MD);
         metadataList.add(ATTACK_WEB_MD);
         metadataList.add(ATTACK_WITHER_MD);
         metadataList.add(BONUS_LOOT_MD);
@@ -121,6 +129,7 @@ public class MetadataHandler {
         metadataList.add(INVULNERABILITY_KNOCKBACK_MD);
         metadataList.add(MOVEMENT_SPEED_MD);
         metadataList.add(INVISIBILITY_MD);
+        metadataList.add(TAUNT_MD);
 
         metadataList.add(FROZEN);
         metadataList.add(FROZEN_COOLDOWN);
@@ -142,6 +151,7 @@ public class MetadataHandler {
         metadataList.add(ATTACK_GRAVITY_MD);
         metadataList.add(ATTACK_POISON_MD);
         metadataList.add(ATTACK_PUSH_MD);
+        metadataList.add(ATTACK_WEAKNESS_MD);
         metadataList.add(ATTACK_WEB_MD);
         metadataList.add(ATTACK_WITHER_MD);
         metadataList.add(BONUS_LOOT_MD);
@@ -153,6 +163,7 @@ public class MetadataHandler {
         metadataList.add(INVULNERABILITY_KNOCKBACK_MD);
         metadataList.add(MOVEMENT_SPEED_MD);
         metadataList.add(INVISIBILITY_MD);
+        metadataList.add(TAUNT_MD);
 
         return metadataList;
 
@@ -171,6 +182,7 @@ public class MetadataHandler {
         metadataList.add(ATTACK_GRAVITY_H);
         metadataList.add(ATTACK_POISON_H);
         metadataList.add(ATTACK_PUSH_H);
+        metadataList.add(ATTACK_WEAKNESS_H);
         metadataList.add(ATTACK_WEB_H);
         metadataList.add(ATTACK_WITHER_H);
         metadataList.add(BONUS_LOOT_H);
@@ -182,6 +194,7 @@ public class MetadataHandler {
         metadataList.add(INVULNERABILITY_KNOCKBACK_H);
         metadataList.add(MOVEMENT_SPEED_H);
         metadataList.add(INVISIBILITY_H);
+        metadataList.add(TAUNT_H);
 
         return metadataList;
 
@@ -254,6 +267,8 @@ public class MetadataHandler {
                 return ATTACK_POISON_H;
             case ATTACK_PUSH_MD:
                 return ATTACK_PUSH_H;
+            case ATTACK_WEAKNESS_MD:
+                return ATTACK_WEAKNESS_H;
             case ATTACK_WEB_MD:
                 return ATTACK_WEB_H;
             case ATTACK_WITHER_MD:
@@ -264,6 +279,8 @@ public class MetadataHandler {
                 return DOUBLE_HEALTH_H;
             case BONUS_LOOT_MD:
                 return BONUS_LOOT_H;
+            case INVISIBILITY_MD:
+                return INVISIBILITY_H;
             case INVULNERABILITY_ARROW_MD:
                 return INVULNERABILITY_ARROW_H;
             case INVULNERABILITY_FALL_DAMAGE_MD:
@@ -274,8 +291,9 @@ public class MetadataHandler {
                 return INVULNERABILITY_KNOCKBACK_H;
             case MOVEMENT_SPEED_MD:
                 return MOVEMENT_SPEED_H;
-            case INVISIBILITY_MD:
-                return INVISIBILITY_H;
+            case TAUNT_MD:
+                return TAUNT_H;
+
             default:
                 Bukkit.getLogger().info("Error: Problem with power name: " + metadata);
                 return null;

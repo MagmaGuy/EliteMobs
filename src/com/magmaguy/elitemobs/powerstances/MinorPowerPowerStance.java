@@ -250,6 +250,17 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_WEAKNESS_MD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.TOTEM, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.TOTEM, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
+
+                    }
+
                     if (entity.hasMetadata(MetadataHandler.ATTACK_WEB_MD)) {
 
                         effectIteration++;
@@ -363,6 +374,18 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack effectItem1 = new ItemStack(Material.GOLD_BOOTS, 1);
                         ItemStack effectItem2 = new ItemStack(Material.GOLD_BOOTS, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
+
+
+                    }
+
+                    if (entity.hasMetadata(MetadataHandler.TAUNT_MD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.JUKEBOX, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.JUKEBOX, 1);
 
                         itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
