@@ -44,9 +44,11 @@ public class MetadataHandler {
     public final static String FORBIDDEN_MD = "Forbidden";
     public final static String CUSTOM_MD = "Custom";
     //Powers
+    public final static String ATTACK_ARROW_MD = "AttackArrow";
     public final static String ATTACK_BLINDING_MD = "AttackBlinding";
     public final static String ATTACK_CONFUSING_MD = "AttackConfusing";
     public final static String ATTACK_FIRE_MD = "AttackFire";
+    public final static String ATTACK_FIREBALL_MD = "AttackFireball";
     public final static String ATTACK_FREEZE_MD = "AttackFreeze";
     public final static String ATTACK_GRAVITY_MD = "AttackGravity";
     public final static String ATTACK_POISON_MD = "AttackPoison";
@@ -63,9 +65,11 @@ public class MetadataHandler {
     public final static String MOVEMENT_SPEED_MD = "MovementSpeed";
     public final static String INVISIBILITY_MD = "Invisibility";
     //Powers human format
+    public final static String ATTACK_ARROW_H = "Archer";
     public final static String ATTACK_BLINDING_H = "Blindness";
     public final static String ATTACK_CONFUSING_H = "Confusion";
     public final static String ATTACK_FIRE_H = "Pyromancer";
+    public final static String ATTACK_FIREBALL_H = "Fireball";
     public final static String ATTACK_FREEZE_H = "Cryomancer";
     public final static String ATTACK_GRAVITY_H = "Levitation";
     public final static String ATTACK_POISON_H = "Poisonous";
@@ -98,8 +102,10 @@ public class MetadataHandler {
         metadataList.add(MINOR_POWER_AMOUNT_MD);
         metadataList.add(VISUAL_EFFECT_MD);
         metadataList.add(FORBIDDEN_MD);
+        metadataList.add(ATTACK_ARROW_MD);
         metadataList.add(ATTACK_CONFUSING_MD);
         metadataList.add(ATTACK_FIRE_MD);
+        metadataList.add(ATTACK_FIREBALL_MD);
         metadataList.add(ATTACK_FREEZE_MD);
         metadataList.add(ATTACK_GRAVITY_MD);
         metadataList.add(ATTACK_POISON_MD);
@@ -127,9 +133,11 @@ public class MetadataHandler {
 
         List<String> metadataList = new ArrayList<>();
 
+        metadataList.add(ATTACK_ARROW_MD);
         metadataList.add(ATTACK_BLINDING_MD);
         metadataList.add(ATTACK_CONFUSING_MD);
         metadataList.add(ATTACK_FIRE_MD);
+        metadataList.add(ATTACK_FIREBALL_MD);
         metadataList.add(ATTACK_FREEZE_MD);
         metadataList.add(ATTACK_GRAVITY_MD);
         metadataList.add(ATTACK_POISON_MD);
@@ -154,9 +162,11 @@ public class MetadataHandler {
 
         List<String> metadataList = new ArrayList<>();
 
+        metadataList.add(ATTACK_ARROW_H);
         metadataList.add(ATTACK_BLINDING_H);
         metadataList.add(ATTACK_CONFUSING_H);
         metadataList.add(ATTACK_FIRE_H);
+        metadataList.add(ATTACK_FIREBALL_H);
         metadataList.add(ATTACK_FREEZE_H);
         metadataList.add(ATTACK_GRAVITY_H);
         metadataList.add(ATTACK_POISON_H);
@@ -177,59 +187,65 @@ public class MetadataHandler {
 
     }
 
-    public String humanToMachineTranslator (String metadata) {
-
-        switch (metadata) {
-
-            case ATTACK_BLINDING_H:
-                return ATTACK_BLINDING_MD;
-            case ATTACK_CONFUSING_H:
-                return ATTACK_CONFUSING_MD;
-            case ATTACK_FIRE_H:
-                return ATTACK_FIRE_MD;
-            case ATTACK_FREEZE_H:
-                return ATTACK_FREEZE_MD;
-            case ATTACK_GRAVITY_H:
-                return ATTACK_GRAVITY_MD;
-            case ATTACK_POISON_H:
-                return ATTACK_POISON_MD;
-            case ATTACK_PUSH_H:
-                return ATTACK_PUSH_MD;
-            case ATTACK_WEB_H:
-                return ATTACK_WEB_MD;
-            case ATTACK_WITHER_H:
-                return ATTACK_WITHER_MD;
-            case BONUS_LOOT_H:
-                return BONUS_LOOT_MD;
-            case INVULNERABILITY_ARROW_H:
-                return INVULNERABILITY_ARROW_MD;
-            case INVULNERABILITY_FALL_DAMAGE_H:
-                return INVULNERABILITY_ARROW_MD;
-            case INVULNERABILITY_FIRE_H:
-                return INVULNERABILITY_FIRE_MD;
-            case INVULNERABILITY_KNOCKBACK_H:
-                return INVULNERABILITY_KNOCKBACK_MD;
-            case MOVEMENT_SPEED_H:
-                return MOVEMENT_SPEED_MD;
-            case INVISIBILITY_H:
-                return INVISIBILITY_MD;
-            default:
-                Bukkit.getLogger().info("Error: Problem with power name: " + metadata);
-                return null;
-        }
-
-    }
+//    public String humanToMachineTranslator (String metadata) {
+//
+//        switch (metadata) {
+//
+//            case ATTACK_ARROW_H:
+//                return ATTACK_ARROW_MD;
+//            case ATTACK_BLINDING_H:
+//                return ATTACK_BLINDING_MD;
+//            case ATTACK_CONFUSING_H:
+//                return ATTACK_CONFUSING_MD;
+//            case ATTACK_FIRE_H:
+//                return ATTACK_FIRE_MD;
+//            case ATTACK_FREEZE_H:
+//                return ATTACK_FREEZE_MD;
+//            case ATTACK_GRAVITY_H:
+//                return ATTACK_GRAVITY_MD;
+//            case ATTACK_POISON_H:
+//                return ATTACK_POISON_MD;
+//            case ATTACK_PUSH_H:
+//                return ATTACK_PUSH_MD;
+//            case ATTACK_WEB_H:
+//                return ATTACK_WEB_MD;
+//            case ATTACK_WITHER_H:
+//                return ATTACK_WITHER_MD;
+//            case BONUS_LOOT_H:
+//                return BONUS_LOOT_MD;
+//            case INVULNERABILITY_ARROW_H:
+//                return INVULNERABILITY_ARROW_MD;
+//            case INVULNERABILITY_FALL_DAMAGE_H:
+//                return INVULNERABILITY_ARROW_MD;
+//            case INVULNERABILITY_FIRE_H:
+//                return INVULNERABILITY_FIRE_MD;
+//            case INVULNERABILITY_KNOCKBACK_H:
+//                return INVULNERABILITY_KNOCKBACK_MD;
+//            case MOVEMENT_SPEED_H:
+//                return MOVEMENT_SPEED_MD;
+//            case INVISIBILITY_H:
+//                return INVISIBILITY_MD;
+//            default:
+//                Bukkit.getLogger().info("Error: Problem with power name: " + metadata);
+//                return null;
+//        }
+//
+//    }
 
     public String machineToHumanTranslator (String metadata) {
 
         switch (metadata) {
 
+            case ATTACK_ARROW_MD:
+                return ATTACK_ARROW_H;
             case ATTACK_BLINDING_MD:
                 return ATTACK_BLINDING_H;
             case ATTACK_CONFUSING_MD:
                 return ATTACK_CONFUSING_H;
             case ATTACK_FIRE_MD:
                 return ATTACK_FIRE_H;
+            case ATTACK_FIREBALL_MD:
+                return ATTACK_FIREBALL_H;
             case ATTACK_FREEZE_MD:
                 return ATTACK_FREEZE_H;
             case ATTACK_GRAVITY_MD:

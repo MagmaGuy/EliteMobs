@@ -161,6 +161,16 @@ public class MinorPowerPowerStance implements Listener {
                     }
 
                     //apply new positioning
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_ARROW_MD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.ARROW, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.ARROW, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
+
+                    }
 
                     if (entity.hasMetadata(MetadataHandler.ATTACK_BLINDING_MD)) {
 
@@ -179,6 +189,17 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack effectItem1 = new ItemStack(Material.LAVA_BUCKET, 1);
                         ItemStack effectItem2 = new ItemStack(Material.LAVA_BUCKET, 1);
+
+                        itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
+
+                    }
+
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_FIREBALL_MD)) {
+
+                        effectIteration++;
+
+                        ItemStack effectItem1 = new ItemStack(Material.FIREBALL, 1);
+                        ItemStack effectItem2 = new ItemStack(Material.FIREBALL, 1);
 
                         itemProcessor(items, effectQuantity, effectIteration, effectItem1, effectItem2, amountPerTrack, entity, counter);
 
