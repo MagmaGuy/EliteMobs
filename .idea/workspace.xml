@@ -8,7 +8,7 @@
   <component name="ChangeListManager">
     <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DamageHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DamageHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" />
     </list>
     <ignored path="ActiveStack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -28,7 +28,7 @@
     <favorites_list name="ActiveStack" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.25130147">
+    <splitter split-orientation="horizontal" split-proportion="0.47089446">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="EliteMobs.java" pinned="false" current-in-tab="false">
@@ -46,7 +46,10 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="192">
                   <caret line="41" column="28" lean-forward="false" selection-start-line="41" selection-start-column="22" selection-end-line="41" selection-end-column="28" />
-                  <folding />
+                  <folding>
+                    <element signature="e#0#13880#0" expanded="false" />
+                    <element signature="imports" expanded="false" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -56,7 +59,10 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="256">
                   <caret line="40" column="37" lean-forward="false" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="37" />
-                  <folding />
+                  <folding>
+                    <element signature="e#0#5355#0" expanded="false" />
+                    <element signature="imports" expanded="false" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -66,7 +72,10 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="672">
                   <caret line="75" column="58" lean-forward="false" selection-start-line="75" selection-start-column="58" selection-end-line="75" selection-end-column="58" />
-                  <folding />
+                  <folding>
+                    <element signature="e#0#8732#0" expanded="false" />
+                    <element signature="imports" expanded="false" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -112,7 +121,9 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="144">
                   <caret line="22" column="22" lean-forward="false" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
-                  <folding />
+                  <folding>
+                    <element signature="e#0#942#0" expanded="false" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -133,11 +144,21 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="DamageHandler.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="DamageHandler.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DamageHandler.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="1296">
                   <caret line="102" column="13" lean-forward="false" selection-start-line="102" selection-start-column="13" selection-end-line="102" selection-end-column="13" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="SpawnMobCommandHandler.java" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="109">
+                  <caret line="107" column="111" lean-forward="false" selection-start-line="107" selection-start-column="111" selection-end-line="107" selection-end-column="111" />
                   <folding />
                 </state>
               </provider>
@@ -261,7 +282,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleDamage.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/ConfigValues.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MinorPowerPowerStance.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/elitedrops/EliteDropsHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java" />
@@ -275,6 +295,7 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/HealthHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DamageHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" />
       </list>
     </option>
   </component>
@@ -375,6 +396,28 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="naturalmobspawner" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MagmasMobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MagmasMobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="elitemobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="mobscanner" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -397,99 +440,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="mobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="elitemobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="aggressive" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="elitemobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mobcustomizer" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="elitemobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="elitedrops" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MagmasMobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="elitemobs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="config" />
+              <option name="myItemId" value="minorpowers" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -512,6 +463,28 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="commands" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MagmasMobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MagmasMobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="elitemobs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="collateralminecraftchanges" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1140,7 +1113,14 @@
       <option name="project" value="LOCAL" />
       <updated>1493988291578</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="Version 2.0.1&#10;&#10;- Fixed shoddy implementation of damage detection on the DamageHandler, should now only account for valid entities.">
+      <created>1494065645323</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1494065645323</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1201,7 +1181,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Version 0.0.26&#10;&#10;- Loot is now its own yml file&#10;- Added more config options&#10;- Tweaked config-related variables&#10;- Reworked all commands, fixed miscellaneous bugs in them&#10;- Tweaked few settings to fully implement iron golems as aggressive stacking entities" />
     <MESSAGE value="Version 0.0.27&#10;&#10;- Fixed iron golem extra stats&#10;- Added initial spawnmob command&#10;- Last planned features before 1.0.0 are now done, only (possible) bugfixes left before upload" />
     <MESSAGE value="Version 1.0.0&#10;&#10;- First public release&#10;- Magmasmobs project renamed to EliteMobs&#10;- Added a metadata flush method, more organized metadata handling&#10;- Fixed fall damage" />
     <MESSAGE value="Version 1.1.0&#10;&#10;- Just bug fixes&#10;- Fixed level 1 mobs being somewhat unkillable (level 1 mobs aren't supposed to exist anyway)&#10;- Fixed gold boots speed power not working&#10;- An issue still remains when two manually spawned mobs merge leaving some vestige visual effects behind" />
@@ -1226,7 +1205,8 @@
     <MESSAGE value="Version 1.4.7&#10;&#10;- Added berserker minor power&#10;- Past two minor powers are incomplete" />
     <MESSAGE value="Version 1.4.8&#10;&#10;- Reduced amount of I/O operations on config files&#10;- Reduced amount of reflection operations when scanning for minor powers (big source of slowdown)&#10;- Made Tank power mobs have half damage&#10;- Made Berserker power mobs half health&#10;- Simplified health math&#10;- Spawnmob commands now pull from a list of strings, need to find a way to make it non-capitalized&#10;- Other miscellaneous minor performance tweaks" />
     <MESSAGE value="Version 2.0.0&#10;&#10;- Public release of 1.4.x changes&#10;- Ironed out small bug with getloot chest GUI" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 2.0.0&#10;&#10;- Public release of 1.4.x changes&#10;- Ironed out small bug with getloot chest GUI" />
+    <MESSAGE value="Version 2.0.1&#10;&#10;- Fixed shoddy implementation of damage detection on the DamageHandler, should now only account for valid entities." />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 2.0.1&#10;&#10;- Fixed shoddy implementation of damage detection on the DamageHandler, should now only account for valid entities." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1446,16 +1426,8 @@
         <state relative-caret-position="384">
           <caret line="37" column="0" lean-forward="true" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="264" column="81" lean-forward="false" selection-start-line="264" selection-start-column="81" selection-end-line="264" selection-end-column="81" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1551,7 +1523,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
           <caret line="22" column="22" lean-forward="false" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
-          <folding />
+          <folding>
+            <element signature="e#0#942#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1567,7 +1541,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="256">
           <caret line="40" column="37" lean-forward="false" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="37" />
-          <folding />
+          <folding>
+            <element signature="e#0#5355#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1575,7 +1552,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="192">
           <caret line="41" column="28" lean-forward="false" selection-start-line="41" selection-start-column="22" selection-end-line="41" selection-end-column="28" />
-          <folding />
+          <folding>
+            <element signature="e#0#13880#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1583,7 +1563,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="672">
           <caret line="75" column="58" lean-forward="false" selection-start-line="75" selection-start-column="58" selection-end-line="75" selection-end-column="58" />
-          <folding />
+          <folding>
+            <element signature="e#0#8732#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1621,6 +1604,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1296">
           <caret line="102" column="13" lean-forward="false" selection-start-line="102" selection-start-column="13" selection-end-line="102" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="109">
+          <caret line="107" column="111" lean-forward="false" selection-start-line="107" selection-start-column="111" selection-end-line="107" selection-end-column="111" />
           <folding />
         </state>
       </provider>

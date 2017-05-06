@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.*;
@@ -104,7 +105,7 @@ public class SpawnMobCommandHandler {
 
             }
 
-        } else if (commandSender instanceof ConsoleCommandSender) {
+        } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
 
             for (World worldIterator : worldList) {
 
