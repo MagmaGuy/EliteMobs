@@ -175,7 +175,57 @@ public class Taunt extends MinorPowers implements Listener {
             "Bows are for the weak of spirit!",
             "Bows are for the weak of heart!",
             "I thought we agreed no bows!",
-            "Bows? You'll regret that"
+            "Bows? You'll regret that",
+
+            //regular hits
+            "Ow!",
+            "Oi!",
+            "Stop that!",
+            "Why?!",
+            "You fight like a Dairy Farmer!",
+            "You are a pain in the backside!",
+            "En garde! Touche!",
+            "Hacks!",
+            "My health is bugged, unkillable!",
+            "Your hits only make me stronger!",
+            "Sticks and stones...",
+            "'tis but a flesh wound!",
+            "Emperor protects!",
+            "Herobrine, aid me!",
+            "Behind you! A creeper!",
+            "I have made a terrible mistake.",
+            "What doesn't kill me...",
+            "Zombies dig scars",
+            "I shall show you my true power!",
+            "Prepare for my ultimate attack!",
+            "My reinforcements are arriving!",
+            "You're going to pay for that!",
+            "That's going to leave a mark!",
+            "An eye for an eye!",
+            "Health insurance will cover that",
+            "I felt that one in my bones",
+            "'tis but a scratch",
+            "What was that? A soft breeze?",
+            "You'll never defeat me like that",
+            "Pathetic.",
+            "Weak.",
+            "That didn't even dent my armor!",
+            "This is going to be an easy one",
+            "My grandchildren will feel that",
+            "Are you even trying?",
+            "An admin just fully healed me",
+            "Haxxor!",
+            "Me? Damaged? Hacks!",
+            "I can't be defeated!",
+            "Good thing I'm using hacks!",
+            "Watch out! Herobrine behind you!",
+            "My life for Aiur!",
+            "Your home is getting griefed!",
+            "Why can't we be friends?",
+            "Valhalla!",
+            "Notch save me!",
+            "No retreat!",
+            "Hit me with your best shot!"
     ));
 
     private final static List<String> HIT_LIST = new ArrayList<>(Arrays.asList(
@@ -328,7 +378,7 @@ public class Taunt extends MinorPowers implements Listener {
     @EventHandler
     public void onDamaged (EntityDamageEvent event) {
 
-        if (((LivingEntity) event.getEntity()).getHealth() - event.getFinalDamage() <= 0 || !event.getEntity().isValid()) {
+        if (!(event.getEntity() instanceof LivingEntity) || ((LivingEntity) event.getEntity()).getHealth() - event.getFinalDamage() <= 0 || !event.getEntity().isValid()) {
 
             return;
 
@@ -339,8 +389,6 @@ public class Taunt extends MinorPowers implements Listener {
             Entity entity = event.getEntity();
 
             if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)) {
-
-                DAMAGED_BY_BOW_LIST.addAll(GENERIC_DAMAGED_LIST);
 
                 nametagProcessor(entity, DAMAGED_BY_BOW_LIST);
 
