@@ -26,6 +26,7 @@ import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
+import com.magmaguy.elitemobs.config.TranslationCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
@@ -63,6 +64,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         mobPowersCustomConfig.initializeMobPowersConfig();
         LootCustomConfig lootCustomConfig = new LootCustomConfig();
         lootCustomConfig.LootCustomConfig();
+        TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
+        translationCustomConfig.initializeTranslationConfig();
         ConfigValues configValues = new ConfigValues();
         configValues.initializeConfigValues();
 
