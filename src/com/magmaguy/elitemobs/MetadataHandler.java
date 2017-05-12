@@ -39,12 +39,20 @@ public class MetadataHandler {
     public final static String ELITE_MOB_MD = "EliteMob";
     public final static String PASSIVE_ELITE_MOB_MD = "PassiveEliteMob";
     public final static String NATURAL_MOB_MD = "NaturalMob";
+    public final static String MAJOR_POWER_AMOUNT_MD = "MajorPowerAmount";
     public final static String MINOR_POWER_AMOUNT_MD = "MinorPowerAmount";
+    public final static String MAJOR_VISUAL_EFFECT_MD = "MajorVisualEffect";
     public final static String VISUAL_EFFECT_MD = "VisualEffect";
     public final static String CUSTOM_NAME = "CustomName";
+    public final static String CUSTOM_ARMOR = "CustomArmor";
+    public final static String TAUNT_NAME = "Taunt_Name";
     public final static String FORBIDDEN_MD = "Forbidden";
     public final static String CUSTOM_MD = "Custom";
-    //Powers
+    //Major powers
+    public final static String ZOMBIE_TEAM_ROCKET_MD = "TeamRocket";
+    //Major powers human format
+    public final static String ZOMBIE_TEAM_ROCKET_H = "TeamRocket";
+    //Minor powers
     public final static String ATTACK_ARROW_MD = "AttackArrow";
     public final static String ATTACK_BLINDING_MD = "AttackBlinding";
     public final static String ATTACK_CONFUSING_MD = "AttackConfusing";
@@ -67,7 +75,7 @@ public class MetadataHandler {
     public final static String MOVEMENT_SPEED_MD = "MovementSpeed";
     public final static String INVISIBILITY_MD = "Invisibility";
     public final static String TAUNT_MD = "Taunt";
-    //Powers human format
+    //Minor powers human format
     public final static String ATTACK_ARROW_H = "Archer";
     public final static String ATTACK_BLINDING_H = "Blindness";
     public final static String ATTACK_CONFUSING_H = "Confusion";
@@ -95,6 +103,9 @@ public class MetadataHandler {
     //powerEffects
     public final static String FROZEN = "Frozen";
     public final static String FROZEN_COOLDOWN = "FrozenCooldown";
+    public final static String TEAM_ROCKET_MEMBER = "TeamRocketMember";
+    public final static String TEAM_ROCKET_ACTIVATED = "TeamRocketActivated";
+
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
 
@@ -105,10 +116,17 @@ public class MetadataHandler {
         metadataList.add(ELITE_MOB_MD);
         metadataList.add(PASSIVE_ELITE_MOB_MD);
         metadataList.add(NATURAL_MOB_MD);
+        metadataList.add(MAJOR_POWER_AMOUNT_MD);
         metadataList.add(MINOR_POWER_AMOUNT_MD);
+        metadataList.add(MAJOR_VISUAL_EFFECT_MD);
         metadataList.add(VISUAL_EFFECT_MD);
         metadataList.add(CUSTOM_NAME);
+        metadataList.add(CUSTOM_ARMOR);
+        metadataList.add(TAUNT_NAME);
         metadataList.add(FORBIDDEN_MD);
+
+        metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
+
         metadataList.add(ATTACK_ARROW_MD);
         metadataList.add(ATTACK_CONFUSING_MD);
         metadataList.add(ATTACK_FIRE_MD);
@@ -133,6 +151,18 @@ public class MetadataHandler {
 
         metadataList.add(FROZEN);
         metadataList.add(FROZEN_COOLDOWN);
+        metadataList.add(TEAM_ROCKET_MEMBER);
+        metadataList.add(TEAM_ROCKET_ACTIVATED);
+
+        return metadataList;
+
+    }
+
+    public List<String> majorPowerList(){
+
+        List<String> metadataList = new ArrayList<>();
+
+        metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
 
         return metadataList;
 
@@ -248,6 +278,9 @@ public class MetadataHandler {
     public String machineToHumanTranslator (String metadata) {
 
         switch (metadata) {
+
+            case ZOMBIE_TEAM_ROCKET_MD:
+                return ZOMBIE_TEAM_ROCKET_H;
 
             case ATTACK_ARROW_MD:
                 return ATTACK_ARROW_H;

@@ -27,6 +27,12 @@ public class ArmorHandler {
 
     public static void ArmorHandler(Entity entity) {
 
+        if (entity.hasMetadata(MetadataHandler.CUSTOM_ARMOR)) {
+
+            return;
+
+        }
+
         if (entity instanceof Zombie || entity instanceof ZombieVillager || entity instanceof PigZombie ||
                 entity instanceof Skeleton || entity instanceof WitherSkeleton) {
 

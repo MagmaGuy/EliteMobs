@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,6 +46,9 @@ import static org.bukkit.Bukkit.getConsoleSender;
 public class SpawnMobCommandHandler {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+
+    MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+    MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
 
     public void spawnMob(CommandSender commandSender, String[] args) {
 
@@ -290,7 +294,14 @@ public class SpawnMobCommandHandler {
             for (String string : mobPower) {
 
                 switch (string) {
-
+                    //major powers
+                    case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
+                        if (entity instanceof Zombie){
+                            entity.setMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD, new FixedMetadataValue(plugin, true));
+                            powerCount++;
+                        }
+                        break;
+                    //minor powers
                     case MetadataHandler.ATTACK_ARROW_H:
                         entity.setMetadata(MetadataHandler.ATTACK_ARROW_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
@@ -301,7 +312,6 @@ public class SpawnMobCommandHandler {
                         break;
                     case MetadataHandler.ATTACK_CONFUSING_H:
                         entity.setMetadata(MetadataHandler.ATTACK_CONFUSING_MD, new FixedMetadataValue(plugin, true));
-                        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
                         minorPowerPowerStance.attackConfusing(entity);
                         powerCount++;
                         break;
@@ -372,8 +382,7 @@ public class SpawnMobCommandHandler {
                         break;
                     case MetadataHandler.INVULNERABILITY_FIRE_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_FIRE_MD, new FixedMetadataValue(plugin, true));
-                        MinorPowerPowerStance minorPowerPowerStance2 = new MinorPowerPowerStance(plugin);
-                        minorPowerPowerStance2.invulnerabilityFireEffect(entity);
+                        minorPowerPowerStance.invulnerabilityFireEffect(entity);
                         powerCount++;
                         break;
                     case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:
@@ -413,8 +422,9 @@ public class SpawnMobCommandHandler {
             }
 
             entity.setMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, powerCount));
-            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+
             minorPowerPowerStance.itemEffect(entity);
+            majorPowerPowerStance.itemEffect(entity);
 
             if (inputError) {
 

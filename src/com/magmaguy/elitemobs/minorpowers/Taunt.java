@@ -442,13 +442,13 @@ public class Taunt extends MinorPowers implements Listener {
 
     private void nametagProcessor (Entity entity, List<String> list){
 
-        if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
+        if (entity.hasMetadata(MetadataHandler.TAUNT_NAME)) {
 
             return;
 
         }
 
-        entity.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(MetadataHandler.TAUNT_NAME, new FixedMetadataValue(plugin, true));
 
         String originalName = entity.getCustomName();
 
@@ -463,7 +463,7 @@ public class Taunt extends MinorPowers implements Listener {
             public void run() {
 
                 entity.setCustomName(originalName);
-                entity.removeMetadata(MetadataHandler.CUSTOM_NAME, plugin);
+                entity.removeMetadata(MetadataHandler.TAUNT_NAME, plugin);
 
             }
 

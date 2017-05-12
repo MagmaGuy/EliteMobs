@@ -29,6 +29,12 @@ public class NameHandler {
 
     public static void customAggressiveName(Entity entity, Plugin plugin) {
 
+        if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
+
+            return;
+
+        }
+
         int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
         switch (entity.getType()) {
@@ -84,7 +90,7 @@ public class NameHandler {
                 entity.setCustomName("Level " + mobLevel + " Elite Iron Golem");
                 break;
             default:
-                getLogger().info("Error: Couldn't assign CUSTOM_MD mob name due to unexpected aggressive boss mob (talk to the dev!)");
+                getLogger().info("Error: Couldn't assign custom mob name due to unexpected aggressive boss mob (talk to the dev!)");
                 getLogger().info("Missing mob type: " + entity.getType());
                 break;
         }
@@ -114,7 +120,7 @@ public class NameHandler {
                 entity.setCustomName("Super Sheep");
                 break;
             default:
-                getLogger().info("Error: Couldn't assign CUSTOM_MD mob name due to unexpected passive boss mob (talk to the dev!)");
+                getLogger().info("Error: Couldn't assign custom mob name due to unexpected passive boss mob (talk to the dev!)");
                 getLogger().info("Missing mob type: " + entity.getType());
                 break;
         }

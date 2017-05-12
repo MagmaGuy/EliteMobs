@@ -59,6 +59,8 @@ public class MinorPowerPowerStance implements Listener {
     private final double speedHorizontal = 20;
     private final double speedVertical = 2;
 
+    MetadataHandler metadataHandler = new MetadataHandler();
+
     //Secondary effect particle processing
     private void particleEffect(Entity entity, Particle particle, int particleAmount, double v, double v1, double v2, double v3) {
 
@@ -146,8 +148,6 @@ public class MinorPowerPowerStance implements Listener {
 
                     int effectQuantity = 0;
                     int effectIteration = 0;
-
-                    MetadataHandler metadataHandler = new MetadataHandler();
 
                     //count amount of active effects
                     for (String string : metadataHandler.minorPowerList()) {
@@ -567,16 +567,7 @@ public class MinorPowerPowerStance implements Listener {
 
         Entity entity = event.getEntity();
 
-        List<String> metadataList = new ArrayList<String>();
-        metadataList.add(MetadataHandler.ATTACK_GRAVITY_MD);
-        metadataList.add(MetadataHandler.ATTACK_POISON_MD);
-        metadataList.add(MetadataHandler.ATTACK_PUSH_MD);
-        metadataList.add(MetadataHandler.ATTACK_WITHER_MD);
-        metadataList.add(MetadataHandler.INVULNERABILITY_ARROW_MD);
-        metadataList.add(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD);
-        metadataList.add(MetadataHandler.MOVEMENT_SPEED_MD);
-
-        for (String string : metadataList) {
+        for (String string : metadataHandler.minorPowerList()) {
 
             if (entity.hasMetadata(string)) {
 

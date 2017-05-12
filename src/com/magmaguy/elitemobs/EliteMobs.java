@@ -34,6 +34,7 @@ import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobSpawner;
+import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.scoreboard.ScoreboardHandler;
 import org.bukkit.Bukkit;
@@ -143,6 +144,34 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }
 
+        for (String string : metadataHandler.majorPowerList()){
+
+            //don't load powers that require no even listeners
+
+
+                try {
+
+                    String earlypath = "com.magmaguy.elitemobs.majorpowers.";
+                    String finalString = earlypath + string;
+
+                    Class<?> clazz = Class.forName(finalString);
+
+                    Object instance = clazz.newInstance();
+
+                    this.getServer().getPluginManager().registerEvents((Listener) instance, this);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                }
+
+
+
+        }
+
         //Mob scanner
         this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
 
@@ -160,6 +189,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Visual effects
         this.getServer().getPluginManager().registerEvents(new MinorPowerPowerStance(this), this);
+        this.getServer().getPluginManager().registerEvents(new MajorPowerPowerStance(), this);
 
         //Loot
         if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)")) {

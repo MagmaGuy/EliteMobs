@@ -17,10 +17,13 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
+import com.magmaguy.elitemobs.majorpowers.MajorPowers;
+import com.magmaguy.elitemobs.majorpowers.TeamRocket;
 import com.magmaguy.elitemobs.minorpowers.MinorPowers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Zombie;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
@@ -35,6 +38,11 @@ public class PowerHandler {
 
     private static Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private static ArrayList<MinorPowers> minorPowerArray = new ArrayList();
+
+    private static MetadataHandler metadataHandler = new MetadataHandler();
+    private static Random random = new Random();
+
+    private static MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
 
     public static void powerHandler(Entity entity) {
 
@@ -58,7 +66,7 @@ public class PowerHandler {
 
             int currentMinorPowerAmount = 0;
 
-            if (entity.hasMetadata("CUSTOM_MD")) {
+            if (entity.hasMetadata(MetadataHandler.CUSTOM_MD)) {
 
                 return;
 
@@ -70,9 +78,9 @@ public class PowerHandler {
 
             }
 
-            if (entity.hasMetadata("MinorPowerAmount")) {
+            if (entity.hasMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD)) {
 
-                currentMinorPowerAmount = entity.getMetadata("MinorPowerAmount").get(0).asInt();
+                currentMinorPowerAmount = entity.getMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD).get(0).asInt();
 
                 Iterator<MinorPowers> minorPowerIterator = minorPowerArray.iterator();
 
@@ -98,7 +106,6 @@ public class PowerHandler {
 
                     if (minorPowerArray.size() > 0) {
 
-                        Random random = new Random();
                         int randomizer = random.nextInt(minorPowerArray.size());
                         MinorPowers selectedMinorPower = minorPowerArray.get(randomizer);
                         minorPowerArray.remove(minorPowerArray.get(randomizer));
@@ -128,7 +135,80 @@ public class PowerHandler {
 
         if (availableMajorPowers >= 1) {
 
-            //Todo: Add major powers
+            int currentMajorPowerAmount = 0;
+
+            if (entity.hasMetadata(MetadataHandler.CUSTOM_MD)){
+
+                return;
+
+            }
+
+            ArrayList<MajorPowers> majorPowersArrayList = new ArrayList();
+
+            if (majorPowersArrayList.isEmpty()) {
+
+                if (entity instanceof Zombie) {
+
+                    TeamRocket teamRocket = new TeamRocket();
+
+                    majorPowersArrayList.add(teamRocket);
+
+                }
+
+            }
+
+            if (entity.hasMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD)) {
+
+                currentMajorPowerAmount = entity.getMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD).get(0).asInt();
+
+                Iterator<MajorPowers> majorPowerIterator = majorPowersArrayList.iterator();
+
+                while (majorPowerIterator.hasNext()) {
+
+                    MajorPowers majorPowers = majorPowerIterator.next();
+
+                    if (majorPowers.existingPowers(entity)) {
+
+                        majorPowerIterator.remove();
+
+                    }
+
+                }
+
+            }
+
+            int missingMajorPowerAmount = availableMajorPowers - currentMajorPowerAmount;
+
+            if (missingMajorPowerAmount > 0 && majorPowersArrayList.size() > 0) {
+
+                for (int i = 0; i < missingMajorPowerAmount; i++) {
+
+                    if (majorPowersArrayList.size() > 0) {
+
+                        int randomizer = random.nextInt(majorPowersArrayList.size());
+                        MajorPowers selectedMajorPower = majorPowersArrayList.get(randomizer);
+                        majorPowersArrayList.remove(majorPowersArrayList.get(randomizer));
+
+                        if (entity.hasMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD)) {
+
+                            int oldMajorPowerAmount = entity.getMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD).get(0).asInt();
+                            int newMajorPowerAmount = oldMajorPowerAmount + 1;
+
+                            entity.setMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, newMajorPowerAmount));
+
+                        } else {
+
+                            entity.setMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, 1));
+
+                        }
+
+                        selectedMajorPower.applyPowers(entity);
+
+                    }
+
+                }
+
+            }
 
         }
 
@@ -137,11 +217,7 @@ public class PowerHandler {
 
     public static void minorPowerArrayInitializer () {
 
-        MetadataHandler metadataHandler = new MetadataHandler();
-
         for (String string : metadataHandler.minorPowerList()) {
-
-            MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
 
             if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)){
 
