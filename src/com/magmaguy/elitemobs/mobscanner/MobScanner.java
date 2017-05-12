@@ -80,7 +80,8 @@ public class MobScanner implements Listener {
 
                     //scan for stacked EliteMobs
                     if (ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") &&
-                            ConfigValues.defaultConfig.getBoolean("Aggressive mob stacking")) {
+                            ConfigValues.defaultConfig.getBoolean("Aggressive mob stacking") &&
+                            !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
 
                         scanValidAggressiveLivingEntity(entity);
 
@@ -140,7 +141,8 @@ public class MobScanner implements Listener {
 
         for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange)) {
 
-            if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()) {
+            if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
+                    && !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD) && !secondEntity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
 
                 //If the sum of both entities is above level 50, don't add both entities together
                 if (levelCap(entity, secondEntity)) {

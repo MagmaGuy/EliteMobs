@@ -13,10 +13,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.majorpowers.zombie;
+package com.magmaguy.elitemobs.majorpowers;
+
+import org.bukkit.entity.Entity;
 
 /**
- * Created by MagmaGuy on 07/05/2017.
+ * Created by MagmaGuy on 10/05/2017.
  */
-public class TeamRocket {
+public abstract class MajorPowers {
+
+    public abstract void applyPowers(Entity entity);
+
+    public abstract boolean existingPowers(Entity entity);
+
 }

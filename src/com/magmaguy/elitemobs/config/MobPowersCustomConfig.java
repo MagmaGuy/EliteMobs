@@ -44,6 +44,12 @@ public class MobPowersCustomConfig {
 
         }
 
+        for (String string : metadataHandler.majorPowerList()) {
+
+            this.getMobPowersConfig().addDefault("Powers.Major Powers." + string, true);
+
+        }
+
         getMobPowersConfig().options().copyDefaults(true);
         saveDefaultCustomConfig();
         saveCustomConfig();

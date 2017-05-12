@@ -212,7 +212,7 @@ public class StatsCommandHandler {
                 unsortedMobCountFilter(unsortedMobCount, strayCount, "strays");
                 unsortedMobCountFilter(unsortedMobCount, witchCount, "witches");
                 unsortedMobCountFilter(unsortedMobCount, witherSkeletonCount, "wither skeletons");
-                unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombies");
+                unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombie");
                 unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
 
                 player.sendMessage(messageStringAppender(aggressiveCountMessage, unsortedMobCount));
@@ -266,7 +266,7 @@ public class StatsCommandHandler {
                 unsortedMobCountFilter(unsortedMobCount, strayCount, "strays");
                 unsortedMobCountFilter(unsortedMobCount, witchCount, "witches");
                 unsortedMobCountFilter(unsortedMobCount, witherSkeletonCount, "wither skeletons");
-                unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombies");
+                unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombie");
                 unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
 
                 getServer().getConsoleSender().sendMessage(messageStringAppender(aggressiveCountMessage, unsortedMobCount));
