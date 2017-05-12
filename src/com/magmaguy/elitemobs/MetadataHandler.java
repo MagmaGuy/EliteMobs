@@ -24,6 +24,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by MagmaGuy on 26/04/2017.
@@ -194,6 +196,14 @@ public class MetadataHandler {
         metadataList.add(MOVEMENT_SPEED_MD);
         metadataList.add(INVISIBILITY_MD);
         metadataList.add(TAUNT_MD);
+
+        return metadataList;
+
+    }
+
+    public List<String> allPowersList(){
+
+        List metadataList = Stream.of(minorPowerList(), majorPowerList()).flatMap(List::stream).collect(Collectors.toList());
 
         return metadataList;
 

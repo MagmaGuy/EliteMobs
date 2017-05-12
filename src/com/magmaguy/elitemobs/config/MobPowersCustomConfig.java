@@ -16,9 +16,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 
@@ -26,8 +24,6 @@ import java.io.File;
  * Created by MagmaGuy on 01/05/2017.
  */
 public class MobPowersCustomConfig {
-
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 

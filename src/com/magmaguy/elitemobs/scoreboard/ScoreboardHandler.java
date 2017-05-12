@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.scoreboard;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -93,7 +94,7 @@ public class ScoreboardHandler implements Listener {
 
                 int powerCounter = 0;
 
-                for (String string : metadataHandler.minorPowerList()) {
+                for (String string : metadataHandler.majorPowerList()) {
 
                     if (entity.hasMetadata(string)) {
 
@@ -120,7 +121,7 @@ public class ScoreboardHandler implements Listener {
 
                 int counter = 0;
 
-                for (String string : metadataHandler.minorPowerList()) {
+                for (String string : metadataHandler.allPowersList()) {
 
                     if (entity.hasMetadata(string)) {
 
@@ -128,7 +129,17 @@ public class ScoreboardHandler implements Listener {
 
                         if (powCount > 13) {
 
-                            Score score = objective.getScore(ChatColor.GREEN + finalString);
+                            Score score;
+
+                            if (metadataHandler.minorPowerList().contains(string)){
+
+                                score = objective.getScore(ChatColor.AQUA + finalString);
+
+                            } else {
+
+                                score = objective.getScore(ChatColor.DARK_AQUA + finalString);
+
+                            }
 
                             if (counter + iterator < powCount) {
 
@@ -145,7 +156,18 @@ public class ScoreboardHandler implements Listener {
 
                         } else {
 
-                            Score score = objective.getScore(ChatColor.GREEN + finalString);
+                            Score score;
+
+                            if (metadataHandler.minorPowerList().contains(string)){
+
+                                score = objective.getScore(ChatColor.AQUA + finalString);
+
+                            } else {
+
+                                score = objective.getScore(ChatColor.DARK_AQUA + finalString);
+
+                            }
+
                             score.setScore(counter);
 
                         }
@@ -159,8 +181,10 @@ public class ScoreboardHandler implements Listener {
                 player.setScoreboard(board);
                 playerHasScoreboard.put(player, true);
 
-                Score healthScore = objective.getScore(ChatColor.GREEN + "Health: " + currentHealth + "/" + maxHealth);
-                healthScore.setScore(powCount);
+                Score healthScore = objective.getScore(String.format("%s%s", ChatColor.DARK_RED, ChatColor.BOLD) +
+                        ConfigValues.translationConfig.getString("ScoreBoard.Health") + ChatColor.RED + currentHealth
+                        + ChatColor.DARK_RED + "/" + ChatColor.RED + maxHealth);
+                healthScore.setScore(powCount + 1);
 
                 iterator++;
 

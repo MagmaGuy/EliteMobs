@@ -24,7 +24,7 @@ import org.bukkit.configuration.Configuration;
  */
 public class ConfigValues {
 
-   public static Configuration defaultConfig, lootConfig, mobPowerConfig;
+   public static Configuration defaultConfig, lootConfig, mobPowerConfig, translationConfig;
 
     public void initializeConfigValues () {
 
@@ -33,6 +33,8 @@ public class ConfigValues {
         lootConfig = lootCustomConfig.getLootConfig();
         MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
         mobPowerConfig = mobPowersCustomConfig.getMobPowersConfig();
+        TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
+        translationConfig = translationCustomConfig.getTranslationConfig();
 
     }
 

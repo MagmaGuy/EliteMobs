@@ -16,6 +16,8 @@
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -26,6 +28,8 @@ import static org.bukkit.Bukkit.getLogger;
  * Created by MagmaGuy on 18/04/2017.
  */
 public class NameHandler {
+
+    private static final Configuration TRANSLATION_CONFIG = ConfigValues.translationConfig;
 
     public static void customAggressiveName(Entity entity, Plugin plugin) {
 
@@ -39,55 +43,72 @@ public class NameHandler {
 
         switch (entity.getType()) {
             case ZOMBIE:
-                entity.setCustomName("Level " + mobLevel + " Elite Zombie");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(1));
                 break;
             case HUSK:
-                entity.setCustomName("Level " + mobLevel + " Elite Husk");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Husk").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Husk").get(1));
                 break;
             case ZOMBIE_VILLAGER:
-                entity.setCustomName("Level " + mobLevel + " Elite Zombie Villager");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(1));
                 break;
             case SKELETON:
-                entity.setCustomName("Level " + mobLevel + " Elite Skeleton");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Skeleton").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Skeleton").get(1));
                 break;
             case WITHER_SKELETON:
-                entity.setCustomName("Level " + mobLevel + " Elite Wither Skeleton");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.WitherSkeleton").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.WitherSkeleton").get(1));
                 break;
             case STRAY:
-                entity.setCustomName("Level " + mobLevel + " Elite Stray");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Stray").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Stray").get(1));
                 break;
             case PIG_ZOMBIE:
-                entity.setCustomName("Level " + mobLevel + " Elite Zombie Pigman");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PigZombie").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.PigZombie").get(1));
                 break;
             case CREEPER:
-                entity.setCustomName("Level " + mobLevel + " Elite Creeper");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Creeper").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Creeper").get(1));
                 break;
             case SPIDER:
-                entity.setCustomName("Level " + mobLevel + " Elite Spider");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Spider").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Spider").get(1));
                 break;
             case ENDERMAN:
-                entity.setCustomName("Level " + mobLevel + " Elite Enderman");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Enderman").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Enderman").get(1));
                 break;
             case CAVE_SPIDER:
-                entity.setCustomName("Level " + mobLevel + " Elite Cave Spider");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.CaveSpider").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.CaveSpider").get(1));
                 break;
             case SILVERFISH:
-                entity.setCustomName("Level " + mobLevel + " Elite Silverfish");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Silverfish").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Silverfish").get(1));
                 break;
             case BLAZE:
-                entity.setCustomName("Level " + mobLevel + " Elite Blaze");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Blaze").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Blaze").get(1));
                 break;
             case WITCH:
-                entity.setCustomName("Level " + mobLevel + " Elite Witch");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Witch").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Witch").get(1));
                 break;
             case ENDERMITE:
-                entity.setCustomName("Level " + mobLevel + " Elite Endermite");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Endermite").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.Endermite").get(1));
                 break;
             case POLAR_BEAR:
-                entity.setCustomName("Level " + mobLevel + " Elite Polar Bear");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PolarBear").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.PolarBear").get(1));
                 break;
             case IRON_GOLEM:
-                entity.setCustomName("Level " + mobLevel + " Elite Iron Golem");
+                entity.setCustomName(TRANSLATION_CONFIG.getStringList("Elite Mob Names.IronGolem").get(0) + mobLevel
+                        + TRANSLATION_CONFIG.getStringList("Elite Mob Names.IronGolem").get(1));
                 break;
             default:
                 getLogger().info("Error: Couldn't assign custom mob name due to unexpected aggressive boss mob (talk to the dev!)");
@@ -105,19 +126,19 @@ public class NameHandler {
         switch (entity.getType()) {
 
             case CHICKEN:
-                entity.setCustomName("Super Chicken");
+                entity.setCustomName(TRANSLATION_CONFIG.getString("Elite Mob Names.Chicken"));
                 break;
             case COW:
-                entity.setCustomName("Super Cow");
+                entity.setCustomName(TRANSLATION_CONFIG.getString("Elite Mob Names.Cow"));
                 break;
             case MUSHROOM_COW:
-                entity.setCustomName("Super Mooshroom");
+                entity.setCustomName(TRANSLATION_CONFIG.getString("Elite Mob Names.MushroomCow"));
                 break;
             case PIG:
-                entity.setCustomName("Super Pig");
+                entity.setCustomName(TRANSLATION_CONFIG.getString("Elite Mob Names.Pig"));
                 break;
             case SHEEP:
-                entity.setCustomName("Super Sheep");
+                entity.setCustomName(TRANSLATION_CONFIG.getString("Elite Mob Names.Sheep"));
                 break;
             default:
                 getLogger().info("Error: Couldn't assign custom mob name due to unexpected passive boss mob (talk to the dev!)");

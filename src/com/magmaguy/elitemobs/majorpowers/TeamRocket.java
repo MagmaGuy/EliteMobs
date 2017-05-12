@@ -16,10 +16,12 @@
 package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ocelot;
@@ -45,6 +47,7 @@ public class TeamRocket extends MajorPowers implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ZOMBIE_TEAM_ROCKET_H;
+    Configuration configuration = ConfigValues.translationConfig;
 
     private static Random random = new Random();
 
@@ -151,82 +154,82 @@ public class TeamRocket extends MajorPowers implements Listener {
 
                         case 1:
                             jesse.setCustomNameVisible(true);
-                            jesse.setCustomName("Prepare for trouble!");
+                            jesse.setCustomName(configuration.getStringList("TeamRocket.Intro").get(0));
                             break;
                         case 2:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName("Make it double!");
+                            james.setCustomName(configuration.getStringList("TeamRocket.Intro").get(1));
                             james.setCustomNameVisible(true);
                             break;
                         case 3:
                             james.setCustomNameVisible(false);
-                            jesse.setCustomName("To protect the world");
+                            jesse.setCustomName(configuration.getStringList("TeamRocket.Intro").get(2));
                             jesse.setCustomNameVisible(true);
                             break;
                         case 4:
-                            jesse.setCustomName("from devastation!");
+                            jesse.setCustomName(configuration.getStringList("TeamRocket.Intro").get(3));
                             break;
                         case 5:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName("To unite all people");
+                            james.setCustomName(configuration.getStringList("TeamRocket.Intro").get(4));
                             james.setCustomNameVisible(true);
                             break;
                         case 6:
-                            james.setCustomName("within our nation!");
+                            james.setCustomName(configuration.getStringList("TeamRocket.Intro").get(5));
                             break;
                         case 7:
                             james.setCustomNameVisible(false);
-                            jesse.setCustomName("To denounce the evils");
+                            jesse.setCustomName(configuration.getStringList("TeamRocket.Intro").get(6));
                             jesse.setCustomNameVisible(true);
                             break;
                         case 8:
-                            jesse.setCustomName("of truth and love!");
+                            jesse.setCustomName(configuration.getStringList("TeamRocket.Intro").get(7));
                             break;
                         case 9:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName("To extend our reach");
+                            james.setCustomName(configuration.getStringList("TeamRocket.Intro").get(8));
                             james.setCustomNameVisible(true);
                             break;
                         case 10:
-                            james.setCustomName("to the stars above!");
+                            james.setCustomName(configuration.getStringList("TeamRocket.Intro").get(9));
                             break;
                         case 11:
                             james.setCustomNameVisible(false);
-                            jesse.setCustomName("Jesse!");
+                            jesse.setCustomName(configuration.getStringList("TeamRocket.Intro").get(10));
                             jesse.setCustomNameVisible(true);
                             break;
                         case 12:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName("James!");
+                            james.setCustomName(configuration.getStringList("TeamRocket.Intro").get(11));
                             james.setCustomNameVisible(true);
                             break;
                         case 13:
                             james.setCustomNameVisible(false);
-                            jesse.setCustomName("Team Rocket blasts off");
+                            jesse.setCustomName(configuration.getStringList("TeamRocket.Intro").get(12));
                             jesse.setCustomNameVisible(true);
                             break;
                         case 14:
-                            jesse.setCustomName("at the speed of light!");
+                            jesse.setCustomName(configuration.getStringList("TeamRocket.Intro").get(13));
                             break;
                         case 15:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName("Surrender now");
+                            james.setCustomName(configuration.getStringList("TeamRocket.Intro").get(14));
                             james.setCustomNameVisible(true);
                             break;
                         case 16:
-                            james.setCustomName("or prepare to fight!");
+                            james.setCustomName(configuration.getStringList("TeamRocket.Intro").get(15));
                             break;
                         case 17:
                             james.setCustomNameVisible(false);
-                            meowth.setCustomName("Meowth! That's right!");
+                            meowth.setCustomName(configuration.getStringList("TeamRocket.Intro").get(16));
                             meowth.setCustomNameVisible(true);
                             break;
                         default:
-                            jesse.setCustomName("Jesse");
+                            jesse.setCustomName(configuration.getString("TeamRocket.Jesse name"));
                             jesse.setCustomNameVisible(true);
-                            james.setCustomName("James");
+                            james.setCustomName(configuration.getString("TeamRocket.James name"));
                             james.setCustomNameVisible(true);
-                            meowth.setCustomName("Meowth");
+                            meowth.setCustomName(configuration.getString("TeamRocket.Meowth name"));
                             Bukkit.getScheduler().cancelTask(processID);
                             break;
 

@@ -45,7 +45,7 @@ public class MajorPowerPowerStance implements Listener {
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private int processID;
     private static int trackAmount = 4;
-    private static int itemsPerTrack = 10;
+    private static int itemsPerTrack = 4;
 
     MetadataHandler metadataHandler = new MetadataHandler();
 
@@ -93,7 +93,7 @@ public class MajorPowerPowerStance implements Listener {
 
                     if (entity.hasMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD)) {
 
-                        ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1);
+                        ItemStack itemStack = new ItemStack(Material.FIREWORK, 1);
 
                         itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
 
@@ -203,7 +203,7 @@ public class MajorPowerPowerStance implements Listener {
 //                    }
 
                     Vector vector = (newLocation.subtract(currentLocation)).toVector();
-                    vector = vector.multiply(0.3);
+                    vector = vector.multiply(0.25);
                     item.setVelocity(vector);
 
                 }

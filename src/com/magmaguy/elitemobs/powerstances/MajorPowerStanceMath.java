@@ -73,7 +73,6 @@ public class MajorPowerStanceMath {
         }
 
         //increment counter for next run
-        Bukkit.getLogger().info("" + counter);
         counter++;
         entity.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, counter));
 
