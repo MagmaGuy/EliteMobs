@@ -109,8 +109,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             jesseHelmetMeta.setColor(Color.PURPLE);
             jesseHelmet.setItemMeta(jesseHelmetMeta);
 
-            ItemStack jamesHelmet = TEAM_ROCKET_HELMET.clone()
-                    ;
+            ItemStack jamesHelmet = TEAM_ROCKET_HELMET.clone();
             LeatherArmorMeta jamesHelmetMeta = (LeatherArmorMeta) jamesHelmet.getItemMeta();
             jamesHelmetMeta.setColor(Color.BLUE);
             jamesHelmet.setItemMeta(jamesHelmetMeta);
@@ -120,6 +119,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             jesse.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
             jesse.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
             jesse.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+            jesse.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             jesse.setMetadata(MetadataHandler.TEAM_ROCKET_MEMBER, new FixedMetadataValue(plugin, true));
             jesse.setCustomName("Jesse");
             jesse.getEquipment().setHelmet(jesseHelmet);
@@ -132,6 +132,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             james.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
             james.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
             james.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+            james.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             james.setMetadata(MetadataHandler.TEAM_ROCKET_MEMBER, new FixedMetadataValue(plugin, true));
             james.setCustomName("James");
             james.getEquipment().setHelmet(jamesHelmet);

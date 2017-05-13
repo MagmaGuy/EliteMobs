@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 2.0.0
+version: 2.2.0
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 commands:
@@ -13,7 +13,7 @@ permissions:
     children:
       elitemobs.stats: true
       elitemobs.getloot: true
-      elitemobs.reload.config: true
+      elitemobs.reload.configs: true
       elitemobs.reload.loot: true
       elitemobs.giveloot: true
       elitemobs.spawnmob: true
@@ -23,7 +23,7 @@ permissions:
   elitemobs.getloot:
     description: Allow players to run /elitemobs getloot
     default: op
-  elitemobs.reload.config:
+  elitemobs.reload.configs:
     decription: Allow players to run /elitemobs reload config
     default: op
   elitemobs.reload.loot:

@@ -374,6 +374,59 @@ public class TranslationCustomConfig {
         this.getTranslationConfig().addDefault("ZombieTeamRocket.James name", "James");
         this.getTranslationConfig().addDefault("ZombieTeamRocket.Meowth name", "Meowth");
 
+        this.getTranslationConfig().addDefault("ZombieParents.Dad Name", "Zombie's Dad");
+        this.getTranslationConfig().addDefault("ZombieParents.Mom Name", "Zombie's Mom");
+
+        this.getTranslationConfig().addDefault("ZombieParents.DeathMessage", Arrays.asList(
+                "You monster!",
+                "My baby!",
+                "What have you done!?",
+                "Revenge!",
+                "Nooooo!",
+                "You will pay for that!",
+                "Eh, he was adopted",
+                "He's dead! Again!",
+                "He's deader than before!",
+                "You broke him!"
+        ));
+
+        this.getTranslationConfig().addDefault("ZombieParents.ZombieDialog", Arrays.asList(
+                "You're embarrassing me!",
+                "He's bullying me!",
+                "He's the one picking on me!",
+                "I can deal with this alone!",
+                "Leave me alone, I got this!",
+                "Stop following me around!",
+                "God this is so embarassing!",
+                "He took my lunch money!",
+                "He's bullying me!"
+        ));
+
+        this.getTranslationConfig().addDefault("ZombieParents.ZombieDadDialog", Arrays.asList(
+                "Get away from my son!",
+                "Stand up for yourself son!",
+                "I'll deal with him!",
+                "Stop picking on my son!",
+                "Why are you doing this?",
+                "I'll talk to your parents!",
+                "You go kiddo!",
+                "Show him who's boss kiddo!",
+                "Nice punch kiddo!"
+        ));
+
+        this.getTranslationConfig().addDefault("ZombieParents.ZombieMomDialog", Arrays.asList(
+                "Hands off my child!",
+                "Are you hurt sweety?",
+                "Did he hurt you sweety?",
+                "Let me see that booboo sweety",
+                "I'll talk to his parents!",
+                "You forgot your jacket sweety!",
+                "Posture, sweetheart",
+                "Break it up!",
+                "Stop this!",
+                "Did you take out the garbage?"
+        ));
+
         getTranslationConfig().options().copyDefaults(true);
         saveDefaultCustomConfig();
         saveCustomConfig();
