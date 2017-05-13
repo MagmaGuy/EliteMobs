@@ -203,7 +203,7 @@ public class MajorPowerPowerStance implements Listener {
 //                    }
 
                     Vector vector = (newLocation.subtract(currentLocation)).toVector();
-                    vector = vector.multiply(0.25);
+                    vector = vector.multiply(0.3);
                     item.setVelocity(vector);
 
                 }
@@ -224,125 +224,6 @@ public class MajorPowerPowerStance implements Listener {
         return item;
 
     }
-
-//    public void itemProcessor (List<Item> items, int effectQuantity, int effectIteration, ItemStack effectItem1,
-//                               ItemStack effectItem2, int amountPerTrack, Entity entity, float counter) {
-//
-//        boolean effectAlreadyPresent = false;
-//
-//        for (Item currentItem : items){
-//
-//            if (currentItem.getItemStack().getType().equals(effectItem1.getType())) {
-//
-//                effectAlreadyPresent = true;
-//                break;
-//
-//            }
-//
-//        }
-//
-//        //divided number is based on the amount of counts it takes for the effect to do a full cycle (counter * 12) may change, may be worth putting on constructor? Finnicky math
-//        int adjustedCounter = 30 / amountPerTrack;
-//        //assuming 2 items per track, dividing the 30 of a full cycle by 2 to operate start positions over 180 degrees
-//        int currentItemOffset = (int) Math.ceil((15 / effectQuantity) * effectIteration);
-//
-//        if (!effectAlreadyPresent) {
-//
-//            int repeatedCycles = 0;
-//
-//            while (repeatedCycles != amountPerTrack){
-//
-//                Item item1 = entity.getWorld().dropItem(entity.getLocation(), effectItem1);
-//                Item item2 = entity.getWorld().dropItem(entity.getLocation(), effectItem2);
-//
-//                item1.setPickupDelay(Integer.MAX_VALUE);
-//                item1.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, 0));
-//
-//                item2.setPickupDelay(Integer.MAX_VALUE);
-//                item2.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, 0));
-//
-//                items.add(item1);
-//                items.add(item2);
-//
-//                adjustedCounter += adjustedCounter;
-//
-//                repeatedCycles++;
-//
-//            }
-//
-//        } else {
-//
-//            int repeatedCycles = 0;
-//
-//            while (repeatedCycles != amountPerTrack) {
-//
-//                List<Location> particleLocations = majorPowerStanceMath.powerStanceConstructor(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter + adjustedCounter + currentItemOffset);
-//                Location newLocation1 = particleLocations.get(0);
-//                Location newLocation2 = particleLocations.get(1);
-//
-//                Location worldMovePrevent1 = items.get(((effectIteration - 1) * 4) + repeatedCycles * amountPerTrack).getLocation();
-//                Location worldMovePrevent2 = items.get(((effectIteration - 1) * 4) + 1 + repeatedCycles * amountPerTrack).getLocation();
-//
-//                //Respawn item to avoid too much client-side visual drifting, avoid errors due to portals and entities going through them
-//                if (counter % (4 * 3) == 0 || !worldMovePrevent1.getWorld().equals(newLocation1.getWorld()) || !worldMovePrevent2.getWorld().equals(newLocation2.getWorld())) {
-//
-//                    List<Location> oldParticleLocations = majorPowerStanceMath.powerStanceConstructor(entity, radiusHorizontal, radiusVertical, speedHorizontal, speedVertical, counter + adjustedCounter - 1 + currentItemOffset);
-//                    Location oldLocation1 = oldParticleLocations.get(0);
-//                    Location oldLocation2 = oldParticleLocations.get(1);
-//
-//
-//                    Item item1 = items.get(((effectIteration-1)*4)+repeatedCycles*amountPerTrack);
-//                    Item item2 = items.get(((effectIteration-1)*4)+1+repeatedCycles*amountPerTrack);
-//
-//                    int index1 = items.indexOf(item1);
-//                    int index2 = items.indexOf(item2);
-//
-//                    items.remove(item1);
-//                    items.remove(item2);
-//
-////                    Location location1 = item1.getLocation();
-//                    item1.remove();
-//                    item1.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
-//
-//                    item1 = entity.getWorld().dropItem(oldLocation1, effectItem1);
-//                    items.add(index1, item1);
-//                    item1.setPickupDelay(Integer.MAX_VALUE);
-//                    item1.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, 0));
-//
-////                    Location location2 = item2.getLocation();
-//                    item2.remove();
-//                    item2.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
-//
-//                    item2 = entity.getWorld().dropItem(oldLocation2, effectItem2);
-//                    items.add(index2, item2);
-//                    item2.setPickupDelay(Integer.MAX_VALUE);
-//                    item2.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, 0));
-//
-//                }
-//
-//                //there are 4 items in 1 run. 2 items processed at a time (for two tracks)
-//                Item item1 = items.get(((effectIteration-1)*4)+repeatedCycles*amountPerTrack);
-//                Item item2 = items.get(((effectIteration-1)*4)+1+repeatedCycles*amountPerTrack);
-//
-//                item1.setGravity(false);
-//                Vector vector1 = (newLocation1.subtract(item1.getLocation()).toVector());
-//                vector1 = vector1.multiply(0.3);
-//                item1.setVelocity(vector1);
-//
-//                item2.setGravity(false);
-//                Vector vector2 = (newLocation2.subtract(item2.getLocation()).toVector());
-//                vector2 = vector2.multiply(0.3);
-//                item2.setVelocity(vector2);
-//
-//                adjustedCounter += adjustedCounter;
-//
-//                repeatedCycles++;
-//
-//            }
-//
-//        }
-//
-//    }
 
     //Events
     @EventHandler

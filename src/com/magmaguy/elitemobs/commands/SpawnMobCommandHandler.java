@@ -436,7 +436,7 @@ public class SpawnMobCommandHandler {
 
                 } else if (commandSender instanceof ConsoleCommandSender) {
 
-                    getConsoleSender().sendMessage("Valid powers: " + metadataHandler.minorPowerListHumanFormat() + " custom");
+                    getConsoleSender().sendMessage("Valid powers: " + metadataHandler.minorPowerListHumanFormat() + metadataHandler.majorPowerList()+ " custom");
 
                 }
 

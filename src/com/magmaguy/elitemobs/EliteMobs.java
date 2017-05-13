@@ -150,8 +150,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
         for (String string : metadataHandler.majorPowerList()){
 
             //don't load powers that require no even listeners
-
-
                 try {
 
                     String earlypath = "com.magmaguy.elitemobs.majorpowers.";
@@ -339,6 +337,10 @@ public class EliteMobs extends JavaPlugin implements Listener {
         mobPowersCustomConfig.reloadCustomConfig();
         LootCustomConfig lootCustomConfig = new LootCustomConfig();
         lootCustomConfig.reloadLootConfig();
+        TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
+        translationCustomConfig.reloadCustomConfig();
+        ConfigValues configValues = new ConfigValues();
+        configValues.initializeConfigValues();
 
         getLogger().info("EliteMobs config reloaded!");
 

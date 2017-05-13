@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.majorpowers.MajorPowers;
-import com.magmaguy.elitemobs.majorpowers.TeamRocket;
+import com.magmaguy.elitemobs.majorpowers.ZombieTeamRocket;
 import com.magmaguy.elitemobs.minorpowers.MinorPowers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -149,9 +149,9 @@ public class PowerHandler {
 
                 if (entity instanceof Zombie) {
 
-                    TeamRocket teamRocket = new TeamRocket();
+                    ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
 
-                    majorPowersArrayList.add(teamRocket);
+                    majorPowersArrayList.add(zombieTeamRocket);
 
                 }
 

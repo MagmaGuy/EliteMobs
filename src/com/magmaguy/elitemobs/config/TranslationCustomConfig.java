@@ -350,7 +350,7 @@ public class TranslationCustomConfig {
                 "Mediocre..."
         ));
 
-        this.getTranslationConfig().addDefault("TeamRocket.Intro", Arrays.asList(
+        this.getTranslationConfig().addDefault("ZombieTeamRocket.Intro", Arrays.asList(
                 "Prepare for trouble!",
                 "Make it double!",
                 "To protect the world",
@@ -370,9 +370,9 @@ public class TranslationCustomConfig {
                 "Meowth! That's right!"
         ));
 
-        this.getTranslationConfig().addDefault("TeamRocket.Jesse name", "Jesse");
-        this.getTranslationConfig().addDefault("TeamRocket.James name", "James");
-        this.getTranslationConfig().addDefault("TeamRocket.Meowth name", "Meowth");
+        this.getTranslationConfig().addDefault("ZombieTeamRocket.Jesse name", "Jesse");
+        this.getTranslationConfig().addDefault("ZombieTeamRocket.James name", "James");
+        this.getTranslationConfig().addDefault("ZombieTeamRocket.Meowth name", "Meowth");
 
         getTranslationConfig().options().copyDefaults(true);
         saveDefaultCustomConfig();
