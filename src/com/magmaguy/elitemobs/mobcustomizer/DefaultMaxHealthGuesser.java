@@ -98,7 +98,7 @@ public class DefaultMaxHealthGuesser {
             case SHEEP:
                 return sheepHealth;
             default:
-                getLogger().info("Error: Couldn't assign CUSTOM_MD mob name due to unexpected boss mob (talk to the dev!)");
+                getLogger().info("Error: Couldn't assign CUSTOM_POWERS_MD mob name due to unexpected boss mob (talk to the dev!)");
                 getLogger().info("Missing mob type: " + entity.getType());
                 break;
         }

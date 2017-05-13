@@ -6,17 +6,18 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="Version 2.1.2&#10;&#10;- Added the ability to fully customize any text displayed to players through translations.yml&#10;- Improved the scoreboard aesthetics">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/ReloadConfigCommandHandler.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/TeamRocket.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java" />
+    <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="Version 2.2&#10;&#10;- Public release of 2.1.x changes&#10;- Added ZombieParents Major Power&#10;- Fixed major effects not getting collected&#10;- Tweaks to ZombieTeamRocket to prevent its reinforcements from getting powers&#10;- Tweaks to scoreboards">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieParents.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DefaultMaxHealthGuesser.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DefaultMaxHealthGuesser.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/plugin.yml" afterPath="$PROJECT_DIR$/src/plugin.yml" />
     </list>
     <ignored path="ActiveStack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -36,70 +37,40 @@
     <favorites_list name="ActiveStack" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.6900319">
+    <splitter split-orientation="horizontal" split-proportion="0.556213">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="MetadataHandler.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-371">
-                  <caret line="45" column="53" lean-forward="false" selection-start-line="45" selection-start-column="31" selection-end-line="45" selection-end-column="53" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                    <element signature="e#10315#10379#0" expanded="false" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="ZombieTeamRocket.java" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3360">
-                  <caret line="259" column="38" lean-forward="false" selection-start-line="259" selection-start-column="34" selection-end-line="259" selection-end-column="38" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file leaf-file-name="EliteMobs.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1">
-                  <caret line="277" column="58" lean-forward="true" selection-start-line="277" selection-start-column="58" selection-end-line="277" selection-end-column="58" />
+                <state relative-caret-position="-494">
+                  <caret line="149" column="59" lean-forward="false" selection-start-line="149" selection-start-column="45" selection-end-line="149" selection-end-column="59" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="CommandHandler.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java">
+          <file leaf-file-name="MetadataHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="5216">
-                  <caret line="355" column="26" lean-forward="false" selection-start-line="355" selection-start-column="26" selection-end-line="355" selection-end-column="26" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="ReloadConfigCommandHandler.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/ReloadConfigCommandHandler.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="496">
-                  <caret line="44" column="8" lean-forward="true" selection-start-line="44" selection-start-column="8" selection-end-line="45" selection-end-column="44" />
+                <state relative-caret-position="2989">
+                  <caret line="371" column="54" lean-forward="false" selection-start-line="371" selection-start-column="54" selection-end-line="371" selection-end-column="54" />
                   <folding>
                     <element signature="imports" expanded="true" />
+                    <element signature="e#10725#10789#0" expanded="false" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="SpawnMobCommandHandler.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java">
+          <file leaf-file-name="ZombieParents.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieParents.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="479">
-                  <caret line="297" column="57" lean-forward="true" selection-start-line="297" selection-start-column="41" selection-end-line="297" selection-end-column="61" />
-                  <folding />
+                <state relative-caret-position="861">
+                  <caret line="113" column="51" lean-forward="false" selection-start-line="113" selection-start-column="51" selection-end-line="113" selection-end-column="51" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -107,18 +78,28 @@
           <file leaf-file-name="PowerHandler.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-163">
-                  <caret line="168" column="0" lean-forward="false" selection-start-line="168" selection-start-column="0" selection-end-line="168" selection-end-column="0" />
+                <state relative-caret-position="624">
+                  <caret line="188" column="59" lean-forward="false" selection-start-line="188" selection-start-column="36" selection-end-line="188" selection-end-column="59" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="MobPowersCustomConfig.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/MobPowersCustomConfig.java">
+          <file leaf-file-name="plugin.yml" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/plugin.yml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="304">
-                  <caret line="35" column="0" lean-forward="false" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+                <state relative-caret-position="16">
+                  <caret line="1" column="12" lean-forward="false" selection-start-line="1" selection-start-column="12" selection-end-line="1" selection-end-column="12" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="SpawnMobCommandHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="223">
+                  <caret line="305" column="80" lean-forward="false" selection-start-line="305" selection-start-column="80" selection-end-line="305" selection-end-column="80" />
                   <folding />
                 </state>
               </provider>
@@ -127,8 +108,8 @@
           <file leaf-file-name="MajorPowerPowerStance.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="96">
-                  <caret line="39" column="3" lean-forward="true" selection-start-line="39" selection-start-column="3" selection-end-line="39" selection-end-column="3" />
+                <state relative-caret-position="276">
+                  <caret line="70" column="0" lean-forward="true" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -138,10 +119,20 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="TranslationCustomConfig.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="319">
+                  <caret line="409" column="35" lean-forward="true" selection-start-line="409" selection-start-column="35" selection-end-line="409" selection-end-column="35" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
           <file leaf-file-name="GenericRotationMatrixMath.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/GenericRotationMatrixMath.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="335">
+                <state relative-caret-position="349">
                   <caret line="37" column="48" lean-forward="false" selection-start-line="37" selection-start-column="48" selection-end-line="37" selection-end-column="48" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -160,10 +151,20 @@
               </provider>
             </entry>
           </file>
+          <file leaf-file-name="ZombieTeamRocket.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-2208">
+                  <caret line="49" column="4" lean-forward="true" selection-start-line="49" selection-start-column="4" selection-end-line="49" selection-end-column="65" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
           <file leaf-file-name="MajorPowerStanceMath.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerStanceMath.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="962">
+                <state relative-caret-position="976">
                   <caret line="74" column="40" lean-forward="false" selection-start-line="74" selection-start-column="40" selection-end-line="74" selection-end-column="40" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -186,12 +187,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>&quot;ER</find>
-      <find>&quot;E</find>
-      <find>&quot;Error:</find>
-      <find>&quot;Error: p</find>
-      <find>&quot;Error: prob</find>
-      <find>&quot;Error: probl</find>
       <find>prepare</find>
       <find>iterator</find>
       <find>mobPowersCustomConfig</find>
@@ -209,13 +204,19 @@
       <find>entity</find>
       <find>CUSTOM_MD</find>
       <find>items</find>
-      <find>minorPowerList</find>
       <find>processID</find>
       <find>setgravity</find>
+      <find>reload</find>
+      <find>minorPowerArrayInitializer</find>
+      <find>entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();</find>
+      <find>powCount</find>
+      <find>minorPowerList</find>
+      <find>powerCounter</find>
+      <find>health</find>
       <find>trackAmount</find>
       <find>Team</find>
       <find>trackHashMap</find>
-      <find>reload</find>
+      <find>MetadataHandler.ELITE_MOB_MD</find>
     </findStrings>
     <replaceStrings>
       <replace>MagmasSuperMob</replace>
@@ -253,7 +254,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/lootConfigHandler.kt" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/CustomConfigConstructor.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/LootCustomConfig.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/CustomConfigLoader.java" />
@@ -264,7 +264,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/PassiveEliteMobDeathHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/PigHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/SheepHandler.java" />
-        <option value="$PROJECT_DIR$/src/plugin.yml" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleHealth.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleDamage.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/elitedrops/EliteDropsHandler.java" />
@@ -283,7 +282,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/MajorPowers.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/zombie/TeamRocket.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MinorPowerPowerStance.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/MobScanner.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/ArmorHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/GenericRotationMatrixMath.java" />
@@ -293,17 +291,20 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/ConfigValues.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/NameHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/Taunt.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerStanceMath.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/TeamRocket.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/ReloadConfigCommandHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieParents.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java" />
+        <option value="$PROJECT_DIR$/src/plugin.yml" />
       </list>
     </option>
   </component>
@@ -364,7 +365,7 @@
               <item name="MagmasMobs" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="elitemobs" type="462c0819:PsiDirectoryNode" />
-              <item name="config" type="462c0819:PsiDirectoryNode" />
+              <item name="elitedrops" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MagmasMobs" type="b2602c69:ProjectViewProjectNode" />
@@ -378,7 +379,21 @@
               <item name="MagmasMobs" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="elitemobs" type="462c0819:PsiDirectoryNode" />
+              <item name="mobcustomizer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MagmasMobs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MagmasMobs" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="elitemobs" type="462c0819:PsiDirectoryNode" />
               <item name="powerstances" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MagmasMobs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MagmasMobs" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="elitemobs" type="462c0819:PsiDirectoryNode" />
+              <item name="scoreboard" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -986,7 +1001,14 @@
       <option name="project" value="LOCAL" />
       <updated>1494595131394</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Version 2.1.3&#10;&#10;- Fixed up config reloading commands&#10;- Refactored TeamRocket to ZombieTeamRocket&#10;- Tweaks to the ZombieTeamRocket power">
+      <created>1494659142430</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1494659142430</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1047,7 +1069,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Version 1.1.4&#10;&#10;- Added BonusLoot power" />
     <MESSAGE value="Version 1.1.5&#10;&#10;- Added a way to spawn mobs with specific powers" />
     <MESSAGE value="Version 1.2.0&#10;&#10;- Minor code cleanup&#10;- Public release of new powers 1.1.x" />
     <MESSAGE value="Version 1.2.1&#10;&#10;- Added mob hunting items&#10;- Fixed edge case where items would teleport to other worlds (now they just respawn if they have)" />
@@ -1072,7 +1093,8 @@
     <MESSAGE value="Version 2.1&#10;&#10;- Public release of 2.0.x changes" />
     <MESSAGE value="Version 2.1.1&#10;&#10;- Initial introduction of Major Powers" />
     <MESSAGE value="Version 2.1.2&#10;&#10;- Added the ability to fully customize any text displayed to players through translations.yml&#10;- Improved the scoreboard aesthetics" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 2.1.2&#10;&#10;- Added the ability to fully customize any text displayed to players through translations.yml&#10;- Improved the scoreboard aesthetics" />
+    <MESSAGE value="Version 2.1.3&#10;&#10;- Fixed up config reloading commands&#10;- Refactored TeamRocket to ZombieTeamRocket&#10;- Tweaks to the ZombieTeamRocket power" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 2.1.3&#10;&#10;- Fixed up config reloading commands&#10;- Refactored TeamRocket to ZombieTeamRocket&#10;- Tweaks to the ZombieTeamRocket power" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1086,13 +1108,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/ChickenHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="65" column="108" lean-forward="true" selection-start-line="65" selection-start-column="108" selection-end-line="65" selection-end-column="108" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackFire.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="480">
@@ -1258,14 +1273,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="15" lean-forward="true" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/PowerStanceMath.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="96">
@@ -1344,28 +1351,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4318">
-          <caret line="59" column="80" lean-forward="true" selection-start-line="59" selection-start-column="80" selection-end-line="59" selection-end-column="80" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/LootCustomConfig.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="480">
           <caret line="48" column="28" lean-forward="false" selection-start-line="48" selection-start-column="11" selection-end-line="48" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2576">
-          <caret line="186" column="49" lean-forward="false" selection-start-line="186" selection-start-column="49" selection-end-line="186" selection-end-column="49" />
           <folding />
         </state>
       </provider>
@@ -1386,13 +1375,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/GenericRotationMatrixMath.java">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/MobPowersCustomConfig.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="335">
-          <caret line="37" column="48" lean-forward="false" selection-start-line="37" selection-start-column="48" selection-end-line="37" selection-end-column="48" />
+        <state relative-caret-position="304">
+          <caret line="35" column="0" lean-forward="false" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/ReloadConfigCommandHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="44" column="8" lean-forward="false" selection-start-line="44" selection-start-column="8" selection-end-line="45" selection-end-column="44" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5216">
+          <caret line="354" column="26" lean-forward="false" selection-start-line="354" selection-start-column="26" selection-end-line="354" selection-end-column="26" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1404,42 +1409,62 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-163">
-          <caret line="168" column="0" lean-forward="false" selection-start-line="168" selection-start-column="0" selection-end-line="168" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="645">
+          <caret line="108" column="16" lean-forward="false" selection-start-line="108" selection-start-column="16" selection-end-line="108" selection-end-column="16" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/MobPowersCustomConfig.java">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="35" column="0" lean-forward="false" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="39" column="3" lean-forward="true" selection-start-line="39" selection-start-column="3" selection-end-line="39" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="479">
-          <caret line="297" column="57" lean-forward="true" selection-start-line="297" selection-start-column="41" selection-end-line="297" selection-end-column="61" />
+        <state relative-caret-position="-2208">
+          <caret line="49" column="4" lean-forward="true" selection-start-line="49" selection-start-column="4" selection-end-line="49" selection-end-column="65" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerStanceMath.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="962">
+        <state relative-caret-position="976">
           <caret line="74" column="40" lean-forward="false" selection-start-line="74" selection-start-column="40" selection-end-line="74" selection-end-column="40" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/SpawnMobCommandHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="223">
+          <caret line="305" column="80" lean-forward="false" selection-start-line="305" selection-start-column="80" selection-end-line="305" selection-end-column="80" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-494">
+          <caret line="149" column="59" lean-forward="false" selection-start-line="149" selection-start-column="45" selection-end-line="149" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="319">
+          <caret line="409" column="35" lean-forward="true" selection-start-line="409" selection-start-column="35" selection-end-line="409" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/GenericRotationMatrixMath.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="349">
+          <caret line="37" column="48" lean-forward="false" selection-start-line="37" selection-start-column="48" selection-end-line="37" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1454,47 +1479,47 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieParents.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1">
-          <caret line="277" column="58" lean-forward="true" selection-start-line="277" selection-start-column="58" selection-end-line="277" selection-end-column="58" />
-          <folding />
+        <state relative-caret-position="861">
+          <caret line="113" column="51" lean-forward="false" selection-start-line="113" selection-start-column="51" selection-end-line="113" selection-end-column="51" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/MetadataHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-371">
-          <caret line="45" column="53" lean-forward="false" selection-start-line="45" selection-start-column="31" selection-end-line="45" selection-end-column="53" />
+        <state relative-caret-position="2989">
+          <caret line="371" column="54" lean-forward="false" selection-start-line="371" selection-start-column="54" selection-end-line="371" selection-end-column="54" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#10315#10379#0" expanded="false" />
+            <element signature="e#10725#10789#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/ReloadConfigCommandHandler.java">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="44" column="8" lean-forward="true" selection-start-line="44" selection-start-column="8" selection-end-line="45" selection-end-column="44" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5216">
-          <caret line="355" column="26" lean-forward="false" selection-start-line="355" selection-start-column="26" selection-end-line="355" selection-end-column="26" />
+        <state relative-caret-position="276">
+          <caret line="70" column="0" lean-forward="true" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieTeamRocket.java">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3360">
-          <caret line="259" column="38" lean-forward="false" selection-start-line="259" selection-start-column="34" selection-end-line="259" selection-end-column="38" />
+        <state relative-caret-position="624">
+          <caret line="188" column="59" lean-forward="false" selection-start-line="188" selection-start-column="36" selection-end-line="188" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16">
+          <caret line="1" column="12" lean-forward="false" selection-start-line="1" selection-start-column="12" selection-end-line="1" selection-end-column="12" />
           <folding />
         </state>
       </provider>

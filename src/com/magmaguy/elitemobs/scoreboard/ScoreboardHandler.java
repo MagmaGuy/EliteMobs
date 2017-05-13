@@ -24,6 +24,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.*;
 
 import java.util.Collection;
@@ -34,7 +35,7 @@ import java.util.HashMap;
  */
 public class ScoreboardHandler implements Listener {
 
-    org.bukkit.plugin.Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     static HashMap playerHasScoreboard = new HashMap<Player, Boolean>();
     int processID;
 
@@ -77,7 +78,6 @@ public class ScoreboardHandler implements Listener {
         processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
             int iterator = 0;
-            int powCount = 0;
 
             public void run() {
 
@@ -94,7 +94,7 @@ public class ScoreboardHandler implements Listener {
 
                 int powerCounter = 0;
 
-                for (String string : metadataHandler.majorPowerList()) {
+                for (String string : metadataHandler.allPowersList()) {
 
                     if (entity.hasMetadata(string)) {
 
@@ -104,16 +104,12 @@ public class ScoreboardHandler implements Listener {
 
                 }
 
-                powCount = powerCounter;
-
                 ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
                 Scoreboard board = scoreboardManager.getNewScoreboard();
                 Objective objective = board.registerNewObjective("test", "dummy");
 
                 objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
                 objective.setDisplayName(entity.getName());
-
 
 
                 int currentHealth = (int) ((LivingEntity) entity).getHealth();
@@ -127,21 +123,21 @@ public class ScoreboardHandler implements Listener {
 
                         String finalString = metadataHandler.machineToHumanTranslator(string);
 
-                        if (powCount > 13) {
+                        if (powerCounter > 13) {
 
-                            Score score;
+                            Score score = null;
 
                             if (metadataHandler.minorPowerList().contains(string)){
 
                                 score = objective.getScore(ChatColor.AQUA + finalString);
 
-                            } else {
+                            } else if (metadataHandler.majorPowerList().contains(string)) {
 
                                 score = objective.getScore(ChatColor.DARK_AQUA + finalString);
 
                             }
 
-                            if (counter + iterator < powCount) {
+                            if (counter + iterator < powerCounter) {
 
                                 score.setScore(counter + iterator);
 
@@ -184,7 +180,7 @@ public class ScoreboardHandler implements Listener {
                 Score healthScore = objective.getScore(String.format("%s%s", ChatColor.DARK_RED, ChatColor.BOLD) +
                         ConfigValues.translationConfig.getString("ScoreBoard.Health") + ChatColor.RED + currentHealth
                         + ChatColor.DARK_RED + "/" + ChatColor.RED + maxHealth);
-                healthScore.setScore(powCount + 1);
+                healthScore.setScore(powerCounter);
 
                 iterator++;
 

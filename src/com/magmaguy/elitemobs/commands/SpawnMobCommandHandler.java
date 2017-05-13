@@ -301,6 +301,12 @@ public class SpawnMobCommandHandler {
                             powerCount++;
                         }
                         break;
+                    case MetadataHandler.ZOMBIE_PARENTS_H:
+                        if (entity instanceof Zombie){
+                            entity.setMetadata(MetadataHandler.ZOMBIE_PARENTS_MD, new FixedMetadataValue(plugin, true));
+                            powerCount++;
+                        }
+                        break;
                     //minor powers
                     case MetadataHandler.ATTACK_ARROW_H:
                         entity.setMetadata(MetadataHandler.ATTACK_ARROW_MD, new FixedMetadataValue(plugin, true));
@@ -399,7 +405,7 @@ public class SpawnMobCommandHandler {
                         powerCount++;
                         break;
                     case "custom":
-                        entity.setMetadata(MetadataHandler.CUSTOM_MD, new FixedMetadataValue(plugin, true));
+                        entity.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
                         powerCount++;
                         break;
                     default:

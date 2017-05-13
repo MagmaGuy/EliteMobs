@@ -49,11 +49,13 @@ public class MetadataHandler {
     public final static String CUSTOM_ARMOR = "CustomArmor";
     public final static String TAUNT_NAME = "Taunt_Name";
     public final static String FORBIDDEN_MD = "Forbidden";
-    public final static String CUSTOM_MD = "Custom";
+    public final static String CUSTOM_POWERS_MD = "Custom";
     //Major powers
     public final static String ZOMBIE_TEAM_ROCKET_MD = "ZombieTeamRocket";
+    public final static String ZOMBIE_PARENTS_MD= "ZombieParents";
     //Major powers human format
     public final static String ZOMBIE_TEAM_ROCKET_H = "ZombieTeamRocket";
+    public final static String ZOMBIE_PARENTS_H= "ZombieParents";
     //Minor powers
     public final static String ATTACK_ARROW_MD = "AttackArrow";
     public final static String ATTACK_BLINDING_MD = "AttackBlinding";
@@ -107,6 +109,7 @@ public class MetadataHandler {
     public final static String FROZEN_COOLDOWN = "FrozenCooldown";
     public final static String TEAM_ROCKET_MEMBER = "TeamRocketMember";
     public final static String TEAM_ROCKET_ACTIVATED = "TeamRocketActivated";
+    public final static String ZOMBIE_PARENTS_ACTIVATED = "ZombieParentsActivated";
 
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
@@ -127,6 +130,7 @@ public class MetadataHandler {
         metadataList.add(TAUNT_NAME);
         metadataList.add(FORBIDDEN_MD);
 
+        metadataList.add(ZOMBIE_PARENTS_MD);
         metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
 
         metadataList.add(ATTACK_ARROW_MD);
@@ -155,6 +159,7 @@ public class MetadataHandler {
         metadataList.add(FROZEN_COOLDOWN);
         metadataList.add(TEAM_ROCKET_MEMBER);
         metadataList.add(TEAM_ROCKET_ACTIVATED);
+        metadataList.add(ZOMBIE_PARENTS_ACTIVATED);
 
         return metadataList;
 
@@ -165,6 +170,7 @@ public class MetadataHandler {
         List<String> metadataList = new ArrayList<>();
 
         metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
+        metadataList.add(ZOMBIE_PARENTS_MD);
 
         return metadataList;
 
@@ -245,6 +251,7 @@ public class MetadataHandler {
         List<String> metadataList = new ArrayList<>();
 
         metadataList().add(ZOMBIE_TEAM_ROCKET_H);
+        metadataList.add(ZOMBIE_PARENTS_H);
 
         return metadataList;
 
@@ -301,6 +308,8 @@ public class MetadataHandler {
 
             case ZOMBIE_TEAM_ROCKET_MD:
                 return ZOMBIE_TEAM_ROCKET_H;
+            case ZOMBIE_PARENTS_MD:
+                return ZOMBIE_PARENTS_H;
 
             case ATTACK_ARROW_MD:
                 return ATTACK_ARROW_H;
@@ -360,7 +369,8 @@ public class MetadataHandler {
 
             if (entity.hasMetadata(string)) {
 
-                if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD)) {
+                if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
+                        !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ) {
 
                     entity.remove();
 

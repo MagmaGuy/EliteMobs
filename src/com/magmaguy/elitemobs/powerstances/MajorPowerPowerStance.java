@@ -101,6 +101,16 @@ public class MajorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_PARENTS_MD)) {
+
+                        ItemStack itemStack = new ItemStack(Material.MONSTER_EGG, 1, (short) 0 ,(byte) 54);
+
+                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
+
+                        effectIteration++;
+
+                    }
+
                     if (!entity.isValid()) {
 
                         for (int i = 0; i < powerItemLocationTracker.size(); i++) {
@@ -187,20 +197,18 @@ public class MajorPowerPowerStance implements Listener {
                     Location newLocation = trackHashMap.get(i).get(j);
                     Location currentLocation = item.getLocation();
 
-//                    if (entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() % 4 * 10 == 0 ||
-//                            item.getWorld() != entity.getWorld()){
-//
-//                        entity.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() - 1 ));
-//                        Location itemLocation = trackHashMap.get(i).get(j);
-//
-//                        item.remove();
-//                        item.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
-//
-//                        item = powerItemLocationTracker.get(effectIteration).get(i).set(j, itemInitializer(itemStack, itemLocation));
-//
-//                        entity.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() + 1 ));
-//
-//                    }
+                    if (entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() % (4 * 10) == 0 ||
+                            item.getWorld() != entity.getWorld()){
+
+                        entity.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() - 1 ));
+                        Location itemLocation = trackHashMap.get(i).get(j);
+
+                        //teleport is accurate at slower update rates, but when teleporting every tick can get an error margin of up to 2 meters
+                        item.teleport(itemLocation);
+
+                        entity.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() + 1 ));
+
+                    }
 
                     Vector vector = (newLocation.subtract(currentLocation)).toVector();
                     vector = vector.multiply(0.3);

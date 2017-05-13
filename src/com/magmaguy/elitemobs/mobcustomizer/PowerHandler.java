@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.majorpowers.MajorPowers;
+import com.magmaguy.elitemobs.majorpowers.ZombieParents;
 import com.magmaguy.elitemobs.majorpowers.ZombieTeamRocket;
 import com.magmaguy.elitemobs.minorpowers.MinorPowers;
 import org.bukkit.Bukkit;
@@ -43,6 +44,8 @@ public class PowerHandler {
     private static Random random = new Random();
 
     private static MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
+    private static ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
+    private static ZombieParents zombieParents = new ZombieParents();
 
     public static void powerHandler(Entity entity) {
 
@@ -66,7 +69,7 @@ public class PowerHandler {
 
             int currentMinorPowerAmount = 0;
 
-            if (entity.hasMetadata(MetadataHandler.CUSTOM_MD)) {
+            if (entity.hasMetadata(MetadataHandler.CUSTOM_POWERS_MD)) {
 
                 return;
 
@@ -137,7 +140,7 @@ public class PowerHandler {
 
             int currentMajorPowerAmount = 0;
 
-            if (entity.hasMetadata(MetadataHandler.CUSTOM_MD)){
+            if (entity.hasMetadata(MetadataHandler.CUSTOM_POWERS_MD)){
 
                 return;
 
@@ -149,9 +152,10 @@ public class PowerHandler {
 
                 if (entity instanceof Zombie) {
 
-                    ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
-
+                    //These powers can't be intialized like minor powers because the list depends on the mob type
+                    //TODO: Add a mob type sensitive power list
                     majorPowersArrayList.add(zombieTeamRocket);
+                    majorPowersArrayList.add(zombieParents);
 
                 }
 
@@ -177,6 +181,7 @@ public class PowerHandler {
 
             }
 
+            //TODO: pretty sure this doesn't check for level 10?
             int missingMajorPowerAmount = availableMajorPowers - currentMajorPowerAmount;
 
             if (missingMajorPowerAmount > 0 && majorPowersArrayList.size() > 0) {
