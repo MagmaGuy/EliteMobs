@@ -17,7 +17,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
-import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -119,19 +118,16 @@ public class CommandHandler implements CommandExecutor {
 
                 //valid /elitemobs reload config
                 if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
-                        args[1].equalsIgnoreCase("config") &&
-                        commandSender.hasPermission("elitemobs.reload.config")) {
+                        args[1].equalsIgnoreCase("configs") &&
+                        commandSender.hasPermission("elitemobs.reload.configs")) {
 
                     Player player = (Player) commandSender;
-                    Bukkit.getPluginManager().getPlugin("EliteMobs").reloadConfig();
-                    MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
-                    mobPowersCustomConfig.reloadCustomConfig();
-                    LootCustomConfig lootCustomConfig = new LootCustomConfig();
-                    lootCustomConfig.reloadLootConfig();
-                    EliteDropsHandler eliteDropsHandler = new EliteDropsHandler();
-                    eliteDropsHandler.superDropParser();
-                    getLogger().info("EliteMobs config reloaded!");
-                    player.sendTitle("EliteMobs config reloaded!", "hehehe butts.");
+
+                    ReloadConfigCommandHandler reloadConfigCommandHandler = new ReloadConfigCommandHandler();
+                    reloadConfigCommandHandler.reloadConfiguration();
+
+                    getLogger().info("EliteMobs configs reloaded!");
+                    player.sendTitle("EliteMobs config reloaded!", "Reloaded config, loot, mobPowers and translation");
 
                     return true;
 
@@ -154,8 +150,12 @@ public class CommandHandler implements CommandExecutor {
                     Player player = (Player) commandSender;
                     LootCustomConfig lootCustomConfig = new LootCustomConfig();
                     lootCustomConfig.reloadLootConfig();
+
+                    EliteDropsHandler eliteDropsHandler = new EliteDropsHandler();
+                    eliteDropsHandler.superDropParser();
+
                     getLogger().info("EliteMobs loot reloaded!");
-                    player.sendTitle("EliteMobs loot reloaded!", "hehehe booty.");
+                    player.sendTitle("EliteMobs loot reloaded!", "Reloaded loot.yml");
 
                     return true;
 
@@ -317,7 +317,7 @@ public class CommandHandler implements CommandExecutor {
 
             player.sendMessage("Valid commands:");
             player.sendMessage("/elitemobs stats");
-            player.sendMessage("/elitemobs reload config");
+            player.sendMessage("/elitemobs reload configs");
             player.sendMessage("/elitemobs reload loot");
             player.sendMessage("/elitemobs getloot (alone to get GUI)");
             player.sendMessage("/elitemobs getloot [loot name]");
@@ -328,7 +328,7 @@ public class CommandHandler implements CommandExecutor {
 
             getLogger().info("Command not recognized. Valid commands:");
             getLogger().info("elitemobs stats");
-            getLogger().info("elitemobs reload config");
+            getLogger().info("elitemobs reload configs");
             getLogger().info("elitemobs reload loot");
             getLogger().info("elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
             getLogger().info("elitemobs spawnmob [worldName] [x] [y] [z] [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
@@ -352,7 +352,7 @@ public class CommandHandler implements CommandExecutor {
 
         }
 
-        //TODO: hunt downstuff that errors when this is changed to false
+        //TODO: hunt down stuff that errors when this is changed to false
         return true;
 
     }

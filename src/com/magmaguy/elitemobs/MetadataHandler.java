@@ -51,9 +51,9 @@ public class MetadataHandler {
     public final static String FORBIDDEN_MD = "Forbidden";
     public final static String CUSTOM_MD = "Custom";
     //Major powers
-    public final static String ZOMBIE_TEAM_ROCKET_MD = "TeamRocket";
+    public final static String ZOMBIE_TEAM_ROCKET_MD = "ZombieTeamRocket";
     //Major powers human format
-    public final static String ZOMBIE_TEAM_ROCKET_H = "TeamRocket";
+    public final static String ZOMBIE_TEAM_ROCKET_H = "ZombieTeamRocket";
     //Minor powers
     public final static String ATTACK_ARROW_MD = "AttackArrow";
     public final static String ATTACK_BLINDING_MD = "AttackBlinding";
@@ -235,6 +235,16 @@ public class MetadataHandler {
         metadataList.add(MOVEMENT_SPEED_H);
         metadataList.add(INVISIBILITY_H);
         metadataList.add(TAUNT_H);
+
+        return metadataList;
+
+    }
+
+    public List<String> majorPowerListHumanFormat() {
+
+        List<String> metadataList = new ArrayList<>();
+
+        metadataList().add(ZOMBIE_TEAM_ROCKET_H);
 
         return metadataList;
 
