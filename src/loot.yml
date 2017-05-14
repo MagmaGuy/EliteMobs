@@ -1,73 +1,73 @@
 Loot:
   Magmaguy's Toothpick:
     Item Type: WOOD_SWORD
-    Item Name: Magmaguy's Toothpick
+    Item Name: "&4Magmaguy&c's &aToothpick"
     Item Lore:
-    - Nearly mint condition!
+    - "&l&5Nearly mint condition!"
     Enchantments:
     - DAMAGE_ALL,1
     Potion Effects:
   Elite Mob Hunting Helmet:
     Item Type: DIAMOND_HELMET
-    Item Name: Elite Mob Hunting Helmet
+    Item Name: "&4Elite Mob Hunting Helmet"
     Item Lore:
-    - Wearing this helmet will
-    - increase the number of
-    - high level Elite Mobs
-    - that spawn around you!
-    - Only for the most tenacious minds.
+    - "Wearing this helmet will"
+    - "increase the number of"
+    - "high level Elite Mobs"
+    - "that spawn around you!"
+    - "Only for the most tenacious minds."
     Enchantments:
     - VANISHING_CURSE,1
     Potion Effects:
     - NIGHT_VISION,1
   Elite Mob Hunting Chestplate:
     Item Type: DIAMOND_CHESTPLATE
-    Item Name: Elite Mob Hunting Chestplate
+    Item Name: "&4Elite Mob Hunting Chestplate"
     Item Lore:
-    - Wearing this chestplate will
-    - increase the number of
-    - high level Elite Mobs
-    - that spawn around you!
-    - Only for the bravest souls.
+    - "Wearing this chestplate will"
+    - "increase the number of"
+    - "high level Elite Mobs"
+    - "that spawn around you!"
+    - "Only for the bravest souls."
     Enchantments:
     - VANISHING_CURSE,1
     Potion Effects:
     - HEALTH_BOOST,1
   Elite Mob Hunting Leggings:
     Item Type: DIAMOND_LEGGINGS
-    Item Name: Elite Mob Hunting Leggings
+    Item Name: "&4Elite Mob Hunting Leggings"
     Item Lore:
-    - Wearing these leggings will
-    - increase the number of
-    - high level Elite Mobs
-    - that spawn around you!
-    - Only for those who aim the highest.
+    - "Wearing these leggings will"
+    - "increase the number of"
+    - "high level Elite Mobs"
+    - "that spawn around you!"
+    - "Only for those who aim the highest."
     Enchantments:
     - VANISHING_CURSE,1
     Potion Effects:
     - JUMP,2
   Elite Mob Hunting Boots:
     Item Type: DIAMOND_BOOTS
-    Item Name: Elite Mob Hunting Boots
+    Item Name: "&4Elite Mob Hunting Boots"
     Item Lore:
-    - Wearing these boots will
-    - increase the number of
-    - high level Elite Mobs
-    - that spawn around you!
-    - Only for those fleetest of foot.
+    - "Wearing these boots will"
+    - "increase the number of"
+    - "high level Elite Mobs"
+    - "that spawn around you!"
+    - "Only for those fleetest of foot."
     Enchantments:
     - VANISHING_CURSE,1
     Potion Effects:
     - SPEED,2
   Elite Mob Hunting Bow:
     Item Type: BOW
-    Item Name: Elite Mob Hunting Bow
+    Item Name: "&4Elite Mob Hunting Bow"
     Item Lore:
-    - Wielding this bow will
-    - increase the number of
-    - high level Elite Mobs
-    - that spawn around you!
-    - Only natural-born hunters.
+    - "Wielding this bow will"
+    - "increase the number of"
+    - "high level Elite Mobs"
+    - "that spawn around you!"
+    - "Only natural-born hunters."
     Enchantments:
     - VANISHING_CURSE,1
     - ARROW_DAMAGE,3

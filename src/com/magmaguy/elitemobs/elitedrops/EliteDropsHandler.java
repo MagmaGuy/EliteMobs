@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
 import static org.bukkit.Bukkit.getLogger;
 
 /**
@@ -59,16 +60,17 @@ public class EliteDropsHandler implements Listener {
             int itemPower = 0;
 
             StringBuilder path = new StringBuilder();
-
             path.append(lootEntry);
 
             String previousPath = path.toString();
 
+
             String itemType = itemTypeHandler(previousPath);
             itemPower += itemTypePower(Material.getMaterial(itemType));
-
+            Bukkit.getLogger().info("Adding: " + previousPath);
             String itemName = itemNameHandler(previousPath);
             List itemLore = itemLoreHandler(previousPath);
+
             List itemEnchantments = itemEnchantmentHandler(previousPath);
             List potionEffects = itemPotionEffectHandler(previousPath);
 
@@ -135,7 +137,6 @@ public class EliteDropsHandler implements Listener {
 
             }
 
-            //TODO: add itmepower here
             rankedItemMapCreator(itemPower, itemStack);
 
         }
@@ -319,7 +320,7 @@ public class EliteDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Name");
 
-        String itemName = lootCustomConfig.getLootConfig().getString(path);
+        String itemName = chatColorConverter(lootCustomConfig.getLootConfig().getString(path));
 
         return itemName;
 
@@ -329,9 +330,33 @@ public class EliteDropsHandler implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Lore");
 
-        List itemLore = lootCustomConfig.getLootConfig().getList(path);
+        List<String> itemLore = (List<String>) lootCustomConfig.getLootConfig().getList(path);
 
-        return itemLore;
+        if (itemLore == null || itemLore.isEmpty()) {
+
+            return itemLore;
+
+        }
+
+        List<String> newList = new ArrayList<>();
+
+        for (String string : itemLore) {
+
+            if (string != null && !string.isEmpty()) {
+
+                newList.add(itemLore.indexOf(string), chatColorConverter(string));
+
+            }
+
+        }
+
+        if (newList == null || newList.isEmpty()) {
+
+            return itemLore;
+
+        }
+
+        return newList;
 
     }
 

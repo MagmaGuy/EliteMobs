@@ -215,7 +215,7 @@ public class MetadataHandler {
 
     }
 
-    public List<String> minorPowerListHumanFormat() {
+    public List<String> powerListHumanFormat() {
 
         List<String> metadataList = new ArrayList<>();
 
@@ -241,6 +241,8 @@ public class MetadataHandler {
         metadataList.add(MOVEMENT_SPEED_H);
         metadataList.add(INVISIBILITY_H);
         metadataList.add(TAUNT_H);
+        metadataList.add(ZOMBIE_TEAM_ROCKET_H);
+        metadataList.add(ZOMBIE_PARENTS_H);
 
         return metadataList;
 

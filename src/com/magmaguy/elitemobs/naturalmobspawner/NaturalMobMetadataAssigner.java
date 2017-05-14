@@ -32,6 +32,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
+import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 
@@ -90,27 +91,29 @@ public class NaturalMobMetadataAssigner implements Listener {
                         for (ItemStack itemStack : EliteDropsHandler.lootList) {
 
                             if (helmet != null && itemStack.getItemMeta().equals(helmet.getItemMeta()) &&
-                                    helmet.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting helmet")) {
+                                    helmet.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting helmet"))) {
 
                                 huntingGearChanceAdder++;
 
                             } else if (chestplate != null && chestplate.getItemMeta().equals(itemStack.getItemMeta())
-                                    && chestplate.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting chestplate")) {
+                                    && chestplate.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting chestplate"))) {
 
                                 huntingGearChanceAdder++;
+
 
                             } else if (leggings != null && leggings.getItemMeta().equals(itemStack.getItemMeta())
-                                    && leggings.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting leggings")) {
+                                    && leggings.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting leggings"))) {
 
                                 huntingGearChanceAdder++;
 
+
                             } else if (boots != null && boots.getItemMeta().equals(itemStack.getItemMeta())
-                                    && boots.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting boots")) {
+                                    && boots.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting boots"))) {
 
                                 huntingGearChanceAdder++;
 
                             } else if (heldItem != null && heldItem.getType() != Material.AIR && heldItem.getItemMeta().equals(itemStack.getItemMeta())
-                                    && heldItem.getItemMeta().getDisplayName().equalsIgnoreCase("elite mob hunting bow")) {
+                                    && heldItem.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting bow"))) {
 
                                 huntingGearChanceAdder++;
 

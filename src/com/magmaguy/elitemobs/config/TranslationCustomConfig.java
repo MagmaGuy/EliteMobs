@@ -373,6 +373,7 @@ public class TranslationCustomConfig {
         this.getTranslationConfig().addDefault("ZombieTeamRocket.Jesse name", "Jesse");
         this.getTranslationConfig().addDefault("ZombieTeamRocket.James name", "James");
         this.getTranslationConfig().addDefault("ZombieTeamRocket.Meowth name", "Meowth");
+        this.getTranslationConfig().addDefault("ZombieTeamRocket.DeathMessage", "Team rocket blasts off again!");
 
         this.getTranslationConfig().addDefault("ZombieParents.Dad Name", "Zombie's Dad");
         this.getTranslationConfig().addDefault("ZombieParents.Mom Name", "Zombie's Mom");

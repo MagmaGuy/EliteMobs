@@ -38,6 +38,8 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
+import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+
 /**
  * Created by MagmaGuy on 07/05/2017.
  */
@@ -160,82 +162,82 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
 
                         case 1:
                             jesse.setCustomNameVisible(true);
-                            jesse.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(0));
+                            jesse.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(0)));
                             break;
                         case 2:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(1));
+                            james.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(1)));
                             james.setCustomNameVisible(true);
                             break;
                         case 3:
                             james.setCustomNameVisible(false);
-                            jesse.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(2));
+                            jesse.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(2)));
                             jesse.setCustomNameVisible(true);
                             break;
                         case 4:
-                            jesse.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(3));
+                            jesse.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(3)));
                             break;
                         case 5:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(4));
+                            james.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(4)));
                             james.setCustomNameVisible(true);
                             break;
                         case 6:
-                            james.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(5));
+                            james.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(5)));
                             break;
                         case 7:
                             james.setCustomNameVisible(false);
-                            jesse.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(6));
+                            jesse.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(6)));
                             jesse.setCustomNameVisible(true);
                             break;
                         case 8:
-                            jesse.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(7));
+                            jesse.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(7)));
                             break;
                         case 9:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(8));
+                            james.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(8)));
                             james.setCustomNameVisible(true);
                             break;
                         case 10:
-                            james.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(9));
+                            james.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(9)));
                             break;
                         case 11:
                             james.setCustomNameVisible(false);
-                            jesse.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(10));
+                            jesse.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(10)));
                             jesse.setCustomNameVisible(true);
                             break;
                         case 12:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(11));
+                            james.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(11)));
                             james.setCustomNameVisible(true);
                             break;
                         case 13:
                             james.setCustomNameVisible(false);
-                            jesse.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(12));
+                            jesse.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(12)));
                             jesse.setCustomNameVisible(true);
                             break;
                         case 14:
-                            jesse.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(13));
+                            jesse.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(13)));
                             break;
                         case 15:
                             jesse.setCustomNameVisible(false);
-                            james.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(14));
+                            james.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(14)));
                             james.setCustomNameVisible(true);
                             break;
                         case 16:
-                            james.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(15));
+                            james.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(15)));
                             break;
                         case 17:
                             james.setCustomNameVisible(false);
-                            meowth.setCustomName(configuration.getStringList("ZombieTeamRocket.Intro").get(16));
+                            meowth.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(16)));
                             meowth.setCustomNameVisible(true);
                             break;
                         default:
-                            jesse.setCustomName(configuration.getString("ZombieTeamRocket.Jesse name"));
+                            jesse.setCustomName(chatColorConverter(configuration.getString("ZombieTeamRocket.Jesse name")));
                             jesse.setCustomNameVisible(true);
-                            james.setCustomName(configuration.getString("ZombieTeamRocket.James name"));
+                            james.setCustomName(chatColorConverter(configuration.getString("ZombieTeamRocket.James name")));
                             james.setCustomNameVisible(true);
-                            meowth.setCustomName(configuration.getString("ZombieTeamRocket.Meowth name"));
+                            meowth.setCustomName(chatColorConverter(configuration.getString("ZombieTeamRocket.Meowth name")));
                             Bukkit.getScheduler().cancelTask(processID);
                             break;
 
@@ -258,7 +260,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
 
             Entity entity = event.getEntity();
 
-            entity.setCustomName("Team rocket blasts off again!");
+            entity.setCustomName(chatColorConverter(configuration.getString("ZombieTeamRocket.DeathMessage")));
 
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
