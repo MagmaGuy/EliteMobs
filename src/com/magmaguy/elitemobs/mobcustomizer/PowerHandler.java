@@ -85,6 +85,7 @@ public class PowerHandler {
 
                 currentMinorPowerAmount = entity.getMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD).get(0).asInt();
 
+                //TODO: this is probably not working as intended
                 Iterator<MinorPowers> minorPowerIterator = minorPowerArray.iterator();
 
                 while (minorPowerIterator.hasNext()) {

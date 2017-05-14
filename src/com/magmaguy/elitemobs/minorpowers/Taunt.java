@@ -35,6 +35,8 @@ import org.bukkit.plugin.Plugin;
 import java.util.List;
 import java.util.Random;
 
+import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
@@ -172,7 +174,7 @@ public class Taunt extends MinorPowers implements Listener {
         int randomizedKey = random.nextInt(list.size());
         String tempName = list.get(randomizedKey);
 
-        entity.setCustomName(tempName);
+        entity.setCustomName(chatColorConverter(tempName));
 
         processID = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 

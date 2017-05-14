@@ -32,6 +32,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
+import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+
 /**
  * Created by MagmaGuy on 13/05/2017.
  */
@@ -81,8 +83,8 @@ public class ZombieParents extends MajorPowers implements Listener {
             Skeleton zombieMom = (Skeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.SKELETON);
             Skeleton zombieDad = (Skeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.SKELETON);
 
-            zombieDad.setCustomName(configuration.getString("ZombieParents.Dad Name"));
-            zombieMom.setCustomName(configuration.getString("ZombieParents.Mom Name"));
+            zombieDad.setCustomName(chatColorConverter(configuration.getString("ZombieParents.Dad Name")));
+            zombieMom.setCustomName(chatColorConverter(configuration.getString("ZombieParents.Mom Name")));
 
             zombieDad.setCustomNameVisible(true);
             zombieMom.setCustomNameVisible(true);
@@ -109,9 +111,9 @@ public class ZombieParents extends MajorPowers implements Listener {
 
                             nameClearer(zombieDad);
 
-                            zombieDad.setCustomName(configuration.getStringList("ZombieParents.DeathMessage").
+                            zombieDad.setCustomName(chatColorConverter(configuration.getStringList("ZombieParents.DeathMessage").
                                     get(random.nextInt(configuration.getStringList("ZombieParents.DeathMessage")
-                                            .size())));
+                                            .size()))));
 
                         }
 
@@ -119,9 +121,9 @@ public class ZombieParents extends MajorPowers implements Listener {
 
                             nameClearer(zombieMom);
 
-                            zombieMom.setCustomName(configuration.getStringList("ZombieParents.DeathMessage").
+                            zombieMom.setCustomName(chatColorConverter(configuration.getStringList("ZombieParents.DeathMessage").
                                     get(random.nextInt(configuration.getStringList("ZombieParents.DeathMessage")
-                                            .size())));
+                                            .size()))));
 
                         }
 
@@ -134,9 +136,9 @@ public class ZombieParents extends MajorPowers implements Listener {
 
                             nameClearer(entity);
 
-                            entity.setCustomName(configuration.getStringList("ZombieParents.ZombieDialog").
+                            entity.setCustomName(chatColorConverter(configuration.getStringList("ZombieParents.ZombieDialog").
                                     get(random.nextInt(configuration.getStringList("ZombieParents.ZombieDialog")
-                                            .size())));
+                                            .size()))));
 
                         }
 
@@ -144,9 +146,9 @@ public class ZombieParents extends MajorPowers implements Listener {
 
                             nameClearer(zombieDad);
 
-                            zombieDad.setCustomName(configuration.getStringList("ZombieParents.ZombieDadDialog").
+                            zombieDad.setCustomName(chatColorConverter(configuration.getStringList("ZombieParents.ZombieDadDialog").
                                     get(random.nextInt(configuration.getStringList("ZombieParents.ZombieDadDialog")
-                                            .size())));
+                                            .size()))));
 
                         }
 
@@ -154,9 +156,9 @@ public class ZombieParents extends MajorPowers implements Listener {
 
                             nameClearer(zombieMom);
 
-                            zombieMom.setCustomName(configuration.getStringList("ZombieParents.ZombieMomDialog").
+                            zombieMom.setCustomName(chatColorConverter(configuration.getStringList("ZombieParents.ZombieMomDialog").
                                     get(random.nextInt(configuration.getStringList("ZombieParents.ZombieMomDialog")
-                                            .size())));
+                                            .size()))));
 
                         }
 
