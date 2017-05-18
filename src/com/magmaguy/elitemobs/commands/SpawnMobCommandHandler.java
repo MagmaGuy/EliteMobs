@@ -295,6 +295,12 @@ public class SpawnMobCommandHandler {
 
                 switch (string) {
                     //major powers
+                    case MetadataHandler.ZOMBIE_FRIENDS_H:
+                        if (entity instanceof Zombie){
+                            entity.setMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD, new FixedMetadataValue(plugin, true));
+                            powerCount++;
+                        }
+                        break;
                     case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
                         if (entity instanceof Zombie){
                             entity.setMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD, new FixedMetadataValue(plugin, true));

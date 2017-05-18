@@ -97,8 +97,6 @@ public class ZombieParents extends MajorPowers implements Listener {
             zombieMom.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             zombieDad.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
             zombieMom.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
-            zombieDad.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            zombieMom.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
 
             processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -142,7 +140,7 @@ public class ZombieParents extends MajorPowers implements Listener {
 
                         }
 
-                        if (random.nextDouble() < 0.5) {
+                        if (random.nextDouble() < 0.5 && zombieDad.isValid()) {
 
                             nameClearer(zombieDad);
 
@@ -152,7 +150,7 @@ public class ZombieParents extends MajorPowers implements Listener {
 
                         }
 
-                        if (random.nextDouble() < 0.5) {
+                        if (random.nextDouble() < 0.5 && zombieMom.isValid()) {
 
                             nameClearer(zombieMom);
 

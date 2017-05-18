@@ -51,9 +51,11 @@ public class MetadataHandler {
     public final static String FORBIDDEN_MD = "Forbidden";
     public final static String CUSTOM_POWERS_MD = "Custom";
     //Major powers
+    public final static String ZOMBIE_FRIENDS_MD = "ZombieFriends";
     public final static String ZOMBIE_TEAM_ROCKET_MD = "ZombieTeamRocket";
     public final static String ZOMBIE_PARENTS_MD= "ZombieParents";
     //Major powers human format
+    public final static String ZOMBIE_FRIENDS_H = "ZombieFriends";
     public final static String ZOMBIE_TEAM_ROCKET_H = "ZombieTeamRocket";
     public final static String ZOMBIE_PARENTS_H= "ZombieParents";
     //Minor powers
@@ -107,7 +109,8 @@ public class MetadataHandler {
     //powerEffects
     public final static String FROZEN = "Frozen";
     public final static String FROZEN_COOLDOWN = "FrozenCooldown";
-    public final static String TEAM_ROCKET_MEMBER = "TeamRocketMember";
+    public final static String ZOMBIE_FRIENDS_ACTIVATED = "ZombieFriendsActivated";
+    public final static String TEAM_ROCKET_MEMBER= "TeamRocketMember";
     public final static String TEAM_ROCKET_ACTIVATED = "TeamRocketActivated";
     public final static String ZOMBIE_PARENTS_ACTIVATED = "ZombieParentsActivated";
 
@@ -130,6 +133,7 @@ public class MetadataHandler {
         metadataList.add(TAUNT_NAME);
         metadataList.add(FORBIDDEN_MD);
 
+        metadataList.add(ZOMBIE_FRIENDS_MD);
         metadataList.add(ZOMBIE_PARENTS_MD);
         metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
 
@@ -157,8 +161,9 @@ public class MetadataHandler {
 
         metadataList.add(FROZEN);
         metadataList.add(FROZEN_COOLDOWN);
-        metadataList.add(TEAM_ROCKET_MEMBER);
+        metadataList.add(ZOMBIE_FRIENDS_ACTIVATED);
         metadataList.add(TEAM_ROCKET_ACTIVATED);
+        metadataList.add(TEAM_ROCKET_MEMBER);
         metadataList.add(ZOMBIE_PARENTS_ACTIVATED);
 
         return metadataList;
@@ -169,6 +174,7 @@ public class MetadataHandler {
 
         List<String> metadataList = new ArrayList<>();
 
+        metadataList.add(ZOMBIE_FRIENDS_MD);
         metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
         metadataList.add(ZOMBIE_PARENTS_MD);
 
@@ -241,18 +247,8 @@ public class MetadataHandler {
         metadataList.add(MOVEMENT_SPEED_H);
         metadataList.add(INVISIBILITY_H);
         metadataList.add(TAUNT_H);
-        metadataList.add(ZOMBIE_TEAM_ROCKET_H);
         metadataList.add(ZOMBIE_PARENTS_H);
-
-        return metadataList;
-
-    }
-
-    public List<String> majorPowerListHumanFormat() {
-
-        List<String> metadataList = new ArrayList<>();
-
-        metadataList().add(ZOMBIE_TEAM_ROCKET_H);
+        metadataList.add(ZOMBIE_TEAM_ROCKET_H);
         metadataList.add(ZOMBIE_PARENTS_H);
 
         return metadataList;
@@ -308,6 +304,8 @@ public class MetadataHandler {
 
         switch (metadata) {
 
+            case ZOMBIE_FRIENDS_MD:
+                return ZOMBIE_FRIENDS_H;
             case ZOMBIE_TEAM_ROCKET_MD:
                 return ZOMBIE_TEAM_ROCKET_H;
             case ZOMBIE_PARENTS_MD:
