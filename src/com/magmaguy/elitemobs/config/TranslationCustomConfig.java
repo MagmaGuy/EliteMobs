@@ -350,6 +350,43 @@ public class TranslationCustomConfig {
                 "Mediocre..."
         ));
 
+        this.getTranslationConfig().addDefault("ZombieFriends.Friend 1", "BFF #1");
+        this.getTranslationConfig().addDefault("ZombieFriends.Friend 2", "BFF #2");
+
+        this.getTranslationConfig().addDefault("ZombieFriends.DeathMessage", Arrays.asList(
+                "Noooo!",
+                "Mediocre!",
+                "Zacharias!",
+                "He's deader than before!"
+        ));
+
+        this.getTranslationConfig().addDefault("ZombieFriends.ZombieDialog", Arrays.asList(
+                "Let's play ZombieCraft later!",
+                "Feel the power of friendship!",
+                "El pueblo, unido!",
+                "I called my friends over!",
+                "BFF power!"
+        ));
+
+        this.getTranslationConfig().addDefault("ZombieFriends.FriendDialog", Arrays.asList(
+                "Don't mess with our friends!",
+                "We got your back Zach!",
+                "Backup has arrived!",
+                "One for all, one for all!",
+                "This is going to be easy!",
+                "Give up we have the high ground!",
+                "You wanna go bruv?",
+                "Worldstaaaaaaaaar!",
+                "What are you doing to our friend",
+                "Feel the power of friendship!",
+                "Friendship power at 100%!",
+                "Zombies, assemble!",
+                "We got your back mate!",
+                "Together we are better!",
+                "The more the merrier!",
+                "I got you fam!"
+        ));
+
         this.getTranslationConfig().addDefault("ZombieTeamRocket.Intro", Arrays.asList(
                 "Prepare for trouble!",
                 "Make it double!",

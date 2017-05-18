@@ -91,6 +91,17 @@ public class MajorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD)) {
+
+
+                        ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 2);
+
+                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
+
+                        effectIteration++;
+
+                    }
+
                     if (entity.hasMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD)) {
 
                         ItemStack itemStack = new ItemStack(Material.FIREWORK, 1);
