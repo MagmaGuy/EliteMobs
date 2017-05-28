@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import org.bukkit.Bukkit;
@@ -63,8 +64,18 @@ public class CommandHandler implements CommandExecutor {
             } else if (commandSender instanceof Player && !commandSender.hasPermission("elitemobs.spawnmob")) {
 
                 Player player = (Player) commandSender;
-                player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                        "You need the following permission: " + "elitemobs.spawnmob");
+
+                if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                            "You need the following permission: " + "elitemobs.spawnmob");
+
+                } else {
+
+                    player.sendMessage("You do not have the permission " + "elitemobs.spawnmob");
+
+                }
+
                 return true;
 
             }
@@ -96,8 +107,16 @@ public class CommandHandler implements CommandExecutor {
                         && !commandSender.hasPermission("elitemobs.stats")) {
 
                     Player player = (Player) commandSender;
-                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                            "You need the following permission: " + "elitemobs.stats");
+                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                                "You need the following permission: " + "elitemobs.stats");
+
+                    } else {
+
+                        player.sendMessage("You do not have the permission " + "elitemobs.stats");
+
+                    }
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
@@ -137,8 +156,17 @@ public class CommandHandler implements CommandExecutor {
                         !commandSender.hasPermission("elitemobs.reload.config")) {
 
                     Player player = (Player) commandSender;
-                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                            "You need the following permission: " + " elitemobs.reload.config");
+
+                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                                "You need the following permission: " + "elitemobs.reload.configs");
+
+                    } else {
+
+                        player.sendMessage("You do not have the permission " + "elitemobs.reload.configs");
+
+                    }
 
                     return true;
 
@@ -165,8 +193,17 @@ public class CommandHandler implements CommandExecutor {
                         !commandSender.hasPermission("elitemobs.reload.loot")) {
 
                     Player player = (Player) commandSender;
-                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                            "You need the following permission: " + " elitemobs.reload.loot");
+
+                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                                "You need the following permission: " + "elitemobs.reload.loot");
+
+                    } else {
+
+                        player.sendMessage("You do not have the permission " + "elitemobs.reload.loot");
+
+                    }
 
                     return true;
 
@@ -196,8 +233,17 @@ public class CommandHandler implements CommandExecutor {
                         || args[0].equalsIgnoreCase("gl") && !commandSender.hasPermission("elitemobs.getloot")) {
 
                     Player player = (Player) commandSender;
-                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                            "You need the following permission: " + " elitemobs.getloot");
+
+                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                                "You need the following permission: " + "elitemobs.getloot");
+
+                    } else {
+
+                        player.sendMessage("You do not have the permission " + "elitemobs.getloot");
+
+                    }
 
                     return true;
 

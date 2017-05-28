@@ -17,9 +17,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
-import com.magmaguy.elitemobs.majorpowers.MajorPowers;
-import com.magmaguy.elitemobs.majorpowers.ZombieParents;
-import com.magmaguy.elitemobs.majorpowers.ZombieTeamRocket;
+import com.magmaguy.elitemobs.majorpowers.*;
 import com.magmaguy.elitemobs.minorpowers.MinorPowers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -43,9 +41,13 @@ public class PowerHandler {
     private static MetadataHandler metadataHandler = new MetadataHandler();
     private static Random random = new Random();
 
+    private static ArrayList<MajorPowers> majorPowersArrayList = new ArrayList();
+
     private static MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
     private static ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
+    private static ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
     private static ZombieParents zombieParents = new ZombieParents();
+    private static ZombieFriends zombieFriends = new ZombieFriends();
 
     public static void powerHandler(Entity entity) {
 
@@ -155,6 +157,8 @@ public class PowerHandler {
 
                     //These powers can't be intialized like minor powers because the list depends on the mob type
                     //TODO: Add a mob type sensitive power list
+                    majorPowersArrayList.add(zombieFriends);
+                    majorPowersArrayList.add(zombieNecronomicon);
                     majorPowersArrayList.add(zombieTeamRocket);
                     majorPowersArrayList.add(zombieParents);
 
@@ -223,7 +227,7 @@ public class PowerHandler {
 
     public static void minorPowerArrayInitializer () {
 
-        for (String string : metadataHandler.minorPowerList()) {
+        for (String string : MetadataHandler.minorPowerList()) {
 
             if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)){
 

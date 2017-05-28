@@ -94,7 +94,7 @@ public class AttackFireball extends MinorPowers implements Listener {
 
                     }
 
-                },100, 100 );
+                },20*8, 20*8 );
 
             }
 

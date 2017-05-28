@@ -301,6 +301,12 @@ public class SpawnMobCommandHandler {
                             powerCount++;
                         }
                         break;
+                    case MetadataHandler.ZOMBIE_NECRONOMICON_H:
+                        if (entity instanceof Zombie){
+                            entity.setMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD, new FixedMetadataValue(plugin, true));
+                            powerCount++;
+                        }
+                        break;
                     case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
                         if (entity instanceof Zombie){
                             entity.setMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD, new FixedMetadataValue(plugin, true));
@@ -444,11 +450,11 @@ public class SpawnMobCommandHandler {
 
                     Player player = (Player) commandSender;
 
-                    player.sendMessage("Valid powers: " + metadataHandler.powerListHumanFormat() + " custom");
+                    player.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat() + " custom");
 
                 } else if (commandSender instanceof ConsoleCommandSender) {
 
-                    getConsoleSender().sendMessage("Valid powers: " + metadataHandler.powerListHumanFormat() + metadataHandler.majorPowerList()+ " custom");
+                    getConsoleSender().sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat() + MetadataHandler.majorPowerList()+ " custom");
 
                 }
 
