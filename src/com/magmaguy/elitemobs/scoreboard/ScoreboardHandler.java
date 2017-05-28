@@ -81,7 +81,8 @@ public class ScoreboardHandler implements Listener {
 
             public void run() {
 
-                if (!entity.isValid() || player.getLocation().distance(entity.getLocation()) > 7) {
+                if (!entity.isValid() || player.getWorld() != entity.getWorld() ||
+                        player.getLocation().distance(entity.getLocation()) > 7) {
 
                     player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
                     playerHasScoreboard.put(player, false);
@@ -94,7 +95,7 @@ public class ScoreboardHandler implements Listener {
 
                 int powerCounter = 0;
 
-                for (String string : metadataHandler.allPowersList()) {
+                for (String string : MetadataHandler.allPowersList()) {
 
                     if (entity.hasMetadata(string)) {
 
@@ -117,7 +118,7 @@ public class ScoreboardHandler implements Listener {
 
                 int counter = 0;
 
-                for (String string : metadataHandler.allPowersList()) {
+                for (String string : MetadataHandler.allPowersList()) {
 
                     if (entity.hasMetadata(string)) {
 
@@ -127,11 +128,11 @@ public class ScoreboardHandler implements Listener {
 
                             Score score = null;
 
-                            if (metadataHandler.minorPowerList().contains(string)){
+                            if (MetadataHandler.minorPowerList().contains(string)){
 
                                 score = objective.getScore(ChatColor.AQUA + finalString);
 
-                            } else if (metadataHandler.majorPowerList().contains(string)) {
+                            } else if (MetadataHandler.majorPowerList().contains(string)) {
 
                                 score = objective.getScore(ChatColor.DARK_AQUA + finalString);
 
@@ -154,7 +155,7 @@ public class ScoreboardHandler implements Listener {
 
                             Score score;
 
-                            if (metadataHandler.minorPowerList().contains(string)){
+                            if (MetadataHandler.minorPowerList().contains(string)){
 
                                 score = objective.getScore(ChatColor.AQUA + finalString);
 

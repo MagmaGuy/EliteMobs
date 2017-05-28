@@ -25,6 +25,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -301,6 +302,21 @@ public class MajorPowerPowerStance implements Listener {
     public void antiItemDespawn (ItemDespawnEvent event) {
 
         if (event.getEntity().hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD)) {
+
+            event.setCancelled(true);
+
+        }
+
+    }
+
+
+    //TODO: this is a lazy solution
+    @EventHandler
+    public void portalPrevention (EntityPortalEvent event) {
+
+        if (event.getEntity().hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD) ||
+                event.getEntity().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD) ||
+                event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             event.setCancelled(true);
 
