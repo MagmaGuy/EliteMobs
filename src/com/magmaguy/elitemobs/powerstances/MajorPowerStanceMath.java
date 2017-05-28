@@ -63,7 +63,7 @@ public class MajorPowerStanceMath {
 
                 //add current location
 
-                locations.add(GenericRotationMatrixMath.applyRotation(entity, a, b, c, NUMBER_OF_POINTS_PER_FULL_ROTATION, X, Y, Z, (int) Math.ceil(counter + NUMBER_OF_POINTS_PER_FULL_ROTATION / itemsPerTrack * j)));
+                locations.add(GenericRotationMatrixMath.applyRotation(entity.getLocation(), a, b, c, NUMBER_OF_POINTS_PER_FULL_ROTATION, X, Y, Z, (int) Math.ceil(counter + NUMBER_OF_POINTS_PER_FULL_ROTATION / itemsPerTrack * j)));
 
             }
 

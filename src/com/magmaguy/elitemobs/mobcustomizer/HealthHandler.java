@@ -27,6 +27,12 @@ public class HealthHandler {
 
     public static void aggressiveHealthHandler(Entity entity, Entity deletedEntity) {
 
+        if (entity.hasMetadata(MetadataHandler.CUSTOM_HEALTH)) {
+
+            return;
+
+        }
+
         Damageable damageableEntity = ((Damageable) entity);
         Damageable damageableDeleted = ((Damageable) deletedEntity);
         double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity);

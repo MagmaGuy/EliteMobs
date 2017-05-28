@@ -116,7 +116,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Minor mob powers
         MetadataHandler metadataHandler = new MetadataHandler();
-        for (String string : metadataHandler.minorPowerList()){
+        for (String string : MetadataHandler.minorPowerList()){
 
             //don't load powers that require no even listeners
             if (!(string.equalsIgnoreCase("MovementSpeed"))
@@ -147,7 +147,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }
 
-        for (String string : metadataHandler.majorPowerList()){
+        for (String string : MetadataHandler.majorPowerList()){
 
             //don't load powers that require no even listeners
                 try {
@@ -320,6 +320,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("SuperCreeper explosion nerf multiplier", 1.0);
         getConfig().addDefault("Turn on visual effects for natural or plugin-spawned EliteMobs", true);
         getConfig().addDefault("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs", true);
+        getConfig().addDefault("Use titles to warn players they are missing a permission", true);
         getConfig().options().copyDefaults(true);
 
         //save the config when changed

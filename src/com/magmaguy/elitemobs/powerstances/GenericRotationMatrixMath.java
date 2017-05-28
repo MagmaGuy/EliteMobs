@@ -16,7 +16,6 @@
 package com.magmaguy.elitemobs.powerstances;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 import static java.lang.Math.*;
@@ -44,11 +43,11 @@ public class GenericRotationMatrixMath {
 
         The rotation matrix multiplication with coordinates is as follows:
         M(v, theta) = |cos(theta) + (1 - cos(theta)) * a^2    (1 - cos(theta)) * a * b + (sin(theta)) * c    (1 - cos(theta)) * a * c - (sin(theta)) * b| |x|
-                      |(1 - cos(theta)) * b * a - (sin (theta)) * c    cos(theta) + (1 + cos(theta)) * b^2    (1 - cos(theta) * b * c + (sin(theta)) * a| |y|
+                      |(1 - cos(theta)) * b * a - (sin (theta)) * c    cos(theta) + (1 - cos(theta)) * b^2    (1 - cos(theta) * b * c + (sin(theta)) * a| |y|
                       |(1 - cos(theta)) * c * a + (sin(theta)) * b    (1 - cos(theta)) * c * b - (sin(theta)) * a    cos(theta) + (1 - cos(theta)) * c^2| |z|
 
         newX = x * (cos(theta) + (1 - cos(theta)) * a^2) + y * ((1 - cos(theta)) * a * b + (sin(theta))) * c) + z * ((1 - cos(theta)) * a * c - (sin(theta)) * b)
-        newY = x * ((1 - cos(theta)) * b * a - (sin (theta)) * c) + y * (cos(theta) + (1 + cos(theta)) * b^2) + z * ((1 - cos(theta) * b * c + (sin(theta)) * a)
+        newY = x * ((1 - cos(theta)) * b * a - (sin (theta)) * c) + y * (cos(theta) + (1 - cos(theta)) * b^2) + z * ((1 - cos(theta) * b * c + (sin(theta)) * a)
         newZ = x * ((1 - cos(theta)) * c * a + (sin(theta)) * b) + y * ((1 - cos(theta)) * c * b - (sin(theta)) * a) + z * (cos(theta) + (1 - cos(theta)) * c^2)
 
         Quick tweak list:
@@ -60,13 +59,13 @@ public class GenericRotationMatrixMath {
 
         Instead of dealing with theta directly, by doing 360/theta you can pick how many points a single rotation has making
         it easier to predict where things are supposed to be.
-         */
+    */
 
     //TODO: register points in hashmap <int, List<Location>>
     private static Location newLocation;
     private static double newX, newY, newZ, theta;
 
-    public static Location applyRotation (Entity entity, double a, double b, double c, double numberOfPointsPerFullRotation, double x, double y, double z, int counter) {
+    public static Location applyRotation (Location centerLocation, double a, double b, double c, double numberOfPointsPerFullRotation, double x, double y, double z, int counter) {
 
         //Adapt numberOfPointsPerFullRotation to 360 degrees
         theta = 360 / numberOfPointsPerFullRotation;
@@ -74,11 +73,11 @@ public class GenericRotationMatrixMath {
         theta = theta + theta * counter;
 
         newX = x * (cos(theta) + (1 - cos(theta)) * pow(a, 2)) + y * ((1 - cos(theta)) * a * b + (sin(theta)) * c) + z * ((1 - cos(theta)) * a * c - (sin(theta)) * b);
-        newY = x * ((1 - cos(theta)) * b * a - (sin(theta)) * c) + y * (cos(theta) + (1 + cos(theta)) * pow(b, 2)) + z * ((1 - cos(theta)) * b * c + (sin(theta)) * a);
+        newY = x * ((1 - cos(theta)) * b * a - (sin(theta)) * c) + y * (cos(theta) + (1 - cos(theta)) * pow(b, 2)) + z * ((1 - cos(theta)) * b * c + (sin(theta)) * a);
         newZ = x * ((1 - cos(theta)) * c * a + (sin(theta)) * b) + y * ((1 - cos(theta)) * c * b - (sin(theta)) * a) + z * (cos(theta) + (1 - cos(theta)) * pow(c, 2));
 
         //adjust rotated point
-        newLocation = (new Location(entity.getWorld(), newX, newY, newZ)).add(entity.getLocation()).add(new Vector(0, 1 ,0));
+        newLocation = (new Location(centerLocation.getWorld(), newX, newY, newZ)).add(centerLocation).add(new Vector(0, 1 ,0));
 
         return newLocation;
 

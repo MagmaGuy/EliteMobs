@@ -81,7 +81,7 @@ public class MajorPowerPowerStance implements Listener {
                     int effectQuantity = 0;
                     int effectIteration = 0;
 
-                    for (String string : metadataHandler.majorPowerList()) {
+                    for (String string : MetadataHandler.majorPowerList()) {
 
                         if (entity.hasMetadata(string)){
 
@@ -95,6 +95,17 @@ public class MajorPowerPowerStance implements Listener {
 
 
                         ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 2);
+
+                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
+
+                        effectIteration++;
+
+                    }
+
+                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD)) {
+
+
+                        ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
 
                         itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
 
@@ -274,7 +285,7 @@ public class MajorPowerPowerStance implements Listener {
 
         Entity entity = event.getEntity();
 
-        for (String string : metadataHandler.majorPowerList()) {
+        for (String string : MetadataHandler.majorPowerList()) {
 
             if (entity.hasMetadata(string)) {
 

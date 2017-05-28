@@ -47,15 +47,18 @@ public class MetadataHandler {
     public final static String VISUAL_EFFECT_MD = "VisualEffect";
     public final static String CUSTOM_NAME = "CustomName";
     public final static String CUSTOM_ARMOR = "CustomArmor";
+    public final static String CUSTOM_HEALTH = "CustomHealth";
     public final static String TAUNT_NAME = "Taunt_Name";
     public final static String FORBIDDEN_MD = "Forbidden";
     public final static String CUSTOM_POWERS_MD = "Custom";
     //Major powers
     public final static String ZOMBIE_FRIENDS_MD = "ZombieFriends";
+    public final static String ZOMBIE_NECRONOMICON_MD = "ZombieNecronomicon";
     public final static String ZOMBIE_TEAM_ROCKET_MD = "ZombieTeamRocket";
     public final static String ZOMBIE_PARENTS_MD= "ZombieParents";
     //Major powers human format
     public final static String ZOMBIE_FRIENDS_H = "ZombieFriends";
+    public final static String ZOMBIE_NECRONOMICON_H = "ZombieNecronomicon";
     public final static String ZOMBIE_TEAM_ROCKET_H = "ZombieTeamRocket";
     public final static String ZOMBIE_PARENTS_H= "ZombieParents";
     //Minor powers
@@ -117,7 +120,7 @@ public class MetadataHandler {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
 
-    public List<String> metadataList() {
+    public static List<String> metadataList() {
 
         List<String> metadataList = new ArrayList<>();
 
@@ -130,34 +133,40 @@ public class MetadataHandler {
         metadataList.add(VISUAL_EFFECT_MD);
         metadataList.add(CUSTOM_NAME);
         metadataList.add(CUSTOM_ARMOR);
+        metadataList.add(CUSTOM_HEALTH);
         metadataList.add(TAUNT_NAME);
         metadataList.add(FORBIDDEN_MD);
 
-        metadataList.add(ZOMBIE_FRIENDS_MD);
-        metadataList.add(ZOMBIE_PARENTS_MD);
-        metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
+//        metadataList.add(ZOMBIE_FRIENDS_MD);
+//        metadataList.add(ZOMBIE_NECRONOMICON_MD);
+//        metadataList.add(ZOMBIE_PARENTS_MD);
+//        metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
 
-        metadataList.add(ATTACK_ARROW_MD);
-        metadataList.add(ATTACK_CONFUSING_MD);
-        metadataList.add(ATTACK_FIRE_MD);
-        metadataList.add(ATTACK_FIREBALL_MD);
-        metadataList.add(ATTACK_FREEZE_MD);
-        metadataList.add(ATTACK_GRAVITY_MD);
-        metadataList.add(ATTACK_POISON_MD);
-        metadataList.add(ATTACK_PUSH_MD);
-        metadataList.add(ATTACK_WEAKNESS_MD);
-        metadataList.add(ATTACK_WEB_MD);
-        metadataList.add(ATTACK_WITHER_MD);
-        metadataList.add(BONUS_LOOT_MD);
-        metadataList.add(DOUBLE_DAMAGE_MD);
-        metadataList.add(DOUBLE_HEALTH_MD);
-        metadataList.add(INVULNERABILITY_ARROW_MD);
-        metadataList.add(INVULNERABILITY_FALL_DAMAGE_MD);
-        metadataList.add(INVULNERABILITY_FIRE_MD);
-        metadataList.add(INVULNERABILITY_KNOCKBACK_MD);
-        metadataList.add(MOVEMENT_SPEED_MD);
-        metadataList.add(INVISIBILITY_MD);
-        metadataList.add(TAUNT_MD);
+        metadataList.addAll(majorPowerList());
+
+//        metadataList.add(ATTACK_ARROW_MD);
+//        metadataList.add(ATTACK_CONFUSING_MD);
+//        metadataList.add(ATTACK_FIRE_MD);
+//        metadataList.add(ATTACK_FIREBALL_MD);
+//        metadataList.add(ATTACK_FREEZE_MD);
+//        metadataList.add(ATTACK_GRAVITY_MD);
+//        metadataList.add(ATTACK_POISON_MD);
+//        metadataList.add(ATTACK_PUSH_MD);
+//        metadataList.add(ATTACK_WEAKNESS_MD);
+//        metadataList.add(ATTACK_WEB_MD);
+//        metadataList.add(ATTACK_WITHER_MD);
+//        metadataList.add(BONUS_LOOT_MD);
+//        metadataList.add(DOUBLE_DAMAGE_MD);
+//        metadataList.add(DOUBLE_HEALTH_MD);
+//        metadataList.add(INVULNERABILITY_ARROW_MD);
+//        metadataList.add(INVULNERABILITY_FALL_DAMAGE_MD);
+//        metadataList.add(INVULNERABILITY_FIRE_MD);
+//        metadataList.add(INVULNERABILITY_KNOCKBACK_MD);
+//        metadataList.add(MOVEMENT_SPEED_MD);
+//        metadataList.add(INVISIBILITY_MD);
+//        metadataList.add(TAUNT_MD);
+
+        metadataList.addAll(minorPowerList());
 
         metadataList.add(FROZEN);
         metadataList.add(FROZEN_COOLDOWN);
@@ -170,11 +179,12 @@ public class MetadataHandler {
 
     }
 
-    public List<String> majorPowerList(){
+    public static List<String> majorPowerList(){
 
         List<String> metadataList = new ArrayList<>();
 
         metadataList.add(ZOMBIE_FRIENDS_MD);
+        metadataList.add(ZOMBIE_NECRONOMICON_MD);
         metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
         metadataList.add(ZOMBIE_PARENTS_MD);
 
@@ -182,7 +192,7 @@ public class MetadataHandler {
 
     }
 
-    public List<String> minorPowerList(){
+    public static List<String> minorPowerList(){
 
         List<String> metadataList = new ArrayList<>();
 
@@ -213,7 +223,7 @@ public class MetadataHandler {
 
     }
 
-    public List<String> allPowersList(){
+    public static List<String> allPowersList(){
 
         List metadataList = Stream.of(minorPowerList(), majorPowerList()).flatMap(List::stream).collect(Collectors.toList());
 
@@ -221,7 +231,7 @@ public class MetadataHandler {
 
     }
 
-    public List<String> powerListHumanFormat() {
+    public static List<String> powerListHumanFormat() {
 
         List<String> metadataList = new ArrayList<>();
 
@@ -247,7 +257,9 @@ public class MetadataHandler {
         metadataList.add(MOVEMENT_SPEED_H);
         metadataList.add(INVISIBILITY_H);
         metadataList.add(TAUNT_H);
+
         metadataList.add(ZOMBIE_PARENTS_H);
+        metadataList.add(ZOMBIE_NECRONOMICON_H);
         metadataList.add(ZOMBIE_TEAM_ROCKET_H);
         metadataList.add(ZOMBIE_PARENTS_H);
 
@@ -306,6 +318,8 @@ public class MetadataHandler {
 
             case ZOMBIE_FRIENDS_MD:
                 return ZOMBIE_FRIENDS_H;
+            case ZOMBIE_NECRONOMICON_MD:
+                return ZOMBIE_NECRONOMICON_H;
             case ZOMBIE_TEAM_ROCKET_MD:
                 return ZOMBIE_TEAM_ROCKET_H;
             case ZOMBIE_PARENTS_MD:
