@@ -86,7 +86,8 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                 @Override
                 public void run() {
 
-                    if (!targetted.isValid() || !targetter.isValid() || targetted.getLocation().distance(targetter.getLocation()) > 30 ) {
+                    if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
+                            || targetted.getLocation().distance(targetter.getLocation()) > 30 ) {
 
                         ((LivingEntity) targetter).setAI(true);
                         Bukkit.getScheduler().cancelTask(processID);

@@ -77,7 +77,8 @@ public class AttackFireball extends MinorPowers implements Listener {
                     @Override
                     public void run() {
 
-                        if (!targetted.isValid() || !targetter.isValid() || targetted.getLocation().distance(targetter.getLocation()) > 20 ) {
+                        if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
+                                || targetted.getLocation().distance(targetter.getLocation()) > 20 ) {
 
                             Bukkit.getScheduler().cancelTask(processID);
                             return;
