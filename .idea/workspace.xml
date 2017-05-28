@@ -11,11 +11,7 @@
   <component name="ChangeListManager">
     <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieNecronomicon.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieNecronomicon.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackArrow.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackArrow.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackFireball.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackFireball.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/plugin.yml" afterPath="$PROJECT_DIR$/src/plugin.yml" />
     </list>
     <ignored path="ActiveStack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -41,7 +37,7 @@
           <file leaf-file-name="CommandHandler.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2306">
+                <state relative-caret-position="2834">
                   <caret line="238" column="52" lean-forward="false" selection-start-line="238" selection-start-column="46" selection-end-line="238" selection-end-column="52" />
                   <folding />
                 </state>
@@ -149,11 +145,61 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="MajorPowerPowerStance.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="MajorPowerPowerStance.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="962">
                   <caret line="318" column="74" lean-forward="false" selection-start-line="318" selection-start-column="74" selection-end-line="318" selection-end-column="74" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="plugin.yml" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/plugin.yml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="16">
+                  <caret line="1" column="12" lean-forward="false" selection-start-line="1" selection-start-column="12" selection-end-line="1" selection-end-column="12" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="translation.yml" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/translation.yml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="0">
+                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="loot.yml" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/loot.yml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="0">
+                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="mobPowers.yml" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/mobPowers.yml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="0">
+                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="EliteMobs.iml" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/EliteMobs.iml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="0">
+                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -217,12 +263,12 @@
       <find>todo</find>
       <find>dropItem</find>
       <find>majorpowerconstructor</find>
-      <find>majorPowerLocationConstructor</find>
       <find>MetadataHandler.ELITE_MOBS</find>
       <find>getConfig</find>
       <find>afraid</find>
       <find>random</find>
       <find>.distance</find>
+      <find>majorPowerLocationConstructor</find>
     </findStrings>
     <replaceStrings>
       <replace>MagmasSuperMob</replace>
@@ -286,7 +332,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationConfig.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/TeamRocket.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/ReloadConfigCommandHandler.java" />
-        <option value="$PROJECT_DIR$/src/plugin.yml" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/ConfigValues.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/ChatColorConverter.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/NameHandler.java" />
@@ -311,6 +356,7 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackFireball.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java" />
+        <option value="$PROJECT_DIR$/src/plugin.yml" />
       </list>
     </option>
   </component>
@@ -664,13 +710,6 @@
       <option name="presentableId" value="Default" />
       <updated>1475814427545</updated>
     </task>
-    <task id="LOCAL-00004" summary="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Added manual bypass for night vision potion effect, game no longer looks like a rave">
-      <created>1489522254785</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1489522254785</updated>
-    </task>
     <task id="LOCAL-00005" summary="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Fixed loot odds being inverted">
       <created>1489525849046</created>
       <option name="number" value="00005" />
@@ -1007,7 +1046,14 @@
       <option name="project" value="LOCAL" />
       <updated>1495987616235</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Version 2.2.4&#10;&#10;- Fixed portal and world-related issues">
+      <created>1495988689365</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1495988689366</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1025,7 +1071,7 @@
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32869297" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20649652" sideWeight="0.49841017" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20649652" sideWeight="0.49841017" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -1068,7 +1114,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Version 1.3.1&#10;&#10;- Added (fabulous) AttackConfusing power&#10;- Added InvulnerabilityKnockback power&#10;- Reworked parts of the visual effects (particles)&#10;- Minor powers now use reflection to add classes to the list (no more manual additions)&#10;- Config now partially linked to the metadataHandler so updates always update the config as well&#10;- Particle-based effects should now show up for command-spawned mobs" />
     <MESSAGE value="Version 1.3.1&#10;&#10;- Added AttackBlinding power&#10;- Made AttackConfusing work for ranged elite mobs" />
     <MESSAGE value="Version 1.4.0&#10;&#10;- First public version with features added during 1.3.x&#10;- Fixed a few config options not being implemented properly (or at all)" />
     <MESSAGE value="Version 1.4.1&#10;&#10;- Major code edit/rewrite to adhere more closely to java naming conventions&#10;- Probably fixed some minor bug with the loot power&#10;- Now using reflection to load listeners for powers, making adding new powers even easier" />
@@ -1093,7 +1138,8 @@
     <MESSAGE value="Version 2.2.1&#10;&#10;- Fixed list of valid powers&#10;- Added team rocket death message to config&#10;- Added the possibility to get colored lore and item names&#10;- Added color code compatibility to everything in the translation config" />
     <MESSAGE value="Version 2.2.2&#10;&#10;- Added ZombieFriends power&#10;- Fixed minor ZombieParents glitch" />
     <MESSAGE value="Version 2.2.3&#10;&#10;- Added ZombieNecronomicon power&#10;- Added config option to not use titles to display missing permission messages&#10;- Tweaks to existing major powers" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 2.2.3&#10;&#10;- Added ZombieNecronomicon power&#10;- Added config option to not use titles to display missing permission messages&#10;- Tweaks to existing major powers" />
+    <MESSAGE value="Version 2.2.4&#10;&#10;- Fixed portal and world-related issues" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 2.2.4&#10;&#10;- Fixed portal and world-related issues" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1379,7 +1425,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2306">
+        <state relative-caret-position="2834">
           <caret line="238" column="52" lean-forward="false" selection-start-line="238" selection-start-column="46" selection-end-line="238" selection-end-column="52" />
           <folding />
         </state>
@@ -1397,6 +1443,46 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="962">
           <caret line="318" column="74" lean-forward="false" selection-start-line="318" selection-start-column="74" selection-end-line="318" selection-end-column="74" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/EliteMobs.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/translation.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/loot.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mobPowers.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16">
+          <caret line="1" column="12" lean-forward="false" selection-start-line="1" selection-start-column="12" selection-end-line="1" selection-end-column="12" />
           <folding />
         </state>
       </provider>
