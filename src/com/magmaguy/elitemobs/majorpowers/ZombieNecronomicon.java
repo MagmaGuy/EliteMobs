@@ -323,7 +323,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
     @EventHandler
     public void onSummonedCreatureDeath (EntityDeathEvent event) {
 
-        if (event.getEntity() instanceof Zombie && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
+        if (event.getEntity() instanceof Zombie && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity().getCustomName() != null &&
                 (event.getEntity().getCustomName().equals(configuration.getString("ZombieNecronomicon.Summoned zombie")) ||
                         event.getEntity().getCustomName().equals(configuration.getString("ZombieNecronomicon.Summoned skeleton")))) {
 
