@@ -33,7 +33,7 @@ public class ArmorHandler {
 
         }
 
-        if (entity instanceof Zombie || entity instanceof ZombieVillager || entity instanceof PigZombie ||
+        if (entity instanceof Zombie || entity instanceof PigZombie ||
                 entity instanceof Skeleton || entity instanceof WitherSkeleton) {
 
             int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();

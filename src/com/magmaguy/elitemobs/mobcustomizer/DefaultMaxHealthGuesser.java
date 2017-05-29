@@ -57,8 +57,8 @@ public class DefaultMaxHealthGuesser {
                 return zombieHealth;
             case HUSK:
                 return huskHealth;
-            case ZOMBIE_VILLAGER:
-                return zombieVillagerHealth;
+//            case ZOMBIE_VILLAGER:
+//                return zombieVillagerHealth;
             case SKELETON:
                 return skeletonHealth;
             case WITHER_SKELETON:
