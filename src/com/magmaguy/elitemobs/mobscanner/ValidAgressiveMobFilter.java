@@ -43,7 +43,7 @@ public class ValidAgressiveMobFilter{
                     entity instanceof Skeleton && config.getBoolean("Valid aggressive EliteMobs.Skeleton") ||
                     entity instanceof Spider && config.getBoolean("Valid aggressive EliteMobs.Spider") ||
                     entity instanceof Witch && config.getBoolean("Valid aggressive EliteMobs.Witch") ||
-                    entity instanceof ZombieVillager && config.getBoolean("Valid aggressive EliteMobs.Zombie") ||
+//                    entity instanceof ZombieVillager && config.getBoolean("Valid aggressive EliteMobs.Zombie") ||
                     entity instanceof Zombie && config.getBoolean("Valid aggressive EliteMobs.Zombie");
 
         }

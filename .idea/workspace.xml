@@ -11,8 +11,10 @@
   <component name="ChangeListManager">
     <list default="true" id="54fd8c0e-d3d8-4252-aa21-3ee438b86173" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieNecronomicon.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieNecronomicon.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/plugin.yml" afterPath="$PROJECT_DIR$/src/plugin.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/StatsCommandHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/StatsCommandHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/ArmorHandler.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/ArmorHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DefaultMaxHealthGuesser.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DefaultMaxHealthGuesser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java" afterPath="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java" />
     </list>
     <ignored path="ActiveStack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,31 +37,81 @@
     <splitter split-orientation="horizontal" split-proportion="0.5804472">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="CommandHandler.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/CommandHandler.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3344">
-                  <caret line="238" column="52" lean-forward="false" selection-start-line="238" selection-start-column="46" selection-end-line="238" selection-end-column="52" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file leaf-file-name="ConfigValues.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/ConfigValues.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="144">
-                  <caret line="24" column="13" lean-forward="false" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
+                <state relative-caret-position="320">
+                  <caret line="35" column="61" lean-forward="true" selection-start-line="35" selection-start-column="61" selection-end-line="35" selection-end-column="61" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="ZombieNecronomicon.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="LootCustomConfig.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/LootCustomConfig.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="144">
+                  <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="CustomConfigLoader.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/CustomConfigLoader.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="448">
+                  <caret line="52" column="28" lean-forward="false" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="28" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="DefaultMaxHealthGuesser.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DefaultMaxHealthGuesser.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="470">
+                  <caret line="63" column="29" lean-forward="false" selection-start-line="63" selection-start-column="29" selection-end-line="63" selection-end-column="29" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="StatsCommandHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/StatsCommandHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="431">
+                  <caret line="270" column="0" lean-forward="true" selection-start-line="270" selection-start-column="0" selection-end-line="270" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ValidAgressiveMobFilter.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="480">
+                  <caret line="46" column="40" lean-forward="false" selection-start-line="46" selection-start-column="40" selection-end-line="46" selection-end-column="40" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ArmorHandler.java" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/ArmorHandler.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="304">
+                  <caret line="35" column="37" lean-forward="false" selection-start-line="35" selection-start-column="37" selection-end-line="35" selection-end-column="37" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ZombieNecronomicon.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieNecronomicon.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="959">
-                  <caret line="325" column="158" lean-forward="false" selection-start-line="325" selection-start-column="158" selection-end-line="325" selection-end-column="158" />
+                <state relative-caret-position="223">
+                  <caret line="279" column="0" lean-forward="true" selection-start-line="279" selection-start-column="0" selection-end-line="279" selection-end-column="0" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -67,11 +119,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="ScoreboardHandler.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/scoreboard/ScoreboardHandler.java">
+          <file leaf-file-name="ReloadConfigCommandHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/ReloadConfigCommandHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="928">
-                  <caret line="84" column="24" lean-forward="false" selection-start-line="84" selection-start-column="24" selection-end-line="84" selection-end-column="24" />
+                <state relative-caret-position="352">
+                  <caret line="41" column="20" lean-forward="false" selection-start-line="41" selection-start-column="8" selection-end-line="41" selection-end-column="20" />
                   <folding />
                 </state>
               </provider>
@@ -82,48 +134,6 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="1008">
                   <caret line="89" column="18" lean-forward="false" selection-start-line="89" selection-start-column="18" selection-end-line="89" selection-end-column="18" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="AttackArrow.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackArrow.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="912">
-                  <caret line="81" column="32" lean-forward="false" selection-start-line="81" selection-start-column="32" selection-end-line="81" selection-end-column="32" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="EliteMobs.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/EliteMobs.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="4512">
-                  <caret line="322" column="89" lean-forward="false" selection-start-line="322" selection-start-column="31" selection-end-line="322" selection-end-column="89" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="ZombieFriends.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieFriends.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="976">
-                  <caret line="90" column="105" lean-forward="false" selection-start-line="90" selection-start-column="12" selection-end-line="90" selection-end-column="105" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="TranslationCustomConfig.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="6048">
-                  <caret line="394" column="82" lean-forward="false" selection-start-line="394" selection-start-column="67" selection-end-line="394" selection-end-column="82" />
                   <folding />
                 </state>
               </provider>
@@ -187,7 +197,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>reload</find>
       <find>minorPowerArrayInitializer</find>
       <find>entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();</find>
       <find>powCount</find>
@@ -217,6 +226,7 @@
       <find>majorPowerLocationConstructor</find>
       <find>afraid</find>
       <find>random</find>
+      <find>zombievill</find>
     </findStrings>
     <replaceStrings>
       <replace>MagmasSuperMob</replace>
@@ -254,7 +264,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/ChickenHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/CowHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/MushroomCowHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/PassiveEliteMobDeathHandler.java" />
@@ -262,9 +271,7 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobs/passive/SheepHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleHealth.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/DoubleDamage.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidPassiveMobFilter.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/StatsCommandHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/LootGUI.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DamageHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackWeakness.java" />
@@ -274,7 +281,6 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/zombie/TeamRocket.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MinorPowerPowerStance.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/MobScanner.java" />
-        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/ArmorHandler.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/translation/yml.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/MobPowersCustomConfig.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationConfig.java" />
@@ -305,6 +311,10 @@
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java" />
         <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieNecronomicon.java" />
         <option value="$PROJECT_DIR$/src/plugin.yml" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DefaultMaxHealthGuesser.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/StatsCommandHandler.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java" />
+        <option value="$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/ArmorHandler.java" />
       </list>
     </option>
   </component>
@@ -344,6 +354,26 @@
               <item name="MagmasMobs" type="b2602c69:ProjectViewProjectNode" />
               <item name="MagmasMobs" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MagmasMobs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MagmasMobs" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="elitemobs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MagmasMobs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MagmasMobs" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="elitemobs" type="462c0819:PsiDirectoryNode" />
+              <item name="commands" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MagmasMobs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MagmasMobs" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="elitemobs" type="462c0819:PsiDirectoryNode" />
+              <item name="config" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -623,13 +653,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1475814427545</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Now applying the correct newHealth">
-      <created>1492272816266</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1492272816266</updated>
     </task>
     <task id="LOCAL-00007" summary="Version 1.0.0&#10;&#10;- Let's pretend this hasn't been released yet&#10;- Major overhaul to the trail effects, they're now smooth and don't cause lag issues">
       <created>1492492338177</created>
@@ -967,7 +990,14 @@
       <option name="project" value="LOCAL" />
       <updated>1495988819406</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="Version 2.3.1&#10;&#10;- Fixed null pointer error in necronomicon death event">
+      <created>1496041452716</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1496041452717</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TodoView">
@@ -996,8 +1026,9 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.09419714" sideWeight="0.76411444" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2182035" sideWeight="0.76411444" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Statistic" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32869297" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.38205722" sideWeight="0.49841017" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -1012,7 +1043,6 @@
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.38205722" sideWeight="0.49841017" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -1028,7 +1058,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Version 1.4.0&#10;&#10;- First public version with features added during 1.3.x&#10;- Fixed a few config options not being implemented properly (or at all)" />
     <MESSAGE value="Version 1.4.1&#10;&#10;- Major code edit/rewrite to adhere more closely to java naming conventions&#10;- Probably fixed some minor bug with the loot power&#10;- Now using reflection to load listeners for powers, making adding new powers even easier" />
     <MESSAGE value="Version 1.4.2&#10;&#10;- Redid all config files so they are more version-independent&#10;- Added mobPowers.yml&#10;- Nerfed default zombie slaying sword loot, added signature item" />
     <MESSAGE value="Version 1.4.3&#10;&#10;- Made it so killing a passive elite mob will make two regular versions of the mob spawn in its place&#10;- As such, cancelling mob spawners is no longer necessary, removed that" />
@@ -1053,7 +1082,8 @@
     <MESSAGE value="Version 2.2.3&#10;&#10;- Added ZombieNecronomicon power&#10;- Added config option to not use titles to display missing permission messages&#10;- Tweaks to existing major powers" />
     <MESSAGE value="Version 2.2.4&#10;&#10;- Fixed portal and world-related issues" />
     <MESSAGE value="Version 2.3&#10;&#10;- Public release of 2.2.x features" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 2.3&#10;&#10;- Public release of 2.2.x features" />
+    <MESSAGE value="Version 2.3.1&#10;&#10;- Fixed null pointer error in necronomicon death event" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 2.3.1&#10;&#10;- Fixed null pointer error in necronomicon death event" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1067,54 +1097,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieFriends.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="976">
-          <caret line="90" column="105" lean-forward="false" selection-start-line="90" selection-start-column="12" selection-end-line="90" selection-end-column="105" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/TranslationCustomConfig.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6048">
-          <caret line="394" column="82" lean-forward="false" selection-start-line="394" selection-start-column="67" selection-end-line="394" selection-end-column="82" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/PowerHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1008">
-          <caret line="89" column="18" lean-forward="false" selection-start-line="89" selection-start-column="18" selection-end-line="89" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/powerstances/MajorPowerPowerStance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4544">
-          <caret line="318" column="74" lean-forward="false" selection-start-line="318" selection-start-column="74" selection-end-line="318" selection-end-column="74" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/translation.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/loot.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/mobPowers.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1353,21 +1335,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/CustomConfigLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/ConfigValues.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="24" column="13" lean-forward="false" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/minorpowers/AttackArrow.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="912">
@@ -1451,20 +1418,84 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/plugin.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16">
+          <caret line="1" column="14" lean-forward="false" selection-start-line="1" selection-start-column="14" selection-end-line="1" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/majorpowers/ZombieNecronomicon.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="959">
-          <caret line="325" column="158" lean-forward="false" selection-start-line="325" selection-start-column="158" selection-end-line="325" selection-end-column="158" />
+        <state relative-caret-position="223">
+          <caret line="279" column="0" lean-forward="true" selection-start-line="279" selection-start-column="0" selection-end-line="279" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/plugin.yml">
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/ReloadConfigCommandHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="16">
-          <caret line="1" column="14" lean-forward="false" selection-start-line="1" selection-start-column="14" selection-end-line="1" selection-end-column="14" />
+        <state relative-caret-position="352">
+          <caret line="41" column="20" lean-forward="false" selection-start-line="41" selection-start-column="8" selection-end-line="41" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/ConfigValues.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="35" column="61" lean-forward="true" selection-start-line="35" selection-start-column="61" selection-end-line="35" selection-end-column="61" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/LootCustomConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/config/CustomConfigLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="52" column="28" lean-forward="false" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/DefaultMaxHealthGuesser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="470">
+          <caret line="63" column="29" lean-forward="false" selection-start-line="63" selection-start-column="29" selection-end-line="63" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/commands/StatsCommandHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="270" column="0" lean-forward="true" selection-start-line="270" selection-start-column="0" selection-end-line="270" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobscanner/ValidAgressiveMobFilter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="46" column="40" lean-forward="false" selection-start-line="46" selection-start-column="40" selection-end-line="46" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/magmaguy/elitemobs/mobcustomizer/ArmorHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="35" column="37" lean-forward="false" selection-start-line="35" selection-start-column="37" selection-end-line="35" selection-end-column="37" />
           <folding />
         </state>
       </provider>
