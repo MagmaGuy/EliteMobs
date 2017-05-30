@@ -55,7 +55,8 @@ public class NaturalMobMetadataAssigner implements Listener {
     public void onSpawn(CreatureSpawnEvent event) {
 
         if (!ConfigValues.defaultConfig.getBoolean("Natural aggressive EliteMob spawning") ||
-                !ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs")){
+                !ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") ||
+                !ConfigValues.defaultConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName().toString())){
 
             return;
 
@@ -64,8 +65,6 @@ public class NaturalMobMetadataAssigner implements Listener {
         if (event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM) {
 
             Entity entity = event.getEntity();
-
-            ValidAgressiveMobFilter validAgressiveMobFilter = new ValidAgressiveMobFilter();
 
             if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 

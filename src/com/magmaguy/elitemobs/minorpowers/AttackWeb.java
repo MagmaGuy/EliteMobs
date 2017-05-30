@@ -41,7 +41,7 @@ public class AttackWeb extends MinorPowers implements Listener {
     public void applyPowers(Entity entity) {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
     }
@@ -61,6 +61,12 @@ public class AttackWeb extends MinorPowers implements Listener {
 
         Block block = damagee.getLocation().getBlock();
         Material originalMaterial = block.getType();
+
+        if (!originalMaterial.equals(Material.AIR)) {
+
+            return;
+
+        }
 
         if (damager.hasMetadata(MetadataHandler.ATTACK_FREEZE_MD) || damager instanceof Projectile &&
                 ProjectileMetadataDetector.projectileMetadataDetector((Projectile)damager , MetadataHandler.ATTACK_FREEZE_MD)) {
@@ -91,7 +97,7 @@ public class AttackWeb extends MinorPowers implements Listener {
                 @Override
                 public void run() {
 
-                    webEffectApplier(counter, damagee, originalMaterial, block);
+                    webEffectApplier(counter, damagee, block);
                     counter++;
 
                 }
@@ -111,7 +117,7 @@ public class AttackWeb extends MinorPowers implements Listener {
                     @Override
                     public void run() {
 
-                        webEffectApplier(counter, damagee, originalMaterial, block);
+                        webEffectApplier(counter, damagee, block);
                         counter++;
 
                     }
@@ -125,13 +131,11 @@ public class AttackWeb extends MinorPowers implements Listener {
 
     }
 
-    private void webEffectApplier(int counter, Entity damagee, Material originalMaterial, Block block) {
+    private void webEffectApplier(int counter, Entity damagee, Block block) {
 
         if (counter == 0) {
 
             damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
-            //make sure the block isn't already placed by the plugin
-            originalMaterial = block.getType();
             block.setType(Material.WEB);
 
             block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
@@ -140,7 +144,7 @@ public class AttackWeb extends MinorPowers implements Listener {
 
         if (counter == 20 * 4) {
 
-            block.setType(originalMaterial);
+            block.setType(Material.AIR);
 
             block.removeMetadata("TemporaryBlock", plugin);
 

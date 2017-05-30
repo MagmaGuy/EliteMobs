@@ -115,7 +115,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new LootGUI(), this);
 
         //Minor mob powers
-        MetadataHandler metadataHandler = new MetadataHandler();
         for (String string : MetadataHandler.minorPowerList()){
 
             //don't load powers that require no even listeners
@@ -189,7 +188,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(this), this);
 
         //Visual effects
-        this.getServer().getPluginManager().registerEvents(new MinorPowerPowerStance(this), this);
+        this.getServer().getPluginManager().registerEvents(new MinorPowerPowerStance(), this);
         this.getServer().getPluginManager().registerEvents(new MajorPowerPowerStance(), this);
 
         //Loot
@@ -246,7 +245,11 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         for (World world : Bukkit.getWorlds()) {
 
-            worldList.add(world);
+            if (getConfig().getBoolean("Valid worlds." + world.getName().toString())) {
+
+                worldList.add(world);
+
+            }
 
         }
 
@@ -269,7 +272,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
             }
 
-        }, 1, 1);
+        }, 1, 20);
 
         processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 
@@ -309,6 +312,13 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Valid passive EliteMobs.Pig", true);
         getConfig().addDefault("Valid passive EliteMobs.Sheep", true);
         getConfig().addDefault("Natural aggressive EliteMob spawning", true);
+
+        for (World world : Bukkit.getWorlds()) {
+
+            getConfig().addDefault("Valid worlds." + world.getName().toString(), true);
+
+        }
+
         getConfig().addDefault("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn", 20);
         getConfig().addDefault("Aggressive mob stacking", true);
         getConfig().addDefault("Aggressive mob stacking cap", 50);
@@ -317,9 +327,12 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Aggressive EliteMobs flat loot drop rate %", 75);
         getConfig().addDefault("Aggressive EliteMobs can drop additional loot with drop % based on EliteMobs level (higher is more likely)", true);
         getConfig().addDefault("Prevent creepers from killing passive mobs", true);
+        getConfig().addDefault("Aggressive EliteMob life multiplier", 1.0);
+        getConfig().addDefault("Aggressive EliteMob damage multiplier", 1.0);
         getConfig().addDefault("SuperCreeper explosion nerf multiplier", 1.0);
         getConfig().addDefault("Turn on visual effects for natural or plugin-spawned EliteMobs", true);
         getConfig().addDefault("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs", true);
+        getConfig().addDefault("Turn on visual effects that indicate an attack is about to happen", true);
         getConfig().addDefault("Use titles to warn players they are missing a permission", true);
         getConfig().options().copyDefaults(true);
 

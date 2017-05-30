@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -43,12 +44,9 @@ import java.util.List;
  */
 public class MajorPowerPowerStance implements Listener {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    private int processID;
+    private Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private static int trackAmount = 4;
-    private static int itemsPerTrack = 4;
-
-    MetadataHandler metadataHandler = new MetadataHandler();
+    private static int itemsPerTrack = 2;
 
     public void itemEffect (Entity entity) {
 
@@ -72,102 +70,153 @@ public class MajorPowerPowerStance implements Listener {
             //First integer counts the visual effects it's in, hashmap is from MajorPowerStance's trackHashMap
             HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker = new HashMap<>();
 
-            processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            new BukkitRunnable(){
 
-                float counter = 0;
+                    int counter = 0;
+                    int zombieFriendsCounter = 0;
+                    int zombieNecronomiconCounter = 0;
+                    int zombieTeamRocketCounter = 0;
+                    int zombieParentsCounter = 0;
 
-                @Override
-                public void run() {
+                    @Override
+                    public void run() {
 
-                    int effectQuantity = 0;
-                    int effectIteration = 0;
+//                    int effectQuantity = 0;
+                        int effectIteration = 0;
 
-                    for (String string : MetadataHandler.majorPowerList()) {
+                        if (counter >= 10) {
 
-                        if (entity.hasMetadata(string)){
-
-                            effectQuantity++;
+                            counter = 0;
 
                         }
 
-                    }
+//                    for (String string : MetadataHandler.majorPowerList()) {
+//
+//                        if (entity.hasMetadata(string)){
+//
+//                            effectQuantity++;
+//
+//                        }
+//
+//                    }
 
-                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD)) {
+                        if (entity.hasMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD)) {
 
+                            ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 2);
 
-                        ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 2);
+                            itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, zombieFriendsCounter);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
+                            effectIteration++;
+                            zombieFriendsCounter++;
+                            if (zombieFriendsCounter >= MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
 
-                        effectIteration++;
-
-                    }
-
-                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD)) {
-
-
-                        ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
-
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
-
-                        effectIteration++;
-
-                    }
-
-                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD)) {
-
-                        ItemStack itemStack = new ItemStack(Material.FIREWORK, 1);
-
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
-
-                        effectIteration++;
-
-                    }
-
-                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_PARENTS_MD)) {
-
-                        ItemStack itemStack = new ItemStack(Material.MONSTER_EGG, 1, (short) 0 ,(byte) 54);
-
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity);
-
-                        effectIteration++;
-
-                    }
-
-                    if (!entity.isValid()) {
-
-                        for (int i = 0; i < powerItemLocationTracker.size(); i++) {
-
-                            for (int j = 0; j < trackAmount; j++) {
-
-                                for (int h = 0; h < itemsPerTrack; h++) {
-
-                                    powerItemLocationTracker.get(i).get(j).get(h).remove();
-                                    powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
-
-                                }
+                                zombieFriendsCounter = 0;
 
                             }
 
                         }
 
-                        entity.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+                        if (entity.hasMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD)) {
 
-                        Bukkit.getScheduler().cancelTask(processID);
+
+                            ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
+
+                            itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, zombieNecronomiconCounter);
+
+                            effectIteration++;
+                            zombieNecronomiconCounter++;
+                            if (zombieNecronomiconCounter >= MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
+
+                                zombieNecronomiconCounter = 0;
+
+                            }
+
+                        }
+
+                        if (entity.hasMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD)) {
+
+                            ItemStack itemStack = new ItemStack(Material.FIREWORK, 1);
+
+                            itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, zombieTeamRocketCounter);
+
+                            effectIteration++;
+                            zombieTeamRocketCounter++;
+                            if (zombieTeamRocketCounter >= MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
+
+                                zombieTeamRocketCounter = 0;
+
+                            }
+
+                        }
+
+                        if (entity.hasMetadata(MetadataHandler.ZOMBIE_PARENTS_MD)) {
+
+                            ItemStack itemStack = new ItemStack(Material.MONSTER_EGG, 1, (short) 0 ,(byte) 54);
+
+                            itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, zombieParentsCounter);
+
+                            effectIteration++;
+                            zombieParentsCounter++;
+                            if (zombieParentsCounter >= MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
+
+                                zombieParentsCounter = 0;
+
+                            }
+
+                        }
+
+                        if (!entity.isValid() || entity.isDead()) {
+
+//                            for (int i = 0; i < powerItemLocationTracker.size(); i++) {
+//
+//                                for (int j = 0; j < trackAmount; j++) {
+//
+//                                    for (int h = 0; h < itemsPerTrack; h++) {
+//
+//                                        powerItemLocationTracker.get(i).get(j).get(h).remove();
+//                                        powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+//
+//                                    }
+//
+//                                }
+//
+//                            }
+
+                            for (int i = 0; i < powerItemLocationTracker.size(); i++) {
+
+                                for (int j = 0; j < trackAmount; j++) {
+
+                                    for (int h = 0; h < itemsPerTrack; h++) {
+
+                                        powerItemLocationTracker.get(i).get(j).get(h).remove();
+                                        powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+
+                                    }
+
+                                }
+
+                            }
+
+                            entity.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+
+                            cancel();
+                            return;
+
+                        }
+
+                        counter++;
 
                     }
 
-                    counter++;
 
-                }
 
-            }, 5, 5);
+            }.runTaskTimer(plugin, 0, 5);
 
         }
 
     }
 
-    public void itemProcessor(HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker, ItemStack itemStack, int effectIteration, Entity entity) {
+    public void itemProcessor(HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker, ItemStack itemStack, int effectIteration, Entity entity, int counter) {
 
         boolean effectAlreadyPresent = false;
 
@@ -186,7 +235,8 @@ public class MajorPowerPowerStance implements Listener {
 
         }
 
-        HashMap<Integer, List<Location>> trackHashMap = MajorPowerStanceMath.majorPowerLocationConstructor(entity, trackAmount, itemsPerTrack);
+        HashMap<Integer, List<Vector>> trackHashMap = MajorPowerStanceMath.majorPowerLocationConstructor(trackAmount, itemsPerTrack, counter);
+        Location centerLocation = entity.getLocation().add(new Vector(0, 1, 0));
 
         if (!effectAlreadyPresent) {
 
@@ -217,19 +267,23 @@ public class MajorPowerPowerStance implements Listener {
                 for (int j = 0; j < itemsPerTrack; j++) {
 
                     Item item = powerItemLocationTracker.get(effectIteration).get(i).get(j);
-                    Location newLocation = trackHashMap.get(i).get(j);
+                    Location newLocation = new Location(entity.getWorld(), trackHashMap.get(i).get(j).getX(),
+                            trackHashMap.get(i).get(j).getY(), trackHashMap.get(i).get(j).getZ()).add(centerLocation);
                     Location currentLocation = item.getLocation();
 
-                    if (entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() % (4 * 10) == 0 ||
+                    if (counter % (29) == 0 ||
                             item.getWorld() != entity.getWorld()){
 
-                        entity.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() - 1 ));
-                        Location itemLocation = trackHashMap.get(i).get(j);
+                        item.teleport(item.getLocation());
 
-                        //teleport is accurate at slower update rates, but when teleporting every tick can get an error margin of up to 2 meters
-                        item.teleport(itemLocation);
-
-                        entity.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, entity.getMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD).get(0).asInt() + 1 ));
+//                        counter--;
+//                        Location itemLocation = new Location(entity.getWorld(), trackHashMap.get(i).get(j).getX(),
+//                                trackHashMap.get(i).get(j).getY(), trackHashMap.get(i).get(j).getZ()).add(centerLocation);
+//
+//                        //teleport is accurate at slower update rates, but when teleporting every tick can get an error margin of up to 2 meters
+//                        item.teleport(itemLocation);
+//
+//                        counter++;
 
                     }
 

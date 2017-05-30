@@ -57,8 +57,8 @@ public class DefaultMaxHealthGuesser {
                 return zombieHealth;
             case HUSK:
                 return huskHealth;
-//            case ZOMBIE_VILLAGER:
-//                return zombieVillagerHealth;
+            case ZOMBIE_VILLAGER:
+                return zombieVillagerHealth;
             case SKELETON:
                 return skeletonHealth;
             case WITHER_SKELETON:
@@ -98,7 +98,7 @@ public class DefaultMaxHealthGuesser {
             case SHEEP:
                 return sheepHealth;
             default:
-                getLogger().info("Error: Couldn't assign CUSTOM_POWERS_MD mob name due to unexpected boss mob (talk to the dev!)");
+                getLogger().info("Error: Couldn't assign custom mob name due to unexpected boss mob (talk to the dev!)");
                 getLogger().info("Missing mob type: " + entity.getType());
                 break;
         }

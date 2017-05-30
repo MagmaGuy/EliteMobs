@@ -21,20 +21,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-
 /**
- * Created by MagmaGuy on 11/05/2017.
+ * Created by MagmaGuy on 29/05/2017.
  */
-public class MajorPowerStanceMath {
+public class MinorPowerStanceMath {
 
     private static double a, b, c;
-    private final static double X = 0;
-    private final static double Y = 1;
+    private final static double X = 1;
+    private final static double Y = 0;
     private final static double Z = 0;
     public final static double NUMBER_OF_POINTS_PER_FULL_ROTATION = 10;
-//    private static HashMap<Integer, List<Vector>> trackHashMap = new HashMap();
+    //    private static HashMap<Integer, List<Vector>> trackHashMap = new HashMap();
     private static HashMap<Integer, HashMap<Integer, List<Vector>>> storedRotatedValues = new HashMap();
 
     public static HashMap<Integer, List<Vector>> majorPowerLocationConstructor (int trackAmount, int itemsPerTrack, int counter) {
@@ -51,9 +48,9 @@ public class MajorPowerStanceMath {
         for (int i = 0; i < trackAmount; i++) {
 
             //45 degree angle between tracks
-            a = cos(i * 2 * Math.PI / trackAmount);
-            b = 0;
-            c = sin(i * 2 * Math.PI / trackAmount);
+            a = 0;
+            b = 1;
+            c = 0;
 
             List<Vector> rotations = new ArrayList<>();
 

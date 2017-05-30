@@ -44,7 +44,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
     public void applyPowers(Entity entity) {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
     }
@@ -64,6 +64,12 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         Block block = damagee.getLocation().getBlock();
         Material originalMaterial = block.getType();
+
+        if (!originalMaterial.equals(Material.AIR)) {
+
+            return;
+
+        }
 
         if (damagee.hasMetadata(MetadataHandler.FROZEN_COOLDOWN)) {
 
@@ -87,7 +93,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
                 @Override
                 public void run() {
 
-                    iceEffectApplier(counter, damagee, originalMaterial, block);
+                    iceEffectApplier(counter, damagee, block);
                     counter++;
 
                 }
@@ -108,7 +114,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
                     @Override
                     public void run() {
 
-                        iceEffectApplier(counter, damagee, originalMaterial, block);
+                        iceEffectApplier(counter, damagee, block);
                         counter++;
 
                     }
@@ -122,7 +128,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
     }
 
-    public void iceEffectApplier(int counter, Entity damagee, Material originalMaterial, Block block) {
+    public void iceEffectApplier(int counter, Entity damagee, Block block) {
 
         if (counter == 0) {
 
@@ -145,7 +151,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
             damagee.removeMetadata(MetadataHandler.FROZEN, plugin);
 
-            block.setType(originalMaterial);
+            block.setType(Material.AIR);
             block.removeMetadata("TemporaryBlock", plugin);
 
         }

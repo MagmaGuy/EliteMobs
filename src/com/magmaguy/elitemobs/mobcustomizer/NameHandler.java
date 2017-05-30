@@ -32,11 +32,11 @@ public class NameHandler {
 
     private static final Configuration TRANSLATION_CONFIG = ConfigValues.translationConfig;
 
-    public static void customAggressiveName(Entity entity, Plugin plugin) {
+    public static String customAggressiveName(Entity entity) {
 
         if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
 
-            return;
+            return null;
 
         }
 
@@ -54,6 +54,7 @@ public class NameHandler {
             case ZOMBIE_VILLAGER:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(0)) + mobLevel
                         + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(1)));
+                //TODO: seperate zombievillager from zombie
                 break;
             case SKELETON:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Skeleton").get(0)) + mobLevel
@@ -118,6 +119,7 @@ public class NameHandler {
         }
 
         entity.setCustomNameVisible(true);
+        return entity.getCustomName();
 
     }
 

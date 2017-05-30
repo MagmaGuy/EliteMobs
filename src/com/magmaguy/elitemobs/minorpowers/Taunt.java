@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.minorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -65,7 +66,7 @@ public class Taunt extends MinorPowers implements Listener {
     public void applyPowers(Entity entity) {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
     }
@@ -97,7 +98,9 @@ public class Taunt extends MinorPowers implements Listener {
     @EventHandler
     public void onDamaged (EntityDamageEvent event) {
 
-        if (!(event.getEntity() instanceof LivingEntity) || ((LivingEntity) event.getEntity()).getHealth() - event.getFinalDamage() <= 0 || !event.getEntity().isValid()) {
+        if (!(event.getEntity() instanceof LivingEntity) ||
+                ((LivingEntity) event.getEntity()).getHealth() - event.getFinalDamage() <= 0 ||
+                !event.getEntity().isValid()) {
 
             return;
 
@@ -181,7 +184,12 @@ public class Taunt extends MinorPowers implements Listener {
             @Override
             public void run() {
 
-                entity.setCustomName(originalName);
+                if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
+                    entity.setCustomName(originalName);
+                } else {
+                    entity.setCustomName(NameHandler.customAggressiveName(entity));
+                }
+
                 entity.removeMetadata(MetadataHandler.TAUNT_NAME, plugin);
 
             }

@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -56,7 +57,7 @@ public class HealthHandler {
 
         }
 
-        damageableEntity.setMaxHealth(ScalingFormula.PowerFormula(defaultMaxHealth, newEliteMobLevel));
+        damageableEntity.setMaxHealth(ScalingFormula.PowerFormula(defaultMaxHealth, newEliteMobLevel) * ConfigValues.defaultConfig.getDouble("Aggressive EliteMob life multiplier"));
 
         if (damageableEntity.getHealth() + damageableDeleted.getHealth() > damageableEntity.getMaxHealth()) {
 

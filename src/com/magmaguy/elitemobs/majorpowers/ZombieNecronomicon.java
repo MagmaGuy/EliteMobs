@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
@@ -31,6 +32,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -44,7 +46,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ZOMBIE_NECRONOMICON_MD;
-    int processID, processID2, processID3;
+    private int processID, processID2, processID3;
     private int chantIndex = 0;
     private boolean summoningEffectOn = false;
 
@@ -73,13 +75,21 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
         Entity targetter = event.getEntity();
         Entity targetted = event.getTarget();
 
+        if (targetter.hasMetadata(MetadataHandler.ZOMBIE_CHANTING)) {
+
+            return;
+
+        }
+
+        targetter.setMetadata(MetadataHandler.ZOMBIE_CHANTING, new FixedMetadataValue(plugin, true));
+
         if (targetted instanceof Player && targetter.hasMetadata(powerMetadata)) {
 
             ((LivingEntity) targetter).setAI(false);
 
             necronomiconVisualEffect((Zombie)targetter);
 
-            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            new BukkitRunnable(){
 
                 ArrayList<Entity> entityList = new ArrayList<>();
 
@@ -89,8 +99,6 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                     if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
                             || targetted.getLocation().distance(targetter.getLocation()) > 30 ) {
 
-                        ((LivingEntity) targetter).setAI(true);
-                        Bukkit.getScheduler().cancelTask(processID);
 
                         for (Entity entity : entityList) {
 
@@ -102,6 +110,9 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                         }
 
+                        ((LivingEntity) targetter).setAI(true);
+                        targetter.removeMetadata(MetadataHandler.ZOMBIE_CHANTING, plugin);
+                        cancel();
                         return;
 
                     }
@@ -170,9 +181,10 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                     }
 
+
                 }
 
-            }, 20 * 3, 20 * 5);
+            }.runTaskTimer(plugin,20 * 3, 20 * 5);
 
         }
 
@@ -181,10 +193,15 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
     private void necronomiconVisualEffect (Zombie zombie) {
 
         summoningEffectOn = true;
-        String mobName = zombie.getCustomName();
         nameScroller(zombie);
 
-        processID2 = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        if (!ConfigValues.defaultConfig.getBoolean("Turn on visual effects that indicate an attack is about to happen")) {
+
+            return;
+
+        }
+
+        new BukkitRunnable(){
 
             int counter = 0;
             HashMap<Integer, List<Item>> fourTrack = new HashMap();
@@ -194,7 +211,6 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                 if (!zombie.isValid() || zombie.hasAI()) {
 
-                    //todo: terminate visual effect here
                     for (List<Item> itemList : fourTrack.values()) {
 
                         for (Item item : itemList) {
@@ -206,10 +222,10 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                     }
 
+                    zombie.setCustomName(NameHandler.customAggressiveName(zombie));
                     summoningEffectOn = false;
-                    Bukkit.getScheduler().cancelTask(processID3);
-                    zombie.setCustomName(mobName);
-                    Bukkit.getScheduler().cancelTask(processID2);
+                    cancel();
+                    return;
 
                 }
 
@@ -247,7 +263,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
             }
 
-        },5,5);
+        }.runTaskTimer(plugin, 5, 5);
 
     }
 
@@ -282,7 +298,8 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                 Location centerLocationFixed = entity.getLocation().add(0, 3, 0);
 
-                Location newLocation = GenericRotationMatrixMath.applyRotation(centerLocationFixed, a, b, c, numberOfPointsPerFullRotation, x, y, z, newCounter);
+                Vector vector = GenericRotationMatrixMath.applyRotation(a, b, c, numberOfPointsPerFullRotation, x, y, z, newCounter);
+                Location newLocation = new Location(entity.getWorld(), vector.getX(), vector.getY(), vector.getZ()).add(centerLocationFixed);
 
                 Vector velocity = (newLocation.subtract(currentLocation)).toVector().multiply(0.3);
                 item.setVelocity(velocity);
@@ -295,12 +312,19 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
     private void nameScroller(Zombie zombie) {
 
-        processID3 = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        new BukkitRunnable(){
 
             String fullChant = chatColorConverter(configuration.getString("ZombieNecronomicon.Summoning chant"));
 
             @Override
             public void run() {
+
+                if(!zombie.isValid() || zombie.hasAI()) {
+
+                    cancel();
+                    return;
+
+                }
 
                 if (chantIndex+31 > fullChant.length()) {
 
@@ -314,9 +338,10 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                 chantIndex++;
 
+
             }
 
-        },0,1);
+        }.runTaskTimer(plugin, 0, 1);
 
     }
 

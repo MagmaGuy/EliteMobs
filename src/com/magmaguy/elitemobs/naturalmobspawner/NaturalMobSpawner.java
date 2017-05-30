@@ -18,7 +18,6 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Material;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -74,8 +73,6 @@ public class NaturalMobSpawner implements Listener {
                 threathLevel = threatLevelCalculator(armorRating, potionEffectRating, EliteMobRating);
 
                 int EliteMobLevel = levelCalculator(threathLevel);
-
-                Damageable damageableMob = (Damageable) entity;
 
                 if (threathLevel == 0) {
 
