@@ -38,7 +38,7 @@ public class MovementSpeed extends MinorPowers {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
     }

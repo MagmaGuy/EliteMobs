@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultMaxHealthGuesser;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -48,7 +49,8 @@ public class WitherSkeletonHandler implements Listener {
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof WitherSkeleton && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof WitherSkeleton && !(event.getEntity() instanceof Skeleton) &&
+                event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             Random random = new Random();
 

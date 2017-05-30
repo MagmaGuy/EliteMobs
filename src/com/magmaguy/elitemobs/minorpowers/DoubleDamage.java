@@ -37,7 +37,7 @@ public class DoubleDamage extends MinorPowers {
         if (!(entity instanceof IronGolem)) {
 
             entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
             minorPowerPowerStance.itemEffect(entity);
 
         }

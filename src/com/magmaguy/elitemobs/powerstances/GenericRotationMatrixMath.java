@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.powerstances;
 
-import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import static java.lang.Math.*;
@@ -62,13 +61,15 @@ public class GenericRotationMatrixMath {
     */
 
     //TODO: register points in hashmap <int, List<Location>>
-    private static Location newLocation;
-    private static double newX, newY, newZ, theta;
+    private static Vector newVector;
+    private static double newX, newY, newZ;
 
-    public static Location applyRotation (Location centerLocation, double a, double b, double c, double numberOfPointsPerFullRotation, double x, double y, double z, int counter) {
+    public static Vector applyRotation (double a, double b, double c, double numberOfPointsPerFullRotation, double x, double y, double z, int counter) {
 
+        double theta;
         //Adapt numberOfPointsPerFullRotation to 360 degrees
-        theta = 360 / numberOfPointsPerFullRotation;
+        //FUCKING RADIAN (2*pi is 360 degrees for a radius of 1)
+        theta = 2*Math.PI / numberOfPointsPerFullRotation;
         //Get the next rotation
         theta = theta + theta * counter;
 
@@ -77,9 +78,9 @@ public class GenericRotationMatrixMath {
         newZ = x * ((1 - cos(theta)) * c * a + (sin(theta)) * b) + y * ((1 - cos(theta)) * c * b - (sin(theta)) * a) + z * (cos(theta) + (1 - cos(theta)) * pow(c, 2));
 
         //adjust rotated point
-        newLocation = (new Location(centerLocation.getWorld(), newX, newY, newZ)).add(centerLocation).add(new Vector(0, 1 ,0));
+        newVector = new Vector(newX, newY, newZ);
 
-        return newLocation;
+        return newVector;
 
     }
 

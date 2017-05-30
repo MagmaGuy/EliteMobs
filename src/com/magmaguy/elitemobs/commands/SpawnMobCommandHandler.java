@@ -47,7 +47,7 @@ public class SpawnMobCommandHandler {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
-    MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+    MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
     MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
 
     public void spawnMob(CommandSender commandSender, String[] args) {
@@ -330,7 +330,7 @@ public class SpawnMobCommandHandler {
                         break;
                     case MetadataHandler.ATTACK_CONFUSING_H:
                         entity.setMetadata(MetadataHandler.ATTACK_CONFUSING_MD, new FixedMetadataValue(plugin, true));
-                        minorPowerPowerStance.attackConfusing(entity);
+//                        minorPowerPowerStance.attackConfusing(entity);
                         powerCount++;
                         break;
                     case MetadataHandler.ATTACK_FIRE_H:
@@ -400,7 +400,7 @@ public class SpawnMobCommandHandler {
                         break;
                     case MetadataHandler.INVULNERABILITY_FIRE_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_FIRE_MD, new FixedMetadataValue(plugin, true));
-                        minorPowerPowerStance.invulnerabilityFireEffect(entity);
+//                        minorPowerPowerStance.invulnerabilityFireEffect(entity);
                         powerCount++;
                         break;
                     case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:

@@ -42,7 +42,7 @@ public class AttackBlinding extends MinorPowers implements Listener{
     public void applyPowers(Entity entity) {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
     }
@@ -70,7 +70,7 @@ public class AttackBlinding extends MinorPowers implements Listener{
 
             }
 
-        } else if (damager instanceof Projectile) {
+        } else if (damager instanceof Projectile && damagee instanceof Player) {
 
             if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
 

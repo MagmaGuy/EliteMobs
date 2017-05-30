@@ -42,7 +42,7 @@ public class AttackFireball extends MinorPowers implements Listener {
     public void applyPowers(Entity entity) {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(plugin);
+        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
     }

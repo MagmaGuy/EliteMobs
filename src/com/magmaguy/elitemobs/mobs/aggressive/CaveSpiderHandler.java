@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.mobcustomizer.DefaultMaxHealthGuesser;
 import org.bukkit.Material;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Spider;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -47,7 +48,8 @@ public class CaveSpiderHandler implements Listener {
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof CaveSpider && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof CaveSpider && !(event.getEntity() instanceof Spider) &&
+                event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             Random random = new Random();
 

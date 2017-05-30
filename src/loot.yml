@@ -32,7 +32,7 @@ Loot:
     Enchantments:
     - VANISHING_CURSE,1
     Potion Effects:
-    - HEALTH_BOOST,1
+    - DAMAGE_RESISTANCE,1
   Elite Mob Hunting Leggings:
     Item Type: DIAMOND_LEGGINGS
     Item Name: "&4Elite Mob Hunting Leggings"

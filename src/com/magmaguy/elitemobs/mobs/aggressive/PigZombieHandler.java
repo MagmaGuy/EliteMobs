@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultMaxHealthGuesser;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -49,7 +50,8 @@ public class PigZombieHandler implements Listener {
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof PigZombieHandler && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof PigZombieHandler && !(event.getEntity() instanceof Zombie) &&
+                event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             Random random = new Random();
 

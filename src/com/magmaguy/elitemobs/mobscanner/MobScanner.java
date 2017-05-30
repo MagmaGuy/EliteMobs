@@ -53,8 +53,6 @@ public class MobScanner implements Listener {
 
     }
 
-    PowerHandler powerHandler = new PowerHandler();
-
     public void scanMobs(int passiveStackAmount) {
 
         for (World world : worldList) {
@@ -72,7 +70,7 @@ public class MobScanner implements Listener {
                             && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
                         HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
-                        customAggressiveName(entity, plugin);
+                        customAggressiveName(entity);
                         PowerHandler.powerHandler(entity);
                         ArmorHandler.ArmorHandler(entity);
 
@@ -83,7 +81,13 @@ public class MobScanner implements Listener {
                             ConfigValues.defaultConfig.getBoolean("Aggressive mob stacking") &&
                             !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
 
-                        scanValidAggressiveLivingEntity(entity);
+                        if (!(entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
+                                entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap")) &&
+                                !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
+
+                            scanValidAggressiveLivingEntity(entity);
+
+                        }
 
                         if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
@@ -127,7 +131,7 @@ public class MobScanner implements Listener {
 
                     entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, ScalingFormula.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
                             DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity))));
-                    customAggressiveName(entity, plugin);
+                    customAggressiveName(entity);
 
                 }
 
@@ -159,7 +163,7 @@ public class MobScanner implements Listener {
                     //setup new EliteMob
                     LevelHandler.LevelHandler(entity, secondEntity, plugin);
                     HealthHandler.aggressiveHealthHandler(entity, secondEntity);
-                    customAggressiveName(entity, plugin);
+                    customAggressiveName(entity);
 
                     if (secondEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 

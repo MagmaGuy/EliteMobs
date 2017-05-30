@@ -62,7 +62,7 @@ public class StatsCommandHandler {
         int witchCount = 0;
         int witherSkeletonCount = 0;
         int zombieCount = 0;
-//        int zombieVillagerCount = 0;
+        int zombieVillagerCount = 0;
 
         int chickenCount = 0;
         int cowCount = 0;
@@ -92,9 +92,9 @@ public class StatsCommandHandler {
                             case HUSK:
                                 huskCount++;
                                 break;
-//                            case ZOMBIE_VILLAGER:
-//                                zombieVillagerCount++;
-//                                break;
+                            case ZOMBIE_VILLAGER:
+                                zombieVillagerCount++;
+                                break;
                             case SKELETON:
                                 skeletonCount++;
                                 break;
@@ -213,7 +213,7 @@ public class StatsCommandHandler {
                 unsortedMobCountFilter(unsortedMobCount, witchCount, "witches");
                 unsortedMobCountFilter(unsortedMobCount, witherSkeletonCount, "wither skeletons");
                 unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombie");
-//                unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
+                unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
 
                 player.sendMessage(messageStringAppender(aggressiveCountMessage, unsortedMobCount));
 
@@ -267,7 +267,7 @@ public class StatsCommandHandler {
                 unsortedMobCountFilter(unsortedMobCount, witchCount, "witches");
                 unsortedMobCountFilter(unsortedMobCount, witherSkeletonCount, "wither skeletons");
                 unsortedMobCountFilter(unsortedMobCount, zombieCount, "zombie");
-//                unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
+                unsortedMobCountFilter(unsortedMobCount, zombieVillagerCount, "zombie villagers");
 
                 getServer().getConsoleSender().sendMessage(messageStringAppender(aggressiveCountMessage, unsortedMobCount));
 

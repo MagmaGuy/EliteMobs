@@ -65,7 +65,7 @@ public class DamageHandler implements Listener{
 
             }
 
-            event.setDamage(damageMath(event.getFinalDamage(), mobLevel));
+            event.setDamage(damageMath(event.getFinalDamage(), mobLevel) * ConfigValues.defaultConfig.getDouble("Aggressive EliteMob damage multiplier"));
 
         }
 
@@ -95,7 +95,7 @@ public class DamageHandler implements Listener{
 
                     }
 
-                    event.setDamage(damageMath(event.getFinalDamage(), mobLevel));
+                    event.setDamage(damageMath(event.getFinalDamage(), mobLevel) * ConfigValues.defaultConfig.getDouble("Aggressive EliteMob damage multiplier"));
 
                 }
 
@@ -112,7 +112,9 @@ public class DamageHandler implements Listener{
 
         if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-            event.setRadius((float) damageMath(event.getRadius(), (int) Math.ceil(event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() * ConfigValues.defaultConfig.getDouble("SuperCreeper explosion nerf multiplier"))));
+            int mobLevel = event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+
+            event.setRadius((float) damageMath(event.getRadius(), (int) Math.ceil(mobLevel / 2 * ConfigValues.defaultConfig.getDouble("SuperCreeper explosion nerf multiplier"))));
 
         }
 

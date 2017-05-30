@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
@@ -172,7 +173,7 @@ public class ZombieParents extends MajorPowers implements Listener {
 
     private void nameClearer (Entity entity) {
 
-        String entityName = entity.getCustomName();
+        String originalName = entity.getCustomName();
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
@@ -181,7 +182,11 @@ public class ZombieParents extends MajorPowers implements Listener {
 
                 if (entity.isValid()) {
 
-                    entity.setCustomName(entityName);
+                    if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
+                        entity.setCustomName(originalName);
+                    } else {
+                        entity.setCustomName(NameHandler.customAggressiveName(entity));
+                    }
 
                 }
 

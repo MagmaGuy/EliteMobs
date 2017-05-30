@@ -116,6 +116,7 @@ public class MetadataHandler {
     public final static String TEAM_ROCKET_MEMBER= "TeamRocketMember";
     public final static String TEAM_ROCKET_ACTIVATED = "TeamRocketActivated";
     public final static String ZOMBIE_PARENTS_ACTIVATED = "ZombieParentsActivated";
+    public final static String ZOMBIE_CHANTING = "ZombieChanting";
 
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
@@ -137,34 +138,7 @@ public class MetadataHandler {
         metadataList.add(TAUNT_NAME);
         metadataList.add(FORBIDDEN_MD);
 
-//        metadataList.add(ZOMBIE_FRIENDS_MD);
-//        metadataList.add(ZOMBIE_NECRONOMICON_MD);
-//        metadataList.add(ZOMBIE_PARENTS_MD);
-//        metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
-
         metadataList.addAll(majorPowerList());
-
-//        metadataList.add(ATTACK_ARROW_MD);
-//        metadataList.add(ATTACK_CONFUSING_MD);
-//        metadataList.add(ATTACK_FIRE_MD);
-//        metadataList.add(ATTACK_FIREBALL_MD);
-//        metadataList.add(ATTACK_FREEZE_MD);
-//        metadataList.add(ATTACK_GRAVITY_MD);
-//        metadataList.add(ATTACK_POISON_MD);
-//        metadataList.add(ATTACK_PUSH_MD);
-//        metadataList.add(ATTACK_WEAKNESS_MD);
-//        metadataList.add(ATTACK_WEB_MD);
-//        metadataList.add(ATTACK_WITHER_MD);
-//        metadataList.add(BONUS_LOOT_MD);
-//        metadataList.add(DOUBLE_DAMAGE_MD);
-//        metadataList.add(DOUBLE_HEALTH_MD);
-//        metadataList.add(INVULNERABILITY_ARROW_MD);
-//        metadataList.add(INVULNERABILITY_FALL_DAMAGE_MD);
-//        metadataList.add(INVULNERABILITY_FIRE_MD);
-//        metadataList.add(INVULNERABILITY_KNOCKBACK_MD);
-//        metadataList.add(MOVEMENT_SPEED_MD);
-//        metadataList.add(INVISIBILITY_MD);
-//        metadataList.add(TAUNT_MD);
 
         metadataList.addAll(minorPowerList());
 
@@ -174,6 +148,7 @@ public class MetadataHandler {
         metadataList.add(TEAM_ROCKET_ACTIVATED);
         metadataList.add(TEAM_ROCKET_MEMBER);
         metadataList.add(ZOMBIE_PARENTS_ACTIVATED);
+        metadataList.add(ZOMBIE_CHANTING);
 
         return metadataList;
 
@@ -266,51 +241,6 @@ public class MetadataHandler {
         return metadataList;
 
     }
-
-//    public String humanToMachineTranslator (String metadata) {
-//
-//        switch (metadata) {
-//
-//            case ATTACK_ARROW_H:
-//                return ATTACK_ARROW_MD;
-//            case ATTACK_BLINDING_H:
-//                return ATTACK_BLINDING_MD;
-//            case ATTACK_CONFUSING_H:
-//                return ATTACK_CONFUSING_MD;
-//            case ATTACK_FIRE_H:
-//                return ATTACK_FIRE_MD;
-//            case ATTACK_FREEZE_H:
-//                return ATTACK_FREEZE_MD;
-//            case ATTACK_GRAVITY_H:
-//                return ATTACK_GRAVITY_MD;
-//            case ATTACK_POISON_H:
-//                return ATTACK_POISON_MD;
-//            case ATTACK_PUSH_H:
-//                return ATTACK_PUSH_MD;
-//            case ATTACK_WEB_H:
-//                return ATTACK_WEB_MD;
-//            case ATTACK_WITHER_H:
-//                return ATTACK_WITHER_MD;
-//            case BONUS_LOOT_H:
-//                return BONUS_LOOT_MD;
-//            case INVULNERABILITY_ARROW_H:
-//                return INVULNERABILITY_ARROW_MD;
-//            case INVULNERABILITY_FALL_DAMAGE_H:
-//                return INVULNERABILITY_ARROW_MD;
-//            case INVULNERABILITY_FIRE_H:
-//                return INVULNERABILITY_FIRE_MD;
-//            case INVULNERABILITY_KNOCKBACK_H:
-//                return INVULNERABILITY_KNOCKBACK_MD;
-//            case MOVEMENT_SPEED_H:
-//                return MOVEMENT_SPEED_MD;
-//            case INVISIBILITY_H:
-//                return INVISIBILITY_MD;
-//            default:
-//                Bukkit.getLogger().info("Error: Problem with power name: " + metadata);
-//                return null;
-//        }
-//
-//    }
 
     public String machineToHumanTranslator (String metadata) {
 
