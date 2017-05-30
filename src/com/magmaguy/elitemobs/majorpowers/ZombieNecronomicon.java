@@ -222,7 +222,12 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                     }
 
-                    zombie.setCustomName(NameHandler.customAggressiveName(zombie));
+                    if (zombie.isValid()) {
+
+                        zombie.setCustomName(NameHandler.customAggressiveName(zombie));
+
+                    }
+                    
                     summoningEffectOn = false;
                     cancel();
                     return;
