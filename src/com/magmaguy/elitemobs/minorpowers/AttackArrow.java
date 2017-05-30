@@ -26,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 /**
@@ -57,23 +58,16 @@ public class AttackArrow extends MinorPowers implements Listener{
     @EventHandler
     public void attackArrow (EntityTargetEvent event) {
 
-        if (event.getEntity().hasMetadata(powerMetadata)) {
+        if (event.getEntity().hasMetadata(powerMetadata) && !event.getEntity().hasMetadata(MetadataHandler.SHOOTING_ARROWS)) {
 
             Entity targetter = event.getEntity();
             Entity targetted = event.getTarget();
 
             if (targetted instanceof Player) {
 
-                Entity arrow = targetter.getWorld().spawnEntity(targetter.getLocation().add(0, 3, 0), EntityType.ARROW);
+                targetter.setMetadata(MetadataHandler.SHOOTING_ARROWS, new FixedMetadataValue(plugin, true));
 
-                Vector targetterToTargetted = targetted.getLocation().toVector().subtract(arrow.getLocation().toVector());
-
-                //nerf inevitable speed of arrows which increases arrow damage in minecraft
-                double distanceNerf = (targetted.getLocation().distance(targetter.getLocation())) /100;
-
-                arrow.setVelocity(targetterToTargetted.multiply(0.5 - distanceNerf));
-
-                processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                new BukkitRunnable() {
 
                     @Override
                     public void run() {
@@ -81,7 +75,8 @@ public class AttackArrow extends MinorPowers implements Listener{
                         if (!targetted.isValid() || !targetter.isValid() || targetter.getWorld() != targetted.getWorld()
                                 || targetted.getLocation().distance(targetter.getLocation()) > 20 ) {
 
-                            Bukkit.getScheduler().cancelTask(processID);
+                            targetter.removeMetadata(MetadataHandler.SHOOTING_ARROWS, plugin);
+                            cancel();
                             return;
 
                         }
@@ -96,7 +91,7 @@ public class AttackArrow extends MinorPowers implements Listener{
 
                     }
 
-                },100, 100 );
+                }.runTaskTimer(plugin, 0, 100);
 
             }
 
