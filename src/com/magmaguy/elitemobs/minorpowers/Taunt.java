@@ -32,6 +32,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.Random;
@@ -179,10 +180,14 @@ public class Taunt extends MinorPowers implements Listener {
 
         entity.setCustomName(chatColorConverter(tempName));
 
-        processID = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        new BukkitRunnable(){
 
             @Override
             public void run() {
+
+                if (!entity.isValid()){
+                    return;
+                }
 
                 if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
                     entity.setCustomName(originalName);
@@ -194,7 +199,8 @@ public class Taunt extends MinorPowers implements Listener {
 
             }
 
-        }, 4 * 20);
+
+        }.runTaskLater(plugin, 4 * 20);
 
     }
 

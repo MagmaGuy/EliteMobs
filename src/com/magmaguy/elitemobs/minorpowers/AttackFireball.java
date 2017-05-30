@@ -26,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 /**
@@ -35,8 +36,6 @@ public class AttackFireball extends MinorPowers implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ATTACK_FIREBALL_MD;
-
-    private int processID;
 
     @Override
     public void applyPowers(Entity entity) {
@@ -57,22 +56,16 @@ public class AttackFireball extends MinorPowers implements Listener {
     @EventHandler
     public void attackFireball (EntityTargetEvent event) {
 
-        if (event.getEntity().hasMetadata(powerMetadata)) {
+        if (event.getEntity().hasMetadata(powerMetadata) && !event.getEntity().hasMetadata(MetadataHandler.SHOOTING_FIREBALLS)) {
 
             Entity targetter = event.getEntity();
             Entity targetted = event.getTarget();
 
             if (targetted instanceof Player) {
 
-                Entity fireball = targetter.getWorld().spawnEntity(targetter.getLocation().add(0, 3, 0), EntityType.FIREBALL);
+                targetter.setMetadata(MetadataHandler.SHOOTING_FIREBALLS, new FixedMetadataValue(plugin, true));
 
-                Vector targetterToTargetted = targetted.getLocation().toVector().subtract(fireball.getLocation().toVector());
-
-                double distanceNerf = (targetted.getLocation().distance(targetter.getLocation())) /100;
-
-                fireball.setVelocity(targetterToTargetted.multiply(0.5 - distanceNerf));
-
-                processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                new BukkitRunnable(){
 
                     @Override
                     public void run() {
@@ -80,7 +73,8 @@ public class AttackFireball extends MinorPowers implements Listener {
                         if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
                                 || targetted.getLocation().distance(targetter.getLocation()) > 20 ) {
 
-                            Bukkit.getScheduler().cancelTask(processID);
+                            targetter.removeMetadata(MetadataHandler.SHOOTING_FIREBALLS, plugin);
+                            cancel();
                             return;
 
                         }
@@ -91,11 +85,12 @@ public class AttackFireball extends MinorPowers implements Listener {
 
                         double distanceNerfRepeating = (targetted.getLocation().distance(targetter.getLocation())) / 100;
 
-                        repeatingFireball.setVelocity(targetterToTargetted.multiply(0.5 - distanceNerfRepeating));
+                        repeatingFireball.setVelocity(targetterToTargetted.multiply(0.5 - distanceNerfRepeating).multiply(0.1));
 
                     }
 
-                },20*8, 20*8 );
+                }.runTaskTimer(plugin, 0, 20 * 8);
+
 
             }
 

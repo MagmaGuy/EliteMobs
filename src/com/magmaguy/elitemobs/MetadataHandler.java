@@ -117,6 +117,8 @@ public class MetadataHandler {
     public final static String TEAM_ROCKET_ACTIVATED = "TeamRocketActivated";
     public final static String ZOMBIE_PARENTS_ACTIVATED = "ZombieParentsActivated";
     public final static String ZOMBIE_CHANTING = "ZombieChanting";
+    public final static String SHOOTING_ARROWS = "ShootingArrows";
+    public final static String SHOOTING_FIREBALLS = "ShootingFireballs";
 
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
@@ -149,6 +151,8 @@ public class MetadataHandler {
         metadataList.add(TEAM_ROCKET_MEMBER);
         metadataList.add(ZOMBIE_PARENTS_ACTIVATED);
         metadataList.add(ZOMBIE_CHANTING);
+        metadataList.add(SHOOTING_ARROWS);
+        metadataList.add(SHOOTING_FIREBALLS);
 
         return metadataList;
 
