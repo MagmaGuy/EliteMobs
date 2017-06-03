@@ -50,10 +50,10 @@ public class CommandHandler implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
 
-        // /elitemobs spawnmob with variable arg length
-        if (args.length > 0 && args[0].equalsIgnoreCase("spawnmob")) {
+        // /elitemobs SpawnMob with variable arg length
+        if (args.length > 0 && args[0].equalsIgnoreCase("SpawnMob")) {
 
-            if (commandSender instanceof ConsoleCommandSender || commandSender instanceof Player && commandSender.hasPermission("elitemobs.spawnmob")) {
+            if (commandSender instanceof ConsoleCommandSender || commandSender instanceof Player && commandSender.hasPermission("elitemobs.SpawnMob")) {
 
                 SpawnMobCommandHandler spawnMob = new SpawnMobCommandHandler();
 
@@ -61,18 +61,18 @@ public class CommandHandler implements CommandExecutor {
 
                 return true;
 
-            } else if (commandSender instanceof Player && !commandSender.hasPermission("elitemobs.spawnmob")) {
+            } else if (commandSender instanceof Player && !commandSender.hasPermission("elitemobs.SpawnMob")) {
 
                 Player player = (Player) commandSender;
 
                 if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
 
                     player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                            "You need the following permission: " + "elitemobs.spawnmob");
+                            "You need the following permission: " + "elitemobs.SpawnMob");
 
                 } else {
 
-                    player.sendMessage("You do not have the permission " + "elitemobs.spawnmob");
+                    player.sendMessage("You do not have the permission " + "elitemobs.SpawnMob");
 
                 }
 
@@ -368,7 +368,7 @@ public class CommandHandler implements CommandExecutor {
             player.sendMessage("/elitemobs getloot (alone to get GUI)");
             player.sendMessage("/elitemobs getloot [loot name]");
             player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
-            player.sendMessage("/elitemobs spawnmob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
+            player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
 
         } else if (commandSender instanceof ConsoleCommandSender) {
 
@@ -377,7 +377,7 @@ public class CommandHandler implements CommandExecutor {
             getLogger().info("elitemobs reload configs");
             getLogger().info("elitemobs reload loot");
             getLogger().info("elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
-            getLogger().info("elitemobs spawnmob [worldName] [x] [y] [z] [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
+            getLogger().info("elitemobs SpawnMob [worldName] [x] [y] [z] [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
 
         }
 

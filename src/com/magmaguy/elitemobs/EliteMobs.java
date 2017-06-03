@@ -30,8 +30,7 @@ import com.magmaguy.elitemobs.config.TranslationCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
-import com.magmaguy.elitemobs.mobs.aggressive.*;
-import com.magmaguy.elitemobs.mobs.passive.*;
+import com.magmaguy.elitemobs.mobcustomizer.DropsHandler;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobSpawner;
@@ -82,34 +81,11 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Hook up all listeners, some depend on config
         this.getServer().getPluginManager().registerEvents(this, this);
 
-        //Aggressive mobs
-        this.getServer().getPluginManager().registerEvents(new ZombieHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new HuskHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new SkeletonHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new WitherSkeletonHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new StrayHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new PigZombieHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new CreeperHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new SpiderHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new EndermanHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new CaveSpiderHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new SilverfishHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new BlazeHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new WitchHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new EndermiteHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new PolarBearHandler(this), this);
-
-        //Passive mobs
-        this.getServer().getPluginManager().registerEvents(new ChickenHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new CowHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new IronGolemHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new MushroomCowHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new PigHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new SheepHandler(this), this);
-        this.getServer().getPluginManager().registerEvents(new PassiveEliteMobDeathHandler(), this);
-
         //Mob damage
         this.getServer().getPluginManager().registerEvents(new DamageHandler(this), this);
+
+        //Mob loot
+        this.getServer().getPluginManager().registerEvents(new DropsHandler(), this);
 
         //getloot GUI
         this.getServer().getPluginManager().registerEvents(new LootGUI(), this);
@@ -269,15 +245,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
             public void run() {
 
                 mobScanner.scanMobs(passiveStackAmount);
-
-            }
-
-        }, 1, 20);
-
-        processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-
-            public void run() {
-
                 potionEffectApplier.potionEffectApplier();
                 scoreboardHandler.scanSight();
 
@@ -329,6 +296,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Prevent creepers from killing passive mobs", true);
         getConfig().addDefault("Aggressive EliteMob life multiplier", 1.0);
         getConfig().addDefault("Aggressive EliteMob damage multiplier", 1.0);
+        getConfig().addDefault("Aggressive EliteMob default loot multiplier", 1.0);
         getConfig().addDefault("SuperCreeper explosion nerf multiplier", 1.0);
         getConfig().addDefault("Turn on visual effects for natural or plugin-spawned EliteMobs", true);
         getConfig().addDefault("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs", true);
