@@ -46,7 +46,6 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ZOMBIE_NECRONOMICON_MD;
-    private int processID, processID2, processID3;
     private int chantIndex = 0;
     private boolean summoningEffectOn = false;
 
@@ -227,7 +226,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                         zombie.setCustomName(NameHandler.customAggressiveName(zombie));
 
                     }
-                    
+
                     summoningEffectOn = false;
                     cancel();
                     return;

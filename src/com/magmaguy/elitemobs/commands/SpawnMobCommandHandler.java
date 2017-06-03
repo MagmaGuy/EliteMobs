@@ -65,7 +65,7 @@ public class SpawnMobCommandHandler {
             if (args.length == 1) {
 
                 player.sendMessage("Valid command syntax:");
-                player.sendMessage("/elitemobs spawnmob [mobType] [mobLevel] [mobPower] [mobPower(you can keep adding these mobPowers as many as you'd like)]");
+                player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower(you can keep adding these mobPowers as many as you'd like)]");
 
             }
 
@@ -84,7 +84,7 @@ public class SpawnMobCommandHandler {
 
                     player.sendMessage("Not a valid level.");
                     player.sendMessage("Valid command syntax:");
-                    player.sendMessage("/elitemobs spawnmob [mobType] [mobLevel] [mobPower] [mobPower(you can keep adding these mobPowers as many as you'd like)]");
+                    player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower(you can keep adding these mobPowers as many as you'd like)]");
 
                 }
 
@@ -135,7 +135,7 @@ public class SpawnMobCommandHandler {
 
                         getConsoleSender().sendMessage("At least one of the coordinates (x:" + args[2] + ", y:" +
                                 args[3] + ", z:" + args[4] + ") is not valid");
-                        getConsoleSender().sendMessage("Valid command syntax: /elitemobs spawnmob worldName xCoord yCoord " +
+                        getConsoleSender().sendMessage("Valid command syntax: /elitemobs SpawnMob worldName xCoord yCoord " +
                                 "zCoord mobType mobLevel mobPower mobPower(you can keep adding these mobPowers as many as you'd like)");
 
                     }
@@ -165,7 +165,7 @@ public class SpawnMobCommandHandler {
 
             if (world == null) {
 
-                getConsoleSender().sendMessage("World " + args[1] + "not found. Valid command syntax: /elitemobs spawnmob" +
+                getConsoleSender().sendMessage("World " + args[1] + "not found. Valid command syntax: /elitemobs SpawnMob" +
                         " [worldName] [xCoord] [yCoord] [zCoord] [mobType] [mobLevel] [mobPower] [mobPower(you can keep adding these " +
                         "mobPowers as many as you'd like)]");
 
