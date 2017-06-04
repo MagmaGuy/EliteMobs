@@ -1,10 +1,10 @@
 name: EliteMobs
-version: 2.4.3
+version: 2.4.4
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 commands:
   elitemobs:
-    description: Tells a player the statistics of the
+    description: Catch-all command
     usage: /elitemobs
     aliases: [em]
 permissions:
