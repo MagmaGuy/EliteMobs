@@ -85,7 +85,19 @@ public class MobScanner implements Listener {
                                 entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap")) &&
                                 !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
 
-                            scanValidAggressiveLivingEntity(entity);
+                            if(!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
+                                    ConfigValues.defaultConfig.getBoolean("Stack aggressive spawner mobs")) {
+
+                                scanValidAggressiveLivingEntity(entity);
+
+                            }
+
+                            if(entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
+                                    ConfigValues.defaultConfig.getBoolean("Stack aggressive natural mobs")) {
+
+                                scanValidAggressiveLivingEntity(entity);
+
+                            }
 
                         }
 

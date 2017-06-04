@@ -27,6 +27,14 @@ public class ArmorHandler {
 
     public static void ArmorHandler(Entity entity) {
 
+        LivingEntity livingEntity = (LivingEntity) entity;
+
+        livingEntity.getEquipment().setItemInMainHandDropChance(0);
+        livingEntity.getEquipment().setHelmetDropChance(0);
+        livingEntity.getEquipment().setChestplateDropChance(0);
+        livingEntity.getEquipment().setLeggingsDropChance(0);
+        livingEntity.getEquipment().setBootsDropChance(0);
+
         if (entity.hasMetadata(MetadataHandler.CUSTOM_ARMOR)) {
 
             return;
