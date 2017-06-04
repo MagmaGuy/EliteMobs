@@ -289,6 +289,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getConfig().addDefault("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn", 20);
         getConfig().addDefault("Aggressive mob stacking", true);
         getConfig().addDefault("Aggressive mob stacking cap", 50);
+        getConfig().addDefault("Stack aggressive spawner mobs", true);
+        getConfig().addDefault("Stack aggressive natural mobs", true);
         getConfig().addDefault("Passive EliteMob stack amount", 50);
         getConfig().addDefault("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)", true);
         getConfig().addDefault("Aggressive EliteMobs flat loot drop rate %", 75);

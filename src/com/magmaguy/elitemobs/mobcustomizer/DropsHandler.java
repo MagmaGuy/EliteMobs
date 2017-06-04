@@ -32,9 +32,7 @@ public class DropsHandler implements Listener {
     @EventHandler
     public void onDeath (EntityDeathEvent event){
 
-        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                !event.getEntity().hasMetadata(MetadataHandler.FORBIDDEN_MD) &&
-                event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() > 1){
+        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)){
 
             List<ItemStack> droppedItems = event.getDrops();
             int mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
