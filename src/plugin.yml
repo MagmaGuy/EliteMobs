@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 2.4.1
+version: 2.4.3
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 commands:
@@ -17,6 +17,8 @@ permissions:
       elitemobs.reload.loot: true
       elitemobs.giveloot: true
       elitemobs.spawnmob: true
+      elitemobs.killall.aggressiveelites: true
+      elitemobs.killall.passiveelites: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -37,3 +39,12 @@ permissions:
     default: op
   elitemobs.scoreboard:
     description: Shows a scoreboard with info about the elite mob a player might be standing next to
+  elitemobs.killall.*:
+    description: Allows players to run /elitemobs killall passiveelites and /elitemobs killall aggressiveelites
+    children:
+      elitemobs.killall.aggressiveelites: true
+      elitemobs.killall.passiveelites: true
+  elitemobs.killall.aggressiveelites:
+    description: Allows players to run /elitemobs killall aggressiveelites
+  elitemobs.killall.passiveelites:
+    description: Allows players to run /elitemobs killall passiveelites

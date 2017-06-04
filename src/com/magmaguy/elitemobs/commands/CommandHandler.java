@@ -19,11 +19,15 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
+import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -36,6 +40,9 @@ import static org.bukkit.Bukkit.getLogger;
 /**
  * Created by MagmaGuy on 21/01/2017.
  */
+
+//This place has been forsaken by God. Leave it while you can.
+//TODO: commandSender.sendMessage actually works for console and players without filtering. Remake that. Also remake the title messages to unite them in some method.
 
 public class CommandHandler implements CommandExecutor {
 
@@ -132,7 +139,8 @@ public class CommandHandler implements CommandExecutor {
                 validCommands(commandSender);
                 return true;
 
-            // /elitemobs reload config | /elitemobs reload loot | /elitemobs giveloot [player] (for GUI menu)
+            // /elitemobs reload config | /elitemobs reload loot | /elitemobs giveloot [player] (for GUI menu) |
+            // /elitemobs killall aggressiveelites | /elitemobs killall passiveelites
             case 2:
 
                 //valid /elitemobs reload config
@@ -247,16 +255,80 @@ public class CommandHandler implements CommandExecutor {
 
                     return true;
 
-                } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof Player
-                    && commandSender.hasPermission("elitemobs.giveloot")) {
+                } else if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("aggressiveelites")) {
 
-                    if (args[0].equalsIgnoreCase("giveloot")) {
+                    if (commandSender.hasPermission("elitemobs.killall.aggressiveelites")){
 
-                        if (validPlayer(args[1])) {
+                        int counter = 0;
 
-                            Player receiver = Bukkit.getServer().getPlayer(args[1]);
+                        for (World world : EliteMobs.worldList) {
 
-                            //TODO: add GUI to giveloot command
+                            for (LivingEntity livingEntity : world.getLivingEntities()) {
+
+                                if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(livingEntity)) {
+
+                                    livingEntity.remove();
+                                    counter++;
+
+                                }
+
+                            }
+
+                        }
+
+                        commandSender.sendMessage("Killed " + counter + " aggressive EliteMobs.");
+
+                        return true;
+
+                    } else if (commandSender instanceof Player) {
+
+                        Player player = ((Player) commandSender);
+
+                        if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                            player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                                    "You need the following permission: " + "elitemobs.killall.aggressiveelites");
+
+                        } else {
+
+                            player.sendMessage("You do not have the permission " + "elitemobs.killall.aggressiveelites");
+
+                        }
+
+                    }
+
+                } else if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("passiveelites")) {
+
+                    if (commandSender.hasPermission("elitemobs.killall.passiveelites")) {
+
+                        for (World world : EliteMobs.worldList) {
+
+                            for (LivingEntity livingEntity : world.getLivingEntities()) {
+
+                                if (livingEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && ValidPassiveMobFilter.ValidPassiveMobFilter(livingEntity)) {
+
+                                    livingEntity.remove();
+
+                                }
+
+                            }
+
+                        }
+
+                        return true;
+
+                    } else if (commandSender instanceof Player) {
+
+                        Player player = ((Player) commandSender);
+
+                        if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                            player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                                    "You need the following permission: " + "elitemobs.killall.passiveelites");
+
+                        } else {
+
+                            player.sendMessage("You do not have the permission " + "elitemobs.killall.passiveelites");
 
                         }
 
