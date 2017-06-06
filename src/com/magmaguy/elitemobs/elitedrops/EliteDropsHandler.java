@@ -15,26 +15,19 @@
 
 package com.magmaguy.elitemobs.elitedrops;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
 import static org.bukkit.Bukkit.getLogger;
@@ -47,11 +40,13 @@ public class EliteDropsHandler implements Listener {
     public static List<ItemStack> lootList = new ArrayList();
     public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
     public static HashMap<Integer, List<ItemStack>> rankedItemStacks = new HashMap<>();
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     LootCustomConfig lootCustomConfig = new LootCustomConfig();
 
     public void superDropParser() {
+
+        //TODO: use ItemRankHandler.guessItemRank(material, enchantmentTotal)
+        //TODO: split class up
 
         List<String> lootCount = lootCounter();
 
@@ -429,46 +424,46 @@ public class EliteDropsHandler implements Listener {
     }
 
 
-    @EventHandler
-    public void onDeath(EntityDeathEvent event) {
-
-        Entity entity = event.getEntity();
-
-        Random random = new Random();
-
-        if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
-                entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() > 4) {
-
-
-            if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100) {
-
-                int randomDrop = random.nextInt(lootList.size());
-
-                entity.getWorld().dropItem(entity.getLocation(), lootList.get(randomDrop));
-
-            }
-
-            //double drops
-            if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop additional loot with drop % based on EliteMob level (higher is more likely)") &&
-                    random.nextDouble() < (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 100)) {
-
-                int randomDrop = random.nextInt(lootList.size());
-
-                entity.getWorld().dropItem(entity.getLocation(), lootList.get(randomDrop));
-
-            }
-
-            entity.removeMetadata(MetadataHandler.ELITE_MOB_MD, plugin);
-
-            if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
-
-                entity.removeMetadata(MetadataHandler.NATURAL_MOB_MD, plugin);
-
-            }
-
-        }
-
-    }
+//    @EventHandler
+//    public void onDeath(EntityDeathEvent event) {
+//
+//        Entity entity = event.getEntity();
+//
+//        Random random = new Random();
+//
+//        if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
+//                entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
+//                entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() > 4) {
+//
+//
+//            if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100) {
+//
+//                int randomDrop = random.nextInt(lootList.size());
+//
+//                entity.getWorld().dropItem(entity.getLocation(), lootList.get(randomDrop));
+//
+//            }
+//
+//            //double drops
+//            if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop additional loot with drop % based on EliteMob level (higher is more likely)") &&
+//                    random.nextDouble() < (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 100)) {
+//
+//                int randomDrop = random.nextInt(lootList.size());
+//
+//                entity.getWorld().dropItem(entity.getLocation(), lootList.get(randomDrop));
+//
+//            }
+//
+//            entity.removeMetadata(MetadataHandler.ELITE_MOB_MD, plugin);
+//
+//            if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
+//
+//                entity.removeMetadata(MetadataHandler.NATURAL_MOB_MD, plugin);
+//
+//            }
+//
+//        }
+//
+//    }
 
 }

@@ -18,8 +18,6 @@ package com.magmaguy.elitemobs.config;
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
-
 /**
  * Created by MagmaGuy on 01/05/2017.
  */
@@ -27,20 +25,17 @@ public class MobPowersCustomConfig {
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
-    private FileConfiguration customConfig = null;
-    private File customConfigFile = null;
-
     public void initializeMobPowersConfig () {
 
         MetadataHandler metadataHandler = new MetadataHandler();
 
-        for (String string : metadataHandler.minorPowerList()) {
+        for (String string : MetadataHandler.minorPowerList()) {
 
             this.getMobPowersConfig().addDefault("Powers.Minor Powers." + string, true);
 
         }
 
-        for (String string : metadataHandler.majorPowerList()) {
+        for (String string : MetadataHandler.majorPowerList()) {
 
             this.getMobPowersConfig().addDefault("Powers.Major Powers." + string, true);
 

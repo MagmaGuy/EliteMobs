@@ -91,7 +91,6 @@ public class LootGUI implements Listener{
 
     private void tierConstructor (Inventory inventory) {
 
-        //TODO: add a way to select items per their rank
         List <Integer> tierSlots = new ArrayList<>();
 
         tierSlots.add(1);

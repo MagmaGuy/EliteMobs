@@ -613,7 +613,7 @@ public class MinorPowerPowerStance implements Listener {
 
         Item item = location.getWorld().dropItem(location, itemStack);
         item.setPickupDelay(Integer.MAX_VALUE);
-        item.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, 0));
+        item.setMetadata(MetadataHandler.VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, 0));
         item.setGravity(false);
 
         return item;
