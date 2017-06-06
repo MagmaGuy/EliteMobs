@@ -23,10 +23,8 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurg
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.LootCustomConfig;
-import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
-import com.magmaguy.elitemobs.config.TranslationCustomConfig;
+import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
@@ -65,6 +63,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         lootCustomConfig.LootCustomConfig();
         TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
         translationCustomConfig.initializeTranslationConfig();
+        RandomItemsSettingsConfig randomItemsSettingsConfig = new RandomItemsSettingsConfig();
+        randomItemsSettingsConfig.initializeRandomItemsSettingsConfig();
         ConfigValues configValues = new ConfigValues();
         configValues.initializeConfigValues();
 
@@ -170,7 +170,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Loot
         if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)")) {
 
-            this.getServer().getPluginManager().registerEvents(new EliteDropsHandler(), this);
+            this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
 
             getLogger().info("EliteMobs - EliteMob loot enabled!");
 
@@ -311,22 +311,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
         saveDefaultConfig();
 
         getLogger().info("EliteMobs config loaded!");
-
-    }
-
-    public void reloadConfiguration() {
-
-        reloadConfig();
-        MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
-        mobPowersCustomConfig.reloadCustomConfig();
-        LootCustomConfig lootCustomConfig = new LootCustomConfig();
-        lootCustomConfig.reloadLootConfig();
-        TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
-        translationCustomConfig.reloadCustomConfig();
-        ConfigValues configValues = new ConfigValues();
-        configValues.initializeConfigValues();
-
-        getLogger().info("EliteMobs config reloaded!");
 
     }
 
