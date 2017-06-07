@@ -48,8 +48,6 @@ public class RandomItemGenerator {
 
         randomItem.setItemMeta(itemMeta);
 
-        Bukkit.getLogger().info("item randomized");
-
         return randomItem;
 
     }
@@ -84,7 +82,21 @@ public class RandomItemGenerator {
 
     private String randomItemNameConstructor(){
 
-        return "Butts";
+        return adjectiveNounPairNameGenerator();
+
+    }
+
+    private String adjectiveNounPairNameGenerator() {
+
+        ArrayList<String> nouns = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid nouns");
+        ArrayList<String> adjectives = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid adjectives");
+
+        String randomName = nouns.get(random.nextInt(nouns.size()));
+        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
+
+        String finalName = randomAdjective + " " + randomName;
+
+        return finalName;
 
     }
 
@@ -288,12 +300,9 @@ public class RandomItemGenerator {
 
                 newMeta.addEnchant(enchantment, finalEnchantLevel, true);
 
-                Bukkit.getLogger().info("Adding enchantment " + enchantment + " at level " + finalEnchantLevel);
-
             } else {
 
                 newMeta.addEnchant(enchantment, 1, true);
-                Bukkit.getLogger().info("Adding enchantment " + enchantment + " at level " + 1);
 
             }
 
@@ -309,7 +318,7 @@ public class RandomItemGenerator {
 
         if (ConfigValues.randomItemsConfig.getBoolean("Monitor randomly generated drops on console")) {
 
-            Bukkit.getLogger().info("Generated item with the following attributes:");
+            Bukkit.getLogger().info("Procedurally generated item with the following attributes:");
             Bukkit.getLogger().info("Item type: " + material);
             Bukkit.getLogger().info("Item name: " + newMeta.getDisplayName());
             Bukkit.getLogger().info("Item lore: " + newMeta.getLore().get(0));
@@ -317,7 +326,7 @@ public class RandomItemGenerator {
 
             for (Map.Entry<Enchantment, Integer> entry : newMeta.getEnchants().entrySet()){
 
-                Bukkit.getLogger().info(entry+"");
+                Bukkit.getLogger().info(entry.getKey() + " level " + entry.getValue());
 
             }
 
