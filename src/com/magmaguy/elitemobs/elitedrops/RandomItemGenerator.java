@@ -22,10 +22,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by MagmaGuy on 04/06/2017.
@@ -42,7 +39,6 @@ public class RandomItemGenerator {
 
         //Apply item name
         itemMeta.setDisplayName(randomItemNameConstructor());
-
 
         //Apply lore
         itemMeta.setLore(randomItemLoreConstructor(rankLevel));
@@ -306,6 +302,22 @@ public class RandomItemGenerator {
             if (newEnchantInt == 0) {
 
                 validEnchantments.remove(enchantment);
+
+            }
+
+        }
+
+        if (ConfigValues.randomItemsConfig.getBoolean("Monitor randomly generated drops on console")) {
+
+            Bukkit.getLogger().info("Generated item with the following attributes:");
+            Bukkit.getLogger().info("Item type: " + material);
+            Bukkit.getLogger().info("Item name: " + newMeta.getDisplayName());
+            Bukkit.getLogger().info("Item lore: " + newMeta.getLore().get(0));
+            Bukkit.getLogger().info("Item enchantments:");
+
+            for (Map.Entry<Enchantment, Integer> entry : newMeta.getEnchants().entrySet()){
+
+                Bukkit.getLogger().info(entry+"");
 
             }
 

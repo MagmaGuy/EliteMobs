@@ -114,7 +114,13 @@ public class DamageHandler implements Listener{
 
             int mobLevel = event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-            event.setRadius((float) damageMath(event.getRadius(), (int) Math.ceil(mobLevel / 2 * ConfigValues.defaultConfig.getDouble("SuperCreeper explosion nerf multiplier"))));
+            if(mobLevel == 1) {
+
+                return;
+                
+            }
+
+            event.setRadius((int) Math.ceil(damageMath(event.getRadius(), (int) Math.ceil(mobLevel / 2 * ConfigValues.defaultConfig.getDouble("SuperCreeper explosion nerf multiplier")))));
 
         }
 

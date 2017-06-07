@@ -46,19 +46,20 @@ public class EliteDropsDropper implements Listener{
         if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
                 entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
+            //dropped item rank should be 0.4x the mob level (level 100 = rank 40 item)
+            int rankRandomizer = (int) ((entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() * 0.5) + (random.nextInt(2) + 1 - 1));
+
+            if (rankRandomizer < 1) {
+
+                rankRandomizer = 0;
+
+            }
+
             if (!EliteDropsHandler.rankedItemStacks.isEmpty()){
 
                 //flat drop rate
                 if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100) {
 
-                    //dropped item rank should be 0.4x the mob level (level 100 = rank 40 item)
-                    int rankRandomizer = (int) ((entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() * 0.5) + (random.nextInt(2) + 1 - 4));
-
-                    if (rankRandomizer < 1) {
-
-                        rankRandomizer = 0;
-
-                    }
 
                     if (EliteDropsHandler.rankedItemStacks.containsKey(rankRandomizer)) {
 
@@ -105,26 +106,9 @@ public class EliteDropsDropper implements Listener{
 
             } else {
 
-                //todo: add pure random gen item loot
-
-            }
-
-
-            if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100) {
-
-                int randomDrop = random.nextInt(EliteDropsHandler.lootList.size());
-
-                entity.getWorld().dropItem(entity.getLocation(), EliteDropsHandler.lootList.get(randomDrop));
-
-            }
-
-            //double drops
-            if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop additional loot with drop % based on EliteMob level (higher is more likely)") &&
-                    random.nextDouble() < (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 100)) {
-
-                int randomDrop = random.nextInt(EliteDropsHandler.lootList.size());
-
-                entity.getWorld().dropItem(entity.getLocation(), EliteDropsHandler.lootList.get(randomDrop));
+                RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
+                ItemStack randomLoot = randomItemGenerator.randomItemGenerator(rankRandomizer);
+                entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
             }
 
