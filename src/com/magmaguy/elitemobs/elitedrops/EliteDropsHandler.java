@@ -52,8 +52,6 @@ public class EliteDropsHandler implements Listener {
 
         for (String lootEntry : lootCount) {
 
-            int itemPower = 0;
-
             StringBuilder path = new StringBuilder();
             path.append(lootEntry);
 
@@ -61,7 +59,6 @@ public class EliteDropsHandler implements Listener {
 
 
             String itemType = itemTypeHandler(previousPath);
-            itemPower += itemTypePower(Material.getMaterial(itemType));
             Bukkit.getLogger().info("Adding: " + previousPath);
             String itemName = itemNameHandler(previousPath);
             List itemLore = itemLoreHandler(previousPath);
@@ -86,7 +83,6 @@ public class EliteDropsHandler implements Listener {
                     Enchantment enchantmentType = Enchantment.getByName(enchantmentName);
 
                     int enchantmentLevel = Integer.parseInt(parsedString[1]);
-                    itemPower += enchantmentLevel;
 
                     itemMeta.addEnchant(enchantmentType, enchantmentLevel, true);
 
@@ -99,6 +95,8 @@ public class EliteDropsHandler implements Listener {
             lootList.add(itemStack);
 
             List<PotionEffect> parsedPotionEffect = new ArrayList();
+
+            int enchantmentCount = 0;
 
             //Add potion effects to a separate list to reduce i/o operations
             if (potionEffects != null) {
@@ -120,7 +118,7 @@ public class EliteDropsHandler implements Listener {
                     }
 
                     int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
-                    itemPower += potionEffectAmplifier;
+                    enchantmentCount += potionEffectAmplifier;
 
                     PotionEffect potionEffect = new PotionEffect(potionEffectType, 40, potionEffectAmplifier);
 
@@ -132,7 +130,7 @@ public class EliteDropsHandler implements Listener {
 
             }
 
-            rankedItemMapCreator(itemPower, itemStack);
+            rankedItemMapCreator(ItemRankHandler.guessItemRank(itemStack.getType(), enchantmentCount), itemStack);
 
         }
 
