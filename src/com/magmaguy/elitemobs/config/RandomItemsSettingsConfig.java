@@ -407,7 +407,7 @@ public class RandomItemsSettingsConfig {
                 "Delightful",
                 "Demonic",
                 "Delirious",
-                ""
+                "test"
         ));
 
         getRandomItemsSettingsConfig().options().copyDefaults(true);
