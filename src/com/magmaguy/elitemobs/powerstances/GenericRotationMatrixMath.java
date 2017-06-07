@@ -54,7 +54,7 @@ public class GenericRotationMatrixMath {
         Theta: Changes the speed at which a location will rotate around the reference point.
         x, y, z: Changes the radius and initial location of the location to be rotated around the vector.
         counter: increments so there can be full rotations. Can be used to predict future or past locations (to add more
-        locations per track for example).
+        elements per track for example).
 
         Instead of dealing with theta directly, by doing 360/theta you can pick how many points a single rotation has making
         it easier to predict where things are supposed to be.
