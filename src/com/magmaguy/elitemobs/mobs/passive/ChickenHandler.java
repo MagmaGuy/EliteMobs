@@ -19,14 +19,18 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.bukkit.Material.EGG;
+import static org.bukkit.Material.*;
 
 /**
  * Created by MagmaGuy on 19/12/2016.
@@ -59,6 +63,49 @@ public class ChickenHandler implements Listener {
                     chicken.getWorld().dropItem(chicken.getLocation(), eggStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
 
                 }
+
+            }
+
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void superDrops(EntityDamageByEntityEvent event) {
+
+        if (event.getEntity() instanceof Chicken && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+
+            Random random = new Random();
+
+            Chicken chicken = (Chicken) event.getEntity();
+
+            double damage = event.getFinalDamage();
+            //health is hardcoded here, maybe change it at some point?
+            double dropChance = damage / 4;
+            double dropRandomizer = random.nextDouble();
+            //this rounds down
+            int dropMinAmount = (int) dropChance;
+
+            ItemStack featherStack = new ItemStack(FEATHER, (random.nextInt(2) + 1));
+            ItemStack poultryStack = new ItemStack(RAW_CHICKEN, 1);
+
+            for (int i = 0; i < dropMinAmount; i++) {
+
+                chicken.getWorld().dropItem(chicken.getLocation(), featherStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                chicken.getWorld().dropItem(chicken.getLocation(), poultryStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+
+                ExperienceOrb xpDrop = chicken.getWorld().spawn(chicken.getLocation(), ExperienceOrb.class);
+                xpDrop.setExperience(random.nextInt(3) + 1);
+
+            }
+
+            if (dropChance > dropRandomizer) {
+
+                chicken.getWorld().dropItem(chicken.getLocation(), featherStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+                chicken.getWorld().dropItem(chicken.getLocation(), poultryStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
+
+                ExperienceOrb xpDrop = chicken.getWorld().spawn(chicken.getLocation(), ExperienceOrb.class);
+                xpDrop.setExperience(random.nextInt(3) + 1);
 
             }
 

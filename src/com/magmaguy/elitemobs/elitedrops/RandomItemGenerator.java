@@ -265,6 +265,8 @@ public class RandomItemGenerator {
         int materialRank = ItemRankHandler.itemTypePower(material);
         rankLevel -= materialRank;
 
+        Bukkit.getLogger().info("Rank level: "+ rankLevel + " Material level: " + materialRank);
+
         //randomizer for enchantments
         for (int i = 0; i < rankLevel; i++) {
 
@@ -290,11 +292,12 @@ public class RandomItemGenerator {
 
                 newMeta.addEnchant(enchantment, finalEnchantLevel, true);
 
-                Bukkit.getLogger().info(validEnchantmentsClone.get(enchantment) + "");
+                Bukkit.getLogger().info("Adding enchantment " + enchantment + " at level " + finalEnchantLevel);
 
             } else {
 
                 newMeta.addEnchant(enchantment, 1, true);
+                Bukkit.getLogger().info("Adding enchantment " + enchantment + " at level " + 1);
 
             }
 

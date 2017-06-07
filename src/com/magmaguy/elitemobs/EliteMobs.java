@@ -29,6 +29,7 @@ import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
 import com.magmaguy.elitemobs.mobcustomizer.DropsHandler;
+import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobSpawner;
@@ -74,6 +75,14 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Get world list
         worldScanner();
+
+        //Load passive mobs TODO: find generic alternative to this
+        this.getServer().getPluginManager().registerEvents(new ChickenHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new CowHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new MushroomCowHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new PassiveEliteMobDeathHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new PigHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new SheepHandler(), this);
 
         //Start the repeating tasks such as scanners
         repeatingTaskRunner();
