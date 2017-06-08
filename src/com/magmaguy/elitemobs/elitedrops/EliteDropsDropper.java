@@ -80,17 +80,9 @@ public class EliteDropsDropper implements Listener{
                             //get rank matching randomizer and item matching randomized index
                             entity.getWorld().dropItem(entity.getLocation(), EliteDropsHandler.rankedItemStacks.get(rankRandomizer).get(randomCustomDrop));
 
-                            RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                            ItemStack randomLoot = randomItemGenerator.randomItemGenerator(rankRandomizer);
-                            entity.getWorld().dropItem(entity.getLocation(), randomLoot);
-
                         }
 
                     }
-
-                    RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(rankRandomizer);
-                    entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
                 }
 
@@ -106,9 +98,7 @@ public class EliteDropsDropper implements Listener{
 
             } else {
 
-                RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                ItemStack randomLoot = randomItemGenerator.randomItemGenerator(rankRandomizer);
-                entity.getWorld().dropItem(entity.getLocation(), randomLoot);
+                //todo: add case where loot.yml is empty
 
             }
 
