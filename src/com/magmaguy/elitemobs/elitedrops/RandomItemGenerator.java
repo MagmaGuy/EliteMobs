@@ -43,7 +43,7 @@ public class RandomItemGenerator {
         }
 
         //Create itemstack, generate material
-        ItemStack randomItem = new ItemStack(randomMaterialConstructor(), 1);
+        ItemStack randomItem = new ItemStack(randomMaterialConstructor(mobLevel), 1);
         ItemMeta itemMeta = randomItem.getItemMeta();
 
         //Apply item name
@@ -61,7 +61,7 @@ public class RandomItemGenerator {
 
     }
 
-    private Material randomMaterialConstructor(){
+    private Material randomMaterialConstructor(int mobLevel){
 
         List<Material> validMaterials = new ArrayList<>();
 
@@ -81,11 +81,92 @@ public class RandomItemGenerator {
 
         }
 
-        int index = random.nextInt(validMaterials.size()) + 1;
+        if (mobLevel < 5) {
 
-        Material material = validMaterials.get(index);
+            validMaterials.remove(Material.DIAMOND);
+            validMaterials.remove(Material.DIAMOND_AXE);
+            validMaterials.remove(Material.DIAMOND_BARDING);
+            validMaterials.remove(Material.DIAMOND_BLOCK);
+            validMaterials.remove(Material.DIAMOND_CHESTPLATE);
+            validMaterials.remove(Material.DIAMOND_HELMET);
+            validMaterials.remove(Material.DIAMOND_HOE);
+            validMaterials.remove(Material.DIAMOND_LEGGINGS);
+            validMaterials.remove(Material.DIAMOND_ORE);
+            validMaterials.remove(Material.DIAMOND_PICKAXE);
+            validMaterials.remove(Material.DIAMOND_SPADE);
+            validMaterials.remove(Material.DIAMOND_SWORD);
 
-        return material;
+        }
+
+        if (mobLevel < 4) {
+
+            validMaterials.remove(Material.IRON_AXE);
+            validMaterials.remove(Material.IRON_BARDING);
+            validMaterials.remove(Material.IRON_BLOCK);
+            validMaterials.remove(Material.IRON_BOOTS);
+            validMaterials.remove(Material.IRON_CHESTPLATE);
+            validMaterials.remove(Material.IRON_HELMET);
+            validMaterials.remove(Material.IRON_HOE);
+            validMaterials.remove(Material.IRON_INGOT);
+            validMaterials.remove(Material.IRON_LEGGINGS);
+            validMaterials.remove(Material.IRON_NUGGET);
+            validMaterials.remove(Material.IRON_ORE);
+            validMaterials.remove(Material.IRON_PICKAXE);
+            validMaterials.remove(Material.IRON_SPADE);
+            validMaterials.remove(Material.IRON_SWORD);
+            validMaterials.remove(Material.IRON_BOOTS);
+
+        }
+
+        if (mobLevel < 3) {
+
+            validMaterials.remove(Material.CHAINMAIL_BOOTS);
+            validMaterials.remove(Material.CHAINMAIL_CHESTPLATE);
+            validMaterials.remove(Material.CHAINMAIL_HELMET);
+            validMaterials.remove(Material.CHAINMAIL_LEGGINGS);
+
+        }
+
+        if (mobLevel < 2) {
+
+            validMaterials.remove(Material.GOLD_AXE);
+            validMaterials.remove(Material.GOLD_BARDING);
+            validMaterials.remove(Material.GOLD_BLOCK);
+            validMaterials.remove(Material.GOLD_BOOTS);
+            validMaterials.remove(Material.GOLD_CHESTPLATE);
+            validMaterials.remove(Material.GOLD_HELMET);
+            validMaterials.remove(Material.GOLD_HOE);
+            validMaterials.remove(Material.GOLD_INGOT);
+            validMaterials.remove(Material.GOLD_NUGGET);
+            validMaterials.remove(Material.GOLD_ORE);
+            validMaterials.remove(Material.GOLD_PICKAXE);
+            validMaterials.remove(Material.GOLD_SPADE);
+            validMaterials.remove(Material.GOLD_SWORD);
+            validMaterials.remove(Material.GOLDEN_APPLE);
+            validMaterials.remove(Material.GOLDEN_CARROT);
+
+        }
+
+        if (mobLevel < 1) {
+
+            validMaterials.remove(Material.LEATHER_BOOTS);
+            validMaterials.remove(Material.LEATHER_CHESTPLATE);
+            validMaterials.remove(Material.LEATHER_HELMET);
+            validMaterials.remove(Material.LEATHER_LEGGINGS);
+
+        }
+
+        if (!validMaterials.isEmpty()) {
+
+            int index = random.nextInt(validMaterials.size());
+
+            Material material = validMaterials.get(index);
+
+            return material;
+
+        }
+
+        return Material.AIR;
 
     }
 
@@ -281,9 +362,8 @@ public class RandomItemGenerator {
             validateEnchantment("FIRE_ASPECT");
             validateEnchantment("KNOCKBACK");
             validateEnchantment("LOOT_BONUS_MOBS");
-            validateEnchantment("LUCK");
             validateEnchantment("MENDING");
-            validateEnchantment("SWEEPING_EDGE");
+//            validateEnchantment("SWEEPING_EDGE");
             validateEnchantment("VANISHING_CURSE");
 
         } else if (material.equals(Material.BOW)) {
@@ -293,7 +373,6 @@ public class RandomItemGenerator {
             validateEnchantment("ARROW_INFINITE");
             validateEnchantment("ARROW_KNOCKBACK");
             validateEnchantment("DURABILITY");
-            validateEnchantment("LUCK");
             validateEnchantment("MENDING");
             validateEnchantment("VANISHING_CURSE");
 
@@ -338,7 +417,6 @@ public class RandomItemGenerator {
             validateEnchantment("FIRE_ASPECT");
             validateEnchantment("KNOCKBACK");
             validateEnchantment("LOOT_BONUS_MOBS");
-            validateEnchantment("LUCK");
             validateEnchantment("MENDING");
             validateEnchantment("VANISHING_CURSE");
             validateEnchantment("DIG_SPEED");
@@ -414,6 +492,8 @@ public class RandomItemGenerator {
 
         }
 
+        Bukkit.getLogger().info(Enchantment.SWEEPING_EDGE.getName());
+
         if (validEnchantments.size() == 0) {
 
             return oldMeta;
@@ -431,6 +511,12 @@ public class RandomItemGenerator {
 
         //randomizer for enchantments
         for (int i = 0; i < rankLevel; i++) {
+
+            if (validEnchantments.size() < 1) {
+
+                break;
+
+            }
 
             int randomIndex = random.nextInt(validEnchantments.size());
 
@@ -472,11 +558,11 @@ public class RandomItemGenerator {
 
         if (ConfigValues.randomItemsConfig.getBoolean("Monitor randomly generated drops on console")) {
 
-            Bukkit.getLogger().info("Procedurally generated item with the following attributes:");
-            Bukkit.getLogger().info("Item type: " + material);
-            Bukkit.getLogger().info("Item name: " + newMeta.getDisplayName());
-            Bukkit.getLogger().info("Item lore: " + newMeta.getLore().get(0));
-            Bukkit.getLogger().info("Item enchantments:");
+            Bukkit.getLogger().info("[EliteMobs] Procedurally generated item with the following attributes:");
+            Bukkit.getLogger().info("[EliteMobs] Item type: " + material);
+            Bukkit.getLogger().info("[EliteMobs] Item name: " + newMeta.getDisplayName());
+            Bukkit.getLogger().info("[EliteMobs] Item lore: " + newMeta.getLore().get(0));
+            Bukkit.getLogger().info("[EliteMobs] Item enchantments:");
 
             for (Map.Entry<Enchantment, Integer> entry : newMeta.getEnchants().entrySet()){
 

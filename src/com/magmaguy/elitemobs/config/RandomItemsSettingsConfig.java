@@ -261,7 +261,6 @@ public class RandomItemsSettingsConfig {
                 "Xeno",
                 "Zealot",
                 "Zenith",
-                "Unique",
                 "Dusk",
                 "Twilight",
                 "Mob",
