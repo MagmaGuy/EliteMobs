@@ -215,6 +215,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                         for (Item item : itemList) {
 
                             item.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+                            item.removeMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, plugin);
                             item.remove();
 
                         }
@@ -248,6 +249,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             item.setGravity(false);
                             item.setPickupDelay(Integer.MAX_VALUE);
                             item.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, true));
+                            item.setMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, new FixedMetadataValue(plugin, true));
 
                             itemList.add(item);
 

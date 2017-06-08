@@ -190,6 +190,7 @@ public class MajorPowerPowerStance implements Listener {
 
                                         powerItemLocationTracker.get(i).get(j).get(h).remove();
                                         powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+                                        powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, plugin);
 
                                     }
 
@@ -276,15 +277,6 @@ public class MajorPowerPowerStance implements Listener {
 
                         item.teleport(item.getLocation());
 
-//                        counter--;
-//                        Location itemLocation = new Location(entity.getWorld(), trackHashMap.get(i).get(j).getX(),
-//                                trackHashMap.get(i).get(j).getY(), trackHashMap.get(i).get(j).getZ()).add(centerLocation);
-//
-//                        //teleport is accurate at slower update rates, but when teleporting every tick can get an error margin of up to 2 meters
-//                        item.teleport(itemLocation);
-//
-//                        counter++;
-
                     }
 
                     Vector vector = (newLocation.subtract(currentLocation)).toVector();
@@ -304,6 +296,7 @@ public class MajorPowerPowerStance implements Listener {
         Item item = location.getWorld().dropItem(location, itemStack);
         item.setPickupDelay(Integer.MAX_VALUE);
         item.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, 0));
+        item.setMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, new FixedMetadataValue(plugin, true));
         item.setGravity(false);
 
         return item;
