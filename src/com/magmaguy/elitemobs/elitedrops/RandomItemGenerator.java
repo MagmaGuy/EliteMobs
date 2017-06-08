@@ -31,20 +31,29 @@ public class RandomItemGenerator {
 
     private Random random = new Random();
 
-    public ItemStack randomItemGenerator(int rankLevel) {
+    public ItemStack randomItemGenerator(int mobLevel) {
+
+        //dropped item rank should be 0.4x the mob level (level 100 = rank 40 item)
+        mobLevel = (int) ((mobLevel * ConfigValues.randomItemsConfig.getDouble("Mob level to item rank multiplier")) + (random.nextInt(6) + 1 - 3));
+
+        if (mobLevel < 1) {
+
+            mobLevel = 0;
+
+        }
 
         //Create itemstack, generate material
         ItemStack randomItem = new ItemStack(randomMaterialConstructor(), 1);
         ItemMeta itemMeta = randomItem.getItemMeta();
 
         //Apply item name
-        itemMeta.setDisplayName(randomItemNameConstructor());
+        itemMeta.setDisplayName(randomItemNameConstructor(randomItem.getType()));
 
         //Apply lore
-        itemMeta.setLore(randomItemLoreConstructor(rankLevel));
+        itemMeta.setLore(randomItemLoreConstructor(mobLevel));
 
         //Apply enchantments
-        itemMeta = randomItemEnchantmentConstructor(randomItem.getType(), itemMeta, rankLevel);
+        itemMeta = randomItemEnchantmentConstructor(randomItem.getType(), itemMeta, mobLevel);
 
         randomItem.setItemMeta(itemMeta);
 
@@ -80,25 +89,170 @@ public class RandomItemGenerator {
 
     }
 
-    private String randomItemNameConstructor(){
+    private static ArrayList<String> nouns = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid nouns");
+    private static ArrayList<String> adjectives = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid adjectives");
+    private static ArrayList<String> verbs = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid verbs");
 
-        return adjectiveNounPairNameGenerator();
+    private String randomItemNameConstructor(Material material){
 
-    }
+        String finalName = "";
 
-    private String adjectiveNounPairNameGenerator() {
+        int nounConstructorSelector = random.nextInt(5) + 1;
 
-        ArrayList<String> nouns = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid nouns");
-        ArrayList<String> adjectives = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid adjectives");
+        if (nounConstructorSelector == 1) {
 
-        String randomName = nouns.get(random.nextInt(nouns.size()));
-        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
+            finalName = verbTypeAdjectiveNoun(material);
 
-        String finalName = randomAdjective + " " + randomName;
+        } else if (nounConstructorSelector == 2) {
+
+            finalName = typeAdjectiveNoun(material);
+
+        } else if (nounConstructorSelector == 3) {
+
+            finalName = nounVerbType(material);
+
+        } else if (nounConstructorSelector == 4) {
+
+            finalName = verbType(material);
+
+        } else if (nounConstructorSelector == 5) {
+
+            finalName = adjectiveVerbType(material);
+
+        }
 
         return finalName;
 
     }
+
+    private String verbTypeAdjectiveNoun (Material material) {
+
+        String randomVerb = verbs.get(random.nextInt(verbs.size()));
+        String itemType = itemTypeStringParser(material);
+        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
+        String randomNoun = nouns.get(random.nextInt(nouns.size()));
+
+        String finalName = randomVerb + " " + itemType + " " + "of the" + " " + randomAdjective + " " + randomNoun;
+
+        return finalName;
+
+    }
+
+    private String typeAdjectiveNoun (Material material) {
+
+        String itemType = itemTypeStringParser(material);
+        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
+        String randomNoun = nouns.get(random.nextInt(nouns.size()));
+
+        String finalName = itemType + " " + "of the" + " " + randomAdjective + " " + randomNoun;
+
+        return finalName;
+
+    }
+
+    private String nounVerbType (Material material) {
+
+        String randomNoun = nouns.get(random.nextInt(nouns.size()));
+        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
+        String randomVerb = verbs.get(random.nextInt(verbs.size()));
+        String itemType = itemTypeStringParser(material);
+
+        String finalName = randomNoun + "'s" + " " + randomAdjective + " " + randomVerb + " " + itemType;
+
+        return finalName;
+
+    }
+
+    private String verbType (Material material) {
+
+        String randomVerb = verbs.get(random.nextInt(verbs.size()));
+        String itemType = itemTypeStringParser(material);
+
+        String finalName = randomVerb + " " + itemType;
+
+        return finalName;
+
+    }
+
+    private String adjectiveVerbType (Material material) {
+
+        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
+        String randomVerb = verbs.get(random.nextInt(verbs.size()));
+        String itemType = itemTypeStringParser(material);
+
+        String finalName = randomAdjective + " " + randomVerb + " " + itemType;
+
+        return finalName;
+
+    }
+
+    private String itemTypeStringParser (Material material) {
+
+        if (material.equals(Material.DIAMOND_SWORD) || material.equals(Material.GOLD_SWORD) ||
+                material.equals(Material.IRON_SWORD) || material.equals(Material.STONE_SWORD) ||
+                material.equals(Material.WOOD_SWORD)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Sword");
+
+        } else if (material.equals(Material.BOW)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Bow");
+
+        } else if (material.equals(Material.DIAMOND_PICKAXE) || material.equals(Material.GOLD_PICKAXE) ||
+                material.equals(Material.IRON_PICKAXE) || material.equals(Material.STONE_PICKAXE) ||
+                material.equals(Material.WOOD_PICKAXE)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Pickaxe");
+
+        } else if (material.equals(Material.DIAMOND_SPADE) || material.equals(Material.GOLD_SPADE) ||
+                material.equals(Material.IRON_SPADE) || material.equals(Material.STONE_SPADE) ||
+                material.equals(Material.WOOD_SPADE)){
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Spade");
+
+        } else if (material.equals(Material.DIAMOND_HOE) || material.equals(Material.GOLD_HOE) ||
+                material.equals(Material.IRON_HOE) || material.equals(Material.STONE_HOE) ||
+                material.equals(Material.WOOD_HOE)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Hoe");
+
+        } else if (material.equals(Material.DIAMOND_AXE) || material.equals(Material.GOLD_AXE) ||
+                material.equals(Material.IRON_AXE) || material.equals(Material.STONE_AXE) ||
+                material.equals(Material.WOOD_AXE)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Axe");
+
+        } else if (material.equals(Material.CHAINMAIL_HELMET) || material.equals(Material.DIAMOND_HELMET) ||
+                material.equals(Material.GOLD_HELMET) || material.equals(Material.IRON_HELMET) ||
+                material.equals(Material.LEATHER_HELMET)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Helmet");
+
+        } else if (material.equals(Material.CHAINMAIL_CHESTPLATE) || material.equals(Material.DIAMOND_CHESTPLATE) ||
+                material.equals(Material.GOLD_CHESTPLATE) || material.equals(Material.IRON_CHESTPLATE) ||
+                material.equals(Material.LEATHER_CHESTPLATE)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Chestplate");
+
+        } else if (material.equals(Material.CHAINMAIL_LEGGINGS) || material.equals(Material.DIAMOND_LEGGINGS) ||
+                material.equals(Material.GOLD_LEGGINGS) || material.equals(Material.IRON_LEGGINGS) ||
+                material.equals(Material.LEATHER_LEGGINGS)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Leggings");
+
+        } else if (material.equals(Material.CHAINMAIL_BOOTS) || material.equals(Material.DIAMOND_BOOTS) ||
+                material.equals(Material.GOLD_BOOTS) || material.equals(Material.IRON_BOOTS) ||
+                material.equals(Material.LEATHER_BOOTS)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Boots");
+
+        }
+
+        Bukkit.getLogger().info("EliteMobs - found unexpected material type in procedurally generated loot. Can't generate item type name.");
+        return "";
+
+    }
+
 
     private List<String> randomItemLoreConstructor(int rankLevel){
 

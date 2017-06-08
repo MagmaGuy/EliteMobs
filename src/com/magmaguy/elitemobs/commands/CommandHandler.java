@@ -140,7 +140,7 @@ public class CommandHandler implements CommandExecutor {
                 return true;
 
             // /elitemobs reload config | /elitemobs reload loot | /elitemobs giveloot [player] (for GUI menu) |
-            // /elitemobs killall aggressiveelites | /elitemobs killall passiveelites
+            // /elitemobs killall aggressiveelites | /elitemobs killall passiveelites | /elitemobs simloot [level]
             case 2:
 
                 //valid /elitemobs reload config
@@ -178,8 +178,11 @@ public class CommandHandler implements CommandExecutor {
 
                     return true;
 
-                    //valid /elitemobs reload loot
-                } else if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player
+
+                }
+
+                //valid /elitemobs reload loot
+                if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player
                         && args[1].equalsIgnoreCase("loot")
                         && commandSender.hasPermission("elitemobs.reload.loot")) {
 
@@ -196,7 +199,9 @@ public class CommandHandler implements CommandExecutor {
                     return true;
 
                     //invalid /elitemobs reload loot
-                } else if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
+                }
+
+                if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
                         args[1].equalsIgnoreCase("loot") &&
                         !commandSender.hasPermission("elitemobs.reload.loot")) {
 
@@ -215,8 +220,11 @@ public class CommandHandler implements CommandExecutor {
 
                     return true;
 
-                    //valid /elitemobs getloot | /elitemobs gl
-                } else if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
+
+                }
+
+                //valid /elitemobs getloot | /elitemobs gl
+                if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
                         commandSender.hasPermission("elitemobs.getloot") || args[0].equalsIgnoreCase("gl")
                         && commandSender instanceof Player && commandSender.hasPermission("elitemobs.getloot")) {
 
@@ -236,8 +244,11 @@ public class CommandHandler implements CommandExecutor {
 
                     }
 
-                    //invalid /elitemobs getloot | /elitemobs gl
-                } else if (args[0].equalsIgnoreCase("getloot") && !commandSender.hasPermission("elitemobs.getloot")
+
+                }
+
+                //invalid /elitemobs getloot | /elitemobs gl
+                if (args[0].equalsIgnoreCase("getloot") && !commandSender.hasPermission("elitemobs.getloot")
                         || args[0].equalsIgnoreCase("gl") && !commandSender.hasPermission("elitemobs.getloot")) {
 
                     Player player = (Player) commandSender;
@@ -255,7 +266,9 @@ public class CommandHandler implements CommandExecutor {
 
                     return true;
 
-                } else if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("aggressiveelites")) {
+                }
+
+                if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("aggressiveelites")) {
 
                     if (commandSender.hasPermission("elitemobs.killall.aggressiveelites")){
 
@@ -297,7 +310,9 @@ public class CommandHandler implements CommandExecutor {
 
                     }
 
-                } else if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("passiveelites")) {
+                }
+
+                if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("passiveelites")) {
 
                     if (commandSender.hasPermission("elitemobs.killall.passiveelites")) {
 
@@ -333,6 +348,35 @@ public class CommandHandler implements CommandExecutor {
                         }
 
                     }
+
+                }
+
+                if (args[0].equalsIgnoreCase("simloot") && commandSender instanceof Player) {
+
+                    Player player = ((Player) commandSender);
+
+                    if (commandSender.hasPermission("elitemobs.simloot")) {
+
+                        SimLootHandler simLootHandler = new SimLootHandler();
+
+                        simLootHandler.simLoot(player, Integer.parseInt(args[1]));
+
+                    }  else if (commandSender instanceof Player) {
+
+                        if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                            player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                                    "You need the following permission: " + "elitemobs.simloot");
+
+                        } else {
+
+                            player.sendMessage("You do not have the permission " + "elitemobs.simloot");
+
+                        }
+
+                    }
+
+                    return true;
 
                 }
 
