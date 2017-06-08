@@ -14,6 +14,7 @@ permissions:
     children:
       elitemobs.stats: true
       elitemobs.getloot: true
+      elitemobs.simloot: true
       elitemobs.reload.configs: true
       elitemobs.reload.loot: true
       elitemobs.giveloot: true
@@ -26,12 +27,15 @@ permissions:
   elitemobs.getloot:
     description: Allow players to run /elitemobs getloot
     default: op
+  elitemobs.simloot:
+    description: Allow players to run /elitemobs simloot
+    default: op
   elitemobs.reload.configs:
     decription: Allow players to run /elitemobs reload config
     default: op
   elitemobs.reload.loot:
-      decription: Allow players to run /elitemobs reload loot
-      default: op
+    decription: Allow players to run /elitemobs reload loot
+    default: op
   elitemobs.giveloot:
     description: Allow players to run /elitemobs giveloot [playername] random/[loot name]
     default: op
