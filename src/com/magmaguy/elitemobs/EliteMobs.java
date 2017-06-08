@@ -57,7 +57,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getLogger().info("EliteMobs - Enabled!");
 
         //Load loot from config
-        loadConfiguration();
+        DefaultConfig defaultConfig = new DefaultConfig();
+        defaultConfig.loadConfiguration();
         MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
         mobPowersCustomConfig.initializeMobPowersConfig();
         LootCustomConfig lootCustomConfig = new LootCustomConfig();
@@ -153,8 +154,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
                     e.printStackTrace();
                 }
 
-
-
         }
 
         //Mob scanner
@@ -177,13 +176,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MajorPowerPowerStance(), this);
 
         //Loot
-        if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)")) {
-
-            this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
-
-            getLogger().info("EliteMobs - EliteMob loot enabled!");
-
-        }
+        this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
 
         //Minecraft behavior canceller
         if (ConfigValues.defaultConfig.getBoolean("Prevent creepers from killing passive mobs")) {
@@ -260,66 +253,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
             }
 
         }, 20, 20);
-
-
-    }
-
-    public void loadConfiguration() {
-
-        //check defaults
-        getConfig().addDefault("Allow aggressive EliteMobs", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Blaze", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.CaveSpider", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Creeper", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Enderman", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Endermite", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.IronGolem", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.PigZombie", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.PolarBear", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Silverfish", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Skeleton", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Spider", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Witch", true);
-        getConfig().addDefault("Valid aggressive EliteMobs.Zombie", true);
-        getConfig().addDefault("Allow Passive EliteMobs", true);
-        getConfig().addDefault("Valid passive EliteMobs.Chicken", true);
-        getConfig().addDefault("Valid passive EliteMobs.Cow", true);
-        getConfig().addDefault("Valid passive EliteMobs.MushroomCow", true);
-        getConfig().addDefault("Valid passive EliteMobs.Pig", true);
-        getConfig().addDefault("Valid passive EliteMobs.Sheep", true);
-        getConfig().addDefault("Natural aggressive EliteMob spawning", true);
-
-        for (World world : Bukkit.getWorlds()) {
-
-            getConfig().addDefault("Valid worlds." + world.getName().toString(), true);
-
-        }
-
-        getConfig().addDefault("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn", 20);
-        getConfig().addDefault("Aggressive mob stacking", true);
-        getConfig().addDefault("Aggressive mob stacking cap", 50);
-        getConfig().addDefault("Stack aggressive spawner mobs", true);
-        getConfig().addDefault("Stack aggressive natural mobs", true);
-        getConfig().addDefault("Passive EliteMob stack amount", 50);
-        getConfig().addDefault("Aggressive EliteMobs can drop config loot (level 5 EliteMobs and up)", true);
-        getConfig().addDefault("Aggressive EliteMobs flat loot drop rate %", 75);
-        getConfig().addDefault("Aggressive EliteMobs can drop additional loot with drop % based on EliteMobs level (higher is more likely)", true);
-        getConfig().addDefault("Prevent creepers from killing passive mobs", true);
-        getConfig().addDefault("Aggressive EliteMob life multiplier", 1.0);
-        getConfig().addDefault("Aggressive EliteMob damage multiplier", 1.0);
-        getConfig().addDefault("Aggressive EliteMob default loot multiplier", 1.0);
-        getConfig().addDefault("SuperCreeper explosion nerf multiplier", 1.0);
-        getConfig().addDefault("Turn on visual effects for natural or plugin-spawned EliteMobs", true);
-        getConfig().addDefault("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs", true);
-        getConfig().addDefault("Turn on visual effects that indicate an attack is about to happen", true);
-        getConfig().addDefault("Use titles to warn players they are missing a permission", true);
-        getConfig().options().copyDefaults(true);
-
-        //save the config when changed
-        saveConfig();
-        saveDefaultConfig();
-
-        getLogger().info("EliteMobs config loaded!");
 
     }
 

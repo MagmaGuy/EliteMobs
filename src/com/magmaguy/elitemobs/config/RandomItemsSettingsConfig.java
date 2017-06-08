@@ -17,7 +17,6 @@ package com.magmaguy.elitemobs.config;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.Arrays;
 
 /**
@@ -27,15 +26,12 @@ public class RandomItemsSettingsConfig {
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
-    private FileConfiguration customConfig = null;
-    private File customConfigFile = null;
-
     public void initializeRandomItemsSettingsConfig () {
 
-        this.getRandomItemsSettingsConfig().addDefault("Drop random items on mob death", true);
+        this.getRandomItemsSettingsConfig().addDefault("Drop random items on elite mob death", true);
         this.getRandomItemsSettingsConfig().addDefault("Mob level to item rank multiplier", 0.5);
         this.getRandomItemsSettingsConfig().addDefault("Monitor randomly generated drops on console", true);
-        this.getRandomItemsSettingsConfig().addDefault("Percentage (%) of times random item drop instead of custom loot (assuming 50 items in that tier)", 50);
+        this.getRandomItemsSettingsConfig().addDefault("Percentage (%) of times random item drop instead of custom loot", 20);
         this.getRandomItemsSettingsConfig().addDefault("Valid material list for random items", Arrays.asList(
                 "DIAMOND_SWORD",
                 "GOLD_SWORD",

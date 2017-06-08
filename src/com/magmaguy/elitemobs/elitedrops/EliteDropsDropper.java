@@ -39,25 +39,40 @@ public class EliteDropsDropper implements Listener{
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        Entity entity = event.getEntity();
+        if (!ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
+                !ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
 
-        Random random = new Random();
+            return;
+
+        }
+
+        Entity entity = event.getEntity();
 
         if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
                 entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-            if (!EliteDropsHandler.rankedItemStacks.isEmpty()){
+            //dropped item rank should be 0.4x the mob level (level 100 = rank 40 item)
+            mobLevel = (int) ((mobLevel * ConfigValues.randomItemsConfig.getDouble("Mob level to item rank multiplier")) + (random.nextInt(6) + 1 - 3));
 
-                //flat drop rate
-                if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100) {
+            if (mobLevel < 1) {
 
+                mobLevel = 0;
+
+            }
+
+            if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100 +
+                    ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs drop rate % increase per mob level")) {
+
+                Bukkit.getLogger().info("Hey");
+
+                if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
+                        ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
 
                     if (EliteDropsHandler.rankedItemStacks.containsKey(mobLevel)) {
 
-                        //chance of custom item dropping goes from 0% to config-based each custom item in that tier adds 1% chance
-                        if (random.nextDouble() < ConfigValues.randomItemsConfig.getDouble("Percentage (%) of times random item drop instead of custom loot (assuming 50 items in that tier)")) {
+                        if (random.nextDouble() < ConfigValues.randomItemsConfig.getDouble("Percentage (%) of times random item drop instead of custom loot")) {
 
                             //create random loot
                             RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
@@ -75,23 +90,40 @@ public class EliteDropsDropper implements Listener{
 
                         }
 
+                    } else {
+
+                        RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
+                        ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel);
+
+                        entity.getWorld().dropItem(entity.getLocation(), randomLoot);
+
                     }
 
+                } else if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
+                        !ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
+
+                    //WARNING: THIS DOES NOT SCALE ITEM LEVEL (since I don't know how much loot is available, approximating will not make sense
+                    int customItemIndex = random.nextInt(EliteDropsHandler.lootList.size());
+                    ItemStack randomizedCustomItem = EliteDropsHandler.lootList.get(customItemIndex);
+
+                    entity.getWorld().dropItem(entity.getLocation(), randomizedCustomItem);
+
+                } else if (!EliteDropsHandler.rankedItemStacks.isEmpty() && !ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
+                        ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
+
+                    RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
+                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel);
+
+                    entity.getWorld().dropItem(entity.getLocation(), randomLoot);
+
+                } else if (EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
+
+                    RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
+                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel);
+
+                    entity.getWorld().dropItem(entity.getLocation(), randomLoot);
+
                 }
-
-                //double drops
-                if (ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop additional loot with drop % based on EliteMob level (higher is more likely)") &&
-                        random.nextDouble() < (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 100)) {
-
-                    int randomDrop = random.nextInt(EliteDropsHandler.lootList.size());
-
-                    entity.getWorld().dropItem(entity.getLocation(), EliteDropsHandler.lootList.get(randomDrop));
-
-                }
-
-            } else {
-
-                //todo: add case where loot.yml is empty
 
             }
 

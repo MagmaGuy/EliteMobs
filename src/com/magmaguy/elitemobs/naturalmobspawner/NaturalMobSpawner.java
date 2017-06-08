@@ -17,17 +17,19 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 import java.util.Random;
-
-import static org.bukkit.Material.*;
 
 /**
  * Created by MagmaGuy on 10/10/2016.
@@ -100,121 +102,79 @@ public class NaturalMobSpawner implements Listener {
 
     private int armorRatingHandler(Player player, int armorRating) {
 
-        armorRating = 0;
-
         if (player.getEquipment().getHelmet() != null) {
 
-            Material helmetMaterial = player.getEquipment().getHelmet().getType();
+            ItemStack helmet = player.getEquipment().getHelmet();
 
-            if (helmetMaterial == LEATHER_HELMET) {
-
-                armorRating = armorRating + 1;
-
-            } else if (helmetMaterial == GOLD_HELMET) {
-
-                armorRating = armorRating + 2;
-
-            } else if (helmetMaterial == CHAINMAIL_HELMET) {
-
-                armorRating = armorRating + 2;
-
-            } else if (helmetMaterial == IRON_HELMET) {
-
-                armorRating = armorRating + 2;
-
-            } else if (helmetMaterial == DIAMOND_HELMET) {
-
-                armorRating = armorRating + 3;
-
-            }
+            armorRating += itemRankCalculator(helmet);
 
         }
 
         if (player.getEquipment().getChestplate() != null) {
 
-            Material chestplateMaterial = player.getEquipment().getChestplate().getType();
+            ItemStack chestplate = player.getEquipment().getChestplate();
 
-            if (chestplateMaterial == LEATHER_CHESTPLATE) {
-
-                armorRating = armorRating + 3;
-
-            } else if (chestplateMaterial == GOLD_CHESTPLATE) {
-
-                armorRating = armorRating + 5;
-
-            } else if (chestplateMaterial == CHAINMAIL_CHESTPLATE) {
-
-                armorRating = armorRating + 5;
-
-            } else if (chestplateMaterial == IRON_CHESTPLATE) {
-
-                armorRating = armorRating + 6;
-
-            } else if (chestplateMaterial == DIAMOND_CHESTPLATE) {
-
-                armorRating = armorRating + 8;
-
-            }
+            armorRating += itemRankCalculator(chestplate);
 
         }
 
         if (player.getEquipment().getLeggings() != null) {
 
-            Material leggingsMaterial = player.getEquipment().getLeggings().getType();
+            ItemStack leggings = player.getEquipment().getLeggings();
 
-            if (leggingsMaterial == LEATHER_LEGGINGS) {
-
-                armorRating = armorRating + 2;
-
-            } else if (leggingsMaterial == GOLD_LEGGINGS) {
-
-                armorRating = armorRating + 3;
-
-            } else if (leggingsMaterial == CHAINMAIL_LEGGINGS) {
-
-                armorRating = armorRating + 4;
-
-            } else if (leggingsMaterial == IRON_LEGGINGS) {
-
-                armorRating = armorRating + 5;
-
-            } else if (leggingsMaterial == DIAMOND_LEGGINGS) {
-
-                armorRating = armorRating + 6;
-
-            }
+            armorRating += itemRankCalculator(leggings);
 
         }
 
         if (player.getEquipment().getBoots() != null) {
 
-            Material bootsMaterial = player.getEquipment().getBoots().getType();
+            ItemStack boots = player.getEquipment().getBoots();
 
-            if (bootsMaterial == LEATHER_BOOTS) {
+            armorRating += itemRankCalculator(boots);
 
-                armorRating = armorRating + 1;
+        }
 
-            } else if (bootsMaterial == GOLD_BOOTS) {
+//        if (player.getEquipment().getItemInMainHand() != null || !player.getEquipment().getItemInOffHand().getType().equals(Material.AIR)) {
+//
+//            ItemStack mainHand = player.getEquipment().getItemInMainHand();
+//
+//            armorRating += itemRankCalculator(mainHand);
+//
+//        }
+//
+//        if (player.getEquipment().getItemInOffHand() != null || !player.getEquipment().getItemInOffHand().getType().equals(Material.AIR)) {
+//
+//            ItemStack offHand = player.getEquipment().getItemInOffHand();
+//
+//            armorRating += itemRankCalculator(offHand);
+//
+//        }
 
-                armorRating = armorRating + 1;
 
-            } else if (bootsMaterial == CHAINMAIL_BOOTS) {
+        return armorRating;
 
-                armorRating = armorRating + 1;
+    }
 
-            } else if (bootsMaterial == IRON_BOOTS) {
+    private int itemRankCalculator (ItemStack itemStack) {
 
-                armorRating = armorRating + 2;
+        Material material = itemStack.getType();
+        ItemMeta itemMeta = itemStack.getItemMeta();
 
-            } else if (bootsMaterial == DIAMOND_BOOTS) {
+        int enchantmentCount = 0;
 
-                armorRating = armorRating + 3;
+        if (!itemMeta.getEnchants().isEmpty()) {
+
+            for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
+
+                enchantmentCount += itemMeta.getEnchantLevel(enchantment);
 
             }
 
         }
 
-        return armorRating;
+        int rankLevel = ItemRankHandler.guessItemRank(material, enchantmentCount);
+
+        return rankLevel;
 
     }
 
