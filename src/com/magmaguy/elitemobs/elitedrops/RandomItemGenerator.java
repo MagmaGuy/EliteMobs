@@ -33,15 +33,6 @@ public class RandomItemGenerator {
 
     public ItemStack randomItemGenerator(int mobLevel) {
 
-        //dropped item rank should be 0.4x the mob level (level 100 = rank 40 item)
-        mobLevel = (int) ((mobLevel * ConfigValues.randomItemsConfig.getDouble("Mob level to item rank multiplier")) + (random.nextInt(6) + 1 - 3));
-
-        if (mobLevel < 1) {
-
-            mobLevel = 0;
-
-        }
-
         //Create itemstack, generate material
         ItemStack randomItem = new ItemStack(randomMaterialConstructor(mobLevel), 1);
         ItemMeta itemMeta = randomItem.getItemMeta();
@@ -49,13 +40,31 @@ public class RandomItemGenerator {
         //Apply item name
         itemMeta.setDisplayName(randomItemNameConstructor(randomItem.getType()));
 
-        //Apply lore
-        itemMeta.setLore(randomItemLoreConstructor(mobLevel));
-
         //Apply enchantments
         itemMeta = randomItemEnchantmentConstructor(randomItem.getType(), itemMeta, mobLevel);
 
         randomItem.setItemMeta(itemMeta);
+
+        //Apply lore
+        itemMeta.setLore(randomItemLoreConstructor(itemMeta, randomItem.getType()));
+
+        randomItem.setItemMeta(itemMeta);
+
+        if (ConfigValues.randomItemsConfig.getBoolean("Monitor randomly generated drops on console")) {
+
+            Bukkit.getLogger().info("[EliteMobs] Procedurally generated item with the following attributes:");
+            Bukkit.getLogger().info("[EliteMobs] Item type: " + randomItem.getType());
+            Bukkit.getLogger().info("[EliteMobs] Item name: " + randomItem.getItemMeta().getDisplayName());
+            Bukkit.getLogger().info("[EliteMobs] Item lore: " + randomItem.getItemMeta().getLore().get(0));
+            Bukkit.getLogger().info("[EliteMobs] Item enchantments:");
+
+            for (Map.Entry<Enchantment, Integer> entry : randomItem.getItemMeta().getEnchants().entrySet()){
+
+                Bukkit.getLogger().info(entry.getKey() + " level " + entry.getValue());
+
+            }
+
+        }
 
         return randomItem;
 
@@ -335,7 +344,21 @@ public class RandomItemGenerator {
     }
 
 
-    private List<String> randomItemLoreConstructor(int rankLevel){
+    private List<String> randomItemLoreConstructor(ItemMeta itemMeta, Material material){
+
+        int enchantmentCount = 0;
+
+        if (!itemMeta.getEnchants().isEmpty()) {
+
+            for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
+
+                enchantmentCount += itemMeta.getEnchantLevel(enchantment);
+
+            }
+
+        }
+
+        int rankLevel = ItemRankHandler.guessItemRank(material, enchantmentCount);
 
         String lore = "Rank " + rankLevel + " Elite Mob Drop";
 
@@ -551,22 +574,6 @@ public class RandomItemGenerator {
             if (newEnchantInt == 0) {
 
                 validEnchantments.remove(enchantment);
-
-            }
-
-        }
-
-        if (ConfigValues.randomItemsConfig.getBoolean("Monitor randomly generated drops on console")) {
-
-            Bukkit.getLogger().info("[EliteMobs] Procedurally generated item with the following attributes:");
-            Bukkit.getLogger().info("[EliteMobs] Item type: " + material);
-            Bukkit.getLogger().info("[EliteMobs] Item name: " + newMeta.getDisplayName());
-            Bukkit.getLogger().info("[EliteMobs] Item lore: " + newMeta.getLore().get(0));
-            Bukkit.getLogger().info("[EliteMobs] Item enchantments:");
-
-            for (Map.Entry<Enchantment, Integer> entry : newMeta.getEnchants().entrySet()){
-
-                Bukkit.getLogger().info(entry.getKey() + " level " + entry.getValue());
 
             }
 

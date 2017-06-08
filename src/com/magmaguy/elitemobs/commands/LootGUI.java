@@ -36,12 +36,12 @@ import java.util.List;
  */
 public class LootGUI implements Listener{
 
-    int currentHeaderPage = 1;
-    int currentLootPage = 1;
-    boolean filter = false;
-    int filterRank = 0;
+    private int currentHeaderPage = 1;
+    private int currentLootPage = 1;
+    private boolean filter = false;
+    private int filterRank = 0;
 
-    List <Integer> lootSlots = new ArrayList<>(Arrays.asList(10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,
+    private List <Integer> lootSlots = new ArrayList<>(Arrays.asList(10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,
             32,33,34,37,38,39,40,41,42,43,46,47,48,49,50,51,52));
 
     public void lootGUI (Player player) {
@@ -181,8 +181,6 @@ public class LootGUI implements Listener{
 
     @EventHandler
     public void onClick (InventoryClickEvent event) {
-
-
 
             if (event.getInventory().getName().equalsIgnoreCase("EliteMobs loot.yml")){
 
