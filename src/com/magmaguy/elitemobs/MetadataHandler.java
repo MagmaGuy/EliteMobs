@@ -120,6 +120,9 @@ public class MetadataHandler {
     public final static String SHOOTING_ARROWS = "ShootingArrows";
     public final static String SHOOTING_FIREBALLS = "ShootingFireballs";
 
+    //third party compatibility
+    public final static String BETTERDROPS_COMPATIBILITY_MD = "betterdrops_ignore";
+
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
 
