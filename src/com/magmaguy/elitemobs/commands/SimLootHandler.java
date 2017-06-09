@@ -15,9 +15,12 @@
 
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.elitedrops.RandomItemGenerator;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Random;
 
 /**
  * Created by MagmaGuy on 08/06/2017.
@@ -26,9 +29,19 @@ public class SimLootHandler {
 
     public void simLoot (Player player, int level) {
 
+        Random random = new Random();
+
+        level = (int) ((level * ConfigValues.randomItemsConfig.getDouble("Mob level to item rank multiplier")) + (random.nextInt(6) + 1 - 3));
+
+        if (level < 1) {
+
+            level = 0;
+
+        }
+
         RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
 
-        ItemStack randomItem = randomItemGenerator.randomItemGenerator(level);
+        ItemStack randomItem = randomItemGenerator.randomItemGeneratorCommand(level);
 
         player.getInventory().addItem(randomItem);
 

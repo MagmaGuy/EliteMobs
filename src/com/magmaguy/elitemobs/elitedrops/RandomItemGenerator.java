@@ -15,10 +15,14 @@
 
 package com.magmaguy.elitemobs.elitedrops;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -31,22 +35,126 @@ public class RandomItemGenerator {
 
     private Random random = new Random();
 
-    public ItemStack randomItemGenerator(int mobLevel) {
+    public ItemStack randomItemGenerator(int itemRank, Entity entity) {
 
         //Create itemstack, generate material
-        ItemStack randomItem = new ItemStack(randomMaterialConstructor(mobLevel), 1);
+        ItemStack randomItem = new ItemStack(randomMaterialConstructor(itemRank), 1);
         ItemMeta itemMeta = randomItem.getItemMeta();
 
         //Apply item name
-        itemMeta.setDisplayName(randomItemNameConstructor(randomItem.getType()));
+        itemMeta.setDisplayName(ChatColorConverter.chatColorConverter(randomItemNameConstructor(randomItem.getType())));
 
         //Apply enchantments
-        itemMeta = randomItemEnchantmentConstructor(randomItem.getType(), itemMeta, mobLevel);
+        itemMeta = randomItemEnchantmentConstructor(randomItem.getType(), itemMeta, itemRank);
 
         randomItem.setItemMeta(itemMeta);
 
         //Apply lore
-        itemMeta.setLore(randomItemLoreConstructor(itemMeta, randomItem.getType()));
+        itemMeta.setLore(randomItemLoreConstructor(itemMeta, randomItem.getType(), entity));
+
+        randomItem.setItemMeta(itemMeta);
+
+        if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for item ranks")) {
+
+            Bukkit.getLogger().info("test1");
+
+            double rankProgression = ConfigValues.defaultConfig.getDouble("Increase MMORPG color rank every X levels X=");
+
+                if (Math.floor(itemRank /rankProgression) >= 5) {
+
+                    itemMeta.setDisplayName(ChatColor.GOLD + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.GOLD + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 4) {
+
+                    itemMeta.setDisplayName(ChatColor.DARK_PURPLE + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 3) {
+
+                    itemMeta.setDisplayName(ChatColor.BLUE + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.BLUE + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 2) {
+
+                    itemMeta.setDisplayName(ChatColor.GREEN + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.GREEN + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 1) {
+
+                    itemMeta.setDisplayName(ChatColor.WHITE + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.WHITE + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 0) {
+
+                    itemMeta.setDisplayName(ChatColor.GRAY + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.GRAY + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                }
+
+
+
+        }
 
         randomItem.setItemMeta(itemMeta);
 
@@ -67,6 +175,14 @@ public class RandomItemGenerator {
         }
 
         return randomItem;
+
+    }
+
+    public ItemStack randomItemGeneratorCommand(int itemRank) {
+
+        Entity entity = null;
+
+        return randomItemGenerator(itemRank, entity);
 
     }
 
@@ -182,12 +298,13 @@ public class RandomItemGenerator {
     private static ArrayList<String> nouns = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid nouns");
     private static ArrayList<String> adjectives = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid adjectives");
     private static ArrayList<String> verbs = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid verbs");
+    private static ArrayList<String> verbers = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid verb-er (noun)");
 
     private String randomItemNameConstructor(Material material){
 
         String finalName = "";
 
-        int nounConstructorSelector = random.nextInt(5) + 1;
+        int nounConstructorSelector = random.nextInt(7) + 1;
 
         if (nounConstructorSelector == 1) {
 
@@ -208,6 +325,14 @@ public class RandomItemGenerator {
         } else if (nounConstructorSelector == 5) {
 
             finalName = adjectiveVerbType(material);
+
+        } else if (nounConstructorSelector == 6) {
+
+            finalName = articleVerber();
+
+        } else if (nounConstructorSelector == 7) {
+
+            finalName = articleAdjectiveVerber();
 
         }
 
@@ -271,6 +396,29 @@ public class RandomItemGenerator {
         String itemType = itemTypeStringParser(material);
 
         String finalName = randomAdjective + " " + randomVerb + " " + itemType;
+
+        return finalName;
+
+    }
+
+    private String articleVerber () {
+
+        String article = "The";
+        String randomVerber = verbers.get(random.nextInt(verbers.size()));
+
+        String finalName = article + " " + randomVerber;
+
+        return finalName;
+
+    }
+
+    private String articleAdjectiveVerber () {
+
+        String article = "The";
+        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
+        String randomVerber = verbers.get(random.nextInt(verbers.size()));
+
+        String finalName = article + " " + randomAdjective + " " + randomVerber;
 
         return finalName;
 
@@ -344,7 +492,7 @@ public class RandomItemGenerator {
     }
 
 
-    private List<String> randomItemLoreConstructor(ItemMeta itemMeta, Material material){
+    private List<String> randomItemLoreConstructor(ItemMeta itemMeta, Material material, Entity entity){
 
         int enchantmentCount = 0;
 
@@ -360,11 +508,24 @@ public class RandomItemGenerator {
 
         int rankLevel = ItemRankHandler.guessItemRank(material, enchantmentCount);
 
-        String lore = "Rank " + rankLevel + " Elite Mob Drop";
+        String lore1 = "Rank " + rankLevel + " Elite Mob Drop";
+
+        String lore2;
+
+        if (entity != null) {
+
+            lore2 = "Looted from a level " + entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + " Elite " + entity.getType().toString();
+
+        } else {
+
+            lore2 = "Obtained via command";
+        }
+
 
         List<String> loreList = new ArrayList<>();
 
-        loreList.add(lore);
+        loreList.add(lore1);
+        loreList.add(lore2);
 
         return loreList;
 

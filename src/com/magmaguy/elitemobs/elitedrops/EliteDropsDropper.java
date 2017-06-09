@@ -51,9 +51,14 @@ public class EliteDropsDropper implements Listener{
         if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
                 entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
+            if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) {
+
+                return;
+
+            }
+
             int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-            //dropped item rank should be 0.4x the mob level (level 100 = rank 40 item)
             mobLevel = (int) ((mobLevel * ConfigValues.randomItemsConfig.getDouble("Mob level to item rank multiplier")) + (random.nextInt(6) + 1 - 3));
 
             if (mobLevel < 1) {
@@ -74,7 +79,7 @@ public class EliteDropsDropper implements Listener{
 
                             //create random loot
                             RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                            ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel);
+                            ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
 
                             entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
@@ -91,7 +96,7 @@ public class EliteDropsDropper implements Listener{
                     } else {
 
                         RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                        ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel);
+                        ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
 
                         entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
@@ -110,14 +115,14 @@ public class EliteDropsDropper implements Listener{
                         ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
 
                     RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel);
+                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
 
                     entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
                 } else if (EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
 
                     RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel);
+                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
 
                     entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
