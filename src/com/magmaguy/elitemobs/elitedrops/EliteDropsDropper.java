@@ -65,8 +65,6 @@ public class EliteDropsDropper implements Listener{
             if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100 +
                     ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs drop rate % increase per mob level")) {
 
-                Bukkit.getLogger().info("Hey");
-
                 if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
                         ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
 

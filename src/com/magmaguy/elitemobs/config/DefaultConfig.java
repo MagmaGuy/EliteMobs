@@ -66,7 +66,7 @@ public class DefaultConfig {
         configuration.addDefault("Passive EliteMob stack amount", 50);
         configuration.addDefault("Aggressive EliteMobs can drop custom loot", true);
         configuration.addDefault("Aggressive EliteMobs flat loot drop rate %", 25);
-        configuration.addDefault("Aggressive EliteMobs drop rate % increase per mob level", 2);
+        configuration.addDefault("Aggressive EliteMobs drop rate % increase per mob level", 1);
         configuration.addDefault("Prevent creepers from killing passive mobs", true);
         configuration.addDefault("Aggressive EliteMob life multiplier", 1.0);
         configuration.addDefault("Aggressive EliteMob damage multiplier", 1.0);

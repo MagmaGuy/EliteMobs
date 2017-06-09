@@ -21,6 +21,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -62,7 +63,7 @@ public class AttackWeb extends MinorPowers implements Listener {
         Block block = damagee.getLocation().getBlock();
         Material originalMaterial = block.getType();
 
-        if (!originalMaterial.equals(Material.AIR)) {
+        if (!originalMaterial.equals(Material.AIR) || !(damagee instanceof Player)) {
 
             return;
 

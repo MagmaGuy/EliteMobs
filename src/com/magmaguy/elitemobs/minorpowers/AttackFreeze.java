@@ -65,7 +65,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
         Block block = damagee.getLocation().getBlock();
         Material originalMaterial = block.getType();
 
-        if (!originalMaterial.equals(Material.AIR)) {
+        if (!originalMaterial.equals(Material.AIR) || !(damagee instanceof Player)) {
 
             return;
 
