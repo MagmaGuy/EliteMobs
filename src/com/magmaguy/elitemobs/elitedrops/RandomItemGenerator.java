@@ -515,8 +515,6 @@ public class RandomItemGenerator {
 
         }
 
-        Bukkit.getLogger().info(Enchantment.SWEEPING_EDGE.getName());
-
         if (validEnchantments.size() == 0) {
 
             return oldMeta;
