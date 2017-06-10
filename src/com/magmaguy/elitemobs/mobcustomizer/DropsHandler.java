@@ -34,6 +34,13 @@ public class DropsHandler implements Listener {
 
         if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)){
 
+            if (!event.getEntity().hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
+                    !ConfigValues.defaultConfig.getBoolean("Drop multiplied default loot from aggressive elite mobs spawned in spawners")) {
+
+                return;
+
+            }
+
             List<ItemStack> droppedItems = event.getDrops();
             int mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
                     ConfigValues.defaultConfig.getDouble("Aggressive EliteMob default loot multiplier"));

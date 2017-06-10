@@ -485,6 +485,7 @@ public class CommandHandler implements CommandExecutor {
             player.sendMessage("/elitemobs killall passiveelites");
             player.sendMessage("/elitemobs getloot (alone to get GUI)");
             player.sendMessage("/elitemobs getloot [loot name]");
+            player.sendMessage("/elitemobs simloot [mob level]");
             player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
             player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
 
