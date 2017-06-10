@@ -37,6 +37,8 @@ import static org.bukkit.Material.*;
  */
 public class ChickenHandler implements Listener {
 
+    private static Random random = new Random();
+
     public static void superEggs(Entity entity, int passiveStackAmount) {
 
         List<Chicken> tempChickenList = new ArrayList<>();
@@ -49,10 +51,10 @@ public class ChickenHandler implements Listener {
 
         if (tempChickenList.size() > 0) {
 
-            Random random = new Random();
-            int eggChance = random.nextInt(12000 / passiveStackAmount);
+            int eggChance = random.nextInt(12000 / 20 / passiveStackAmount);
 
             //Chicken lay eggs every 5-10 minutes, assuming 10 min that's 12000 ticks
+            //method runs every 20 ticks
             //should spawn 1 by 1 but the odds of it spawning are scaled to fit config passivemob stack size
             if (eggChance == 1) {
 
