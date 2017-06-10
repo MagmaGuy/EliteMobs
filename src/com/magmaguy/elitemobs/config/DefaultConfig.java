@@ -73,6 +73,7 @@ public class DefaultConfig {
         configuration.addDefault("Aggressive EliteMob life multiplier", 1.0);
         configuration.addDefault("Aggressive EliteMob damage multiplier", 1.0);
         configuration.addDefault("Aggressive EliteMob default loot multiplier", 1.0);
+        configuration.addDefault("Drop multiplied default loot from aggressive elite mobs spawned in spawners", true);
         configuration.addDefault("SuperCreeper explosion nerf multiplier", 1.0);
         configuration.addDefault("Turn on visual effects for natural or plugin-spawned EliteMobs", true);
         configuration.addDefault("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs", true);

@@ -22,13 +22,13 @@ public class ScalingFormula{
 
     public static double PowerFormula(double baseAmount, int EliteMobLevel) {
 
-        return 8.25 * baseAmount * Math.pow((Math.log10(EliteMobLevel)), 2) + baseAmount;
+        return 4 * baseAmount * Math.pow((Math.log10(EliteMobLevel)), 1.5) + baseAmount;
 
     }
 
     public static double reversePowerFormula (double currentValue, double baseAmount) {
 
-        return Math.pow(10, (Math.sqrt((currentValue - baseAmount) / (8.25 * baseAmount))));
+        return Math.pow(10, (Math.pow((currentValue - baseAmount) / (4 * baseAmount), 1 / 1.5)));
 
     }
 
