@@ -687,8 +687,6 @@ public class RandomItemGenerator {
         int materialRank = ItemRankHandler.itemTypePower(material);
         rankLevel -= materialRank;
 
-        Bukkit.getLogger().info("Rank level: "+ rankLevel + " Material level: " + materialRank);
-
         //randomizer for enchantments
         for (int i = 0; i < rankLevel; i++) {
 

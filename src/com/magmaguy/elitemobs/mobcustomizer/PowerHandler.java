@@ -39,10 +39,7 @@ public class PowerHandler {
     private static Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private static ArrayList<MinorPowers> minorPowerArray = new ArrayList();
 
-    private static MetadataHandler metadataHandler = new MetadataHandler();
     private static Random random = new Random();
-
-    private static ArrayList<MajorPowers> majorPowersArrayList = new ArrayList();
 
     private static MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
     private static ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
