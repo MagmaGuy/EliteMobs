@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.majorpowers.*;
 import com.magmaguy.elitemobs.minorpowers.MinorPowers;
@@ -157,10 +158,29 @@ public class PowerHandler {
 
                     //These powers can't be intialized like minor powers because the list depends on the mob type
                     //TODO: Add a mob type sensitive power list
-                    majorPowersArrayList.add(zombieFriends);
-                    majorPowersArrayList.add(zombieNecronomicon);
-                    majorPowersArrayList.add(zombieTeamRocket);
-                    majorPowersArrayList.add(zombieParents);
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieFriends")) {
+
+                        majorPowersArrayList.add(zombieFriends);
+
+                    }
+
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieFriends.ZombieNecronomicon")) {
+
+                        majorPowersArrayList.add(zombieNecronomicon);
+
+                    }
+
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieFriends.ZombieTeamRocket")) {
+
+                        majorPowersArrayList.add(zombieTeamRocket);
+
+                    }
+
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieFriends.ZombieParents")) {
+
+                        majorPowersArrayList.add(zombieParents);
+
+                    }
 
                 }
 
