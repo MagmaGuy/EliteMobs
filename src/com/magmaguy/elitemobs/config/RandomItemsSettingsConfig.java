@@ -30,7 +30,7 @@ public class RandomItemsSettingsConfig {
 
         this.getRandomItemsSettingsConfig().addDefault("Drop random items on elite mob death", true);
         this.getRandomItemsSettingsConfig().addDefault("Mob level to item rank multiplier", 0.5);
-        this.getRandomItemsSettingsConfig().addDefault("Monitor randomly generated drops on console", true);
+        this.getRandomItemsSettingsConfig().addDefault("Monitor randomly generated drops on console", false);
         this.getRandomItemsSettingsConfig().addDefault("Percentage (%) of times random item drop instead of custom loot", 20);
         this.getRandomItemsSettingsConfig().addDefault("Valid material list for random items", Arrays.asList(
                 "DIAMOND_SWORD",
