@@ -367,7 +367,8 @@ public class TranslationCustomConfig {
                 "I called my friends over!",
                 "BFF power!",
                 "One for all!",
-                "Get him!"
+                "Get him!",
+                "Screw you guys, I'm going home!"
         ));
 
         this.getTranslationConfig().addDefault("ZombieFriends.FriendDialog", Arrays.asList(
