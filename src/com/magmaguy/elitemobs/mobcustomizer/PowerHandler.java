@@ -164,19 +164,19 @@ public class PowerHandler {
 
                     }
 
-                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieFriends.ZombieNecronomicon")) {
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieNecronomicon")) {
 
                         majorPowersArrayList.add(zombieNecronomicon);
 
                     }
 
-                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieFriends.ZombieTeamRocket")) {
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieTeamRocket")) {
 
                         majorPowersArrayList.add(zombieTeamRocket);
 
                     }
 
-                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieFriends.ZombieParents")) {
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieParents")) {
 
                         majorPowersArrayList.add(zombieParents);
 
