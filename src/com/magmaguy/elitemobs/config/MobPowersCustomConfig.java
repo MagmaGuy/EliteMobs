@@ -27,8 +27,6 @@ public class MobPowersCustomConfig {
 
     public void initializeMobPowersConfig () {
 
-        MetadataHandler metadataHandler = new MetadataHandler();
-
         for (String string : MetadataHandler.minorPowerList()) {
 
             this.getMobPowersConfig().addDefault("Powers.Minor Powers." + string, true);
