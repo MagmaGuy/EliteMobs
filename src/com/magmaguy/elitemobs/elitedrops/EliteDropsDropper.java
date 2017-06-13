@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -36,7 +37,7 @@ public class EliteDropsDropper implements Listener{
 
     private Random random = new Random();
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
         if (!ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&

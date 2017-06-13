@@ -56,8 +56,6 @@ public class RandomItemGenerator {
 
         if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for item ranks")) {
 
-            Bukkit.getLogger().info("test1");
-
             double rankProgression = ConfigValues.defaultConfig.getDouble("Increase MMORPG color rank every X levels X=");
 
                 if (Math.floor(itemRank /rankProgression) >= 5) {
