@@ -482,6 +482,18 @@ public class RandomItemGenerator {
 
             return ConfigValues.randomItemsConfig.getString("Material name.Boots");
 
+        } else if (material.equals(Material.SHEARS)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Shears");
+
+        } else if (material.equals(Material.FISHING_ROD)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Fishing Rod");
+
+        } else if (material.equals(Material.SHIELD)) {
+
+            return ConfigValues.randomItemsConfig.getString("Material name.Shield");
+
         }
 
         Bukkit.getLogger().info("EliteMobs - found unexpected material type in procedurally generated loot. Can't generate item type name.");
@@ -582,7 +594,7 @@ public class RandomItemGenerator {
 
         } else if (material.equals(Material.DIAMOND_HOE) || material.equals(Material.GOLD_HOE) ||
                 material.equals(Material.IRON_HOE) || material.equals(Material.STONE_HOE) ||
-                material.equals(Material.WOOD_HOE)) {
+                material.equals(Material.WOOD_HOE) || material.equals(Material.SHIELD)) {
 
             validateEnchantment("DURABILITY");
             validateEnchantment("MENDING");
@@ -614,7 +626,6 @@ public class RandomItemGenerator {
             validateEnchantment("OXYGEN");
             validateEnchantment("PROTECTION_ENVIRONMENTAL");
             validateEnchantment("PROTECTION_EXPLOSIONS");
-            validateEnchantment("PROTECTION_FALL");
             validateEnchantment("PROTECTION_FIRE");
             validateEnchantment("PROTECTION_PROJECTILE");
             validateEnchantment("THORNS");
@@ -628,15 +639,12 @@ public class RandomItemGenerator {
             validateEnchantment("BINDING_CURSE");
             validateEnchantment("DURABILITY");
             validateEnchantment("MENDING");
-            validateEnchantment("OXYGEN");
             validateEnchantment("PROTECTION_ENVIRONMENTAL");
             validateEnchantment("PROTECTION_EXPLOSIONS");
-            validateEnchantment("PROTECTION_FALL");
             validateEnchantment("PROTECTION_FIRE");
             validateEnchantment("PROTECTION_PROJECTILE");
             validateEnchantment("THORNS");
             validateEnchantment("VANISHING_CURSE");
-            validateEnchantment("WATER_WORKER");
 
         } else if (material.equals(Material.CHAINMAIL_LEGGINGS) || material.equals(Material.DIAMOND_LEGGINGS) ||
                 material.equals(Material.GOLD_LEGGINGS) || material.equals(Material.IRON_LEGGINGS) ||
@@ -645,15 +653,12 @@ public class RandomItemGenerator {
             validateEnchantment("BINDING_CURSE");
             validateEnchantment("DURABILITY");
             validateEnchantment("MENDING");
-            validateEnchantment("OXYGEN");
             validateEnchantment("PROTECTION_ENVIRONMENTAL");
             validateEnchantment("PROTECTION_EXPLOSIONS");
-            validateEnchantment("PROTECTION_FALL");
             validateEnchantment("PROTECTION_FIRE");
             validateEnchantment("PROTECTION_PROJECTILE");
             validateEnchantment("THORNS");
             validateEnchantment("VANISHING_CURSE");
-            validateEnchantment("WATER_WORKER");
 
         } else if (material.equals(Material.CHAINMAIL_BOOTS) || material.equals(Material.DIAMOND_BOOTS) ||
                 material.equals(Material.GOLD_BOOTS) || material.equals(Material.IRON_BOOTS) ||
@@ -662,7 +667,6 @@ public class RandomItemGenerator {
             validateEnchantment("BINDING_CURSE");
             validateEnchantment("DURABILITY");
             validateEnchantment("MENDING");
-            validateEnchantment("OXYGEN");
             validateEnchantment("PROTECTION_ENVIRONMENTAL");
             validateEnchantment("PROTECTION_EXPLOSIONS");
             validateEnchantment("PROTECTION_FALL");
@@ -670,7 +674,24 @@ public class RandomItemGenerator {
             validateEnchantment("PROTECTION_PROJECTILE");
             validateEnchantment("THORNS");
             validateEnchantment("VANISHING_CURSE");
-            validateEnchantment("WATER_WORKER");
+            validateEnchantment("DEPTH_STRIDER");
+            validateEnchantment("FROST_WALKER");
+
+
+        } else if (material.equals(Material.FISHING_ROD)) {
+
+            validateEnchantment("BINDING_CURSE");
+            validateEnchantment("DURABILITY");
+            validateEnchantment("MENDING");
+            validateEnchantment("LUCK");
+            validateEnchantment("LURE");
+
+        } else if (material.equals(Material.SHEARS)) {
+
+            validateEnchantment("BINDING_CURSE");
+            validateEnchantment("DIG_SPEED");
+            validateEnchantment("MENDING");
+            validateEnchantment("DURABILITY");
 
         }
 

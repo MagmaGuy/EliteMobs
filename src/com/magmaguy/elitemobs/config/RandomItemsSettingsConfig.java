@@ -59,6 +59,9 @@ public class RandomItemsSettingsConfig {
                 "IRON_AXE",
                 "STONE_AXE",
                 "WOOD_AXE",
+                "SHEARS",
+                "SHIELD",
+                "FISHING_ROD",
                 "CHAINMAIL_HELMET",
                 "DIAMOND_HELMET",
                 "GOLD_HELMET",
@@ -172,6 +175,9 @@ public class RandomItemsSettingsConfig {
         this.getRandomItemsSettingsConfig().addDefault("Material name.Spade", "Spade");
         this.getRandomItemsSettingsConfig().addDefault("Material name.Hoe", "Hoe");
         this.getRandomItemsSettingsConfig().addDefault("Material name.Axe", "Axe");
+        this.getRandomItemsSettingsConfig().addDefault("Material name.Fishing Rod", "Fishing Rod");
+        this.getRandomItemsSettingsConfig().addDefault("Material name.Shield", "Shield");
+        this.getRandomItemsSettingsConfig().addDefault("Material name.Shears", "Shears");
         this.getRandomItemsSettingsConfig().addDefault("Material name.Helmet", "Helmet");
         this.getRandomItemsSettingsConfig().addDefault("Material name.Chestplate", "Chestplate");
         this.getRandomItemsSettingsConfig().addDefault("Material name.Leggings", "Leggings");
