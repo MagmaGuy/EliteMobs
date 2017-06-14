@@ -24,6 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
 
 /**
  * Created by MagmaGuy on 18/04/2017.
@@ -111,6 +112,12 @@ public class DamageHandler implements Listener{
     public void explosionPrimeEvent(ExplosionPrimeEvent event) {
 
         if (event.getEntity() instanceof Creeper && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+
+            for (PotionEffect potionEffect : ((Creeper) event.getEntity()).getActivePotionEffects()) {
+
+                ((Creeper) event.getEntity()).removePotionEffect(potionEffect.getType());
+
+            }
 
             int mobLevel = event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
