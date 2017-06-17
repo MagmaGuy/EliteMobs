@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 3.0.11
+version: 3.0.14
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -13,6 +13,7 @@ permissions:
     description: Gives access to all elitemobs commands
     children:
       elitemobs.stats: true
+      elitemobs.shop: true
       elitemobs.getloot: true
       elitemobs.simloot: true
       elitemobs.reload.configs: true
@@ -53,3 +54,27 @@ permissions:
     description: Allows players to run /elitemobs killall aggressiveelites
   elitemobs.killall.passiveelites:
     description: Allows players to run /elitemobs killall passiveelites
+  elitemobs.currency.user:
+    description: Gives access to the commands users need to use the economy features (shops, paying other players)
+    children:
+      elitemobs.shop: true
+      elitemobs.pay: true
+      elitemobs.wallet: true
+  elitemobs.shop:
+    description: Allows players to run /elitemobs shop
+    default: op
+  elitemobs.currency.pay:
+    description: Allows players to run /elitemobs paycoins [username] [amount]
+    default: op
+  elitemobs.currency.subtract:
+    description: Allows players to run /elitemobs subtractcoins [username] [amount]
+    default: op
+  elitemobs.currency.set:
+    description: Allows players to run /elitemobs setcoins [username] [amount]
+    default: op
+  elitemobs.currency.check:
+    decription: Allows players to run /elitemobs check [username]
+    default: op
+  elitemobs.currency.wallet:
+    decription: Allows players to run /elitemobs wallet
+    default: op
