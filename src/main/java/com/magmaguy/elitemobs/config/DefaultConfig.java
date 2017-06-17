@@ -61,6 +61,7 @@ public class DefaultConfig {
         configuration.addDefault("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn", 20);
         configuration.addDefault("Aggressive mob stacking", true);
         configuration.addDefault("Aggressive mob stacking cap", 50);
+        configuration.addDefault("Natural elite mob level cap", 200);
         configuration.addDefault("Stack aggressive spawner mobs", true);
         configuration.addDefault("Stack aggressive natural mobs", true);
         configuration.addDefault("Passive EliteMob stack amount", 50);

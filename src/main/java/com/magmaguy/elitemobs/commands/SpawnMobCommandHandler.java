@@ -281,7 +281,7 @@ public class SpawnMobCommandHandler {
         }
 
 
-        //todo: add a way to select the powers mobs get, get alt system to spawn unstackable EliteMobs with fixed powers
+        //todo: get alt system to spawn unstackable EliteMobs with fixed powers
 
         if (mobPower.size() > 0) {
 
