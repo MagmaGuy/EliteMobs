@@ -593,8 +593,11 @@ public class RandomItemGenerator {
             validateEnchantment("MENDING");
             validateEnchantment("VANISHING_CURSE");
             validateEnchantment("DIG_SPEED");
-            validateEnchantment("LOOT_BONUS_BLOCKS");
-            validateEnchantment("SILK_TOUCH");
+            if (random.nextDouble() < 0.5) {
+                validateEnchantment("LOOT_BONUS_BLOCKS");
+            } else {
+                validateEnchantment("SILK_TOUCH");
+            }
 
         } else if (material.equals(Material.DIAMOND_HOE) || material.equals(Material.GOLD_HOE) ||
                 material.equals(Material.IRON_HOE) || material.equals(Material.STONE_HOE) ||
