@@ -17,11 +17,14 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
+import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -68,7 +71,9 @@ public class CommandHandler implements CommandExecutor {
 
                 return true;
 
-            } else if (commandSender instanceof Player && !commandSender.hasPermission("elitemobs.SpawnMob")) {
+            }
+
+            if (commandSender instanceof Player && !commandSender.hasPermission("elitemobs.SpawnMob")) {
 
                 Player player = (Player) commandSender;
 
@@ -97,7 +102,7 @@ public class CommandHandler implements CommandExecutor {
                 validCommands(commandSender);
                 return true;
 
-            // /elitemobs stats | /elitemobs getloot (for GUI menu)
+            // /elitemobs stats | /elitemobs getloot (for GUI menu) | /elitemobs shop
             case 1:
 
                 if (args[0].equalsIgnoreCase("stats") && commandSender instanceof Player &&
@@ -140,11 +145,55 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
+                if (args[0].equalsIgnoreCase("shop") && commandSender instanceof Player &&
+                        commandSender.hasPermission("elitemobs.shop")) {
+
+                    ShopHandler shopHandler = new ShopHandler();
+
+                    shopHandler.initializeShop((Player) commandSender);
+
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("shop") && commandSender instanceof Player &&
+                        !commandSender.hasPermission("elitemobs.shop")) {
+
+                    Player player = (Player) commandSender;
+                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                                "You need the following permission: " + "elitemobs.shop");
+
+                    } else {
+
+                        player.sendMessage("You do not have the permission " + "elitemobs.shop");
+
+                    }
+
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("wallet") && commandSender instanceof Player &&
+                        commandSender.hasPermission("elitemobs.currency.wallet")) {
+
+                        String name = commandSender.getName();
+
+                        Double money = CurrencyCommandsHandler.walletCommand(name);
+
+                        commandSender.sendMessage(ChatColor.GREEN + "You have " + money + " " + ConfigValues.economyConfig.getString("Currency name"));
+
+                        return true;
+
+                }
+
                 validCommands(commandSender);
                 return true;
 
             // /elitemobs reload config | /elitemobs reload loot | /elitemobs giveloot [player] (for GUI menu) |
-            // /elitemobs killall aggressiveelites | /elitemobs killall passiveelites | /elitemobs simloot [level]
+            // /elitemobs killall aggressiveelites | /elitemobs killall passiveelites | /elitemobs simloot [level] |
+            // /elitemobs check [playerName]
             case 2:
 
                 //valid /elitemobs reload config
@@ -163,7 +212,9 @@ public class CommandHandler implements CommandExecutor {
                     return true;
 
                     //invalid /elitemobs reload config
-                } else if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
+                }
+
+                if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
                         args[1].equalsIgnoreCase("config") &&
                         !commandSender.hasPermission("elitemobs.reload.config")) {
 
@@ -181,7 +232,6 @@ public class CommandHandler implements CommandExecutor {
                     }
 
                     return true;
-
 
                 }
 
@@ -384,10 +434,29 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
+                if (args[0].equals("check") && commandSender instanceof Player && commandSender.hasPermission("elitemobs.currency.check")) {
+
+                    try {
+
+                        Double money = EconomyHandler.checkCurrency(args[1]);
+
+                        commandSender.sendMessage(args[1] + " has " + money + " " + ConfigValues.economyConfig.get("Currency name"));
+
+                    } catch (Exception e) {
+
+                        commandSender.sendMessage("Input not valid. Command format: /em set [playerName] [amount]");
+
+                    }
+
+                    return true;
+
+                }
+
                 validCommands(commandSender);
                 return true;
 
-            // /elitemobs giveloot [player] [loot]
+            // /elitemobs giveloot [player] [loot] || /elitemobs paycoins [player] [amount] || /elitemobs subtractcoins [player] [amount]
+            // || /elitemobs setcoins [player] [amount]
             case 3:
 
                 if (commandSender instanceof ConsoleCommandSender || commandSender instanceof Player
@@ -461,6 +530,68 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
+                if (args[0].equals("pay") && commandSender instanceof Player && commandSender.hasPermission("elitemobs.currency.pay")) {
+
+                    try {
+
+                        if (Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(commandSender.getName())) {
+
+                            CurrencyCommandsHandler.payCommand(args[1], Integer.parseInt(args[2]));
+                            CurrencyCommandsHandler.subtractCommand(commandSender.getName(), Integer.parseInt(args[2]));
+
+                            commandSender.sendMessage("You have paid " + args[2] + " to " + args[1]);
+                            commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(commandSender.getName()));
+
+                        }
+
+
+                    } catch (Exception e) {
+
+                        commandSender.sendMessage("Input not valid. Command format: /em pay [playerName] [amount]");
+
+                    }
+
+                    return true;
+
+                }
+
+                if (args[0].equals("subtract") && commandSender instanceof Player && commandSender.hasPermission("elitemobs.currency.subtract")) {
+
+                    try {
+
+                        CurrencyCommandsHandler.subtractCommand(args[1], Integer.parseInt(args[2]));
+
+                        commandSender.sendMessage("You have subtracted " + args[2] + " from " + args[1]);
+                        commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(args[1]));
+
+                    } catch (Exception e) {
+
+                        commandSender.sendMessage("Input not valid. Command format: /em subtract [playerName] [amount]");
+
+                    }
+
+                    return true;
+
+                }
+
+                if (args[0].equals("set") && commandSender instanceof Player && commandSender.hasPermission("elitemobs.currency.set")) {
+
+                    try {
+
+                        CurrencyCommandsHandler.setCommand(args[1], Integer.parseInt(args[2]));
+
+                        commandSender.sendMessage("You set " + args[1] + "'s " + ConfigValues.economyConfig.get("Currency name") + " to " + args[2]);
+
+                    } catch (Exception e) {
+
+                        commandSender.sendMessage("Input not valid. Command format: /em set [playerName] [amount]");
+
+                    }
+
+                    return true;
+
+                }
+
                 validCommands(commandSender);
                 return true;
 
@@ -483,6 +614,7 @@ public class CommandHandler implements CommandExecutor {
 
             player.sendMessage("Valid commands:");
             player.sendMessage("/elitemobs stats");
+            player.sendMessage("/elitemobs shop");
             player.sendMessage("/elitemobs reload configs");
             player.sendMessage("/elitemobs reload loot");
             player.sendMessage("/elitemobs killall aggressiveelites");

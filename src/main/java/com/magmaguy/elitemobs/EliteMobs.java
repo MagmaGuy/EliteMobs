@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurg
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
+import com.magmaguy.elitemobs.commands.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
@@ -67,6 +68,10 @@ public class EliteMobs extends JavaPlugin implements Listener {
         translationCustomConfig.initializeTranslationConfig();
         RandomItemsSettingsConfig randomItemsSettingsConfig = new RandomItemsSettingsConfig();
         randomItemsSettingsConfig.initializeRandomItemsSettingsConfig();
+        EconomySettingsConfig economySettingsConfig = new EconomySettingsConfig();
+        economySettingsConfig.intializeEconomySettingsConfig();
+        PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
+        playerMoneyDataConfig.intializeEconomySettingsConfig();
         ConfigValues configValues = new ConfigValues();
         configValues.initializeConfigValues();
 
@@ -177,6 +182,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Loot
         this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
+
+        //Shop
+        this.getServer().getPluginManager().registerEvents(new ShopHandler(), this);
 
         //Minecraft behavior canceller
         if (ConfigValues.defaultConfig.getBoolean("Prevent creepers from killing passive mobs")) {
