@@ -578,8 +578,12 @@ public class RandomItemGenerator {
             validateEnchantment("MENDING");
             validateEnchantment("VANISHING_CURSE");
             validateEnchantment("DIG_SPEED");
-            validateEnchantment("LOOT_BONUS_BLOCKS");
-            validateEnchantment("SILK_TOUCH");
+            //TODO: this doesn't take config into account
+            if (random.nextDouble() < 0.5) {
+                validateEnchantment("LOOT_BONUS_BLOCKS");
+            } else {
+                validateEnchantment("SILK_TOUCH");
+            }
 
         } else if (material.equals(Material.DIAMOND_SPADE) || material.equals(Material.GOLD_SPADE) ||
                 material.equals(Material.IRON_SPADE) || material.equals(Material.STONE_SPADE) ||
