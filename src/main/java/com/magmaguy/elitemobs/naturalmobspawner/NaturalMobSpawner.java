@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -75,6 +76,12 @@ public class NaturalMobSpawner implements Listener {
                 threathLevel = threatLevelCalculator(armorRating, potionEffectRating, EliteMobRating);
 
                 int EliteMobLevel = levelCalculator(threathLevel);
+
+                if (EliteMobLevel > ConfigValues.defaultConfig.getInt("Natural elite mob level cap")) {
+
+                    EliteMobLevel = ConfigValues.defaultConfig.getInt("Natural elite mob level cap");
+
+                }
 
                 if (threathLevel == 0) {
 

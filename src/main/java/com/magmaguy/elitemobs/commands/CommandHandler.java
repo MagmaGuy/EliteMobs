@@ -110,7 +110,9 @@ public class CommandHandler implements CommandExecutor {
 
                     return true;
 
-                } else if (args[0].equalsIgnoreCase("stats") && commandSender instanceof Player
+                }
+
+                if (args[0].equalsIgnoreCase("stats") && commandSender instanceof Player
                         && !commandSender.hasPermission("elitemobs.stats")) {
 
                     Player player = (Player) commandSender;
@@ -126,7 +128,9 @@ public class CommandHandler implements CommandExecutor {
                     }
                     return true;
 
-                } else if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
+                }
+
+                if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
                         commandSender.hasPermission("elitemobs.getloot") || args[0].equalsIgnoreCase("gl")
                         && commandSender instanceof Player && commandSender.hasPermission("elitemobs.getloot")) {
 
