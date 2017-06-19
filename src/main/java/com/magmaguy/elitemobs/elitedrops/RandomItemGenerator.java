@@ -524,18 +524,29 @@ public class RandomItemGenerator {
 
         if (entity != null) {
 
-            lore2 = "Looted from a level " + entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + " Elite " + entity.getType().toString();
+            lore2 = "Looted from a level " + entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + " Elite " +
+                    entity.getType().toString();
 
         } else {
 
-            lore2 = "Obtained via command";
+            lore2 = "Obtained from shop";
         }
-
 
         List<String> loreList = new ArrayList<>();
 
         loreList.add(lore1);
         loreList.add(lore2);
+
+        if (ConfigValues.economyConfig.getBoolean("Enable economy")) {
+
+            String lore3;
+
+            lore3 = "Worth " + rankLevel * ConfigValues.economyConfig.getDouble("Tier price progression") + " " +
+                    ConfigValues.economyConfig.getString("Currency name");
+
+            loreList.add(lore3);
+
+        }
 
         return loreList;
 

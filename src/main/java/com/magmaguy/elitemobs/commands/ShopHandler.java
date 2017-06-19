@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import com.magmaguy.elitemobs.elitedrops.RandomItemGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
@@ -56,7 +57,6 @@ public class ShopHandler implements Listener {
         shopHeader(shopInventory);
         shopContents(shopInventory);
 
-
     }
 
     private void shopHeader(Inventory shopInventory) {
@@ -83,7 +83,22 @@ public class ShopHandler implements Listener {
         for (int i = 9; i < 54; i++) {
 
             //TODO: add config option for limit
-            shopInventory.setItem(i, randomItemGenerator.randomItemGeneratorCommand(random.nextInt(150) + 1));
+            int balancedMax = ConfigValues.economyConfig.getInt("Procedurally Generated Loot.Highest simulated elite mob level loot")
+                    - ConfigValues.economyConfig.getInt("Procedurally Generated Loot.Lowest simulated elite mob level loot");
+            int balancedMin = ConfigValues.economyConfig.getInt("Procedurally Generated Loot.Lowest simulated elite mob level loot");
+
+            int randomLevel = random.nextInt(balancedMax + 1) + balancedMin;
+
+            //adjust to item rank
+            int level = (int) ((randomLevel * ConfigValues.randomItemsConfig.getDouble("Mob level to item rank multiplier")) + (random.nextInt(6) + 1 - 3));
+
+            if (level < 1) {
+
+                level = 0;
+
+            }
+
+            shopInventory.setItem(i, randomItemGenerator.randomItemGeneratorCommand(level));
 
         }
 
@@ -91,6 +106,12 @@ public class ShopHandler implements Listener {
 
     @EventHandler
     public void onClick (InventoryClickEvent event) {
+
+        if (!ConfigValues.economyConfig.getBoolean("Enable economy")) {
+
+            return;
+
+        }
 
         if (event.getInventory().getName().equalsIgnoreCase("EliteMobs Shop")) {
 
@@ -111,19 +132,11 @@ public class ShopHandler implements Listener {
             }
 
 
-            if (!event.getCurrentItem().getItemMeta().hasLore()) {
+            if (!event.getCurrentItem().getItemMeta().hasLore() || !event.getCurrentItem().getItemMeta().getLore().
+                    get(event.getCurrentItem().getItemMeta().getLore().size() - 1).contains(ConfigValues.economyConfig.
+                    getString("Currency name"))) {
 
                 event.setCancelled(true);
-                return;
-
-            }
-
-            String[] itemLoreFirstLine = event.getCurrentItem().getItemMeta().getLore().get(0).split(" ");
-            String firstWord = itemLoreFirstLine[2] + " " + itemLoreFirstLine[3] + " " + itemLoreFirstLine[4];
-
-            //Don't allow selling items that aren't elite drops (or the head button)
-            if (!firstWord.equalsIgnoreCase("Elite Mob Drop") && event.getSlot() != 4) {
-
                 return;
 
             }
@@ -155,10 +168,6 @@ public class ShopHandler implements Listener {
 
             String currencyName = ConfigValues.economyConfig.getString("Currency name");
 
-            event.getWhoClicked().sendMessage("This item is rank " + itemRank);
-            event.getWhoClicked().sendMessage("You have " + EconomyHandler.checkCurrency(event.getWhoClicked().getName()));
-            player.sendMessage(event.getSlot() + "");
-
             if (8 < event.getSlot() && event.getClickedInventory().getName().equalsIgnoreCase("EliteMobs Shop")) {
                 //These slots are for buying items
 
@@ -168,14 +177,15 @@ public class ShopHandler implements Listener {
                     player.getInventory().addItem(itemStack);
                     populateShop(event.getInventory());
 
-                    player.sendMessage("You have bought " + itemDisplayName + " for " + itemValue + " " + currencyName);
-                    player.sendMessage("You have " + EconomyHandler.checkCurrency(player.getName()) + " " + currencyName);
+                    player.sendMessage(ChatColor.GREEN + "You have bought " + itemDisplayName + " for " + ChatColor.DARK_GREEN +  itemValue + " " + ChatColor.GREEN + currencyName);
+                    player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(player.getName()) + " " + ChatColor.GREEN + currencyName);
 
                 } else {
 
                     player.closeInventory();
-                    player.sendMessage("You don't have enough " + currencyName + "!");
-                    player.sendMessage("You have " + EconomyHandler.checkCurrency(player.getName()) + " " + currencyName);
+                    player.sendMessage(ChatColor.RED +"You don't have enough " + currencyName + "!");
+                    player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(player.getName()) + " " + ChatColor.GREEN + currencyName);
+                    player.sendMessage(ChatColor.GREEN + "That item cost " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + currencyName + ".");
 
                 }
 

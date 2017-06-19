@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.elitedrops;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -61,7 +62,6 @@ public class EliteDropsHandler implements Listener {
             String itemType = itemTypeHandler(previousPath);
             Bukkit.getLogger().info("Adding: " + previousPath);
             String itemName = itemNameHandler(previousPath);
-            List itemLore = itemLoreHandler(previousPath);
 
             List itemEnchantments = itemEnchantmentHandler(previousPath);
             List potionEffects = itemPotionEffectHandler(previousPath);
@@ -69,7 +69,6 @@ public class EliteDropsHandler implements Listener {
             ItemStack itemStack = new ItemStack(Material.getMaterial(itemType), 1);
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.setDisplayName(itemName);
-            itemMeta.setLore(itemLore);
 
             int enchantmentCount = 0;
 
@@ -94,9 +93,7 @@ public class EliteDropsHandler implements Listener {
 
             }
 
-            itemStack.setItemMeta(itemMeta);
 
-            lootList.add(itemStack);
 
             List<PotionEffect> parsedPotionEffect = new ArrayList();
 
@@ -132,7 +129,16 @@ public class EliteDropsHandler implements Listener {
 
             }
 
-            rankedItemMapCreator(ItemRankHandler.guessItemRank(itemStack.getType(), enchantmentCount), itemStack);
+            int itemRank = ItemRankHandler.guessItemRank(itemStack.getType(), enchantmentCount);
+
+            List itemLore = itemLoreHandler(previousPath, itemRank);
+            itemMeta.setLore(itemLore);
+
+            itemStack.setItemMeta(itemMeta);
+
+            lootList.add(itemStack);
+
+            rankedItemMapCreator(itemRank, itemStack);
 
         }
 
@@ -208,13 +214,14 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public List itemLoreHandler(String previousPath) {
+    public List itemLoreHandler(String previousPath, int itemRank) {
 
         String path = automatedStringBuilder(previousPath, "Item Lore");
 
         List<String> itemLore = (List<String>) lootCustomConfig.getLootConfig().getList(path);
 
-        if (itemLore == null || itemLore.isEmpty()) {
+        if (!ConfigValues.defaultConfig.getBoolean("Show item rank on custom item drops") && (itemLore == null || itemLore.isEmpty()) &&
+                !ConfigValues.economyConfig.getBoolean("Enable economy")) {
 
             return itemLore;
 
@@ -222,13 +229,34 @@ public class EliteDropsHandler implements Listener {
 
         List<String> newList = new ArrayList<>();
 
-        for (String string : itemLore) {
+        if (ConfigValues.defaultConfig.getBoolean("Show item rank on custom item drops")) {
 
-            if (string != null && !string.isEmpty()) {
+            newList.add("Rank " + itemRank + " Elite Mob Drop");
 
-                newList.add(itemLore.indexOf(string), chatColorConverter(string));
+        }
+
+        if (itemLore != null && !itemLore.isEmpty()){
+
+            for (String string : itemLore) {
+
+                if (string != null && !string.isEmpty()) {
+
+                    newList.add(chatColorConverter(string));
+
+                }
 
             }
+
+        }
+
+        if (ConfigValues.economyConfig.getBoolean("Enable economy")) {
+
+            String lore3;
+
+            lore3 = "Worth " + itemRank * ConfigValues.economyConfig.getDouble("Tier price progression") + " " +
+                    ConfigValues.economyConfig.getString("Currency name");
+
+            newList.add(lore3);
 
         }
 
