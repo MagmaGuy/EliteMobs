@@ -438,7 +438,7 @@ public class CommandHandler implements CommandExecutor {
 
                     try {
 
-                        Double money = EconomyHandler.checkCurrency(args[1]);
+                        Double money = CurrencyCommandsHandler.checkCommand(args[1]);
 
                         commandSender.sendMessage(args[1] + " has " + money + " " + ConfigValues.economyConfig.get("Currency name"));
 

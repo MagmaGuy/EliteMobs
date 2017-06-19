@@ -80,6 +80,7 @@ public class DefaultConfig {
         configuration.addDefault("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs", true);
         configuration.addDefault("Turn on visual effects that indicate an attack is about to happen", true);
         configuration.addDefault("Use titles to warn players they are missing a permission", true);
+        configuration.addDefault("Show item rank on custom item drops", true);
         configuration.options().copyDefaults(true);
 
         //save the config when changed
