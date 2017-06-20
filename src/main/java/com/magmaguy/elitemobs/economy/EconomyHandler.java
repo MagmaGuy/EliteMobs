@@ -18,6 +18,8 @@ package com.magmaguy.elitemobs.economy;
 import com.magmaguy.elitemobs.config.PlayerMoneyDataConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.UUID;
+
 /**
  * Created by MagmaGuy on 17/06/2017.
  */
@@ -26,18 +28,18 @@ public class EconomyHandler {
     private static PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
     private static FileConfiguration configuration = playerMoneyDataConfig.getEconomySettingsConfig();
 
-    public static double addCurrency (String name, double amount) {
+    public static double addCurrency (UUID user, double amount) {
 
-        if (!checkUserExists(name)) {
+        if (!checkUserExists(user.toString())) {
 
-            createUser(name);
+            createUser(user);
 
         }
 
-        double currentAmount = configuration.getDouble(name);
+        double currentAmount = configuration.getDouble(user.toString());
         double newAmount = currentAmount + amount;
 
-        configuration.set(name, newAmount);
+        configuration.set(user.toString(), newAmount);
         playerMoneyDataConfig.saveCustomConfig();
 
         return newAmount;
@@ -45,52 +47,52 @@ public class EconomyHandler {
     }
 
 
-    public static double subtractCurrency (String name, double amount) {
+    public static double subtractCurrency (UUID user, double amount) {
 
-        if (!checkUserExists(name)) {
+        if (!checkUserExists(user.toString())) {
 
-            createUser(name);
+            createUser(user);
 
         }
 
-        double currentAmount = configuration.getDouble(name);
+        double currentAmount = configuration.getDouble(user.toString());
         double newAmount = currentAmount - amount;
 
-        configuration.set(name, newAmount);
+        configuration.set(user.toString(), newAmount);
         playerMoneyDataConfig.saveCustomConfig();
 
         return newAmount;
 
     }
 
-    public static void setCurrency (String name, double amount) {
+    public static void setCurrency (UUID user, double amount) {
 
-        if (!checkUserExists(name)) {
+        if (!checkUserExists(user.toString())) {
 
-            createUser(name);
+            createUser(user);
 
         }
 
-        configuration.set(name, amount);
+        configuration.set(user.toString(), amount);
         playerMoneyDataConfig.saveCustomConfig();
 
     }
 
-    public static double checkCurrency (String name) {
+    public static double checkCurrency (UUID user) {
 
-        if (!checkUserExists(name)) {
+        if (!checkUserExists(user.toString())) {
 
-            createUser(name);
+            createUser(user);
 
         }
 
-        return configuration.getDouble(name);
+        return configuration.getDouble(user.toString());
 
     }
 
-    public static void createUser (String name){
+    public static void createUser (UUID user){
 
-        configuration.set(name, 0);
+        configuration.set(user.toString(), 0);
         playerMoneyDataConfig.saveCustomConfig();
 
     }

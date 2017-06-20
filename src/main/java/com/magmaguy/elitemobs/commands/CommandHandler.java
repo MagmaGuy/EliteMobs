@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
@@ -534,13 +535,13 @@ public class CommandHandler implements CommandExecutor {
 
                     try {
 
-                        if (Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(commandSender.getName())) {
+                        if (Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))) {
 
                             CurrencyCommandsHandler.payCommand(args[1], Integer.parseInt(args[2]));
                             CurrencyCommandsHandler.subtractCommand(commandSender.getName(), Integer.parseInt(args[2]));
 
                             commandSender.sendMessage("You have paid " + args[2] + " to " + args[1]);
-                            commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(commandSender.getName()));
+                            commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
 
                         }
 
@@ -562,7 +563,7 @@ public class CommandHandler implements CommandExecutor {
                         CurrencyCommandsHandler.subtractCommand(args[1], Integer.parseInt(args[2]));
 
                         commandSender.sendMessage("You have subtracted " + args[2] + " from " + args[1]);
-                        commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(args[1]));
+                        commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
 
                     } catch (Exception e) {
 
