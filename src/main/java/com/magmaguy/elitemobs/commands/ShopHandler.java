@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import com.magmaguy.elitemobs.elitedrops.RandomItemGenerator;
 import org.bukkit.Bukkit;
@@ -77,12 +78,12 @@ public class ShopHandler implements Listener {
     private void shopContents(Inventory shopInventory) {
 
         //Anything after 8 is populated
-        RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
         Random random = new Random();
 
         for (int i = 9; i < 54; i++) {
 
-            //TODO: add config option for limit
+            RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
+
             int balancedMax = ConfigValues.economyConfig.getInt("Procedurally Generated Loot.Highest simulated elite mob level loot")
                     - ConfigValues.economyConfig.getInt("Procedurally Generated Loot.Lowest simulated elite mob level loot");
             int balancedMin = ConfigValues.economyConfig.getInt("Procedurally Generated Loot.Lowest simulated elite mob level loot");
@@ -171,20 +172,20 @@ public class ShopHandler implements Listener {
             if (8 < event.getSlot() && event.getClickedInventory().getName().equalsIgnoreCase("EliteMobs Shop")) {
                 //These slots are for buying items
 
-                if (EconomyHandler.checkCurrency(player.getName()) >= itemValue) {
+                if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
                     //player has enough money
-                    EconomyHandler.subtractCurrency(player.getName(), itemValue);
+                    EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(player.getName()), itemValue);
                     player.getInventory().addItem(itemStack);
                     populateShop(event.getInventory());
 
                     player.sendMessage(ChatColor.GREEN + "You have bought " + itemDisplayName + " for " + ChatColor.DARK_GREEN +  itemValue + " " + ChatColor.GREEN + currencyName);
-                    player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(player.getName()) + " " + ChatColor.GREEN + currencyName);
+                    player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + currencyName);
 
                 } else {
 
                     player.closeInventory();
                     player.sendMessage(ChatColor.RED +"You don't have enough " + currencyName + "!");
-                    player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(player.getName()) + " " + ChatColor.GREEN + currencyName);
+                    player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + currencyName);
                     player.sendMessage(ChatColor.GREEN + "That item cost " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + currencyName + ".");
 
                 }
@@ -196,12 +197,12 @@ public class ShopHandler implements Listener {
 
                 double amountDeduced = itemValue * (ConfigValues.economyConfig.getDouble("Item resale value (percentage)") / 100);
 
-                EconomyHandler.addCurrency(player.getName(), amountDeduced);
+                EconomyHandler.addCurrency(UUIDFilter.guessUUI(player.getName()), amountDeduced);
 
                 event.setCurrentItem(new ItemStack(Material.AIR));
 
                 player.sendMessage("You have sold " + itemDisplayName + " for " + amountDeduced + " " + currencyName);
-                player.sendMessage("You have " + EconomyHandler.checkCurrency(player.getName()) + " " + currencyName);
+                player.sendMessage("You have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + currencyName);
 
 
             }

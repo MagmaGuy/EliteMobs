@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.economy.UUIDFilter;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
@@ -24,31 +25,31 @@ public class CurrencyCommandsHandler {
 
     public static void payCommand(String playerName, int amount) {
 
-        EconomyHandler.addCurrency(playerName, amount);
+        EconomyHandler.addCurrency(UUIDFilter.guessUUI(playerName), amount);
 
     }
 
     public static void subtractCommand(String playerName, int amount) {
 
-        EconomyHandler.subtractCurrency(playerName, amount);
+        EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(playerName), amount);
 
     }
 
     public static void setCommand(String playerName, int amount) {
 
-        EconomyHandler.setCurrency(playerName, amount);
+        EconomyHandler.setCurrency(UUIDFilter.guessUUI(playerName), amount);
 
     }
 
     public static Double checkCommand(String playerName) {
 
-        return EconomyHandler.checkCurrency(playerName);
+        return EconomyHandler.checkCurrency(UUIDFilter.guessUUI(playerName));
 
     }
 
     public static Double walletCommand(String playerName) {
 
-        return EconomyHandler.checkCurrency(playerName);
+        return EconomyHandler.checkCurrency(UUIDFilter.guessUUI(playerName));
 
     }
 

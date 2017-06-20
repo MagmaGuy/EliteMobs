@@ -13,21 +13,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.api;
+package com.magmaguy.elitemobs.economy;
 
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 /**
- * Created by MagmaGuy on 03/06/2017.
+ * Created by MagmaGuy on 20/06/2017.
  */
-public class API extends Event{
+public class UUIDFilter {
 
+    public static UUID guessUUI(String string) {
 
-    @Override
-    public HandlerList getHandlers() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+
+            if (player.getName().equalsIgnoreCase(string) || player.getDisplayName().equalsIgnoreCase(string)) {
+
+                return player.getUniqueId();
+
+            }
+
+        }
+
         return null;
-    }
 
+    }
 
 }

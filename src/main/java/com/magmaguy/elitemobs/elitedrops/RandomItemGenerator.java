@@ -698,7 +698,7 @@ public class RandomItemGenerator {
 
         } else if (material.equals(Material.FISHING_ROD)) {
 
-            validateEnchantment("BINDING_CURSE");
+            validateEnchantment("VANISHING_CURSE");
             validateEnchantment("DURABILITY");
             validateEnchantment("MENDING");
             validateEnchantment("LUCK");
@@ -706,7 +706,7 @@ public class RandomItemGenerator {
 
         } else if (material.equals(Material.SHEARS)) {
 
-            validateEnchantment("BINDING_CURSE");
+            validateEnchantment("VANISHING_CURSE");
             validateEnchantment("DIG_SPEED");
             validateEnchantment("MENDING");
             validateEnchantment("DURABILITY");
