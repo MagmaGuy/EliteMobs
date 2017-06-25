@@ -70,7 +70,7 @@ public class SpawnMobCommandHandler {
             }
 
             world = player.getWorld();
-            location = player.getTargetBlock((HashSet<Byte>) null, 30).getLocation().add(0, 1, 0);
+            location = player.getTargetBlock((HashSet<Byte>) null, 30).getLocation().add(0.5, 1, 0.5);
 
             entityInput = args[1].toLowerCase();
 
@@ -288,8 +288,6 @@ public class SpawnMobCommandHandler {
             boolean inputError = false;
 
             int powerCount = 0;
-
-            MetadataHandler metadataHandler = new MetadataHandler();
 
             for (String string : mobPower) {
 

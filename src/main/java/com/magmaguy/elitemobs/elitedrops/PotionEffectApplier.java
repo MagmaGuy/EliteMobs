@@ -76,8 +76,7 @@ public class PotionEffectApplier {
 
         for (ItemStack itemStackIteration : potionEffectItemList.keySet()) {
 
-            if (itemStackIteration.getType().equals(itemStack.getType()) &&
-                    itemStackIteration.getItemMeta().equals(itemStack.getItemMeta())) {
+            if (itemStackIteration.equals(itemStack)) {
 
                 ItemStack defaultStack = itemStackIteration;
                 effectApplier(defaultStack, player);

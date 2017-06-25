@@ -31,6 +31,8 @@ public class EconomySettingsConfig {
         this.getEconomySettingsConfig().addDefault("Tier price progression", 20);
         this.getEconomySettingsConfig().addDefault("Procedurally Generated Loot.Lowest simulated elite mob level loot", 1);
         this.getEconomySettingsConfig().addDefault("Procedurally Generated Loot.Highest simulated elite mob level loot", 100);
+        this.getEconomySettingsConfig().addDefault("Custom Loot.Lowest simulated elite mob level loot", 1);
+        this.getEconomySettingsConfig().addDefault("Custom Loot.Highest simulated elite mob level loot", 100);
         this.getEconomySettingsConfig().addDefault("Currency name", "Elite Coins");
 
         getEconomySettingsConfig().options().copyDefaults(true);

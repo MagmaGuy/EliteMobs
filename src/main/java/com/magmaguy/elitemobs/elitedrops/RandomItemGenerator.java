@@ -150,8 +150,6 @@ public class RandomItemGenerator {
 
                 }
 
-
-
         }
 
         randomItem.setItemMeta(itemMeta);

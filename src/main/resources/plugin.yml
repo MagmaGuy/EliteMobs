@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 3.0.16
+version: 3.0.17
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -58,10 +58,14 @@ permissions:
     description: Gives access to the commands users need to use the economy features (shops, paying other players)
     children:
       elitemobs.shop: true
+      elitemobs.customshop: true
       elitemobs.pay: true
       elitemobs.wallet: true
   elitemobs.shop:
     description: Allows players to run /elitemobs shop
+    default: op
+  elitemobs.customshop:
+    decription: Allows players to run /elitemobs customshop
     default: op
   elitemobs.currency.pay:
     description: Allows players to run /elitemobs paycoins [username] [amount]
