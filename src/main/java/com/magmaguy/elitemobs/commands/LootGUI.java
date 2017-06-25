@@ -254,6 +254,4 @@ public class LootGUI implements Listener{
 
         }
 
-
-
 }

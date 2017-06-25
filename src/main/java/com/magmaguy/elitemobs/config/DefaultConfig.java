@@ -69,6 +69,7 @@ public class DefaultConfig {
         configuration.addDefault("Aggressive EliteMobs flat loot drop rate %", 25);
         configuration.addDefault("Aggressive EliteMobs drop rate % increase per mob level", 1);
         configuration.addDefault("Use MMORPG colors for item ranks", true);
+        configuration.addDefault("Use MMORPG colors for custom items", true);
         configuration.addDefault("Increase MMORPG color rank every X levels X=", 15);
         configuration.addDefault("Prevent creepers from killing passive mobs", true);
         configuration.addDefault("Aggressive EliteMob life multiplier", 1.0);

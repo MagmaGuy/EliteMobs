@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.elitedrops;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
@@ -106,6 +107,133 @@ public class EliteDropsHandler implements Listener {
 
                     String[] parsedString = string.split(",");
 
+                    //this is a really bad way of doing things, two wrongs make a right
+                    if (parsedString.length % 2 != 0) {
+
+                        getLogger().info("Your item " + itemName + " has a problematic potions effect entry.");
+
+                    }
+
+                    int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
+                    enchantmentCount += potionEffectAmplifier * 15;
+
+                }
+
+            }
+
+            int itemRank = ItemRankHandler.guessItemRank(itemStack.getType(), enchantmentCount);
+
+            List itemLore = itemLoreHandler(previousPath, itemRank);
+            itemMeta.setLore(itemLore);
+
+            if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for custom items")) {
+
+                double rankProgression = ConfigValues.defaultConfig.getDouble("Increase MMORPG color rank every X levels X=");
+
+                if (Math.floor(itemRank /rankProgression) >= 5) {
+
+                    itemMeta.setDisplayName(ChatColor.GOLD + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.GOLD + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 4) {
+
+                    itemMeta.setDisplayName(ChatColor.DARK_PURPLE + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 3) {
+
+                    itemMeta.setDisplayName(ChatColor.BLUE + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.BLUE + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 2) {
+
+                    itemMeta.setDisplayName(ChatColor.GREEN + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.GREEN + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 1) {
+
+                    itemMeta.setDisplayName(ChatColor.WHITE + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.WHITE + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                } else if (Math.floor(itemRank / rankProgression) == 0) {
+
+                    itemMeta.setDisplayName(ChatColor.GRAY + itemMeta.getDisplayName());
+
+                    List list = new ArrayList();
+
+                    for (String string : itemMeta.getLore()) {
+
+                        String coloredString = ChatColor.GRAY + "" + ChatColor.ITALIC + string;
+                        list.add(coloredString);
+
+                    }
+
+                    itemMeta.setLore(list);
+
+                }
+
+            }
+
+            itemStack.setItemMeta(itemMeta);
+
+            if (potionEffects != null) {
+
+                for (Object object : potionEffects) {
+
+                    String string = object.toString();
+
+                    String[] parsedString = string.split(",");
+
                     String potionEffectTypeString = parsedString[0];
                     PotionEffectType potionEffectType = PotionEffectType.getByName(potionEffectTypeString);
 
@@ -117,7 +245,6 @@ public class EliteDropsHandler implements Listener {
                     }
 
                     int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
-                    enchantmentCount += potionEffectAmplifier * 5;
 
                     PotionEffect potionEffect = new PotionEffect(potionEffectType, 40, potionEffectAmplifier);
 
@@ -128,13 +255,6 @@ public class EliteDropsHandler implements Listener {
                 potionEffectItemList.put(itemStack, parsedPotionEffect);
 
             }
-
-            int itemRank = ItemRankHandler.guessItemRank(itemStack.getType(), enchantmentCount);
-
-            List itemLore = itemLoreHandler(previousPath, itemRank);
-            itemMeta.setLore(itemLore);
-
-            itemStack.setItemMeta(itemMeta);
 
             lootList.add(itemStack);
 

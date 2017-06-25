@@ -176,6 +176,17 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
+                if ((args[0].equalsIgnoreCase("customShop") || args[0].equalsIgnoreCase("cShop")) &&
+                        commandSender instanceof Player && commandSender.hasPermission("elitemobs.customshop")) {
+
+                    CustomShopHandler customShopHandler = new CustomShopHandler();
+
+                    customShopHandler.initializeShop((Player) commandSender);
+
+                    return true;
+
+                }
+
                 if (args[0].equalsIgnoreCase("wallet") && commandSender instanceof Player &&
                         commandSender.hasPermission("elitemobs.currency.wallet")) {
 

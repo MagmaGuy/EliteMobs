@@ -22,6 +22,7 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
+import com.magmaguy.elitemobs.commands.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.commands.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
@@ -183,8 +184,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Loot
         this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
 
-        //Shop
+        //Shops
         this.getServer().getPluginManager().registerEvents(new ShopHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new CustomShopHandler(), this);
 
         //Minecraft behavior canceller
         if (ConfigValues.defaultConfig.getBoolean("Prevent creepers from killing passive mobs")) {
