@@ -43,7 +43,7 @@ public class EliteDropsHandler implements Listener {
     public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
     public static HashMap<Integer, List<ItemStack>> rankedItemStacks = new HashMap<>();
 
-    LootCustomConfig lootCustomConfig = new LootCustomConfig();
+    private LootCustomConfig lootCustomConfig = new LootCustomConfig();
 
     public void superDropParser() {
 

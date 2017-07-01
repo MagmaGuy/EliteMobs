@@ -19,7 +19,6 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
-import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -107,13 +106,14 @@ public class CustomShopHandler implements Listener {
 
             }
 
+            //TODO: ADJUST TO LEVEL
+
             Object[] itemRankKeys = validItemsList.keySet().toArray();
             Object itemRankIndex = itemRankKeys[random.nextInt(itemRankKeys.length)];
 
             List<ItemStack> itemEntryList = validItemsList.get(itemRankIndex);
             int itemEntryIndex = random.nextInt(itemEntryList.size());
 
-            //TODO: add custom loot here
             shopInventory.setItem(i, validItemsList.get(itemRankIndex).get(itemEntryIndex));
 
         }
@@ -179,7 +179,19 @@ public class CustomShopHandler implements Listener {
 
             }
 
-            int itemRank = ItemRankHandler.guessItemRank(itemStack.getType(), enchantments);
+            int itemRank = 0;
+
+            for (Integer integer : EliteDropsHandler.rankedItemStacks.keySet()) {
+
+                if (EliteDropsHandler.rankedItemStacks.get(integer).contains(itemStack)) {
+
+                    itemRank = integer;
+                    break;
+
+                }
+
+            }
+
             double itemValue = itemRank * ConfigValues.economyConfig.getDouble("Tier price progression");
 
             String currencyName = ConfigValues.economyConfig.getString("Currency name");
