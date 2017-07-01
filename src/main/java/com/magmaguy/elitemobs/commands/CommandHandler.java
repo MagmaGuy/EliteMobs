@@ -34,29 +34,36 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
 import static com.magmaguy.elitemobs.elitedrops.EliteDropsHandler.lootList;
 import static org.bukkit.Bukkit.getLogger;
+import static org.bukkit.Bukkit.getServer;
 
 /**
  * Created by MagmaGuy on 21/01/2017.
  */
 
-//This place has been forsaken by God. Leave it while you can.
-//TODO: commandSender.sendMessage actually works for console and players without filtering. Remake that. Also remake the title messages to unite them in some method.
-
 public class CommandHandler implements CommandExecutor {
 
-    private EliteMobs plugin;
-
-    public CommandHandler(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
+    private final static String STATS = "elitemobs.stats";
+    private final static String GETLOOT = "elitemobs.getloot";
+    private final static String SIMLOOT = "elitemobs.simloot";
+    private final static String RELOAD_CONFIGS = "elitemobs.reload.configs";
+    private final static String RELOAD_LOOT = "elitemobs.reload.loot";
+    private final static String GIVELOOT = "elitemobs.giveloot";
+    private final static String SPAWNMOB = "elitemobs.spawnmob";
+    private final static String KILLALL_AGGRESSIVEELITES = "elitemobs.killall.aggressiveelites";
+    private final static String KILLALL_PASSIVEELITES = "elitemobs.killall.passiveelites";
+    private final static String SHOP = "elitemobs.shop";
+    private final static String CUSTOMSHOP = "elitemobs.customshop";
+    private final static String CURRENCY_PAY = "elitemobs.currency.pay";
+    private final static String CURRENCY_ADD = "elitemobs.currency.add";
+    private final static String CURRENCY_SUBTRACT = "elitemobs.currency.subtract";
+    private final static String CURRENCY_SET = "elitemobs.currency.set";
+    private final static String CURRENCY_CHECK = "elitemobs.currency.check";
+    private final static String CURRENCY_WALLET = "elitemobs.currency.wallet";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -64,30 +71,11 @@ public class CommandHandler implements CommandExecutor {
         // /elitemobs SpawnMob with variable arg length
         if (args.length > 0 && args[0].equalsIgnoreCase("SpawnMob")) {
 
-            if (commandSender instanceof ConsoleCommandSender || commandSender instanceof Player && commandSender.hasPermission("elitemobs.SpawnMob")) {
+            if (permCheck(SPAWNMOB, commandSender)) {
 
                 SpawnMobCommandHandler spawnMob = new SpawnMobCommandHandler();
 
                 spawnMob.spawnMob(commandSender, args);
-
-                return true;
-
-            }
-
-            if (commandSender instanceof Player && !commandSender.hasPermission("elitemobs.SpawnMob")) {
-
-                Player player = (Player) commandSender;
-
-                if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                    player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                            "You need the following permission: " + "elitemobs.SpawnMob");
-
-                } else {
-
-                    player.sendMessage("You do not have the permission " + "elitemobs.SpawnMob");
-
-                }
 
                 return true;
 
@@ -106,9 +94,7 @@ public class CommandHandler implements CommandExecutor {
             // /elitemobs stats | /elitemobs getloot (for GUI menu) | /elitemobs shop
             case 1:
 
-                if (args[0].equalsIgnoreCase("stats") && commandSender instanceof Player &&
-                        commandSender.hasPermission("elitemobs.stats") || args[0].equalsIgnoreCase("stats")
-                        && commandSender instanceof ConsoleCommandSender){
+                if (args[0].equalsIgnoreCase("stats") && permCheck(STATS, commandSender)){
 
                     StatsCommandHandler stats = new StatsCommandHandler();
 
@@ -118,27 +104,8 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-                if (args[0].equalsIgnoreCase("stats") && commandSender instanceof Player
-                        && !commandSender.hasPermission("elitemobs.stats")) {
-
-                    Player player = (Player) commandSender;
-                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                                "You need the following permission: " + "elitemobs.stats");
-
-                    } else {
-
-                        player.sendMessage("You do not have the permission " + "elitemobs.stats");
-
-                    }
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
-                        commandSender.hasPermission("elitemobs.getloot") || args[0].equalsIgnoreCase("gl")
-                        && commandSender instanceof Player && commandSender.hasPermission("elitemobs.getloot")) {
+                if ((args[0].equalsIgnoreCase("getloot") || args[0].equalsIgnoreCase("gl")) &&
+                        userPermCheck(GETLOOT, commandSender)) {
 
                     LootGUI lootGUI = new LootGUI();
                     lootGUI.lootGUI((Player)commandSender);
@@ -146,8 +113,7 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-                if (args[0].equalsIgnoreCase("shop") && commandSender instanceof Player &&
-                        commandSender.hasPermission("elitemobs.shop")) {
+                if (args[0].equalsIgnoreCase("shop") && userPermCheck(SHOP, commandSender)) {
 
                     ShopHandler shopHandler = new ShopHandler();
 
@@ -157,27 +123,8 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-                if (args[0].equalsIgnoreCase("shop") && commandSender instanceof Player &&
-                        !commandSender.hasPermission("elitemobs.shop")) {
-
-                    Player player = (Player) commandSender;
-                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                                "You need the following permission: " + "elitemobs.shop");
-
-                    } else {
-
-                        player.sendMessage("You do not have the permission " + "elitemobs.shop");
-
-                    }
-
-                    return true;
-
-                }
-
                 if ((args[0].equalsIgnoreCase("customShop") || args[0].equalsIgnoreCase("cShop")) &&
-                        commandSender instanceof Player && commandSender.hasPermission("elitemobs.customshop")) {
+                        userPermCheck(CUSTOMSHOP, commandSender)) {
 
                     CustomShopHandler customShopHandler = new CustomShopHandler();
 
@@ -187,8 +134,7 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-                if (args[0].equalsIgnoreCase("wallet") && commandSender instanceof Player &&
-                        commandSender.hasPermission("elitemobs.currency.wallet")) {
+                if (args[0].equalsIgnoreCase("wallet") && userPermCheck(CURRENCY_WALLET, commandSender)) {
 
                         String name = commandSender.getName();
 
@@ -208,10 +154,9 @@ public class CommandHandler implements CommandExecutor {
             // /elitemobs check [playerName]
             case 2:
 
-                //valid /elitemobs reload config
-                if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
-                        args[1].equalsIgnoreCase("configs") &&
-                        commandSender.hasPermission("elitemobs.reload.configs")) {
+                // /elitemobs reload config
+                if (args[0].equalsIgnoreCase("reload") && args[1].equalsIgnoreCase("configs")
+                        && permCheck(RELOAD_CONFIGS, commandSender)) {
 
                     Player player = (Player) commandSender;
 
@@ -223,76 +168,27 @@ public class CommandHandler implements CommandExecutor {
 
                     return true;
 
-                    //invalid /elitemobs reload config
                 }
 
-                if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
-                        args[1].equalsIgnoreCase("config") &&
-                        !commandSender.hasPermission("elitemobs.reload.config")) {
+                // /elitemobs reload loot
+                if (args[0].equalsIgnoreCase("reload") && args[1].equalsIgnoreCase("loot")
+                        && permCheck(RELOAD_LOOT, commandSender)) {
 
-                    Player player = (Player) commandSender;
-
-                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                                "You need the following permission: " + "elitemobs.reload.configs");
-
-                    } else {
-
-                        player.sendMessage("You do not have the permission " + "elitemobs.reload.configs");
-
-                    }
-
-                    return true;
-
-                }
-
-                //valid /elitemobs reload loot
-                if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player
-                        && args[1].equalsIgnoreCase("loot")
-                        && commandSender.hasPermission("elitemobs.reload.loot")) {
-
-                    Player player = (Player) commandSender;
                     LootCustomConfig lootCustomConfig = new LootCustomConfig();
                     lootCustomConfig.reloadLootConfig();
 
                     EliteDropsHandler eliteDropsHandler = new EliteDropsHandler();
                     eliteDropsHandler.superDropParser();
 
-                    getLogger().info("EliteMobs loot reloaded!");
-                    player.sendTitle("EliteMobs loot reloaded!", "Reloaded loot.yml");
+                    commandSender.sendMessage("EliteMobs configs reloaded!");
 
                     return true;
 
-                    //invalid /elitemobs reload loot
                 }
 
-                if (args[0].equalsIgnoreCase("reload") && commandSender instanceof Player &&
-                        args[1].equalsIgnoreCase("loot") &&
-                        !commandSender.hasPermission("elitemobs.reload.loot")) {
-
-                    Player player = (Player) commandSender;
-
-                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                                "You need the following permission: " + "elitemobs.reload.loot");
-
-                    } else {
-
-                        player.sendMessage("You do not have the permission " + "elitemobs.reload.loot");
-
-                    }
-
-                    return true;
-
-
-                }
-
-                //valid /elitemobs getloot | /elitemobs gl
-                if (args[0].equalsIgnoreCase("getloot") && commandSender instanceof Player &&
-                        commandSender.hasPermission("elitemobs.getloot") || args[0].equalsIgnoreCase("gl")
-                        && commandSender instanceof Player && commandSender.hasPermission("elitemobs.getloot")) {
+                // /elitemobs getloot | /elitemobs gl
+                if ((args[0].equalsIgnoreCase("getloot") || args[0].equalsIgnoreCase("gl"))
+                        && userPermCheck(GETLOOT, commandSender)) {
 
                     Player player = (Player) commandSender;
 
@@ -310,33 +206,11 @@ public class CommandHandler implements CommandExecutor {
 
                     }
 
-
                 }
 
-                //invalid /elitemobs getloot | /elitemobs gl
-                if (args[0].equalsIgnoreCase("getloot") && !commandSender.hasPermission("elitemobs.getloot")
-                        || args[0].equalsIgnoreCase("gl") && !commandSender.hasPermission("elitemobs.getloot")) {
+                if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("aggressiveelites") &&
+                        permCheck(KILLALL_AGGRESSIVEELITES, commandSender)) {
 
-                    Player player = (Player) commandSender;
-
-                    if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                        player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                                "You need the following permission: " + "elitemobs.getloot");
-
-                    } else {
-
-                        player.sendMessage("You do not have the permission " + "elitemobs.getloot");
-
-                    }
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("aggressiveelites")) {
-
-                    if (commandSender.hasPermission("elitemobs.killall.aggressiveelites")){
 
                         int counter = 0;
 
@@ -359,28 +233,10 @@ public class CommandHandler implements CommandExecutor {
 
                         return true;
 
-                    } else if (commandSender instanceof Player) {
-
-                        Player player = ((Player) commandSender);
-
-                        if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                            player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                                    "You need the following permission: " + "elitemobs.killall.aggressiveelites");
-
-                        } else {
-
-                            player.sendMessage("You do not have the permission " + "elitemobs.killall.aggressiveelites");
-
-                        }
-
-                    }
-
                 }
 
-                if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("passiveelites")) {
-
-                    if (commandSender.hasPermission("elitemobs.killall.passiveelites")) {
+                if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("passiveelites") &&
+                        permCheck(KILLALL_PASSIVEELITES, commandSender)) {
 
                         for (World world : EliteMobs.worldList) {
 
@@ -398,55 +254,21 @@ public class CommandHandler implements CommandExecutor {
 
                         return true;
 
-                    } else if (commandSender instanceof Player) {
-
-                        Player player = ((Player) commandSender);
-
-                        if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                            player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                                    "You need the following permission: " + "elitemobs.killall.passiveelites");
-
-                        } else {
-
-                            player.sendMessage("You do not have the permission " + "elitemobs.killall.passiveelites");
-
-                        }
-
-                    }
-
                 }
 
-                if (args[0].equalsIgnoreCase("simloot") && commandSender instanceof Player) {
+                if (args[0].equalsIgnoreCase("simloot") && commandSender instanceof Player &&
+                        userPermCheck(SIMLOOT, commandSender)) {
 
-                    Player player = ((Player) commandSender);
-
-                    if (commandSender.hasPermission("elitemobs.simloot")) {
 
                         SimLootHandler simLootHandler = new SimLootHandler();
 
-                        simLootHandler.simLoot(player, Integer.parseInt(args[1]));
-
-                    }  else if (commandSender instanceof Player) {
-
-                        if (Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
-
-                            player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                                    "You need the following permission: " + "elitemobs.simloot");
-
-                        } else {
-
-                            player.sendMessage("You do not have the permission " + "elitemobs.simloot");
-
-                        }
-
-                    }
+                        simLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]));
 
                     return true;
 
                 }
 
-                if (args[0].equals("check") && commandSender instanceof Player && commandSender.hasPermission("elitemobs.currency.check")) {
+                if (args[0].equals("check") && permCheck(CURRENCY_CHECK, commandSender)) {
 
                     try {
 
@@ -471,10 +293,7 @@ public class CommandHandler implements CommandExecutor {
             // || /elitemobs setcoins [player] [amount]
             case 3:
 
-                if (commandSender instanceof ConsoleCommandSender || commandSender instanceof Player
-                        && commandSender.hasPermission("elitemobs.giveloot")) {
-
-                    if (args[0].equalsIgnoreCase("giveloot")) {
+                if (args[0].equalsIgnoreCase("giveloot") && permCheck(GIVELOOT, commandSender)) {
 
                         if (validPlayer(args[1])) {
 
@@ -538,21 +357,30 @@ public class CommandHandler implements CommandExecutor {
 
                         }
 
-                    }
-
                 }
 
-                if (args[0].equals("pay") && commandSender instanceof Player && commandSender.hasPermission("elitemobs.currency.pay")) {
+                if (args[0].equals("pay") && userPermCheck(CURRENCY_PAY, commandSender)) {
 
                     try {
 
-                        if (Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))) {
+                        if (Double.parseDouble(args[2]) > 0 && Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))) {
 
                             CurrencyCommandsHandler.payCommand(args[1], Integer.parseInt(args[2]));
                             CurrencyCommandsHandler.subtractCommand(commandSender.getName(), Integer.parseInt(args[2]));
 
-                            commandSender.sendMessage("You have paid " + args[2] + " to " + args[1]);
-                            commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
+                            commandSender.sendMessage("You have paid " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " to " + args[1]);
+                            commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())) + " " + ConfigValues.economyConfig.get("Currency name"));
+
+                            Player recipient = getServer().getPlayer(args[1]);
+                            recipient.sendMessage("You have received " + args[2] + " " +  ConfigValues.economyConfig.get("Currency name") +" from " + ((Player) commandSender).getDisplayName());
+
+                        } else if (Double.parseDouble(args[2]) < 0) {
+
+                            commandSender.sendMessage("Nice try. This plugin doesn't make the same mistake as banks have in the past.");
+
+                        } else {
+
+                            commandSender.sendMessage("You don't have enough " + ConfigValues.economyConfig.get("Currency name") + " to do that!");
 
                         }
 
@@ -567,7 +395,26 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-                if (args[0].equals("subtract") && commandSender instanceof Player && commandSender.hasPermission("elitemobs.currency.subtract")) {
+                if (args[0].equals("add") && userPermCheck(CURRENCY_ADD, commandSender)) {
+
+                    try {
+
+                        CurrencyCommandsHandler.addCommand(args[1], Integer.parseInt(args[2]));
+
+                        commandSender.sendMessage("You have added " + args[2] + " to " + args[1]);
+                        commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
+
+                    } catch (Exception e) {
+
+                        commandSender.sendMessage("Input not valid. Command format: /em subtract [playerName] [amount]");
+
+                    }
+
+                    return true;
+
+                }
+
+                if (args[0].equals("subtract") && userPermCheck(CURRENCY_SUBTRACT, commandSender)) {
 
                     try {
 
@@ -586,7 +433,7 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-                if (args[0].equals("set") && commandSender instanceof Player && commandSender.hasPermission("elitemobs.currency.set")) {
+                if (args[0].equals("set") && permCheck(CURRENCY_SET, commandSender)) {
 
                     try {
 
@@ -617,6 +464,46 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
+    private boolean permCheck (String permission, CommandSender commandSender) {
+
+        if (commandSender.hasPermission(permission)) {
+
+            return true;
+
+        }
+
+        if (commandSender instanceof Player &&
+                Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+
+            Player player = (Player) commandSender;
+
+            player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
+                    "You need the following permission: " + permission);
+
+        } else {
+
+            commandSender.sendMessage("[EliteMobs] You may not run this command.");
+            commandSender.sendMessage("[EliteMobs] You don't have the permission " + permission);
+
+        }
+
+        return false;
+
+    }
+
+    private boolean userPermCheck (String permission, CommandSender commandSender) {
+
+        if (commandSender instanceof Player) {
+
+            return permCheck(permission, commandSender);
+
+        }
+
+        commandSender.sendMessage("[EliteMobs] You may not run this command.");
+        commandSender.sendMessage("[EliteMobs] This is a user command.");
+        return false;
+
+    }
 
     private void validCommands(CommandSender commandSender){
 
@@ -624,31 +511,82 @@ public class CommandHandler implements CommandExecutor {
 
             Player player = (Player) commandSender;
 
-            player.sendMessage("Valid commands:");
-            player.sendMessage("/elitemobs stats");
-            player.sendMessage("/elitemobs shop");
-            player.sendMessage("/elitemobs reload configs");
-            player.sendMessage("/elitemobs reload loot");
-            player.sendMessage("/elitemobs killall aggressiveelites");
-            player.sendMessage("/elitemobs killall passiveelites");
-            player.sendMessage("/elitemobs getloot (alone to get GUI)");
-            player.sendMessage("/elitemobs getloot [loot name]");
-            player.sendMessage("/elitemobs simloot [mob level]");
-            player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
-            player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
+            player.sendMessage("[EliteMobs] Valid commands:");
+            if (silentPermCheck(STATS, commandSender)) {
+                player.sendMessage("/elitemobs stats");
+            }
+            if (silentPermCheck(SHOP, commandSender)) {
+                player.sendMessage("/elitemobs shop");
+            }
+            if (silentPermCheck(CUSTOMSHOP, commandSender)) {
+                player.sendMessage("/elitemobs customshop");
+            }
+            if (silentPermCheck(CURRENCY_WALLET, commandSender)) {
+                player.sendMessage("/elitemobs wallet");
+            }
+            if (silentPermCheck(CURRENCY_PAY, commandSender)) {
+                player.sendMessage("/elitemobs pay [username]");
+            }
+            if (silentPermCheck(CURRENCY_ADD, commandSender)) {
+                player.sendMessage("/elitemobs add [username]");
+            }
+            if (silentPermCheck(CURRENCY_SUBTRACT, commandSender)) {
+                player.sendMessage("/elitemobs subtract [username]");
+            }
+            if (silentPermCheck(CURRENCY_SET, commandSender)) {
+                player.sendMessage("/elitemobs set [username]");
+            }
+            if (silentPermCheck(CURRENCY_CHECK, commandSender)) {
+                player.sendMessage("/elitemobs check [username]");
+            }
+            if (silentPermCheck(RELOAD_CONFIGS, commandSender)) {
+                player.sendMessage("/elitemobs reload configs");
+            }
+            if (silentPermCheck(RELOAD_LOOT, commandSender)) {
+                player.sendMessage("/elitemobs reload loot");
+            }
+            if (silentPermCheck(KILLALL_AGGRESSIVEELITES, commandSender)) {
+                player.sendMessage("/elitemobs killall aggressiveelites");
+            }
+            if (silentPermCheck(KILLALL_PASSIVEELITES, commandSender)) {
+                player.sendMessage("/elitemobs killall passiveelites");
+            }
+            if (silentPermCheck(SIMLOOT, commandSender)) {
+                player.sendMessage("/elitemobs simloot [mob level]");
+            }
+            if (silentPermCheck(GETLOOT, commandSender)) {
+                player.sendMessage("/elitemobs getloot [loot name (no loot name = GUI)]");
+            }
+            if (silentPermCheck(GIVELOOT, commandSender)) {
+                player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
+            }
+            if (silentPermCheck(SPAWNMOB, commandSender)) {
+                player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
+            }
+
 
         } else if (commandSender instanceof ConsoleCommandSender) {
 
-            getLogger().info("Command not recognized. Valid commands:");
-            getLogger().info("elitemobs stats");
-            getLogger().info("elitemobs reload configs");
-            getLogger().info("elitemobs reload loot");
-            commandSender.sendMessage("/elitemobs killall aggressiveelites");
-            commandSender.sendMessage("/elitemobs killall passiveelites");
-            getLogger().info("elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
-            getLogger().info("elitemobs SpawnMob [worldName] [x] [y] [z] [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
+            commandSender.sendMessage("[EliteMobs] Command not recognized. Valid commands:");
+            commandSender.sendMessage("elitemobs stats");
+            commandSender.sendMessage("elitemobs reload loot");
+            commandSender.sendMessage("elitemobs reload configs");
+            commandSender.sendMessage("elitemobs check [username]");
+            commandSender.sendMessage("elitemobs set [username]");
+            commandSender.sendMessage("elitemobs add [username]");
+            commandSender.sendMessage("elitemobs subtract [username]");
+            commandSender.sendMessage("elitemobs killall passiveelites");
+            commandSender.sendMessage("elitemobs killall aggressiveelites");
+            commandSender.sendMessage("elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
+            commandSender.sendMessage("elitemobs SpawnMob [worldName] [x] [y] [z] [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
 
         }
+
+    }
+
+    private boolean silentPermCheck (String permission, CommandSender commandSender) {
+
+        return commandSender.hasPermission(permission);
 
     }
 

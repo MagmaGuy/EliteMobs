@@ -23,19 +23,29 @@ import com.magmaguy.elitemobs.economy.UUIDFilter;
  */
 public class CurrencyCommandsHandler {
 
-    public static void payCommand(String playerName, int amount) {
+    public static void payCommand(String playerName, double amount) {
+
+        if (amount > 0) {
+
+            EconomyHandler.addCurrency(UUIDFilter.guessUUI(playerName), amount);
+
+        }
+
+    }
+
+    public static void addCommand(String playerName, double amount) {
 
         EconomyHandler.addCurrency(UUIDFilter.guessUUI(playerName), amount);
 
     }
 
-    public static void subtractCommand(String playerName, int amount) {
+    public static void subtractCommand(String playerName, double amount) {
 
         EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(playerName), amount);
 
     }
 
-    public static void setCommand(String playerName, int amount) {
+    public static void setCommand(String playerName, double amount) {
 
         EconomyHandler.setCurrency(UUIDFilter.guessUUI(playerName), amount);
 

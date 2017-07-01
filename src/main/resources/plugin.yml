@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 3.0.17
+version: 3.0.18
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -22,6 +22,23 @@ permissions:
       elitemobs.spawnmob: true
       elitemobs.killall.aggressiveelites: true
       elitemobs.killall.passiveelites: true
+      elitemobs.currency.user: true
+      elitemobs.currency.subtract: true
+      elitemobs.currency.set: true
+      elitemobs.currency.check: true
+      elitemobs.currency.add: true
+  elitemobs.currency.user:
+    description: Gives access to the commands users need to use the economy features (shops, paying other players)
+    children:
+      elitemobs.shop: true
+      elitemobs.customshop: true
+      elitemobs.pay: true
+      elitemobs.wallet: true
+  elitemobs.killall.*:
+      description: Allows players to run /elitemobs killall passiveelites and /elitemobs killall aggressiveelites
+      children:
+        elitemobs.killall.aggressiveelites: true
+        elitemobs.killall.passiveelites: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -45,22 +62,13 @@ permissions:
     default: op
   elitemobs.scoreboard:
     description: Shows a scoreboard with info about the elite mob a player might be standing next to
-  elitemobs.killall.*:
-    description: Allows players to run /elitemobs killall passiveelites and /elitemobs killall aggressiveelites
-    children:
-      elitemobs.killall.aggressiveelites: true
-      elitemobs.killall.passiveelites: true
+    default: false
   elitemobs.killall.aggressiveelites:
     description: Allows players to run /elitemobs killall aggressiveelites
+    default: op
   elitemobs.killall.passiveelites:
     description: Allows players to run /elitemobs killall passiveelites
-  elitemobs.currency.user:
-    description: Gives access to the commands users need to use the economy features (shops, paying other players)
-    children:
-      elitemobs.shop: true
-      elitemobs.customshop: true
-      elitemobs.pay: true
-      elitemobs.wallet: true
+    default: op
   elitemobs.shop:
     description: Allows players to run /elitemobs shop
     default: op
@@ -68,13 +76,16 @@ permissions:
     decription: Allows players to run /elitemobs customshop
     default: op
   elitemobs.currency.pay:
-    description: Allows players to run /elitemobs paycoins [username] [amount]
+    description: Allows players to run /elitemobs pay [username] [amount]
+    default: op
+  elitemobs.currency.add:
+    description: Allows players to run /elitemobs add [username] [amount]
     default: op
   elitemobs.currency.subtract:
-    description: Allows players to run /elitemobs subtractcoins [username] [amount]
+    description: Allows players to run /elitemobs subtract [username] [amount]
     default: op
   elitemobs.currency.set:
-    description: Allows players to run /elitemobs setcoins [username] [amount]
+    description: Allows players to run /elitemobs set [username] [amount]
     default: op
   elitemobs.currency.check:
     decription: Allows players to run /elitemobs check [username]

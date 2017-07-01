@@ -200,7 +200,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(this), this);
 
         //Commands
-        this.getCommand("elitemobs").setExecutor(new CommandHandler(this));
+        this.getCommand("elitemobs").setExecutor(new CommandHandler());
 
     }
 
