@@ -59,6 +59,18 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         getLogger().info("EliteMobs - Enabled!");
 
+        //Enable stats
+//        Metrics metrics = new Metrics(this);
+
+        // Optional: Add custom charts
+//        metrics.addCustomChart(new Metrics.SimplePie("elitemobs_version") {
+//            @Override
+//            public String getValue() {
+//                // (This is useless as there is already a player chart by default.)
+//                return Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion();
+//            }
+//        });
+
         //Load loot from config
         DefaultConfig defaultConfig = new DefaultConfig();
         defaultConfig.loadConfiguration();
