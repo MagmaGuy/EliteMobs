@@ -24,7 +24,8 @@ import org.bukkit.configuration.Configuration;
  */
 public class ConfigValues {
 
-   public static Configuration defaultConfig, lootConfig, mobPowerConfig, translationConfig, randomItemsConfig, economyConfig;
+   public static Configuration defaultConfig, lootConfig, mobPowerConfig, translationConfig, randomItemsConfig,
+           economyConfig, playerCacheConfig;
 
     public void initializeConfigValues () {
 
@@ -39,6 +40,8 @@ public class ConfigValues {
         randomItemsConfig = randomItemsSettingsConfig.getRandomItemsSettingsConfig();
         EconomySettingsConfig economySettingsConfig = new EconomySettingsConfig();
         economyConfig = economySettingsConfig.getEconomySettingsConfig();
+        PlayerCacheConfig playerCacheConfig1 = new PlayerCacheConfig();
+        playerCacheConfig = playerCacheConfig1.getPlayerCacheConfig();
 
     }
 

@@ -64,6 +64,7 @@ public class CommandHandler implements CommandExecutor {
     private final static String CURRENCY_SET = "elitemobs.currency.set";
     private final static String CURRENCY_CHECK = "elitemobs.currency.check";
     private final static String CURRENCY_WALLET = "elitemobs.currency.wallet";
+    private final static String CURRENCY_COINTOP = "elitemobs.currency.cointop";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -143,6 +144,14 @@ public class CommandHandler implements CommandExecutor {
                         commandSender.sendMessage(ChatColor.GREEN + "You have " + money + " " + ConfigValues.economyConfig.getString("Currency name"));
 
                         return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("coinTop") && userPermCheck(CURRENCY_COINTOP, commandSender)) {
+
+                    CurrencyCommandsHandler.coinTop(commandSender);
+
+                    return true;
 
                 }
 
@@ -523,6 +532,9 @@ public class CommandHandler implements CommandExecutor {
             }
             if (silentPermCheck(CURRENCY_WALLET, commandSender)) {
                 player.sendMessage("/elitemobs wallet");
+            }
+            if (silentPermCheck(CURRENCY_COINTOP, commandSender)) {
+                player.sendMessage("/elitemobs cointop");
             }
             if (silentPermCheck(CURRENCY_PAY, commandSender)) {
                 player.sendMessage("/elitemobs pay [username]");

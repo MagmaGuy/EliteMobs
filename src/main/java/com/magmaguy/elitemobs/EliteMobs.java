@@ -20,6 +20,7 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
+import com.magmaguy.elitemobs.collateralminecraftchanges.OfflinePlayerCacher;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.CustomShopHandler;
@@ -161,6 +162,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
                 }
 
         }
+
+        //Player cacher
+        this.getServer().getPluginManager().registerEvents(new OfflinePlayerCacher(), this);
 
         //Mob scanner
         this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);

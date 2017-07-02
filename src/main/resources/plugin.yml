@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 3.0.18
+version: 3.0.19
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -32,8 +32,9 @@ permissions:
     children:
       elitemobs.shop: true
       elitemobs.customshop: true
-      elitemobs.pay: true
-      elitemobs.wallet: true
+      elitemobs.currency.pay: true
+      elitemobs.currency.wallet: true
+      elitemobs.currency.cointop: true
   elitemobs.killall.*:
       description: Allows players to run /elitemobs killall passiveelites and /elitemobs killall aggressiveelites
       children:
@@ -92,4 +93,7 @@ permissions:
     default: op
   elitemobs.currency.wallet:
     decription: Allows players to run /elitemobs wallet
+    default: op
+  elitemobs.currency.cointop:
+    decription: Allows players to run /elitemobs highscore
     default: op
