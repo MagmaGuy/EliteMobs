@@ -15,8 +15,19 @@
 
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.PlayerCacheConfig;
+import com.magmaguy.elitemobs.config.PlayerMoneyDataConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.util.ArrayList;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
@@ -60,6 +71,82 @@ public class CurrencyCommandsHandler {
     public static Double walletCommand(String playerName) {
 
         return EconomyHandler.checkCurrency(UUIDFilter.guessUUI(playerName));
+
+    }
+
+    public static void coinTop(CommandSender commandSender) {
+
+        ArrayList<String> arrayList = new ArrayList();
+
+        PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
+        Configuration configuration = playerMoneyDataConfig.getEconomySettingsConfig();
+
+
+        for (String string : configuration.getKeys(false)) {
+
+            if (arrayList.size() == 0) {
+
+                arrayList.add(string);
+
+            } else {
+
+                int index = arrayList.size();
+
+                for (String inArrayString : arrayList) {
+
+                    double arrayEntryValue = configuration.getDouble(inArrayString);
+                    double newValue = configuration.getDouble(string);
+
+                    if (newValue > arrayEntryValue) {
+
+                        index = arrayList.indexOf(inArrayString);
+                        break;
+
+                    }
+
+                }
+
+                arrayList.add(index, string);
+
+            }
+
+        }
+
+        commandSender.sendMessage(ChatColor.RED + "[EliteMobs] " + ChatColor.DARK_GREEN + ConfigValues.economyConfig.get("Currency name") + " High Score:");
+
+        int iterationAmount = 10;
+
+        if (arrayList.size() < 10) {
+
+            iterationAmount = arrayList.size();
+
+        }
+
+        PlayerCacheConfig playerCacheConfig = new PlayerCacheConfig();
+        FileConfiguration playerCacheConfiguration = playerCacheConfig.getPlayerCacheConfig();
+
+        for (int i = 0; i < iterationAmount; i++){
+
+            String name = "";
+
+            if (playerCacheConfiguration.contains(arrayList.get(i))) {
+
+                name = playerCacheConfiguration.getString(arrayList.get(i));
+
+            } else {
+
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(arrayList.get(i));
+                name = offlinePlayer.getName();
+
+            }
+
+            int place = i + 1;
+
+            commandSender.sendMessage(ChatColor.GREEN + "#" + place + " " + ChatColor.WHITE + name + " with " +
+                    ChatColor.DARK_GREEN + configuration.getDouble(arrayList.get(i)) + " " + ChatColor.GREEN +
+                    ConfigValues.economyConfig.get("Currency name"));
+
+        }
 
     }
 
