@@ -188,7 +188,7 @@ public class StatsCommandHandler {
             Player player = (Player) commandSender;
 
             player.sendMessage("§5§m-----------------------------------------------------");
-            player.sendMessage("§a§lEliteMobs stats:");
+            player.sendMessage("§a§lEliteMobs v. " + Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion() + " stats:");
             player.sendMessage("There are currently §l§6" + totalMobCount + " §f§rEliteMobs replacing §l§e" +
                     mobLevelSavingsCount + " §f§rregular mobs.");
 
