@@ -39,6 +39,7 @@ import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobSpawner;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.scoreboard.ScoreboardHandler;
+import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -60,7 +61,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         getLogger().info("EliteMobs - Enabled!");
 
         //Enable stats
-//        Metrics metrics = new Metrics(this);
+        Metrics metrics = new Metrics(this);
 
         // Optional: Add custom charts
 //        metrics.addCustomChart(new Metrics.SimplePie("elitemobs_version") {

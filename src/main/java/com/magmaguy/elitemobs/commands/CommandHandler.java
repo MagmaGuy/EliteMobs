@@ -65,6 +65,7 @@ public class CommandHandler implements CommandExecutor {
     private final static String CURRENCY_CHECK = "elitemobs.currency.check";
     private final static String CURRENCY_WALLET = "elitemobs.currency.wallet";
     private final static String CURRENCY_COINTOP = "elitemobs.currency.cointop";
+    private final static String VERSION = "elitemobs.version";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -150,6 +151,15 @@ public class CommandHandler implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("coinTop") && userPermCheck(CURRENCY_COINTOP, commandSender)) {
 
                     CurrencyCommandsHandler.coinTop(commandSender);
+
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("version") && permCheck(VERSION, commandSender)) {
+
+                    commandSender.sendMessage(ChatColor.DARK_GREEN + "[EliteMobs]" + ChatColor.WHITE + " version " + ChatColor.GREEN +
+                            Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion());
 
                     return true;
 
