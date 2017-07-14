@@ -38,6 +38,12 @@ public class MushroomCowHandler implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
+        if (event.getFinalDamage() < 1) {
+
+            return;
+
+        }
+
         if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
             Random random = new Random();
