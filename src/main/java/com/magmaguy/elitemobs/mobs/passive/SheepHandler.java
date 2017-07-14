@@ -39,6 +39,12 @@ public class SheepHandler implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
+        if (event.getFinalDamage() < 1) {
+
+            return;
+
+        }
+
         if (event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && event.getEntity() instanceof Sheep) {
 
             Random random = new Random();
