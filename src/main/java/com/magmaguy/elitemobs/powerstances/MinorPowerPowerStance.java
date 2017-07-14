@@ -23,12 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -128,58 +123,40 @@ public class MinorPowerPowerStance implements Listener {
 
             new BukkitRunnable(){
 
-
-                int attackArrowCounter = 0;
-                int attackBlindingCounter = 0;
-                int attackFireCounter = 0;
-                int attackFireballCounter = 0;
-                int attackFreezeCounter = 0;
-                int attackGravityCounter = 0;
-                int attackPoisonCounter = 0;
-                int attackPushCounter = 0;
-                int attackWeaknessCounter = 0;
-                int attackWebCounter = 0;
-                int attackWitherCounter = 0;
-                int bonusLootCounter = 0;
-                int doubleDamageCounter = 0;
-                int doubleHealthCounter = 0;
-                int invisibilityCounter = 0;
-                int invulnerabilityArrowCounter = 0;
-                int invulnerabilityFallDamageCounter = 0;
-                int invulnerabilityKnockbackCounter = 0;
-                int movementSpeedCounter = 0;
-                int tauntCounter = 0;
+                int globalPositionCounter = 0;
 
                 public void run() {
 
-//                    int effectQuantity = 0;
-                    int effectIteration = 0;
+                    int effectQuantity = 0;
+                    int itemStackHashMapPosition = 0;
+                    int individualPositionCounter = 0;
 
                     //count amount of active effects
-//                    for (String string : MetadataHandler.minorPowerList()) {
-//
-//                        if (entity.hasMetadata(string)) {
-//
-//                            effectQuantity++;
-//
-//                        }
-//
-//                    }
+                    for (String string : MetadataHandler.minorPowerList()) {
+
+                        if (entity.hasMetadata(string)) {
+
+                            effectQuantity++;
+
+                        }
+
+                    }
+
+                    if (globalPositionCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
+
+                        globalPositionCounter = 1;
+
+                    }
 
                     //apply new positioning
                     if (entity.hasMetadata(MetadataHandler.ATTACK_ARROW_MD)) {
 
                         ItemStack itemStack = new ItemStack(Material.ARROW, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackArrowCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackArrowCounter++;
-                        if (attackArrowCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackArrowCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -187,15 +164,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.EYE_OF_ENDER, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackBlindingCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackBlindingCounter++;
-                        if (attackBlindingCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackBlindingCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -203,15 +175,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.LAVA_BUCKET, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackFireCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackFireCounter++;
-                        if (attackFireCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackFireCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -219,15 +186,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.FIREBALL, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackFireballCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackFireballCounter++;
-                        if (attackFireballCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackFireballCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -235,15 +197,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.PACKED_ICE, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackFreezeCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackFreezeCounter++;
-                        if (attackFreezeCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackFreezeCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -251,15 +208,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.ELYTRA, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackGravityCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackGravityCounter++;
-                        if (attackGravityCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackGravityCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -267,15 +219,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.EMERALD, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackPoisonCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackPoisonCounter++;
-                        if (attackPoisonCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackPoisonCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -283,15 +230,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.PISTON_BASE, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackPushCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackPushCounter++;
-                        if (attackPushCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackPushCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -299,15 +241,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.TOTEM, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackWeaknessCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackWeaknessCounter++;
-                        if (attackWeaknessCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackWeaknessCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -315,15 +252,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.WEB, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackWebCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackWebCounter++;
-                        if (attackWebCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackWebCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -331,15 +263,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, attackWitherCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        attackWitherCounter++;
-                        if (attackWitherCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            attackWitherCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -347,15 +274,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.CHEST, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, bonusLootCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        bonusLootCounter++;
-                        if (bonusLootCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            bonusLootCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -363,15 +285,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.GOLD_SWORD, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, doubleDamageCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        doubleDamageCounter++;
-                        if (doubleDamageCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            doubleDamageCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -379,15 +296,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.SHIELD, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, doubleHealthCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        doubleHealthCounter++;
-                        if (doubleHealthCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            doubleHealthCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -395,15 +307,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.THIN_GLASS, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, invisibilityCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        invisibilityCounter++;
-                        if (invisibilityCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            invisibilityCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -411,16 +318,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.SPECTRAL_ARROW, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, invulnerabilityArrowCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        invulnerabilityArrowCounter++;
-                        if (invulnerabilityArrowCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            invulnerabilityArrowCounter = 0;
-
-                        }
-
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -428,16 +329,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.FEATHER, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, invulnerabilityFallDamageCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        invulnerabilityFallDamageCounter++;
-                        if (invulnerabilityFallDamageCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            invulnerabilityFallDamageCounter = 0;
-
-                        }
-
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -445,15 +340,10 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.ANVIL, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, invulnerabilityKnockbackCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        invulnerabilityKnockbackCounter++;
-                        if (invulnerabilityKnockbackCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            invulnerabilityKnockbackCounter = 0;
-
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
 
@@ -461,34 +351,24 @@ public class MinorPowerPowerStance implements Listener {
 
                         ItemStack itemStack = new ItemStack(Material.GOLD_BOOTS, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, movementSpeedCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        movementSpeedCounter++;
-                        if (movementSpeedCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            movementSpeedCounter = 0;
-
-                        }
-
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
                     }
 
                     if (entity.hasMetadata(MetadataHandler.TAUNT_MD)) {
 
                         ItemStack itemStack = new ItemStack(Material.JUKEBOX, 1);
 
-                        itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, tauntCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        effectIteration++;
-                        tauntCounter++;
-                        if (tauntCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
-
-                            tauntCounter = 0;
-
-                        }
-
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
                     }
+
+                    globalPositionCounter++;
 
                     if (!entity.isValid() || entity.isDead()) {
 
@@ -512,6 +392,7 @@ public class MinorPowerPowerStance implements Listener {
 
                         cancel();
                         return;
+
                     }
 
                 }
@@ -523,6 +404,14 @@ public class MinorPowerPowerStance implements Listener {
         }
 
     }
+
+
+    private int adjustTrackPosition(int effectQuantity, int globalPositionCounter, int individualPositionCounter) {
+
+        return (int) ((MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION / itemsPerTrack) / effectQuantity * individualPositionCounter + globalPositionCounter);
+
+    }
+
 
     public void itemProcessor(HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker, ItemStack itemStack, int effectIteration, Entity entity, int counter) {
 
@@ -579,7 +468,7 @@ public class MinorPowerPowerStance implements Listener {
                             trackHashMap.get(i).get(j).getY(), trackHashMap.get(i).get(j).getZ()).add(centerLocation);
                     Location currentLocation = item.getLocation();
 
-                    if (counter % (29) == 0 || item.getWorld() != entity.getWorld()){
+                    if (item.getWorld() != entity.getWorld()) {
 
                         item.teleport(item.getLocation());
 
@@ -598,6 +487,7 @@ public class MinorPowerPowerStance implements Listener {
 
     }
 
+
     private Item itemInitializer (ItemStack itemStack, Location location) {
 
         Item item = location.getWorld().dropItem(location, itemStack);
@@ -607,59 +497,6 @@ public class MinorPowerPowerStance implements Listener {
         item.setGravity(false);
 
         return item;
-
-    }
-
-    //Events
-    @EventHandler
-    public void lastAntiPickupSafeguard(PlayerPickupItemEvent event) {
-
-        if (event.getItem().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)) {
-
-            event.setCancelled(true);
-
-        }
-
-    }
-
-
-    @EventHandler
-    public void antiHopperPickupSafeguard(InventoryPickupItemEvent event) {
-
-        if (event.getItem().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)) {
-
-            event.setCancelled(true);
-
-        }
-
-    }
-
-
-    @EventHandler
-    public void metadataKiller(EntityDeathEvent event) {
-
-        Entity entity = event.getEntity();
-
-        for (String string : MetadataHandler.minorPowerList()) {
-
-            if (entity.hasMetadata(string)) {
-
-                entity.removeMetadata(string, plugin);
-
-            }
-
-        }
-
-    }
-
-    @EventHandler
-    public void antiItemDespawn (ItemDespawnEvent event) {
-
-        if (event.getEntity().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)) {
-
-            event.setCancelled(true);
-
-        }
 
     }
 

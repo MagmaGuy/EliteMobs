@@ -22,13 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityPortalEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -48,7 +42,7 @@ public class MajorPowerPowerStance implements Listener {
     private static int trackAmount = 4;
     private static int itemsPerTrack = 2;
 
-    public void itemEffect (Entity entity) {
+    public void itemEffect(Entity entity) {
 
         if (ConfigValues.defaultConfig.getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
 
@@ -70,150 +64,116 @@ public class MajorPowerPowerStance implements Listener {
             //First integer counts the visual effects it's in, hashmap is from MajorPowerStance's trackHashMap
             HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker = new HashMap<>();
 
-            new BukkitRunnable(){
+            new BukkitRunnable() {
 
-                    int counter = 0;
-                    int zombieFriendsCounter = 0;
-                    int zombieNecronomiconCounter = 0;
-                    int zombieTeamRocketCounter = 0;
-                    int zombieParentsCounter = 0;
+                int globalPositionCounter = 1;
 
-                    @Override
-                    public void run() {
+                public void run() {
 
-//                    int effectQuantity = 0;
-                        int effectIteration = 0;
+                    int effectQuantity = 0;
+                    int itemStackHashMapPosition = 0;
+                    int individualPositionCounter = 0;
 
-                        if (counter >= 10) {
+                    for (String string : MetadataHandler.majorPowerList()) {
 
-                            counter = 0;
+                        if (entity.hasMetadata(string)) {
+
+                            effectQuantity++;
 
                         }
 
-//                    for (String string : MetadataHandler.majorPowerList()) {
-//
-//                        if (entity.hasMetadata(string)){
-//
-//                            effectQuantity++;
-//
-//                        }
-//
-//                    }
+                    }
 
-                        if (entity.hasMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD)) {
+                    if (globalPositionCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
 
-                            ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 2);
+                        globalPositionCounter = 0;
 
-                            itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, zombieFriendsCounter);
+                    }
 
-                            effectIteration++;
-                            zombieFriendsCounter++;
-                            if (zombieFriendsCounter >= MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
+                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD)) {
 
-                                zombieFriendsCounter = 0;
+                        ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 2);
 
-                            }
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                        if (entity.hasMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD)) {
+                    }
+
+                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD)) {
 
 
-                            ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
+                        ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
 
-                            itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, zombieNecronomiconCounter);
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                            effectIteration++;
-                            zombieNecronomiconCounter++;
-                            if (zombieNecronomiconCounter >= MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                                zombieNecronomiconCounter = 0;
+                    }
 
-                            }
+                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD)) {
 
-                        }
+                        ItemStack itemStack = new ItemStack(Material.FIREWORK, 1);
 
-                        if (entity.hasMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD)) {
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                            ItemStack itemStack = new ItemStack(Material.FIREWORK, 1);
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                            itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, zombieTeamRocketCounter);
+                    }
 
-                            effectIteration++;
-                            zombieTeamRocketCounter++;
-                            if (zombieTeamRocketCounter >= MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
+                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_PARENTS_MD)) {
 
-                                zombieTeamRocketCounter = 0;
+                        ItemStack itemStack = new ItemStack(Material.MONSTER_EGG, 1, (short) 0, (byte) 54);
 
-                            }
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
 
-                        }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                        if (entity.hasMetadata(MetadataHandler.ZOMBIE_PARENTS_MD)) {
+                    }
 
-                            ItemStack itemStack = new ItemStack(Material.MONSTER_EGG, 1, (short) 0 ,(byte) 54);
+                    if (!entity.isValid() || entity.isDead()) {
 
-                            itemProcessor(powerItemLocationTracker, itemStack, effectIteration, entity, zombieParentsCounter);
+                        for (int i = 0; i < powerItemLocationTracker.size(); i++) {
 
-                            effectIteration++;
-                            zombieParentsCounter++;
-                            if (zombieParentsCounter >= MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION) {
+                            for (int j = 0; j < trackAmount; j++) {
 
-                                zombieParentsCounter = 0;
+                                for (int h = 0; h < itemsPerTrack; h++) {
 
-                            }
-
-                        }
-
-                        if (!entity.isValid() || entity.isDead()) {
-
-//                            for (int i = 0; i < powerItemLocationTracker.size(); i++) {
-//
-//                                for (int j = 0; j < trackAmount; j++) {
-//
-//                                    for (int h = 0; h < itemsPerTrack; h++) {
-//
-//                                        powerItemLocationTracker.get(i).get(j).get(h).remove();
-//                                        powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
-//
-//                                    }
-//
-//                                }
-//
-//                            }
-
-                            for (int i = 0; i < powerItemLocationTracker.size(); i++) {
-
-                                for (int j = 0; j < trackAmount; j++) {
-
-                                    for (int h = 0; h < itemsPerTrack; h++) {
-
-                                        powerItemLocationTracker.get(i).get(j).get(h).remove();
-                                        powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
-                                        powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, plugin);
-
-                                    }
+                                    powerItemLocationTracker.get(i).get(j).get(h).remove();
+                                    powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+                                    powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, plugin);
 
                                 }
 
                             }
 
-                            entity.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
-
-                            cancel();
-                            return;
-
                         }
 
-                        counter++;
+                        entity.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+
+                        cancel();
+                        return;
 
                     }
 
+                    globalPositionCounter++;
+
+                }
 
 
             }.runTaskTimer(plugin, 0, 5);
 
         }
+
+    }
+
+    private int adjustTrackPosition(int effectQuantity, int globalPositionCounter, int individualPositionCounter) {
+
+        return (int) ((MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION / itemsPerTrack) / effectQuantity * individualPositionCounter + globalPositionCounter);
 
     }
 
@@ -223,7 +183,7 @@ public class MajorPowerPowerStance implements Listener {
 
         if (!powerItemLocationTracker.isEmpty()) {
 
-            for(int i = 0; i < powerItemLocationTracker.size(); i++) {
+            for (int i = 0; i < powerItemLocationTracker.size(); i++) {
 
                 if (powerItemLocationTracker.get(i).get(0).get(0).getItemStack().getType().equals(itemStack.getType())) {
 
@@ -272,8 +232,7 @@ public class MajorPowerPowerStance implements Listener {
                             trackHashMap.get(i).get(j).getY(), trackHashMap.get(i).get(j).getZ()).add(centerLocation);
                     Location currentLocation = item.getLocation();
 
-                    if (counter % (29) == 0 ||
-                            item.getWorld() != entity.getWorld()){
+                    if (item.getWorld() != entity.getWorld()) {
 
                         item.teleport(item.getLocation());
 
@@ -291,7 +250,7 @@ public class MajorPowerPowerStance implements Listener {
 
     }
 
-    private Item itemInitializer (ItemStack itemStack, Location location) {
+    private Item itemInitializer(ItemStack itemStack, Location location) {
 
         Item item = location.getWorld().dropItem(location, itemStack);
         item.setPickupDelay(Integer.MAX_VALUE);
@@ -300,74 +259,6 @@ public class MajorPowerPowerStance implements Listener {
         item.setGravity(false);
 
         return item;
-
-    }
-
-    //Events
-    @EventHandler
-    public void lastAntiPickupSafeguard(PlayerPickupItemEvent event) {
-
-        if (event.getItem().hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD)) {
-
-            event.setCancelled(true);
-
-        }
-
-    }
-
-
-    @EventHandler
-    public void antiHopperPickupSafeguard(InventoryPickupItemEvent event) {
-
-        if (event.getItem().hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD)) {
-
-            event.setCancelled(true);
-
-        }
-
-    }
-
-
-    @EventHandler
-    public void metadataKiller(EntityDeathEvent event) {
-
-        Entity entity = event.getEntity();
-
-        for (String string : MetadataHandler.majorPowerList()) {
-
-            if (entity.hasMetadata(string)) {
-
-                entity.removeMetadata(string, plugin);
-
-            }
-
-        }
-
-    }
-
-    @EventHandler
-    public void antiItemDespawn (ItemDespawnEvent event) {
-
-        if (event.getEntity().hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD)) {
-
-            event.setCancelled(true);
-
-        }
-
-    }
-
-
-    //TODO: this is a lazy solution
-    @EventHandler
-    public void portalPrevention (EntityPortalEvent event) {
-
-        if (event.getEntity().hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD) ||
-                event.getEntity().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD) ||
-                event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
-
-            event.setCancelled(true);
-
-        }
 
     }
 

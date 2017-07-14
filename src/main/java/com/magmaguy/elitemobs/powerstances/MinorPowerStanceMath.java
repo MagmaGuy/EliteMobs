@@ -31,7 +31,6 @@ public class MinorPowerStanceMath {
     private final static double Y = 0;
     private final static double Z = 0;
     public final static double NUMBER_OF_POINTS_PER_FULL_ROTATION = 10;
-    //    private static HashMap<Integer, List<Vector>> trackHashMap = new HashMap();
     private static HashMap<Integer, HashMap<Integer, List<Vector>>> storedRotatedValues = new HashMap();
 
     public static HashMap<Integer, List<Vector>> majorPowerLocationConstructor (int trackAmount, int itemsPerTrack, int counter) {

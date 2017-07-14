@@ -27,6 +27,9 @@ permissions:
       elitemobs.currency.set: true
       elitemobs.currency.check: true
       elitemobs.currency.add: true
+      elitemobs.currency.cointop: true
+      elitemobs.scoreboard: false
+    default: op
   elitemobs.currency.user:
     description: Gives access to the commands users need to use the economy features (shops, paying other players)
     children:

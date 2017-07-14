@@ -20,6 +20,7 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
+import com.magmaguy.elitemobs.collateralminecraftchanges.EntityDeathMetadataFlusher;
 import com.magmaguy.elitemobs.collateralminecraftchanges.OfflinePlayerCacher;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
@@ -36,6 +37,7 @@ import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobSpawner;
+import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.scoreboard.ScoreboardHandler;
@@ -62,15 +64,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Enable stats
         Metrics metrics = new Metrics(this);
-
-        // Optional: Add custom charts
-//        metrics.addCustomChart(new Metrics.SimplePie("elitemobs_version") {
-//            @Override
-//            public String getValue() {
-//                // (This is useless as there is already a player chart by default.)
-//                return Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion();
-//            }
-//        });
 
         //Load loot from config
         DefaultConfig defaultConfig = new DefaultConfig();
@@ -123,7 +116,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Minor mob powers
         for (String string : MetadataHandler.minorPowerList()){
 
-            //don't load powers that require no even listeners
+            //don't load powers that require no event listeners
             if (!(string.equalsIgnoreCase("MovementSpeed"))
                     && !(string.equalsIgnoreCase("Invisibility"))
                     && !(string.equalsIgnoreCase("DoubleHealth"))
@@ -154,7 +147,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         for (String string : MetadataHandler.majorPowerList()){
 
-            //don't load powers that require no even listeners
+            //don't load powers that require no event listeners
                 try {
 
                     String earlypath = "com.magmaguy.elitemobs.majorpowers.";
@@ -195,6 +188,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(this), this);
 
         //Visual effects
+        this.getServer().getPluginManager().registerEvents(new EffectEventHandlers(), this);
         this.getServer().getPluginManager().registerEvents(new MinorPowerPowerStance(), this);
         this.getServer().getPluginManager().registerEvents(new MajorPowerPowerStance(), this);
 
@@ -215,6 +209,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         }
 
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(this), this);
+        this.getServer().getPluginManager().registerEvents(new EntityDeathMetadataFlusher(), this);
 
         //Commands
         this.getCommand("elitemobs").setExecutor(new CommandHandler());
@@ -275,7 +270,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
                 mobScanner.scanMobs(passiveStackAmount);
                 potionEffectApplier.potionEffectApplier();
-                scoreboardHandler.scanSight();
+                if (ConfigValues.defaultConfig.getBoolean("Use scoreboards (requires permission)")) {
+                    scoreboardHandler.scanSight();
+                }
 
             }
 
