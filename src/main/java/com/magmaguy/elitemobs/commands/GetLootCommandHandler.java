@@ -15,6 +15,8 @@
 
 package com.magmaguy.elitemobs.commands;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -31,20 +33,20 @@ public class GetLootCommandHandler {
 
             String itemRawName = itemStack.getItemMeta().getDisplayName();
 
-            //TODO: shouldn't happen, weird
-            if (itemRawName == null) {
+            if (itemRawName != null) {
 
-                return false;
+                Bukkit.getLogger().info(itemStack.getItemMeta().getDisplayName());
 
-            }
+                String itemProcessedName = itemRawName.replaceAll(" ", "_").toLowerCase();
+                itemProcessedName = ChatColor.stripColor(itemProcessedName);
 
-            String itemProcessedName = itemRawName.replaceAll(" ", "_").toLowerCase();
+                if (itemProcessedName.equalsIgnoreCase(args1) && player.isValid()) {
 
-            if (itemProcessedName.equalsIgnoreCase(args1) && player.isValid()) {
+                    player.getInventory().addItem(itemStack);
 
-                player.getInventory().addItem(itemStack);
+                    return true;
 
-                return true;
+                }
 
             }
 
