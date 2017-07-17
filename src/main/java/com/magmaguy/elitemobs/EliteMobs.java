@@ -33,6 +33,7 @@ import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
 import com.magmaguy.elitemobs.mobcustomizer.DropsHandler;
+import com.magmaguy.elitemobs.mobmerger.MergeHandler;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
@@ -173,7 +174,10 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new OfflinePlayerCacher(), this);
 
         //Mob scanner
-        this.getServer().getPluginManager().registerEvents(new MobScanner(this), this);
+        this.getServer().getPluginManager().registerEvents(new MobScanner(), this);
+
+        //Mob merger TODO: maybe add a config scan here?
+        this.getServer().getPluginManager().registerEvents(new MergeHandler(), this);
 
         //Natural EliteMobs Spawning
         if (ConfigValues.defaultConfig.getBoolean("Natural EliteMob spawning")) {
@@ -260,7 +264,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //eggs need to scale with stacked amount
         int passiveStackAmount = ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
 
-        MobScanner mobScanner = new MobScanner(this);
+        MobScanner mobScanner = new MobScanner();
         PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
         ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
 

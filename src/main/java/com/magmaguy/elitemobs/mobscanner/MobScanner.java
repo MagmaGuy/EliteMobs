@@ -15,11 +15,11 @@
 
 package com.magmaguy.elitemobs.mobscanner;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.mobcustomizer.*;
 import com.magmaguy.elitemobs.mobs.passive.ChickenHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -42,16 +42,9 @@ import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customPassiveName
  */
 public class MobScanner implements Listener {
 
-    private EliteMobs plugin;
+    private Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private int aggressiveRange = 2;
     private int passiveRange = 15;
-
-
-    public MobScanner(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
 
     public void scanMobs(int passiveStackAmount) {
 
@@ -82,8 +75,7 @@ public class MobScanner implements Listener {
                             !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
 
                         if (!(entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                                entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap")) &&
-                                !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
+                                entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap"))) {
 
                             if(!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
                                     ConfigValues.defaultConfig.getBoolean("Stack aggressive spawner mobs")) {

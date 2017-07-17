@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
@@ -151,6 +152,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             zombie.setMaxHealth(zombie.getMaxHealth() / 2);
                             zombie.setCustomName(chatColorConverter(configuration.getString("ZombieNecronomicon.Summoned zombie")));
                             zombie.setCustomNameVisible(true);
+                            AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombie);
 
                             zombie.setVelocity(new Vector((random.nextDouble()-0.5)/30, 0.5, (random.nextDouble()-0.5)/30));
 
@@ -167,6 +169,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             skeleton.setMaxHealth(skeleton.getMaxHealth() / 2);
                             skeleton.setCustomName(chatColorConverter(configuration.getString("ZombieNecronomicon.Summoned skeleton")));
                             skeleton.setCustomNameVisible(true);
+                            AggressiveEliteMobConstructor.constructAggressiveEliteMob(skeleton);
 
                             skeleton.setVelocity(new Vector((random.nextDouble()-0.5)/30, 0.5, (random.nextDouble()-0.5)/30));
 
