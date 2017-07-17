@@ -15,6 +15,8 @@
 
 package com.magmaguy.elitemobs.mobmerger;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
@@ -61,6 +63,12 @@ public class MergeHandler implements Listener {
     }
 
     private void validateEntityType(Entity eventEntity) {
+
+        if (!eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) && !ConfigValues.defaultConfig.getBoolean("Stack aggressive spawner mobs")) {
+
+            return;
+
+        }
 
         MobScanner mobScanner = new MobScanner();
 
