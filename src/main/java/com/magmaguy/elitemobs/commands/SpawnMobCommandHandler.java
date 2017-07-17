@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
@@ -47,8 +48,8 @@ public class SpawnMobCommandHandler {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
-    MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-    MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
+    private MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
+    private MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
 
     public void spawnMob(CommandSender commandSender, String[] args) {
 
@@ -459,6 +460,8 @@ public class SpawnMobCommandHandler {
             }
 
         }
+
+        AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
 
     }
 
