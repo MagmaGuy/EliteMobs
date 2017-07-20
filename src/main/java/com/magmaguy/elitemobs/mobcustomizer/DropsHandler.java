@@ -46,11 +46,22 @@ public class DropsHandler implements Listener {
             int mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
                     ConfigValues.defaultConfig.getDouble("Aggressive EliteMob default loot multiplier"));
 
+            ItemStack heldItem = null;
+            if (event.getEntity().getEquipment().getItemInMainHand() != null) {
+
+                heldItem = event.getEntity().getEquipment().getItemInMainHand();
+
+            }
+
             for (ItemStack itemStack : droppedItems) {
 
                 for (int i = 0; i < mobLevel; i++) {
 
-                    event.getEntity().getLocation().getWorld().dropItem(event.getEntity().getLocation(), itemStack);
+                    if (itemStack != heldItem) {
+
+                        event.getEntity().getLocation().getWorld().dropItem(event.getEntity().getLocation(), itemStack);
+
+                    }
 
                 }
 
