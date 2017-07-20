@@ -75,6 +75,12 @@ public class ChickenHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
+        if (event.isCancelled()) {
+
+            return;
+
+        }
+
         if (event.getFinalDamage() < 1) {
 
             return;

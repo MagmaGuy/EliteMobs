@@ -35,7 +35,7 @@ import static org.bukkit.Material.*;
  */
 public class MushroomCowHandler implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
         if (event.getFinalDamage() < 1) {
