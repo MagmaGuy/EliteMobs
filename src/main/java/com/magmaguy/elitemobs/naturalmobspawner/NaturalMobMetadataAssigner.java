@@ -82,34 +82,14 @@ public class NaturalMobMetadataAssigner implements Listener {
                         if (player.getLocation().distance(entity.getLocation()) < range) {
 
                             ItemStack helmet = player.getInventory().getHelmet();
-//                            String helmetName = "";
-//                            if (helmet != null && helmet.getType() != Material.AIR && helmet.getItemMeta().hasDisplayName()) {
-//                                helmetName = ChatColor.stripColor(helmet.getItemMeta().getDisplayName());
-//                            }
 
                             ItemStack chestplate = player.getInventory().getChestplate();
-//                            String chestplateName = "";
-//                            if (chestplate != null && chestplate.getType() != Material.AIR && chestplate.getItemMeta().hasDisplayName()) {
-//                                chestplateName = ChatColor.stripColor(chestplate.getItemMeta().getDisplayName());
-//                            }
 
                             ItemStack leggings = player.getInventory().getLeggings();
-//                            String leggingsName = "";
-//                            if (leggings != null && leggings.getType() != Material.AIR && leggings.getItemMeta().hasDisplayName()) {
-//                                leggingsName = ChatColor.stripColor(leggings.getItemMeta().getDisplayName());
-//                            }
 
                             ItemStack boots = player.getInventory().getBoots();
-//                            String bootsName = "";
-//                            if (boots != null && boots.getType() != Material.AIR && boots.getItemMeta().hasDisplayName()) {
-//                                bootsName = ChatColor.stripColor(boots.getItemMeta().getDisplayName());
-//                            }
 
                             ItemStack heldItem = player.getInventory().getItemInMainHand();
-//                            String heldName = "";
-//                            if (heldItem != null && heldItem.getType() != Material.AIR && heldItem.getItemMeta().hasDisplayName()) {
-//                                heldName = ChatColor.stripColor(heldItem.getItemMeta().getDisplayName());
-//                            }
 
                             for (ItemStack itemStack : EliteDropsHandler.lootList) {
 
@@ -161,7 +141,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
     private boolean itemValidator(ItemStack listStack, ItemStack inventoryStack, String displayName) {
 
-        if (inventoryStack != null && inventoryStack.getType() != Material.AIR && inventoryStack.hasItemMeta() &&
+        if (inventoryStack != null && inventoryStack.getType() != Material.AIR && inventoryStack.hasItemMeta() && inventoryStack.getItemMeta().hasLore() &&
                 inventoryStack.getItemMeta().getLore().equals(listStack.getItemMeta().getLore()) && inventoryStack.getItemMeta().hasDisplayName()) {
 
             String displayeNameStripped = ChatColor.stripColor(inventoryStack.getItemMeta().getDisplayName());

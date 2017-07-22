@@ -98,57 +98,6 @@ public class NaturalMobSpawner implements Listener {
         entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, EliteMobLevel));
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
 
-//        for (Entity scannedEntity : scanEntity) {
-//
-//            amountOfPlayersTogether++;
-//
-//            if (scannedEntity instanceof Player) //vanishnopacket support
-//            {
-//
-//                Player player = (Player) scannedEntity;
-//                int armorRating = 0;
-//
-//                armorRating = armorRatingHandler(player, armorRating);
-//
-//                int potionEffectRating = player.getActivePotionEffects().size();
-//
-//                int EliteMobRating = 0;
-//                EliteMobRating = EliteMobRating(player, EliteMobRating, range);
-//
-//                int threathLevel = 0;
-//                threathLevel = threatLevelCalculator(armorRating, potionEffectRating, EliteMobRating);
-//
-//                int EliteMobLevel = levelCalculator(threathLevel);
-//
-//                if (EliteMobLevel > ConfigValues.defaultConfig.getInt("Natural elite mob level cap")) {
-//
-//                    EliteMobLevel = ConfigValues.defaultConfig.getInt("Natural elite mob level cap");
-//
-//                }
-//
-//                if (threathLevel == 0) {
-//
-//                    return;
-//
-//                }
-//
-//                if (amountOfPlayersTogether == 1) {
-//
-//                    entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, EliteMobLevel));
-//
-//
-//                } else if (amountOfPlayersTogether > 1 && random.nextDouble() < 0.20) {
-//
-//                    entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, EliteMobLevel));
-//
-//                }
-//
-//                AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
-//
-//            }
-//
-//        }
-
     }
 
 
