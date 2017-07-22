@@ -124,21 +124,50 @@ public class MinorPowerPowerStance implements Listener {
             new BukkitRunnable(){
 
                 int globalPositionCounter = 0;
+                int effectQuantity = 0;
 
                 public void run() {
 
-                    int effectQuantity = 0;
                     int itemStackHashMapPosition = 0;
                     int individualPositionCounter = 0;
+                    int effectQuantityChecksum = 0;
 
                     //count amount of active effects
                     for (String string : MetadataHandler.minorPowerList()) {
 
                         if (entity.hasMetadata(string)) {
 
-                            effectQuantity++;
+                            effectQuantityChecksum++;
 
                         }
+
+                    }
+
+                    if (effectQuantity == 0) {
+
+                        effectQuantity = effectQuantityChecksum;
+
+                    } else if (effectQuantity != effectQuantityChecksum) {
+
+                        for (int i = 0; i < powerItemLocationTracker.size(); i++) {
+
+                            for (int j = 0; j < trackAmount; j++) {
+
+                                for (int h = 0; h < itemsPerTrack; h++) {
+
+                                    powerItemLocationTracker.get(i).get(j).get(h).remove();
+                                    powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
+                                    powerItemLocationTracker.get(i).get(j).get(h).removeMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, plugin);
+
+                                }
+
+                            }
+
+                        }
+
+                        powerItemLocationTracker.clear();
+
+                        effectQuantity = effectQuantityChecksum;
 
                     }
 

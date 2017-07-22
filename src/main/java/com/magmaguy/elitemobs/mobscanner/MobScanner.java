@@ -59,15 +59,14 @@ public class MobScanner implements Listener {
                 if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
                     //scan for naturally/command/plugin spawned EliteMobs
-                    if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() != 1
-                            && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
-
-                        HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
-                        customAggressiveName(entity);
-                        PowerHandler.powerHandler(entity);
-                        ArmorHandler.ArmorHandler(entity);
-
-                    }
+//                    if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() != 1
+//                            && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
+//
+//                        AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
+//
+//                        Bukkit.getLogger().info("Missed one");
+//
+//                    }
 
                     //scan for stacked EliteMobs
                     if (ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") &&
@@ -106,19 +105,17 @@ public class MobScanner implements Listener {
                 }
 
                 //scan for passive mobs
-                if (ConfigValues.defaultConfig.getBoolean("Allow Passive EliteMobs")) {
+                if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && ConfigValues.defaultConfig.getBoolean("Allow Passive EliteMobs")) {
 
                     //scan for passive mobs that might have lost their metadata
-                    if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity)
-                            && ((LivingEntity) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)
-                            &&((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount")) {
+                    if (((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount")) {
 
                         customPassiveName(entity, plugin);
 
                     }
 
                     //scan for new passive supermobs
-                    if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+                    if (!entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
 
                         scanValidPassiveLivingEntity(entity);
 
@@ -130,7 +127,7 @@ public class MobScanner implements Listener {
                 }
 
                 //scan for iron golems with missing metadata
-                if (!entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity instanceof IronGolem &&
+                if (entity instanceof IronGolem && !entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
                         ((IronGolem) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
                     entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, ScalingFormula.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
