@@ -49,6 +49,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -268,11 +269,22 @@ public class EliteMobs extends JavaPlugin implements Listener {
         PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
         ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
 
-        processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+        new BukkitRunnable() {
 
+            @Override
             public void run() {
 
                 mobScanner.scanMobs(passiveStackAmount);
+
+            }
+
+        }.runTaskTimer(this, 20, 20 * 10);
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
                 potionEffectApplier.potionEffectApplier();
                 if (ConfigValues.defaultConfig.getBoolean("Use scoreboards (requires permission)")) {
                     scoreboardHandler.scanSight();
@@ -280,7 +292,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
             }
 
-        }, 20, 20);
+        }.runTaskTimer(this, 20, 20);
 
     }
 

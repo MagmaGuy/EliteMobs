@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
@@ -98,6 +99,8 @@ public class ZombieParents extends MajorPowers implements Listener {
             zombieMom.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             zombieDad.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
             zombieMom.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
+            AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombieDad);
+            AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombieMom);
 
             processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 

@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
@@ -93,6 +94,8 @@ public class ZombieFriends extends MajorPowers implements Listener {
             friend2.setCustomName(chatColorConverter(configuration.getString("ZombieFriends.Friend 2")));
             friend1.setCustomNameVisible(true);
             friend2.setCustomNameVisible(true);
+            AggressiveEliteMobConstructor.constructAggressiveEliteMob(friend1);
+            AggressiveEliteMobConstructor.constructAggressiveEliteMob(friend2);
 
             processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 

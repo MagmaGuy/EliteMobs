@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -128,6 +129,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             jesse.getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
             jesse.getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);
             jesse.getEquipment().setBoots(TEAM_ROCKET_BOOTS);
+            AggressiveEliteMobConstructor.constructAggressiveEliteMob(jesse);
 
             Zombie james = (Zombie) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.ZOMBIE);
             james.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
@@ -141,6 +143,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             james.getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
             james.getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);
             james.getEquipment().setBoots(TEAM_ROCKET_BOOTS);
+            AggressiveEliteMobConstructor.constructAggressiveEliteMob(james);
 
             Ocelot meowth = (Ocelot) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.OCELOT);
             meowth.setMetadata(MetadataHandler.TEAM_ROCKET_MEMBER, new FixedMetadataValue(plugin, true));
