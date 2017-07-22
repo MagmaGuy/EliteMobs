@@ -20,6 +20,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -32,7 +34,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
-import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 
@@ -42,7 +43,8 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 public class NaturalMobMetadataAssigner implements Listener {
 
     private EliteMobs plugin;
-    private int range = 100;
+    private int range = Bukkit.getServer().getViewDistance() * 16;
+    private static Random random = new Random();
 
 
     public NaturalMobMetadataAssigner(Plugin plugin) {
@@ -68,53 +70,71 @@ public class NaturalMobMetadataAssigner implements Listener {
 
             if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
-                Random random = new Random();
-
                 entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(plugin, true));
 
                 //20% chance of turning a mob into a EliteMob unless special gear is equipped
                 int huntingGearChanceAdder = 0;
 
-                for (Entity surroundingEntity : entity.getNearbyEntities(range, range, range)) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
 
-                    if (surroundingEntity instanceof Player) {
+                    if (player.getWorld().equals(entity.getWorld())) {
 
-                        Player player = (Player) surroundingEntity;
+                        if (player.getLocation().distance(entity.getLocation()) < range) {
 
-                        ItemStack helmet = player.getInventory().getHelmet();
-                        ItemStack chestplate = player.getInventory().getChestplate();
-                        ItemStack leggings = player.getInventory().getLeggings();
-                        ItemStack boots = player.getInventory().getBoots();
-                        ItemStack heldItem = player.getInventory().getItemInMainHand();
+                            ItemStack helmet = player.getInventory().getHelmet();
+//                            String helmetName = "";
+//                            if (helmet != null && helmet.getType() != Material.AIR && helmet.getItemMeta().hasDisplayName()) {
+//                                helmetName = ChatColor.stripColor(helmet.getItemMeta().getDisplayName());
+//                            }
 
-                        for (ItemStack itemStack : EliteDropsHandler.lootList) {
+                            ItemStack chestplate = player.getInventory().getChestplate();
+//                            String chestplateName = "";
+//                            if (chestplate != null && chestplate.getType() != Material.AIR && chestplate.getItemMeta().hasDisplayName()) {
+//                                chestplateName = ChatColor.stripColor(chestplate.getItemMeta().getDisplayName());
+//                            }
 
-                            if (helmet != null && itemStack.getItemMeta().equals(helmet.getItemMeta()) &&
-                                    helmet.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting helmet"))) {
+                            ItemStack leggings = player.getInventory().getLeggings();
+//                            String leggingsName = "";
+//                            if (leggings != null && leggings.getType() != Material.AIR && leggings.getItemMeta().hasDisplayName()) {
+//                                leggingsName = ChatColor.stripColor(leggings.getItemMeta().getDisplayName());
+//                            }
 
-                                huntingGearChanceAdder++;
+                            ItemStack boots = player.getInventory().getBoots();
+//                            String bootsName = "";
+//                            if (boots != null && boots.getType() != Material.AIR && boots.getItemMeta().hasDisplayName()) {
+//                                bootsName = ChatColor.stripColor(boots.getItemMeta().getDisplayName());
+//                            }
 
-                            } else if (chestplate != null && chestplate.getItemMeta().equals(itemStack.getItemMeta())
-                                    && chestplate.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting chestplate"))) {
+                            ItemStack heldItem = player.getInventory().getItemInMainHand();
+//                            String heldName = "";
+//                            if (heldItem != null && heldItem.getType() != Material.AIR && heldItem.getItemMeta().hasDisplayName()) {
+//                                heldName = ChatColor.stripColor(heldItem.getItemMeta().getDisplayName());
+//                            }
 
-                                huntingGearChanceAdder++;
+                            for (ItemStack itemStack : EliteDropsHandler.lootList) {
+
+                                if (itemValidator(itemStack, helmet, "elite mob hunting helmet")) {
+
+                                    huntingGearChanceAdder++;
+
+                                } else if (itemValidator(itemStack, chestplate, "elite mob hunting chestplate")) {
+
+                                    huntingGearChanceAdder++;
 
 
-                            } else if (leggings != null && leggings.getItemMeta().equals(itemStack.getItemMeta())
-                                    && leggings.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting leggings"))) {
+                                } else if (itemValidator(itemStack, leggings, "elite mob hunting leggings")) {
 
-                                huntingGearChanceAdder++;
+                                    huntingGearChanceAdder++;
 
 
-                            } else if (boots != null && boots.getItemMeta().equals(itemStack.getItemMeta())
-                                    && boots.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting boots"))) {
+                                } else if (itemValidator(itemStack, boots, "elite mob hunting boots")) {
 
-                                huntingGearChanceAdder++;
+                                    huntingGearChanceAdder++;
 
-                            } else if (heldItem != null && heldItem.getType() != Material.AIR && heldItem.getItemMeta().equals(itemStack.getItemMeta())
-                                    && heldItem.getItemMeta().getDisplayName().equalsIgnoreCase(chatColorConverter("&4elite mob hunting bow"))) {
+                                } else if (itemValidator(itemStack, heldItem, "elite mob hunting bow")) {
 
-                                huntingGearChanceAdder++;
+                                    huntingGearChanceAdder++;
+                                }
 
                             }
 
@@ -124,8 +144,9 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                 }
 
-                if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn") / 100
-                        + huntingGearChanceAdder * 10) {
+                Double validChance = (ConfigValues.defaultConfig.getDouble("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn") + (huntingGearChanceAdder * 10)) / 100;
+
+                if (random.nextDouble() < validChance) {
 
                     NaturalMobSpawner naturalMobSpawner = new NaturalMobSpawner(plugin);
                     naturalMobSpawner.naturalMobProcessor(entity);
@@ -135,6 +156,25 @@ public class NaturalMobMetadataAssigner implements Listener {
             }
 
         }
+
+    }
+
+    private boolean itemValidator(ItemStack listStack, ItemStack inventoryStack, String displayName) {
+
+        if (inventoryStack != null && inventoryStack.getType() != Material.AIR && inventoryStack.hasItemMeta() &&
+                inventoryStack.getItemMeta().getLore().equals(listStack.getItemMeta().getLore()) && inventoryStack.getItemMeta().hasDisplayName()) {
+
+            String displayeNameStripped = ChatColor.stripColor(inventoryStack.getItemMeta().getDisplayName());
+
+            if (displayeNameStripped.equalsIgnoreCase(displayName)) {
+
+                return true;
+
+            }
+
+        }
+
+        return false;
 
     }
 
