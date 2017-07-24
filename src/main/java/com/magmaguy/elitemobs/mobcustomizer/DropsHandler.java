@@ -17,12 +17,16 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,18 +50,25 @@ public class DropsHandler implements Listener {
             int mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
                     ConfigValues.defaultConfig.getDouble("Aggressive EliteMob default loot multiplier"));
 
-            ItemStack heldItem = null;
-            if (event.getEntity().getEquipment().getItemInMainHand() != null) {
-
-                heldItem = event.getEntity().getEquipment().getItemInMainHand();
-
-            }
+            inventoryItemsConstructor(event.getEntity());
 
             for (ItemStack itemStack : droppedItems) {
 
-                for (int i = 0; i < mobLevel; i++) {
+                boolean itemIsWorn = false;
 
-                    if (itemStack != heldItem) {
+                for (ItemStack wornItem : wornItems) {
+
+                    if (wornItem.isSimilar(itemStack)) {
+
+                        itemIsWorn = true;
+
+                    }
+
+                }
+
+                if (!itemIsWorn) {
+
+                    for (int i = 0; i < mobLevel; i++) {
 
                         event.getEntity().getLocation().getWorld().dropItem(event.getEntity().getLocation(), itemStack);
 
@@ -71,6 +82,45 @@ public class DropsHandler implements Listener {
             event.setDroppedExp(droppedXP);
 
         }
+
+    }
+
+    private List<ItemStack> wornItems = new ArrayList<>();
+
+    private List<ItemStack> inventoryItemsConstructor(LivingEntity entity) {
+
+        EntityEquipment equipment = entity.getEquipment();
+
+        if (equipment.getItemInMainHand() != null && !equipment.getItemInMainHand().getType().equals(Material.AIR)) {
+
+            wornItems.add(equipment.getItemInMainHand());
+
+        }
+
+        if (equipment.getHelmet() != null) {
+
+            wornItems.add(equipment.getHelmet());
+        }
+
+        if (equipment.getChestplate() != null) {
+
+            wornItems.add(equipment.getChestplate());
+
+        }
+
+        if (equipment.getLeggings() != null) {
+
+            wornItems.add(equipment.getLeggings());
+
+        }
+
+        if (equipment.getBoots() != null) {
+
+            wornItems.add(equipment.getBoots());
+
+        }
+
+        return wornItems;
 
     }
 
