@@ -126,7 +126,7 @@ public class EliteDropsHandler implements Listener {
             List itemLore = itemLoreHandler(previousPath, itemRank);
             itemMeta.setLore(itemLore);
 
-            if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for custom items")) {
+            if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for custom items") && ChatColor.stripColor(itemName).equals(itemName)) {
 
                 double rankProgression = ConfigValues.defaultConfig.getDouble("Increase MMORPG color rank every X levels X=");
 
