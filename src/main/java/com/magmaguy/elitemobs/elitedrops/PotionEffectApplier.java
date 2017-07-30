@@ -16,10 +16,15 @@
 package com.magmaguy.elitemobs.elitedrops;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.magmaguy.elitemobs.elitedrops.EliteDropsHandler.potionEffectItemList;
 
@@ -74,18 +79,47 @@ public class PotionEffectApplier {
 
     private void itemComparator(ItemStack itemStack, Player player) {
 
+        List<String> parsedItemLore = loreStripper(itemStack);
+
         for (ItemStack itemStackIteration : potionEffectItemList.keySet()) {
 
             if (itemStackIteration.getType().equals(itemStack.getType()) &&
-                    itemStackIteration.getItemMeta().getDisplayName().equals(itemStack.getItemMeta().getDisplayName()) &&
-                    itemStackIteration.getItemMeta().getLore().equals(itemStack.getItemMeta().getLore())) {
+                    ChatColor.stripColor(itemStackIteration.getItemMeta().getDisplayName()).equals(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName())) &&
+                    loreStripper(itemStackIteration).equals(parsedItemLore)) {
 
-                ItemStack defaultStack = itemStackIteration;
-                effectApplier(defaultStack, player);
+                effectApplier(itemStackIteration, player);
 
             }
 
         }
+
+    }
+
+    private List<String> loreStripper(ItemStack itemStack) {
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        List<String> rawLore = new ArrayList<>();
+
+        if (!itemStack.hasItemMeta() || !itemStack.getItemMeta().hasLore()) {
+
+            return rawLore;
+
+        }
+
+        rawLore = itemMeta.getLore();
+
+        List<String> strippedLore = new ArrayList<>();
+
+        for (String string : rawLore) {
+
+            String strippedLine = ChatColor.stripColor(string);
+
+            strippedLore.add(strippedLine);
+
+        }
+
+        return strippedLore;
 
     }
 
