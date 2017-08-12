@@ -59,6 +59,13 @@ public class LevelHandler {
 
         }
 
+        //handle sub-2 levels, causes some issues and makes no logical sense
+        if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) {
+
+            entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 2));
+
+        }
+
     }
 
 }

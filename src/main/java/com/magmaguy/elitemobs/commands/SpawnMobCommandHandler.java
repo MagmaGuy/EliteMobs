@@ -24,6 +24,7 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
@@ -71,7 +72,7 @@ public class SpawnMobCommandHandler {
             }
 
             world = player.getWorld();
-            location = player.getTargetBlock((HashSet<Byte>) null, 30).getLocation().add(0.5, 1, 0.5);
+            location = player.getTargetBlock((HashSet<Material>) null, 30).getLocation().add(0.5, 1, 0.5);
 
             entityInput = args[1].toLowerCase();
 
