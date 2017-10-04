@@ -57,7 +57,6 @@ import java.util.List;
 public class EliteMobs extends JavaPlugin implements Listener {
 
     public static List<World> worldList = new ArrayList();
-    private int processID;
 
     @Override
     public void onEnable() {
@@ -170,6 +169,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
                 }
 
         }
+
+        //Metadata (player purger)
+        this.getServer().getPluginManager().registerEvents(new MetadataHandler(), this);
 
         //Player cacher
         this.getServer().getPluginManager().registerEvents(new OfflinePlayerCacher(), this);
@@ -293,6 +295,18 @@ public class EliteMobs extends JavaPlugin implements Listener {
             }
 
         }.runTaskTimer(this, 20, 20);
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                //fixed drop rate for super chicken eggs
+                ChickenHandler.dropEggs();
+
+            }
+
+        }.runTaskTimer(this, 20 * 60 * 10, 20 * 60 * 10);
 
     }
 
