@@ -20,6 +20,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -30,7 +34,7 @@ import java.util.stream.Stream;
 /**
  * Created by MagmaGuy on 26/04/2017.
  */
-public class MetadataHandler {
+public class MetadataHandler implements Listener {
 
     //if you're wondering why I thought this was needed, it's because I got tired of finding and replacing
     //individual metadata strings and stuff breaking due to it
@@ -125,6 +129,8 @@ public class MetadataHandler {
 
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
+
+    public List<String> test = new ArrayList<>();
 
     public static List<String> metadataList() {
 
@@ -341,6 +347,41 @@ public class MetadataHandler {
 
 
                 entity.removeMetadata(string, plugin);
+
+            }
+
+        }
+
+    }
+
+    @EventHandler
+    public void flushPlayerMetadataOnQuit(PlayerQuitEvent event) {
+
+        Player player = event.getPlayer();
+
+        for (String string : metadataList()) {
+
+            if (player.hasMetadata(string)) {
+
+                player.removeMetadata(string, plugin);
+
+            }
+
+        }
+
+    }
+
+
+    @EventHandler
+    public void flushPlayerMetadataOnDeath(PlayerDeathEvent event) {
+
+        Player player = event.getEntity();
+
+        for (String string : metadataList()) {
+
+            if (player.hasMetadata(string)) {
+
+                player.removeMetadata(string, plugin);
 
             }
 

@@ -21,10 +21,7 @@ import com.magmaguy.elitemobs.mobcustomizer.*;
 import com.magmaguy.elitemobs.mobs.passive.ChickenHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -122,7 +119,16 @@ public class MobScanner implements Listener {
                     }
 
                     //spawn chicken eggs, really wish there were an event for this
-                    ChickenHandler.superEggs(entity, passiveStackAmount);
+//                    ChickenHandler.superEggs(entity, passiveStackAmount);
+                    if (entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && entity instanceof Chicken) {
+
+                        if (!ChickenHandler.activeChickenList.contains(entity)) {
+
+                            ChickenHandler.activeChickenList.add((Chicken) entity);
+
+                        }
+
+                    }
 
                 }
 
@@ -235,14 +241,8 @@ public class MobScanner implements Listener {
 
             return false;
 
-        } else if (damageable2.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                damageable2.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap")) {
-
-            return false;
-
-        }
-
-        return true;
+        } else return !damageable2.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
+                damageable2.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap");
 
     }
 
