@@ -43,7 +43,7 @@ public class MobScanner implements Listener {
     private int aggressiveRange = 2;
     private int passiveRange = 15;
 
-    public void scanMobs(int passiveStackAmount) {
+    public void scanMobs() {
 
         for (World world : worldList) {
 
@@ -119,7 +119,6 @@ public class MobScanner implements Listener {
                     }
 
                     //spawn chicken eggs, really wish there were an event for this
-//                    ChickenHandler.superEggs(entity, passiveStackAmount);
                     if (entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && entity instanceof Chicken) {
 
                         if (!ChickenHandler.activeChickenList.contains(entity)) {

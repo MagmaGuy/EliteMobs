@@ -16,7 +16,6 @@
 package com.magmaguy.elitemobs.mobs.passive;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import org.bukkit.Material;
 import org.bukkit.entity.Chicken;
@@ -42,41 +41,6 @@ import static org.bukkit.Material.RAW_CHICKEN;
  * Created by MagmaGuy on 19/12/2016.
  */
 public class ChickenHandler implements Listener {
-
-    private static Random random = new Random();
-
-//    public static void superEggs(Entity entity, int passiveStackAmount) {
-//
-//        List<Chicken> tempChickenList = new ArrayList<>();
-//
-//        if (entity instanceof Chicken && entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
-//
-//            tempChickenList.add((Chicken) entity);
-//
-//        }
-//
-//        if (tempChickenList.size() > 0) {
-//
-//            int eggChance = random.nextInt(12000 / 20 * 5 / passiveStackAmount);
-//
-//            //Chicken lay eggs every 5-10 minutes, assuming 10 min that's 12000 ticks
-//            //method runs every 20*5 ticks
-//            //should spawn 1 by 1 but the odds of it spawning are scaled to fit config passivemob stack size
-//            if (eggChance == 1) {
-//
-//                for (Chicken chicken : tempChickenList) {
-//
-//                    ItemStack eggStack = new ItemStack(EGG, 1);
-//
-//                    chicken.getWorld().dropItem(chicken.getLocation(), eggStack).setVelocity(ItemDropVelocity.ItemDropVelocity());
-//
-//                }
-//
-//            }
-//
-//        }
-//
-//    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void superDrops(EntityDamageByEntityEvent event) {
@@ -188,7 +152,11 @@ public class ChickenHandler implements Listener {
 
         for (Chicken chicken : activeChickenList) {
 
-            for (int i = 0; i < ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount"); i++) {
+            if (!chicken.isValid()) {
+
+                activeChickenList.remove(chicken);
+
+            } else {
 
                 Item droppedItem = chicken.getWorld().dropItem(chicken.getLocation(), eggStack);
                 droppedItem.setVelocity(ItemDropVelocity.ItemDropVelocity());

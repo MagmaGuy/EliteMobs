@@ -15,28 +15,17 @@
 
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.plugin.Plugin;
 
 
 /**
  * Created by MagmaGuy on 20/12/2016.
  */
 public class ChunkUnloadMetadataPurge implements Listener {
-
-    private EliteMobs plugin;
-
-    public ChunkUnloadMetadataPurge(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
-
 
     @EventHandler
     public void onUnload(ChunkUnloadEvent event) {

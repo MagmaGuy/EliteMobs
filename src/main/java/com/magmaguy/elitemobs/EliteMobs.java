@@ -215,7 +215,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }
 
-        this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(this), this);
+        this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(), this);
         this.getServer().getPluginManager().registerEvents(new EntityDeathMetadataFlusher(), this);
 
         //Commands
@@ -264,9 +264,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
     public void repeatingTaskRunner() {
 
-        //eggs need to scale with stacked amount
-        int passiveStackAmount = ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
-
         MobScanner mobScanner = new MobScanner();
         PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
         ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
@@ -276,7 +273,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
             @Override
             public void run() {
 
-                mobScanner.scanMobs(passiveStackAmount);
+                mobScanner.scanMobs();
 
             }
 
@@ -296,17 +293,19 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }.runTaskTimer(this, 20, 20);
 
+        int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
+
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                //fixed drop rate for super chicken eggs
+                //drops 1 egg for every loaded super chicken
                 ChickenHandler.dropEggs();
 
             }
 
-        }.runTaskTimer(this, 20 * 60 * 10, 20 * 60 * 10);
+        }.runTaskTimer(this, eggTimerInterval, eggTimerInterval);
 
     }
 
