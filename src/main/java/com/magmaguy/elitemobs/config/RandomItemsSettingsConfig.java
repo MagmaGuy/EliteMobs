@@ -85,89 +85,89 @@ public class RandomItemsSettingsConfig {
         ));
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_DAMAGE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_DAMAGE.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_DAMAGE.Max Level", 5);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_FIRE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_FIRE.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_FIRE.Max Level", 1);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_INFINITE.Allow", true);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_KNOCKBACK.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_KNOCKBACK.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_KNOCKBACK.Max Level", 2);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.BINDING_CURSE.Allow", true);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ALL.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ALL.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ALL.Max Level", 5);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ARTHROPODS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ARTHROPODS.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ARTHROPODS.Max Level", 5);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_UNDEAD.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_UNDEAD.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_UNDEAD.Max Level", 5);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DEPTH_STRIDER.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DEPTH_STRIDER.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DEPTH_STRIDER.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DIG_SPEED.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DIG_SPEED.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DIG_SPEED.Max Level", 5);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DURABILITY.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DURABILITY.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DURABILITY.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FIRE_ASPECT.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FIRE_ASPECT.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FIRE_ASPECT.Max Level", 2);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FROST_WALKER.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FROST_WALKER.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FROST_WALKER.Max Level", 2);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.KNOCKBACK.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.KNOCKBACK.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.KNOCKBACK.Max Level", 2);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_BLOCKS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_BLOCKS.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_BLOCKS.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_MOBS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_MOBS.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_MOBS.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LUCK.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LUCK.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LUCK.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LURE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LURE.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LURE.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.MENDING.Allow", false);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.OXYGEN.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.OXYGEN.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.OXYGEN.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_ENVIRONMENTAL.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_ENVIRONMENTAL.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_ENVIRONMENTAL.Max Level", 4);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_EXPLOSIONS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_EXPLOSIONS.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_EXPLOSIONS.Max Level", 4);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FALL.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FALL.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FALL.Max Level", 4);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FIRE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FIRE.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FIRE.Max Level", 4);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_PROJECTILE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_PROJECTILE.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_PROJECTILE.Max Level", 4);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.SILK_TOUCH.Allow", true);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.SWEEPING_EDGE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.SWEEPING_EDGE.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.SWEEPING_EDGE.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.THORNS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.THORNS.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.THORNS.Max Level", 3);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.VANISHING_CURSE.Allow", true);
 
         this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.WATER_WORKER.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.WATER_WORKER.Max Level", 10);
+        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.WATER_WORKER.Max Level", 1);
 
         this.getRandomItemsSettingsConfig().addDefault("Material name.Sword", "Sword");
         this.getRandomItemsSettingsConfig().addDefault("Material name.Bow", "Bow");

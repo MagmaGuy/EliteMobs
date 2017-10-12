@@ -295,13 +295,15 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
 
+        ChickenHandler chickenHandler = new ChickenHandler();
+
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
                 //drops 1 egg for every loaded super chicken
-                ChickenHandler.dropEggs();
+                chickenHandler.dropEggs();
 
             }
 
