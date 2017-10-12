@@ -18,21 +18,17 @@ package com.magmaguy.elitemobs.mobs.passive;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
 import org.bukkit.Material;
-import org.bukkit.entity.Chicken;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.Item;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.bukkit.Material.FEATHER;
 import static org.bukkit.Material.RAW_CHICKEN;
@@ -143,18 +139,41 @@ public class ChickenHandler implements Listener {
 
     }
 
+    @EventHandler
+    public void superChickenChunkUnloadEvent(ChunkUnloadEvent event) {
+
+        List<Entity> entityList = Arrays.asList(event.getChunk().getEntities());
+
+        for (Entity entity : entityList) {
+
+            if (entity instanceof Chicken && entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+
+                activeChickenList.remove(entity);
+
+            }
+
+        }
+
+    }
+
     //Egg drop chance is based on the underlying timer
-    public static void dropEggs() {
+    public void dropEggs() {
 
         if (activeChickenList.isEmpty()) return;
 
         ItemStack eggStack = new ItemStack(Material.EGG, 1);
 
-        for (Chicken chicken : activeChickenList) {
+        Iterator<Chicken> superChickenIterator = activeChickenList.iterator();
 
-            if (!chicken.isValid()) {
+        while (superChickenIterator.hasNext()) {
 
-                activeChickenList.remove(chicken);
+            Chicken chicken = superChickenIterator.next();
+
+
+            if (chicken == null || !chicken.isValid()) {
+
+//                activeChickenList.remove(superChickenIterator.next());
+                superChickenIterator.remove();
 
             } else {
 
@@ -164,6 +183,21 @@ public class ChickenHandler implements Listener {
             }
 
         }
+
+//        for (Chicken chicken : activeChickenList) {
+//
+//            if (!chicken.isValid()) {
+//
+//                activeChickenList.remove(chicken);
+//
+//            } else {
+//
+//                Item droppedItem = chicken.getWorld().dropItem(chicken.getLocation(), eggStack);
+//                droppedItem.setVelocity(ItemDropVelocity.ItemDropVelocity());
+//
+//            }
+//
+//        }
 
     }
 
