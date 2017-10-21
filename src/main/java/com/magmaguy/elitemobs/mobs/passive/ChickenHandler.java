@@ -172,7 +172,6 @@ public class ChickenHandler implements Listener {
 
             if (chicken == null || !chicken.isValid()) {
 
-//                activeChickenList.remove(superChickenIterator.next());
                 superChickenIterator.remove();
 
             } else {
@@ -183,21 +182,6 @@ public class ChickenHandler implements Listener {
             }
 
         }
-
-//        for (Chicken chicken : activeChickenList) {
-//
-//            if (!chicken.isValid()) {
-//
-//                activeChickenList.remove(chicken);
-//
-//            } else {
-//
-//                Item droppedItem = chicken.getWorld().dropItem(chicken.getLocation(), eggStack);
-//                droppedItem.setVelocity(ItemDropVelocity.ItemDropVelocity());
-//
-//            }
-//
-//        }
 
     }
 
