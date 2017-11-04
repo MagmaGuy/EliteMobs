@@ -66,6 +66,7 @@ public class CommandHandler implements CommandExecutor {
     private final static String CURRENCY_WALLET = "elitemobs.currency.wallet";
     private final static String CURRENCY_COINTOP = "elitemobs.currency.cointop";
     private final static String VERSION = "elitemobs.version";
+    private final static String CONFIG = "elitemobs.config";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -162,6 +163,12 @@ public class CommandHandler implements CommandExecutor {
                             Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion());
 
                     return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("config") && permCheck(CONFIG, commandSender)) {
+
+                    //todo CONFIG STUFF HERE
 
                 }
 
