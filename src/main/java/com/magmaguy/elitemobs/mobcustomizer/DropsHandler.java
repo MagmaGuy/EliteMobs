@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.Material;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,7 +35,7 @@ import java.util.List;
  */
 public class DropsHandler implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath (EntityDeathEvent event){
 
         if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)){
@@ -79,7 +80,8 @@ public class DropsHandler implements Listener {
             }
 
             int droppedXP = event.getDroppedExp() * mobLevel;
-            event.setDroppedExp(droppedXP);
+            event.setDroppedExp(0);
+            event.getEntity().getWorld().spawn(event.getEntity().getLocation(), ExperienceOrb.class).setExperience(droppedXP);
 
         }
 

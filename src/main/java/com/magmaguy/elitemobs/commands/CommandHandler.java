@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -168,7 +169,8 @@ public class CommandHandler implements CommandExecutor {
 
                 if (args[0].equalsIgnoreCase("config") && permCheck(CONFIG, commandSender)) {
 
-                    //todo CONFIG STUFF HERE
+                    GUIConfigHandler guiConfigHandler = new GUIConfigHandler();
+                    guiConfigHandler.GUIConfigHandler((Player) commandSender);
 
                 }
 

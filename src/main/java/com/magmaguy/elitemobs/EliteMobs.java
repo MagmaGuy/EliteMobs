@@ -27,6 +27,7 @@ import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.commands.ShopHandler;
+import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
@@ -113,6 +114,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //getloot GUI
         this.getServer().getPluginManager().registerEvents(new LootGUI(), this);
+
+        //config GUI
+        this.getServer().getPluginManager().registerEvents(new GUIConfigHandler(), this);
 
         //Minor mob powers
         for (String string : MetadataHandler.minorPowerList()){
