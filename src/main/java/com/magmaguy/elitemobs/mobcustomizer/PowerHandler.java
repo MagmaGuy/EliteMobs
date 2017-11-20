@@ -203,7 +203,6 @@ public class PowerHandler {
 
             }
 
-            //TODO: pretty sure this doesn't check for level 10?
             int missingMajorPowerAmount = availableMajorPowers - currentMajorPowerAmount;
 
             if (missingMajorPowerAmount > 0 && majorPowersArrayList.size() > 0) {

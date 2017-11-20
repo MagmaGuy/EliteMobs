@@ -37,8 +37,6 @@ public class AttackArrow extends MinorPowers implements Listener{
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ATTACK_ARROW_MD;
 
-    private int processID;
-
     @Override
     public void applyPowers(Entity entity) {
 
