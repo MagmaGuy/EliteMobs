@@ -68,8 +68,11 @@ public class EliteDropsDropper implements Listener{
 
             }
 
-            if (random.nextDouble() < ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100 +
-                    ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs drop rate % increase per mob level") / 100) {
+            double chanceToDrop = ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100 +
+                    (ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs drop rate % increase per mob level") *
+                            entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 100);
+
+            if (random.nextDouble() < chanceToDrop) {
 
                 if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
                         ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){

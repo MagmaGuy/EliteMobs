@@ -89,13 +89,13 @@ public class MobScanner implements Listener {
 
                         }
 
-                        if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+                    }
 
-                            PowerHandler.powerHandler(entity);
+                    if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-                            ArmorHandler.ArmorHandler(entity);
+                        PowerHandler.powerHandler(entity);
 
-                        }
+                        ArmorHandler.ArmorHandler(entity);
 
                     }
 
