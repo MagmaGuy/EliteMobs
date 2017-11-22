@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -58,6 +59,12 @@ public class AttackWither extends MinorPowers implements Listener {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
+
+        if (!(damagee instanceof Player)) {
+
+            return;
+
+        }
 
         if (damager.hasMetadata(powerMetadata) && damagee instanceof LivingEntity) {
 
