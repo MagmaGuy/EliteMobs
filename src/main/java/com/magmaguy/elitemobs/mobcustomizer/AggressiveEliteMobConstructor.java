@@ -27,6 +27,13 @@ public class AggressiveEliteMobConstructor {
 
     public static void constructAggressiveEliteMob(Entity entity) {
 
+        if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) {
+
+            entity.remove();
+            return;
+
+        }
+
         HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
         customAggressiveName(entity);
         PowerHandler.powerHandler(entity);
