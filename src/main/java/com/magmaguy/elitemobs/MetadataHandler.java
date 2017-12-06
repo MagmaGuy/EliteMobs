@@ -324,7 +324,7 @@ public class MetadataHandler implements Listener {
 
         for (String string : metadataList()) {
 
-            if (entity.hasMetadata(string)) {
+            if (entity.hasMetadata(string) && !string.equals(NATURAL_MOB_MD)) {
 
                 if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
                         !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ) {
