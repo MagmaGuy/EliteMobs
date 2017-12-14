@@ -327,7 +327,8 @@ public class MetadataHandler implements Listener {
             if (entity.hasMetadata(string) && !string.equals(NATURAL_MOB_MD)) {
 
                 if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
-                        !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ) {
+                        !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
+                        (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity))) {
 
                     entity.remove();
 
@@ -337,11 +338,11 @@ public class MetadataHandler implements Listener {
 
             }
 
-            if (!(entity instanceof IronGolem) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
-
-                entity.remove();
-
-            }
+//            if (!(entity instanceof IronGolem) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
+//
+//                entity.remove();
+//
+//            }
 
             if (entity instanceof Player) {
 
