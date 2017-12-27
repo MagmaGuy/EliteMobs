@@ -450,11 +450,11 @@ public class SpawnMobCommandHandler {
 
                     Player player = (Player) commandSender;
 
-                    player.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat() + " custom");
+                    player.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + " custom");
 
                 } else if (commandSender instanceof ConsoleCommandSender) {
 
-                    getConsoleSender().sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat() + MetadataHandler.majorPowerList()+ " custom");
+                    getConsoleSender().sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList+ " custom");
 
                 }
 

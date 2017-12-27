@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -130,82 +131,72 @@ public class MetadataHandler implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
 
-    public List<String> test = new ArrayList<>();
+    public static List<String> minorPowerList = new ArrayList<>(Arrays.asList(
+            ATTACK_ARROW_MD,
+            ATTACK_BLINDING_MD,
+            ATTACK_CONFUSING_MD,
+            ATTACK_FIRE_MD,
+            ATTACK_FIREBALL_MD,
+            ATTACK_FREEZE_MD,
+            ATTACK_GRAVITY_MD,
+            ATTACK_POISON_MD,
+            ATTACK_PUSH_MD,
+            ATTACK_WEAKNESS_MD,
+            ATTACK_WEB_MD,
+            ATTACK_WITHER_MD,
+            BONUS_LOOT_MD,
+            DOUBLE_DAMAGE_MD,
+            DOUBLE_HEALTH_MD,
+            INVULNERABILITY_ARROW_MD,
+            INVULNERABILITY_FALL_DAMAGE_MD,
+            INVULNERABILITY_FIRE_MD,
+            INVULNERABILITY_KNOCKBACK_MD,
+            MOVEMENT_SPEED_MD,
+            INVISIBILITY_MD,
+            TAUNT_MD
+    ));
+
+    public static List<String> majorPowerList = new ArrayList<>(Arrays.asList(
+            ZOMBIE_FRIENDS_MD,
+            ZOMBIE_NECRONOMICON_MD,
+            ZOMBIE_TEAM_ROCKET_MD,
+            ZOMBIE_PARENTS_MD
+    ));
+
+    public static List<String> forMetadataList = new ArrayList<>(Arrays.asList( //add major and minor power lists
+            ELITE_MOB_MD,
+            PASSIVE_ELITE_MOB_MD,
+            NATURAL_MOB_MD,
+            MAJOR_POWER_AMOUNT_MD,
+            MINOR_POWER_AMOUNT_MD,
+            MAJOR_VISUAL_EFFECT_MD,
+            VISUAL_EFFECT_MD,
+            CUSTOM_NAME,
+            CUSTOM_ARMOR,
+            CUSTOM_HEALTH,
+            TAUNT_NAME,
+            FORBIDDEN_MD,
+            FROZEN,
+            FROZEN_COOLDOWN,
+            ZOMBIE_FRIENDS_ACTIVATED,
+            TEAM_ROCKET_ACTIVATED,
+            TEAM_ROCKET_MEMBER,
+            ZOMBIE_PARENTS_ACTIVATED,
+            ZOMBIE_CHANTING,
+            SHOOTING_ARROWS,
+            SHOOTING_FIREBALLS
+    ));
 
     public static List<String> metadataList() {
 
         List<String> metadataList = new ArrayList<>();
 
-        metadataList.add(ELITE_MOB_MD);
-        metadataList.add(PASSIVE_ELITE_MOB_MD);
-        metadataList.add(NATURAL_MOB_MD);
-        metadataList.add(MAJOR_POWER_AMOUNT_MD);
-        metadataList.add(MINOR_POWER_AMOUNT_MD);
-        metadataList.add(MAJOR_VISUAL_EFFECT_MD);
-        metadataList.add(VISUAL_EFFECT_MD);
-        metadataList.add(CUSTOM_NAME);
-        metadataList.add(CUSTOM_ARMOR);
-        metadataList.add(CUSTOM_HEALTH);
-        metadataList.add(TAUNT_NAME);
-        metadataList.add(FORBIDDEN_MD);
+        metadataList.addAll(forMetadataList);
 
-        metadataList.addAll(majorPowerList());
+        metadataList.addAll(majorPowerList);
 
-        metadataList.addAll(minorPowerList());
+        metadataList.addAll(minorPowerList);
 
-        metadataList.add(FROZEN);
-        metadataList.add(FROZEN_COOLDOWN);
-        metadataList.add(ZOMBIE_FRIENDS_ACTIVATED);
-        metadataList.add(TEAM_ROCKET_ACTIVATED);
-        metadataList.add(TEAM_ROCKET_MEMBER);
-        metadataList.add(ZOMBIE_PARENTS_ACTIVATED);
-        metadataList.add(ZOMBIE_CHANTING);
-        metadataList.add(SHOOTING_ARROWS);
-        metadataList.add(SHOOTING_FIREBALLS);
-
-        return metadataList;
-
-    }
-
-    public static List<String> majorPowerList(){
-
-        List<String> metadataList = new ArrayList<>();
-
-        metadataList.add(ZOMBIE_FRIENDS_MD);
-        metadataList.add(ZOMBIE_NECRONOMICON_MD);
-        metadataList.add(ZOMBIE_TEAM_ROCKET_MD);
-        metadataList.add(ZOMBIE_PARENTS_MD);
-
-        return metadataList;
-
-    }
-
-    public static List<String> minorPowerList(){
-
-        List<String> metadataList = new ArrayList<>();
-
-        metadataList.add(ATTACK_ARROW_MD);
-        metadataList.add(ATTACK_BLINDING_MD);
-        metadataList.add(ATTACK_CONFUSING_MD);
-        metadataList.add(ATTACK_FIRE_MD);
-        metadataList.add(ATTACK_FIREBALL_MD);
-        metadataList.add(ATTACK_FREEZE_MD);
-        metadataList.add(ATTACK_GRAVITY_MD);
-        metadataList.add(ATTACK_POISON_MD);
-        metadataList.add(ATTACK_PUSH_MD);
-        metadataList.add(ATTACK_WEAKNESS_MD);
-        metadataList.add(ATTACK_WEB_MD);
-        metadataList.add(ATTACK_WITHER_MD);
-        metadataList.add(BONUS_LOOT_MD);
-        metadataList.add(DOUBLE_DAMAGE_MD);
-        metadataList.add(DOUBLE_HEALTH_MD);
-        metadataList.add(INVULNERABILITY_ARROW_MD);
-        metadataList.add(INVULNERABILITY_FALL_DAMAGE_MD);
-        metadataList.add(INVULNERABILITY_FIRE_MD);
-        metadataList.add(INVULNERABILITY_KNOCKBACK_MD);
-        metadataList.add(MOVEMENT_SPEED_MD);
-        metadataList.add(INVISIBILITY_MD);
-        metadataList.add(TAUNT_MD);
 
         return metadataList;
 
@@ -213,49 +204,44 @@ public class MetadataHandler implements Listener {
 
     public static List<String> allPowersList(){
 
-        List metadataList = Stream.of(minorPowerList(), majorPowerList()).flatMap(List::stream).collect(Collectors.toList());
+        List metadataList = Stream.of(minorPowerList, majorPowerList).flatMap(List::stream).collect(Collectors.toList());
 
         return metadataList;
 
     }
 
-    public static List<String> powerListHumanFormat() {
+    public static List<String> powerListHumanFormat = new ArrayList<>(Arrays.asList( //add major and minor power lists
+            //minor powers
+            ATTACK_ARROW_H,
+            ATTACK_BLINDING_H,
+            ATTACK_CONFUSING_H,
+            ATTACK_FIRE_H,
+            ATTACK_FIREBALL_H,
+            ATTACK_FREEZE_H,
+            ATTACK_GRAVITY_H,
+            ATTACK_POISON_H,
+            ATTACK_PUSH_H,
+            ATTACK_WEAKNESS_H,
+            ATTACK_WEB_H,
+            ATTACK_WITHER_H,
+            BONUS_LOOT_H,
+            DOUBLE_DAMAGE_H,
+            DOUBLE_HEALTH_H,
+            INVULNERABILITY_ARROW_H,
+            INVULNERABILITY_FALL_DAMAGE_H,
+            INVULNERABILITY_FIRE_H,
+            INVULNERABILITY_KNOCKBACK_H,
+            MOVEMENT_SPEED_H,
+            INVISIBILITY_H,
+            TAUNT_H,
+            //major powers
+            ZOMBIE_PARENTS_H,
+            ZOMBIE_NECRONOMICON_H,
+            ZOMBIE_TEAM_ROCKET_H,
+            ZOMBIE_PARENTS_H
+    ));
 
-        List<String> metadataList = new ArrayList<>();
-
-        metadataList.add(ATTACK_ARROW_H);
-        metadataList.add(ATTACK_BLINDING_H);
-        metadataList.add(ATTACK_CONFUSING_H);
-        metadataList.add(ATTACK_FIRE_H);
-        metadataList.add(ATTACK_FIREBALL_H);
-        metadataList.add(ATTACK_FREEZE_H);
-        metadataList.add(ATTACK_GRAVITY_H);
-        metadataList.add(ATTACK_POISON_H);
-        metadataList.add(ATTACK_PUSH_H);
-        metadataList.add(ATTACK_WEAKNESS_H);
-        metadataList.add(ATTACK_WEB_H);
-        metadataList.add(ATTACK_WITHER_H);
-        metadataList.add(BONUS_LOOT_H);
-        metadataList.add(DOUBLE_DAMAGE_H);
-        metadataList.add(DOUBLE_HEALTH_H);
-        metadataList.add(INVULNERABILITY_ARROW_H);
-        metadataList.add(INVULNERABILITY_FALL_DAMAGE_H);
-        metadataList.add(INVULNERABILITY_FIRE_H);
-        metadataList.add(INVULNERABILITY_KNOCKBACK_H);
-        metadataList.add(MOVEMENT_SPEED_H);
-        metadataList.add(INVISIBILITY_H);
-        metadataList.add(TAUNT_H);
-
-        metadataList.add(ZOMBIE_PARENTS_H);
-        metadataList.add(ZOMBIE_NECRONOMICON_H);
-        metadataList.add(ZOMBIE_TEAM_ROCKET_H);
-        metadataList.add(ZOMBIE_PARENTS_H);
-
-        return metadataList;
-
-    }
-
-    public String machineToHumanTranslator (String metadata) {
+    public static String machineToHumanTranslator (String metadata) {
 
         switch (metadata) {
 

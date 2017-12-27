@@ -75,7 +75,7 @@ public class MajorPowerPowerStance implements Listener {
                     int individualPositionCounter = 0;
                     int effectQuantityChecksum = 0;
 
-                    for (String string : MetadataHandler.majorPowerList()) {
+                    for (String string : MetadataHandler.majorPowerList) {
 
                         if (entity.hasMetadata(string)) {
 
