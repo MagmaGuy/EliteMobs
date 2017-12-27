@@ -243,7 +243,7 @@ public class PowerHandler {
 
     public static void minorPowerArrayInitializer () {
 
-        for (String string : MetadataHandler.minorPowerList()) {
+        for (String string : MetadataHandler.minorPowerList) {
 
             if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)){
 

@@ -27,13 +27,13 @@ public class MobPowersCustomConfig {
 
     public void initializeMobPowersConfig () {
 
-        for (String string : MetadataHandler.minorPowerList()) {
+        for (String string : MetadataHandler.minorPowerList) {
 
             this.getMobPowersConfig().addDefault("Powers.Minor Powers." + string, true);
 
         }
 
-        for (String string : MetadataHandler.majorPowerList()) {
+        for (String string : MetadataHandler.majorPowerList) {
 
             this.getMobPowersConfig().addDefault("Powers.Major Powers." + string, true);
 

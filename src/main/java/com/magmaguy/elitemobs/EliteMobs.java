@@ -119,7 +119,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new GUIConfigHandler(), this);
 
         //Minor mob powers
-        for (String string : MetadataHandler.minorPowerList()){
+        for (String string : MetadataHandler.minorPowerList){
 
             //don't load powers that require no event listeners
             if (!(string.equalsIgnoreCase("MovementSpeed"))
@@ -150,7 +150,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }
 
-        for (String string : MetadataHandler.majorPowerList()){
+        for (String string : MetadataHandler.majorPowerList){
 
             //don't load powers that require no event listeners
                 try {
