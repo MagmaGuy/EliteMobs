@@ -8,6 +8,6 @@ At this time, I am not interested in accepting contributions to the code. This i
 
 That being said, I am deeply interested in any suggestions, be they for improving existing features or creating new ones.
 
-There's a wiki, it has a few entries, if you want more info maybe try reading it.
+# There's a wiki, it has a few entries, if you want more info maybe try reading it.
 
 # //TODO: add description of features and how they work, some day, maybe

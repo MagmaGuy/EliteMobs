@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.commands.guiconfig;
 
+import com.magmaguy.elitemobs.commands.guiconfig.configurers.ValidMobsConfigurer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +36,7 @@ import java.util.List;
  */
 public class GUIConfigHandler implements Listener {
 
-    private ItemStack signature = SignatureItem.signatureItem();
+    private static ItemStack signature = SignatureItem.signatureItem();
 
     public void GUIConfigHandler(Player player) {
 
@@ -54,10 +56,10 @@ public class GUIConfigHandler implements Listener {
 
     }
 
-    private void configPickerPopulator(Inventory inventory) {
+    public static void configPickerPopulator(Inventory inventory) {
 
         List<String> mobConfigLore = new ArrayList<>(Arrays.asList("Configure Mobs"));
-        ItemStack mobConfig = itemInitializer(Material.BONE, "Configure Mobs", mobConfigLore);
+        ItemStack mobConfig = skullItemInitializer(Material.SKULL_ITEM, "MHF_Creeper", "Configure Mobs", mobConfigLore);
         inventory.setItem(19, mobConfig);
 
         List<String> itemConfigLore = new ArrayList<>(Arrays.asList("Configure Items"));
@@ -120,7 +122,20 @@ public class GUIConfigHandler implements Listener {
 
     }
 
-    private Inventory threeRowInventory(String title) {
+    private void mobMechanicPickerPopulator(Inventory inventory) {
+
+        List<String> backToMainLore = new ArrayList<>(Arrays.asList("Back To Main Menu"));
+        ItemStack backToMain = itemInitializer(Material.BARRIER, "Back To Main Menu", backToMainLore);
+        inventory.setItem(0, backToMain);
+
+        //check if blazes are enabled
+        List<String> validMobsLore = new ArrayList<>(Arrays.asList("Valid mobs", "Set which mobs can be elite mobs", "Passive and Aggressive"));
+        ItemStack validMobs = skullItemInitializer(Material.SKULL_ITEM, "MHF_Blaze", "Configure Valid Elite Mobs", validMobsLore);
+        inventory.setItem(20, validMobs);
+
+    }
+
+    public static Inventory threeRowInventory(String title) {
 
         Inventory inventory = Bukkit.createInventory(null, 9 * 3, title);
 
@@ -130,10 +145,35 @@ public class GUIConfigHandler implements Listener {
 
     }
 
-    private ItemStack itemInitializer(Material material, String title, List<String> lore) {
+    public static Inventory sixRowInventory(String title) {
+
+        Inventory inventory = Bukkit.createInventory(null, 9 * 6, title);
+
+        inventory.setItem(4, signature);
+
+        return inventory;
+
+    }
+
+    public static ItemStack itemInitializer(Material material, String title, List<String> lore) {
 
         ItemStack item = new ItemStack(material, 1);
         ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setDisplayName(title);
+        itemMeta.setLore(lore);
+        item.setItemMeta(itemMeta);
+
+        return item;
+
+    }
+
+    public static ItemStack skullItemInitializer(Material material, String mhfValue, String title, List<String> lore) {
+
+        ItemStack item = new ItemStack(material, 1, (short) 3);
+        ItemMeta itemMeta = item.getItemMeta();
+        SkullMeta skullMeta = (SkullMeta) itemMeta;
+        skullMeta.setOwner(mhfValue);
+        item.setItemMeta(skullMeta);
         itemMeta.setDisplayName(title);
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
@@ -231,15 +271,36 @@ public class GUIConfigHandler implements Listener {
 
                 if (name.equals("Back To Main Menu")) {
 
+                    player.closeInventory();
+                    Inventory smallInventory = threeRowInventory("Config GUI");
+                    player.openInventory(smallInventory);
+                    configPickerPopulator(smallInventory);
+
+                    return;
+
+                }
+
+                if (name.equals("Configure Elite Mob Mechanics")) {
+
                     smallInventoryWiper(inventory);
-                    configPickerPopulator(inventory);
+                    mobMechanicPickerPopulator(inventory);
+
+                    return;
+
+                }
+
+                if (name.equals("Configure Valid Elite Mobs")) {
+
+                    player.closeInventory();
+                    Inventory largeInventory = GUIConfigHandler.sixRowInventory("Config GUI - Valid Mobs");
+                    player.openInventory(largeInventory);
+                    ValidMobsConfigurer.validMobsPickerPopulator(largeInventory);
 
                     return;
 
                 }
 
             }
-
 
         }
 

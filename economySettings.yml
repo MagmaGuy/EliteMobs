@@ -1,0 +1,10 @@
+Enable economy: true
+Item resale value (percentage): 5
+Tier price progression: 20
+Procedurally Generated Loot:
+  Lowest simulated elite mob level loot: 1
+  Highest simulated elite mob level loot: 100
+Currency name: Elite Coins
+Custom Loot:
+  Lowest simulated elite mob level loot: 1
+  Highest simulated elite mob level loot: 100

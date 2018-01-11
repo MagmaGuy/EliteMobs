@@ -1,0 +1,53 @@
+Allow aggressive EliteMobs: true
+Valid aggressive EliteMobs:
+  Blaze: true
+  CaveSpider: true
+  Creeper: false
+  Enderman: true
+  Endermite: true
+  IronGolem: true
+  PigZombie: true
+  PolarBear: true
+  Silverfish: true
+  Skeleton: true
+  Spider: true
+  Witch: true
+  Zombie: true
+Allow Passive EliteMobs: true
+Valid passive EliteMobs:
+  Chicken: true
+  Cow: true
+  MushroomCow: true
+  Pig: true
+  Sheep: true
+Natural aggressive EliteMob spawning: true
+Valid worlds:
+  world: true
+  world_nether: true
+  Flat: true
+  world_the_end: true
+Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn: 20
+Aggressive mob stacking: true
+Aggressive mob stacking cap: 50
+Natural elite mob level cap: 200
+Stack aggressive spawner mobs: true
+Stack aggressive natural mobs: true
+Passive EliteMob stack amount: 50
+Aggressive EliteMobs can drop custom loot: true
+Aggressive EliteMobs flat loot drop rate %: 25
+Aggressive EliteMobs drop rate % increase per mob level: 1
+Use MMORPG colors for item ranks: true
+Use MMORPG colors for custom items: true
+Increase MMORPG color rank every X levels X=: 15
+Prevent creepers from killing passive mobs: true
+Aggressive EliteMob life multiplier: 1.0
+Aggressive EliteMob damage multiplier: 1.0
+Aggressive EliteMob default loot multiplier: 1.0
+Drop multiplied default loot from aggressive elite mobs spawned in spawners: true
+SuperCreeper explosion nerf multiplier: 1.0
+Turn on visual effects for natural or plugin-spawned EliteMobs: true
+Turn off visual effects for non-natural or non-plugin-spawned EliteMobs: true
+Turn on visual effects that indicate an attack is about to happen: true
+Use titles to warn players they are missing a permission: true
+Show item rank on custom item drops: true
+Use scoreboards (requires permission): false
