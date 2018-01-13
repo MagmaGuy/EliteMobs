@@ -25,6 +25,7 @@ import org.bukkit.configuration.Configuration;
  */
 public class DefaultConfig {
 
+
     public void loadConfiguration() {
 
         Configuration configuration = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
@@ -90,6 +91,12 @@ public class DefaultConfig {
         Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).saveDefaultConfig();
 
         Bukkit.getLogger().info("EliteMobs config loaded!");
+
+    }
+
+    public static void reloadConfig() {
+
+        Bukkit.getPluginManager().getPlugin("EliteMobs").reloadConfig();
 
     }
 

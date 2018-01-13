@@ -21,7 +21,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>4.5.0</version>
+    <version>4.5.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -94,13 +94,6 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--Spigot API and NMS-->
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
