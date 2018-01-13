@@ -1,4 +1,4 @@
-Allow aggressive EliteMobs: true
+,Allow aggressive EliteMobs: true
 Valid aggressive EliteMobs:
   Blaze: true
   CaveSpider: true

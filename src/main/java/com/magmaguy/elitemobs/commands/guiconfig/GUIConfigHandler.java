@@ -59,7 +59,7 @@ public class GUIConfigHandler implements Listener {
     public static void configPickerPopulator(Inventory inventory) {
 
         List<String> mobConfigLore = new ArrayList<>(Arrays.asList("Configure Mobs"));
-        ItemStack mobConfig = skullItemInitializer(Material.SKULL_ITEM, "MHF_Creeper", "Configure Mobs", mobConfigLore);
+        ItemStack mobConfig = skullItemInitializer("MHF_Creeper", "Configure Mobs", mobConfigLore);
         inventory.setItem(19, mobConfig);
 
         List<String> itemConfigLore = new ArrayList<>(Arrays.asList("Configure Items"));
@@ -130,7 +130,7 @@ public class GUIConfigHandler implements Listener {
 
         //check if blazes are enabled
         List<String> validMobsLore = new ArrayList<>(Arrays.asList("Valid mobs", "Set which mobs can be elite mobs", "Passive and Aggressive"));
-        ItemStack validMobs = skullItemInitializer(Material.SKULL_ITEM, "MHF_Blaze", "Configure Valid Elite Mobs", validMobsLore);
+        ItemStack validMobs = skullItemInitializer("MHF_Blaze", "Configure Valid Elite Mobs", validMobsLore);
         inventory.setItem(20, validMobs);
 
     }
@@ -167,9 +167,9 @@ public class GUIConfigHandler implements Listener {
 
     }
 
-    public static ItemStack skullItemInitializer(Material material, String mhfValue, String title, List<String> lore) {
+    public static ItemStack skullItemInitializer(String mhfValue, String title, List<String> lore) {
 
-        ItemStack item = new ItemStack(material, 1, (short) 3);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         ItemMeta itemMeta = item.getItemMeta();
         SkullMeta skullMeta = (SkullMeta) itemMeta;
         skullMeta.setOwner(mhfValue);
@@ -182,7 +182,7 @@ public class GUIConfigHandler implements Listener {
 
     }
 
-    private void smallInventoryWiper(Inventory inventory) {
+    public static void inventoryWiper(Inventory inventory) {
 
         ItemStack air = new ItemStack(Material.AIR, 1);
 
@@ -235,7 +235,7 @@ public class GUIConfigHandler implements Listener {
 
                 if (name.equals("Start selecting configs!")) {
 
-                    smallInventoryWiper(inventory);
+                    inventoryWiper(inventory);
                     configPickerPopulator(inventory);
 
                     return;
@@ -244,7 +244,7 @@ public class GUIConfigHandler implements Listener {
 
                 if (name.equals("Configure Mobs")) {
 
-                    smallInventoryWiper(inventory);
+                    inventoryWiper(inventory);
                     mobPickerPopulator(inventory);
 
                     return;
@@ -253,7 +253,7 @@ public class GUIConfigHandler implements Listener {
 
                 if (name.equals("Configure Items")) {
 
-                    smallInventoryWiper(inventory);
+                    inventoryWiper(inventory);
                     itemPickerPopulator(inventory);
 
                     return;
@@ -262,7 +262,7 @@ public class GUIConfigHandler implements Listener {
 
                 if (name.equals("Configure Miscellaneous Settings")) {
 
-                    smallInventoryWiper(inventory);
+                    inventoryWiper(inventory);
                     miscellaneousPickerPopulator(inventory);
 
                     return;
@@ -282,7 +282,7 @@ public class GUIConfigHandler implements Listener {
 
                 if (name.equals("Configure Elite Mob Mechanics")) {
 
-                    smallInventoryWiper(inventory);
+                    inventoryWiper(inventory);
                     mobMechanicPickerPopulator(inventory);
 
                     return;
