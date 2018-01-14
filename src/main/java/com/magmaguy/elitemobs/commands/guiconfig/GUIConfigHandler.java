@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.commands.guiconfig;
 
+import com.magmaguy.elitemobs.commands.guiconfig.configurers.MobSpawningAndLoot;
 import com.magmaguy.elitemobs.commands.guiconfig.configurers.ValidMobsConfigurer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -128,10 +129,16 @@ public class GUIConfigHandler implements Listener {
         ItemStack backToMain = itemInitializer(Material.BARRIER, "Back To Main Menu", backToMainLore);
         inventory.setItem(0, backToMain);
 
-        //check if blazes are enabled
         List<String> validMobsLore = new ArrayList<>(Arrays.asList("Valid mobs", "Set which mobs can be elite mobs", "Passive and Aggressive"));
-        ItemStack validMobs = skullItemInitializer("MHF_Blaze", "Configure Valid Elite Mobs", validMobsLore);
+        ItemStack validMobs = skullItemInitializer("MHF_Zombie", "Configure Valid Elite Mobs", validMobsLore);
         inventory.setItem(20, validMobs);
+
+        List<String> miscLore = new ArrayList<>(Arrays.asList(
+                "Configure spawn rates, drop rates",
+                "modify health and damage, among",
+                "other miscellaneous items"));
+        ItemStack misc = skullItemInitializer("MHF_Question", "Miscellaneous", miscLore);
+        inventory.setItem(24, misc);
 
     }
 
@@ -295,6 +302,17 @@ public class GUIConfigHandler implements Listener {
                     Inventory largeInventory = GUIConfigHandler.sixRowInventory("Config GUI - Valid Mobs");
                     player.openInventory(largeInventory);
                     ValidMobsConfigurer.validMobsPickerPopulator(largeInventory);
+
+                    return;
+
+                }
+
+                if (name.equals("Miscellaneous")) {
+
+                    player.closeInventory();
+                    Inventory largeInventory = GUIConfigHandler.sixRowInventory("Miscellaneous");
+                    player.openInventory(largeInventory);
+                    MobSpawningAndLoot.mobSpawningAndLootPopulator(largeInventory);
 
                     return;
 
