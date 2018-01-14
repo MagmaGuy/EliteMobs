@@ -78,11 +78,22 @@ public class MobSpawningAndLoot implements Listener {
 
         //This lists the settings in config.yml in no particular order, with the exception of valid mobs and worlds
         //Valid chest slots start at slot 18
-        //ItemStack conversionPercentageItem = itemStackConstructor() TODO: Continue from here
+        List<String> conversionPercentageString = new ArrayList<>(Arrays.asList(
+                "Changes the chance that a freshly",
+                "spawned mob will become an Elite Mob"));
+        ItemStack conversionPercentageItem = doubleItemStackConstructor(
+                "Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn",
+                conversionPercentageString, conversionPercentage);
 
     }
 
-    private static ItemStack itemStackConstructor (String title, List<String> lore, Boolean currentSetting) {
+    private static ItemStack boolItemStackConstructor(String title, List<String> lore, Boolean currentSetting) {
+
+
+
+    }
+
+    private static ItemStack doubleItemStackConstructor(String title, List<String> lore, double currentSetting) {
 
 
 
