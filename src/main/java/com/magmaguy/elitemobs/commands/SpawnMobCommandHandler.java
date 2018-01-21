@@ -24,7 +24,6 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
@@ -36,7 +35,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import static com.magmaguy.elitemobs.EliteMobs.worldList;
@@ -72,7 +70,7 @@ public class SpawnMobCommandHandler {
             }
 
             world = player.getWorld();
-            location = player.getTargetBlock((HashSet<Material>) null, 30).getLocation().add(0.5, 1, 0.5);
+            location = player.getTargetBlock(null, 30).getLocation().add(0.5, 1, 0.5);
 
             entityInput = args[1].toLowerCase();
 
@@ -296,25 +294,25 @@ public class SpawnMobCommandHandler {
                 switch (string) {
                     //major powers
                     case MetadataHandler.ZOMBIE_FRIENDS_H:
-                        if (entity instanceof Zombie){
+                        if (entity instanceof Zombie) {
                             entity.setMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD, new FixedMetadataValue(plugin, true));
                             powerCount++;
                         }
                         break;
                     case MetadataHandler.ZOMBIE_NECRONOMICON_H:
-                        if (entity instanceof Zombie){
+                        if (entity instanceof Zombie) {
                             entity.setMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD, new FixedMetadataValue(plugin, true));
                             powerCount++;
                         }
                         break;
                     case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
-                        if (entity instanceof Zombie){
+                        if (entity instanceof Zombie) {
                             entity.setMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD, new FixedMetadataValue(plugin, true));
                             powerCount++;
                         }
                         break;
                     case MetadataHandler.ZOMBIE_PARENTS_H:
-                        if (entity instanceof Zombie){
+                        if (entity instanceof Zombie) {
                             entity.setMetadata(MetadataHandler.ZOMBIE_PARENTS_MD, new FixedMetadataValue(plugin, true));
                             powerCount++;
                         }
@@ -454,7 +452,7 @@ public class SpawnMobCommandHandler {
 
                 } else if (commandSender instanceof ConsoleCommandSender) {
 
-                    getConsoleSender().sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList+ " custom");
+                    getConsoleSender().sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList + " custom");
 
                 }
 

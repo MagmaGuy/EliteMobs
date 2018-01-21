@@ -41,10 +41,11 @@ public class ValidMobsConfigurer implements Listener {
         populateValidMobs(inventory);
 
     }
+
     private static Boolean blaze, caveSpider, creeper, enderman, endermite, ironGolem, pigZombie, polarBear, silverfish,
             skeleton, spider, witch, zombie, chicken, cow, mushroomCow, pig, sheep, aggressive, passive;
 
-    private static void configStatusChecker () {
+    private static void configStatusChecker() {
 
         blaze = aggressiveBooleanConfigGrabber("Blaze");
         caveSpider = aggressiveBooleanConfigGrabber("CaveSpider");
@@ -96,7 +97,7 @@ public class ValidMobsConfigurer implements Listener {
 
     }
 
-    private static void populateValidMobs(Inventory inventory){
+    private static void populateValidMobs(Inventory inventory) {
 
         configStatusChecker();
 
@@ -105,7 +106,7 @@ public class ValidMobsConfigurer implements Listener {
         left half is occupied by the aggressive mobs, right side is occupied by the passive ones
         */
 
-        List <Integer> aggressiveMobSlots = new ArrayList(Arrays.asList(9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47, 48));
+        List<Integer> aggressiveMobSlots = new ArrayList(Arrays.asList(9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47, 48));
         List<Integer> passiveMobSlots = new ArrayList(Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44, 50, 51, 52, 53));
 
         //populate aggressive mobs
@@ -186,7 +187,7 @@ public class ValidMobsConfigurer implements Listener {
 
     }
 
-    private static ItemStack validMobConfigSkullGenerator (String string, Boolean bool) {
+    private static ItemStack validMobConfigSkullGenerator(String string, Boolean bool) {
 
         ItemStack itemStack = GUIConfigHandler.skullItemInitializer("MHF_" + string,
                 skullTitleGenerator(bool, string), skullLoreGenerator(bool));
@@ -195,7 +196,7 @@ public class ValidMobsConfigurer implements Listener {
 
     }
 
-    private static String skullTitleGenerator (Boolean bool, String string) {
+    private static String skullTitleGenerator(Boolean bool, String string) {
 
         String finalString = string + " Elite Mobs are ";
         finalString += bool ? "enabled!" : "disabled!";
@@ -204,7 +205,7 @@ public class ValidMobsConfigurer implements Listener {
 
     }
 
-    private static List<String> skullLoreGenerator (Boolean bool) {
+    private static List<String> skullLoreGenerator(Boolean bool) {
 
         String finalString = "Click to ";
         finalString += bool ? "disable!" : "enable!";

@@ -53,7 +53,7 @@ public class ShopHandler implements Listener {
 
     }
 
-    private void populateShop(Inventory shopInventory ) {
+    private void populateShop(Inventory shopInventory) {
 
         shopHeader(shopInventory);
         shopContents(shopInventory);
@@ -106,7 +106,7 @@ public class ShopHandler implements Listener {
     }
 
     @EventHandler
-    public void onClick (InventoryClickEvent event) {
+    public void onClick(InventoryClickEvent event) {
 
         if (!ConfigValues.economyConfig.getBoolean("Enable economy")) {
 
@@ -178,13 +178,13 @@ public class ShopHandler implements Listener {
                     player.getInventory().addItem(itemStack);
                     populateShop(event.getInventory());
 
-                    player.sendMessage(ChatColor.GREEN + "You have bought " + itemDisplayName + " for " + ChatColor.DARK_GREEN +  itemValue + " " + ChatColor.GREEN + currencyName);
+                    player.sendMessage(ChatColor.GREEN + "You have bought " + itemDisplayName + " for " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + currencyName);
                     player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + currencyName);
 
                 } else {
 
                     player.closeInventory();
-                    player.sendMessage(ChatColor.RED +"You don't have enough " + currencyName + "!");
+                    player.sendMessage(ChatColor.RED + "You don't have enough " + currencyName + "!");
                     player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + currencyName);
                     player.sendMessage(ChatColor.GREEN + "That item cost " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + currencyName + ".");
 

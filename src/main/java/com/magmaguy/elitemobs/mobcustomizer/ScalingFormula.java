@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 /**
  * Created by MagmaGuy on 18/04/2017.
  */
-public class ScalingFormula{
+public class ScalingFormula {
 
     public static double PowerFormula(double baseAmount, int EliteMobLevel) {
 
@@ -26,7 +26,7 @@ public class ScalingFormula{
 
     }
 
-    public static double reversePowerFormula (double currentValue, double baseAmount) {
+    public static double reversePowerFormula(double currentValue, double baseAmount) {
 
         return Math.pow(10, (Math.pow((currentValue - baseAmount) / (4 * baseAmount), 1 / 1.5)));
 

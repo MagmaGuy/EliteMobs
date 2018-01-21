@@ -30,7 +30,7 @@ public class OfflinePlayerCacher implements Listener {
     private static FileConfiguration configuration = playerCacheConfig.getPlayerCacheConfig();
 
     @EventHandler
-    public static void onLogin (PlayerJoinEvent event) {
+    public static void onLogin(PlayerJoinEvent event) {
 
         String UUID = event.getPlayer().getUniqueId().toString();
         String playerName = event.getPlayer().getName();

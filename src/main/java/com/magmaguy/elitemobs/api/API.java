@@ -21,7 +21,7 @@ import org.bukkit.event.HandlerList;
 /**
  * Created by MagmaGuy on 03/06/2017.
  */
-public class API extends Event{
+public class API extends Event {
 
 
     @Override

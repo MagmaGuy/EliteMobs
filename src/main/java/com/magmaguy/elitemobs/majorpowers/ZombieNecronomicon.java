@@ -87,9 +87,9 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
             ((LivingEntity) targetter).setAI(false);
 
-            necronomiconVisualEffect((Zombie)targetter);
+            necronomiconVisualEffect((Zombie) targetter);
 
-            new BukkitRunnable(){
+            new BukkitRunnable() {
 
                 ArrayList<Entity> entityList = new ArrayList<>();
 
@@ -97,7 +97,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                 public void run() {
 
                     if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
-                            || targetted.getLocation().distance(targetter.getLocation()) > 30 ) {
+                            || targetted.getLocation().distance(targetter.getLocation()) > 30) {
 
 
                         for (Entity entity : entityList) {
@@ -119,7 +119,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                     int randomizedNumber = random.nextInt(5) + 1;
 
-                    for(Iterator<Entity> iterator = entityList.iterator(); iterator.hasNext();) {
+                    for (Iterator<Entity> iterator = entityList.iterator(); iterator.hasNext(); ) {
 
                         Entity currentEntity = iterator.next();
 
@@ -141,7 +141,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                         }
 
-                        if (randomizedNumber < 5){
+                        if (randomizedNumber < 5) {
 
                             Zombie zombie = (Zombie) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.ZOMBIE);
                             zombie.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 1));
@@ -154,7 +154,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             zombie.setCustomNameVisible(true);
                             AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombie);
 
-                            zombie.setVelocity(new Vector((random.nextDouble()-0.5)/30, 0.5, (random.nextDouble()-0.5)/30));
+                            zombie.setVelocity(new Vector((random.nextDouble() - 0.5) / 30, 0.5, (random.nextDouble() - 0.5) / 30));
 
                             entityList.add(zombie);
 
@@ -171,7 +171,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             skeleton.setCustomNameVisible(true);
                             AggressiveEliteMobConstructor.constructAggressiveEliteMob(skeleton);
 
-                            skeleton.setVelocity(new Vector((random.nextDouble()-0.5)/30, 0.5, (random.nextDouble()-0.5)/30));
+                            skeleton.setVelocity(new Vector((random.nextDouble() - 0.5) / 30, 0.5, (random.nextDouble() - 0.5) / 30));
 
                             entityList.add(skeleton);
 
@@ -186,13 +186,13 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                 }
 
-            }.runTaskTimer(plugin,20 * 3, 20 * 5);
+            }.runTaskTimer(plugin, 20 * 3, 20 * 5);
 
         }
 
     }
 
-    private void necronomiconVisualEffect (Zombie zombie) {
+    private void necronomiconVisualEffect(Zombie zombie) {
 
         summoningEffectOn = true;
         nameScroller(zombie);
@@ -203,7 +203,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
         }
 
-        new BukkitRunnable(){
+        new BukkitRunnable() {
 
             int counter = 0;
             HashMap<Integer, List<Item>> fourTrack = new HashMap();
@@ -276,7 +276,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
     }
 
-    private void itemMover (HashMap<Integer, List<Item>> xTrack, Entity entity, int counter){
+    private void itemMover(HashMap<Integer, List<Item>> xTrack, Entity entity, int counter) {
 
         double a = 0;
         double b = 1;
@@ -321,27 +321,27 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
     private void nameScroller(Zombie zombie) {
 
-        new BukkitRunnable(){
+        new BukkitRunnable() {
 
             String fullChant = chatColorConverter(configuration.getString("ZombieNecronomicon.Summoning chant"));
 
             @Override
             public void run() {
 
-                if(!zombie.isValid() || zombie.hasAI()) {
+                if (!zombie.isValid() || zombie.hasAI()) {
 
                     cancel();
                     return;
 
                 }
 
-                if (chantIndex+31 > fullChant.length()) {
+                if (chantIndex + 31 > fullChant.length()) {
 
                     chantIndex = 0;
 
                 }
 
-                String subString = fullChant.substring(chantIndex, chantIndex+31);
+                String subString = fullChant.substring(chantIndex, chantIndex + 31);
 
                 zombie.setCustomName(subString);
 
@@ -355,7 +355,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
     }
 
     @EventHandler
-    public void onSummonedCreatureDeath (EntityDeathEvent event) {
+    public void onSummonedCreatureDeath(EntityDeathEvent event) {
 
         if (event.getEntity() instanceof Zombie && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity().getCustomName() != null &&
                 (event.getEntity().getCustomName().equals(configuration.getString("ZombieNecronomicon.Summoned zombie")) ||

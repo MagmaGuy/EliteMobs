@@ -36,9 +36,9 @@ import java.util.List;
 public class DropsHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDeath (EntityDeathEvent event){
+    public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)){
+        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             if (!event.getEntity().hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
                     !ConfigValues.defaultConfig.getBoolean("Drop multiplied default loot from aggressive elite mobs spawned in spawners")) {

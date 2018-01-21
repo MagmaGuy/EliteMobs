@@ -70,7 +70,7 @@ public class AttackWeb extends MinorPowers implements Listener {
         }
 
         if (damager.hasMetadata(MetadataHandler.ATTACK_FREEZE_MD) || damager instanceof Projectile &&
-                ProjectileMetadataDetector.projectileMetadataDetector((Projectile)damager , MetadataHandler.ATTACK_FREEZE_MD)) {
+                ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, MetadataHandler.ATTACK_FREEZE_MD)) {
 
             return;
 

@@ -95,7 +95,6 @@ public class EliteDropsHandler implements Listener {
             }
 
 
-
             List<PotionEffect> parsedPotionEffect = new ArrayList();
 
             //Add potion effects to a separate list to reduce i/o operations
@@ -130,7 +129,7 @@ public class EliteDropsHandler implements Listener {
 
                 double rankProgression = ConfigValues.defaultConfig.getDouble("Increase MMORPG color rank every X levels X=");
 
-                if (Math.floor(itemRank /rankProgression) >= 5) {
+                if (Math.floor(itemRank / rankProgression) >= 5) {
 
                     itemMeta.setDisplayName(ChatColor.GOLD + itemMeta.getDisplayName());
 
@@ -355,7 +354,7 @@ public class EliteDropsHandler implements Listener {
 
         }
 
-        if (itemLore != null && !itemLore.isEmpty()){
+        if (itemLore != null && !itemLore.isEmpty()) {
 
             for (String string : itemLore) {
 
@@ -410,7 +409,7 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public void rankedItemMapCreator (int itemPower, ItemStack itemStack) {
+    public void rankedItemMapCreator(int itemPower, ItemStack itemStack) {
 
         if (rankedItemStacks.get(itemPower) == null) {
 

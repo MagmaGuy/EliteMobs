@@ -174,7 +174,7 @@ public class ZombieParents extends MajorPowers implements Listener {
 
     }
 
-    private void nameClearer (Entity entity) {
+    private void nameClearer(Entity entity) {
 
         String originalName = entity.getCustomName();
 

@@ -26,7 +26,7 @@ public class RandomItemsSettingsConfig {
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
-    public void initializeRandomItemsSettingsConfig () {
+    public void initializeRandomItemsSettingsConfig() {
 
         this.getRandomItemsSettingsConfig().addDefault("Drop random items on elite mob death", true);
         this.getRandomItemsSettingsConfig().addDefault("Mob level to item rank multiplier", 0.5);

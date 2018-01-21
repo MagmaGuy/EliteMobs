@@ -32,7 +32,7 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Created by MagmaGuy on 30/04/2017.
  */
-public class AttackBlinding extends MinorPowers implements Listener{
+public class AttackBlinding extends MinorPowers implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ATTACK_BLINDING_MD;
@@ -55,7 +55,7 @@ public class AttackBlinding extends MinorPowers implements Listener{
     }
 
     @EventHandler
-    public void attackBlinding (EntityDamageByEntityEvent event) {
+    public void attackBlinding(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
@@ -66,7 +66,7 @@ public class AttackBlinding extends MinorPowers implements Listener{
 
                 Player player = (Player) damagee;
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20*5, 3));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 3));
 
             }
 
@@ -76,7 +76,7 @@ public class AttackBlinding extends MinorPowers implements Listener{
 
                 Player player = (Player) damagee;
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20*5, 3));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 3));
 
             }
 

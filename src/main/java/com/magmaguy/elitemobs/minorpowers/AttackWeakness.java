@@ -55,7 +55,7 @@ public class AttackWeakness extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void attackWeakness (EntityDamageByEntityEvent event) {
+    public void attackWeakness(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
@@ -66,7 +66,7 @@ public class AttackWeakness extends MinorPowers implements Listener {
 
                 Player player = (Player) damagee;
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20*3, 0));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 0));
 
             }
 
@@ -76,7 +76,7 @@ public class AttackWeakness extends MinorPowers implements Listener {
 
                 Player player = (Player) damagee;
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20*3, 0));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 0));
 
             }
 

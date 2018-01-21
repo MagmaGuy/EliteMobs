@@ -114,16 +114,16 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
                         }
 
-                       if (friend2.isValid()) {
+                        if (friend2.isValid()) {
 
 
-                           nameClearer(friend1);
+                            nameClearer(friend1);
 
-                           friend2.setCustomName(chatColorConverter(configuration.getStringList("ZombieFriends.DeathMessage").
-                                   get(random.nextInt(configuration.getStringList("ZombieFriends.DeathMessage")
-                                           .size()))));
+                            friend2.setCustomName(chatColorConverter(configuration.getStringList("ZombieFriends.DeathMessage").
+                                    get(random.nextInt(configuration.getStringList("ZombieFriends.DeathMessage")
+                                            .size()))));
 
-                       }
+                        }
 
                         Bukkit.getScheduler().cancelTask(processID);
                         return;
@@ -164,13 +164,13 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
                 }
 
-            },20, 20*8);
+            }, 20, 20 * 8);
 
         }
 
     }
 
-    private void nameClearer (Entity entity) {
+    private void nameClearer(Entity entity) {
 
         String originalName = entity.getCustomName();
 

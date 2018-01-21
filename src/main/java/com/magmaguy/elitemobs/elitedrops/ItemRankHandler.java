@@ -22,7 +22,7 @@ import org.bukkit.Material;
  */
 public class ItemRankHandler {
 
-    public static int guessItemRank (Material material, int enchantmentTotal) {
+    public static int guessItemRank(Material material, int enchantmentTotal) {
 
         int itemTypePowerCount = itemTypePower(material);
 
@@ -32,7 +32,7 @@ public class ItemRankHandler {
 
     }
 
-    public static int itemTypePower (Material material) {
+    public static int itemTypePower(Material material) {
 
         switch (material) {
 

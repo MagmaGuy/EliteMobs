@@ -32,7 +32,7 @@ import org.bukkit.util.Vector;
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackArrow extends MinorPowers implements Listener{
+public class AttackArrow extends MinorPowers implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ATTACK_ARROW_MD;
@@ -54,7 +54,7 @@ public class AttackArrow extends MinorPowers implements Listener{
     }
 
     @EventHandler
-    public void attackArrow (EntityTargetEvent event) {
+    public void attackArrow(EntityTargetEvent event) {
 
         if (event.getEntity().hasMetadata(powerMetadata) && !event.getEntity().hasMetadata(MetadataHandler.SHOOTING_ARROWS)) {
 
@@ -71,7 +71,7 @@ public class AttackArrow extends MinorPowers implements Listener{
                     public void run() {
 
                         if (!targetted.isValid() || !targetter.isValid() || targetter.getWorld() != targetted.getWorld()
-                                || targetted.getLocation().distance(targetter.getLocation()) > 20 ) {
+                                || targetted.getLocation().distance(targetter.getLocation()) > 20) {
 
                             targetter.removeMetadata(MetadataHandler.SHOOTING_ARROWS, plugin);
                             cancel();

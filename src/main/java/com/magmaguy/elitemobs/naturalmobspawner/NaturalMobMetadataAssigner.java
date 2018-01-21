@@ -58,7 +58,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
         if (!ConfigValues.defaultConfig.getBoolean("Natural aggressive EliteMob spawning") ||
                 !ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") ||
-                !ConfigValues.defaultConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName().toString())){
+                !ConfigValues.defaultConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName().toString())) {
 
             return;
 
@@ -146,11 +146,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
             String displayeNameStripped = ChatColor.stripColor(inventoryStack.getItemMeta().getDisplayName());
 
-            if (displayeNameStripped.equalsIgnoreCase(displayName)) {
-
-                return true;
-
-            }
+            return displayeNameStripped.equalsIgnoreCase(displayName);
 
         }
 

@@ -76,10 +76,10 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
     private static final ItemStack TEAM_ROCKET_HELMET = new ItemStack(Material.LEATHER_HELMET, 1);
 
     @EventHandler
-    public void onHit (EntityDamageEvent event) {
+    public void onHit(EntityDamageEvent event) {
 
         if (event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Zombie &&
-                !event.getEntity().hasMetadata(MetadataHandler.TEAM_ROCKET_ACTIVATED) && random.nextDouble() < 0.5){
+                !event.getEntity().hasMetadata(MetadataHandler.TEAM_ROCKET_ACTIVATED) && random.nextDouble() < 0.5) {
 
             Entity entity = event.getEntity();
 
@@ -161,7 +161,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
                 @Override
                 public void run() {
 
-                    switch (counter){
+                    switch (counter) {
 
                         case 1:
                             jesse.setCustomNameVisible(true);
@@ -250,14 +250,14 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
 
                 }
 
-            },1, 15*2);
+            }, 1, 15 * 2);
 
         }
 
     }
 
     @EventHandler
-    public void onDeath (EntityDeathEvent event) {
+    public void onDeath(EntityDeathEvent event) {
 
         if (event.getEntity().hasMetadata(MetadataHandler.TEAM_ROCKET_MEMBER)) {
 

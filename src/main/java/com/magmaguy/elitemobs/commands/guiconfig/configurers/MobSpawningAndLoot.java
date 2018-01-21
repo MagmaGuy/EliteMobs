@@ -22,7 +22,7 @@ public class MobSpawningAndLoot implements Listener {
     private static double conversionPercentage, aggressiveStackingCap, naturalLevelCap, passiveStackAmount, flatLootDropRate,
             levelDropRate, mmorpgRankChange, lifeMultiplier, damageMultiplier, lootMultiplier, explosionMultiplier;
 
-    private static void configStatusChecker(){
+    private static void configStatusChecker() {
 
         //get boolean values
         aggressiveStacking = boolValueGrabber("Aggressive mob stacking");
@@ -55,19 +55,19 @@ public class MobSpawningAndLoot implements Listener {
 
     }
 
-    private static Boolean boolValueGrabber (String string) {
+    private static Boolean boolValueGrabber(String string) {
 
         return ConfigValues.defaultConfig.getBoolean(string);
 
     }
 
-    private static double doubleValueGrabber (String string) {
+    private static double doubleValueGrabber(String string) {
 
         return ConfigValues.defaultConfig.getDouble(string);
 
     }
 
-    public static void mobSpawningAndLootPopulator (Inventory inventory){
+    public static void mobSpawningAndLootPopulator(Inventory inventory) {
 
         List<String> backToMainLore = new ArrayList<>(Arrays.asList("Back To Main Menu"));
         ItemStack backToMain = GUIConfigHandler.itemInitializer(Material.BARRIER, "Back To Main Menu", backToMainLore);
@@ -345,5 +345,5 @@ public class MobSpawningAndLoot implements Listener {
         return itemStack;
 
     }
-    
+
 }

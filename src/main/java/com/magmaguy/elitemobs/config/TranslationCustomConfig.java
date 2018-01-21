@@ -30,25 +30,25 @@ public class TranslationCustomConfig {
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
 
-    public void initializeTranslationConfig () {
+    public void initializeTranslationConfig() {
 
 
-        this.getTranslationConfig().addDefault("Elite Mob Names.Blaze", Arrays.asList("Level "," Elite Blaze"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.CaveSpider", Arrays.asList("Level "," Elite Cave Spider"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Creeper", Arrays.asList("Level "," Elite Creeper"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Enderman", Arrays.asList("Level "," Elite Enderman"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Endermite", Arrays.asList("Level "," Elite Endermite"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Husk", Arrays.asList("Level "," Elite Husk"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.IronGolem", Arrays.asList("Level "," Elite Iron Golem"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.PigZombie", Arrays.asList("Level "," Elite Zombie Pigman"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.PolarBear", Arrays.asList("Level "," Elite Polar Bear"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Silverfish", Arrays.asList("Level "," Elite Silverfish"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Skeleton", Arrays.asList("Level "," Elite Skeleton"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Spider", Arrays.asList("Level "," Elite Spider"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Stray", Arrays.asList("Level "," Elite Stray"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Witch", Arrays.asList("Level "," Elite Witch"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.WitherSkeleton", Arrays.asList("Level "," Elite Wither Skeleton"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Zombie", Arrays.asList("Level "," Elite Zombie"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Blaze", Arrays.asList("Level ", " Elite Blaze"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.CaveSpider", Arrays.asList("Level ", " Elite Cave Spider"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Creeper", Arrays.asList("Level ", " Elite Creeper"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Enderman", Arrays.asList("Level ", " Elite Enderman"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Endermite", Arrays.asList("Level ", " Elite Endermite"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Husk", Arrays.asList("Level ", " Elite Husk"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.IronGolem", Arrays.asList("Level ", " Elite Iron Golem"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.PigZombie", Arrays.asList("Level ", " Elite Zombie Pigman"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.PolarBear", Arrays.asList("Level ", " Elite Polar Bear"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Silverfish", Arrays.asList("Level ", " Elite Silverfish"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Skeleton", Arrays.asList("Level ", " Elite Skeleton"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Spider", Arrays.asList("Level ", " Elite Spider"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Stray", Arrays.asList("Level ", " Elite Stray"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Witch", Arrays.asList("Level ", " Elite Witch"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.WitherSkeleton", Arrays.asList("Level ", " Elite Wither Skeleton"));
+        this.getTranslationConfig().addDefault("Elite Mob Names.Zombie", Arrays.asList("Level ", " Elite Zombie"));
 
         this.getTranslationConfig().addDefault("Elite Mob Names.Chicken", "Super Chicken");
         this.getTranslationConfig().addDefault("Elite Mob Names.Cow", "Super Cow");
@@ -236,7 +236,7 @@ public class TranslationCustomConfig {
                 "Notch save me!",
                 "No retreat!",
                 "Hit me with your best shot!"
-                ));
+        ));
 
         this.getTranslationConfig().addDefault("Taunts.Hit", Arrays.asList(
                 "A solid hit!",

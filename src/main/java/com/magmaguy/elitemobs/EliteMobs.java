@@ -123,7 +123,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MobSpawningAndLoot(), this);
 
         //Minor mob powers
-        for (String string : MetadataHandler.minorPowerList){
+        for (String string : MetadataHandler.minorPowerList) {
 
             //don't load powers that require no event listeners
             if (!(string.equalsIgnoreCase("MovementSpeed"))
@@ -154,27 +154,27 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }
 
-        for (String string : MetadataHandler.majorPowerList){
+        for (String string : MetadataHandler.majorPowerList) {
 
             //don't load powers that require no event listeners
-                try {
+            try {
 
-                    String earlypath = "com.magmaguy.elitemobs.majorpowers.";
-                    String finalString = earlypath + string;
+                String earlypath = "com.magmaguy.elitemobs.majorpowers.";
+                String finalString = earlypath + string;
 
-                    Class<?> clazz = Class.forName(finalString);
+                Class<?> clazz = Class.forName(finalString);
 
-                    Object instance = clazz.newInstance();
+                Object instance = clazz.newInstance();
 
-                    this.getServer().getPluginManager().registerEvents((Listener) instance, this);
+                this.getServer().getPluginManager().registerEvents((Listener) instance, this);
 
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            }
 
         }
 

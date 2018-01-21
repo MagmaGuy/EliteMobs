@@ -34,17 +34,17 @@ import java.util.List;
 /**
  * Created by MagmaGuy on 04/05/2017.
  */
-public class LootGUI implements Listener{
+public class LootGUI implements Listener {
 
     private int currentHeaderPage = 1;
     private int currentLootPage = 1;
     private boolean filter = false;
     private int filterRank = 0;
 
-    private List <Integer> lootSlots = new ArrayList<>(Arrays.asList(10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,
-            32,33,34,37,38,39,40,41,42,43,46,47,48,49,50,51,52));
+    private List<Integer> lootSlots = new ArrayList<>(Arrays.asList(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31,
+            32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52));
 
-    public void lootGUI (Player player) {
+    public void lootGUI(Player player) {
 
         Inventory fakeChestInventory = Bukkit.createInventory(null, 54, "EliteMobs loot.yml");
         tierConstructor(fakeChestInventory);
@@ -89,9 +89,9 @@ public class LootGUI implements Listener{
 
     }
 
-    private void tierConstructor (Inventory inventory) {
+    private void tierConstructor(Inventory inventory) {
 
-        List <Integer> tierSlots = new ArrayList<>();
+        List<Integer> tierSlots = new ArrayList<>();
 
         tierSlots.add(1);
         tierSlots.add(2);
@@ -106,7 +106,7 @@ public class LootGUI implements Listener{
 
         for (int number : tierSlots) {
 
-            if (keySet.size() >= counter + ((currentHeaderPage - 1) * 6 )){
+            if (keySet.size() >= counter + ((currentHeaderPage - 1) * 6)) {
 
                 ItemStack chest = new ItemStack(Material.CHEST, 1);
                 ItemMeta chestItemMeta = chest.getItemMeta();
@@ -126,7 +126,7 @@ public class LootGUI implements Listener{
 
     }
 
-    private void lootNavigationConstructor (Inventory inventory) {
+    private void lootNavigationConstructor(Inventory inventory) {
 
         ItemStack arrowLeft = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowLeftSkullMeta = (SkullMeta) arrowLeft.getItemMeta();
@@ -147,7 +147,7 @@ public class LootGUI implements Listener{
 
     }
 
-    private void lootConstructor (Inventory inventory) {
+    private void lootConstructor(Inventory inventory) {
 
         int counter = 1;
 
@@ -180,77 +180,77 @@ public class LootGUI implements Listener{
     }
 
     @EventHandler
-    public void onClick (InventoryClickEvent event) {
+    public void onClick(InventoryClickEvent event) {
 
-            if (event.getInventory().getName().equalsIgnoreCase("EliteMobs loot.yml")){
+        if (event.getInventory().getName().equalsIgnoreCase("EliteMobs loot.yml")) {
 
-                if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
+            if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
 
-                    event.setCancelled(true);
-                    return;
+                event.setCancelled(true);
+                return;
 
-                }
+            }
 
-                String itemDisplayName = event.getCurrentItem().getItemMeta().getDisplayName();
-                Player player = (Player) event.getWhoClicked();
+            String itemDisplayName = event.getCurrentItem().getItemMeta().getDisplayName();
+            Player player = (Player) event.getWhoClicked();
 
-                if (itemDisplayName != null) {
+            if (itemDisplayName != null) {
 
-                    if (itemDisplayName.equals("Next Loot Page")) {
+                if (itemDisplayName.equals("Next Loot Page")) {
 
-                        currentLootPage++;
-                        lootGUI(player);
+                    currentLootPage++;
+                    lootGUI(player);
 
-                    } else if (itemDisplayName.equals("Previous Loot Page")) {
+                } else if (itemDisplayName.equals("Previous Loot Page")) {
 
-                        if (currentLootPage > 1) {
+                    if (currentLootPage > 1) {
 
-                            currentLootPage--;
-                            lootGUI(player);
-
-                        }
-
-                    } else if (itemDisplayName.equals("Next Item Ranks")) {
-
-                        currentHeaderPage++;
-                        lootGUI(player);
-
-                    } else if (itemDisplayName.equals("Previous Item Ranks")) {
-
-                        if (currentHeaderPage > 1) {
-
-                            currentHeaderPage--;
-                            lootGUI(player);
-
-                        }
-
-                    } else if (itemDisplayName.equals("EliteMobs by MagmaGuy")) {
-
-                        filter = false;
-                        currentLootPage = 1;
-                        lootGUI(player);
-
-                    } else if (event.getCurrentItem().getItemMeta().getLore().get(0).equals("Filter by items of this rank.")) {
-
-                        filter = true;
-                        String[] lore = itemDisplayName.split("\\s");
-                        filterRank = Integer.valueOf(lore[1]);
-                        currentLootPage = 1;
+                        currentLootPage--;
                         lootGUI(player);
 
                     }
 
+                } else if (itemDisplayName.equals("Next Item Ranks")) {
+
+                    currentHeaderPage++;
+                    lootGUI(player);
+
+                } else if (itemDisplayName.equals("Previous Item Ranks")) {
+
+                    if (currentHeaderPage > 1) {
+
+                        currentHeaderPage--;
+                        lootGUI(player);
+
+                    }
+
+                } else if (itemDisplayName.equals("EliteMobs by MagmaGuy")) {
+
+                    filter = false;
+                    currentLootPage = 1;
+                    lootGUI(player);
+
+                } else if (event.getCurrentItem().getItemMeta().getLore().get(0).equals("Filter by items of this rank.")) {
+
+                    filter = true;
+                    String[] lore = itemDisplayName.split("\\s");
+                    filterRank = Integer.valueOf(lore[1]);
+                    currentLootPage = 1;
+                    lootGUI(player);
+
                 }
-
-                 if (lootSlots.contains(event.getSlot())) {
-
-                    player.getInventory().addItem(event.getCurrentItem());
-
-                }
-
-                event.setCancelled(true);
 
             }
+
+            if (lootSlots.contains(event.getSlot())) {
+
+                player.getInventory().addItem(event.getCurrentItem());
+
+            }
+
+            event.setCancelled(true);
+
+        }
 
     }
 

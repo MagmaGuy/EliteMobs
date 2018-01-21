@@ -28,7 +28,7 @@ public class EconomyHandler {
     private static PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
     private static FileConfiguration configuration = playerMoneyDataConfig.getEconomySettingsConfig();
 
-    public static double addCurrency (UUID user, double amount) {
+    public static double addCurrency(UUID user, double amount) {
 
         if (!checkUserExists(user.toString())) {
 
@@ -47,7 +47,7 @@ public class EconomyHandler {
     }
 
 
-    public static double subtractCurrency (UUID user, double amount) {
+    public static double subtractCurrency(UUID user, double amount) {
 
         if (!checkUserExists(user.toString())) {
 
@@ -65,7 +65,7 @@ public class EconomyHandler {
 
     }
 
-    public static void setCurrency (UUID user, double amount) {
+    public static void setCurrency(UUID user, double amount) {
 
         if (!checkUserExists(user.toString())) {
 
@@ -78,7 +78,7 @@ public class EconomyHandler {
 
     }
 
-    public static double checkCurrency (UUID user) {
+    public static double checkCurrency(UUID user) {
 
         if (!checkUserExists(user.toString())) {
 
@@ -90,14 +90,14 @@ public class EconomyHandler {
 
     }
 
-    public static void createUser (UUID user){
+    public static void createUser(UUID user) {
 
         configuration.set(user.toString(), 0);
         playerMoneyDataConfig.saveCustomConfig();
 
     }
 
-    public static boolean checkUserExists(String name){
+    public static boolean checkUserExists(String name) {
 
         for (String string : configuration.getKeys(false)) {
 

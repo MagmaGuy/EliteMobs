@@ -71,7 +71,7 @@ public class HealthHandler {
 
     }
 
-    public static void passiveHealthHandler (Entity entity, int passiveStacking) {
+    public static void passiveHealthHandler(Entity entity, int passiveStacking) {
 
         ((Damageable) entity).setMaxHealth(((LivingEntity) entity).getMaxHealth() * passiveStacking);
 

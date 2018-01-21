@@ -240,7 +240,7 @@ public class StatsCommandHandler {
 
         } else if (commandSender instanceof ConsoleCommandSender) {
 
-            getServer().getConsoleSender().sendMessage( "§5§m-------------------------------------------------------------");
+            getServer().getConsoleSender().sendMessage("§5§m-------------------------------------------------------------");
             getServer().getConsoleSender().sendMessage("§a§lEliteMobs stats:");
             getServer().getConsoleSender().sendMessage("There are currently §l§6" + totalMobCount + " §f§rEliteMobs replacing §l§e" +
                     mobLevelSavingsCount + " §f§rregular mobs.");

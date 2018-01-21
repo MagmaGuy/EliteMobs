@@ -15,6 +15,8 @@
 
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -60,12 +62,12 @@ public class MetadataHandler implements Listener {
     public final static String ZOMBIE_FRIENDS_MD = "ZombieFriends";
     public final static String ZOMBIE_NECRONOMICON_MD = "ZombieNecronomicon";
     public final static String ZOMBIE_TEAM_ROCKET_MD = "ZombieTeamRocket";
-    public final static String ZOMBIE_PARENTS_MD= "ZombieParents";
+    public final static String ZOMBIE_PARENTS_MD = "ZombieParents";
     //Major powers human format
     public final static String ZOMBIE_FRIENDS_H = "ZombieFriends";
     public final static String ZOMBIE_NECRONOMICON_H = "ZombieNecronomicon";
     public final static String ZOMBIE_TEAM_ROCKET_H = "ZombieTeamRocket";
-    public final static String ZOMBIE_PARENTS_H= "ZombieParents";
+    public final static String ZOMBIE_PARENTS_H = "ZombieParents";
     //Minor powers
     public final static String ATTACK_ARROW_MD = "AttackArrow";
     public final static String ATTACK_BLINDING_MD = "AttackBlinding";
@@ -118,7 +120,7 @@ public class MetadataHandler implements Listener {
     public final static String FROZEN = "Frozen";
     public final static String FROZEN_COOLDOWN = "FrozenCooldown";
     public final static String ZOMBIE_FRIENDS_ACTIVATED = "ZombieFriendsActivated";
-    public final static String TEAM_ROCKET_MEMBER= "TeamRocketMember";
+    public final static String TEAM_ROCKET_MEMBER = "TeamRocketMember";
     public final static String TEAM_ROCKET_ACTIVATED = "TeamRocketActivated";
     public final static String ZOMBIE_PARENTS_ACTIVATED = "ZombieParentsActivated";
     public final static String ZOMBIE_CHANTING = "ZombieChanting";
@@ -202,7 +204,7 @@ public class MetadataHandler implements Listener {
 
     }
 
-    public static List<String> allPowersList(){
+    public static List<String> allPowersList() {
 
         List metadataList = Stream.of(minorPowerList, majorPowerList).flatMap(List::stream).collect(Collectors.toList());
 
@@ -241,7 +243,7 @@ public class MetadataHandler implements Listener {
             ZOMBIE_PARENTS_H
     ));
 
-    public static String machineToHumanTranslator (String metadata) {
+    public static String machineToHumanTranslator(String metadata) {
 
         switch (metadata) {
 
@@ -312,15 +314,35 @@ public class MetadataHandler implements Listener {
 
             if (entity.hasMetadata(string) && !string.equals(NATURAL_MOB_MD)) {
 
-                if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
-                        !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
-                        (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity))) {
+                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.DESPAWN_ELITE_MOBS_ON_CHUNK_UNLOAD)) {
 
-                    entity.remove();
+                    if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
+                            !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
+                            (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity))) {
+
+                        entity.remove();
+
+                    }
+
+                    entity.removeMetadata(string, plugin);
+
+                } else {
+
+                    if (entity.isDead() || !entity.isValid()) {
+
+                        if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
+                                !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
+                                (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity))) {
+
+                            entity.remove();
+
+                        }
+
+                        entity.removeMetadata(string, plugin);
+
+                    }
 
                 }
-
-                entity.removeMetadata(string, plugin);
 
             }
 

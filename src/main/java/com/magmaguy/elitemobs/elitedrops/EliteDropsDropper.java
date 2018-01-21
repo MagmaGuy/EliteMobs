@@ -31,13 +31,13 @@ import java.util.Random;
 /**
  * Created by MagmaGuy on 04/06/2017.
  */
-public class EliteDropsDropper implements Listener{
+public class EliteDropsDropper implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     private Random random = new Random();
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
         if (!ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
@@ -75,7 +75,7 @@ public class EliteDropsDropper implements Listener{
             if (random.nextDouble() < chanceToDrop) {
 
                 if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                        ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
+                        ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
 
                     if (EliteDropsHandler.rankedItemStacks.containsKey(mobLevel)) {
 
@@ -116,14 +116,14 @@ public class EliteDropsDropper implements Listener{
                     entity.getWorld().dropItem(entity.getLocation(), randomizedCustomItem);
 
                 } else if (!EliteDropsHandler.rankedItemStacks.isEmpty() && !ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                        ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
+                        ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
 
                     RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
                     ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
 
                     entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
-                } else if (EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")){
+                } else if (EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
 
                     RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
                     ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);

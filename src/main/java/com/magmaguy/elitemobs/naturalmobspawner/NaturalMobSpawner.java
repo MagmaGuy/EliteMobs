@@ -49,7 +49,7 @@ public class NaturalMobSpawner implements Listener {
 
     }
 
-    public void naturalMobProcessor (Entity entity) {
+    public void naturalMobProcessor(Entity entity) {
 
         List<Player> closePlayers = new ArrayList<>();
 
@@ -156,7 +156,7 @@ public class NaturalMobSpawner implements Listener {
 
     }
 
-    private int itemRankCalculator (ItemStack itemStack) {
+    private int itemRankCalculator(ItemStack itemStack) {
 
         Material material = itemStack.getType();
         ItemMeta itemMeta = itemStack.getItemMeta();

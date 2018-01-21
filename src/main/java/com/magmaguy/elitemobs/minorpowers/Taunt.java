@@ -50,7 +50,6 @@ public class Taunt extends MinorPowers implements Listener {
     private static Random random = new Random();
 
 
-
     private final static List<String> TARGET_TAUNT_LIST = ConfigValues.translationConfig.getStringList("Taunts.Target");
 
     private final static List<String> GENERIC_DAMAGED_LIST = ConfigValues.translationConfig.getStringList("Taunts.Damaged");
@@ -80,7 +79,7 @@ public class Taunt extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void onTarget (EntityTargetEvent event) {
+    public void onTarget(EntityTargetEvent event) {
 
         if (event.getEntity().hasMetadata(powerMetadata)) {
 
@@ -97,7 +96,7 @@ public class Taunt extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void onDamaged (EntityDamageEvent event) {
+    public void onDamaged(EntityDamageEvent event) {
 
         if (!(event.getEntity() instanceof LivingEntity) ||
                 ((LivingEntity) event.getEntity()).getHealth() - event.getFinalDamage() <= 0 ||
@@ -126,34 +125,34 @@ public class Taunt extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void onHit (EntityDamageByEntityEvent event) {
+    public void onHit(EntityDamageByEntityEvent event) {
 
 
-            if (event.getDamager().hasMetadata(powerMetadata) || event.getDamager() instanceof Projectile &&
+        if (event.getDamager().hasMetadata(powerMetadata) || event.getDamager() instanceof Projectile &&
+                ProjectileMetadataDetector.projectileMetadataDetector((Projectile) event.getDamager(), powerMetadata)) {
+
+            if (event.getDamager().hasMetadata(powerMetadata)) {
+
+                nametagProcessor(event.getDamager(), HIT_LIST);
+
+            } else if (event.getDamager() instanceof Projectile &&
                     ProjectileMetadataDetector.projectileMetadataDetector((Projectile) event.getDamager(), powerMetadata)) {
 
-                if (event.getDamager().hasMetadata(powerMetadata)) {
+                Entity entity = (Entity) ((Projectile) event.getDamager()).getShooter();
 
-                    nametagProcessor(event.getDamager(), HIT_LIST);
-
-                } else if (event.getDamager() instanceof Projectile &&
-                        ProjectileMetadataDetector.projectileMetadataDetector((Projectile) event.getDamager(), powerMetadata)) {
-
-                    Entity entity = (Entity) ((Projectile) event.getDamager()).getShooter();
-
-                    nametagProcessor(entity, HIT_LIST);
-
-                }
+                nametagProcessor(entity, HIT_LIST);
 
             }
+
+        }
 
 
     }
 
     @EventHandler
-    public void onDeath (EntityDeathEvent event){
+    public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(powerMetadata)){
+        if (event.getEntity().hasMetadata(powerMetadata)) {
 
             Entity entity = event.getEntity();
 
@@ -163,7 +162,7 @@ public class Taunt extends MinorPowers implements Listener {
 
     }
 
-    private void nametagProcessor (Entity entity, List<String> list){
+    private void nametagProcessor(Entity entity, List<String> list) {
 
         if (entity.hasMetadata(MetadataHandler.TAUNT_NAME)) {
 
@@ -180,12 +179,12 @@ public class Taunt extends MinorPowers implements Listener {
 
         entity.setCustomName(chatColorConverter(tempName));
 
-        new BukkitRunnable(){
+        new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                if (!entity.isValid()){
+                if (!entity.isValid()) {
                     return;
                 }
 

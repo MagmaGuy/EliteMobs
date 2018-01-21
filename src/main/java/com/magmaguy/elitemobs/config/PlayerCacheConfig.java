@@ -24,7 +24,7 @@ public class PlayerCacheConfig {
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
-    public void intializePlayerCacheConfig () {
+    public void intializePlayerCacheConfig() {
 
         getPlayerCacheConfig().options().copyDefaults(true);
         saveDefaultCustomConfig();
