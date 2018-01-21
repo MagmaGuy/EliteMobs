@@ -27,7 +27,7 @@ import java.util.Random;
  */
 public class SimLootHandler {
 
-    public void simLoot (Player player, int level) {
+    public void simLoot(Player player, int level) {
 
         Random random = new Random();
 

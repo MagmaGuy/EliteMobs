@@ -64,10 +64,12 @@ public class MergeHandler implements Listener {
 
     private void validateEntityType(Entity eventEntity) {
 
-        if (!eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) && !ConfigValues.defaultConfig.getBoolean("Stack aggressive spawner mobs")) {
-
+        if (!ConfigValues.defaultConfig.getBoolean("Valid worlds." + eventEntity.getWorld().getName().toString())) {
             return;
+        }
 
+        if (!eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) && !ConfigValues.defaultConfig.getBoolean("Stack aggressive spawner mobs")) {
+            return;
         }
 
         MobScanner mobScanner = new MobScanner();

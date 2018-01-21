@@ -87,7 +87,7 @@ public class CommandHandler implements CommandExecutor {
 
         }
 
-        switch(args.length) {
+        switch (args.length) {
 
             //just /elitemobs
             case 0:
@@ -98,7 +98,7 @@ public class CommandHandler implements CommandExecutor {
             // /elitemobs stats | /elitemobs getloot (for GUI menu) | /elitemobs shop
             case 1:
 
-                if (args[0].equalsIgnoreCase("stats") && permCheck(STATS, commandSender)){
+                if (args[0].equalsIgnoreCase("stats") && permCheck(STATS, commandSender)) {
 
                     StatsCommandHandler stats = new StatsCommandHandler();
 
@@ -112,7 +112,7 @@ public class CommandHandler implements CommandExecutor {
                         userPermCheck(GETLOOT, commandSender)) {
 
                     LootGUI lootGUI = new LootGUI();
-                    lootGUI.lootGUI((Player)commandSender);
+                    lootGUI.lootGUI((Player) commandSender);
                     return true;
 
                 }
@@ -140,13 +140,13 @@ public class CommandHandler implements CommandExecutor {
 
                 if (args[0].equalsIgnoreCase("wallet") && userPermCheck(CURRENCY_WALLET, commandSender)) {
 
-                        String name = commandSender.getName();
+                    String name = commandSender.getName();
 
-                        Double money = CurrencyCommandsHandler.walletCommand(name);
+                    Double money = CurrencyCommandsHandler.walletCommand(name);
 
-                        commandSender.sendMessage(ChatColor.GREEN + "You have " + money + " " + ConfigValues.economyConfig.getString("Currency name"));
+                    commandSender.sendMessage(ChatColor.GREEN + "You have " + money + " " + ConfigValues.economyConfig.getString("Currency name"));
 
-                        return true;
+                    return true;
 
                 }
 
@@ -240,47 +240,47 @@ public class CommandHandler implements CommandExecutor {
                         permCheck(KILLALL_AGGRESSIVEELITES, commandSender)) {
 
 
-                        int counter = 0;
+                    int counter = 0;
 
-                        for (World world : EliteMobs.worldList) {
+                    for (World world : EliteMobs.worldList) {
 
-                            for (LivingEntity livingEntity : world.getLivingEntities()) {
+                        for (LivingEntity livingEntity : world.getLivingEntities()) {
 
-                                if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(livingEntity)) {
+                            if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(livingEntity)) {
 
-                                    livingEntity.remove();
-                                    counter++;
-
-                                }
+                                livingEntity.remove();
+                                counter++;
 
                             }
 
                         }
 
-                        commandSender.sendMessage("Killed " + counter + " aggressive EliteMobs.");
+                    }
 
-                        return true;
+                    commandSender.sendMessage("Killed " + counter + " aggressive EliteMobs.");
+
+                    return true;
 
                 }
 
                 if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("passiveelites") &&
                         permCheck(KILLALL_PASSIVEELITES, commandSender)) {
 
-                        for (World world : EliteMobs.worldList) {
+                    for (World world : EliteMobs.worldList) {
 
-                            for (LivingEntity livingEntity : world.getLivingEntities()) {
+                        for (LivingEntity livingEntity : world.getLivingEntities()) {
 
-                                if (livingEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && ValidPassiveMobFilter.ValidPassiveMobFilter(livingEntity)) {
+                            if (livingEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && ValidPassiveMobFilter.ValidPassiveMobFilter(livingEntity)) {
 
-                                    livingEntity.remove();
-
-                                }
+                                livingEntity.remove();
 
                             }
 
                         }
 
-                        return true;
+                    }
+
+                    return true;
 
                 }
 
@@ -288,9 +288,9 @@ public class CommandHandler implements CommandExecutor {
                         userPermCheck(SIMLOOT, commandSender)) {
 
 
-                        SimLootHandler simLootHandler = new SimLootHandler();
+                    SimLootHandler simLootHandler = new SimLootHandler();
 
-                        simLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]));
+                    simLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]));
 
                     return true;
 
@@ -323,53 +323,33 @@ public class CommandHandler implements CommandExecutor {
 
                 if (args[0].equalsIgnoreCase("giveloot") && permCheck(GIVELOOT, commandSender)) {
 
-                        if (validPlayer(args[1])) {
+                    if (validPlayer(args[1])) {
 
-                            Player receiver = Bukkit.getServer().getPlayer(args[1]);
+                        Player receiver = Bukkit.getServer().getPlayer(args[1]);
 
-                            GetLootCommandHandler getLootCommandHandler = new GetLootCommandHandler();
+                        GetLootCommandHandler getLootCommandHandler = new GetLootCommandHandler();
 
-                            if (args[2].equalsIgnoreCase("random") || args[2].equalsIgnoreCase("r")) {
+                        if (args[2].equalsIgnoreCase("random") || args[2].equalsIgnoreCase("r")) {
 
-                                Random random = new Random();
+                            Random random = new Random();
 
-                                int index = random.nextInt(lootList.size());
+                            int index = random.nextInt(lootList.size());
 
-                                ItemStack itemStack = new ItemStack(lootList.get(index));
+                            ItemStack itemStack = new ItemStack(lootList.get(index));
 
-                                receiver.getInventory().addItem(itemStack);
+                            receiver.getInventory().addItem(itemStack);
 
-                                return true;
+                            return true;
 
-                            } else if (getLootCommandHandler.getLootHandler(receiver, args[2])) {
+                        } else if (getLootCommandHandler.getLootHandler(receiver, args[2])) {
 
-                                return true;
+                            return true;
 
-                            } else if (!getLootCommandHandler.getLootHandler(receiver, args[2])) {
-
-                                if (commandSender instanceof ConsoleCommandSender) {
-
-                                    getLogger().info("Can't give loot to player - loot not found.");
-
-                                    return true;
-
-                                } else if (commandSender instanceof Player) {
-
-                                    Player player = (Player) commandSender;
-
-                                    player.sendTitle("Can't give loot to player - loot not found.","");
-
-                                    return true;
-
-                                }
-
-                            }
-
-                        } else {
+                        } else if (!getLootCommandHandler.getLootHandler(receiver, args[2])) {
 
                             if (commandSender instanceof ConsoleCommandSender) {
 
-                                getLogger().info("Can't give loot to player - player not found.");
+                                getLogger().info("Can't give loot to player - loot not found.");
 
                                 return true;
 
@@ -377,13 +357,33 @@ public class CommandHandler implements CommandExecutor {
 
                                 Player player = (Player) commandSender;
 
-                                player.sendTitle("Can't give loot to player - player not found.","");
+                                player.sendTitle("Can't give loot to player - loot not found.", "");
 
                                 return true;
 
                             }
 
                         }
+
+                    } else {
+
+                        if (commandSender instanceof ConsoleCommandSender) {
+
+                            getLogger().info("Can't give loot to player - player not found.");
+
+                            return true;
+
+                        } else if (commandSender instanceof Player) {
+
+                            Player player = (Player) commandSender;
+
+                            player.sendTitle("Can't give loot to player - player not found.", "");
+
+                            return true;
+
+                        }
+
+                    }
 
                 }
 
@@ -400,7 +400,7 @@ public class CommandHandler implements CommandExecutor {
                             commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())) + " " + ConfigValues.economyConfig.get("Currency name"));
 
                             Player recipient = getServer().getPlayer(args[1]);
-                            recipient.sendMessage("You have received " + args[2] + " " +  ConfigValues.economyConfig.get("Currency name") +" from " + ((Player) commandSender).getDisplayName());
+                            recipient.sendMessage("You have received " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " from " + ((Player) commandSender).getDisplayName());
 
                         } else if (Double.parseDouble(args[2]) < 0) {
 
@@ -492,7 +492,7 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
-    private boolean permCheck (String permission, CommandSender commandSender) {
+    private boolean permCheck(String permission, CommandSender commandSender) {
 
         if (commandSender.hasPermission(permission)) {
 
@@ -519,7 +519,7 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
-    private boolean userPermCheck (String permission, CommandSender commandSender) {
+    private boolean userPermCheck(String permission, CommandSender commandSender) {
 
         if (commandSender instanceof Player) {
 
@@ -533,7 +533,7 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
-    private void validCommands(CommandSender commandSender){
+    private void validCommands(CommandSender commandSender) {
 
         if (commandSender instanceof Player) {
 
@@ -615,7 +615,7 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
-    private boolean silentPermCheck (String permission, CommandSender commandSender) {
+    private boolean silentPermCheck(String permission, CommandSender commandSender) {
 
         return commandSender.hasPermission(permission);
 

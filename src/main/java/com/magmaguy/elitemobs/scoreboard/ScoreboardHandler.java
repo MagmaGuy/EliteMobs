@@ -39,7 +39,7 @@ public class ScoreboardHandler implements Listener {
     static HashMap playerHasScoreboard = new HashMap<Player, Boolean>();
     int processID;
 
-    public void scanSight () {
+    public void scanSight() {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
 
@@ -73,7 +73,7 @@ public class ScoreboardHandler implements Listener {
 
     }
 
-    public void aggressiveEliteMobScoreboard (Entity entity, Player player) {
+    public void aggressiveEliteMobScoreboard(Entity entity, Player player) {
 
         processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -122,13 +122,13 @@ public class ScoreboardHandler implements Listener {
 
                     if (entity.hasMetadata(string)) {
 
-                        String finalString = metadataHandler.machineToHumanTranslator(string);
+                        String finalString = MetadataHandler.machineToHumanTranslator(string);
 
                         if (powerCounter > 13) {
 
                             Score score = null;
 
-                            if (MetadataHandler.minorPowerList.contains(string)){
+                            if (MetadataHandler.minorPowerList.contains(string)) {
 
                                 score = objective.getScore(ChatColor.AQUA + finalString);
 
@@ -155,7 +155,7 @@ public class ScoreboardHandler implements Listener {
 
                             Score score;
 
-                            if (MetadataHandler.minorPowerList.contains(string)){
+                            if (MetadataHandler.minorPowerList.contains(string)) {
 
                                 score = objective.getScore(ChatColor.AQUA + finalString);
 

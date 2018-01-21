@@ -52,7 +52,7 @@ public class LootCustomConfig {
 
     }
 
-    public void reloadLootConfig(){
+    public void reloadLootConfig() {
 
         customConfigLoader.reloadCustomConfig("loot.yml");
 

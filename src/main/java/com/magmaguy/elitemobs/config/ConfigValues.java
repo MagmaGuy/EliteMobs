@@ -24,10 +24,10 @@ import org.bukkit.configuration.Configuration;
  */
 public class ConfigValues {
 
-   public static Configuration defaultConfig, lootConfig, mobPowerConfig, translationConfig, randomItemsConfig,
-           economyConfig, playerCacheConfig;
+    public static Configuration defaultConfig, lootConfig, mobPowerConfig, translationConfig, randomItemsConfig,
+            economyConfig, playerCacheConfig;
 
-    public void initializeConfigValues () {
+    public void initializeConfigValues() {
 
         defaultConfig = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
         LootCustomConfig lootCustomConfig = new LootCustomConfig();

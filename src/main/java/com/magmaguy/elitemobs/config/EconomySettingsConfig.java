@@ -24,7 +24,7 @@ public class EconomySettingsConfig {
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
-    public void intializeEconomySettingsConfig () {
+    public void intializeEconomySettingsConfig() {
 
         this.getEconomySettingsConfig().addDefault("Enable economy", true);
         this.getEconomySettingsConfig().addDefault("Item resale value (percentage)", 5);
@@ -41,28 +41,28 @@ public class EconomySettingsConfig {
 
     }
 
-        public FileConfiguration getEconomySettingsConfig() {
+    public FileConfiguration getEconomySettingsConfig() {
 
-            return customConfigLoader.getCustomConfig("economySettings.yml");
+        return customConfigLoader.getCustomConfig("economySettings.yml");
 
-        }
+    }
 
-        public void reloadCustomConfig() {
+    public void reloadCustomConfig() {
 
-            customConfigLoader.reloadCustomConfig("economySettings.yml");
+        customConfigLoader.reloadCustomConfig("economySettings.yml");
 
-        }
+    }
 
-        public void saveCustomConfig() {
+    public void saveCustomConfig() {
 
-            customConfigLoader.saveCustomDefaultConfig("economySettings.yml");
+        customConfigLoader.saveCustomDefaultConfig("economySettings.yml");
 
-        }
+    }
 
-        public void saveDefaultCustomConfig() {
+    public void saveDefaultCustomConfig() {
 
-            customConfigLoader.saveDefaultCustomConfig("economySettings.yml");
+        customConfigLoader.saveDefaultCustomConfig("economySettings.yml");
 
-        }
+    }
 
 }

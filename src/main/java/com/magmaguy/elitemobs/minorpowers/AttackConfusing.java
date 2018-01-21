@@ -54,7 +54,7 @@ public class AttackConfusing extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void attackConfusing (EntityDamageByEntityEvent event) {
+    public void attackConfusing(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
@@ -65,7 +65,7 @@ public class AttackConfusing extends MinorPowers implements Listener {
 
                 Player player = (Player) damagee;
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*10, 3));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 10, 3));
 
             }
 
@@ -75,7 +75,7 @@ public class AttackConfusing extends MinorPowers implements Listener {
 
                 Player player = (Player) damagee;
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*10, 3));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 10, 3));
 
             }
 

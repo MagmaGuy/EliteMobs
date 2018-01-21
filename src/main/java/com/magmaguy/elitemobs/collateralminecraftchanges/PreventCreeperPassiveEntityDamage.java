@@ -26,7 +26,7 @@ import org.bukkit.plugin.Plugin;
 /**
  * Created by MagmaGuy on 22/04/2017.
  */
-public class PreventCreeperPassiveEntityDamage implements Listener{
+public class PreventCreeperPassiveEntityDamage implements Listener {
 
     private EliteMobs plugin;
 
@@ -38,7 +38,7 @@ public class PreventCreeperPassiveEntityDamage implements Listener{
 
     //This cancels all creeper and entity-caused explosion damage on passive mobs
     @EventHandler
-    public void superCreeperCollateralDamageAvoider (EntityDamageEvent event) {
+    public void superCreeperCollateralDamageAvoider(EntityDamageEvent event) {
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
 

@@ -54,7 +54,7 @@ public class AttackFireball extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void attackFireball (EntityTargetEvent event) {
+    public void attackFireball(EntityTargetEvent event) {
 
         if (event.getEntity().hasMetadata(powerMetadata) && !event.getEntity().hasMetadata(MetadataHandler.SHOOTING_FIREBALLS)) {
 
@@ -65,13 +65,13 @@ public class AttackFireball extends MinorPowers implements Listener {
 
                 targetter.setMetadata(MetadataHandler.SHOOTING_FIREBALLS, new FixedMetadataValue(plugin, true));
 
-                new BukkitRunnable(){
+                new BukkitRunnable() {
 
                     @Override
                     public void run() {
 
                         if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
-                                || targetted.getLocation().distance(targetter.getLocation()) > 20 ) {
+                                || targetted.getLocation().distance(targetter.getLocation()) > 20) {
 
                             targetter.removeMetadata(MetadataHandler.SHOOTING_FIREBALLS, plugin);
                             cancel();

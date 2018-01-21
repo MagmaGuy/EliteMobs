@@ -25,7 +25,7 @@ public class MobPowersCustomConfig {
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
-    public void initializeMobPowersConfig () {
+    public void initializeMobPowersConfig() {
 
         for (String string : MetadataHandler.minorPowerList) {
 

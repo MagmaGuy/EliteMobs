@@ -141,7 +141,7 @@ public class PowerHandler {
 
             int currentMajorPowerAmount = 0;
 
-            if (entity.hasMetadata(MetadataHandler.CUSTOM_POWERS_MD)){
+            if (entity.hasMetadata(MetadataHandler.CUSTOM_POWERS_MD)) {
 
                 return;
 
@@ -241,11 +241,11 @@ public class PowerHandler {
     }
 
 
-    public static void minorPowerArrayInitializer () {
+    public static void minorPowerArrayInitializer() {
 
         for (String string : MetadataHandler.minorPowerList) {
 
-            if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)){
+            if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)) {
 
                 try {
 

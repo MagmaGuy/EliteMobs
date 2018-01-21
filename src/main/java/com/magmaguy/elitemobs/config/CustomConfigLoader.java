@@ -44,7 +44,7 @@ public class CustomConfigLoader {
         return customConfig;
     }
 
-    public void reloadCustomConfig(String configName){
+    public void reloadCustomConfig(String configName) {
 
         if (customConfigFile == null) {
 

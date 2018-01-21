@@ -33,7 +33,7 @@ public class MinorPowerStanceMath {
     public final static double NUMBER_OF_POINTS_PER_FULL_ROTATION = 10;
     private static HashMap<Integer, HashMap<Integer, List<Vector>>> storedRotatedValues = new HashMap();
 
-    public static HashMap<Integer, List<Vector>> majorPowerLocationConstructor (int trackAmount, int itemsPerTrack, int counter) {
+    public static HashMap<Integer, List<Vector>> majorPowerLocationConstructor(int trackAmount, int itemsPerTrack, int counter) {
 
         if (storedRotatedValues.containsKey(counter)) {
 

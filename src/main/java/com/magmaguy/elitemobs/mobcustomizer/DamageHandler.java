@@ -29,7 +29,7 @@ import org.bukkit.potion.PotionEffect;
 /**
  * Created by MagmaGuy on 18/04/2017.
  */
-public class DamageHandler implements Listener{
+public class DamageHandler implements Listener {
 
     private EliteMobs plugin;
 
@@ -71,7 +71,6 @@ public class DamageHandler implements Listener{
         }
 
         if (event.getDamager() instanceof Projectile) {
-
 
 
             if (((Projectile) event.getDamager()).getShooter() instanceof Skeleton ||
@@ -121,7 +120,7 @@ public class DamageHandler implements Listener{
 
             int mobLevel = event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-            if(mobLevel <= 1) {
+            if (mobLevel <= 1) {
 
                 return;
 

@@ -58,97 +58,97 @@ public class RandomItemGenerator {
 
             double rankProgression = ConfigValues.defaultConfig.getDouble("Increase MMORPG color rank every X levels X=");
 
-                if (Math.floor(itemRank /rankProgression) >= 5) {
+            if (Math.floor(itemRank / rankProgression) >= 5) {
 
-                    itemMeta.setDisplayName(ChatColor.GOLD + itemMeta.getDisplayName());
+                itemMeta.setDisplayName(ChatColor.GOLD + itemMeta.getDisplayName());
 
-                    List list = new ArrayList();
+                List list = new ArrayList();
 
-                    for (String string : itemMeta.getLore()) {
+                for (String string : itemMeta.getLore()) {
 
-                        String coloredString = ChatColor.GOLD + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 4) {
-
-                    itemMeta.setDisplayName(ChatColor.DARK_PURPLE + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 3) {
-
-                    itemMeta.setDisplayName(ChatColor.BLUE + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.BLUE + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 2) {
-
-                    itemMeta.setDisplayName(ChatColor.GREEN + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.GREEN + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 1) {
-
-                    itemMeta.setDisplayName(ChatColor.WHITE + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.WHITE + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 0) {
-
-                    itemMeta.setDisplayName(ChatColor.GRAY + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.GRAY + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
+                    String coloredString = ChatColor.GOLD + "" + ChatColor.ITALIC + string;
+                    list.add(coloredString);
 
                 }
+
+                itemMeta.setLore(list);
+
+            } else if (Math.floor(itemRank / rankProgression) == 4) {
+
+                itemMeta.setDisplayName(ChatColor.DARK_PURPLE + itemMeta.getDisplayName());
+
+                List list = new ArrayList();
+
+                for (String string : itemMeta.getLore()) {
+
+                    String coloredString = ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + string;
+                    list.add(coloredString);
+
+                }
+
+                itemMeta.setLore(list);
+
+            } else if (Math.floor(itemRank / rankProgression) == 3) {
+
+                itemMeta.setDisplayName(ChatColor.BLUE + itemMeta.getDisplayName());
+
+                List list = new ArrayList();
+
+                for (String string : itemMeta.getLore()) {
+
+                    String coloredString = ChatColor.BLUE + "" + ChatColor.ITALIC + string;
+                    list.add(coloredString);
+
+                }
+
+                itemMeta.setLore(list);
+
+            } else if (Math.floor(itemRank / rankProgression) == 2) {
+
+                itemMeta.setDisplayName(ChatColor.GREEN + itemMeta.getDisplayName());
+
+                List list = new ArrayList();
+
+                for (String string : itemMeta.getLore()) {
+
+                    String coloredString = ChatColor.GREEN + "" + ChatColor.ITALIC + string;
+                    list.add(coloredString);
+
+                }
+
+                itemMeta.setLore(list);
+
+            } else if (Math.floor(itemRank / rankProgression) == 1) {
+
+                itemMeta.setDisplayName(ChatColor.WHITE + itemMeta.getDisplayName());
+
+                List list = new ArrayList();
+
+                for (String string : itemMeta.getLore()) {
+
+                    String coloredString = ChatColor.WHITE + "" + ChatColor.ITALIC + string;
+                    list.add(coloredString);
+
+                }
+
+                itemMeta.setLore(list);
+
+            } else if (Math.floor(itemRank / rankProgression) == 0) {
+
+                itemMeta.setDisplayName(ChatColor.GRAY + itemMeta.getDisplayName());
+
+                List list = new ArrayList();
+
+                for (String string : itemMeta.getLore()) {
+
+                    String coloredString = ChatColor.GRAY + "" + ChatColor.ITALIC + string;
+                    list.add(coloredString);
+
+                }
+
+                itemMeta.setLore(list);
+
+            }
 
         }
 
@@ -162,7 +162,7 @@ public class RandomItemGenerator {
             Bukkit.getLogger().info("[EliteMobs] Item lore: " + randomItem.getItemMeta().getLore().get(0));
             Bukkit.getLogger().info("[EliteMobs] Item enchantments:");
 
-            for (Map.Entry<Enchantment, Integer> entry : randomItem.getItemMeta().getEnchants().entrySet()){
+            for (Map.Entry<Enchantment, Integer> entry : randomItem.getItemMeta().getEnchants().entrySet()) {
 
                 Bukkit.getLogger().info(entry.getKey() + " level " + entry.getValue());
 
@@ -182,7 +182,7 @@ public class RandomItemGenerator {
 
     }
 
-    private Material randomMaterialConstructor(int mobLevel){
+    private Material randomMaterialConstructor(int mobLevel) {
 
         List<Material> validMaterials = new ArrayList<>();
 
@@ -296,7 +296,7 @@ public class RandomItemGenerator {
     private static ArrayList<String> verbs = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid verbs");
     private static ArrayList<String> verbers = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid verb-er (noun)");
 
-    private String randomItemNameConstructor(Material material){
+    private String randomItemNameConstructor(Material material) {
 
         String finalName = "";
 
@@ -336,7 +336,7 @@ public class RandomItemGenerator {
 
     }
 
-    private String verbTypeAdjectiveNoun (Material material) {
+    private String verbTypeAdjectiveNoun(Material material) {
 
         String randomVerb = verbs.get(random.nextInt(verbs.size()));
         String itemType = itemTypeStringParser(material);
@@ -349,7 +349,7 @@ public class RandomItemGenerator {
 
     }
 
-    private String typeAdjectiveNoun (Material material) {
+    private String typeAdjectiveNoun(Material material) {
 
         String itemType = itemTypeStringParser(material);
         String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
@@ -361,7 +361,7 @@ public class RandomItemGenerator {
 
     }
 
-    private String nounVerbType (Material material) {
+    private String nounVerbType(Material material) {
 
         String randomNoun = nouns.get(random.nextInt(nouns.size()));
         String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
@@ -374,7 +374,7 @@ public class RandomItemGenerator {
 
     }
 
-    private String verbType (Material material) {
+    private String verbType(Material material) {
 
         String randomVerb = verbs.get(random.nextInt(verbs.size()));
         String itemType = itemTypeStringParser(material);
@@ -385,7 +385,7 @@ public class RandomItemGenerator {
 
     }
 
-    private String adjectiveVerbType (Material material) {
+    private String adjectiveVerbType(Material material) {
 
         String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
         String randomVerb = verbs.get(random.nextInt(verbs.size()));
@@ -397,7 +397,7 @@ public class RandomItemGenerator {
 
     }
 
-    private String articleVerber () {
+    private String articleVerber() {
 
         String article = "The";
         String randomVerber = verbers.get(random.nextInt(verbers.size()));
@@ -408,7 +408,7 @@ public class RandomItemGenerator {
 
     }
 
-    private String articleAdjectiveVerber () {
+    private String articleAdjectiveVerber() {
 
         String article = "The";
         String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
@@ -420,7 +420,7 @@ public class RandomItemGenerator {
 
     }
 
-    private String itemTypeStringParser (Material material) {
+    private String itemTypeStringParser(Material material) {
 
         if (material.equals(Material.DIAMOND_SWORD) || material.equals(Material.GOLD_SWORD) ||
                 material.equals(Material.IRON_SWORD) || material.equals(Material.STONE_SWORD) ||
@@ -440,7 +440,7 @@ public class RandomItemGenerator {
 
         } else if (material.equals(Material.DIAMOND_SPADE) || material.equals(Material.GOLD_SPADE) ||
                 material.equals(Material.IRON_SPADE) || material.equals(Material.STONE_SPADE) ||
-                material.equals(Material.WOOD_SPADE)){
+                material.equals(Material.WOOD_SPADE)) {
 
             return ConfigValues.randomItemsConfig.getString("Material name.Spade");
 
@@ -500,7 +500,7 @@ public class RandomItemGenerator {
     }
 
 
-    private List<String> randomItemLoreConstructor(ItemMeta itemMeta, Material material, Entity entity){
+    private List<String> randomItemLoreConstructor(ItemMeta itemMeta, Material material, Entity entity) {
 
         int enchantmentCount = 0;
 
@@ -552,7 +552,7 @@ public class RandomItemGenerator {
 
     HashMap<Enchantment, Integer> validEnchantments = new HashMap();
 
-    private ItemMeta randomItemEnchantmentConstructor(Material material, ItemMeta oldMeta, int rankLevel){
+    private ItemMeta randomItemEnchantmentConstructor(Material material, ItemMeta oldMeta, int rankLevel) {
 
         if (material.equals(Material.DIAMOND_SWORD) || material.equals(Material.GOLD_SWORD) ||
                 material.equals(Material.IRON_SWORD) || material.equals(Material.STONE_SWORD) ||
@@ -596,7 +596,7 @@ public class RandomItemGenerator {
 
         } else if (material.equals(Material.DIAMOND_SPADE) || material.equals(Material.GOLD_SPADE) ||
                 material.equals(Material.IRON_SPADE) || material.equals(Material.STONE_SPADE) ||
-                material.equals(Material.WOOD_SPADE)){
+                material.equals(Material.WOOD_SPADE)) {
 
             validateEnchantment("DURABILITY");
             validateEnchantment("MENDING");

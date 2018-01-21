@@ -121,7 +121,7 @@ public class MinorPowerPowerStance implements Listener {
             //contains all items around a given entity
             HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker = new HashMap<>();
 
-            new BukkitRunnable(){
+            new BukkitRunnable() {
 
                 int globalPositionCounter = 0;
                 int effectQuantity = 0;
@@ -448,7 +448,7 @@ public class MinorPowerPowerStance implements Listener {
 
         if (!powerItemLocationTracker.isEmpty()) {
 
-            for(int i = 0; i < powerItemLocationTracker.size(); i++) {
+            for (int i = 0; i < powerItemLocationTracker.size(); i++) {
 
                 if (powerItemLocationTracker.get(i).get(0).get(0).getItemStack().getType().equals(itemStack.getType())) {
 
@@ -517,7 +517,7 @@ public class MinorPowerPowerStance implements Listener {
     }
 
 
-    private Item itemInitializer (ItemStack itemStack, Location location) {
+    private Item itemInitializer(ItemStack itemStack, Location location) {
 
         Item item = location.getWorld().dropItem(location, itemStack);
         item.setPickupDelay(Integer.MAX_VALUE);

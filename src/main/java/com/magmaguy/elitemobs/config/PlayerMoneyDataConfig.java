@@ -24,7 +24,7 @@ public class PlayerMoneyDataConfig {
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
-    public void intializeEconomySettingsConfig () {
+    public void intializeEconomySettingsConfig() {
 
         getEconomySettingsConfig().options().copyDefaults(true);
         saveDefaultCustomConfig();

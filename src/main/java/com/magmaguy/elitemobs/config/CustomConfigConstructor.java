@@ -38,6 +38,7 @@ public class CustomConfigConstructor extends YamlConfiguration {
 
     /**
      * Creates new PluginFile, without defaults
+     *
      * @param fileName - Name of the file
      */
     public CustomConfigConstructor(String fileName) {
@@ -46,7 +47,8 @@ public class CustomConfigConstructor extends YamlConfiguration {
 
     /**
      * Creates new PluginFile, with defaults
-     * @param fileName - Name of the file
+     *
+     * @param fileName     - Name of the file
      * @param defaultsName - Name of the defaults
      */
     public CustomConfigConstructor(String fileName, String defaultsName) {

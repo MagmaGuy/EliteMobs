@@ -125,7 +125,7 @@ public class CurrencyCommandsHandler {
         PlayerCacheConfig playerCacheConfig = new PlayerCacheConfig();
         FileConfiguration playerCacheConfiguration = playerCacheConfig.getPlayerCacheConfig();
 
-        for (int i = 0; i < iterationAmount; i++){
+        for (int i = 0; i < iterationAmount; i++) {
 
             String name = "";
 

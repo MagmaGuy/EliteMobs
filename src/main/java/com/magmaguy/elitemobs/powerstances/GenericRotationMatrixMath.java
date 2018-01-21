@@ -64,12 +64,12 @@ public class GenericRotationMatrixMath {
     private static Vector newVector;
     private static double newX, newY, newZ;
 
-    public static Vector applyRotation (double a, double b, double c, double numberOfPointsPerFullRotation, double x, double y, double z, int counter) {
+    public static Vector applyRotation(double a, double b, double c, double numberOfPointsPerFullRotation, double x, double y, double z, int counter) {
 
         double theta;
         //Adapt numberOfPointsPerFullRotation to 360 degrees
         //FUCKING RADIAN (2*pi is 360 degrees for a radius of 1)
-        theta = 2*Math.PI / numberOfPointsPerFullRotation;
+        theta = 2 * Math.PI / numberOfPointsPerFullRotation;
         //Get the next rotation
         theta = theta + theta * counter;
 

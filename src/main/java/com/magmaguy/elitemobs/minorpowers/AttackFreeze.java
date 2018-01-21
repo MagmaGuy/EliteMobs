@@ -141,7 +141,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
                 Player player = (Player) damagee;
 
-                player.sendTitle("","Frozen!");
+                player.sendTitle("", "Frozen!");
 
             }
 
