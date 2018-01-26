@@ -15,8 +15,6 @@
 
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -314,7 +312,6 @@ public class MetadataHandler implements Listener {
 
             if (entity.hasMetadata(string) && !string.equals(NATURAL_MOB_MD)) {
 
-                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.DESPAWN_ELITE_MOBS_ON_CHUNK_UNLOAD)) {
 
                     if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
                             !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
@@ -326,31 +323,9 @@ public class MetadataHandler implements Listener {
 
                     entity.removeMetadata(string, plugin);
 
-                } else {
 
-                    if (entity.isDead() || !entity.isValid()) {
-
-                        if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
-                                !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
-                                (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity))) {
-
-                            entity.remove();
-
-                        }
-
-                        entity.removeMetadata(string, plugin);
-
-                    }
-
-                }
 
             }
-
-//            if (!(entity instanceof IronGolem) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
-//
-//                entity.remove();
-//
-//            }
 
             if (entity instanceof Player) {
 
