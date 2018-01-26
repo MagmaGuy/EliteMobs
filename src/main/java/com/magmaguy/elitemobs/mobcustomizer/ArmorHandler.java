@@ -16,6 +16,8 @@
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +29,8 @@ public class ArmorHandler {
 
     public static void ArmorHandler(Entity entity) {
 
+        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_ARMOR)) return;
+
         LivingEntity livingEntity = (LivingEntity) entity;
 
         livingEntity.getEquipment().setItemInMainHandDropChance(0);
@@ -35,11 +39,7 @@ public class ArmorHandler {
         livingEntity.getEquipment().setLeggingsDropChance(0);
         livingEntity.getEquipment().setBootsDropChance(0);
 
-        if (entity.hasMetadata(MetadataHandler.CUSTOM_ARMOR)) {
-
-            return;
-
-        }
+        if (entity.hasMetadata(MetadataHandler.CUSTOM_ARMOR)) return;
 
         if (entity instanceof Zombie || entity instanceof PigZombie ||
                 entity instanceof Skeleton || entity instanceof WitherSkeleton) {
@@ -48,7 +48,9 @@ public class ArmorHandler {
 
             if (mobLevel >= 2) {
 
-                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
+                    ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+                }
 
             }
 
@@ -72,7 +74,10 @@ public class ArmorHandler {
 
             if (mobLevel >= 12) {
 
-                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
+                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
+                    ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
+                }
+
 
             }
 
@@ -96,7 +101,9 @@ public class ArmorHandler {
 
             if (mobLevel >= 22) {
 
-                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
+                    ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+                }
 
             }
 
@@ -120,7 +127,9 @@ public class ArmorHandler {
 
             if (mobLevel >= 32) {
 
-                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
+                    ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+                }
 
             }
 
@@ -150,7 +159,9 @@ public class ArmorHandler {
 
             if (mobLevel >= 44) {
 
-                ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
+                    ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+                }
 
             }
 

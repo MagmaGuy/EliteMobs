@@ -25,9 +25,9 @@ import org.bukkit.configuration.Configuration;
  */
 public class DefaultConfig {
 
-    public static final String DESPAWN_ELITE_MOBS_ON_CHUNK_UNLOAD = "!Danger! Despawn Elite Mobs on chunk unload";
     public static final String SHOW_NAME_TAGS_ON_TARGET = "Only show nametags when targeting a mob";
-
+    public static final String ELITE_ARMOR = "Elite Mobs wear armor";
+    public static final String ELITE_HELMETS = "Elite Mobs wear helmets";
 
     public void loadConfiguration() {
 
@@ -87,8 +87,9 @@ public class DefaultConfig {
         configuration.addDefault("Use titles to warn players they are missing a permission", true);
         configuration.addDefault("Show item rank on custom item drops", true);
         configuration.addDefault("Use scoreboards (requires permission)", false);
-        configuration.addDefault(DESPAWN_ELITE_MOBS_ON_CHUNK_UNLOAD, true);
         configuration.addDefault(SHOW_NAME_TAGS_ON_TARGET, false);
+        configuration.addDefault(ELITE_ARMOR, true);
+        configuration.addDefault(ELITE_HELMETS, true);
         configuration.options().copyDefaults(true);
 
         //save the config when changed
