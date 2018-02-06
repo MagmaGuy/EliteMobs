@@ -96,14 +96,17 @@ permissions:
     description: Allows players to run /elitemobs set [username] [amount]
     default: op
   elitemobs.currency.check:
-    decription: Allows players to run /elitemobs check [username]
+    description: Allows players to run /elitemobs check [username]
     default: op
   elitemobs.currency.wallet:
-    decription: Allows players to run /elitemobs wallet
+    description: Allows players to run /elitemobs wallet
     default: op
   elitemobs.currency.cointop:
-    decription: Allows players to run /elitemobs highscore
+    description: Allows players to run /elitemobs highscore
     default: op
   elitemobs.conf:
-    decription: Allows players to run /elitemobs config
+    description: Allows players to run /elitemobs config
+    default: op
+  elitemobs.event.smalltreasuregoblin:
+    description: Allow players to launch the smalltreasuregoblin event
     default: op

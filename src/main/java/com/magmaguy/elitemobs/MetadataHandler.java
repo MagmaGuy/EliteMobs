@@ -56,6 +56,7 @@ public class MetadataHandler implements Listener {
     public final static String TAUNT_NAME = "Taunt_Name";
     public final static String FORBIDDEN_MD = "Forbidden";
     public final static String CUSTOM_POWERS_MD = "Custom";
+    public final static String EVENT_CREATURE = "EventCreature";
     //Major powers
     public final static String ZOMBIE_FRIENDS_MD = "ZombieFriends";
     public final static String ZOMBIE_NECRONOMICON_MD = "ZombieNecronomicon";
@@ -127,6 +128,10 @@ public class MetadataHandler implements Listener {
 
     //third party compatibility
     public final static String BETTERDROPS_COMPATIBILITY_MD = "betterdrops_ignore";
+
+    //events
+    public final static String PERSISTENT_ENTITY = "PersistentEntity";
+    public final static String TREASURE_GOBLIN = "TreasureGoblin";
 
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
@@ -308,6 +313,12 @@ public class MetadataHandler implements Listener {
 
     public void flushMetadata(Entity entity) {
 
+        if (entity.hasMetadata(EVENT_CREATURE)) {
+
+            return;
+
+        }
+
         for (String string : metadataList()) {
 
             if (entity.hasMetadata(string) && !string.equals(NATURAL_MOB_MD)) {
@@ -335,6 +346,16 @@ public class MetadataHandler implements Listener {
             }
 
         }
+
+    }
+
+    public void fullMetadataFlush(Entity entity) {
+
+        if (entity.hasMetadata(EVENT_CREATURE)) {
+            entity.removeMetadata(EVENT_CREATURE, plugin);
+        }
+
+        flushMetadata(entity);
 
     }
 

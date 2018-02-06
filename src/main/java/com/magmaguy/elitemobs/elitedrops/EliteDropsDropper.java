@@ -49,6 +49,12 @@ public class EliteDropsDropper implements Listener {
 
         Entity entity = event.getEntity();
 
+        dropItem(entity);
+
+    }
+
+    public void dropItem(Entity entity) {
+
         if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
                 entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
@@ -131,14 +137,6 @@ public class EliteDropsDropper implements Listener {
                     entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
                 }
-
-            }
-
-            entity.removeMetadata(MetadataHandler.ELITE_MOB_MD, plugin);
-
-            if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
-
-                entity.removeMetadata(MetadataHandler.NATURAL_MOB_MD, plugin);
 
             }
 

@@ -54,7 +54,7 @@ public class NameHandler {
             case ZOMBIE_VILLAGER:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(0)) + mobLevel
                         + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(1)));
-                //TODO: separate zombievillager from zombie
+                //TODO: separate zombies from zombie
                 break;
             case SKELETON:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Skeleton").get(0)) + mobLevel
