@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.Bukkit;
@@ -68,6 +69,7 @@ public class CommandHandler implements CommandExecutor {
     private final static String CURRENCY_COINTOP = "elitemobs.currency.cointop";
     private final static String VERSION = "elitemobs.version";
     private final static String CONFIG = "elitemobs.config";
+    private final static String EVENT_SMALL_TREASURE_GOBLIN = "elitemobs.event.smalltreasuregoblin";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -296,7 +298,7 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-                if (args[0].equals("check") && permCheck(CURRENCY_CHECK, commandSender)) {
+                if (args[0].equalsIgnoreCase("check") && permCheck(CURRENCY_CHECK, commandSender)) {
 
                     try {
 
@@ -309,6 +311,16 @@ public class CommandHandler implements CommandExecutor {
                         commandSender.sendMessage("Input not valid. Command format: /em set [playerName] [amount]");
 
                     }
+
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("event") && args[1].equalsIgnoreCase("smalltreasuregoblin") &&
+                        permCheck(EVENT_SMALL_TREASURE_GOBLIN, commandSender)) {
+
+                    SmallTreasureGoblin smallTreasureGoblin = new SmallTreasureGoblin();
+                    smallTreasureGoblin.initializeEvent();
 
                     return true;
 

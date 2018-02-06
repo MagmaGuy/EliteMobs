@@ -34,6 +34,9 @@ import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
+import com.magmaguy.elitemobs.events.EventLauncher;
+import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
+import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
 import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
 import com.magmaguy.elitemobs.mobcustomizer.DropsHandler;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
@@ -84,6 +87,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         economySettingsConfig.intializeEconomySettingsConfig();
         PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
         playerMoneyDataConfig.intializeEconomySettingsConfig();
+        EventsConfig eventsConfig = new EventsConfig();
+        eventsConfig.initializeEventsConfig();
         ConfigValues configValues = new ConfigValues();
         configValues.initializeConfigValues();
 
@@ -226,8 +231,17 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(), this);
         this.getServer().getPluginManager().registerEvents(new EntityDeathMetadataFlusher(), this);
 
+
+        //Initialize custom events
+        this.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), this);
+        this.getServer().getPluginManager().registerEvents(new TreasureGoblin(), this);
+
         //Commands
         this.getCommand("elitemobs").setExecutor(new CommandHandler());
+
+        //launch events
+        EventLauncher eventLauncher = new EventLauncher();
+        eventLauncher.eventRepeatingTask();
 
     }
 
@@ -240,7 +254,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
             for (Entity entity : world.getEntities()) {
 
-                metadataHandler.flushMetadata(entity);
+                metadataHandler.fullMetadataFlush(entity);
 
                 if (entity instanceof Player) {
 
