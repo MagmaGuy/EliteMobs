@@ -16,7 +16,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.elitedrops.RandomItemGenerator;
+import com.magmaguy.elitemobs.elitedrops.ProceduralItemGenerator;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -39,9 +39,9 @@ public class SimLootHandler {
 
         }
 
-        RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
+        ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
 
-        ItemStack randomItem = randomItemGenerator.randomItemGeneratorCommand(level);
+        ItemStack randomItem = proceduralItemGenerator.randomItemGeneratorCommand(level);
 
         player.getInventory().addItem(randomItem);
 

@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Arrays;
@@ -26,12 +27,59 @@ public class RandomItemsSettingsConfig {
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
+    public static String ARROW_DAMAGE_BOOL, ARROW_DAMAGE_MAX_LEVEL,
+            ARROW_FIRE_BOOL, ARROW_FIRE_MAX_LEVEL,
+            ARROW_INFINITE_BOOL,
+            ARROW_KNOCKBACK_BOOL, ARROW_KNOCKBACK_MAX_LEVEL,
+            BINDING_CURSE_BOOL,
+            DAMAGE_ALL_BOOL, DAMAGE_ALL_MAX_LEVEL,
+            DAMAGE_ARTHROPODS_BOOL, DAMAGE_ARTHROPODS_MAX_LEVEL,
+            DAMAGE_UNDEAD_BOOL, DAMAGE_UNDEAD_MAX_LEVEL,
+            DEPTH_STRIDER_BOOL, DEPTH_STRIDER_MAX_LEVEL,
+            DIG_SPEED_BOOL, DIG_SPEED_MAX_LEVEL,
+            DURABILITY_BOOL, DURABILITY_MAX_LEVEL,
+            FIRE_ASPECT_BOOL, FIRE_ASPECT_MAX_LEVEL,
+            FROST_WALKER_BOOL, FROST_WALKER_MAX_LEVEL,
+            KNOCKBACK_BOOL, KNOCKBACK_MAX_LEVEL,
+            LOOT_BONUS_BLOCKS_BOOL, LOOT_BONUS_BLOCKS_MAX_LEVEL,
+            LOOT_BONUS_MOBS_BOOL, LOOT_BONUS_MOBS_MAX_LEVEL,
+            LUCK_BOOL, LUCK_MAX_LEVEL,
+            LURE_BOOL, LURE_MAX_LEVEL,
+            MENDING_BOOL,
+            OXYGEN_BOOL, OXYGEN_MAX_LEVEL,
+            PROTECTION_ENVIRONMENTAL_BOOL, PROTECTION_ENVIRONMENTAL_MAX_LEVEL,
+            PROTECTION_EXPLOSIONS_BOOL, PROTECTION_EXPLOSIONS_MAX_LEVEL,
+            PROTECTION_FALL_BOOL, PROTECTION_FALL_MAX_LEVEL,
+            PROTECTION_FIRE_BOOL, PROTECTION_FIRE_MAX_LEVEL,
+            PROTECTION_PROJECTILE_BOOL, PROTECTION_PROJECTILE_MAX_LEVEL,
+            SILK_TOUCH_BOOL,
+            SWEEPING_EDGE_BOOL, SWEEPING_EDGE_MAX_LEVEL,
+            THORNS_BOOL, THORNS_MAX_LEVEL,
+            VANISHING_CURSE_BOOL,
+            WATER_WORKER_BOOL, WATER_WORKER_MAX_LEVEL;
+
+    public static final String LORE_MOB_LEVEL_SOURCE = "Item source (mob) (line 1)";
+    public static final String LORE_SHOP_SOURCE = "Item source (shop) (line 1)";
+    public static final String LORE_WORTH = "Item worth (line 2)";
+    public static final String LORE_RESALE_WORTH = "Item resale worth (line 2)";
+    public static final String LORE_SIGNATURE = "Elite Mobs drop (line 3)";
+    public static final String LORE_STRUCTURE = "Lore structure";
+
+    public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
+    public static final String MONITOR_ITEMS_ON_CONSOLE = "Monitor procedurally generated items on console";
+
     public void initializeRandomItemsSettingsConfig() {
 
-        this.getRandomItemsSettingsConfig().addDefault("Drop random items on elite mob death", true);
+        this.getRandomItemsSettingsConfig().addDefault(DROP_ITEMS_ON_DEATH, true);
         this.getRandomItemsSettingsConfig().addDefault("Mob level to item rank multiplier", 0.5);
-        this.getRandomItemsSettingsConfig().addDefault("Monitor randomly generated drops on console", false);
+        this.getRandomItemsSettingsConfig().addDefault(MONITOR_ITEMS_ON_CONSOLE, false);
         this.getRandomItemsSettingsConfig().addDefault("Percentage (%) of times random item drop instead of custom loot", 20);
+        this.getRandomItemsSettingsConfig().addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from a level $level Elite $mob");
+        this.getRandomItemsSettingsConfig().addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
+        this.getRandomItemsSettingsConfig().addDefault(LORE_WORTH, "Worth $worth $currencyName");
+        this.getRandomItemsSettingsConfig().addDefault(LORE_RESALE_WORTH, "$resale $currencyName resale value");
+        this.getRandomItemsSettingsConfig().addDefault(LORE_SIGNATURE, "Elite Mobs drop");
+        this.getRandomItemsSettingsConfig().addDefault(LORE_STRUCTURE, ChatColorConverter.chatColorConverter("&m----------------------\n $line1 \n $line2 \n $line3 \n&m----------------------"));
         this.getRandomItemsSettingsConfig().addDefault("Valid material list for random items", Arrays.asList(
                 "DIAMOND_SWORD",
                 "GOLD_SWORD",
@@ -84,90 +132,176 @@ public class RandomItemsSettingsConfig {
                 "LEATHER_BOOTS"
         ));
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_DAMAGE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_DAMAGE.Max Level", 5);
+        ARROW_DAMAGE_BOOL = boolValidEnchantmentConstructor("ARROW_DAMAGE");
+        ARROW_DAMAGE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("ARROW_DAMAGE");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_FIRE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_FIRE.Max Level", 1);
+        ARROW_FIRE_BOOL = boolValidEnchantmentConstructor("ARROW_FIRE");
+        ARROW_FIRE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("ARROW_FIRE");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_INFINITE.Allow", true);
+        ARROW_INFINITE_BOOL = boolValidEnchantmentConstructor("ARROW_INFINITE");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_KNOCKBACK.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.ARROW_KNOCKBACK.Max Level", 2);
+        ARROW_KNOCKBACK_BOOL = boolValidEnchantmentConstructor("ARROW_KNOCKBACK");
+        ARROW_KNOCKBACK_MAX_LEVEL = maxLevelValidEnchantmentConstructor("ARROW_KNOCKBACK");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.BINDING_CURSE.Allow", true);
+        BINDING_CURSE_BOOL = boolValidEnchantmentConstructor("BINDING_CURSE");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ALL.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ALL.Max Level", 5);
+        DAMAGE_ALL_BOOL = boolValidEnchantmentConstructor("DAMAGE_ALL");
+        DAMAGE_ALL_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DAMAGE_ALL");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ARTHROPODS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_ARTHROPODS.Max Level", 5);
+        DAMAGE_ARTHROPODS_BOOL = boolValidEnchantmentConstructor("DAMAGE_ARTHROPODS");
+        DAMAGE_ARTHROPODS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DAMAGE_ARTHROPODS");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_UNDEAD.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DAMAGE_UNDEAD.Max Level", 5);
+        DAMAGE_UNDEAD_BOOL = boolValidEnchantmentConstructor("DAMAGE_UNDEAD");
+        DAMAGE_UNDEAD_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DAMAGE_UNDEAD");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DEPTH_STRIDER.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DEPTH_STRIDER.Max Level", 3);
+        DEPTH_STRIDER_BOOL = boolValidEnchantmentConstructor("DEPTH_STRIDER");
+        DEPTH_STRIDER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DEPTH_STRIDER");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DIG_SPEED.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DIG_SPEED.Max Level", 5);
+        DIG_SPEED_BOOL = boolValidEnchantmentConstructor("DIG_SPEED");
+        DIG_SPEED_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DIG_SPEED");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DURABILITY.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.DURABILITY.Max Level", 3);
+        DURABILITY_BOOL = boolValidEnchantmentConstructor("DURABILITY");
+        DURABILITY_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DURABILITY");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FIRE_ASPECT.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FIRE_ASPECT.Max Level", 2);
+        FIRE_ASPECT_BOOL = boolValidEnchantmentConstructor("FIRE_ASPECT");
+        FIRE_ASPECT_MAX_LEVEL = maxLevelValidEnchantmentConstructor("FIRE_ASPECT");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FROST_WALKER.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.FROST_WALKER.Max Level", 2);
+        FROST_WALKER_BOOL = boolValidEnchantmentConstructor("FROST_WALKER");
+        FROST_WALKER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("FROST_WALKER");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.KNOCKBACK.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.KNOCKBACK.Max Level", 2);
+        KNOCKBACK_BOOL = boolValidEnchantmentConstructor("KNOCKBACK");
+        KNOCKBACK_MAX_LEVEL = maxLevelValidEnchantmentConstructor("KNOCKBACK");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_BLOCKS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_BLOCKS.Max Level", 3);
+        LOOT_BONUS_BLOCKS_BOOL = boolValidEnchantmentConstructor("LOOT_BONUS_BLOCKS");
+        LOOT_BONUS_BLOCKS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("LOOT_BONUS_BLOCKS");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_MOBS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LOOT_BONUS_MOBS.Max Level", 3);
+        LOOT_BONUS_MOBS_BOOL = boolValidEnchantmentConstructor("LOOT_BONUS_MOBS");
+        LOOT_BONUS_MOBS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("LOOT_BONUS_MOBS");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LUCK.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LUCK.Max Level", 3);
+        LUCK_BOOL = boolValidEnchantmentConstructor("LUCK");
+        LUCK_MAX_LEVEL = maxLevelValidEnchantmentConstructor("LUCK");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LURE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.LURE.Max Level", 3);
+        LURE_BOOL = boolValidEnchantmentConstructor("LURE");
+        LURE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("LURE");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.MENDING.Allow", false);
+        MENDING_BOOL = boolValidEnchantmentConstructor("MENDING");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.OXYGEN.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.OXYGEN.Max Level", 3);
+        OXYGEN_BOOL = boolValidEnchantmentConstructor("OXYGEN");
+        OXYGEN_MAX_LEVEL = maxLevelValidEnchantmentConstructor("OXYGEN");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_ENVIRONMENTAL.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_ENVIRONMENTAL.Max Level", 4);
+        PROTECTION_ENVIRONMENTAL_BOOL = boolValidEnchantmentConstructor("PROTECTION_ENVIRONMENTAL");
+        PROTECTION_ENVIRONMENTAL_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_ENVIRONMENTAL");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_EXPLOSIONS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_EXPLOSIONS.Max Level", 4);
+        PROTECTION_EXPLOSIONS_BOOL = boolValidEnchantmentConstructor("PROTECTION_EXPLOSIONS");
+        PROTECTION_EXPLOSIONS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_EXPLOSIONS");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FALL.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FALL.Max Level", 4);
+        PROTECTION_FALL_BOOL = boolValidEnchantmentConstructor("PROTECTION_FALL");
+        PROTECTION_FALL_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_FALL");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FIRE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_FIRE.Max Level", 4);
+        PROTECTION_FIRE_BOOL = boolValidEnchantmentConstructor("PROTECTION_FIRE");
+        PROTECTION_FIRE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_FIRE");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_PROJECTILE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.PROTECTION_PROJECTILE.Max Level", 4);
+        PROTECTION_PROJECTILE_BOOL = boolValidEnchantmentConstructor("PROTECTION_PROJECTILE");
+        PROTECTION_PROJECTILE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_PROJECTILE");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.SILK_TOUCH.Allow", true);
+        SILK_TOUCH_BOOL = boolValidEnchantmentConstructor("SILK_TOUCH");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.SWEEPING_EDGE.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.SWEEPING_EDGE.Max Level", 3);
+        SWEEPING_EDGE_BOOL = boolValidEnchantmentConstructor("SWEEPING_EDGE");
+        SWEEPING_EDGE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("SWEEPING_EDGE");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.THORNS.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.THORNS.Max Level", 3);
+        THORNS_BOOL = boolValidEnchantmentConstructor("THORNS");
+        THORNS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("THORNS");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.VANISHING_CURSE.Allow", true);
+        VANISHING_CURSE_BOOL = boolValidEnchantmentConstructor("VANISHING");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.WATER_WORKER.Allow", true);
-        this.getRandomItemsSettingsConfig().addDefault("Valid Enchantments.WATER_WORKER.Max Level", 1);
+        WATER_WORKER_BOOL = boolValidEnchantmentConstructor("WATER_WORKER");
+        WATER_WORKER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("WATER_WORKER");
+
+
+        this.getRandomItemsSettingsConfig().addDefault(ARROW_DAMAGE_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(ARROW_DAMAGE_MAX_LEVEL, 5);
+
+        this.getRandomItemsSettingsConfig().addDefault(ARROW_FIRE_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(ARROW_FIRE_MAX_LEVEL, 1);
+
+        this.getRandomItemsSettingsConfig().addDefault(ARROW_INFINITE_BOOL, true);
+
+        this.getRandomItemsSettingsConfig().addDefault(ARROW_KNOCKBACK_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(ARROW_KNOCKBACK_MAX_LEVEL, 2);
+
+        this.getRandomItemsSettingsConfig().addDefault(BINDING_CURSE_BOOL, true);
+
+        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_ALL_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_ALL_MAX_LEVEL, 5);
+
+        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_ARTHROPODS_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_ARTHROPODS_MAX_LEVEL, 5);
+
+        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_UNDEAD_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_UNDEAD_MAX_LEVEL, 5);
+
+        this.getRandomItemsSettingsConfig().addDefault(DEPTH_STRIDER_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(DEPTH_STRIDER_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(DIG_SPEED_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(DIG_SPEED_MAX_LEVEL, 5);
+
+        this.getRandomItemsSettingsConfig().addDefault(DURABILITY_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(DURABILITY_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(FIRE_ASPECT_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(FIRE_ASPECT_MAX_LEVEL, 2);
+
+        this.getRandomItemsSettingsConfig().addDefault(FROST_WALKER_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(FROST_WALKER_MAX_LEVEL, 2);
+
+        this.getRandomItemsSettingsConfig().addDefault(KNOCKBACK_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(KNOCKBACK_MAX_LEVEL, 2);
+
+        this.getRandomItemsSettingsConfig().addDefault(LOOT_BONUS_BLOCKS_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(LOOT_BONUS_BLOCKS_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(LOOT_BONUS_MOBS_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(LOOT_BONUS_MOBS_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(LUCK_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(LUCK_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(LURE_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(LURE_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(MENDING_BOOL, false);
+
+        this.getRandomItemsSettingsConfig().addDefault(OXYGEN_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(OXYGEN_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_ENVIRONMENTAL_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_ENVIRONMENTAL_MAX_LEVEL, 4);
+
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_EXPLOSIONS_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_EXPLOSIONS_MAX_LEVEL, 4);
+
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_FALL_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_FALL_MAX_LEVEL, 4);
+
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_FIRE_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_FIRE_MAX_LEVEL, 4);
+
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_PROJECTILE_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_PROJECTILE_MAX_LEVEL, 4);
+
+        this.getRandomItemsSettingsConfig().addDefault(SILK_TOUCH_BOOL, true);
+
+        this.getRandomItemsSettingsConfig().addDefault(SWEEPING_EDGE_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(SWEEPING_EDGE_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(THORNS_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(THORNS_MAX_LEVEL, 3);
+
+        this.getRandomItemsSettingsConfig().addDefault(VANISHING_CURSE_BOOL, true);
+
+        this.getRandomItemsSettingsConfig().addDefault(WATER_WORKER_BOOL, true);
+        this.getRandomItemsSettingsConfig().addDefault(WATER_WORKER_MAX_LEVEL, 1);
 
         this.getRandomItemsSettingsConfig().addDefault("Material name.Sword", "Sword");
         this.getRandomItemsSettingsConfig().addDefault("Material name.Bow", "Bow");
@@ -1391,6 +1525,27 @@ public class RandomItemsSettingsConfig {
         saveDefaultCustomConfig();
         saveCustomConfig();
 
+    }
+
+    private String boolValidEnchantmentConstructor(String string) {
+
+        String validEnchantmentsprefix = "Valid Enchantments.";
+        String allowSuffix = ".Allow";
+
+        String finalString = validEnchantmentsprefix + string + allowSuffix;
+
+        return finalString;
+
+    }
+
+    private String maxLevelValidEnchantmentConstructor(String string) {
+
+        String validEnchantmentsprefix = "Valid Enchantments.";
+        String maxLevelSuffix = ".Max Level";
+
+        String finalString = validEnchantmentsprefix + string + maxLevelSuffix;
+
+        return finalString;
     }
 
     public FileConfiguration getRandomItemsSettingsConfig() {
