@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.RandomItemsSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -41,7 +42,7 @@ public class EliteDropsDropper implements Listener {
     public void onDeath(EntityDeathEvent event) {
 
         if (!ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                !ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
+                !ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
             return;
 
@@ -81,15 +82,15 @@ public class EliteDropsDropper implements Listener {
             if (random.nextDouble() < chanceToDrop) {
 
                 if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                        ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
+                        ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
                     if (EliteDropsHandler.rankedItemStacks.containsKey(mobLevel)) {
 
                         if (random.nextDouble() < ConfigValues.randomItemsConfig.getDouble("Percentage (%) of times random item drop instead of custom loot")) {
 
                             //create random loot
-                            RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                            ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
+                            ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
+                            ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
 
                             entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
@@ -105,15 +106,15 @@ public class EliteDropsDropper implements Listener {
 
                     } else {
 
-                        RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                        ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
+                        ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
+                        ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
 
                         entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
                     }
 
                 } else if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                        !ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
+                        !ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
                     //WARNING: THIS DOES NOT SCALE ITEM LEVEL (since I don't know how much loot is available, approximating will not make sense
                     int customItemIndex = random.nextInt(EliteDropsHandler.lootList.size());
@@ -122,17 +123,17 @@ public class EliteDropsDropper implements Listener {
                     entity.getWorld().dropItem(entity.getLocation(), randomizedCustomItem);
 
                 } else if (!EliteDropsHandler.rankedItemStacks.isEmpty() && !ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                        ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
+                        ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
-                    RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
+                    ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
+                    ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
 
                     entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
-                } else if (EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean("Drop random items on elite mob death")) {
+                } else if (EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
-                    RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
-                    ItemStack randomLoot = randomItemGenerator.randomItemGenerator(mobLevel, entity);
+                    ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
+                    ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
 
                     entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
