@@ -124,106 +124,13 @@ public class EliteDropsHandler implements Listener {
 
             List itemLore = itemLoreHandler(previousPath, itemRank);
             itemMeta.setLore(itemLore);
+            itemStack.setItemMeta(itemMeta);
 
             if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for custom items") && ChatColor.stripColor(itemName).equals(itemName)) {
 
-                double rankProgression = ConfigValues.defaultConfig.getDouble("Increase MMORPG color rank every X levels X=");
-
-                if (Math.floor(itemRank / rankProgression) >= 5) {
-
-                    itemMeta.setDisplayName(ChatColor.GOLD + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.GOLD + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 4) {
-
-                    itemMeta.setDisplayName(ChatColor.DARK_PURPLE + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 3) {
-
-                    itemMeta.setDisplayName(ChatColor.BLUE + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.BLUE + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 2) {
-
-                    itemMeta.setDisplayName(ChatColor.GREEN + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.GREEN + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 1) {
-
-                    itemMeta.setDisplayName(ChatColor.WHITE + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.WHITE + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                } else if (Math.floor(itemRank / rankProgression) == 0) {
-
-                    itemMeta.setDisplayName(ChatColor.GRAY + itemMeta.getDisplayName());
-
-                    List list = new ArrayList();
-
-                    for (String string : itemMeta.getLore()) {
-
-                        String coloredString = ChatColor.GRAY + "" + ChatColor.ITALIC + string;
-                        list.add(coloredString);
-
-                    }
-
-                    itemMeta.setLore(list);
-
-                }
+                DropQuality.dropQualityColorizer(itemStack);
 
             }
-
-            itemStack.setItemMeta(itemMeta);
 
             if (potionEffects != null) {
 
