@@ -18,8 +18,9 @@ package com.magmaguy.elitemobs.elitedrops;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.RandomItemsSettingsConfig;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -31,7 +32,7 @@ import java.util.*;
 /**
  * Created by MagmaGuy on 04/06/2017.
  */
-public class RandomItemGenerator {
+public class ProceduralItemGenerator {
 
     private Random random = new Random();
 
@@ -50,111 +51,13 @@ public class RandomItemGenerator {
         randomItem.setItemMeta(itemMeta);
 
         //Apply lore
-        itemMeta.setLore(randomItemLoreConstructor(itemMeta, randomItem.getType(), entity));
+        itemMeta.setLore(proceduralItemLoreConstructor(itemMeta, randomItem.getType(), entity));
 
         randomItem.setItemMeta(itemMeta);
 
-        if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for item ranks")) {
+        DropQuality.dropQualityColorizer(randomItem);
 
-            double rankProgression = ConfigValues.defaultConfig.getDouble("Increase MMORPG color rank every X levels X=");
-
-            if (Math.floor(itemRank / rankProgression) >= 5) {
-
-                itemMeta.setDisplayName(ChatColor.GOLD + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.GOLD + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
-
-            } else if (Math.floor(itemRank / rankProgression) == 4) {
-
-                itemMeta.setDisplayName(ChatColor.DARK_PURPLE + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
-
-            } else if (Math.floor(itemRank / rankProgression) == 3) {
-
-                itemMeta.setDisplayName(ChatColor.BLUE + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.BLUE + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
-
-            } else if (Math.floor(itemRank / rankProgression) == 2) {
-
-                itemMeta.setDisplayName(ChatColor.GREEN + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.GREEN + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
-
-            } else if (Math.floor(itemRank / rankProgression) == 1) {
-
-                itemMeta.setDisplayName(ChatColor.WHITE + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.WHITE + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
-
-            } else if (Math.floor(itemRank / rankProgression) == 0) {
-
-                itemMeta.setDisplayName(ChatColor.GRAY + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.GRAY + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
-
-            }
-
-        }
-
-        randomItem.setItemMeta(itemMeta);
-
-        if (ConfigValues.randomItemsConfig.getBoolean("Monitor randomly generated drops on console")) {
+        if (ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.MONITOR_ITEMS_ON_CONSOLE)) {
 
             Bukkit.getLogger().info("[EliteMobs] Procedurally generated item with the following attributes:");
             Bukkit.getLogger().info("[EliteMobs] Item type: " + randomItem.getType());
@@ -500,53 +403,86 @@ public class RandomItemGenerator {
     }
 
 
-    private List<String> randomItemLoreConstructor(ItemMeta itemMeta, Material material, Entity entity) {
+    private List<String> proceduralItemLoreConstructor(ItemMeta itemMeta, Material material, Entity entity) {
 
-        int enchantmentCount = 0;
-
-        if (!itemMeta.getEnchants().isEmpty()) {
-
-            for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
-
-                enchantmentCount += itemMeta.getEnchantLevel(enchantment);
-
-            }
-
-        }
-
-        int rankLevel = ItemRankHandler.guessItemRank(material, enchantmentCount);
-
-        String lore1 = "Rank " + rankLevel + " Elite Mob Drop";
-
-        String lore2;
+        String line1 = "";
 
         if (entity != null) {
 
-            lore2 = "Looted from a level " + entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + " Elite " +
-                    entity.getType().toString();
+            line1 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_MOB_LEVEL_SOURCE).replace("$level",
+                    entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + "");
 
         } else {
 
-            lore2 = "Obtained from shop";
-        }
-
-        List<String> loreList = new ArrayList<>();
-
-        loreList.add(lore1);
-        loreList.add(lore2);
-
-        if (ConfigValues.economyConfig.getBoolean("Enable economy")) {
-
-            String lore3;
-
-            lore3 = "Worth " + rankLevel * ConfigValues.economyConfig.getDouble("Tier price progression") + " " +
-                    ConfigValues.economyConfig.getString("Currency name");
-
-            loreList.add(lore3);
+            line1 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_SHOP_SOURCE);
 
         }
 
-        return loreList;
+        String line2 = "";
+
+        if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) {
+
+            int enchantmentCount = 0;
+
+            if (!itemMeta.getEnchants().isEmpty()) {
+
+                for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
+
+                    enchantmentCount += itemMeta.getEnchantLevel(enchantment);
+
+                }
+
+            }
+
+            int rankLevel = ItemRankHandler.guessItemRank(material, enchantmentCount);
+            String itemWorth = String.valueOf(rankLevel * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.TIER_PRICE_PROGRESSION));
+            line2 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_WORTH).replace("$currencyName",
+                    ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+            line2 = line2.replace("$worth", itemWorth);
+
+        }
+
+        String line3 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_SIGNATURE);
+
+        String loreStructure = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_STRUCTURE);
+
+        if (line1.length() > 0) {
+
+            loreStructure = loreStructure.replace("$line1", line1);
+
+        } else {
+
+
+            loreStructure = loreStructure.replace("$line1", "");
+
+        }
+
+        if (line2.length() > 0) {
+
+
+            loreStructure = loreStructure.replace("$line2", line2);
+
+        } else {
+
+
+            loreStructure = loreStructure.replace("$line2", "");
+
+        }
+
+        if (line3.length() > 0) {
+
+
+            loreStructure = loreStructure.replace("$line3", line3);
+
+        } else {
+
+            loreStructure = loreStructure.replace("$line3", "");
+
+        }
+
+        List<String> lore = Arrays.asList(loreStructure.split("\n"));
+
+        return lore;
 
     }
 
@@ -566,7 +502,7 @@ public class RandomItemGenerator {
             validateEnchantment("KNOCKBACK");
             validateEnchantment("LOOT_BONUS_MOBS");
             validateEnchantment("MENDING");
-//            validateEnchantment("SWEEPING_EDGE");
+            validateEnchantment("SWEEPING_EDGE");
             validateEnchantment("VANISHING_CURSE");
 
         } else if (material.equals(Material.BOW)) {

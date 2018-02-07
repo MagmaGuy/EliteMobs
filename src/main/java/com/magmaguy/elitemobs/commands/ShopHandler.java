@@ -16,10 +16,11 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
-import com.magmaguy.elitemobs.elitedrops.RandomItemGenerator;
+import com.magmaguy.elitemobs.elitedrops.ProceduralItemGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -82,7 +83,7 @@ public class ShopHandler implements Listener {
 
         for (int i = 9; i < 54; i++) {
 
-            RandomItemGenerator randomItemGenerator = new RandomItemGenerator();
+            ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
 
             int balancedMax = ConfigValues.economyConfig.getInt("Procedurally Generated Loot.Highest simulated elite mob level loot")
                     - ConfigValues.economyConfig.getInt("Procedurally Generated Loot.Lowest simulated elite mob level loot");
@@ -99,7 +100,7 @@ public class ShopHandler implements Listener {
 
             }
 
-            shopInventory.setItem(i, randomItemGenerator.randomItemGeneratorCommand(level));
+            shopInventory.setItem(i, proceduralItemGenerator.randomItemGeneratorCommand(level));
 
         }
 
@@ -108,7 +109,7 @@ public class ShopHandler implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (!ConfigValues.economyConfig.getBoolean("Enable economy")) {
+        if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) {
 
             return;
 
@@ -133,12 +134,18 @@ public class ShopHandler implements Listener {
             }
 
 
-            if (!event.getCurrentItem().getItemMeta().hasLore() || !event.getCurrentItem().getItemMeta().getLore().
-                    get(event.getCurrentItem().getItemMeta().getLore().size() - 1).contains(ConfigValues.economyConfig.
-                    getString("Currency name"))) {
+            if (!event.getCurrentItem().getItemMeta().hasLore()) {
 
-                event.setCancelled(true);
-                return;
+                for (String string : event.getCurrentItem().getItemMeta().getLore()) {
+
+                    if (!string.contains(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))) {
+
+                        event.setCancelled(true);
+                        return;
+
+                    }
+
+                }
 
             }
 
@@ -165,9 +172,9 @@ public class ShopHandler implements Listener {
             }
 
             int itemRank = ItemRankHandler.guessItemRank(itemStack.getType(), enchantments);
-            double itemValue = itemRank * ConfigValues.economyConfig.getDouble("Tier price progression");
+            double itemValue = itemRank * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.TIER_PRICE_PROGRESSION);
 
-            String currencyName = ConfigValues.economyConfig.getString("Currency name");
+            String currencyName = ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME);
 
             if (8 < event.getSlot() && event.getClickedInventory().getName().equalsIgnoreCase("EliteMobs Shop")) {
                 //These slots are for buying items
