@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.events;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
@@ -35,7 +36,7 @@ public class SmallTreasureGoblin implements Listener {
 
     public static boolean entityQueued = false;
 
-    public void initializeEvent() {
+    public static void initializeEvent() {
         entityQueued = true;
     }
 
@@ -75,9 +76,15 @@ public class SmallTreasureGoblin implements Listener {
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (entityQueued && event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) && event.getEntity() instanceof Zombie) {
+        if (EliteMobs.worldList.contains(event.getEntity().getWorld())) {
 
-            createGoblin(event.getEntity());
+            if (entityQueued && (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
+                    event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) &&
+                    event.getEntity() instanceof Zombie) {
+
+                createGoblin(event.getEntity());
+
+            }
 
         }
 

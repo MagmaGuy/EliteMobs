@@ -18,14 +18,12 @@ package com.magmaguy.elitemobs.elitedrops;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.RandomItemsSettingsConfig;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
@@ -33,8 +31,6 @@ import java.util.Random;
  * Created by MagmaGuy on 04/06/2017.
  */
 public class EliteDropsDropper implements Listener {
-
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     private Random random = new Random();
 
@@ -86,7 +82,7 @@ public class EliteDropsDropper implements Listener {
 
                     if (EliteDropsHandler.rankedItemStacks.containsKey(mobLevel)) {
 
-                        if (random.nextDouble() < ConfigValues.randomItemsConfig.getDouble("Percentage (%) of times random item drop instead of custom loot")) {
+                        if (random.nextDouble() * 100 <= ConfigValues.randomItemsConfig.getDouble("Percentage (%) of times random item drop instead of custom loot")) {
 
                             //create random loot
                             ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();

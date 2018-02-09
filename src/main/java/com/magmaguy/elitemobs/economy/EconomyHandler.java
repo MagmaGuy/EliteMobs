@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.economy;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.PlayerMoneyDataConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -42,6 +43,8 @@ public class EconomyHandler {
         configuration.set(user.toString(), newAmount);
         playerMoneyDataConfig.saveCustomConfig();
 
+        ConfigValues.initializeConfigValues();
+
         return newAmount;
 
     }
@@ -61,6 +64,8 @@ public class EconomyHandler {
         configuration.set(user.toString(), newAmount);
         playerMoneyDataConfig.saveCustomConfig();
 
+        ConfigValues.initializeConfigValues();
+
         return newAmount;
 
     }
@@ -75,6 +80,8 @@ public class EconomyHandler {
 
         configuration.set(user.toString(), amount);
         playerMoneyDataConfig.saveCustomConfig();
+
+        ConfigValues.initializeConfigValues();
 
     }
 
@@ -94,6 +101,8 @@ public class EconomyHandler {
 
         configuration.set(user.toString(), 0);
         playerMoneyDataConfig.saveCustomConfig();
+
+        ConfigValues.initializeConfigValues();
 
     }
 

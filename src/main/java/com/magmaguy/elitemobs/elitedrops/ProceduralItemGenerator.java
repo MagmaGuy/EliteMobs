@@ -560,9 +560,6 @@ public class ProceduralItemGenerator {
             validateEnchantment("DAMAGE_ARTHROPODS");
             validateEnchantment("DAMAGE_UNDEAD");
             validateEnchantment("DURABILITY");
-            validateEnchantment("FIRE_ASPECT");
-            validateEnchantment("KNOCKBACK");
-            validateEnchantment("LOOT_BONUS_MOBS");
             validateEnchantment("MENDING");
             validateEnchantment("VANISHING_CURSE");
             validateEnchantment("DIG_SPEED");

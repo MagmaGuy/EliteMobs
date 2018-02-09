@@ -27,7 +27,7 @@ public class ConfigValues {
     public static Configuration defaultConfig, lootConfig, mobPowerConfig, translationConfig, randomItemsConfig,
             economyConfig, playerCacheConfig, eventsConfig;
 
-    public void initializeConfigValues() {
+    public static void initializeConfigValues() {
 
         defaultConfig = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
         LootCustomConfig lootCustomConfig = new LootCustomConfig();

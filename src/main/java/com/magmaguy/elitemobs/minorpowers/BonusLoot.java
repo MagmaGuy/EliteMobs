@@ -16,7 +16,7 @@
 package com.magmaguy.elitemobs.minorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -25,8 +25,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Random;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
@@ -59,10 +57,10 @@ public class BonusLoot extends MinorPowers implements Listener {
 
             Entity entity = event.getEntity();
 
-            Random random = new Random();
-            int randomDrop = random.nextInt(EliteDropsHandler.lootList.size());
+            EliteDropsDropper eliteDropsDropper = new EliteDropsDropper();
 
-            entity.getWorld().dropItem(entity.getLocation(), EliteDropsHandler.lootList.get(randomDrop));
+            //drops item
+            eliteDropsDropper.dropItem(entity);
 
         }
 
