@@ -17,21 +17,27 @@ package com.magmaguy.elitemobs.elitedrops;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static com.magmaguy.elitemobs.elitedrops.EliteDropsHandler.potionEffectItemList;
+import static com.magmaguy.elitemobs.elitedrops.EliteDropsHandler.*;
 
 /**
  * Created by MagmaGuy on 14/03/2017.
  */
-public class PotionEffectApplier {
+public class PotionEffectApplier implements Listener {
 
     public void potionEffectApplier() {
 
@@ -123,26 +129,212 @@ public class PotionEffectApplier {
 
     }
 
+    List<PotionEffectType> offensivePotionEffects = new ArrayList<>(Arrays.asList(
+            PotionEffectType.BLINDNESS,
+            PotionEffectType.CONFUSION,
+            PotionEffectType.GLOWING,
+            PotionEffectType.HARM,
+            PotionEffectType.HUNGER,
+            PotionEffectType.LEVITATION,
+            PotionEffectType.POISON,
+            PotionEffectType.SLOW,
+            PotionEffectType.SLOW_DIGGING,
+            PotionEffectType.UNLUCK,
+            PotionEffectType.WEAKNESS,
+            PotionEffectType.WITHER
+    ));
+
     private void effectApplier(ItemStack key, Player player) {
 
         for (PotionEffect potionEffect : potionEffectItemList.get(key)) {
 
-            //night vision getting deleted and put back is extremely jarring, bypass
-            if (potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)) {
+            if (!offensivePotionEffects.contains(potionEffect.getType()) &&
+                    (invertedCombatItemComparator(key) == null || !invertedCombatItemComparator(key).contains(potionEffect)) ||
+                    offensivePotionEffects.contains(potionEffect.getType()) && invertedContinuousItemComparator(key) != null &&
+                            invertedContinuousItemComparator(key).contains(potionEffect) &&
+                            invertedCombatItemComparator(key) != null && invertedCombatItemComparator(key).contains(potionEffect)) {
 
-                player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20 * 60, 1));
+                //night vision getting deleted and put back is extremely jarring, bypass
+                if (potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)) {
 
-            } else {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20 * 60, 1));
 
-                //Bypass due to minecraft not reapplying time correctly
-                player.removePotionEffect(potionEffect.getType());
+                } else {
 
-                player.addPotionEffect(potionEffect);
+                    //Bypass due to minecraft not reapplying time correctly
+                    player.removePotionEffect(potionEffect.getType());
+
+                    player.addPotionEffect(potionEffect);
+
+                }
 
             }
 
         }
 
     }
+
+    @EventHandler
+    public void onPlayerHitWithPotionEffect(EntityDamageByEntityEvent event) {
+
+        if (event.isCancelled()) return;
+
+        Player player;
+
+        //deal with bows
+        if (event.getDamager() instanceof Arrow) {
+
+            Arrow arrow = (Arrow) event.getDamager();
+
+            if (arrow.getShooter() instanceof Player) {
+
+                player = (Player) arrow.getShooter();
+
+            } else {
+
+                return;
+
+            }
+
+        } else if (event.getDamager() instanceof Player) {
+
+            player = (Player) event.getDamager();
+
+        } else {
+
+            return;
+
+        }
+
+        LivingEntity damagee;
+
+        if (event.getEntity() instanceof LivingEntity) {
+
+            damagee = (LivingEntity) event.getEntity();
+
+        } else {
+
+            return;
+
+        }
+
+        ItemStack mainHand = combatItemComparator(player.getEquipment().getItemInMainHand());
+        ItemStack offHand = combatItemComparator(player.getEquipment().getItemInOffHand());
+
+        //todo: check if there's a way to tell which hand dealt the damage
+        if (mainHand != null) {
+
+            for (PotionEffect potionEffect : potionEffectItemList.get(mainHand)) {
+
+
+                //todo: find appropriate duration
+                PotionEffect potionEffect1 = new PotionEffect(potionEffect.getType(), 20 * 5, potionEffect.getAmplifier());
+
+                if ((offensivePotionEffects.contains(potionEffect.getType()) && invertedCombatItemComparator(mainHand) != null && invertedCombatItemComparator(mainHand).contains(potionEffect)) ||
+                        (!offensivePotionEffects.contains(potionEffect.getType()) &&
+                                (invertedCombatItemComparator(mainHand) == null || invertedCombatItemComparator(mainHand) != null && !invertedCombatItemComparator(mainHand).contains(potionEffect)))) {
+
+                    player.addPotionEffect(potionEffect1);
+
+                } else if ((!offensivePotionEffects.contains(potionEffect.getType()) && invertedCombatItemComparator(mainHand) != null && invertedCombatItemComparator(mainHand).contains(potionEffect)) ||
+                        (offensivePotionEffects.contains(potionEffect.getType()) &&
+                                (invertedCombatItemComparator(mainHand) == null || invertedCombatItemComparator(mainHand) != null && !invertedCombatItemComparator(mainHand).contains(potionEffect)))) {
+
+                    damagee.addPotionEffect(potionEffect1);
+
+                }
+
+
+            }
+
+        }
+
+        if (offHand != null) {
+
+            for (PotionEffect potionEffect : potionEffectItemList.get(offHand)) {
+
+
+                //todo: find appropriate duration
+                PotionEffect potionEffect1 = new PotionEffect(potionEffect.getType(), 20 * 5, potionEffect.getAmplifier());
+
+                if (invertedCombatItemComparator(offHand) != null && invertedCombatItemComparator(offHand).contains(potionEffect)) {
+
+                    player.addPotionEffect(potionEffect1);
+
+                } else if ((!offensivePotionEffects.contains(potionEffect.getType()) && invertedCombatItemComparator(offHand) != null && invertedCombatItemComparator(offHand).contains(potionEffect)) ||
+                        (offensivePotionEffects.contains(potionEffect.getType()) &&
+                                (invertedCombatItemComparator(offHand) == null || invertedCombatItemComparator(offHand) != null && !invertedCombatItemComparator(offHand).contains(potionEffect)))) {
+
+                    damagee.addPotionEffect(potionEffect1);
+
+                }
+
+
+            }
+
+        }
+
+    }
+
+    private ItemStack combatItemComparator(ItemStack itemStack) {
+
+        List<String> parsedItemLore = loreStripper(itemStack);
+
+        for (ItemStack itemStackIteration : potionEffectItemList.keySet()) {
+
+            if (itemStackIteration.getType().equals(itemStack.getType()) &&
+                    ChatColor.stripColor(itemStackIteration.getItemMeta().getDisplayName()).equals(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName())) &&
+                    loreStripper(itemStackIteration).equals(parsedItemLore)) {
+
+                return itemStackIteration;
+
+            }
+
+        }
+
+        return null;
+
+    }
+
+    private List<PotionEffect> invertedCombatItemComparator(ItemStack itemStack) {
+
+        List<String> parsedItemLore = loreStripper(itemStack);
+
+        for (ItemStack itemStackIteration : itemsWithInvertedPotionEffects.keySet()) {
+
+            if (itemStackIteration.getType().equals(itemStack.getType()) &&
+                    ChatColor.stripColor(itemStackIteration.getItemMeta().getDisplayName()).equals(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName())) &&
+                    loreStripper(itemStackIteration).equals(parsedItemLore)) {
+
+                return itemsWithInvertedPotionEffects.get(itemStackIteration);
+
+            }
+
+        }
+
+        return null;
+
+    }
+
+    private List<PotionEffect> invertedContinuousItemComparator(ItemStack itemStack) {
+
+        List<String> parsedItemLore = loreStripper(itemStack);
+
+        for (ItemStack itemStackIteration : itemsWithContinuousInvertedPotionEffects.keySet()) {
+
+            if (itemStackIteration.getType().equals(itemStack.getType()) &&
+                    ChatColor.stripColor(itemStackIteration.getItemMeta().getDisplayName()).equals(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName())) &&
+                    loreStripper(itemStackIteration).equals(parsedItemLore)) {
+
+                return itemsWithContinuousInvertedPotionEffects.get(itemStackIteration);
+
+            }
+
+        }
+
+        return null;
+
+    }
+
 
 }

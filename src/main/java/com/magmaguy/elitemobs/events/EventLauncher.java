@@ -40,7 +40,6 @@ public class EventLauncher {
                     //if enough time has passed, run the event and reset the counter
                     if (timeCheck(counter)) {
 
-                        Bukkit.getLogger().info("launching event");
                         eventSelector();
                         counter = 0;
                         return;
@@ -67,13 +66,13 @@ public class EventLauncher {
 
         if (ConfigValues.eventsConfig.getInt(EventsConfig.MAXIMUM_ONLINE_PLAYERS) <= Bukkit.getOnlinePlayers().size()) {
 
-            return counter >= ConfigValues.eventsConfig.getInt(EventsConfig.MINIMUM_EVENT_FREQUENCY);
+            return counter >= ConfigValues.eventsConfig.getInt(EventsConfig.MAXIMUM_EVENT_FREQUENCY);
 
         }
 
         if (ConfigValues.eventsConfig.getInt(EventsConfig.MINIMUM_ONLINE_PLAYERS) == Bukkit.getOnlinePlayers().size()) {
 
-            return counter >= ConfigValues.eventsConfig.getInt(EventsConfig.MAXIMUM_EVENT_FREQUENCY);
+            return counter >= ConfigValues.eventsConfig.getInt(EventsConfig.MINIMUM_EVENT_FREQUENCY);
 
         }
 
@@ -98,8 +97,7 @@ public class EventLauncher {
     private void eventSelector() {
 
         //todo: once more events are added, randomize which one gets picked in a weighed fashion
-        SmallTreasureGoblin smallTreasureGoblin = new SmallTreasureGoblin();
-        smallTreasureGoblin.initializeEvent();
+        SmallTreasureGoblin.initializeEvent();
 
     }
 

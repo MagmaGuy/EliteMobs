@@ -90,7 +90,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         EventsConfig eventsConfig = new EventsConfig();
         eventsConfig.initializeEventsConfig();
         ConfigValues configValues = new ConfigValues();
-        configValues.initializeConfigValues();
+        ConfigValues.initializeConfigValues();
 
         //Parse loot
         EliteDropsHandler superDrops = new EliteDropsHandler();
@@ -118,6 +118,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Mob loot
         this.getServer().getPluginManager().registerEvents(new DropsHandler(), this);
+
+        //potion effects
+        this.getServer().getPluginManager().registerEvents(new PotionEffectApplier(), this);
 
         //getloot GUI
         this.getServer().getPluginManager().registerEvents(new LootGUI(), this);

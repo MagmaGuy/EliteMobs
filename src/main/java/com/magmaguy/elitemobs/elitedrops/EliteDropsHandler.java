@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
-import static org.bukkit.Bukkit.getLogger;
 
 /**
  * Created by MagmaGuy on 29/11/2016.
@@ -42,6 +41,8 @@ public class EliteDropsHandler implements Listener {
     public static List<ItemStack> lootList = new ArrayList();
     public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
     public static HashMap<Integer, List<ItemStack>> rankedItemStacks = new HashMap<>();
+    public static HashMap<ItemStack, List<PotionEffect>> itemsWithInvertedPotionEffects = new HashMap<>();
+    public static HashMap<ItemStack, List<PotionEffect>> itemsWithContinuousInvertedPotionEffects = new HashMap<>();
 
     private LootCustomConfig lootCustomConfig = new LootCustomConfig();
 
@@ -106,15 +107,18 @@ public class EliteDropsHandler implements Listener {
 
                     String[] parsedString = string.split(",");
 
-                    //this is a really bad way of doing things, two wrongs make a right
-                    if (parsedString.length % 2 != 0) {
+                    if (parsedString.length == 1) {
 
-                        getLogger().info("Your item " + itemName + " has a problematic potions effect entry.");
+                        Bukkit.getLogger().info("[EliteMobs] Your item " + itemName + " does not have a level for its potion effect.");
+                        Bukkit.getLogger().info("[EliteMobs] You need to add a number (probably 1) after the comma for the potion effect.");
+                        Bukkit.getLogger().info("[EliteMobs] THIS CURRENTLY BREAKS THE PLUGIN!");
+
+                    } else if (parsedString.length > 1) {
+
+                        int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
+                        enchantmentCount += potionEffectAmplifier * 15;
 
                     }
-
-                    int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
-                    enchantmentCount += potionEffectAmplifier * 15;
 
                 }
 
@@ -132,6 +136,9 @@ public class EliteDropsHandler implements Listener {
 
             }
 
+            Boolean inverted = false;
+            Boolean continuous = false;
+
             if (potionEffects != null) {
 
                 for (Object object : potionEffects) {
@@ -143,22 +150,57 @@ public class EliteDropsHandler implements Listener {
                     String potionEffectTypeString = parsedString[0];
                     PotionEffectType potionEffectType = PotionEffectType.getByName(potionEffectTypeString);
 
-                    //this is a really bad way of doing things, two wrongs make a right
-                    if (parsedString.length % 2 != 0) {
+                    if (parsedString.length == 1) {
 
-                        getLogger().info("Your item " + itemName + " has a problematic potions effect entry.");
+                        Bukkit.getLogger().info("[EliteMobs] Your item " + itemName + " does not have a level for its potion effect.");
+                        Bukkit.getLogger().info("[EliteMobs] You need to add a number (probably 1) after the comma for the potion effect.");
+                        Bukkit.getLogger().info("[EliteMobs] THIS CURRENTLY BREAKS THE PLUGIN!");
+
+                    } else if (parsedString.length > 1) {
+
+                        int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
+
+                        PotionEffect potionEffect = new PotionEffect(potionEffectType, 40, potionEffectAmplifier);
+
+                        parsedPotionEffect.add(potionEffect);
 
                     }
 
-                    int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
+                    if (parsedString.length > 2) {
 
-                    PotionEffect potionEffect = new PotionEffect(potionEffectType, 40, potionEffectAmplifier);
+                        if (parsedString[2].equalsIgnoreCase("inverted")) {
 
-                    parsedPotionEffect.add(potionEffect);
+                            inverted = true;
+
+                        }
+
+                    }
+
+                    if (parsedString.length > 3) {
+
+                        if (parsedString[3].equalsIgnoreCase("continuous")) {
+
+                            continuous = true;
+
+                        }
+
+                    }
 
                 }
 
                 potionEffectItemList.put(itemStack, parsedPotionEffect);
+
+                if (inverted) {
+
+                    itemsWithInvertedPotionEffects.put(itemStack, parsedPotionEffect);
+
+                }
+
+                if (continuous) {
+
+                    itemsWithContinuousInvertedPotionEffects.put(itemStack, parsedPotionEffect);
+
+                }
 
             }
 

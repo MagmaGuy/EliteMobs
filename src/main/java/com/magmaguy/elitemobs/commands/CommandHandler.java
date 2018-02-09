@@ -319,8 +319,7 @@ public class CommandHandler implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("event") && args[1].equalsIgnoreCase("smalltreasuregoblin") &&
                         permCheck(EVENT_SMALL_TREASURE_GOBLIN, commandSender)) {
 
-                    SmallTreasureGoblin smallTreasureGoblin = new SmallTreasureGoblin();
-                    smallTreasureGoblin.initializeEvent();
+                    SmallTreasureGoblin.initializeEvent();
 
                     return true;
 
