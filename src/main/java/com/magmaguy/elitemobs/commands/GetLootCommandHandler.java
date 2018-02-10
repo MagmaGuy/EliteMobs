@@ -20,7 +20,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static com.magmaguy.elitemobs.elitedrops.EliteDropsHandler.lootList;
+import static com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor.lootList;
 
 /**
  * Created by MagmaGuy on 01/05/2017.

@@ -15,8 +15,9 @@
 
 package com.magmaguy.elitemobs.elitedrops;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.LootCustomConfig;
+import com.google.common.collect.Lists;
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -24,7 +25,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
@@ -36,13 +36,10 @@ import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
 /**
  * Created by MagmaGuy on 29/11/2016.
  */
-public class EliteDropsHandler implements Listener {
+public class CustomDropsConstructor implements Listener {
 
     public static List<ItemStack> lootList = new ArrayList();
-    public static HashMap<ItemStack, List<PotionEffect>> potionEffectItemList = new HashMap();
     public static HashMap<Integer, List<ItemStack>> rankedItemStacks = new HashMap<>();
-    public static HashMap<ItemStack, List<PotionEffect>> itemsWithInvertedPotionEffects = new HashMap<>();
-    public static HashMap<ItemStack, List<PotionEffect>> itemsWithContinuousInvertedPotionEffects = new HashMap<>();
 
     private LootCustomConfig lootCustomConfig = new LootCustomConfig();
 
@@ -74,6 +71,7 @@ public class EliteDropsHandler implements Listener {
 
             int enchantmentCount = 0;
 
+            //Add enchantments
             if (itemEnchantments != null) {
 
                 for (Object object : itemEnchantments) {
@@ -96,29 +94,78 @@ public class EliteDropsHandler implements Listener {
             }
 
 
-            List<PotionEffect> parsedPotionEffect = new ArrayList();
-
-            //Add potion effects to a separate list to reduce i/o operations
+            List<String> potionEffectLore = new ArrayList<>();
+            //Add potion effects
             if (potionEffects != null) {
 
                 for (Object object : potionEffects) {
 
+                    //Add potion effects to item rank
                     String string = object.toString();
 
                     String[] parsedString = string.split(",");
 
+                    //check if the input is correct
                     if (parsedString.length == 1) {
 
                         Bukkit.getLogger().info("[EliteMobs] Your item " + itemName + " does not have a level for its potion effect.");
                         Bukkit.getLogger().info("[EliteMobs] You need to add a number (probably 1) after the comma for the potion effect.");
-                        Bukkit.getLogger().info("[EliteMobs] THIS CURRENTLY BREAKS THE PLUGIN!");
+                        Bukkit.getLogger().info("[EliteMobs] THIS MIGHT BREAK THE PLUGIN!");
+                        break;
 
                     } else if (parsedString.length > 1) {
+
+                        if (PotionEffectType.getByName(parsedString[0]) == null) {
+
+                            break;
+
+                        }
+
+                        try {
+
+                            Integer.parseInt(parsedString[1]);
+
+                        } catch (NumberFormatException e) {
+
+                            Bukkit.getLogger().info("[EliteMobs] Your item " + itemName + " does not have a valid level for its potion effect.");
+                            Bukkit.getLogger().info("[EliteMobs] The item is therefore broken. Fix it!");
+
+                            break;
+                        }
 
                         int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
                         enchantmentCount += potionEffectAmplifier * 15;
 
                     }
+
+                    String lore = "";
+
+                    //Add hidden lore to identify powers
+                    //Legacy support: potion effects used to only require two tags
+                    if (ConfigValues.customLootSettingsConfig.getBoolean(CustomLootSettingsConfig.SHOW_POTION_EFFECTS)) {
+
+                        lore = parsedString[0].toLowerCase().substring(0, 1).toUpperCase() +
+                                parsedString[0].toLowerCase().substring(1, (parsedString[0].length())).replace("_", " ") +
+                                " " + parsedString[1];
+
+//                        if (parsedString.length > 2) {
+//
+//                            lore += "," + parsedString[2];
+//
+//                        }
+//
+//                        if (parsedString.length > 3) {
+//
+//                            lore +=  "," + parsedString[3];
+//
+//                        }
+
+                    }
+
+                    String obfuscatedString = loreObfuscator(" " + string);
+                    lore += obfuscatedString;
+
+                    potionEffectLore.add(lore);
 
                 }
 
@@ -126,8 +173,54 @@ public class EliteDropsHandler implements Listener {
 
             int itemRank = ItemRankHandler.guessItemRank(itemStack.getType(), enchantmentCount);
 
-            List itemLore = itemLoreHandler(previousPath, itemRank);
-            itemMeta.setLore(itemLore);
+            List<String> structuredLore = Lists.newArrayList(ConfigValues.customLootSettingsConfig.getString(CustomLootSettingsConfig.LORE_STRUCTURE).split("\n"));
+            List<String> parsedStructuredLore = new ArrayList<>();
+
+            for (String string : structuredLore) {
+
+                if (string.contains("$potionEffect")) {
+
+                    if (potionEffectLore.size() > 0) {
+
+                        for (String string1 : potionEffectLore) {
+
+                            parsedStructuredLore.add(ChatColorConverter.chatColorConverter(string1));
+
+                        }
+
+                    }
+
+                } else if (string.contains("$customLore")) {
+
+                    if (customLoreParser(previousPath) != null && customLoreParser(previousPath).size() > 0) {
+
+                        for (String string1 : customLoreParser(previousPath)) {
+
+
+                            parsedStructuredLore.add(ChatColorConverter.chatColorConverter(string1));
+
+                        }
+
+                    }
+
+                } else if (string.contains("$itemValue")) {
+
+                    if (loreWorthParser(itemRank) != null) {
+
+                        parsedStructuredLore.add(ChatColorConverter.chatColorConverter(loreWorthParser(itemRank)));
+
+                    }
+
+                } else {
+
+                    parsedStructuredLore.add(ChatColorConverter.chatColorConverter(string));
+
+                }
+
+            }
+
+            //Add config lore
+            itemMeta.setLore(parsedStructuredLore);
             itemStack.setItemMeta(itemMeta);
 
             if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for custom items") && ChatColor.stripColor(itemName).equals(itemName)) {
@@ -136,84 +229,40 @@ public class EliteDropsHandler implements Listener {
 
             }
 
-            Boolean inverted = false;
-            Boolean continuous = false;
-
-            if (potionEffects != null) {
-
-                for (Object object : potionEffects) {
-
-                    String string = object.toString();
-
-                    String[] parsedString = string.split(",");
-
-                    String potionEffectTypeString = parsedString[0];
-                    PotionEffectType potionEffectType = PotionEffectType.getByName(potionEffectTypeString);
-
-                    if (parsedString.length == 1) {
-
-                        Bukkit.getLogger().info("[EliteMobs] Your item " + itemName + " does not have a level for its potion effect.");
-                        Bukkit.getLogger().info("[EliteMobs] You need to add a number (probably 1) after the comma for the potion effect.");
-                        Bukkit.getLogger().info("[EliteMobs] THIS CURRENTLY BREAKS THE PLUGIN!");
-
-                    } else if (parsedString.length > 1) {
-
-                        int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
-
-                        PotionEffect potionEffect = new PotionEffect(potionEffectType, 40, potionEffectAmplifier);
-
-                        parsedPotionEffect.add(potionEffect);
-
-                    }
-
-                    if (parsedString.length > 2) {
-
-                        if (parsedString[2].equalsIgnoreCase("inverted")) {
-
-                            inverted = true;
-
-                        }
-
-                    }
-
-                    if (parsedString.length > 3) {
-
-                        if (parsedString[3].equalsIgnoreCase("continuous")) {
-
-                            continuous = true;
-
-                        }
-
-                    }
-
-                }
-
-                potionEffectItemList.put(itemStack, parsedPotionEffect);
-
-                if (inverted) {
-
-                    itemsWithInvertedPotionEffects.put(itemStack, parsedPotionEffect);
-
-                }
-
-                if (continuous) {
-
-                    itemsWithContinuousInvertedPotionEffects.put(itemStack, parsedPotionEffect);
-
-                }
-
-            }
-
+            //Add custom item to lootList
             lootList.add(itemStack);
 
+            //Add item to ranked item list for drop math
             rankedItemMapCreator(itemRank, itemStack);
 
         }
 
     }
 
+    private String loreObfuscator(String textToObfuscate) {
 
-    public List<String> lootCounter() {
+        String insert = "§";
+        int period = 1;
+
+        StringBuilder stringBuilder = new StringBuilder(textToObfuscate.length() + insert.length() * (textToObfuscate.length() / period) + 0);
+
+        int index = 0;
+        String prefix = "";
+
+        while (index < textToObfuscate.length()) {
+
+            stringBuilder.append(prefix);
+            prefix = insert;
+            stringBuilder.append(textToObfuscate.substring(index, Math.min(index + period, textToObfuscate.length())));
+            index += period;
+
+        }
+
+        return stringBuilder.toString();
+
+    }
+
+    private List<String> lootCounter() {
 
         List<String> lootCount = new ArrayList();
 
@@ -248,7 +297,7 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public String automatedStringBuilder(String previousPath, String append) {
+    private String automatedStringBuilder(String previousPath, String append) {
 
         StringBuilder automatedStringBuilder = new StringBuilder();
 
@@ -262,7 +311,7 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public String itemTypeHandler(String previousPath) {
+    private String itemTypeHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Type");
 
@@ -272,7 +321,7 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public String itemNameHandler(String previousPath) {
+    private String itemNameHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Name");
 
@@ -282,26 +331,13 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public List itemLoreHandler(String previousPath, int itemRank) {
+    private List<String> customLoreParser(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Lore");
 
         List<String> itemLore = (List<String>) lootCustomConfig.getLootConfig().getList(path);
 
-        if (!ConfigValues.defaultConfig.getBoolean("Show item rank on custom item drops") && (itemLore == null || itemLore.isEmpty()) &&
-                !ConfigValues.economyConfig.getBoolean("Enable economy")) {
-
-            return itemLore;
-
-        }
-
         List<String> newList = new ArrayList<>();
-
-        if (ConfigValues.defaultConfig.getBoolean("Show item rank on custom item drops")) {
-
-            newList.add("Rank " + itemRank + " Elite Mob Drop");
-
-        }
 
         if (itemLore != null && !itemLore.isEmpty()) {
 
@@ -317,17 +353,6 @@ public class EliteDropsHandler implements Listener {
 
         }
 
-        if (ConfigValues.economyConfig.getBoolean("Enable economy")) {
-
-            String lore3;
-
-            lore3 = "Worth " + itemRank * ConfigValues.economyConfig.getDouble("Tier price progression") + " " +
-                    ConfigValues.economyConfig.getString("Currency name");
-
-            newList.add(lore3);
-
-        }
-
         if (newList == null || newList.isEmpty()) {
 
             return itemLore;
@@ -338,7 +363,27 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public List itemEnchantmentHandler(String previousPath) {
+    private String loreWorthParser(int itemRank) {
+
+        if (ConfigValues.economyConfig.getBoolean("Enable economy")) {
+
+            String valueLore;
+
+            String value = itemRank * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.TIER_PRICE_PROGRESSION) + "";
+
+            valueLore = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_WORTH);
+            valueLore = valueLore.replace("$worth", value);
+            valueLore = valueLore.replace("$currencyName", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+
+            return valueLore;
+
+        }
+
+        return null;
+
+    }
+
+    private List itemEnchantmentHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
 
@@ -348,7 +393,7 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public List itemPotionEffectHandler(String previousPath) {
+    private List<String> itemPotionEffectHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Potion Effects");
 
@@ -358,7 +403,7 @@ public class EliteDropsHandler implements Listener {
 
     }
 
-    public void rankedItemMapCreator(int itemPower, ItemStack itemStack) {
+    private void rankedItemMapCreator(int itemPower, ItemStack itemStack) {
 
         if (rankedItemStacks.get(itemPower) == null) {
 

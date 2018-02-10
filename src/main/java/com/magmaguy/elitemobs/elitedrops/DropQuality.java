@@ -62,108 +62,31 @@ public class DropQuality {
 
             if (enchantPercentage > 100) {
 
-                itemMeta.setDisplayName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
+                colorizeBoldNameAndLore(ChatColor.DARK_AQUA, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 5) {
 
-                itemMeta.setDisplayName(ChatColor.GOLD + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.GOLD + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
+                itemMeta = colorizeNameAndLore(ChatColor.GOLD, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 4) {
 
-                itemMeta.setDisplayName(ChatColor.DARK_PURPLE + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.DARK_PURPLE + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
+                itemMeta = colorizeNameAndLore(ChatColor.DARK_PURPLE, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 3) {
 
-                itemMeta.setDisplayName(ChatColor.BLUE + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.BLUE + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
+                itemMeta = colorizeNameAndLore(ChatColor.BLUE, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 2) {
 
-                itemMeta.setDisplayName(ChatColor.GREEN + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.GREEN + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
+                itemMeta = colorizeNameAndLore(ChatColor.GREEN, itemMeta);
 
             } else if (enchantPercentage > 100 / 6 * 1) {
 
-                itemMeta.setDisplayName(ChatColor.WHITE + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.WHITE + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
+                itemMeta = colorizeNameAndLore(ChatColor.WHITE, itemMeta);
 
             } else {
 
-                itemMeta.setDisplayName(ChatColor.GRAY + itemMeta.getDisplayName());
-
-                List list = new ArrayList();
-
-                for (String string : itemMeta.getLore()) {
-
-                    String coloredString = ChatColor.GRAY + "" + ChatColor.ITALIC + string;
-                    list.add(coloredString);
-
-                }
-
-                itemMeta.setLore(list);
+                itemMeta = colorizeNameAndLore(ChatColor.GRAY, itemMeta);
 
             }
 
@@ -173,9 +96,61 @@ public class DropQuality {
 
     }
 
-    private static int maxRankCalculator(ItemStack itemStack) {
+    private static ItemMeta colorizeNameAndLore(ChatColor chatColor, ItemMeta itemMeta) {
 
-        Configuration configuration = ConfigValues.randomItemsConfig;
+        itemMeta.setDisplayName(chatColor + itemMeta.getDisplayName());
+
+        List list = new ArrayList();
+
+        if (itemMeta.getLore() != null) {
+
+            for (String string : itemMeta.getLore()) {
+
+                if (!string.isEmpty()) {
+
+                    String colorizedString = chatColor + "" + ChatColor.ITALIC + string;
+                    list.add(colorizedString);
+
+                }
+
+            }
+
+            itemMeta.setLore(list);
+
+        }
+
+        return itemMeta;
+
+    }
+
+    private static ItemMeta colorizeBoldNameAndLore(ChatColor chatColor, ItemMeta itemMeta) {
+
+        itemMeta.setDisplayName(chatColor + "" + ChatColor.BOLD + "" + itemMeta.getDisplayName());
+
+        List list = new ArrayList();
+
+        if (!itemMeta.getLore().isEmpty()) {
+
+            for (String string : itemMeta.getLore()) {
+
+                if (!string.isEmpty()) {
+
+                    String colorizedString = chatColor + "" + ChatColor.BOLD + "" + ChatColor.ITALIC + string;
+                    list.add(colorizedString);
+
+                }
+
+            }
+
+            itemMeta.setLore(list);
+
+        }
+
+        return itemMeta;
+
+    }
+
+    private static int maxRankCalculator(ItemStack itemStack) {
 
         int maxRank = 0;
 

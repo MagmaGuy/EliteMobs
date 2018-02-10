@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -84,9 +84,9 @@ public class CustomShopHandler implements Listener {
 
         for (int i = balancedMin; i != balancedMax; i++) {
 
-            if (EliteDropsHandler.rankedItemStacks.get(i) != null) {
+            if (CustomDropsConstructor.rankedItemStacks.get(i) != null) {
 
-                validItemsList.put(i, EliteDropsHandler.rankedItemStacks.get(i));
+                validItemsList.put(i, CustomDropsConstructor.rankedItemStacks.get(i));
 
             }
 
@@ -181,9 +181,9 @@ public class CustomShopHandler implements Listener {
 
             int itemRank = 0;
 
-            for (Integer integer : EliteDropsHandler.rankedItemStacks.keySet()) {
+            for (Integer integer : CustomDropsConstructor.rankedItemStacks.keySet()) {
 
-                if (EliteDropsHandler.rankedItemStacks.get(integer).contains(itemStack)) {
+                if (CustomDropsConstructor.rankedItemStacks.get(integer).contains(itemStack)) {
 
                     itemRank = integer;
                     break;

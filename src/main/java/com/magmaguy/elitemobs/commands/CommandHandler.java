@@ -22,7 +22,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
@@ -39,7 +39,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
-import static com.magmaguy.elitemobs.elitedrops.EliteDropsHandler.lootList;
+import static com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor.lootList;
 import static org.bukkit.Bukkit.getLogger;
 import static org.bukkit.Bukkit.getServer;
 
@@ -207,8 +207,8 @@ public class CommandHandler implements CommandExecutor {
                     LootCustomConfig lootCustomConfig = new LootCustomConfig();
                     lootCustomConfig.reloadLootConfig();
 
-                    EliteDropsHandler eliteDropsHandler = new EliteDropsHandler();
-                    eliteDropsHandler.superDropParser();
+                    CustomDropsConstructor customDropsConstructor = new CustomDropsConstructor();
+                    customDropsConstructor.superDropParser();
 
                     commandSender.sendMessage("EliteMobs configs reloaded!");
 

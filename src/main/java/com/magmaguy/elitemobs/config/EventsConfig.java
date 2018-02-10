@@ -19,7 +19,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class EventsConfig {
 
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+    private CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
     public static final String ENABLE_EVENTS = "Enable events";
     public static final String MINIMUM_ONLINE_PLAYERS = "Minimum amount of online players for event to trigger";

@@ -32,11 +32,7 @@ public class ProjectileMetadataDetector {
 
             Entity trueDamagerEntity = (Entity) trueDamager;
 
-            if (trueDamagerEntity.hasMetadata(metadata)) {
-
-                return true;
-
-            }
+            return trueDamagerEntity.hasMetadata(metadata);
 
         }
 
