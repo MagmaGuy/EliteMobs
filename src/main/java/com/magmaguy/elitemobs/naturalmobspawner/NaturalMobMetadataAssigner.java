@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -91,7 +91,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                             ItemStack heldItem = player.getInventory().getItemInMainHand();
 
-                            for (ItemStack itemStack : EliteDropsHandler.lootList) {
+                            for (ItemStack itemStack : CustomDropsConstructor.lootList) {
 
                                 if (itemValidator(itemStack, helmet, "elite mob hunting helmet")) {
 

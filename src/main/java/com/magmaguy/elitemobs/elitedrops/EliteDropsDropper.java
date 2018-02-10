@@ -77,10 +77,10 @@ public class EliteDropsDropper implements Listener {
 
             if (random.nextDouble() < chanceToDrop) {
 
-                if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
+                if (!CustomDropsConstructor.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
                         ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
-                    if (EliteDropsHandler.rankedItemStacks.containsKey(mobLevel)) {
+                    if (CustomDropsConstructor.rankedItemStacks.containsKey(mobLevel)) {
 
                         if (random.nextDouble() * 100 <= ConfigValues.randomItemsConfig.getDouble("Percentage (%) of times random item drop instead of custom loot")) {
 
@@ -93,10 +93,10 @@ public class EliteDropsDropper implements Listener {
                         } else {
 
                             //drop custom loot
-                            int randomCustomDrop = random.nextInt(EliteDropsHandler.rankedItemStacks.get(mobLevel).size());
+                            int randomCustomDrop = random.nextInt(CustomDropsConstructor.rankedItemStacks.get(mobLevel).size());
 
                             //get rank matching randomizer and item matching randomized index
-                            entity.getWorld().dropItem(entity.getLocation(), EliteDropsHandler.rankedItemStacks.get(mobLevel).get(randomCustomDrop));
+                            entity.getWorld().dropItem(entity.getLocation(), CustomDropsConstructor.rankedItemStacks.get(mobLevel).get(randomCustomDrop));
 
                         }
 
@@ -109,16 +109,16 @@ public class EliteDropsDropper implements Listener {
 
                     }
 
-                } else if (!EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
+                } else if (!CustomDropsConstructor.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
                         !ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
                     //WARNING: THIS DOES NOT SCALE ITEM LEVEL (since I don't know how much loot is available, approximating will not make sense
-                    int customItemIndex = random.nextInt(EliteDropsHandler.lootList.size());
-                    ItemStack randomizedCustomItem = EliteDropsHandler.lootList.get(customItemIndex);
+                    int customItemIndex = random.nextInt(CustomDropsConstructor.lootList.size());
+                    ItemStack randomizedCustomItem = CustomDropsConstructor.lootList.get(customItemIndex);
 
                     entity.getWorld().dropItem(entity.getLocation(), randomizedCustomItem);
 
-                } else if (!EliteDropsHandler.rankedItemStacks.isEmpty() && !ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
+                } else if (!CustomDropsConstructor.rankedItemStacks.isEmpty() && !ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
                         ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
                     ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
@@ -126,7 +126,7 @@ public class EliteDropsDropper implements Listener {
 
                     entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
-                } else if (EliteDropsHandler.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
+                } else if (CustomDropsConstructor.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
 
                     ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
                     ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);

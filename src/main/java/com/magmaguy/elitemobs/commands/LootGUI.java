@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -100,7 +100,7 @@ public class LootGUI implements Listener {
         tierSlots.add(6);
         tierSlots.add(7);
 
-        List<Integer> keySet = new ArrayList<>(EliteDropsHandler.rankedItemStacks.keySet());
+        List<Integer> keySet = new ArrayList<>(CustomDropsConstructor.rankedItemStacks.keySet());
 
         int counter = 1;
 
@@ -155,15 +155,15 @@ public class LootGUI implements Listener {
 
             if (!filter) {
 
-                if (EliteDropsHandler.lootList.size() >= counter + ((currentLootPage - 1) * 35)) {
+                if (CustomDropsConstructor.lootList.size() >= counter + ((currentLootPage - 1) * 35)) {
 
-                    inventory.setItem(number, EliteDropsHandler.lootList.get(counter - 1 + ((currentLootPage - 1) * 35)));
+                    inventory.setItem(number, CustomDropsConstructor.lootList.get(counter - 1 + ((currentLootPage - 1) * 35)));
 
                 }
 
             } else {
 
-                List<ItemStack> currentRankloot = EliteDropsHandler.rankedItemStacks.get(filterRank);
+                List<ItemStack> currentRankloot = CustomDropsConstructor.rankedItemStacks.get(filterRank);
 
                 if (currentRankloot.size() >= counter + ((currentLootPage - 1) * 35)) {
 

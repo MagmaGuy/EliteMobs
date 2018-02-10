@@ -20,7 +20,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
 import com.magmaguy.elitemobs.config.TranslationCustomConfig;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
+import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
 import org.bukkit.Bukkit;
 
 /**
@@ -39,11 +39,11 @@ public class ReloadConfigCommandHandler {
         TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
         translationCustomConfig.reloadCustomConfig();
         ConfigValues configValues = new ConfigValues();
-        configValues.initializeConfigValues();
+        ConfigValues.initializeConfigValues();
 
         //reload config-based initialized data
-        EliteDropsHandler eliteDropsHandler = new EliteDropsHandler();
-        eliteDropsHandler.superDropParser();
+        CustomDropsConstructor customDropsConstructor = new CustomDropsConstructor();
+        customDropsConstructor.superDropParser();
 
         Bukkit.getLogger().info("EliteMobs config reloaded!");
 

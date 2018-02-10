@@ -31,8 +31,8 @@ import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
 import com.magmaguy.elitemobs.commands.guiconfig.configurers.MobSpawningAndLoot;
 import com.magmaguy.elitemobs.commands.guiconfig.configurers.ValidMobsConfigurer;
 import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsHandler;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
@@ -79,6 +79,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         mobPowersCustomConfig.initializeMobPowersConfig();
         LootCustomConfig lootCustomConfig = new LootCustomConfig();
         lootCustomConfig.LootCustomConfig();
+        CustomLootSettingsConfig customLootSettingsConfig = new CustomLootSettingsConfig();
+        customLootSettingsConfig.initializeCustomLootSettingsConfig();
         TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
         translationCustomConfig.initializeTranslationConfig();
         RandomItemsSettingsConfig randomItemsSettingsConfig = new RandomItemsSettingsConfig();
@@ -89,11 +91,10 @@ public class EliteMobs extends JavaPlugin implements Listener {
         playerMoneyDataConfig.intializeEconomySettingsConfig();
         EventsConfig eventsConfig = new EventsConfig();
         eventsConfig.initializeEventsConfig();
-        ConfigValues configValues = new ConfigValues();
         ConfigValues.initializeConfigValues();
 
         //Parse loot
-        EliteDropsHandler superDrops = new EliteDropsHandler();
+        CustomDropsConstructor superDrops = new CustomDropsConstructor();
         superDrops.superDropParser();
 
         //Get world list
