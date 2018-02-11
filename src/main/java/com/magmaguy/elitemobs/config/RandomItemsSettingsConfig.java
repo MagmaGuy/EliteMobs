@@ -67,20 +67,23 @@ public class RandomItemsSettingsConfig {
 
     public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
     public static final String MONITOR_ITEMS_ON_CONSOLE = "Monitor procedurally generated items on console";
+    public static final String MOB_LEVEL_TO_RANK_MULTIPLIER = "Mob level to item rank multiplier";
+    public static final String PERCENTAGE_PROCEDURAL_ITEM_INSTEAD_OF_CUSTOM = "Percentage (%) of times random item drop instead of custom loot";
+    public static final String PROCEDURAL_ITEM_VALID_MATERIALS = "Valid material list for random items";
 
     public void initializeRandomItemsSettingsConfig() {
 
         this.getRandomItemsSettingsConfig().addDefault(DROP_ITEMS_ON_DEATH, true);
-        this.getRandomItemsSettingsConfig().addDefault("Mob level to item rank multiplier", 0.5);
+        this.getRandomItemsSettingsConfig().addDefault(MOB_LEVEL_TO_RANK_MULTIPLIER, 0.5);
         this.getRandomItemsSettingsConfig().addDefault(MONITOR_ITEMS_ON_CONSOLE, false);
-        this.getRandomItemsSettingsConfig().addDefault("Percentage (%) of times random item drop instead of custom loot", 20);
+        this.getRandomItemsSettingsConfig().addDefault(PERCENTAGE_PROCEDURAL_ITEM_INSTEAD_OF_CUSTOM, 20);
         this.getRandomItemsSettingsConfig().addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from a level $level Elite $mob");
         this.getRandomItemsSettingsConfig().addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
         this.getRandomItemsSettingsConfig().addDefault(LORE_WORTH, "Worth $worth $currencyName");
         this.getRandomItemsSettingsConfig().addDefault(LORE_RESALE_WORTH, "$resale $currencyName resale value");
         this.getRandomItemsSettingsConfig().addDefault(LORE_SIGNATURE, "Elite Mobs drop");
         this.getRandomItemsSettingsConfig().addDefault(LORE_STRUCTURE, ChatColorConverter.chatColorConverter("&m----------------------\n $line1 \n $line2 \n $line3 \n&m----------------------"));
-        this.getRandomItemsSettingsConfig().addDefault("Valid material list for random items", Arrays.asList(
+        this.getRandomItemsSettingsConfig().addDefault(PROCEDURAL_ITEM_VALID_MATERIALS, Arrays.asList(
                 "DIAMOND_SWORD",
                 "GOLD_SWORD",
                 "IRON_SWORD",

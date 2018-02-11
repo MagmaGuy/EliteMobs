@@ -16,17 +16,26 @@
 package com.magmaguy.elitemobs.elitedrops;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by MagmaGuy on 06/06/2017.
  */
 public class ItemRankHandler {
 
-    public static int guessItemRank(Material material, int enchantmentTotal) {
+    public static int guessItemRank(ItemStack itemStack) {
 
-        int itemTypePowerCount = itemTypePower(material);
+        int itemTypePowerCount = itemTypePower(itemStack.getType());
 
-        int total = itemTypePowerCount + enchantmentTotal;
+        int enchantmentCount = countEnchantments(itemStack);
+
+        int adjustedPotionEffectCount = getPotionEffectCount(itemStack) * 15;
+
+        int total = itemTypePowerCount + enchantmentCount + adjustedPotionEffectCount;
 
         return total;
 
@@ -142,6 +151,51 @@ public class ItemRankHandler {
                 return 0;
 
         }
+
+    }
+
+    private static int countEnchantments(ItemStack itemStack) {
+
+        int enchantments = 0;
+
+        if (!itemStack.getEnchantments().isEmpty()) {
+
+            for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
+
+                enchantments += entry.getValue();
+
+            }
+
+        }
+
+        return enchantments;
+
+    }
+
+    private static int getPotionEffectCount(ItemStack itemStack) {
+
+        if (itemStack.getItemMeta().getLore() == null) return 0;
+
+        PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
+        List<String> potionList = potionEffectApplier.loreDeobfuscator(itemStack);
+
+        int potionEffectCount = 0;
+
+        for (String string : potionList) {
+
+            for (String string1 : string.split(",")) {
+
+                if (string1.equals(string.split(",")[1])) {
+
+                    potionEffectCount++;
+
+                }
+
+            }
+
+        }
+
+        return potionEffectCount;
 
     }
 

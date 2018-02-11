@@ -65,6 +65,24 @@ public class SmallTreasureGoblin implements Listener {
 
             String sendString = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT).replace("$location", coordinates);
 
+            String worldName = "";
+
+            if (entity.getWorld().getName().contains("_")) {
+
+                for (String string : entity.getWorld().getName().split("_")) {
+
+                    worldName += string.substring(0, 1).toUpperCase() + string.toLowerCase() + " ";
+
+                }
+
+            } else {
+
+                worldName = entity.getWorld().getName().substring(0, 1).toUpperCase() + entity.getWorld().getName().substring(1).toLowerCase();
+
+            }
+
+            sendString = sendString.replace("$world", worldName);
+
             player.sendMessage(sendString);
 
         }

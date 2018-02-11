@@ -40,7 +40,7 @@ public class EventsConfig {
         this.getEventsConfig().addDefault(MINIMUM_EVENT_FREQUENCY, 30);
         this.getEventsConfig().addDefault(MAXIMUM_EVENT_FREQUENCY, 10);
         this.getEventsConfig().addDefault(ENABLED_EVENTS + "." + TREASURE_GOBLIN_SMALL, true);
-        this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT, "A treasure goblin has appeared at $location\n" +
+        this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT, "A treasure goblin has appeared in $world at $location\n" +
                 "Make sure to take a hunting party with you!");
         this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT, "A Treasure Goblin has been slain by $player!");
         this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT, "A Treasure Goblin has been slain!");

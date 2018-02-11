@@ -82,7 +82,7 @@ public class EventLauncher {
         double maxFrequency = ConfigValues.eventsConfig.getInt(EventsConfig.MAXIMUM_EVENT_FREQUENCY);
 
         //y=mx slope = m
-        double slope = ((maxFrequency - minFrequency) / (minPlayers - maxPlayers));
+        double slope = ((maxFrequency - minFrequency) / (maxPlayers - minPlayers));
 
         double newTimerValue = slope * Bukkit.getOnlinePlayers().size() + minFrequency;
 

@@ -63,7 +63,7 @@ public class EliteDropsDropper implements Listener {
 
             int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-            mobLevel = (int) ((mobLevel * ConfigValues.randomItemsConfig.getDouble("Mob level to item rank multiplier")) + (random.nextInt(6) + 1 - 3));
+            mobLevel = (int) ((mobLevel * ConfigValues.randomItemsConfig.getDouble(RandomItemsSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER)) + (random.nextInt(6) + 1 - 3));
 
             if (mobLevel < 1) {
 

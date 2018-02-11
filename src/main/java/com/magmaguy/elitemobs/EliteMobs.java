@@ -24,12 +24,13 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.EntityDeathMetadataFlus
 import com.magmaguy.elitemobs.collateralminecraftchanges.OfflinePlayerCacher;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
-import com.magmaguy.elitemobs.commands.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
-import com.magmaguy.elitemobs.commands.ShopHandler;
 import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
 import com.magmaguy.elitemobs.commands.guiconfig.configurers.MobSpawningAndLoot;
 import com.magmaguy.elitemobs.commands.guiconfig.configurers.ValidMobsConfigurer;
+import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
+import com.magmaguy.elitemobs.commands.shops.ItemSaleEvent;
+import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
@@ -222,6 +223,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Shops
         this.getServer().getPluginManager().registerEvents(new ShopHandler(), this);
         this.getServer().getPluginManager().registerEvents(new CustomShopHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new ItemSaleEvent(), this);
 
         //Minecraft behavior canceller
         if (ConfigValues.defaultConfig.getBoolean("Prevent creepers from killing passive mobs")) {

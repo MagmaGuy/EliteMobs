@@ -51,7 +51,7 @@ public class ProceduralItemGenerator {
         randomItem.setItemMeta(itemMeta);
 
         //Apply lore
-        itemMeta.setLore(proceduralItemLoreConstructor(itemMeta, randomItem.getType(), entity));
+        itemMeta.setLore(proceduralItemLoreConstructor(randomItem, entity));
 
         randomItem.setItemMeta(itemMeta);
 
@@ -72,6 +72,9 @@ public class ProceduralItemGenerator {
             }
 
         }
+
+        //Add hidden lore for shops to validate
+        ObfuscatedSignatureLoreData.obfuscateSignatureData(randomItem);
 
         return randomItem;
 
@@ -403,7 +406,7 @@ public class ProceduralItemGenerator {
     }
 
 
-    private List<String> proceduralItemLoreConstructor(ItemMeta itemMeta, Material material, Entity entity) {
+    private List<String> proceduralItemLoreConstructor(ItemStack itemStack, Entity entity) {
 
         String line1 = "";
 
@@ -411,6 +414,28 @@ public class ProceduralItemGenerator {
 
             line1 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_MOB_LEVEL_SOURCE).replace("$level",
                     entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + "");
+
+            String newName = "";
+
+            if (entity.getType().name().contains("_")) {
+
+                List<String> tempSubList = Arrays.asList(entity.getType().name().split("_"));
+
+                for (String string : tempSubList) {
+
+                    string = string.toLowerCase().substring(0, 1).toUpperCase() + " ";
+                    newName += string;
+
+                }
+
+            } else {
+
+                newName = entity.getType().name().substring(0, 1) + entity.getType().name().substring(1).toLowerCase();
+
+            }
+
+            line1 = line1.replace("$mob", newName);
+
 
         } else {
 
@@ -422,20 +447,7 @@ public class ProceduralItemGenerator {
 
         if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) {
 
-            int enchantmentCount = 0;
-
-            if (!itemMeta.getEnchants().isEmpty()) {
-
-                for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
-
-                    enchantmentCount += itemMeta.getEnchantLevel(enchantment);
-
-                }
-
-            }
-
-            int rankLevel = ItemRankHandler.guessItemRank(material, enchantmentCount);
-            String itemWorth = String.valueOf(rankLevel * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.TIER_PRICE_PROGRESSION));
+            String itemWorth = ItemWorthCalculator.determineItemWorth(itemStack) + "";
             line2 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_WORTH).replace("$currencyName",
                     ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
             line2 = line2.replace("$worth", itemWorth);
