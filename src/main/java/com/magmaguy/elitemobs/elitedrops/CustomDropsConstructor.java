@@ -45,9 +45,6 @@ public class CustomDropsConstructor implements Listener {
 
     public void superDropParser() {
 
-        //TODO: use ItemRankHandler.guessItemRank(material, enchantmentTotal)
-        //TODO: split class up
-
         List<String> lootCount = lootCounter();
 
         for (String lootEntry : lootCount) {
@@ -69,8 +66,6 @@ public class CustomDropsConstructor implements Listener {
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.setDisplayName(itemName);
 
-            int enchantmentCount = 0;
-
             //Add enchantments
             if (itemEnchantments != null) {
 
@@ -85,14 +80,14 @@ public class CustomDropsConstructor implements Listener {
 
                     int enchantmentLevel = Integer.parseInt(parsedString[1]);
 
-                    enchantmentCount += enchantmentLevel;
-
                     itemMeta.addEnchant(enchantmentType, enchantmentLevel, true);
 
                 }
 
             }
 
+            //All obfuscated potion effect lore is stored in the first line of lore, so it gets temporarily stored in a single string
+            String allObfuscatedPotionEffects = "";
 
             List<String> potionEffectLore = new ArrayList<>();
             //Add potion effects
@@ -133,9 +128,6 @@ public class CustomDropsConstructor implements Listener {
                             break;
                         }
 
-                        int potionEffectAmplifier = Integer.parseInt(parsedString[1]);
-                        enchantmentCount += potionEffectAmplifier * 15;
-
                     }
 
                     String lore = "";
@@ -163,7 +155,8 @@ public class CustomDropsConstructor implements Listener {
                     }
 
                     String obfuscatedString = loreObfuscator(" " + string);
-                    lore += obfuscatedString;
+                    allObfuscatedPotionEffects += obfuscatedString;
+//                    lore += obfuscatedString;
 
                     potionEffectLore.add(lore);
 
@@ -171,7 +164,11 @@ public class CustomDropsConstructor implements Listener {
 
             }
 
-            int itemRank = ItemRankHandler.guessItemRank(itemStack.getType(), enchantmentCount);
+            //temporarily add enchantments ahead of time so the worth parser knows what potion effects are in play
+            List<String> tempLore = new ArrayList<>();
+            tempLore.add(allObfuscatedPotionEffects);
+            itemMeta.setLore(tempLore);
+            itemStack.setItemMeta(itemMeta);
 
             List<String> structuredLore = Lists.newArrayList(ConfigValues.customLootSettingsConfig.getString(CustomLootSettingsConfig.LORE_STRUCTURE).split("\n"));
             List<String> parsedStructuredLore = new ArrayList<>();
@@ -205,9 +202,9 @@ public class CustomDropsConstructor implements Listener {
 
                 } else if (string.contains("$itemValue")) {
 
-                    if (loreWorthParser(itemRank) != null) {
+                    if (loreWorthParser(itemStack) != null) {
 
-                        parsedStructuredLore.add(ChatColorConverter.chatColorConverter(loreWorthParser(itemRank)));
+                        parsedStructuredLore.add(ChatColorConverter.chatColorConverter(loreWorthParser(itemStack)));
 
                     }
 
@@ -229,11 +226,35 @@ public class CustomDropsConstructor implements Listener {
 
             }
 
+            itemMeta = itemStack.getItemMeta();
+
+            List<String> obfuscatedLore = new ArrayList<>();
+            //Add the identifying line of lore
+            for (String string : itemMeta.getLore()) {
+
+                if (string.equals(itemMeta.getLore().get(0))) {
+
+                    obfuscatedLore.add(string + allObfuscatedPotionEffects);
+
+                } else {
+
+                    obfuscatedLore.add(string);
+
+                }
+
+            }
+
+            itemMeta.setLore(obfuscatedLore);
+            itemStack.setItemMeta(itemMeta);
+
+            //Add hidden lore for shops to validate
+            ObfuscatedSignatureLoreData.obfuscateSignatureData(itemStack);
+
             //Add custom item to lootList
             lootList.add(itemStack);
 
             //Add item to ranked item list for drop math
-            rankedItemMapCreator(itemRank, itemStack);
+            rankedItemMapCreator(ItemRankHandler.guessItemRank(itemStack), itemStack);
 
         }
 
@@ -363,13 +384,13 @@ public class CustomDropsConstructor implements Listener {
 
     }
 
-    private String loreWorthParser(int itemRank) {
+    private String loreWorthParser(ItemStack itemStack) {
 
-        if (ConfigValues.economyConfig.getBoolean("Enable economy")) {
+        if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) {
 
             String valueLore;
 
-            String value = itemRank * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.TIER_PRICE_PROGRESSION) + "";
+            String value = ItemWorthCalculator.determineItemWorth(itemStack) + "";
 
             valueLore = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_WORTH);
             valueLore = valueLore.replace("$worth", value);

@@ -21,13 +21,10 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
@@ -158,24 +155,7 @@ public class NaturalMobSpawner implements Listener {
 
     private int itemRankCalculator(ItemStack itemStack) {
 
-        Material material = itemStack.getType();
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        int enchantmentCount = 0;
-
-        if (!itemMeta.getEnchants().isEmpty()) {
-
-            for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
-
-                enchantmentCount += itemMeta.getEnchantLevel(enchantment);
-
-            }
-
-        }
-
-        int rankLevel = ItemRankHandler.guessItemRank(material, enchantmentCount);
-
-        return rankLevel;
+        return ItemRankHandler.guessItemRank(itemStack);
 
     }
 

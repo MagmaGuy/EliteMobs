@@ -17,6 +17,8 @@ package com.magmaguy.elitemobs.config;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.Arrays;
+
 /**
  * Created by MagmaGuy on 17/06/2017.
  */
@@ -32,6 +34,12 @@ public class EconomySettingsConfig {
     public static final String LOWEST_SIMULATED_CUSTOM_LOOT = "Custom Loot.Lowest simulated elite mob level loot";
     public static final String HIGHEST_SIMULATED_CUSTOM_LOOT = "Custom Loot.Highest simulated elite mob level loot";
     public static final String CURRENCY_NAME = "Currency name";
+    public static final String SHOP_NAME = "Shop name";
+    public static final String CUSTOM_SHOP_NAME = "Custom shop name";
+    public static final String SIGNATURE_ITEM_LOCATION_SHOPS = "Reroll button location for EliteMobs Shops";
+    public static final String SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Shop";
+    public static final String CUSTOM_SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Custom Shop";
+
 
     public void intializeEconomySettingsConfig() {
 
@@ -43,6 +51,15 @@ public class EconomySettingsConfig {
         this.getEconomySettingsConfig().addDefault(LOWEST_SIMULATED_CUSTOM_LOOT, 1);
         this.getEconomySettingsConfig().addDefault(HIGHEST_SIMULATED_CUSTOM_LOOT, 100);
         this.getEconomySettingsConfig().addDefault(CURRENCY_NAME, "Elite Coins");
+        this.getEconomySettingsConfig().addDefault(SHOP_NAME, "EliteMobs Shop");
+        this.getEconomySettingsConfig().addDefault(CUSTOM_SHOP_NAME, "EliteMobs Custom Shop");
+        this.getEconomySettingsConfig().addDefault(SIGNATURE_ITEM_LOCATION_SHOPS, 4);
+        this.getEconomySettingsConfig().addDefault(SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+                46, 47, 48, 49, 50, 51, 52, 53));
+        this.getEconomySettingsConfig().addDefault(CUSTOM_SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+                46, 47, 48, 49, 50, 51, 52, 53));
 
         getEconomySettingsConfig().options().copyDefaults(true);
         saveDefaultCustomConfig();

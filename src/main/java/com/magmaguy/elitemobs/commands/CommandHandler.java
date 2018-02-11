@@ -18,6 +18,8 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
+import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
+import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.LootCustomConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;

@@ -54,6 +54,7 @@ public class PotionEffectApplier implements Listener {
     public static final String TARGET = "TARGET";
     public static final String SELF = "SELF";
     public static final String CONTINUOUS = "CONTINUOUS";
+    public static final String ONHIT = "ONHIT";
 
     public void potionEffectApplier() {
 
@@ -132,7 +133,7 @@ public class PotionEffectApplier implements Listener {
 
     }
 
-    private List<String> loreDeobfuscator(ItemStack itemStack) {
+    public List<String> loreDeobfuscator(ItemStack itemStack) {
 
         List<String> lore = itemStack.getItemMeta().getLore();
         List<String> deobfuscatedString = new ArrayList<>();
@@ -147,12 +148,26 @@ public class PotionEffectApplier implements Listener {
 
                     if (potionEffectType != null) {
 
-                        if (string.contains(potionEffectType.getName() + ",")) {
+                        for (String spaceSeparation : string.split(" ")) {
 
-                            int substringStart = string.indexOf(potionEffectType.getName());
-                            string = string.substring(substringStart, string.length());
+                            //individual potion effects are separated at this level
+                            boolean validPotionEffect = false;
 
-                            deobfuscatedString.add(string);
+                            for (String commaSeparation : spaceSeparation.split(",")) {
+
+                                if (commaSeparation.equals(potionEffectType.getName()) && spaceSeparation.contains(",")) {
+
+                                    validPotionEffect = true;
+
+                                }
+
+                            }
+
+                            if (validPotionEffect) {
+
+                                deobfuscatedString.add(spaceSeparation);
+
+                            }
 
                         }
 
@@ -171,6 +186,7 @@ public class PotionEffectApplier implements Listener {
     private HashMap<PotionEffect, List<String>> potionEffectCreator(List<String> deobfuscatedLore, boolean event) {
 
         HashMap<PotionEffect, List<String>> potionEffects = new HashMap<>();
+
 
         for (String string : deobfuscatedLore) {
 
@@ -213,15 +229,18 @@ public class PotionEffectApplier implements Listener {
 
                 if (substringIndex == 3) {
 
-                    continuous = substring;
-                    if (continuous.equalsIgnoreCase(CONTINUOUS)) {
+                    if (substring.equalsIgnoreCase(CONTINUOUS)) {
 
-                        tags.add(continuous);
+                        tags.add(substring);
+
+                    } else if (substring.equalsIgnoreCase(ONHIT)) {
+
+                        tags.add(substring);
 
                     } else {
 
                         Bukkit.getLogger().info("[EliteMobs] Error with loot.yml: was expecting '" + CONTINUOUS +
-                                "' value but got '" + continuous + "' instead.");
+                                "' or '" + ONHIT + "' value but got '" + substring + "' instead.");
 
                     }
 
@@ -250,6 +269,7 @@ public class PotionEffectApplier implements Listener {
 
         }
 
+
         return potionEffects;
 
     }
@@ -277,7 +297,8 @@ public class PotionEffectApplier implements Listener {
 
                 if (potionEffects.get(potionEffect).get(0).equalsIgnoreCase(SELF)) {
 
-                    if (!offensivePotionEffects.contains(potionEffect.getType())) {
+                    if ((!offensivePotionEffects.contains(potionEffect.getType()) && potionEffects.get(potionEffect).size() == 1) ||
+                            (!offensivePotionEffects.contains(potionEffect.getType()) && potionEffects.get(potionEffect).get(1).equalsIgnoreCase(CONTINUOUS))) {
 
                         player.removePotionEffect(potionEffect.getType());
                         player.addPotionEffect(potionEffect);
