@@ -73,3 +73,105 @@ Loot:
     - ARROW_DAMAGE,3
     Potion Effects:
     - LUCK,1
+  Rabbit Charm:
+    Item Type: RABBIT_FOOT
+    Item Name: "Rabbit Charm"
+    Item Lore:
+    - "With this charm, just about"
+    - "any destination is only a hop,"
+    - "skip and a jump away!"
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - JUMP,2,self,continuous
+    Drop Weight: 1
+  Camel Charm:
+    Item Type: COOKED_BEEF
+    Item Name: "Camel Charm"
+    Item Lore:
+    - "Camels can go for 7 months"
+    - "without drinking water. With"
+    - "this, you won't ever need it!"
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - SATURATION,1
+    Drop Weight: 1
+  Vampiric Charm:
+    Item Type: STICK
+    Item Name: "Vampiric Charm"
+    Item Lore:
+    - "No one can remember where this"
+    - "came from, and no one can"
+    - "forget how dangerous it is..."
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - HEAL,1,self,onHit
+    - BLINDNESS,1,self,onHit
+    - SLOW,1,self,onHit
+  Scorpion Charm:
+    Item Type: POISONOUS_POTATO
+    Item Name: "Scorpion Charm"
+    Item Lore:
+    - "Float like a butterfly,"
+    - "sting like a bee,"
+    - "poison like a potato!"
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - POISON,1,target,onHit
+    Drop Weight: 1
+  Chameleon Charm:
+    Item Type: LEATHER
+    Item Name: "Chameleon Charm"
+    Item Lore:
+    - "The colorful Chameleon can"
+    - "blend in just about anywhere, "
+    - "slowly creeping around..."
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - INVISIBILITY,1,self,onHit
+    - SLOW,2,self,onHit
+    - BLINDNESS,1,self,onHit
+    Drop Weight: 1
+  Shulker Charm:
+    Item Type: FEATHER
+    Item Name: "Shulker Charm"
+    Item Lore:
+    - "I believe I can fly"
+    - "I believe I can touch the sky"
+    - "And you're coming with me!"
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - LEVITATION,1,self,onHit
+    - LEVITATION,2,target,onHit
+    Drop Weight: 1
+  Elephant Charm:
+    Item Type: ANVIL
+    Item Name: "Elephant Charm"
+    Item Lore:
+    - "Gain the power of an elephant"
+    - "stampede, for the cost of the"
+    - "speed of an elephant stampede!"
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - INCREASE_DAMAGE,2,self,onHit
+    - SLOW,4,self,onHit
+    Drop Weight: 1
+  Cheetah Charm:
+    Item Type: GOLD_BOOTS
+    Item Name: "Cheetah Charm"
+    Item Lore:
+    - "Cheetahs can reach speeds of"
+    - "120 km/h... for about 60"
+    - "seconds. Make them count."
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - SPEED,3,self,continuous
+    - HUNGER,1,self,continuous
+    Drop Weight: 1

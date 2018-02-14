@@ -91,7 +91,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                             ItemStack heldItem = player.getInventory().getItemInMainHand();
 
-                            for (ItemStack itemStack : CustomDropsConstructor.lootList) {
+                            for (ItemStack itemStack : CustomDropsConstructor.customItemList) {
 
                                 if (itemValidator(itemStack, helmet, "elite mob hunting helmet")) {
 

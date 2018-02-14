@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands.guiconfig.configurers;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
@@ -20,7 +21,7 @@ public class MobSpawningAndLoot implements Listener {
             permissionMissingTitles, customItemRank, scoreboards;
 
     private static double conversionPercentage, aggressiveStackingCap, naturalLevelCap, passiveStackAmount, flatLootDropRate,
-            levelDropRate, mmorpgRankChange, lifeMultiplier, damageMultiplier, lootMultiplier, explosionMultiplier;
+            levelDropRate, lifeMultiplier, damageMultiplier, lootMultiplier, explosionMultiplier;
 
     private static void configStatusChecker() {
 
@@ -45,9 +46,8 @@ public class MobSpawningAndLoot implements Listener {
         aggressiveStackingCap = doubleValueGrabber("Aggressive mob stacking cap");
         naturalLevelCap = doubleValueGrabber("Natural elite mob level cap");
         passiveStackAmount = doubleValueGrabber("Passive EliteMob stack amount");
-        flatLootDropRate = doubleValueGrabber("Aggressive EliteMobs flat loot drop rate %");
-        levelDropRate = doubleValueGrabber("Aggressive EliteMobs flat loot drop rate %");
-        mmorpgRankChange = doubleValueGrabber("Increase MMORPG color rank every X levels X=");
+        flatLootDropRate = doubleValueGrabber(DefaultConfig.ELITE_ITEM_FLAT_DROP_RATE);
+        levelDropRate = doubleValueGrabber(DefaultConfig.ELITE_ITEM_FLAT_DROP_RATE);
         lifeMultiplier = doubleValueGrabber("Aggressive EliteMob life multiplier");
         damageMultiplier = doubleValueGrabber("Aggressive EliteMob damage multiplier");
         lootMultiplier = doubleValueGrabber("Aggressive EliteMob default loot multiplier");
@@ -144,7 +144,7 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets the base drop rate for special items",
                 "(custom and procedurally generated) dropped",
                 "by Elite Mobs"));
-        ItemStack flatLootDropRateItem = percentageDoubleItemStackConstructor("Aggressive EliteMobs flat loot drop rate %",
+        ItemStack flatLootDropRateItem = percentageDoubleItemStackConstructor(DefaultConfig.ELITE_ITEM_FLAT_DROP_RATE,
                 flatLootDropRateLore, flatLootDropRate);
         optionsList.add(flatLootDropRateItem);
 
@@ -171,14 +171,6 @@ public class MobSpawningAndLoot implements Listener {
         ItemStack mmorpgColorsCustomItem = boolItemStackConstructor("Use MMORPG colors for custom items",
                 mmorpgColorsCustomLore, mmorpgColorsCustom);
         optionsList.add(mmorpgColorsCustomItem);
-
-        List<String> mmorpgRankChangeLore = new ArrayList<>(Arrays.asList(
-                "Sets how many levels of enchantments and",
-                "potions it takes for the rarity rank of",
-                "items to go up"));
-        ItemStack mmorpgRankChangeItem = doubleItemStackConstructor("Increase MMORPG color rank every X levels X=",
-                mmorpgRankChangeLore, mmorpgRankChange);
-        optionsList.add(mmorpgRankChangeItem);
 
         List<String> creepersFarmDamageLore = new ArrayList<>(Arrays.asList(
                 "Sets whether or not creepers can damage",

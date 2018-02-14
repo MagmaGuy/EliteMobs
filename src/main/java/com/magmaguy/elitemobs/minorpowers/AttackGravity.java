@@ -56,12 +56,14 @@ public class AttackGravity extends MinorPowers implements Listener {
     @EventHandler
     public void attackGravity(EntityDamageByEntityEvent event) {
 
+        if (!(event.getEntity() instanceof LivingEntity)) return;
+
         Entity damager = event.getDamager();
-        Entity damagee = event.getEntity();
+        LivingEntity damagee = (LivingEntity) event.getEntity();
 
-        if (damager.hasMetadata(powerMetadata) && damagee instanceof LivingEntity) {
+        if (damager.hasMetadata(powerMetadata)) {
 
-            ((LivingEntity) damagee).addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 1));
+            damagee.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 1));
 
         }
 
@@ -69,7 +71,7 @@ public class AttackGravity extends MinorPowers implements Listener {
 
             if (ProjectileMetadataDetector.projectileMetadataDetector(((Projectile) damager), powerMetadata)) {
 
-                ((LivingEntity) damagee).addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 1));
+                damagee.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 1));
 
             }
 

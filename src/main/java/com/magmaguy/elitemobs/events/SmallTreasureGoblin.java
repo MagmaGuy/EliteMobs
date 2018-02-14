@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.events;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
@@ -82,6 +83,8 @@ public class SmallTreasureGoblin implements Listener {
             }
 
             sendString = sendString.replace("$world", worldName);
+
+            sendString = ChatColorConverter.chatColorConverter(sendString);
 
             player.sendMessage(sendString);
 

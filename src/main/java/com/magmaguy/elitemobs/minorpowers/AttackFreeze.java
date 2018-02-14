@@ -134,8 +134,14 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
             damagee.setMetadata(MetadataHandler.FROZEN, new FixedMetadataValue(plugin, true));
             damagee.setMetadata(MetadataHandler.FROZEN_COOLDOWN, new FixedMetadataValue(plugin, true));
-            block.setType(Material.PACKED_ICE);
-            block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+
+            if (block.getType() == Material.AIR) {
+
+                block.setType(Material.PACKED_ICE);
+                block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+
+            }
+
 
             if (damagee instanceof Player) {
 
@@ -151,8 +157,12 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
             damagee.removeMetadata(MetadataHandler.FROZEN, plugin);
 
-            block.setType(Material.AIR);
-            block.removeMetadata("TemporaryBlock", plugin);
+            if (block.getType() == Material.PACKED_ICE) {
+
+                block.setType(Material.AIR);
+                block.removeMetadata("TemporaryBlock", plugin);
+
+            }
 
         }
 

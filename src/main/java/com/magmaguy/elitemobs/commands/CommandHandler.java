@@ -41,7 +41,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
-import static com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor.lootList;
+import static com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor.customItemList;
 import static org.bukkit.Bukkit.getLogger;
 import static org.bukkit.Bukkit.getServer;
 
@@ -346,9 +346,9 @@ public class CommandHandler implements CommandExecutor {
 
                             Random random = new Random();
 
-                            int index = random.nextInt(lootList.size());
+                            int index = random.nextInt(customItemList.size());
 
-                            ItemStack itemStack = new ItemStack(lootList.get(index));
+                            ItemStack itemStack = new ItemStack(customItemList.get(index));
 
                             receiver.getInventory().addItem(itemStack);
 

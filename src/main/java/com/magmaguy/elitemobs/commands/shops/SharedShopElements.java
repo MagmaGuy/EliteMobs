@@ -15,17 +15,20 @@
 
 package com.magmaguy.elitemobs.commands.shops;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class SharedShopElements {
 
@@ -51,24 +54,55 @@ public class SharedShopElements {
 
     public static void buyMessage(Player player, String itemDisplayName, double itemValue) {
 
-        player.sendMessage(ChatColor.GREEN + "You have bought " + itemDisplayName + " for " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-        player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                player.sendMessage(ChatColor.GREEN + "You have bought " + itemDisplayName + " for " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+                player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+
+            }
+
+
+        }.runTaskLater(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 2);
 
     }
 
     public static void insufficientFundsMessage(Player player, double itemValue) {
 
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                player.sendMessage(ChatColor.RED + "You don't have enough " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + "!");
+                player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+                player.sendMessage(ChatColor.GREEN + "That item cost " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + ".");
+
+            }
+
+
+        }.runTaskLater(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 2);
+
         player.closeInventory();
-        player.sendMessage(ChatColor.RED + "You don't have enough " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + "!");
-        player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-        player.sendMessage(ChatColor.GREEN + "That item cost " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + ".");
 
     }
 
     public static void sellMessage(Player player, String itemDisplayName, double amountDeduced) {
 
-        player.sendMessage("You have sold " + itemDisplayName + " for " + amountDeduced + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-        player.sendMessage("You have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                player.sendMessage("You have sold " + itemDisplayName + " for " + amountDeduced + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+                player.sendMessage("You have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+
+            }
+
+
+        }.runTaskLater(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 2);
 
     }
 

@@ -193,7 +193,7 @@ public class PotionEffectApplier implements Listener {
             int substringIndex = 0;
             PotionEffectType potionEffectType = null;
             int potionEffectMagnitude = 0;
-            String victim, continuous;
+            String victim;
             List<String> tags = new ArrayList<>();
 
 
@@ -247,23 +247,23 @@ public class PotionEffectApplier implements Listener {
                 }
 
                 substringIndex++;
-                if (potionEffectType != null || potionEffectMagnitude > 0) {
 
-                    PotionEffect potionEffect;
+            }
 
-                    if (!event) potionEffect = continuousPotionEffect(potionEffectType, potionEffectMagnitude);
-                    else potionEffect = eventPotionEffect(potionEffectType, potionEffectMagnitude);
+            if (potionEffectType != null && potionEffectMagnitude > 0) {
 
-                    potionEffects.put(potionEffect, tags);
+                PotionEffect potionEffect;
 
-                } else {
+                if (!event) potionEffect = continuousPotionEffect(potionEffectType, potionEffectMagnitude - 1);
+                else potionEffect = eventPotionEffect(potionEffectType, potionEffectMagnitude - 1);
 
-                    Bukkit.getLogger().info("[EliteMobs] There seems to be something very wrong with one of your potion effects.");
-                    Bukkit.getLogger().info("[EliteMobs] An item has an invalid potion effect or potion effect level.");
-                    Bukkit.getLogger().info("[EliteMobs] Problematic entry has the follow settings: " + string);
+                potionEffects.put(potionEffect, tags);
 
-                }
+            } else {
 
+                Bukkit.getLogger().info("[EliteMobs] There seems to be something very wrong with one of your potion effects.");
+                Bukkit.getLogger().info("[EliteMobs] An item has an invalid potion effect or potion effect level.");
+                Bukkit.getLogger().info("[EliteMobs] Problematic entry has the follow settings: " + string);
 
             }
 

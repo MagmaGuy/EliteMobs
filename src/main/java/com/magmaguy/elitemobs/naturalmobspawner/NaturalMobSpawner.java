@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -54,13 +55,17 @@ public class NaturalMobSpawner implements Listener {
 
             if (player.getWorld().equals(entity.getWorld()) && player.getLocation().distance(entity.getLocation()) < range) {
 
-                closePlayers.add(player);
+                if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
+
+                    closePlayers.add(player);
+
+                }
 
             }
 
         }
 
-        int EliteMobLevel = 0;
+        int eliteMobLevel = 0;
 
         for (Player player : closePlayers) {
 
@@ -70,29 +75,22 @@ public class NaturalMobSpawner implements Listener {
 
             int potionEffectRating = player.getActivePotionEffects().size();
 
-//            int EliteMobRating = 0;
-//            EliteMobRating = EliteMobRating(player, EliteMobRating, range);
-
             int threatLevel = 0;
             threatLevel = threatLevelCalculator(armorRating, potionEffectRating);
 
-            EliteMobLevel += levelCalculator(threatLevel);
+            eliteMobLevel += levelCalculator(threatLevel);
 
-            if (EliteMobLevel > ConfigValues.defaultConfig.getInt("Natural elite mob level cap")) {
+            if (eliteMobLevel > ConfigValues.defaultConfig.getInt("Natural elite mob level cap")) {
 
-                EliteMobLevel = ConfigValues.defaultConfig.getInt("Natural elite mob level cap");
-
-            }
-
-            if (threatLevel == 0) {
-
-                return;
+                eliteMobLevel = ConfigValues.defaultConfig.getInt("Natural elite mob level cap");
 
             }
 
         }
 
-        entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, EliteMobLevel));
+        if (eliteMobLevel < 2) return;
+
+        entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, eliteMobLevel));
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
 
     }
@@ -132,23 +130,6 @@ public class NaturalMobSpawner implements Listener {
 
         }
 
-//        if (player.getEquipment().getItemInMainHand() != null || !player.getEquipment().getItemInOffHand().getType().equals(Material.AIR)) {
-//
-//            ItemStack mainHand = player.getEquipment().getItemInMainHand();
-//
-//            armorRating += itemRankCalculator(mainHand);
-//
-//        }
-//
-//        if (player.getEquipment().getItemInOffHand() != null || !player.getEquipment().getItemInOffHand().getType().equals(Material.AIR)) {
-//
-//            ItemStack offHand = player.getEquipment().getItemInOffHand();
-//
-//            armorRating += itemRankCalculator(offHand);
-//
-//        }
-
-
         return armorRating;
 
     }
@@ -159,28 +140,6 @@ public class NaturalMobSpawner implements Listener {
 
     }
 
-
-//    private int EliteMobRating(Player player, int EliteMobRating, double range) {
-//
-//        for (Entity nearPlayer : player.getNearbyEntities(range, range, range)) {
-//
-//            if (nearPlayer.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
-//
-//                EliteMobRating++;
-//
-//                if (EliteMobRating > 50) {
-//
-//                    return EliteMobRating;
-//
-//                }
-//
-//            }
-//
-//        }
-//
-//        return EliteMobRating;
-//
-//    }
 
 
     private int threatLevelCalculator(int armorRating, int potionEffectRating) {
