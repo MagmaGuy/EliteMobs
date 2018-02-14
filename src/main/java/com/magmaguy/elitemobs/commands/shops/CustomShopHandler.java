@@ -31,8 +31,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -64,32 +62,12 @@ public class CustomShopHandler implements Listener {
         //Anything after 8 is populated
         Random random = new Random();
 
-        int balancedMax = ConfigValues.economyConfig.getInt(EconomySettingsConfig.HIGHEST_SIMULATED_CUSTOM_LOOT)
-                - ConfigValues.economyConfig.getInt(EconomySettingsConfig.LOWEST_SIMULATED_CUSTOM_LOOT);
-        int balancedMin = ConfigValues.economyConfig.getInt(EconomySettingsConfig.LOWEST_SIMULATED_CUSTOM_LOOT);
-
-        HashMap<Integer, List<ItemStack>> validItemsList = new HashMap<>();
-
-        for (int i = balancedMin; i != balancedMax; i++) {
-
-            if (CustomDropsConstructor.rankedItemStacks.get(i) != null) {
-
-                validItemsList.put(i, CustomDropsConstructor.rankedItemStacks.get(i));
-
-            }
-
-        }
-
 
         for (int i = 9; i < 54; i++) {
 
-            Object[] itemRankKeys = validItemsList.keySet().toArray();
-            Object itemRankIndex = itemRankKeys[random.nextInt(itemRankKeys.length)];
+            int itemEntryIndex = random.nextInt(CustomDropsConstructor.customItemList.size());
 
-            List<ItemStack> itemEntryList = validItemsList.get(itemRankIndex);
-            int itemEntryIndex = random.nextInt(itemEntryList.size());
-
-            shopInventory.setItem(i, validItemsList.get(itemRankIndex).get(itemEntryIndex));
+            shopInventory.setItem(i, CustomDropsConstructor.customItemList.get(itemEntryIndex));
 
         }
 

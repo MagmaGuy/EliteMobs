@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.events.mobs;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
@@ -39,7 +40,7 @@ public class TreasureGoblin implements Listener {
 
             Entity entity = event.getEntity();
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < ConfigValues.eventsConfig.getInt(EventsConfig.SMALL_TREASURE_GOBLIN_REWARD); i++) {
 
                 eliteDropsDropper.dropItem(entity);
 
@@ -49,11 +50,12 @@ public class TreasureGoblin implements Listener {
 
                 if (((LivingEntity) entity).getKiller() != null) {
 
-                    player.sendMessage(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT).replace("$player", ((LivingEntity) entity).getKiller().getDisplayName()));
+                    player.sendMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.chatColorConverter(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT)
+                            .replace("$player", ((LivingEntity) entity).getKiller().getDisplayName())));
 
                 } else {
 
-                    player.sendMessage(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT));
+                    player.sendMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.chatColorConverter(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
 
                 }
 

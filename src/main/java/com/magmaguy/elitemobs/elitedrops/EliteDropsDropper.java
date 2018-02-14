@@ -17,7 +17,9 @@ package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.RandomItemsSettingsConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,6 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -37,14 +40,14 @@ public class EliteDropsDropper implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
-        if (!ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                !ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
-
-            return;
-
-        }
+        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_PLUGIN_LOOT)) return;
 
         Entity entity = event.getEntity();
+
+        if (!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) ||
+                !entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+
+        if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) return;
 
         dropItem(entity);
 
@@ -52,92 +55,226 @@ public class EliteDropsDropper implements Listener {
 
     public void dropItem(Entity entity) {
 
-        if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
-                entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+        //remember that this is used by other classes, like the extra loot power
+        double chanceToDrop = ConfigValues.defaultConfig.getDouble(DefaultConfig.ELITE_ITEM_FLAT_DROP_RATE) / 100 +
+                (ConfigValues.defaultConfig.getDouble(DefaultConfig.ELITE_ITEM_LEVEL_DROP_RATE) / 100 *
+                        entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
 
-            if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) {
+        if (random.nextDouble() > chanceToDrop) return;
+
+        boolean proceduralItemsOn = ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH);
+
+        boolean customItemsOn = ConfigValues.defaultConfig.getBoolean(DefaultConfig.DROP_CUSTOM_ITEMS);
+
+        boolean staticCustomItemsExist = CustomDropsConstructor.staticCustomItemHashMap.size() > 0;
+
+        int itemRankWeighedWithMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+
+        //random adds a little wiggle room for item rank power
+        itemRankWeighedWithMobLevel = (int) ((itemRankWeighedWithMobLevel * ConfigValues.randomItemsConfig.getDouble(RandomItemsSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER)) + (random.nextInt(6) + 1 - 3));
+
+        if (itemRankWeighedWithMobLevel < 1) itemRankWeighedWithMobLevel = 0;
+
+        boolean customDynamicDropExists = CustomDropsConstructor.dynamicRankedItemStacks.containsKey(itemRankWeighedWithMobLevel);
+
+        if (proceduralItemsOn && !customItemsOn) {
+
+            dropProcedurallyGeneratedItem(itemRankWeighedWithMobLevel, entity);
+            return;
+
+        }
+
+        if (!proceduralItemsOn && customItemsOn) {
+
+            Bukkit.getLogger().info("running code 2");
+
+            if (!customDynamicDropExists && !staticCustomItemsExist) {
 
                 return;
 
             }
 
-            int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+            if (!customDynamicDropExists && staticCustomItemsExist) {
 
-            mobLevel = (int) ((mobLevel * ConfigValues.randomItemsConfig.getDouble(RandomItemsSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER)) + (random.nextInt(6) + 1 - 3));
-
-            if (mobLevel < 1) {
-
-                mobLevel = 0;
+                dropCustomStaticLoot(entity);
+                return;
 
             }
 
-            double chanceToDrop = ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs flat loot drop rate %") / 100 +
-                    (ConfigValues.defaultConfig.getDouble("Aggressive EliteMobs drop rate % increase per mob level") *
-                            entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 100);
+            if (customDynamicDropExists && !staticCustomItemsExist) {
 
-            if (random.nextDouble() < chanceToDrop) {
+                dropCustomDynamicLoot(itemRankWeighedWithMobLevel, entity);
 
-                if (!CustomDropsConstructor.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                        ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
+            }
 
-                    if (CustomDropsConstructor.rankedItemStacks.containsKey(mobLevel)) {
+            if (customDynamicDropExists && staticCustomItemsExist) {
 
-                        if (random.nextDouble() * 100 <= ConfigValues.randomItemsConfig.getDouble("Percentage (%) of times random item drop instead of custom loot")) {
+                HashMap<String, Double> weighedConfigValues = new HashMap<>();
+                weighedConfigValues.put(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
+                weighedConfigValues.put(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT));
 
-                            //create random loot
-                            ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
-                            ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
+                String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
-                            entity.getWorld().dropItem(entity.getLocation(), randomLoot);
+                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
+                    dropCustomDynamicLoot(itemRankWeighedWithMobLevel, entity);
+                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT)) dropCustomStaticLoot(entity);
 
-                        } else {
-
-                            //drop custom loot
-                            int randomCustomDrop = random.nextInt(CustomDropsConstructor.rankedItemStacks.get(mobLevel).size());
-
-                            //get rank matching randomizer and item matching randomized index
-                            entity.getWorld().dropItem(entity.getLocation(), CustomDropsConstructor.rankedItemStacks.get(mobLevel).get(randomCustomDrop));
-
-                        }
-
-                    } else {
-
-                        ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
-                        ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
-
-                        entity.getWorld().dropItem(entity.getLocation(), randomLoot);
-
-                    }
-
-                } else if (!CustomDropsConstructor.rankedItemStacks.isEmpty() && ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                        !ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
-
-                    //WARNING: THIS DOES NOT SCALE ITEM LEVEL (since I don't know how much loot is available, approximating will not make sense
-                    int customItemIndex = random.nextInt(CustomDropsConstructor.lootList.size());
-                    ItemStack randomizedCustomItem = CustomDropsConstructor.lootList.get(customItemIndex);
-
-                    entity.getWorld().dropItem(entity.getLocation(), randomizedCustomItem);
-
-                } else if (!CustomDropsConstructor.rankedItemStacks.isEmpty() && !ConfigValues.defaultConfig.getBoolean("Aggressive EliteMobs can drop custom loot") &&
-                        ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
-
-                    ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
-                    ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
-
-                    entity.getWorld().dropItem(entity.getLocation(), randomLoot);
-
-                } else if (CustomDropsConstructor.rankedItemStacks.isEmpty() && ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH)) {
-
-                    ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
-                    ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
-
-                    entity.getWorld().dropItem(entity.getLocation(), randomLoot);
-
-                }
+                return;
 
             }
 
         }
+
+        if (proceduralItemsOn && customItemsOn) {
+
+            if (!customDynamicDropExists && !staticCustomItemsExist) {
+
+                Bukkit.getLogger().info("running code 0");
+
+                dropProcedurallyGeneratedItem(itemRankWeighedWithMobLevel, entity);
+                return;
+
+            }
+
+            if (!customDynamicDropExists && staticCustomItemsExist) {
+
+                Bukkit.getLogger().info("running code 2");
+
+                HashMap<String, Double> weighedConfigValues = new HashMap<>();
+                weighedConfigValues.put(DefaultConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.PROCEDURAL_ITEM_WEIGHT));
+                weighedConfigValues.put(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT));
+
+                String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
+
+                if (selectedLootSystem.equals(DefaultConfig.PROCEDURAL_ITEM_WEIGHT))
+                    dropProcedurallyGeneratedItem(itemRankWeighedWithMobLevel, entity);
+                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT)) dropCustomStaticLoot(entity);
+
+                return;
+
+            }
+
+            if (customDynamicDropExists && !staticCustomItemsExist) {
+
+                Bukkit.getLogger().info("running code 3");
+
+                HashMap<String, Double> weighedConfigValues = new HashMap<>();
+                weighedConfigValues.put(DefaultConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.PROCEDURAL_ITEM_WEIGHT));
+                weighedConfigValues.put(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
+
+                String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
+
+                if (selectedLootSystem.equals(DefaultConfig.PROCEDURAL_ITEM_WEIGHT))
+                    dropProcedurallyGeneratedItem(itemRankWeighedWithMobLevel, entity);
+                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
+                    dropCustomDynamicLoot(itemRankWeighedWithMobLevel, entity);
+
+                return;
+
+            }
+
+            if (customDynamicDropExists && staticCustomItemsExist) {
+
+                HashMap<String, Double> weighedConfigValues = new HashMap<>();
+                weighedConfigValues.put(DefaultConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.PROCEDURAL_ITEM_WEIGHT));
+                weighedConfigValues.put(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
+                weighedConfigValues.put(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT));
+
+                String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
+
+                if (selectedLootSystem.equals(DefaultConfig.PROCEDURAL_ITEM_WEIGHT))
+                    dropProcedurallyGeneratedItem(itemRankWeighedWithMobLevel, entity);
+                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
+                    dropCustomDynamicLoot(itemRankWeighedWithMobLevel, entity);
+                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT)) dropCustomStaticLoot(entity);
+
+                Bukkit.getLogger().info(selectedLootSystem);
+
+                return;
+
+            }
+
+        }
+
+    }
+
+    private String pickWeighedLootSystem(HashMap<String, Double> weighedConfigValues) {
+
+        double totalWeight = 0;
+
+        for (String string : weighedConfigValues.keySet()) {
+
+            totalWeight += weighedConfigValues.get(string);
+
+        }
+
+        String selectedLootSystem = null;
+        double random = Math.random() * totalWeight;
+
+        for (String string : weighedConfigValues.keySet()) {
+
+            random -= weighedConfigValues.get(string);
+
+
+            if (random <= 0) {
+
+                selectedLootSystem = string;
+
+                break;
+
+            }
+
+        }
+
+        return selectedLootSystem;
+
+    }
+
+    private void dropCustomDynamicLoot(int mobLevel, Entity entity) {
+
+        int randomCustomDrop = random.nextInt(CustomDropsConstructor.dynamicRankedItemStacks.get(mobLevel).size());
+
+        //get rank matching randomizer and item matching randomized index
+        entity.getWorld().dropItem(entity.getLocation(), CustomDropsConstructor.dynamicRankedItemStacks.get(mobLevel).get(randomCustomDrop));
+
+    }
+
+    private void dropCustomStaticLoot(Entity entity) {
+
+        double totalWeight = 0;
+
+        for (ItemStack itemStack : CustomDropsConstructor.staticCustomItemHashMap.keySet()) {
+
+            totalWeight += CustomDropsConstructor.staticCustomItemHashMap.get(itemStack);
+
+        }
+
+        ItemStack generatedItemStack = null;
+        double random = Math.random() * totalWeight;
+
+        for (ItemStack itemStack : CustomDropsConstructor.staticCustomItemHashMap.keySet()) {
+
+            random -= CustomDropsConstructor.staticCustomItemHashMap.get(itemStack);
+
+            if (random <= 0) {
+
+                generatedItemStack = itemStack;
+                break;
+
+            }
+
+        }
+
+        entity.getWorld().dropItem(entity.getLocation(), generatedItemStack);
+
+    }
+
+    private void dropProcedurallyGeneratedItem(int mobLevel, Entity entity) {
+
+        ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
+        ItemStack randomLoot = proceduralItemGenerator.randomItemGenerator(mobLevel, entity);
+
+        entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 
     }
 

@@ -100,7 +100,7 @@ public class LootGUI implements Listener {
         tierSlots.add(6);
         tierSlots.add(7);
 
-        List<Integer> keySet = new ArrayList<>(CustomDropsConstructor.rankedItemStacks.keySet());
+        List<Integer> keySet = new ArrayList<>(CustomDropsConstructor.dynamicRankedItemStacks.keySet());
 
         int counter = 1;
 
@@ -155,15 +155,15 @@ public class LootGUI implements Listener {
 
             if (!filter) {
 
-                if (CustomDropsConstructor.lootList.size() >= counter + ((currentLootPage - 1) * 35)) {
+                if (CustomDropsConstructor.customItemList.size() >= counter + ((currentLootPage - 1) * 35)) {
 
-                    inventory.setItem(number, CustomDropsConstructor.lootList.get(counter - 1 + ((currentLootPage - 1) * 35)));
+                    inventory.setItem(number, CustomDropsConstructor.customItemList.get(counter - 1 + ((currentLootPage - 1) * 35)));
 
                 }
 
             } else {
 
-                List<ItemStack> currentRankloot = CustomDropsConstructor.rankedItemStacks.get(filterRank);
+                List<ItemStack> currentRankloot = CustomDropsConstructor.dynamicRankedItemStacks.get(filterRank);
 
                 if (currentRankloot.size() >= counter + ((currentLootPage - 1) * 35)) {
 

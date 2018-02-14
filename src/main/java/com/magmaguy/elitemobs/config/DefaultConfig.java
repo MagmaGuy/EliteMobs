@@ -28,6 +28,13 @@ public class DefaultConfig {
     public static final String SHOW_NAME_TAGS_ON_TARGET = "Only show nametags when targeting a mob";
     public static final String ELITE_ARMOR = "Elite Mobs wear armor";
     public static final String ELITE_HELMETS = "Elite Mobs wear helmets";
+    public static final String ELITE_ITEM_FLAT_DROP_RATE = "EliteMob base percentual plugin item drop chance";
+    public static final String ELITE_ITEM_LEVEL_DROP_RATE = "EliteMob plugin item percentual drop chance increase per level";
+    public static final String PROCEDURAL_ITEM_WEIGHT = "Procedurally generated item weight";
+    public static final String CUSTOM_DYNAMIC_ITEM_WEIGHT = "Custom dynamic item weight";
+    public static final String CUSTOM_STATIC_ITEM_WEIGHT = "Custom static item weight";
+    public static final String ENABLE_PLUGIN_LOOT = "Enable plugin loot";
+    public static final String DROP_CUSTOM_ITEMS = "Elite Mobs can drop custom loot";
 
     public void loadConfiguration() {
 
@@ -69,12 +76,15 @@ public class DefaultConfig {
         configuration.addDefault("Stack aggressive spawner mobs", true);
         configuration.addDefault("Stack aggressive natural mobs", true);
         configuration.addDefault("Passive EliteMob stack amount", 50);
-        configuration.addDefault("Aggressive EliteMobs can drop custom loot", true);
-        configuration.addDefault("Aggressive EliteMobs flat loot drop rate %", 25);
-        configuration.addDefault("Aggressive EliteMobs drop rate % increase per mob level", 1);
+        configuration.addDefault(ENABLE_PLUGIN_LOOT, true);
+        configuration.addDefault(DROP_CUSTOM_ITEMS, true);
+        configuration.addDefault(ELITE_ITEM_FLAT_DROP_RATE, 25);
+        configuration.addDefault(ELITE_ITEM_LEVEL_DROP_RATE, 1);
+        configuration.addDefault(PROCEDURAL_ITEM_WEIGHT, 29);
+        configuration.addDefault(CUSTOM_DYNAMIC_ITEM_WEIGHT, 70);
+        configuration.addDefault(CUSTOM_STATIC_ITEM_WEIGHT, 1);
         configuration.addDefault("Use MMORPG colors for item ranks", true);
         configuration.addDefault("Use MMORPG colors for custom items", true);
-//        configuration.addDefault("Increase MMORPG color rank every X levels X=", 15);
         configuration.addDefault("Prevent creepers from killing passive mobs", true);
         configuration.addDefault("Aggressive EliteMob life multiplier", 1.0);
         configuration.addDefault("Aggressive EliteMob damage multiplier", 1.0);

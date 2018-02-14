@@ -34,6 +34,7 @@ import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
+import com.magmaguy.elitemobs.elitedrops.PlaceEventPrevent;
 import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
@@ -219,6 +220,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         //Loot
         this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
+        this.getServer().getPluginManager().registerEvents(new PlaceEventPrevent(), this);
 
         //Shops
         this.getServer().getPluginManager().registerEvents(new ShopHandler(), this);

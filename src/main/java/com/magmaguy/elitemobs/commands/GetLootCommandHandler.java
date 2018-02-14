@@ -20,7 +20,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor.lootList;
+import static com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor.customItemList;
 
 /**
  * Created by MagmaGuy on 01/05/2017.
@@ -29,7 +29,7 @@ public class GetLootCommandHandler {
 
     public boolean getLootHandler(Player player, String args1) {
 
-        for (ItemStack itemStack : lootList) {
+        for (ItemStack itemStack : customItemList) {
 
             String itemRawName = itemStack.getItemMeta().getDisplayName();
 

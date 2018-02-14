@@ -38,8 +38,9 @@ import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
  */
 public class CustomDropsConstructor implements Listener {
 
-    public static List<ItemStack> lootList = new ArrayList();
-    public static HashMap<Integer, List<ItemStack>> rankedItemStacks = new HashMap<>();
+    public static ArrayList<ItemStack> customItemList = new ArrayList();
+    public static HashMap<ItemStack, Double> staticCustomItemHashMap = new HashMap<>();
+    public static HashMap<Integer, List<ItemStack>> dynamicRankedItemStacks = new HashMap<>();
 
     private LootCustomConfig lootCustomConfig = new LootCustomConfig();
 
@@ -55,14 +56,22 @@ public class CustomDropsConstructor implements Listener {
             String previousPath = path.toString();
 
 
-            String itemType = itemTypeHandler(previousPath);
+            Material itemType = itemTypeHandler(previousPath);
             Bukkit.getLogger().info("Adding: " + previousPath);
             String itemName = itemNameHandler(previousPath);
+
+            if (itemType == null) {
+
+                Bukkit.getLogger().info(ChatColorConverter.chatColorConverter("&4[EliteMobs] Material type used for " + itemName + " is not valid."));
+                break;
+
+            }
 
             List itemEnchantments = itemEnchantmentHandler(previousPath);
             List potionEffects = itemPotionEffectHandler(previousPath);
 
-            ItemStack itemStack = new ItemStack(Material.getMaterial(itemType), 1);
+            ItemStack itemStack = new ItemStack(itemType, 1);
+
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.setDisplayName(itemName);
 
@@ -250,11 +259,15 @@ public class CustomDropsConstructor implements Listener {
             //Add hidden lore for shops to validate
             ObfuscatedSignatureLoreData.obfuscateSignatureData(itemStack);
 
-            //Add custom item to lootList
-            lootList.add(itemStack);
+            //Add custom item to customItemList
+            if (!loreAddDropFrequency(previousPath, itemStack)) {
 
-            //Add item to ranked item list for drop math
-            rankedItemMapCreator(ItemRankHandler.guessItemRank(itemStack), itemStack);
+                //Add item to ranked item list for drop math
+                rankedItemMapCreator(ItemRankHandler.guessItemRank(itemStack), itemStack);
+
+            }
+
+            customItemList.add(itemStack);
 
         }
 
@@ -332,11 +345,22 @@ public class CustomDropsConstructor implements Listener {
 
     }
 
-    private String itemTypeHandler(String previousPath) {
+    private Material itemTypeHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Type");
 
-        String itemType = lootCustomConfig.getLootConfig().getString(path);
+        Material itemType;
+
+        try {
+
+            itemType = Material.getMaterial(lootCustomConfig.getLootConfig().getString(path));
+
+        } catch (Error error) {
+
+            return null;
+
+        }
+
 
         return itemType;
 
@@ -346,9 +370,7 @@ public class CustomDropsConstructor implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Name");
 
-        String itemName = chatColorConverter(lootCustomConfig.getLootConfig().getString(path));
-
-        return itemName;
+        return chatColorConverter(lootCustomConfig.getLootConfig().getString(path));
 
     }
 
@@ -374,7 +396,7 @@ public class CustomDropsConstructor implements Listener {
 
         }
 
-        if (newList == null || newList.isEmpty()) {
+        if (newList.isEmpty()) {
 
             return itemLore;
 
@@ -426,23 +448,54 @@ public class CustomDropsConstructor implements Listener {
 
     private void rankedItemMapCreator(int itemPower, ItemStack itemStack) {
 
-        if (rankedItemStacks.get(itemPower) == null) {
+        if (dynamicRankedItemStacks.get(itemPower) == null) {
 
             List<ItemStack> list = new ArrayList<>();
 
             list.add(itemStack);
 
-            rankedItemStacks.put(itemPower, list);
+            dynamicRankedItemStacks.put(itemPower, list);
 
         } else {
 
-            List<ItemStack> list = rankedItemStacks.get(itemPower);
+            List<ItemStack> list = dynamicRankedItemStacks.get(itemPower);
 
             list.add(itemStack);
 
-            rankedItemStacks.put(itemPower, list);
+            dynamicRankedItemStacks.put(itemPower, list);
 
         }
+
+    }
+
+    private boolean loreAddDropFrequency(String previousPath, ItemStack itemStack) {
+
+        String path = automatedStringBuilder(previousPath, "Drop Weight");
+
+        //Only tag the item if it contains a value other than dynamic
+        if (lootCustomConfig.getLootConfig().contains(path)) {
+
+            if (!lootCustomConfig.getLootConfig().getString(path).equalsIgnoreCase("dynamic")) {
+
+                try {
+
+                    Double dropWeight = Double.valueOf(lootCustomConfig.getLootConfig().getString(path));
+                    staticCustomItemHashMap.put(itemStack, dropWeight);
+                    return true;
+
+                } catch (NumberFormatException e) {
+
+                    Bukkit.getLogger().info("[EliteMobs] Your item " + path + " contains an invalid drop weight value ("
+                            + lootCustomConfig.getLootConfig().getString(path) + ")");
+
+                }
+
+
+            }
+
+        }
+
+        return false;
 
     }
 

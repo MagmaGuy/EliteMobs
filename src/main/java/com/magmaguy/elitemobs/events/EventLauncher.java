@@ -28,6 +28,8 @@ public class EventLauncher {
 
     public void eventRepeatingTask() {
 
+        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.ENABLED_EVENTS)) return;
+
         new BukkitRunnable() {
 
             int counter = 0;
@@ -86,9 +88,6 @@ public class EventLauncher {
 
         double newTimerValue = slope * Bukkit.getOnlinePlayers().size() + minFrequency;
 
-        Bukkit.getLogger().info("newTimerValue: " + newTimerValue + "maxFrequency: " + maxFrequency + "minFrequency" + minFrequency +
-                "minPlayer" + minPlayers + "maxPlayers" + maxPlayers + "onlinePlayers" + Bukkit.getOnlinePlayers().size());
-
         return counter >= newTimerValue;
 
 
@@ -97,6 +96,7 @@ public class EventLauncher {
     private void eventSelector() {
 
         //todo: once more events are added, randomize which one gets picked in a weighed fashion
+        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.ENABLED_EVENTS)) return;
         SmallTreasureGoblin.initializeEvent();
 
     }

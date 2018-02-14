@@ -31,6 +31,7 @@ public class EventsConfig {
     public static final String SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT = "Small treasure goblin event announcement text";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT = "Small treasure goblin killed by players message";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT = "Small treasure goblin nondescript death message";
+    public static final String SMALL_TREASURE_GOBLIN_REWARD = "Treasure goblin extra loot drop amount";
 
     public void initializeEventsConfig() {
 
@@ -40,10 +41,10 @@ public class EventsConfig {
         this.getEventsConfig().addDefault(MINIMUM_EVENT_FREQUENCY, 30);
         this.getEventsConfig().addDefault(MAXIMUM_EVENT_FREQUENCY, 10);
         this.getEventsConfig().addDefault(ENABLED_EVENTS + "." + TREASURE_GOBLIN_SMALL, true);
-        this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT, "A treasure goblin has appeared in $world at $location\n" +
-                "Make sure to take a hunting party with you!");
+        this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT, "&7&m-----------------------------------------------------\n&7[&aEvent&7] &fA &ctreasure goblin &fhas appeared in&c $world &fat&c $location \n &fMake sure to take a hunting party with you!\n&7&m-----------------------------------------------------");
         this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT, "A Treasure Goblin has been slain by $player!");
         this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT, "A Treasure Goblin has been slain!");
+        this.getEventsConfig().addDefault(SMALL_TREASURE_GOBLIN_REWARD, 10);
 
         getEventsConfig().options().copyDefaults(true);
         saveDefaultCustomConfig();

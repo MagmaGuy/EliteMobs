@@ -60,7 +60,7 @@ public class ObfuscatedSignatureLoreData {
 
     }
 
-    private static String loreObfuscator(String textToObfuscate) {
+    public static String loreObfuscator(String textToObfuscate) {
 
         String insert = "§";
         int period = 1;

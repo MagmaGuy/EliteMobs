@@ -24,17 +24,20 @@ public class CustomLootSettingsConfig {
     public static final String SHOW_POTION_EFFECTS = "Show potion effects on lore";
     public static final String SHOW_ITEM_VALUE = "Show item value on lore";
     public static final String LORE_STRUCTURE = "Lore structure";
+    public static final String PREVENT_CUSTOM_ITEM_PLACING = "Prevent players from placing pleaceable Elite custom items";
     public static final String DEFAULT_POTION_EFFECT_DURATION = "Default potion effect duration (seconds, on hit)";
     public static final String ABSORPTION = "ABSORPTION";
     public static final String BLINDNESS = "BLINDNESS";
     public static final String CONFUSION = "CONFUSION";
     public static final String DAMAGE_RESISTANCE = "DAMAGE_RESISTANCE";
+//    public static final String
 
 
     public void initializeCustomLootSettingsConfig() {
 
         this.getCustomLootSettingsConfig().addDefault(SHOW_POTION_EFFECTS, true);
         this.getCustomLootSettingsConfig().addDefault(SHOW_ITEM_VALUE, true);
+        this.getCustomLootSettingsConfig().addDefault(PREVENT_CUSTOM_ITEM_PLACING, true);
         this.getCustomLootSettingsConfig().addDefault(LORE_STRUCTURE, "$potionEffect\n&m----------------------\n$customLore\n$itemValue\n&m----------------------");
 
         getCustomLootSettingsConfig().options().copyDefaults(true);
