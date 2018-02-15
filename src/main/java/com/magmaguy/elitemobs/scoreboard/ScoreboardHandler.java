@@ -35,8 +35,8 @@ import java.util.HashMap;
  */
 public class ScoreboardHandler implements Listener {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     static HashMap playerHasScoreboard = new HashMap<Player, Boolean>();
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     int processID;
 
     public void scanSight() {

@@ -46,13 +46,15 @@ import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
  */
 public class ZombieTeamRocket extends MajorPowers implements Listener {
 
+    private static final ItemStack TEAM_ROCKET_CHESTPIECE = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
+    private static final ItemStack TEAM_ROCKET_LEGGINGS = new ItemStack(Material.LEATHER_LEGGINGS, 1);
+    private static final ItemStack TEAM_ROCKET_BOOTS = new ItemStack(Material.LEATHER_BOOTS, 1);
+    private static final ItemStack TEAM_ROCKET_HELMET = new ItemStack(Material.LEATHER_HELMET, 1);
+    private static Random random = new Random();
     int processID;
-
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ZOMBIE_TEAM_ROCKET_H;
     Configuration configuration = ConfigValues.translationConfig;
-
-    private static Random random = new Random();
 
     @Override
     public void applyPowers(Entity entity) {
@@ -69,11 +71,6 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
         return entity.hasMetadata(powerMetadata);
 
     }
-
-    private static final ItemStack TEAM_ROCKET_CHESTPIECE = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
-    private static final ItemStack TEAM_ROCKET_LEGGINGS = new ItemStack(Material.LEATHER_LEGGINGS, 1);
-    private static final ItemStack TEAM_ROCKET_BOOTS = new ItemStack(Material.LEATHER_BOOTS, 1);
-    private static final ItemStack TEAM_ROCKET_HELMET = new ItemStack(Material.LEATHER_HELMET, 1);
 
     @EventHandler
     public void onHit(EntityDamageEvent event) {
@@ -235,12 +232,14 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
                             meowth.setCustomName(chatColorConverter(configuration.getStringList("ZombieTeamRocket.Intro").get(16)));
                             meowth.setCustomNameVisible(true);
                             break;
-                        default:
+                        case 18:
                             jesse.setCustomName(chatColorConverter(configuration.getString("ZombieTeamRocket.Jesse name")));
                             jesse.setCustomNameVisible(true);
                             james.setCustomName(chatColorConverter(configuration.getString("ZombieTeamRocket.James name")));
                             james.setCustomNameVisible(true);
                             meowth.setCustomName(chatColorConverter(configuration.getString("ZombieTeamRocket.Meowth name")));
+                        case 30:
+                            meowth.remove();
                             Bukkit.getScheduler().cancelTask(processID);
                             break;
 
@@ -269,7 +268,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
                 @Override
                 public void run() {
 
-                    entity.setVelocity(new Vector(0, 2, 0));
+                    entity.setVelocity(new Vector(0, 10, 0));
 
                 }
 

@@ -16,7 +16,8 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.PlayerCacheConfig;
+import com.magmaguy.elitemobs.config.CustomConfigLoader;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.PlayerMoneyDataConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
@@ -78,8 +79,8 @@ public class CurrencyCommandsHandler {
 
         ArrayList<String> arrayList = new ArrayList();
 
-        PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
-        Configuration configuration = playerMoneyDataConfig.getEconomySettingsConfig();
+        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
 
         for (String string : configuration.getKeys(false)) {
@@ -112,7 +113,7 @@ public class CurrencyCommandsHandler {
 
         }
 
-        commandSender.sendMessage(ChatColor.RED + "[EliteMobs] " + ChatColor.DARK_GREEN + ConfigValues.economyConfig.get("Currency name") + " High Score:");
+        commandSender.sendMessage(ChatColor.RED + "[EliteMobs] " + ChatColor.DARK_GREEN + ConfigValues.economyConfig.get(EconomySettingsConfig.CURRENCY_NAME) + " High Score:");
 
         int iterationAmount = 10;
 
@@ -122,8 +123,7 @@ public class CurrencyCommandsHandler {
 
         }
 
-        PlayerCacheConfig playerCacheConfig = new PlayerCacheConfig();
-        FileConfiguration playerCacheConfiguration = playerCacheConfig.getPlayerCacheConfig();
+        FileConfiguration playerCacheConfiguration = (FileConfiguration) ConfigValues.defaultConfig;
 
         for (int i = 0; i < iterationAmount; i++) {
 
@@ -144,7 +144,7 @@ public class CurrencyCommandsHandler {
 
             commandSender.sendMessage(ChatColor.GREEN + "#" + place + " " + ChatColor.WHITE + name + " with " +
                     ChatColor.DARK_GREEN + configuration.getDouble(arrayList.get(i)) + " " + ChatColor.GREEN +
-                    ConfigValues.economyConfig.get("Currency name"));
+                    ConfigValues.economyConfig.get(EconomySettingsConfig.CURRENCY_NAME));
 
         }
 

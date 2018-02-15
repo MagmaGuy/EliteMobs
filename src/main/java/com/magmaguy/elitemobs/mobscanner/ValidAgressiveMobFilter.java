@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.mobscanner;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.*;
@@ -25,11 +24,9 @@ import org.bukkit.entity.*;
  */
 public class ValidAgressiveMobFilter {
 
-    private EliteMobs plugin;
-
     public static boolean ValidAgressiveMobFilter(Entity entity) {
 
-        Configuration config = ConfigValues.defaultConfig;
+        Configuration config = ConfigValues.validMobsConfig;
 
         return entity instanceof Blaze && config.getBoolean("Valid aggressive EliteMobs.Blaze") ||
                 entity instanceof CaveSpider && config.getBoolean("Valid aggressive EliteMobs.CaveSpider") ||
@@ -43,7 +40,7 @@ public class ValidAgressiveMobFilter {
                 entity instanceof Skeleton && config.getBoolean("Valid aggressive EliteMobs.Skeleton") ||
                 entity instanceof Spider && config.getBoolean("Valid aggressive EliteMobs.Spider") ||
                 entity instanceof Witch && config.getBoolean("Valid aggressive EliteMobs.Witch") ||
-                entity instanceof ZombieVillager && config.getBoolean("Valid aggressive EliteMobs.Zombie") || //TODO: seperate zombievillager from zombie
+                entity instanceof ZombieVillager && config.getBoolean("Valid aggressive EliteMobs.Zombie") ||
                 entity instanceof Zombie && config.getBoolean("Valid aggressive EliteMobs.Zombie");
 
     }

@@ -16,8 +16,9 @@
 package com.magmaguy.elitemobs.economy;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.CustomConfigLoader;
 import com.magmaguy.elitemobs.config.PlayerMoneyDataConfig;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.Configuration;
 
 import java.util.UUID;
 
@@ -27,9 +28,11 @@ import java.util.UUID;
 public class EconomyHandler {
 
     private static PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
-    private static FileConfiguration configuration = playerMoneyDataConfig.getEconomySettingsConfig();
 
     public static double addCurrency(UUID user, double amount) {
+
+        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
         if (!checkUserExists(user.toString())) {
 
@@ -41,9 +44,7 @@ public class EconomyHandler {
         double newAmount = currentAmount + amount;
 
         configuration.set(user.toString(), newAmount);
-        playerMoneyDataConfig.saveCustomConfig();
-
-        ConfigValues.initializeConfigValues();
+        customConfigLoader.saveCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
         return newAmount;
 
@@ -51,6 +52,9 @@ public class EconomyHandler {
 
 
     public static double subtractCurrency(UUID user, double amount) {
+
+        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
         if (!checkUserExists(user.toString())) {
 
@@ -62,7 +66,7 @@ public class EconomyHandler {
         double newAmount = currentAmount - amount;
 
         configuration.set(user.toString(), newAmount);
-        playerMoneyDataConfig.saveCustomConfig();
+        customConfigLoader.saveCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
         ConfigValues.initializeConfigValues();
 
@@ -72,6 +76,9 @@ public class EconomyHandler {
 
     public static void setCurrency(UUID user, double amount) {
 
+        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
+
         if (!checkUserExists(user.toString())) {
 
             createUser(user);
@@ -79,13 +86,16 @@ public class EconomyHandler {
         }
 
         configuration.set(user.toString(), amount);
-        playerMoneyDataConfig.saveCustomConfig();
+        customConfigLoader.saveCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
         ConfigValues.initializeConfigValues();
 
     }
 
     public static double checkCurrency(UUID user) {
+
+        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
         if (!checkUserExists(user.toString())) {
 
@@ -99,14 +109,20 @@ public class EconomyHandler {
 
     public static void createUser(UUID user) {
 
+        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
+
         configuration.set(user.toString(), 0);
-        playerMoneyDataConfig.saveCustomConfig();
+        customConfigLoader.saveCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
         ConfigValues.initializeConfigValues();
 
     }
 
     public static boolean checkUserExists(String name) {
+
+        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
 
         for (String string : configuration.getKeys(false)) {
 

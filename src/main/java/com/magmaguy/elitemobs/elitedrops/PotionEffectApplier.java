@@ -36,6 +36,10 @@ import java.util.List;
  */
 public class PotionEffectApplier implements Listener {
 
+    public static final String TARGET = "TARGET";
+    public static final String SELF = "SELF";
+    public static final String CONTINUOUS = "CONTINUOUS";
+    public static final String ONHIT = "ONHIT";
     List<PotionEffectType> offensivePotionEffects = new ArrayList<>(Arrays.asList(
             PotionEffectType.BLINDNESS,
             PotionEffectType.CONFUSION,
@@ -50,11 +54,6 @@ public class PotionEffectApplier implements Listener {
             PotionEffectType.WEAKNESS,
             PotionEffectType.WITHER
     ));
-
-    public static final String TARGET = "TARGET";
-    public static final String SELF = "SELF";
-    public static final String CONTINUOUS = "CONTINUOUS";
-    public static final String ONHIT = "ONHIT";
 
     public void potionEffectApplier() {
 
@@ -220,7 +219,7 @@ public class PotionEffectApplier implements Listener {
 
                     } else {
 
-                        Bukkit.getLogger().info("[EliteMobs] Error with loot.yml: was expecting '" + TARGET + "' or '"
+                        Bukkit.getLogger().info("[EliteMobs] Error with ItemsCustomLootList.yml: was expecting '" + TARGET + "' or '"
                                 + SELF + "' values but got '" + victim + "' instead.");
 
                     }
@@ -239,7 +238,7 @@ public class PotionEffectApplier implements Listener {
 
                     } else {
 
-                        Bukkit.getLogger().info("[EliteMobs] Error with loot.yml: was expecting '" + CONTINUOUS +
+                        Bukkit.getLogger().info("[EliteMobs] Error with ItemsCustomLootList.yml: was expecting '" + CONTINUOUS +
                                 "' or '" + ONHIT + "' value but got '" + substring + "' instead.");
 
                     }

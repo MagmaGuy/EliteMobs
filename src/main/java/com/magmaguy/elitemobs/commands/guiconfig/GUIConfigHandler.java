@@ -39,6 +39,85 @@ public class GUIConfigHandler implements Listener {
 
     private static ItemStack signature = SignatureItem.signatureItem();
 
+    public static void configPickerPopulator(Inventory inventory) {
+
+        List<String> mobConfigLore = new ArrayList<>(Arrays.asList("Configure Mobs"));
+        ItemStack mobConfig = skullItemInitializer("MHF_Creeper", "Configure Mobs", mobConfigLore);
+        inventory.setItem(19, mobConfig);
+
+        List<String> itemConfigLore = new ArrayList<>(Arrays.asList("Configure Items"));
+        ItemStack itemConfig = itemInitializer(Material.DIAMOND_SWORD, "Configure Items", itemConfigLore);
+        inventory.setItem(22, itemConfig);
+
+        List<String> miscellanousConfigLore = new ArrayList<>(Arrays.asList("Configure Miscellaneous"));
+        ItemStack miscellanousConfig = itemInitializer(Material.BOOKSHELF, "Configure Miscellaneous Settings", miscellanousConfigLore);
+        inventory.setItem(25, miscellanousConfig);
+
+    }
+
+    public static Inventory threeRowInventory(String title) {
+
+        Inventory inventory = Bukkit.createInventory(null, 9 * 3, title);
+
+        inventory.setItem(4, signature);
+
+        return inventory;
+
+    }
+
+    public static Inventory sixRowInventory(String title) {
+
+        Inventory inventory = Bukkit.createInventory(null, 9 * 6, title);
+
+        inventory.setItem(4, signature);
+
+        return inventory;
+
+    }
+
+    public static ItemStack itemInitializer(Material material, String title, List<String> lore) {
+
+        ItemStack item = new ItemStack(material, 1);
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setDisplayName(title);
+        itemMeta.setLore(lore);
+        item.setItemMeta(itemMeta);
+
+        return item;
+
+    }
+
+    public static ItemStack skullItemInitializer(String mhfValue, String title, List<String> lore) {
+
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemMeta itemMeta = item.getItemMeta();
+        SkullMeta skullMeta = (SkullMeta) itemMeta;
+        skullMeta.setOwner(mhfValue);
+        item.setItemMeta(skullMeta);
+        itemMeta.setDisplayName(title);
+        itemMeta.setLore(lore);
+        item.setItemMeta(itemMeta);
+
+        return item;
+
+    }
+
+    public static void inventoryWiper(Inventory inventory) {
+
+        ItemStack air = new ItemStack(Material.AIR, 1);
+
+        for (int i = 0; i < inventory.getSize(); i++) {
+
+            if (i != 4) {
+
+                inventory.setItem(i, air);
+
+            }
+
+        }
+
+    }
+
     public void GUIConfigHandler(Player player) {
 
         //this is the first method called, every other method is summoned by clicking options in it
@@ -54,22 +133,6 @@ public class GUIConfigHandler implements Listener {
         introInventory.setItem(24, configSelect);
 
         player.openInventory(introInventory);
-
-    }
-
-    public static void configPickerPopulator(Inventory inventory) {
-
-        List<String> mobConfigLore = new ArrayList<>(Arrays.asList("Configure Mobs"));
-        ItemStack mobConfig = skullItemInitializer("MHF_Creeper", "Configure Mobs", mobConfigLore);
-        inventory.setItem(19, mobConfig);
-
-        List<String> itemConfigLore = new ArrayList<>(Arrays.asList("Configure Items"));
-        ItemStack itemConfig = itemInitializer(Material.DIAMOND_SWORD, "Configure Items", itemConfigLore);
-        inventory.setItem(22, itemConfig);
-
-        List<String> miscellanousConfigLore = new ArrayList<>(Arrays.asList("Configure Miscellaneous"));
-        ItemStack miscellanousConfig = itemInitializer(Material.BOOKSHELF, "Configure Miscellaneous Settings", miscellanousConfigLore);
-        inventory.setItem(25, miscellanousConfig);
 
     }
 
@@ -139,69 +202,6 @@ public class GUIConfigHandler implements Listener {
                 "other miscellaneous items"));
         ItemStack misc = skullItemInitializer("MHF_Question", "Miscellaneous", miscLore);
         inventory.setItem(24, misc);
-
-    }
-
-    public static Inventory threeRowInventory(String title) {
-
-        Inventory inventory = Bukkit.createInventory(null, 9 * 3, title);
-
-        inventory.setItem(4, signature);
-
-        return inventory;
-
-    }
-
-    public static Inventory sixRowInventory(String title) {
-
-        Inventory inventory = Bukkit.createInventory(null, 9 * 6, title);
-
-        inventory.setItem(4, signature);
-
-        return inventory;
-
-    }
-
-    public static ItemStack itemInitializer(Material material, String title, List<String> lore) {
-
-        ItemStack item = new ItemStack(material, 1);
-        ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(title);
-        itemMeta.setLore(lore);
-        item.setItemMeta(itemMeta);
-
-        return item;
-
-    }
-
-    public static ItemStack skullItemInitializer(String mhfValue, String title, List<String> lore) {
-
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
-        ItemMeta itemMeta = item.getItemMeta();
-        SkullMeta skullMeta = (SkullMeta) itemMeta;
-        skullMeta.setOwner(mhfValue);
-        item.setItemMeta(skullMeta);
-        itemMeta.setDisplayName(title);
-        itemMeta.setLore(lore);
-        item.setItemMeta(itemMeta);
-
-        return item;
-
-    }
-
-    public static void inventoryWiper(Inventory inventory) {
-
-        ItemStack air = new ItemStack(Material.AIR, 1);
-
-        for (int i = 0; i < inventory.getSize(); i++) {
-
-            if (i != 4) {
-
-                inventory.setItem(i, air);
-
-            }
-
-        }
 
     }
 

@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
+import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -46,7 +46,7 @@ public class LootGUI implements Listener {
 
     public void lootGUI(Player player) {
 
-        Inventory fakeChestInventory = Bukkit.createInventory(null, 54, "EliteMobs loot.yml");
+        Inventory fakeChestInventory = Bukkit.createInventory(null, 54, "EliteMobs ItemsCustomLootList.yml");
         tierConstructor(fakeChestInventory);
         headerConstructor(fakeChestInventory);
         lootNavigationConstructor(fakeChestInventory);
@@ -100,7 +100,7 @@ public class LootGUI implements Listener {
         tierSlots.add(6);
         tierSlots.add(7);
 
-        List<Integer> keySet = new ArrayList<>(CustomDropsConstructor.dynamicRankedItemStacks.keySet());
+        List<Integer> keySet = new ArrayList<>(CustomItemConstructor.dynamicRankedItemStacks.keySet());
 
         int counter = 1;
 
@@ -155,15 +155,15 @@ public class LootGUI implements Listener {
 
             if (!filter) {
 
-                if (CustomDropsConstructor.customItemList.size() >= counter + ((currentLootPage - 1) * 35)) {
+                if (CustomItemConstructor.customItemList.size() >= counter + ((currentLootPage - 1) * 35)) {
 
-                    inventory.setItem(number, CustomDropsConstructor.customItemList.get(counter - 1 + ((currentLootPage - 1) * 35)));
+                    inventory.setItem(number, CustomItemConstructor.customItemList.get(counter - 1 + ((currentLootPage - 1) * 35)));
 
                 }
 
             } else {
 
-                List<ItemStack> currentRankloot = CustomDropsConstructor.dynamicRankedItemStacks.get(filterRank);
+                List<ItemStack> currentRankloot = CustomItemConstructor.dynamicRankedItemStacks.get(filterRank);
 
                 if (currentRankloot.size() >= counter + ((currentLootPage - 1) * 35)) {
 
@@ -182,7 +182,7 @@ public class LootGUI implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (event.getInventory().getName().equalsIgnoreCase("EliteMobs loot.yml")) {
+        if (event.getInventory().getName().equalsIgnoreCase("EliteMobs ItemsCustomLootList.yml")) {
 
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
 

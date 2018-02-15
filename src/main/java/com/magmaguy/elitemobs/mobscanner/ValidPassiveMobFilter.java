@@ -26,7 +26,7 @@ public class ValidPassiveMobFilter {
 
     public static boolean ValidPassiveMobFilter(Entity entity) {
 
-        Configuration config = ConfigValues.defaultConfig;
+        Configuration config = ConfigValues.validMobsConfig;
 
         return entity instanceof Chicken && config.getBoolean("Valid passive EliteMobs.Chicken") ||
                 entity instanceof Cow && config.getBoolean("Valid passive EliteMobs.Cow") ||

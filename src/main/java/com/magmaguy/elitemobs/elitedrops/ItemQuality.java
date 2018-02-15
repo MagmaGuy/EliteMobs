@@ -16,7 +16,8 @@
 package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.RandomItemsSettingsConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -27,15 +28,46 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DropQuality {
+public class ItemQuality {
 
     //item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
     //calculate item quality percentually from the max item level set in configs
     //6 ranks so 100/6 = 16,67% of theoretical max per rank
 
+    private static final int ARROW_DAMAGE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_DAMAGE_BOOL, ItemsProceduralSettingsConfig.ARROW_DAMAGE_MAX_LEVEL);
+    private static final int ARROW_FIRE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_FIRE_BOOL, ItemsProceduralSettingsConfig.ARROW_FIRE_MAX_LEVEL);
+    private static final int ARROW_INFINITE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_INFINITE_BOOL);
+    private static final int ARROW_KNOCKBACK = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_KNOCKBACK_BOOL, ItemsProceduralSettingsConfig.ARROW_KNOCKBACK_MAX_LEVEL);
+    private static final int BINDING_CURSE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.BINDING_CURSE_BOOL);
+    private static final int DAMAGE_ALL = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DAMAGE_ALL_BOOL, ItemsProceduralSettingsConfig.DAMAGE_ALL_MAX_LEVEL);
+    private static final int DAMAGE_ARTHROPODS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DAMAGE_ARTHROPODS_BOOL, ItemsProceduralSettingsConfig.DAMAGE_ARTHROPODS_MAX_LEVEL);
+    private static final int DAMAGE_UNDEAD = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DAMAGE_UNDEAD_BOOL, ItemsProceduralSettingsConfig.DAMAGE_UNDEAD_MAX_LEVEL);
+    private static final int DEPTH_STRIDER = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DEPTH_STRIDER_BOOL, ItemsProceduralSettingsConfig.DEPTH_STRIDER_MAX_LEVEL);
+    private static final int DIG_SPEED = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DIG_SPEED_BOOL, ItemsProceduralSettingsConfig.DIG_SPEED_MAX_LEVEL);
+    private static final int DURABILITY = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DURABILITY_BOOL, ItemsProceduralSettingsConfig.DURABILITY_MAX_LEVEL);
+    private static final int FIRE_ASPECT = enchantMaxValueGetter(ItemsProceduralSettingsConfig.FIRE_ASPECT_BOOL, ItemsProceduralSettingsConfig.FIRE_ASPECT_MAX_LEVEL);
+    private static final int FROST_WALKER = enchantMaxValueGetter(ItemsProceduralSettingsConfig.FROST_WALKER_BOOL, ItemsProceduralSettingsConfig.FROST_WALKER_MAX_LEVEL);
+    private static final int KNOCKBACK = enchantMaxValueGetter(ItemsProceduralSettingsConfig.KNOCKBACK_BOOL, ItemsProceduralSettingsConfig.KNOCKBACK_MAX_LEVEL);
+    private static final int LOOT_BONUS_BLOCKS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.LOOT_BONUS_BLOCKS_BOOL, ItemsProceduralSettingsConfig.LOOT_BONUS_BLOCKS_MAX_LEVEL);
+    private static final int LOOT_BONUS_MOBS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.LOOT_BONUS_MOBS_BOOL, ItemsProceduralSettingsConfig.LOOT_BONUS_MOBS_MAX_LEVEL);
+    private static final int LUCK = enchantMaxValueGetter(ItemsProceduralSettingsConfig.LUCK_BOOL, ItemsProceduralSettingsConfig.LUCK_MAX_LEVEL);
+    private static final int LURE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.LURE_BOOL, ItemsProceduralSettingsConfig.LURE_MAX_LEVEL);
+    private static final int MENDING = enchantMaxValueGetter(ItemsProceduralSettingsConfig.MENDING_BOOL);
+    private static final int OXYGEN = enchantMaxValueGetter(ItemsProceduralSettingsConfig.OXYGEN_BOOL, ItemsProceduralSettingsConfig.OXYGEN_MAX_LEVEL);
+    private static final int PROTECTION_ENVIRONMENTAL = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_ENVIRONMENTAL_BOOL, ItemsProceduralSettingsConfig.PROTECTION_ENVIRONMENTAL_MAX_LEVEL);
+    private static final int PROTECTION_EXPLOSIONS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_EXPLOSIONS_BOOL, ItemsProceduralSettingsConfig.PROTECTION_EXPLOSIONS_MAX_LEVEL);
+    private static final int PROTECTION_FALL = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_FALL_BOOL, ItemsProceduralSettingsConfig.PROTECTION_FALL_MAX_LEVEL);
+    private static final int PROTECTION_FIRE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_FIRE_BOOL, ItemsProceduralSettingsConfig.PROTECTION_FIRE_MAX_LEVEL);
+    private static final int PROTECTION_PROJECTILE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_PROJECTILE_BOOL, ItemsProceduralSettingsConfig.PROTECTION_PROJECTILE_MAX_LEVEL);
+    private static final int SILK_TOUCH = enchantMaxValueGetter(ItemsProceduralSettingsConfig.SILK_TOUCH_BOOL);
+    private static final int SWEEPING_EDGE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.SWEEPING_EDGE_BOOL, ItemsProceduralSettingsConfig.SWEEPING_EDGE_MAX_LEVEL);
+    private static final int THORNS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.THORNS_BOOL, ItemsProceduralSettingsConfig.THORNS_MAX_LEVEL);
+    private static final int VANISHING_CURSE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.VANISHING_CURSE_BOOL);
+    private static final int WATER_WORKER = enchantMaxValueGetter(ItemsProceduralSettingsConfig.WATER_WORKER_BOOL, ItemsProceduralSettingsConfig.WATER_WORKER_MAX_LEVEL);
+
     public static void dropQualityColorizer(ItemStack itemStack) {
 
-        if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for item ranks")) {
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.MMORPG_COLORS)) {
 
             ItemMeta itemMeta = itemStack.getItemMeta();
 
@@ -313,41 +345,9 @@ public class DropQuality {
 
     }
 
-    private static final int ARROW_DAMAGE = enchantMaxValueGetter(RandomItemsSettingsConfig.ARROW_DAMAGE_BOOL, RandomItemsSettingsConfig.ARROW_DAMAGE_MAX_LEVEL);
-    private static final int ARROW_FIRE = enchantMaxValueGetter(RandomItemsSettingsConfig.ARROW_FIRE_BOOL, RandomItemsSettingsConfig.ARROW_FIRE_MAX_LEVEL);
-    private static final int ARROW_INFINITE = enchantMaxValueGetter(RandomItemsSettingsConfig.ARROW_INFINITE_BOOL);
-    private static final int ARROW_KNOCKBACK = enchantMaxValueGetter(RandomItemsSettingsConfig.ARROW_KNOCKBACK_BOOL, RandomItemsSettingsConfig.ARROW_KNOCKBACK_MAX_LEVEL);
-    private static final int BINDING_CURSE = enchantMaxValueGetter(RandomItemsSettingsConfig.BINDING_CURSE_BOOL);
-    private static final int DAMAGE_ALL = enchantMaxValueGetter(RandomItemsSettingsConfig.DAMAGE_ALL_BOOL, RandomItemsSettingsConfig.DAMAGE_ALL_MAX_LEVEL);
-    private static final int DAMAGE_ARTHROPODS = enchantMaxValueGetter(RandomItemsSettingsConfig.DAMAGE_ARTHROPODS_BOOL, RandomItemsSettingsConfig.DAMAGE_ARTHROPODS_MAX_LEVEL);
-    private static final int DAMAGE_UNDEAD = enchantMaxValueGetter(RandomItemsSettingsConfig.DAMAGE_UNDEAD_BOOL, RandomItemsSettingsConfig.DAMAGE_UNDEAD_MAX_LEVEL);
-    private static final int DEPTH_STRIDER = enchantMaxValueGetter(RandomItemsSettingsConfig.DEPTH_STRIDER_BOOL, RandomItemsSettingsConfig.DEPTH_STRIDER_MAX_LEVEL);
-    private static final int DIG_SPEED = enchantMaxValueGetter(RandomItemsSettingsConfig.DIG_SPEED_BOOL, RandomItemsSettingsConfig.DIG_SPEED_MAX_LEVEL);
-    private static final int DURABILITY = enchantMaxValueGetter(RandomItemsSettingsConfig.DURABILITY_BOOL, RandomItemsSettingsConfig.DURABILITY_MAX_LEVEL);
-    private static final int FIRE_ASPECT = enchantMaxValueGetter(RandomItemsSettingsConfig.FIRE_ASPECT_BOOL, RandomItemsSettingsConfig.FIRE_ASPECT_MAX_LEVEL);
-    private static final int FROST_WALKER = enchantMaxValueGetter(RandomItemsSettingsConfig.FROST_WALKER_BOOL, RandomItemsSettingsConfig.FROST_WALKER_MAX_LEVEL);
-    private static final int KNOCKBACK = enchantMaxValueGetter(RandomItemsSettingsConfig.KNOCKBACK_BOOL, RandomItemsSettingsConfig.KNOCKBACK_MAX_LEVEL);
-    private static final int LOOT_BONUS_BLOCKS = enchantMaxValueGetter(RandomItemsSettingsConfig.LOOT_BONUS_BLOCKS_BOOL, RandomItemsSettingsConfig.LOOT_BONUS_BLOCKS_MAX_LEVEL);
-    private static final int LOOT_BONUS_MOBS = enchantMaxValueGetter(RandomItemsSettingsConfig.LOOT_BONUS_MOBS_BOOL, RandomItemsSettingsConfig.LOOT_BONUS_MOBS_MAX_LEVEL);
-    private static final int LUCK = enchantMaxValueGetter(RandomItemsSettingsConfig.LUCK_BOOL, RandomItemsSettingsConfig.LUCK_MAX_LEVEL);
-    private static final int LURE = enchantMaxValueGetter(RandomItemsSettingsConfig.LURE_BOOL, RandomItemsSettingsConfig.LURE_MAX_LEVEL);
-    private static final int MENDING = enchantMaxValueGetter(RandomItemsSettingsConfig.MENDING_BOOL);
-    private static final int OXYGEN = enchantMaxValueGetter(RandomItemsSettingsConfig.OXYGEN_BOOL, RandomItemsSettingsConfig.OXYGEN_MAX_LEVEL);
-    private static final int PROTECTION_ENVIRONMENTAL = enchantMaxValueGetter(RandomItemsSettingsConfig.PROTECTION_ENVIRONMENTAL_BOOL, RandomItemsSettingsConfig.PROTECTION_ENVIRONMENTAL_MAX_LEVEL);
-    private static final int PROTECTION_EXPLOSIONS = enchantMaxValueGetter(RandomItemsSettingsConfig.PROTECTION_EXPLOSIONS_BOOL, RandomItemsSettingsConfig.PROTECTION_EXPLOSIONS_MAX_LEVEL);
-    private static final int PROTECTION_FALL = enchantMaxValueGetter(RandomItemsSettingsConfig.PROTECTION_FALL_BOOL, RandomItemsSettingsConfig.PROTECTION_FALL_MAX_LEVEL);
-    private static final int PROTECTION_FIRE = enchantMaxValueGetter(RandomItemsSettingsConfig.PROTECTION_FIRE_BOOL, RandomItemsSettingsConfig.PROTECTION_FIRE_MAX_LEVEL);
-    private static final int PROTECTION_PROJECTILE = enchantMaxValueGetter(RandomItemsSettingsConfig.PROTECTION_PROJECTILE_BOOL, RandomItemsSettingsConfig.PROTECTION_PROJECTILE_MAX_LEVEL);
-    private static final int SILK_TOUCH = enchantMaxValueGetter(RandomItemsSettingsConfig.SILK_TOUCH_BOOL);
-    private static final int SWEEPING_EDGE = enchantMaxValueGetter(RandomItemsSettingsConfig.SWEEPING_EDGE_BOOL, RandomItemsSettingsConfig.SWEEPING_EDGE_MAX_LEVEL);
-    private static final int THORNS = enchantMaxValueGetter(RandomItemsSettingsConfig.THORNS_BOOL, RandomItemsSettingsConfig.THORNS_MAX_LEVEL);
-    private static final int VANISHING_CURSE = enchantMaxValueGetter(RandomItemsSettingsConfig.VANISHING_CURSE_BOOL);
-    private static final int WATER_WORKER = enchantMaxValueGetter(RandomItemsSettingsConfig.WATER_WORKER_BOOL, RandomItemsSettingsConfig.WATER_WORKER_MAX_LEVEL);
-
-
     private static int enchantMaxValueGetter(String boolString) {
 
-        Configuration configuration = ConfigValues.randomItemsConfig;
+        Configuration configuration = ConfigValues.itemsProceduralSettingsConfig;
 
         if (configuration.getBoolean(boolString)) {
 
@@ -361,7 +361,7 @@ public class DropQuality {
 
     private static int enchantMaxValueGetter(String boolString, String maxLevelString) {
 
-        Configuration configuration = ConfigValues.randomItemsConfig;
+        Configuration configuration = ConfigValues.itemsProceduralSettingsConfig;
 
         if (configuration.getBoolean(boolString)) {
 

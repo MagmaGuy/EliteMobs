@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.Configuration;
 
 import java.util.Arrays;
 
@@ -24,8 +24,7 @@ import java.util.Arrays;
  */
 public class EconomySettingsConfig {
 
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-
+    public static final String CONFIG_NAME = "EconomySettings.yml";
     public static final String ENABLE_ECONOMY = "Enable economy";
     public static final String RESALE_VALUE = "Item resale value (percentage)";
     public static final String TIER_PRICE_PROGRESSION = "Tier price progression";
@@ -39,55 +38,32 @@ public class EconomySettingsConfig {
     public static final String SIGNATURE_ITEM_LOCATION_SHOPS = "Reroll button location for EliteMobs Shops";
     public static final String SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Shop";
     public static final String CUSTOM_SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Custom Shop";
+    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
+    public void initializeConfig() {
 
-    public void intializeEconomySettingsConfig() {
-
-        this.getEconomySettingsConfig().addDefault(ENABLE_ECONOMY, true);
-        this.getEconomySettingsConfig().addDefault(RESALE_VALUE, 5);
-        this.getEconomySettingsConfig().addDefault(TIER_PRICE_PROGRESSION, 20);
-        this.getEconomySettingsConfig().addDefault(LOWEST_PROCEDURALLY_SIMULATED_LOOT, 1);
-        this.getEconomySettingsConfig().addDefault(HIGHEST_PROCEDURALLY_SIMULATED_LOOT, 100);
-        this.getEconomySettingsConfig().addDefault(LOWEST_SIMULATED_CUSTOM_LOOT, 1);
-        this.getEconomySettingsConfig().addDefault(HIGHEST_SIMULATED_CUSTOM_LOOT, 100);
-        this.getEconomySettingsConfig().addDefault(CURRENCY_NAME, "Elite Coins");
-        this.getEconomySettingsConfig().addDefault(SHOP_NAME, "EliteMobs Shop");
-        this.getEconomySettingsConfig().addDefault(CUSTOM_SHOP_NAME, "EliteMobs Custom Shop");
-        this.getEconomySettingsConfig().addDefault(SIGNATURE_ITEM_LOCATION_SHOPS, 4);
-        this.getEconomySettingsConfig().addDefault(SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+        configuration.addDefault(ENABLE_ECONOMY, true);
+        configuration.addDefault(RESALE_VALUE, 5);
+        configuration.addDefault(TIER_PRICE_PROGRESSION, 20);
+        configuration.addDefault(LOWEST_PROCEDURALLY_SIMULATED_LOOT, 1);
+        configuration.addDefault(HIGHEST_PROCEDURALLY_SIMULATED_LOOT, 100);
+        configuration.addDefault(LOWEST_SIMULATED_CUSTOM_LOOT, 1);
+        configuration.addDefault(HIGHEST_SIMULATED_CUSTOM_LOOT, 100);
+        configuration.addDefault(CURRENCY_NAME, "Elite Coins");
+        configuration.addDefault(SHOP_NAME, "EliteMobs Shop");
+        configuration.addDefault(CUSTOM_SHOP_NAME, "EliteMobs Custom Shop");
+        configuration.addDefault(SIGNATURE_ITEM_LOCATION_SHOPS, 4);
+        configuration.addDefault(SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
                 46, 47, 48, 49, 50, 51, 52, 53));
-        this.getEconomySettingsConfig().addDefault(CUSTOM_SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+        configuration.addDefault(CUSTOM_SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
                 46, 47, 48, 49, 50, 51, 52, 53));
 
-        getEconomySettingsConfig().options().copyDefaults(true);
-        saveDefaultCustomConfig();
-        saveCustomConfig();
-
-    }
-
-    public FileConfiguration getEconomySettingsConfig() {
-
-        return customConfigLoader.getCustomConfig("economySettings.yml");
-
-    }
-
-    public void reloadCustomConfig() {
-
-        customConfigLoader.reloadCustomConfig("economySettings.yml");
-
-    }
-
-    public void saveCustomConfig() {
-
-        customConfigLoader.saveCustomDefaultConfig("economySettings.yml");
-
-    }
-
-    public void saveDefaultCustomConfig() {
-
-        customConfigLoader.saveDefaultCustomConfig("economySettings.yml");
+        configuration.options().copyDefaults(true);
+        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
+        customConfigLoader.saveCustomConfig(CONFIG_NAME);
 
     }
 

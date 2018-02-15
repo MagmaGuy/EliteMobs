@@ -17,6 +17,8 @@ package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.mobcustomizer.*;
 import com.magmaguy.elitemobs.mobs.passive.ChickenHandler;
 import org.bukkit.Bukkit;
@@ -55,33 +57,23 @@ public class MobScanner implements Listener {
 
                 if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
-                    //scan for naturally/command/plugin spawned EliteMobs
-//                    if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() != 1
-//                            && ((Damageable) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
-//
-//                        AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
-//
-//                        Bukkit.getLogger().info("Missed one");
-//
-//                    }
-
                     //scan for stacked EliteMobs
-                    if (ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") &&
-                            ConfigValues.defaultConfig.getBoolean("Aggressive mob stacking") &&
+                    if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) &&
+                            ConfigValues.defaultConfig.getBoolean(DefaultConfig.AGGRESSIVE_MOB_STACKING) &&
                             !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
 
                         if (!(entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                                entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap"))) {
+                                entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt(DefaultConfig.ELITEMOB_STACKING_CAP))) {
 
                             if (!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
-                                    ConfigValues.defaultConfig.getBoolean("Stack aggressive spawner mobs")) {
+                                    ConfigValues.defaultConfig.getBoolean(DefaultConfig.STACK_AGGRESSIVE_SPAWNER_MOBS)) {
 
                                 scanValidAggressiveLivingEntity(entity);
 
                             }
 
                             if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
-                                    ConfigValues.defaultConfig.getBoolean("Stack aggressive natural mobs")) {
+                                    ConfigValues.defaultConfig.getBoolean(DefaultConfig.STACK_AGGRESSIVE_NATURAL_MOBS)) {
 
                                 scanValidAggressiveLivingEntity(entity);
 
@@ -102,10 +94,10 @@ public class MobScanner implements Listener {
                 }
 
                 //scan for passive mobs
-                if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && ConfigValues.defaultConfig.getBoolean("Allow Passive EliteMobs")) {
+                if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS)) {
 
                     //scan for passive mobs that might have lost their metadata
-                    if (((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount")) {
+                    if (((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT)) {
 
                         customPassiveName(entity, plugin);
 
@@ -189,7 +181,7 @@ public class MobScanner implements Listener {
 
     public void scanValidPassiveLivingEntity(Entity entity) {
 
-        int passiveStacking = ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
+        int passiveStacking = ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
 
         List<LivingEntity> animalContainer = new ArrayList<>();
 
@@ -236,12 +228,12 @@ public class MobScanner implements Listener {
         Damageable damageable2 = (Damageable) entity2;
 
         if (damageable1.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                damageable1.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap")) {
+                damageable1.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.defaultConfig.getInt(DefaultConfig.ELITEMOB_STACKING_CAP)) {
 
             return false;
 
         } else return !damageable2.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
-                damageable2.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < ConfigValues.defaultConfig.getInt("Aggressive mob stacking cap");
+                damageable2.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < ConfigValues.defaultConfig.getInt(DefaultConfig.ELITEMOB_STACKING_CAP);
 
     }
 

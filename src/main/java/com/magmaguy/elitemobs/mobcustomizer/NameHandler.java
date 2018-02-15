@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -118,7 +119,8 @@ public class NameHandler {
                 break;
         }
 
-        entity.setCustomNameVisible(true);
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
+            entity.setCustomNameVisible(true);
         return entity.getCustomName();
 
     }

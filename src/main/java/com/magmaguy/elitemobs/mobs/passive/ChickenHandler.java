@@ -38,6 +38,14 @@ import static org.bukkit.Material.RAW_CHICKEN;
  */
 public class ChickenHandler implements Listener {
 
+    public static List<Chicken> activeChickenList = new ArrayList<>();
+
+    /*
+    Augmented egg drops
+    There's no egg dropping event and listening for new eggs can be extremely inaccurate due to high chicken density
+    Use events to add and remove loaded chicken and use the scanner to update the list of active chicken
+    */
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
@@ -92,14 +100,6 @@ public class ChickenHandler implements Listener {
         }
 
     }
-
-    /*
-    Augmented egg drops
-    There's no egg dropping event and listening for new eggs can be extremely inaccurate due to high chicken density
-    Use events to add and remove loaded chicken and use the scanner to update the list of active chicken
-    */
-
-    public static List<Chicken> activeChickenList = new ArrayList<>();
 
     @EventHandler
     public void superChickenAppearEvent(EntitySpawnEvent event) {

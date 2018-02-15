@@ -132,10 +132,6 @@ public class MetadataHandler implements Listener {
     //events
     public final static String PERSISTENT_ENTITY = "PersistentEntity";
     public final static String TREASURE_GOBLIN = "TreasureGoblin";
-
-
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
-
     public static List<String> minorPowerList = new ArrayList<>(Arrays.asList(
             ATTACK_ARROW_MD,
             ATTACK_BLINDING_MD,
@@ -160,14 +156,12 @@ public class MetadataHandler implements Listener {
             INVISIBILITY_MD,
             TAUNT_MD
     ));
-
     public static List<String> majorPowerList = new ArrayList<>(Arrays.asList(
             ZOMBIE_FRIENDS_MD,
             ZOMBIE_NECRONOMICON_MD,
             ZOMBIE_TEAM_ROCKET_MD,
             ZOMBIE_PARENTS_MD
     ));
-
     public static List<String> forMetadataList = new ArrayList<>(Arrays.asList( //add major and minor power lists
             ELITE_MOB_MD,
             PASSIVE_ELITE_MOB_MD,
@@ -191,30 +185,6 @@ public class MetadataHandler implements Listener {
             SHOOTING_ARROWS,
             SHOOTING_FIREBALLS
     ));
-
-    public static List<String> metadataList() {
-
-        List<String> metadataList = new ArrayList<>();
-
-        metadataList.addAll(forMetadataList);
-
-        metadataList.addAll(majorPowerList);
-
-        metadataList.addAll(minorPowerList);
-
-
-        return metadataList;
-
-    }
-
-    public static List<String> allPowersList() {
-
-        List metadataList = Stream.of(minorPowerList, majorPowerList).flatMap(List::stream).collect(Collectors.toList());
-
-        return metadataList;
-
-    }
-
     public static List<String> powerListHumanFormat = new ArrayList<>(Arrays.asList( //add major and minor power lists
             //minor powers
             ATTACK_ARROW_H,
@@ -245,6 +215,30 @@ public class MetadataHandler implements Listener {
             ZOMBIE_TEAM_ROCKET_H,
             ZOMBIE_PARENTS_H
     ));
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
+
+    public static List<String> metadataList() {
+
+        List<String> metadataList = new ArrayList<>();
+
+        metadataList.addAll(forMetadataList);
+
+        metadataList.addAll(majorPowerList);
+
+        metadataList.addAll(minorPowerList);
+
+
+        return metadataList;
+
+    }
+
+    public static List<String> allPowersList() {
+
+        List metadataList = Stream.of(minorPowerList, majorPowerList).flatMap(List::stream).collect(Collectors.toList());
+
+        return metadataList;
+
+    }
 
     public static String machineToHumanTranslator(String metadata) {
 

@@ -29,9 +29,9 @@ import java.util.logging.Level;
  */
 public class CustomConfigLoader {
 
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     public FileConfiguration getCustomConfig(String configName) {
 
@@ -75,7 +75,7 @@ public class CustomConfigLoader {
 
     }
 
-    public void saveCustomDefaultConfig(String configName) {
+    public void saveCustomConfig(String configName) {
 
         if (customConfig == null || customConfigFile == null) {
 

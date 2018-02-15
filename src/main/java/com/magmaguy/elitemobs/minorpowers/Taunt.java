@@ -44,22 +44,14 @@ import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
  */
 public class Taunt extends MinorPowers implements Listener {
 
+    private final static List<String> TARGET_TAUNT_LIST = ConfigValues.translationConfig.getStringList("Taunts.Target");
+    private final static List<String> GENERIC_DAMAGED_LIST = ConfigValues.translationConfig.getStringList("Taunts.Damaged");
+    private final static List<String> DAMAGED_BY_BOW_LIST = ConfigValues.translationConfig.getStringList("Taunts.BowDamaged");
+    private final static List<String> HIT_LIST = ConfigValues.translationConfig.getStringList("Taunts.Hit");
+    private final static List<String> DEATH_LIST = ConfigValues.translationConfig.getStringList("Taunts.Death");
+    private static Random random = new Random();
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.TAUNT_MD;
-
-    private static Random random = new Random();
-
-
-    private final static List<String> TARGET_TAUNT_LIST = ConfigValues.translationConfig.getStringList("Taunts.Target");
-
-    private final static List<String> GENERIC_DAMAGED_LIST = ConfigValues.translationConfig.getStringList("Taunts.Damaged");
-
-    private final static List<String> DAMAGED_BY_BOW_LIST = ConfigValues.translationConfig.getStringList("Taunts.BowDamaged");
-
-    private final static List<String> HIT_LIST = ConfigValues.translationConfig.getStringList("Taunts.Hit");
-
-    private final static List<String> DEATH_LIST = ConfigValues.translationConfig.getStringList("Taunts.Death");
-
     private int processID;
 
     @Override

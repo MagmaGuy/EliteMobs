@@ -15,23 +15,29 @@
 
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.configuration.Configuration;
+import com.magmaguy.elitemobs.MetadataHandler;
+import org.bukkit.Bukkit;
+
+import java.io.File;
 
 /**
- * Created by MagmaGuy on 17/06/2017.
+ * Created by MagmaGuy on 01/05/2017.
  */
-public class PlayerMoneyDataConfig {
+public class ItemsCustomLootListConfig {
 
-    public static final String CONFIG_NAME = "playerMoneyData.yml";
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    public static final String CONFIG_NAME = "ItemsCustomLootList.yml";
 
     public void intializeConfig() {
 
-        //no real defaults, just a data file
-        customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME);
+        Bukkit.getLogger().info(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDataFolder().getAbsolutePath() + "/" + CONFIG_NAME);
+
+        File file = new File(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDataFolder().getAbsolutePath() + "/" + CONFIG_NAME);
+
+        if (!file.exists()) {
+
+            CustomConfigConstructor customConfigConstructor = new CustomConfigConstructor(CONFIG_NAME, CONFIG_NAME);
+
+        }
 
     }
 

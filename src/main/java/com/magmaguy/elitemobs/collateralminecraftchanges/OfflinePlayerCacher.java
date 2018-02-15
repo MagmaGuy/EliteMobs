@@ -15,8 +15,10 @@
 
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.CustomConfigLoader;
 import com.magmaguy.elitemobs.config.PlayerCacheConfig;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -26,26 +28,29 @@ import org.bukkit.event.player.PlayerJoinEvent;
  */
 public class OfflinePlayerCacher implements Listener {
 
-    private static PlayerCacheConfig playerCacheConfig = new PlayerCacheConfig();
-    private static FileConfiguration configuration = playerCacheConfig.getPlayerCacheConfig();
-
     @EventHandler
-    public static void onLogin(PlayerJoinEvent event) {
+    public void onLogin(PlayerJoinEvent event) {
+
+        Configuration cachedConfiguration = ConfigValues.playerCacheConfig;
 
         String UUID = event.getPlayer().getUniqueId().toString();
         String playerName = event.getPlayer().getName();
 
-        if (!configuration.contains(UUID)) {
+        if (!cachedConfiguration.contains(UUID)) {
 
-            configuration.set(UUID, playerName);
+            CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+            customConfigLoader.getCustomConfig(PlayerCacheConfig.CONFIG_NAME).set(UUID, playerName);
+            customConfigLoader.saveCustomConfig(PlayerCacheConfig.CONFIG_NAME);
 
-            playerCacheConfig.saveCustomConfig();
+            ConfigValues.initializeConfigValues();
 
-        } else if (!configuration.getString(UUID).equals(playerName)) {
+        } else if (!cachedConfiguration.getString(UUID).equals(playerName)) {
 
-            configuration.set(UUID, playerName);
+            CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+            customConfigLoader.getCustomConfig(PlayerCacheConfig.CONFIG_NAME).set(UUID, playerName);
+            customConfigLoader.saveCustomConfig(PlayerCacheConfig.CONFIG_NAME);
 
-            playerCacheConfig.saveCustomConfig();
+            ConfigValues.initializeConfigValues();
 
         }
 

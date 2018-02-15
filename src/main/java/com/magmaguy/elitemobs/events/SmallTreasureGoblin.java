@@ -33,9 +33,8 @@ import org.bukkit.plugin.Plugin;
 
 public class SmallTreasureGoblin implements Listener {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-
     public static boolean entityQueued = false;
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     public static void initializeEvent() {
         entityQueued = true;

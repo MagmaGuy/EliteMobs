@@ -15,26 +15,16 @@
 
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Created by MagmaGuy on 22/04/2017.
  */
 public class PreventCreeperPassiveEntityDamage implements Listener {
-
-    private EliteMobs plugin;
-
-    public PreventCreeperPassiveEntityDamage(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
 
     //This cancels all creeper and entity-caused explosion damage on passive mobs
     @EventHandler

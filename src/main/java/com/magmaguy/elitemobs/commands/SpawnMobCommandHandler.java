@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
@@ -267,7 +268,7 @@ public class SpawnMobCommandHandler {
         if (entityType == EntityType.CHICKEN || entityType == EntityType.COW || entityType == EntityType.MUSHROOM_COW ||
                 entityType == EntityType.PIG || entityType == EntityType.SHEEP) {
 
-            HealthHandler.passiveHealthHandler(entity, ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount"));
+            HealthHandler.passiveHealthHandler(entity, ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT));
             NameHandler.customPassiveName(entity, plugin);
 
             return;

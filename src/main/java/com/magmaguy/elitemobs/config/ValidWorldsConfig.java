@@ -15,20 +15,24 @@
 
 package com.magmaguy.elitemobs.config;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.Configuration;
 
-/**
- * Created by MagmaGuy on 02/07/2017.
- */
-public class PlayerCacheConfig {
+public class ValidWorldsConfig {
 
-    public static final String CONFIG_NAME = "playerCache.yml";
+    public static final String CONFIG_NAME = "ValidWorlds.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
     public void initializeConfig() {
 
-        //no real defaults, just a data file
+        for (World world : Bukkit.getWorlds()) {
+
+            configuration.addDefault("Valid worlds." + world.getName(), true);
+
+        }
+
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);

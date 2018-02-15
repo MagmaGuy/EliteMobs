@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.LivingEntity;
@@ -35,13 +36,15 @@ import java.util.List;
  */
 public class DropsHandler implements Listener {
 
+    private List<ItemStack> wornItems = new ArrayList<>();
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath(EntityDeathEvent event) {
 
         if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             if (!event.getEntity().hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
-                    !ConfigValues.defaultConfig.getBoolean("Drop multiplied default loot from aggressive elite mobs spawned in spawners")) {
+                    !ConfigValues.defaultConfig.getBoolean(DefaultConfig.SPAWNER_DEFAULT_LOOT_MULTIPLIER)) {
 
                 return;
 
@@ -49,7 +52,7 @@ public class DropsHandler implements Listener {
 
             List<ItemStack> droppedItems = event.getDrops();
             int mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
-                    ConfigValues.defaultConfig.getDouble("Aggressive EliteMob default loot multiplier"));
+                    ConfigValues.defaultConfig.getDouble(DefaultConfig.DEFAULT_LOOT_MULTIPLIER));
 
             inventoryItemsConstructor(event.getEntity());
 
@@ -86,8 +89,6 @@ public class DropsHandler implements Listener {
         }
 
     }
-
-    private List<ItemStack> wornItems = new ArrayList<>();
 
     private List<ItemStack> inventoryItemsConstructor(LivingEntity entity) {
 

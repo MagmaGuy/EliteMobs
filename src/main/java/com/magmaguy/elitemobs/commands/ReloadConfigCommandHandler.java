@@ -15,12 +15,8 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.LootCustomConfig;
-import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
-import com.magmaguy.elitemobs.config.TranslationCustomConfig;
-import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
+import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
 import org.bukkit.Bukkit;
 
 /**
@@ -31,19 +27,11 @@ public class ReloadConfigCommandHandler {
     public void reloadConfiguration() {
 
         //Reload all configs
-        Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).reloadConfig();
-        MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
-        mobPowersCustomConfig.reloadCustomConfig();
-        LootCustomConfig lootCustomConfig = new LootCustomConfig();
-        lootCustomConfig.reloadLootConfig();
-        TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
-        translationCustomConfig.reloadCustomConfig();
-        ConfigValues configValues = new ConfigValues();
         ConfigValues.initializeConfigValues();
 
         //reload config-based initialized data
-        CustomDropsConstructor customDropsConstructor = new CustomDropsConstructor();
-        customDropsConstructor.superDropParser();
+        CustomItemConstructor customItemConstructor = new CustomItemConstructor();
+        customItemConstructor.superDropParser();
 
         Bukkit.getLogger().info("EliteMobs config reloaded!");
 

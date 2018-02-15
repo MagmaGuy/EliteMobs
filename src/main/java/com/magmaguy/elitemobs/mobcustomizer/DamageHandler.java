@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -66,7 +67,7 @@ public class DamageHandler implements Listener {
 
             }
 
-            event.setDamage(damageMath(event.getFinalDamage(), mobLevel) * ConfigValues.defaultConfig.getDouble("Aggressive EliteMob damage multiplier"));
+            event.setDamage(damageMath(event.getFinalDamage(), mobLevel) * ConfigValues.defaultConfig.getDouble(DefaultConfig.DAMAGE_MULTIPLIER));
 
         }
 
@@ -95,7 +96,7 @@ public class DamageHandler implements Listener {
 
                     }
 
-                    event.setDamage(damageMath(event.getFinalDamage(), mobLevel) * ConfigValues.defaultConfig.getDouble("Aggressive EliteMob damage multiplier"));
+                    event.setDamage(damageMath(event.getFinalDamage(), mobLevel) * ConfigValues.defaultConfig.getDouble(DefaultConfig.DAMAGE_MULTIPLIER));
 
                 }
 
@@ -126,7 +127,7 @@ public class DamageHandler implements Listener {
 
             }
 
-            event.setRadius((int) Math.ceil(damageMath(event.getRadius(), (int) Math.ceil(mobLevel / 2 * ConfigValues.defaultConfig.getDouble("SuperCreeper explosion nerf multiplier")))));
+            event.setRadius((int) Math.ceil(damageMath(event.getRadius(), (int) Math.ceil(mobLevel / 2 * ConfigValues.defaultConfig.getDouble(DefaultConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)))));
 
         }
 

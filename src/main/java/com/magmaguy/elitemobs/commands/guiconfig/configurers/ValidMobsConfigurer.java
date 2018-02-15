@@ -32,6 +32,9 @@ import java.util.List;
 
 public class ValidMobsConfigurer implements Listener {
 
+    private static Boolean blaze, caveSpider, creeper, enderman, endermite, ironGolem, pigZombie, polarBear, silverfish,
+            skeleton, spider, witch, zombie, chicken, cow, mushroomCow, pig, sheep, aggressive, passive;
+
     public static void validMobsPickerPopulator(Inventory inventory) {
 
         List<String> backToMainLore = new ArrayList<>(Arrays.asList("Back To Main Menu"));
@@ -41,9 +44,6 @@ public class ValidMobsConfigurer implements Listener {
         populateValidMobs(inventory);
 
     }
-
-    private static Boolean blaze, caveSpider, creeper, enderman, endermite, ironGolem, pigZombie, polarBear, silverfish,
-            skeleton, spider, witch, zombie, chicken, cow, mushroomCow, pig, sheep, aggressive, passive;
 
     private static void configStatusChecker() {
 

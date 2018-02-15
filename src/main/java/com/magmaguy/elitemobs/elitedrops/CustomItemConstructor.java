@@ -36,13 +36,11 @@ import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
 /**
  * Created by MagmaGuy on 29/11/2016.
  */
-public class CustomDropsConstructor implements Listener {
+public class CustomItemConstructor implements Listener {
 
     public static ArrayList<ItemStack> customItemList = new ArrayList();
     public static HashMap<ItemStack, Double> staticCustomItemHashMap = new HashMap<>();
     public static HashMap<Integer, List<ItemStack>> dynamicRankedItemStacks = new HashMap<>();
-
-    private LootCustomConfig lootCustomConfig = new LootCustomConfig();
 
     public void superDropParser() {
 
@@ -143,7 +141,7 @@ public class CustomDropsConstructor implements Listener {
 
                     //Add hidden lore to identify powers
                     //Legacy support: potion effects used to only require two tags
-                    if (ConfigValues.customLootSettingsConfig.getBoolean(CustomLootSettingsConfig.SHOW_POTION_EFFECTS)) {
+                    if (ConfigValues.itemsCustomLootSettingsConfig.getBoolean(ItemsCustomLootSettingsConfig.SHOW_POTION_EFFECTS)) {
 
                         lore = parsedString[0].toLowerCase().substring(0, 1).toUpperCase() +
                                 parsedString[0].toLowerCase().substring(1, (parsedString[0].length())).replace("_", " ") +
@@ -179,7 +177,7 @@ public class CustomDropsConstructor implements Listener {
             itemMeta.setLore(tempLore);
             itemStack.setItemMeta(itemMeta);
 
-            List<String> structuredLore = Lists.newArrayList(ConfigValues.customLootSettingsConfig.getString(CustomLootSettingsConfig.LORE_STRUCTURE).split("\n"));
+            List<String> structuredLore = Lists.newArrayList(ConfigValues.itemsCustomLootSettingsConfig.getString(ItemsCustomLootSettingsConfig.LORE_STRUCTURE).split("\n"));
             List<String> parsedStructuredLore = new ArrayList<>();
 
             for (String string : structuredLore) {
@@ -229,9 +227,9 @@ public class CustomDropsConstructor implements Listener {
             itemMeta.setLore(parsedStructuredLore);
             itemStack.setItemMeta(itemMeta);
 
-            if (ConfigValues.defaultConfig.getBoolean("Use MMORPG colors for custom items") && ChatColor.stripColor(itemName).equals(itemName)) {
+            if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.MMORPG_COLORS_FOR_CUSTOM_ITEMS) && ChatColor.stripColor(itemName).equals(itemName)) {
 
-                DropQuality.dropQualityColorizer(itemStack);
+                ItemQuality.dropQualityColorizer(itemStack);
 
             }
 
@@ -273,7 +271,7 @@ public class CustomDropsConstructor implements Listener {
 
     }
 
-    private String loreObfuscator(String textToObfuscate) {
+    public String loreObfuscator(String textToObfuscate) {
 
         String insert = "§";
         int period = 1;
@@ -300,7 +298,7 @@ public class CustomDropsConstructor implements Listener {
 
         List<String> lootCount = new ArrayList();
 
-        for (String configIterator : lootCustomConfig.getLootConfig().getKeys(true)) {
+        for (String configIterator : ConfigValues.itemsCustomLootListConfig.getKeys(true)) {
 
             int dotCount = 0;
 
@@ -353,7 +351,7 @@ public class CustomDropsConstructor implements Listener {
 
         try {
 
-            itemType = Material.getMaterial(lootCustomConfig.getLootConfig().getString(path));
+            itemType = Material.getMaterial(ConfigValues.itemsCustomLootListConfig.getString(path));
 
         } catch (Error error) {
 
@@ -370,7 +368,7 @@ public class CustomDropsConstructor implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Name");
 
-        return chatColorConverter(lootCustomConfig.getLootConfig().getString(path));
+        return chatColorConverter(ConfigValues.itemsCustomLootListConfig.getString(path));
 
     }
 
@@ -378,7 +376,7 @@ public class CustomDropsConstructor implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Item Lore");
 
-        List<String> itemLore = (List<String>) lootCustomConfig.getLootConfig().getList(path);
+        List<String> itemLore = (List<String>) ConfigValues.itemsCustomLootListConfig.getList(path);
 
         List<String> newList = new ArrayList<>();
 
@@ -414,7 +412,7 @@ public class CustomDropsConstructor implements Listener {
 
             String value = ItemWorthCalculator.determineItemWorth(itemStack) + "";
 
-            valueLore = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_WORTH);
+            valueLore = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_WORTH);
             valueLore = valueLore.replace("$worth", value);
             valueLore = valueLore.replace("$currencyName", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
 
@@ -430,7 +428,7 @@ public class CustomDropsConstructor implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
 
-        List enchantments = lootCustomConfig.getLootConfig().getList(path);
+        List enchantments = ConfigValues.itemsCustomLootListConfig.getList(path);
 
         return enchantments;
 
@@ -440,7 +438,7 @@ public class CustomDropsConstructor implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Potion Effects");
 
-        List potionEffects = lootCustomConfig.getLootConfig().getList(path);
+        List potionEffects = ConfigValues.itemsCustomLootListConfig.getList(path);
 
         return potionEffects;
 
@@ -473,20 +471,20 @@ public class CustomDropsConstructor implements Listener {
         String path = automatedStringBuilder(previousPath, "Drop Weight");
 
         //Only tag the item if it contains a value other than dynamic
-        if (lootCustomConfig.getLootConfig().contains(path)) {
+        if (ConfigValues.itemsCustomLootListConfig.contains(path)) {
 
-            if (!lootCustomConfig.getLootConfig().getString(path).equalsIgnoreCase("dynamic")) {
+            if (!ConfigValues.itemsCustomLootListConfig.getString(path).equalsIgnoreCase("dynamic")) {
 
                 try {
 
-                    Double dropWeight = Double.valueOf(lootCustomConfig.getLootConfig().getString(path));
+                    Double dropWeight = Double.valueOf(ConfigValues.itemsCustomLootListConfig.getString(path));
                     staticCustomItemHashMap.put(itemStack, dropWeight);
                     return true;
 
                 } catch (NumberFormatException e) {
 
                     Bukkit.getLogger().info("[EliteMobs] Your item " + path + " contains an invalid drop weight value ("
-                            + lootCustomConfig.getLootConfig().getString(path) + ")");
+                            + ConfigValues.itemsCustomLootListConfig.getString(path) + ")");
 
                 }
 

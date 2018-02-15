@@ -15,12 +15,11 @@
 
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.Configuration;
 
-public class CustomLootSettingsConfig {
+public class ItemsCustomLootSettingsConfig {
 
-    private CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-
+    public static final String CONFIG_NAME = "ItemsCustomLootSettings.yml";
     public static final String SHOW_POTION_EFFECTS = "Show potion effects on lore";
     public static final String SHOW_ITEM_VALUE = "Show item value on lore";
     public static final String LORE_STRUCTURE = "Lore structure";
@@ -30,45 +29,20 @@ public class CustomLootSettingsConfig {
     public static final String BLINDNESS = "BLINDNESS";
     public static final String CONFUSION = "CONFUSION";
     public static final String DAMAGE_RESISTANCE = "DAMAGE_RESISTANCE";
-//    public static final String
+    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+    private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
+    public void initializeConfig() {
 
-    public void initializeCustomLootSettingsConfig() {
+        configuration.addDefault(SHOW_POTION_EFFECTS, true);
+        configuration.addDefault(SHOW_ITEM_VALUE, true);
+        configuration.addDefault(PREVENT_CUSTOM_ITEM_PLACING, true);
+        configuration.addDefault(LORE_STRUCTURE, "$potionEffect\n&m----------------------\n$customLore\n$itemValue\n&m----------------------");
 
-        this.getCustomLootSettingsConfig().addDefault(SHOW_POTION_EFFECTS, true);
-        this.getCustomLootSettingsConfig().addDefault(SHOW_ITEM_VALUE, true);
-        this.getCustomLootSettingsConfig().addDefault(PREVENT_CUSTOM_ITEM_PLACING, true);
-        this.getCustomLootSettingsConfig().addDefault(LORE_STRUCTURE, "$potionEffect\n&m----------------------\n$customLore\n$itemValue\n&m----------------------");
-
-        getCustomLootSettingsConfig().options().copyDefaults(true);
-        saveDefaultCustomLootSettingsConfig();
-        saveCustomLootSettingsConfig();
-
-    }
-
-    public FileConfiguration getCustomLootSettingsConfig() {
-
-        return customConfigLoader.getCustomConfig("customLootSettings.yml");
+        customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
+        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
+        customConfigLoader.saveCustomConfig(CONFIG_NAME);
 
     }
-
-    public void reloadCustomLootSettingsConfig() {
-
-        customConfigLoader.reloadCustomConfig("customLootSettings.yml");
-
-    }
-
-    public void saveCustomLootSettingsConfig() {
-
-        customConfigLoader.saveCustomDefaultConfig("customLootSettings.yml");
-
-    }
-
-    public void saveDefaultCustomLootSettingsConfig() {
-
-        customConfigLoader.saveDefaultCustomConfig("customLootSettings.yml");
-
-    }
-
 
 }

@@ -18,11 +18,12 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
+import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
+import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,9 +43,9 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
  */
 public class NaturalMobMetadataAssigner implements Listener {
 
+    private static Random random = new Random();
     private EliteMobs plugin;
     private int range = Bukkit.getServer().getViewDistance() * 16;
-    private static Random random = new Random();
 
 
     public NaturalMobMetadataAssigner(Plugin plugin) {
@@ -56,9 +57,9 @@ public class NaturalMobMetadataAssigner implements Listener {
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (!ConfigValues.defaultConfig.getBoolean("Natural aggressive EliteMob spawning") ||
-                !ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") ||
-                !ConfigValues.defaultConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName().toString())) {
+        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.NATURAL_MOB_SPAWNING) ||
+                !ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) ||
+                !ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName())) {
 
             return;
 
@@ -72,7 +73,6 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                 entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(plugin, true));
 
-                //20% chance of turning a mob into a EliteMob unless special gear is equipped
                 int huntingGearChanceAdder = 0;
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -91,32 +91,15 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                             ItemStack heldItem = player.getInventory().getItemInMainHand();
 
-                            for (ItemStack itemStack : CustomDropsConstructor.customItemList) {
+                            UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
 
-                                if (itemValidator(itemStack, helmet, "elite mob hunting helmet")) {
+                            if (uniqueItemConstructor.huntingSetItemDetector(helmet)) huntingGearChanceAdder++;
+                            if (uniqueItemConstructor.huntingSetItemDetector(chestplate)) huntingGearChanceAdder++;
+                            if (uniqueItemConstructor.huntingSetItemDetector(leggings)) huntingGearChanceAdder++;
+                            if (uniqueItemConstructor.huntingSetItemDetector(boots)) huntingGearChanceAdder++;
+                            if (uniqueItemConstructor.huntingSetItemDetector(heldItem)) huntingGearChanceAdder++;
 
-                                    huntingGearChanceAdder++;
-
-                                } else if (itemValidator(itemStack, chestplate, "elite mob hunting chestplate")) {
-
-                                    huntingGearChanceAdder++;
-
-
-                                } else if (itemValidator(itemStack, leggings, "elite mob hunting leggings")) {
-
-                                    huntingGearChanceAdder++;
-
-
-                                } else if (itemValidator(itemStack, boots, "elite mob hunting boots")) {
-
-                                    huntingGearChanceAdder++;
-
-                                } else if (itemValidator(itemStack, heldItem, "elite mob hunting bow")) {
-
-                                    huntingGearChanceAdder++;
-                                }
-
-                            }
+                            Bukkit.getLogger().info(huntingGearChanceAdder + "");
 
                         }
 
@@ -124,7 +107,8 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                 }
 
-                Double validChance = (ConfigValues.defaultConfig.getDouble("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn") + (huntingGearChanceAdder * 10)) / 100;
+                Double validChance = (ConfigValues.defaultConfig.getDouble(DefaultConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
+                        (huntingGearChanceAdder * ConfigValues.itemsUniqueConfig.getInt(ItemsUniqueConfig.HUNTING_SET_CHANCE_INCREASER))) / 100;
 
                 if (random.nextDouble() < validChance) {
 
@@ -136,21 +120,6 @@ public class NaturalMobMetadataAssigner implements Listener {
             }
 
         }
-
-    }
-
-    private boolean itemValidator(ItemStack listStack, ItemStack inventoryStack, String displayName) {
-
-        if (inventoryStack != null && inventoryStack.getType() != Material.AIR && inventoryStack.hasItemMeta() && inventoryStack.getItemMeta().hasLore() &&
-                inventoryStack.getItemMeta().getLore().equals(listStack.getItemMeta().getLore()) && inventoryStack.getItemMeta().hasDisplayName()) {
-
-            String displayeNameStripped = ChatColor.stripColor(inventoryStack.getItemMeta().getDisplayName());
-
-            return displayeNameStripped.equalsIgnoreCase(displayName);
-
-        }
-
-        return false;
 
     }
 
