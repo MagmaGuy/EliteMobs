@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -148,7 +149,7 @@ public class StatsCommandHandler {
 
                         //passive EliteMobs only stack at 50 right now
                         //TODO: redo this count at some other stage of this plugin's development
-                        mobLevelSavingsCount += ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
+                        mobLevelSavingsCount += ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
                         passiveCount++;
 
                         switch (livingEntity.getType()) {

@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.commands.shops;
 import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.RandomItemsSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.ItemWorthCalculator;
@@ -77,7 +77,7 @@ public class ShopHandler implements Listener {
             int randomLevel = random.nextInt(balancedMax + 1) + balancedMin;
 
             //adjust to item rank
-            int level = (int) ((randomLevel * ConfigValues.randomItemsConfig.getDouble(RandomItemsSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER))
+            int level = (int) ((randomLevel * ConfigValues.itemsProceduralSettingsConfig.getDouble(ItemsProceduralSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER))
                     + (random.nextInt(6) + 1 - 3));
 
             if (level < 1) {

@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.elitedrops;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.RandomItemsSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -62,20 +62,20 @@ public class EliteDropsDropper implements Listener {
 
         if (random.nextDouble() > chanceToDrop) return;
 
-        boolean proceduralItemsOn = ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.DROP_ITEMS_ON_DEATH);
+        boolean proceduralItemsOn = ConfigValues.itemsProceduralSettingsConfig.getBoolean(ItemsProceduralSettingsConfig.DROP_ITEMS_ON_DEATH);
 
         boolean customItemsOn = ConfigValues.defaultConfig.getBoolean(DefaultConfig.DROP_CUSTOM_ITEMS);
 
-        boolean staticCustomItemsExist = CustomDropsConstructor.staticCustomItemHashMap.size() > 0;
+        boolean staticCustomItemsExist = CustomItemConstructor.staticCustomItemHashMap.size() > 0;
 
         int itemRankWeighedWithMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
         //random adds a little wiggle room for item rank power
-        itemRankWeighedWithMobLevel = (int) ((itemRankWeighedWithMobLevel * ConfigValues.randomItemsConfig.getDouble(RandomItemsSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER)) + (random.nextInt(6) + 1 - 3));
+        itemRankWeighedWithMobLevel = (int) ((itemRankWeighedWithMobLevel * ConfigValues.itemsProceduralSettingsConfig.getDouble(ItemsProceduralSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER)) + (random.nextInt(6) + 1 - 3));
 
         if (itemRankWeighedWithMobLevel < 1) itemRankWeighedWithMobLevel = 0;
 
-        boolean customDynamicDropExists = CustomDropsConstructor.dynamicRankedItemStacks.containsKey(itemRankWeighedWithMobLevel);
+        boolean customDynamicDropExists = CustomItemConstructor.dynamicRankedItemStacks.containsKey(itemRankWeighedWithMobLevel);
 
         if (proceduralItemsOn && !customItemsOn) {
 
@@ -85,8 +85,6 @@ public class EliteDropsDropper implements Listener {
         }
 
         if (!proceduralItemsOn && customItemsOn) {
-
-            Bukkit.getLogger().info("running code 2");
 
             if (!customDynamicDropExists && !staticCustomItemsExist) {
 
@@ -129,16 +127,12 @@ public class EliteDropsDropper implements Listener {
 
             if (!customDynamicDropExists && !staticCustomItemsExist) {
 
-                Bukkit.getLogger().info("running code 0");
-
                 dropProcedurallyGeneratedItem(itemRankWeighedWithMobLevel, entity);
                 return;
 
             }
 
             if (!customDynamicDropExists && staticCustomItemsExist) {
-
-                Bukkit.getLogger().info("running code 2");
 
                 HashMap<String, Double> weighedConfigValues = new HashMap<>();
                 weighedConfigValues.put(DefaultConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.PROCEDURAL_ITEM_WEIGHT));
@@ -155,8 +149,6 @@ public class EliteDropsDropper implements Listener {
             }
 
             if (customDynamicDropExists && !staticCustomItemsExist) {
-
-                Bukkit.getLogger().info("running code 3");
 
                 HashMap<String, Double> weighedConfigValues = new HashMap<>();
                 weighedConfigValues.put(DefaultConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.PROCEDURAL_ITEM_WEIGHT));
@@ -232,10 +224,10 @@ public class EliteDropsDropper implements Listener {
 
     private void dropCustomDynamicLoot(int mobLevel, Entity entity) {
 
-        int randomCustomDrop = random.nextInt(CustomDropsConstructor.dynamicRankedItemStacks.get(mobLevel).size());
+        int randomCustomDrop = random.nextInt(CustomItemConstructor.dynamicRankedItemStacks.get(mobLevel).size());
 
         //get rank matching randomizer and item matching randomized index
-        entity.getWorld().dropItem(entity.getLocation(), CustomDropsConstructor.dynamicRankedItemStacks.get(mobLevel).get(randomCustomDrop));
+        entity.getWorld().dropItem(entity.getLocation(), CustomItemConstructor.dynamicRankedItemStacks.get(mobLevel).get(randomCustomDrop));
 
     }
 
@@ -243,18 +235,18 @@ public class EliteDropsDropper implements Listener {
 
         double totalWeight = 0;
 
-        for (ItemStack itemStack : CustomDropsConstructor.staticCustomItemHashMap.keySet()) {
+        for (ItemStack itemStack : CustomItemConstructor.staticCustomItemHashMap.keySet()) {
 
-            totalWeight += CustomDropsConstructor.staticCustomItemHashMap.get(itemStack);
+            totalWeight += CustomItemConstructor.staticCustomItemHashMap.get(itemStack);
 
         }
 
         ItemStack generatedItemStack = null;
         double random = Math.random() * totalWeight;
 
-        for (ItemStack itemStack : CustomDropsConstructor.staticCustomItemHashMap.keySet()) {
+        for (ItemStack itemStack : CustomItemConstructor.staticCustomItemHashMap.keySet()) {
 
-            random -= CustomDropsConstructor.staticCustomItemHashMap.get(itemStack);
+            random -= CustomItemConstructor.staticCustomItemHashMap.get(itemStack);
 
             if (random <= 0) {
 

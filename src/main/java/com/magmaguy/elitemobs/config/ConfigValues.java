@@ -24,28 +24,47 @@ import org.bukkit.configuration.Configuration;
  */
 public class ConfigValues {
 
-    public static Configuration defaultConfig, lootConfig, mobPowerConfig, translationConfig, randomItemsConfig,
-            economyConfig, playerCacheConfig, eventsConfig, customLootSettingsConfig;
+    public static Configuration defaultConfig, itemsCustomLootListConfig, mobPowerConfig, translationConfig, itemsProceduralSettingsConfig,
+            economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, validMobsConfig, validWorldsConfig, itemsUniqueConfig;
 
     public static void initializeConfigValues() {
 
+        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+
         defaultConfig = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
-        LootCustomConfig lootCustomConfig = new LootCustomConfig();
-        lootConfig = lootCustomConfig.getLootConfig();
-        MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
-        CustomLootSettingsConfig customLootSettingsConfig1 = new CustomLootSettingsConfig();
-        customLootSettingsConfig = customLootSettingsConfig1.getCustomLootSettingsConfig();
-        mobPowerConfig = mobPowersCustomConfig.getMobPowersConfig();
-        TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
-        translationConfig = translationCustomConfig.getTranslationConfig();
-        RandomItemsSettingsConfig randomItemsSettingsConfig = new RandomItemsSettingsConfig();
-        randomItemsConfig = randomItemsSettingsConfig.getRandomItemsSettingsConfig();
-        EconomySettingsConfig economySettingsConfig = new EconomySettingsConfig();
-        economyConfig = economySettingsConfig.getEconomySettingsConfig();
-        PlayerCacheConfig playerCacheConfig1 = new PlayerCacheConfig();
-        playerCacheConfig = playerCacheConfig1.getPlayerCacheConfig();
-        EventsConfig eventConfig = new EventsConfig();
-        eventsConfig = eventConfig.getEventsConfig();
+
+        customConfigLoader = new CustomConfigLoader();
+        itemsCustomLootListConfig = customConfigLoader.getCustomConfig(ItemsCustomLootListConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        mobPowerConfig = customConfigLoader.getCustomConfig(MobPowersConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        itemsCustomLootSettingsConfig = customConfigLoader.getCustomConfig(ItemsCustomLootSettingsConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        translationConfig = customConfigLoader.getCustomConfig(TranslationConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        itemsProceduralSettingsConfig = customConfigLoader.getCustomConfig(ItemsProceduralSettingsConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        economyConfig = customConfigLoader.getCustomConfig(EconomySettingsConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        playerCacheConfig = customConfigLoader.getCustomConfig(PlayerCacheConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        eventsConfig = customConfigLoader.getCustomConfig(EventsConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        validMobsConfig = customConfigLoader.getCustomConfig(ValidMobsConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        validWorldsConfig = customConfigLoader.getCustomConfig(ValidWorldsConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        itemsUniqueConfig = customConfigLoader.getCustomConfig(ItemsUniqueConfig.CONFIG_NAME);
 
     }
 

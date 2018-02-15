@@ -16,17 +16,27 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.Configuration;
 
 import java.util.Arrays;
 
 /**
  * Created by MagmaGuy on 04/06/2017.
  */
-public class RandomItemsSettingsConfig {
+public class ItemsProceduralSettingsConfig {
 
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-
+    public static final String CONFIG_NAME = "ItemsProceduralSettings.yml";
+    public static final String LORE_MOB_LEVEL_SOURCE = "Item source (mob) (line 1)";
+    public static final String LORE_SHOP_SOURCE = "Item source (shop) (line 1)";
+    public static final String LORE_WORTH = "Item worth (line 2)";
+    public static final String LORE_RESALE_WORTH = "Item resale worth (line 2)";
+    public static final String LORE_SIGNATURE = "Elite Mobs drop (line 3)";
+    public static final String LORE_STRUCTURE = "Lore structure";
+    public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
+    public static final String MONITOR_ITEMS_ON_CONSOLE = "Monitor procedurally generated items on console";
+    public static final String MOB_LEVEL_TO_RANK_MULTIPLIER = "Mob level to item rank multiplier";
+    public static final String PERCENTAGE_PROCEDURAL_ITEM_INSTEAD_OF_CUSTOM = "Percentage (%) of times random item drop instead of custom loot";
+    public static final String PROCEDURAL_ITEM_VALID_MATERIALS = "Valid material list for random items";
     public static String ARROW_DAMAGE_BOOL, ARROW_DAMAGE_MAX_LEVEL,
             ARROW_FIRE_BOOL, ARROW_FIRE_MAX_LEVEL,
             ARROW_INFINITE_BOOL,
@@ -57,33 +67,22 @@ public class RandomItemsSettingsConfig {
             THORNS_BOOL, THORNS_MAX_LEVEL,
             VANISHING_CURSE_BOOL,
             WATER_WORKER_BOOL, WATER_WORKER_MAX_LEVEL;
+    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
-    public static final String LORE_MOB_LEVEL_SOURCE = "Item source (mob) (line 1)";
-    public static final String LORE_SHOP_SOURCE = "Item source (shop) (line 1)";
-    public static final String LORE_WORTH = "Item worth (line 2)";
-    public static final String LORE_RESALE_WORTH = "Item resale worth (line 2)";
-    public static final String LORE_SIGNATURE = "Elite Mobs drop (line 3)";
-    public static final String LORE_STRUCTURE = "Lore structure";
+    public void intializeConfig() {
 
-    public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
-    public static final String MONITOR_ITEMS_ON_CONSOLE = "Monitor procedurally generated items on console";
-    public static final String MOB_LEVEL_TO_RANK_MULTIPLIER = "Mob level to item rank multiplier";
-    public static final String PERCENTAGE_PROCEDURAL_ITEM_INSTEAD_OF_CUSTOM = "Percentage (%) of times random item drop instead of custom loot";
-    public static final String PROCEDURAL_ITEM_VALID_MATERIALS = "Valid material list for random items";
-
-    public void initializeRandomItemsSettingsConfig() {
-
-        this.getRandomItemsSettingsConfig().addDefault(DROP_ITEMS_ON_DEATH, true);
-        this.getRandomItemsSettingsConfig().addDefault(MOB_LEVEL_TO_RANK_MULTIPLIER, 0.5);
-        this.getRandomItemsSettingsConfig().addDefault(MONITOR_ITEMS_ON_CONSOLE, false);
-        this.getRandomItemsSettingsConfig().addDefault(PERCENTAGE_PROCEDURAL_ITEM_INSTEAD_OF_CUSTOM, 20);
-        this.getRandomItemsSettingsConfig().addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from a level $level Elite $mob");
-        this.getRandomItemsSettingsConfig().addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
-        this.getRandomItemsSettingsConfig().addDefault(LORE_WORTH, "Worth $worth $currencyName");
-        this.getRandomItemsSettingsConfig().addDefault(LORE_RESALE_WORTH, "$resale $currencyName resale value");
-        this.getRandomItemsSettingsConfig().addDefault(LORE_SIGNATURE, "Elite Mobs drop");
-        this.getRandomItemsSettingsConfig().addDefault(LORE_STRUCTURE, ChatColorConverter.chatColorConverter("&m----------------------\n $line1 \n $line2 \n $line3 \n&m----------------------"));
-        this.getRandomItemsSettingsConfig().addDefault(PROCEDURAL_ITEM_VALID_MATERIALS, Arrays.asList(
+        configuration.addDefault(DROP_ITEMS_ON_DEATH, true);
+        configuration.addDefault(MOB_LEVEL_TO_RANK_MULTIPLIER, 0.5);
+        configuration.addDefault(MONITOR_ITEMS_ON_CONSOLE, false);
+        configuration.addDefault(PERCENTAGE_PROCEDURAL_ITEM_INSTEAD_OF_CUSTOM, 20);
+        configuration.addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from a level $level Elite $mob");
+        configuration.addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
+        configuration.addDefault(LORE_WORTH, "Worth $worth $currencyName");
+        configuration.addDefault(LORE_RESALE_WORTH, "$resale $currencyName resale value");
+        configuration.addDefault(LORE_SIGNATURE, "Elite Mobs drop");
+        configuration.addDefault(LORE_STRUCTURE, ChatColorConverter.chatColorConverter("&m----------------------\n $line1 \n $line2 \n $line3 \n&m----------------------"));
+        configuration.addDefault(PROCEDURAL_ITEM_VALID_MATERIALS, Arrays.asList(
                 "DIAMOND_SWORD",
                 "GOLD_SWORD",
                 "IRON_SWORD",
@@ -221,106 +220,106 @@ public class RandomItemsSettingsConfig {
         WATER_WORKER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("WATER_WORKER");
 
 
-        this.getRandomItemsSettingsConfig().addDefault(ARROW_DAMAGE_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(ARROW_DAMAGE_MAX_LEVEL, 5);
+        configuration.addDefault(ARROW_DAMAGE_BOOL, true);
+        configuration.addDefault(ARROW_DAMAGE_MAX_LEVEL, 5);
 
-        this.getRandomItemsSettingsConfig().addDefault(ARROW_FIRE_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(ARROW_FIRE_MAX_LEVEL, 1);
+        configuration.addDefault(ARROW_FIRE_BOOL, true);
+        configuration.addDefault(ARROW_FIRE_MAX_LEVEL, 1);
 
-        this.getRandomItemsSettingsConfig().addDefault(ARROW_INFINITE_BOOL, true);
+        configuration.addDefault(ARROW_INFINITE_BOOL, true);
 
-        this.getRandomItemsSettingsConfig().addDefault(ARROW_KNOCKBACK_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(ARROW_KNOCKBACK_MAX_LEVEL, 2);
+        configuration.addDefault(ARROW_KNOCKBACK_BOOL, true);
+        configuration.addDefault(ARROW_KNOCKBACK_MAX_LEVEL, 2);
 
-        this.getRandomItemsSettingsConfig().addDefault(BINDING_CURSE_BOOL, true);
+        configuration.addDefault(BINDING_CURSE_BOOL, true);
 
-        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_ALL_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_ALL_MAX_LEVEL, 5);
+        configuration.addDefault(DAMAGE_ALL_BOOL, true);
+        configuration.addDefault(DAMAGE_ALL_MAX_LEVEL, 5);
 
-        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_ARTHROPODS_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_ARTHROPODS_MAX_LEVEL, 5);
+        configuration.addDefault(DAMAGE_ARTHROPODS_BOOL, true);
+        configuration.addDefault(DAMAGE_ARTHROPODS_MAX_LEVEL, 5);
 
-        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_UNDEAD_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(DAMAGE_UNDEAD_MAX_LEVEL, 5);
+        configuration.addDefault(DAMAGE_UNDEAD_BOOL, true);
+        configuration.addDefault(DAMAGE_UNDEAD_MAX_LEVEL, 5);
 
-        this.getRandomItemsSettingsConfig().addDefault(DEPTH_STRIDER_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(DEPTH_STRIDER_MAX_LEVEL, 3);
+        configuration.addDefault(DEPTH_STRIDER_BOOL, true);
+        configuration.addDefault(DEPTH_STRIDER_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(DIG_SPEED_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(DIG_SPEED_MAX_LEVEL, 5);
+        configuration.addDefault(DIG_SPEED_BOOL, true);
+        configuration.addDefault(DIG_SPEED_MAX_LEVEL, 5);
 
-        this.getRandomItemsSettingsConfig().addDefault(DURABILITY_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(DURABILITY_MAX_LEVEL, 3);
+        configuration.addDefault(DURABILITY_BOOL, true);
+        configuration.addDefault(DURABILITY_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(FIRE_ASPECT_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(FIRE_ASPECT_MAX_LEVEL, 2);
+        configuration.addDefault(FIRE_ASPECT_BOOL, true);
+        configuration.addDefault(FIRE_ASPECT_MAX_LEVEL, 2);
 
-        this.getRandomItemsSettingsConfig().addDefault(FROST_WALKER_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(FROST_WALKER_MAX_LEVEL, 2);
+        configuration.addDefault(FROST_WALKER_BOOL, true);
+        configuration.addDefault(FROST_WALKER_MAX_LEVEL, 2);
 
-        this.getRandomItemsSettingsConfig().addDefault(KNOCKBACK_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(KNOCKBACK_MAX_LEVEL, 2);
+        configuration.addDefault(KNOCKBACK_BOOL, true);
+        configuration.addDefault(KNOCKBACK_MAX_LEVEL, 2);
 
-        this.getRandomItemsSettingsConfig().addDefault(LOOT_BONUS_BLOCKS_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(LOOT_BONUS_BLOCKS_MAX_LEVEL, 3);
+        configuration.addDefault(LOOT_BONUS_BLOCKS_BOOL, true);
+        configuration.addDefault(LOOT_BONUS_BLOCKS_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(LOOT_BONUS_MOBS_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(LOOT_BONUS_MOBS_MAX_LEVEL, 3);
+        configuration.addDefault(LOOT_BONUS_MOBS_BOOL, true);
+        configuration.addDefault(LOOT_BONUS_MOBS_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(LUCK_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(LUCK_MAX_LEVEL, 3);
+        configuration.addDefault(LUCK_BOOL, true);
+        configuration.addDefault(LUCK_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(LURE_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(LURE_MAX_LEVEL, 3);
+        configuration.addDefault(LURE_BOOL, true);
+        configuration.addDefault(LURE_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(MENDING_BOOL, false);
+        configuration.addDefault(MENDING_BOOL, false);
 
-        this.getRandomItemsSettingsConfig().addDefault(OXYGEN_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(OXYGEN_MAX_LEVEL, 3);
+        configuration.addDefault(OXYGEN_BOOL, true);
+        configuration.addDefault(OXYGEN_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_ENVIRONMENTAL_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_ENVIRONMENTAL_MAX_LEVEL, 4);
+        configuration.addDefault(PROTECTION_ENVIRONMENTAL_BOOL, true);
+        configuration.addDefault(PROTECTION_ENVIRONMENTAL_MAX_LEVEL, 4);
 
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_EXPLOSIONS_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_EXPLOSIONS_MAX_LEVEL, 4);
+        configuration.addDefault(PROTECTION_EXPLOSIONS_BOOL, true);
+        configuration.addDefault(PROTECTION_EXPLOSIONS_MAX_LEVEL, 4);
 
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_FALL_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_FALL_MAX_LEVEL, 4);
+        configuration.addDefault(PROTECTION_FALL_BOOL, true);
+        configuration.addDefault(PROTECTION_FALL_MAX_LEVEL, 4);
 
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_FIRE_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_FIRE_MAX_LEVEL, 4);
+        configuration.addDefault(PROTECTION_FIRE_BOOL, true);
+        configuration.addDefault(PROTECTION_FIRE_MAX_LEVEL, 4);
 
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_PROJECTILE_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(PROTECTION_PROJECTILE_MAX_LEVEL, 4);
+        configuration.addDefault(PROTECTION_PROJECTILE_BOOL, true);
+        configuration.addDefault(PROTECTION_PROJECTILE_MAX_LEVEL, 4);
 
-        this.getRandomItemsSettingsConfig().addDefault(SILK_TOUCH_BOOL, true);
+        configuration.addDefault(SILK_TOUCH_BOOL, true);
 
-        this.getRandomItemsSettingsConfig().addDefault(SWEEPING_EDGE_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(SWEEPING_EDGE_MAX_LEVEL, 3);
+        configuration.addDefault(SWEEPING_EDGE_BOOL, true);
+        configuration.addDefault(SWEEPING_EDGE_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(THORNS_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(THORNS_MAX_LEVEL, 3);
+        configuration.addDefault(THORNS_BOOL, true);
+        configuration.addDefault(THORNS_MAX_LEVEL, 3);
 
-        this.getRandomItemsSettingsConfig().addDefault(VANISHING_CURSE_BOOL, true);
+        configuration.addDefault(VANISHING_CURSE_BOOL, true);
 
-        this.getRandomItemsSettingsConfig().addDefault(WATER_WORKER_BOOL, true);
-        this.getRandomItemsSettingsConfig().addDefault(WATER_WORKER_MAX_LEVEL, 1);
+        configuration.addDefault(WATER_WORKER_BOOL, true);
+        configuration.addDefault(WATER_WORKER_MAX_LEVEL, 1);
 
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Sword", "Sword");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Bow", "Bow");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Pickaxe", "Pickaxe");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Spade", "Spade");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Hoe", "Hoe");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Axe", "Axe");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Fishing Rod", "Fishing Rod");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Shield", "Shield");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Shears", "Shears");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Helmet", "Helmet");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Chestplate", "Chestplate");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Leggings", "Leggings");
-        this.getRandomItemsSettingsConfig().addDefault("Material name.Boots", "Boots");
+        configuration.addDefault("Material name.Sword", "Sword");
+        configuration.addDefault("Material name.Bow", "Bow");
+        configuration.addDefault("Material name.Pickaxe", "Pickaxe");
+        configuration.addDefault("Material name.Spade", "Spade");
+        configuration.addDefault("Material name.Hoe", "Hoe");
+        configuration.addDefault("Material name.Axe", "Axe");
+        configuration.addDefault("Material name.Fishing Rod", "Fishing Rod");
+        configuration.addDefault("Material name.Shield", "Shield");
+        configuration.addDefault("Material name.Shears", "Shears");
+        configuration.addDefault("Material name.Helmet", "Helmet");
+        configuration.addDefault("Material name.Chestplate", "Chestplate");
+        configuration.addDefault("Material name.Leggings", "Leggings");
+        configuration.addDefault("Material name.Boots", "Boots");
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid nouns", Arrays.asList(
+        configuration.addDefault("Valid nouns", Arrays.asList(
                 "MagmaGuy",
                 "Dawn",
                 "Sunset",
@@ -532,7 +531,7 @@ public class RandomItemsSettingsConfig {
                 "Hunter"
         ));
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid verb-er (noun)", Arrays.asList(
+        configuration.addDefault("Valid verb-er (noun)", Arrays.asList(
                 "World Breaker",
                 "World Shatterer",
                 "Avenger",
@@ -734,7 +733,7 @@ public class RandomItemsSettingsConfig {
                 "Sneaker"
         ));
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid adjectives", Arrays.asList(
+        configuration.addDefault("Valid adjectives", Arrays.asList(
                 "Adorable",
                 "Beautiful",
                 "Clean",
@@ -1260,7 +1259,7 @@ public class RandomItemsSettingsConfig {
                 "Menacing"
         ));
 
-        this.getRandomItemsSettingsConfig().addDefault("Valid verbs", Arrays.asList(
+        configuration.addDefault("Valid verbs", Arrays.asList(
                 "Slashing",
                 "Cutting",
                 "Stabbing",
@@ -1524,9 +1523,9 @@ public class RandomItemsSettingsConfig {
 
         ));
 
-        getRandomItemsSettingsConfig().options().copyDefaults(true);
-        saveDefaultCustomConfig();
-        saveCustomConfig();
+        configuration.options().copyDefaults(true);
+        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
+        customConfigLoader.saveCustomConfig(CONFIG_NAME);
 
     }
 
@@ -1549,30 +1548,6 @@ public class RandomItemsSettingsConfig {
         String finalString = validEnchantmentsprefix + string + maxLevelSuffix;
 
         return finalString;
-    }
-
-    public FileConfiguration getRandomItemsSettingsConfig() {
-
-        return customConfigLoader.getCustomConfig("randomItemsSettings.yml");
-
-    }
-
-    public void reloadCustomConfig() {
-
-        customConfigLoader.reloadCustomConfig("randomItemsSettings.yml");
-
-    }
-
-    public void saveCustomConfig() {
-
-        customConfigLoader.saveCustomDefaultConfig("randomItemsSettings.yml");
-
-    }
-
-    public void saveDefaultCustomConfig() {
-
-        customConfigLoader.saveDefaultCustomConfig("randomItemsSettings.yml");
-
     }
 
 }

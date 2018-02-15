@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.mobmerger;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
@@ -68,20 +69,20 @@ public class MergeHandler implements Listener {
             return;
         }
 
-        if (!eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) && !ConfigValues.defaultConfig.getBoolean("Stack aggressive spawner mobs")) {
+        if (!eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STACK_AGGRESSIVE_SPAWNER_MOBS)) {
             return;
         }
 
         MobScanner mobScanner = new MobScanner();
 
         if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(eventEntity) && ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") &&
-                ConfigValues.defaultConfig.getBoolean("Aggressive mob stacking") && !eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
+                ConfigValues.defaultConfig.getBoolean(DefaultConfig.AGGRESSIVE_MOB_STACKING) && !eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
-            if (ConfigValues.defaultConfig.getBoolean("Aggressive mob stacking") && !eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
+            if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.AGGRESSIVE_MOB_STACKING) && !eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
                 mobScanner.scanValidAggressiveLivingEntity(eventEntity);
 
-            } else if (ConfigValues.defaultConfig.getBoolean("Aggressive mob stacking") && ConfigValues.defaultConfig.getBoolean("Stack aggressive natural mobs") &&
+            } else if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.AGGRESSIVE_MOB_STACKING) && ConfigValues.defaultConfig.getBoolean(DefaultConfig.STACK_AGGRESSIVE_NATURAL_MOBS) &&
                     eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
                 mobScanner.scanValidAggressiveLivingEntity(eventEntity);

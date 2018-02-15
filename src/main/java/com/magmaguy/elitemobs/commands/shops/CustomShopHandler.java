@@ -20,7 +20,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
-import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
+import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
 import com.magmaguy.elitemobs.elitedrops.ItemWorthCalculator;
 import com.magmaguy.elitemobs.elitedrops.ObfuscatedSignatureLoreData;
 import org.bukkit.Bukkit;
@@ -65,9 +65,9 @@ public class CustomShopHandler implements Listener {
 
         for (int i = 9; i < 54; i++) {
 
-            int itemEntryIndex = random.nextInt(CustomDropsConstructor.customItemList.size());
+            int itemEntryIndex = random.nextInt(CustomItemConstructor.customItemList.size());
 
-            shopInventory.setItem(i, CustomDropsConstructor.customItemList.get(itemEntryIndex));
+            shopInventory.setItem(i, CustomItemConstructor.customItemList.get(itemEntryIndex));
 
         }
 

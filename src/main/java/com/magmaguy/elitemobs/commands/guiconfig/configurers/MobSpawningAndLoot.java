@@ -26,32 +26,31 @@ public class MobSpawningAndLoot implements Listener {
     private static void configStatusChecker() {
 
         //get boolean values
-        aggressiveStacking = boolValueGrabber("Aggressive mob stacking");
-        spawnerStacking = boolValueGrabber("Stack aggressive spawner mobs");
-        naturalStacking = boolValueGrabber("Stack aggressive natural mobs");
-        customLoot = boolValueGrabber("Aggressive EliteMobs can drop custom loot");
-        mmorpgColors = boolValueGrabber("Use MMORPG colors for item ranks");
-        mmorpgColorsCustom = boolValueGrabber("Use MMORPG colors for custom items");
-        creepersFarmDamage = boolValueGrabber("Prevent creepers from killing passive mobs");
-        spawnerVanillaLootBonus = boolValueGrabber("Drop multiplied default loot from aggressive elite mobs spawned in spawners");
-        naturalVisualEffect = boolValueGrabber("Turn on visual effects for natural or plugin-spawned EliteMobs");
-        spawnerVisualEffects = boolValueGrabber("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs");
-        telegraphedVisualEffects = boolValueGrabber("Turn on visual effects that indicate an attack is about to happen");
-        permissionMissingTitles = boolValueGrabber("Use titles to warn players they are missing a permission");
-        customItemRank = boolValueGrabber("Show item rank on custom item drops");
-        scoreboards = boolValueGrabber("Use scoreboards (requires permission)");
+        aggressiveStacking = boolValueGrabber(DefaultConfig.AGGRESSIVE_MOB_STACKING);
+        spawnerStacking = boolValueGrabber(DefaultConfig.STACK_AGGRESSIVE_SPAWNER_MOBS);
+        naturalStacking = boolValueGrabber(DefaultConfig.STACK_AGGRESSIVE_NATURAL_MOBS);
+        customLoot = boolValueGrabber(DefaultConfig.DROP_CUSTOM_ITEMS);
+        mmorpgColors = boolValueGrabber(DefaultConfig.MMORPG_COLORS);
+        mmorpgColorsCustom = boolValueGrabber(DefaultConfig.MMORPG_COLORS_FOR_CUSTOM_ITEMS);
+        creepersFarmDamage = boolValueGrabber(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER);
+        spawnerVanillaLootBonus = boolValueGrabber(DefaultConfig.SPAWNER_DEFAULT_LOOT_MULTIPLIER);
+        naturalVisualEffect = boolValueGrabber(DefaultConfig.ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS);
+        spawnerVisualEffects = boolValueGrabber(DefaultConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS);
+        telegraphedVisualEffects = boolValueGrabber(DefaultConfig.ENABLE_WARNING_VISUAL_EFFECTS);
+        permissionMissingTitles = boolValueGrabber(DefaultConfig.ENABLE_PERMISSION_TITLES);
+        scoreboards = boolValueGrabber(DefaultConfig.ENABLE_POWER_SCOREBOARDS);
 
         //get double values
-        conversionPercentage = doubleValueGrabber("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn");
-        aggressiveStackingCap = doubleValueGrabber("Aggressive mob stacking cap");
-        naturalLevelCap = doubleValueGrabber("Natural elite mob level cap");
-        passiveStackAmount = doubleValueGrabber("Passive EliteMob stack amount");
+        conversionPercentage = doubleValueGrabber(DefaultConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE);
+        aggressiveStackingCap = doubleValueGrabber(DefaultConfig.ELITEMOB_STACKING_CAP);
+        naturalLevelCap = doubleValueGrabber(DefaultConfig.NATURAL_ELITEMOB_LEVEL_CAP);
+        passiveStackAmount = doubleValueGrabber(DefaultConfig.SUPERMOB_STACK_AMOUNT);
         flatLootDropRate = doubleValueGrabber(DefaultConfig.ELITE_ITEM_FLAT_DROP_RATE);
         levelDropRate = doubleValueGrabber(DefaultConfig.ELITE_ITEM_FLAT_DROP_RATE);
-        lifeMultiplier = doubleValueGrabber("Aggressive EliteMob life multiplier");
-        damageMultiplier = doubleValueGrabber("Aggressive EliteMob damage multiplier");
-        lootMultiplier = doubleValueGrabber("Aggressive EliteMob default loot multiplier");
-        explosionMultiplier = doubleValueGrabber("SuperCreeper explosion nerf multiplier");
+        lifeMultiplier = doubleValueGrabber(DefaultConfig.LIFE_MULTIPLIER);
+        damageMultiplier = doubleValueGrabber(DefaultConfig.DAMAGE_MULTIPLIER);
+        lootMultiplier = doubleValueGrabber(DefaultConfig.DEFAULT_LOOT_MULTIPLIER);
+        explosionMultiplier = doubleValueGrabber(DefaultConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER);
 
     }
 
@@ -87,56 +86,56 @@ public class MobSpawningAndLoot implements Listener {
         List<String> conversionPercentageLore = new ArrayList<>(Arrays.asList(
                 "Changes the chance that a freshly",
                 "spawned mob will become an Elite Mob"));
-        ItemStack conversionPercentageItem = percentageDoubleItemStackConstructor("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn",
+        ItemStack conversionPercentageItem = percentageDoubleItemStackConstructor(DefaultConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE,
                 conversionPercentageLore, conversionPercentage);
         optionsList.add(conversionPercentageItem);
 
         List<String> aggressiveStackingLore = new ArrayList<>(Arrays.asList(
                 "Sets whether or not mobs can merge",
                 "creating a new, higher level mob."));
-        ItemStack aggressiveStackingItem = boolItemStackConstructor("Aggressive mob stacking",
+        ItemStack aggressiveStackingItem = boolItemStackConstructor(DefaultConfig.AGGRESSIVE_MOB_STACKING,
                 aggressiveStackingLore, aggressiveStacking);
         optionsList.add(aggressiveStackingItem);
 
         List<String> aggressiveStackingCapLore = new ArrayList<>(Arrays.asList(
                 "Changes the maximum level Elite Mobs",
                 "can reach through stacking"));
-        ItemStack aggressiveStackingCapItem = doubleItemStackConstructor("Aggressive mob stacking cap",
+        ItemStack aggressiveStackingCapItem = doubleItemStackConstructor(DefaultConfig.ELITEMOB_STACKING_CAP,
                 aggressiveStackingCapLore, aggressiveStackingCap);
         optionsList.add(aggressiveStackingCapItem);
 
         List<String> naturalLevelCapLore = new ArrayList<>(Arrays.asList(
                 "Sets the maximum level Elite Mobs",
                 "can naturally spawn at."));
-        ItemStack naturalLevelCapItem = doubleItemStackConstructor("Natural elite mob level cap",
+        ItemStack naturalLevelCapItem = doubleItemStackConstructor(DefaultConfig.NATURAL_ELITEMOB_LEVEL_CAP,
                 naturalLevelCapLore, naturalLevelCap);
         optionsList.add(naturalLevelCapItem);
 
         List<String> spawnerStackingLore = new ArrayList<>(Arrays.asList(
                 "Sets whether or not mobs spawned in",
                 "mob spawners can merge"));
-        ItemStack spawnerStackingItem = boolItemStackConstructor("Stack aggressive spawner mobs",
+        ItemStack spawnerStackingItem = boolItemStackConstructor(DefaultConfig.STACK_AGGRESSIVE_SPAWNER_MOBS,
                 spawnerStackingLore, spawnerStacking);
         optionsList.add(spawnerStackingItem);
 
         List<String> naturalStackingLore = new ArrayList<>(Arrays.asList(
                 "Sets whether or not mobs spawned",
                 "naturally can merge "));
-        ItemStack naturalStackingItem = boolItemStackConstructor("Stack aggressive natural mobs",
+        ItemStack naturalStackingItem = boolItemStackConstructor(DefaultConfig.STACK_AGGRESSIVE_NATURAL_MOBS,
                 naturalStackingLore, naturalStacking);
         optionsList.add(naturalStackingItem);
 
         List<String> passiveStackAmountLore = new ArrayList<>(Arrays.asList(
                 "Sets how many passive mobs need to",
                 "be together to merge into a Super mob"));
-        ItemStack passiveStackAmountItem = doubleItemStackConstructor("Passive EliteMob stack amount",
+        ItemStack passiveStackAmountItem = doubleItemStackConstructor(DefaultConfig.SUPERMOB_STACK_AMOUNT,
                 passiveStackAmountLore, passiveStackAmount);
         optionsList.add(passiveStackAmountItem);
 
         List<String> customLootLore = new ArrayList<>(Arrays.asList(
                 "Sets whether or not naturally spawned",
-                "Elite Mobs can drop the loot in loot.yml"));
-        ItemStack customLootItem = boolItemStackConstructor("Aggressive EliteMobs can drop custom loot",
+                "Elite Mobs can drop the loot in ItemsCustomLootList.yml"));
+        ItemStack customLootItem = boolItemStackConstructor(DefaultConfig.DROP_CUSTOM_ITEMS,
                 customLootLore, customLoot);
         optionsList.add(customLootItem);
 
@@ -152,7 +151,7 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets the additional percentual chance",
                 "Elite Mobs have of dropping special items",
                 "with each additional level"));
-        ItemStack levelDropRateItem = percentageDoubleItemStackConstructor("Aggressive EliteMobs drop rate % increase per mob level",
+        ItemStack levelDropRateItem = percentageDoubleItemStackConstructor(DefaultConfig.ELITE_ITEM_LEVEL_DROP_RATE,
                 levelDropRateLore, levelDropRate);
         optionsList.add(levelDropRateItem);
 
@@ -160,15 +159,15 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets whether or not items will be",
                 "colored based on their power following",
                 "the World of Warcraft rarity format"));
-        ItemStack mmorpgColorsItem = boolItemStackConstructor("Use MMORPG colors for item ranks",
+        ItemStack mmorpgColorsItem = boolItemStackConstructor(DefaultConfig.MMORPG_COLORS,
                 mmorpgColorsLore, mmorpgColors);
         optionsList.add(mmorpgColorsItem);
 
         List<String> mmorpgColorsCustomLore = new ArrayList<>(Arrays.asList(
-                "Sets whether or not items in loot.yml",
+                "Sets whether or not items in ItemsCustomLootList.yml",
                 "will have their color codes overwritten",
                 "to follow the WoW item power format"));
-        ItemStack mmorpgColorsCustomItem = boolItemStackConstructor("Use MMORPG colors for custom items",
+        ItemStack mmorpgColorsCustomItem = boolItemStackConstructor(DefaultConfig.MMORPG_COLORS_FOR_CUSTOM_ITEMS,
                 mmorpgColorsCustomLore, mmorpgColorsCustom);
         optionsList.add(mmorpgColorsCustomItem);
 
@@ -176,21 +175,21 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets whether or not creepers can damage",
                 "passive mobs. Prevents Elite Creepers",
                 "from nuking animal farms"));
-        ItemStack creepersFarmDamageItem = boolItemStackConstructor("Prevent creepers from killing passive mobs",
+        ItemStack creepersFarmDamageItem = boolItemStackConstructor(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER,
                 creepersFarmDamageLore, creepersFarmDamage);
         optionsList.add(creepersFarmDamageItem);
 
         List<String> lifeMultiplierLore = new ArrayList<>(Arrays.asList(
                 "Multiplies life. Values between 0.1 and 0.99",
                 "nerf, values above 1 boost"));
-        ItemStack lifeMultiplierItem = doubleItemStackConstructor("Aggressive EliteMob life multiplier",
+        ItemStack lifeMultiplierItem = doubleItemStackConstructor(DefaultConfig.LIFE_MULTIPLIER,
                 lifeMultiplierLore, lifeMultiplier);
         optionsList.add(lifeMultiplierItem);
 
         List<String> damageMultiplierLore = new ArrayList<>(Arrays.asList(
                 "Multiplies damage. Values between 0.1",
                 "and 0.99 nerf, values above 1 boost"));
-        ItemStack damageMultiplierItem = doubleItemStackConstructor("Aggressive EliteMob damage multiplier",
+        ItemStack damageMultiplierItem = doubleItemStackConstructor(DefaultConfig.DAMAGE_MULTIPLIER,
                 damageMultiplierLore, damageMultiplier);
         optionsList.add(damageMultiplierItem);
 
@@ -198,7 +197,7 @@ public class MobSpawningAndLoot implements Listener {
                 "Multiplies vanilla loot drops from Elite Mobs",
                 "Values between 0.1 and 0.99 nerf, values above",
                 "1 boost"));
-        ItemStack lootMultiplierItem = doubleItemStackConstructor("Aggressive EliteMob default loot multiplier",
+        ItemStack lootMultiplierItem = doubleItemStackConstructor(DefaultConfig.DEFAULT_LOOT_MULTIPLIER,
                 lootMultiplierLore, lootMultiplier);
         optionsList.add(lootMultiplierItem);
 
@@ -206,7 +205,7 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets whether or not Elite Mobs spawned",
                 "through mob spawners drop more loot than",
                 "non-elite mobs"));
-        ItemStack spawnerVanillaLootBonusItem = boolItemStackConstructor("Drop multiplied default loot from aggressive elite mobs spawned in spawners",
+        ItemStack spawnerVanillaLootBonusItem = boolItemStackConstructor(DefaultConfig.SPAWNER_DEFAULT_LOOT_MULTIPLIER,
                 spawnerVanillaLootBonusLore, spawnerVanillaLootBonus);
         optionsList.add(spawnerVanillaLootBonusItem);
 
@@ -214,7 +213,7 @@ public class MobSpawningAndLoot implements Listener {
                 "Multiplies explosion range and damage",
                 "from Elite Creepers. Values between 0.1",
                 "and 0.99 nerf, values above 1 boost."));
-        ItemStack explosionMultiplierItem = doubleItemStackConstructor("SuperCreeper explosion nerf multiplier",
+        ItemStack explosionMultiplierItem = doubleItemStackConstructor(DefaultConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER,
                 explosionMultiplierLore, explosionMultiplier);
         optionsList.add(explosionMultiplierItem);
 
@@ -222,7 +221,7 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets whether or not Elite Mobs have",
                 "visual effects floating around them",
                 "indicating the powers they have"));
-        ItemStack naturalVisualEffectItem = boolItemStackConstructor("Turn on visual effects for natural or plugin-spawned EliteMobs",
+        ItemStack naturalVisualEffectItem = boolItemStackConstructor(DefaultConfig.ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS,
                 naturalVisualEffectsLore, naturalVisualEffect);
         optionsList.add(naturalVisualEffectItem);
 
@@ -230,7 +229,7 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets whether or not Elite Mobs spawned",
                 "in mob spawners will have visual effects",
                 "around them indicating the powers they have"));
-        ItemStack spawnerVisualEffectsItem = boolItemStackConstructor("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs",
+        ItemStack spawnerVisualEffectsItem = boolItemStackConstructor(DefaultConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS,
                 spawnerVisualEffectsLore, spawnerVisualEffects);
         optionsList.add(spawnerVisualEffectsItem);
 
@@ -238,7 +237,7 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets whether or no Elite Mobs will",
                 "display special visual effects when",
                 "in special attack phases"));
-        ItemStack telegraphedVisualEffectsItem = boolItemStackConstructor("Turn on visual effects that indicate an attack is about to happen",
+        ItemStack telegraphedVisualEffectsItem = boolItemStackConstructor(DefaultConfig.ENABLE_WARNING_VISUAL_EFFECTS,
                 telegraphedVisualEffectsLore, telegraphedVisualEffects);
         optionsList.add(telegraphedVisualEffectsItem);
 
@@ -246,22 +245,15 @@ public class MobSpawningAndLoot implements Listener {
                 "Sets whether or not titles will",
                 "be used to display permission missing",
                 "messages (instead of chat text)"));
-        ItemStack permissionMissingTitlesItem = boolItemStackConstructor("Use titles to warn players they are missing a permission",
+        ItemStack permissionMissingTitlesItem = boolItemStackConstructor(DefaultConfig.ENABLE_PERMISSION_TITLES,
                 permissionMissingTitlesLore, permissionMissingTitles);
         optionsList.add(permissionMissingTitlesItem);
-
-        List<String> customItemRankLore = new ArrayList<>(Arrays.asList(
-                "Sets whether or not items in loot.yml",
-                "will display item rank info"));
-        ItemStack customItemRankItem = boolItemStackConstructor("Show item rank on custom item drops",
-                customItemRankLore, customItemRank);
-        optionsList.add(customItemRankItem);
 
         List<String> scoreboardsLore = new ArrayList<>(Arrays.asList(
                 "Sets whether or not scoreboards can be",
                 "used to display health and powers that",
                 "an Elite Mob may have (requires permission)"));
-        ItemStack scoreboardsItem = boolItemStackConstructor("Use scoreboards (requires permission)",
+        ItemStack scoreboardsItem = boolItemStackConstructor(DefaultConfig.ENABLE_POWER_SCOREBOARDS,
                 scoreboardsLore, scoreboards);
         optionsList.add(scoreboardsItem);
 

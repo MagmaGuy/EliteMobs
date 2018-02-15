@@ -15,50 +15,48 @@
 
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.Configuration;
 
-import java.io.File;
 import java.util.Arrays;
 
 /**
  * Created by MagmaGuy on 12/05/2017.
  */
-public class TranslationCustomConfig {
+public class TranslationConfig {
 
+    public static final String CONFIG_NAME = "translation.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
-    private FileConfiguration customConfig = null;
-    private File customConfigFile = null;
-
-    public void initializeTranslationConfig() {
+    public void initializeConfig() {
 
 
-        this.getTranslationConfig().addDefault("Elite Mob Names.Blaze", Arrays.asList("Level ", " Elite Blaze"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.CaveSpider", Arrays.asList("Level ", " Elite Cave Spider"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Creeper", Arrays.asList("Level ", " Elite Creeper"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Enderman", Arrays.asList("Level ", " Elite Enderman"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Endermite", Arrays.asList("Level ", " Elite Endermite"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Husk", Arrays.asList("Level ", " Elite Husk"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.IronGolem", Arrays.asList("Level ", " Elite Iron Golem"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.PigZombie", Arrays.asList("Level ", " Elite Zombie Pigman"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.PolarBear", Arrays.asList("Level ", " Elite Polar Bear"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Silverfish", Arrays.asList("Level ", " Elite Silverfish"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Skeleton", Arrays.asList("Level ", " Elite Skeleton"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Spider", Arrays.asList("Level ", " Elite Spider"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Stray", Arrays.asList("Level ", " Elite Stray"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Witch", Arrays.asList("Level ", " Elite Witch"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.WitherSkeleton", Arrays.asList("Level ", " Elite Wither Skeleton"));
-        this.getTranslationConfig().addDefault("Elite Mob Names.Zombie", Arrays.asList("Level ", " Elite Zombie"));
+        configuration.addDefault("Elite Mob Names.Blaze", Arrays.asList("Level ", " Elite Blaze"));
+        configuration.addDefault("Elite Mob Names.CaveSpider", Arrays.asList("Level ", " Elite Cave Spider"));
+        configuration.addDefault("Elite Mob Names.Creeper", Arrays.asList("Level ", " Elite Creeper"));
+        configuration.addDefault("Elite Mob Names.Enderman", Arrays.asList("Level ", " Elite Enderman"));
+        configuration.addDefault("Elite Mob Names.Endermite", Arrays.asList("Level ", " Elite Endermite"));
+        configuration.addDefault("Elite Mob Names.Husk", Arrays.asList("Level ", " Elite Husk"));
+        configuration.addDefault("Elite Mob Names.IronGolem", Arrays.asList("Level ", " Elite Iron Golem"));
+        configuration.addDefault("Elite Mob Names.PigZombie", Arrays.asList("Level ", " Elite Zombie Pigman"));
+        configuration.addDefault("Elite Mob Names.PolarBear", Arrays.asList("Level ", " Elite Polar Bear"));
+        configuration.addDefault("Elite Mob Names.Silverfish", Arrays.asList("Level ", " Elite Silverfish"));
+        configuration.addDefault("Elite Mob Names.Skeleton", Arrays.asList("Level ", " Elite Skeleton"));
+        configuration.addDefault("Elite Mob Names.Spider", Arrays.asList("Level ", " Elite Spider"));
+        configuration.addDefault("Elite Mob Names.Stray", Arrays.asList("Level ", " Elite Stray"));
+        configuration.addDefault("Elite Mob Names.Witch", Arrays.asList("Level ", " Elite Witch"));
+        configuration.addDefault("Elite Mob Names.WitherSkeleton", Arrays.asList("Level ", " Elite Wither Skeleton"));
+        configuration.addDefault("Elite Mob Names.Zombie", Arrays.asList("Level ", " Elite Zombie"));
 
-        this.getTranslationConfig().addDefault("Elite Mob Names.Chicken", "Super Chicken");
-        this.getTranslationConfig().addDefault("Elite Mob Names.Cow", "Super Cow");
-        this.getTranslationConfig().addDefault("Elite Mob Names.MushroomCow", "Super Mooshroom");
-        this.getTranslationConfig().addDefault("Elite Mob Names.Pig", "Super Pig");
-        this.getTranslationConfig().addDefault("Elite Mob Names.Sheep", "Super Sheep");
+        configuration.addDefault("Elite Mob Names.Chicken", "Super Chicken");
+        configuration.addDefault("Elite Mob Names.Cow", "Super Cow");
+        configuration.addDefault("Elite Mob Names.MushroomCow", "Super Mooshroom");
+        configuration.addDefault("Elite Mob Names.Pig", "Super Pig");
+        configuration.addDefault("Elite Mob Names.Sheep", "Super Sheep");
 
-        this.getTranslationConfig().addDefault("ScoreBoard.Health", "Health: ");
+        configuration.addDefault("ScoreBoard.Health", "Health: ");
 
-        this.getTranslationConfig().addDefault("Taunts.Target", Arrays.asList(
+        configuration.addDefault("Taunts.Target", Arrays.asList(
                 "OI! Get over here!",
                 "What's that I see? A coward?",
                 "Sir, prepare your fisticuffs!",
@@ -123,7 +121,7 @@ public class TranslationCustomConfig {
                 "Witness me blood bag!",
                 "I go all shiny and chrome!"));
 
-        this.getTranslationConfig().addDefault("Taunts.Damaged", Arrays.asList(
+        configuration.addDefault("Taunts.Damaged", Arrays.asList(
                 "Ow!",
                 "Oi!",
                 "Stop that!",
@@ -174,7 +172,7 @@ public class TranslationCustomConfig {
                 "Hit me with your best shot!"
         ));
 
-        this.getTranslationConfig().addDefault("Taunts.BowDamaged", Arrays.asList(
+        configuration.addDefault("Taunts.BowDamaged", Arrays.asList(
                 "Fight me like a Player!",
                 "Afraid to come up-close?",
                 "I can smell your fear from here!",
@@ -238,7 +236,7 @@ public class TranslationCustomConfig {
                 "Hit me with your best shot!"
         ));
 
-        this.getTranslationConfig().addDefault("Taunts.Hit", Arrays.asList(
+        configuration.addDefault("Taunts.Hit", Arrays.asList(
                 "A solid hit!",
                 "He shoots, and he scores!",
                 "You'll feel that in the morning!",
@@ -304,7 +302,7 @@ public class TranslationCustomConfig {
                 "I'll make you endangered!"
         ));
 
-        this.getTranslationConfig().addDefault("Taunts.Death", Arrays.asList(
+        configuration.addDefault("Taunts.Death", Arrays.asList(
                 "Alas, poor Yorick!",
                 "The rest is silence",
                 "I shall return",
@@ -350,17 +348,17 @@ public class TranslationCustomConfig {
                 "Mediocre..."
         ));
 
-        this.getTranslationConfig().addDefault("ZombieFriends.Friend 1", "BFF #1");
-        this.getTranslationConfig().addDefault("ZombieFriends.Friend 2", "BFF #2");
+        configuration.addDefault("ZombieFriends.Friend 1", "BFF #1");
+        configuration.addDefault("ZombieFriends.Friend 2", "BFF #2");
 
-        this.getTranslationConfig().addDefault("ZombieFriends.DeathMessage", Arrays.asList(
+        configuration.addDefault("ZombieFriends.DeathMessage", Arrays.asList(
                 "Noooo!",
                 "Mediocre!",
                 "Zacharias!",
                 "He's deader than before!"
         ));
 
-        this.getTranslationConfig().addDefault("ZombieFriends.ZombieDialog", Arrays.asList(
+        configuration.addDefault("ZombieFriends.ZombieDialog", Arrays.asList(
                 "Let's play ZombieCraft later!",
                 "Feel the power of friendship!",
                 "El pueblo, unido!",
@@ -371,7 +369,7 @@ public class TranslationCustomConfig {
                 "Screw you guys, I'm going home!"
         ));
 
-        this.getTranslationConfig().addDefault("ZombieFriends.FriendDialog", Arrays.asList(
+        configuration.addDefault("ZombieFriends.FriendDialog", Arrays.asList(
                 "Don't mess with our friends!",
                 "We got your back Zach!",
                 "Backup has arrived!",
@@ -391,9 +389,9 @@ public class TranslationCustomConfig {
                 "All for one!"
         ));
 
-        this.getTranslationConfig().addDefault("ZombieNecronomicon.Summoned zombie", "Summoned Zombie");
-        this.getTranslationConfig().addDefault("ZombieNecronomicon.Summoned skeleton", "Summoned Skeleton");
-        this.getTranslationConfig().addDefault("ZombieNecronomicon.Summoning chant", "Nor is it to be thought..." +
+        configuration.addDefault("ZombieNecronomicon.Summoned zombie", "Summoned Zombie");
+        configuration.addDefault("ZombieNecronomicon.Summoned skeleton", "Summoned Skeleton");
+        configuration.addDefault("ZombieNecronomicon.Summoning chant", "Nor is it to be thought..." +
                 "that man is either the oldest " +
                 "or the last of earth's masters, or that the common bulk of life and substance walks alone. The Old Ones" +
                 " were, the Old Ones are, and the Old Ones shall be. Not in the spaces we know, but between them, they " +
@@ -416,7 +414,7 @@ public class TranslationCustomConfig {
                 "where man rules now. After summer is winter, after winter summer. They wait patient and potent, for " +
                 "here shall They reign again.");
 
-        this.getTranslationConfig().addDefault("ZombieTeamRocket.Intro", Arrays.asList(
+        configuration.addDefault("ZombieTeamRocket.Intro", Arrays.asList(
                 "Prepare for trouble!",
                 "Make it double!",
                 "To protect the world",
@@ -436,15 +434,15 @@ public class TranslationCustomConfig {
                 "Meowth! That's right!"
         ));
 
-        this.getTranslationConfig().addDefault("ZombieTeamRocket.Jesse name", "Jesse");
-        this.getTranslationConfig().addDefault("ZombieTeamRocket.James name", "James");
-        this.getTranslationConfig().addDefault("ZombieTeamRocket.Meowth name", "Meowth");
-        this.getTranslationConfig().addDefault("ZombieTeamRocket.DeathMessage", "Team rocket blasts off again!");
+        configuration.addDefault("ZombieTeamRocket.Jesse name", "Jesse");
+        configuration.addDefault("ZombieTeamRocket.James name", "James");
+        configuration.addDefault("ZombieTeamRocket.Meowth name", "Meowth");
+        configuration.addDefault("ZombieTeamRocket.DeathMessage", "Team rocket blasts off again!");
 
-        this.getTranslationConfig().addDefault("ZombieParents.Dad Name", "Zombie's Dad");
-        this.getTranslationConfig().addDefault("ZombieParents.Mom Name", "Zombie's Mom");
+        configuration.addDefault("ZombieParents.Dad Name", "Zombie's Dad");
+        configuration.addDefault("ZombieParents.Mom Name", "Zombie's Mom");
 
-        this.getTranslationConfig().addDefault("ZombieParents.DeathMessage", Arrays.asList(
+        configuration.addDefault("ZombieParents.DeathMessage", Arrays.asList(
                 "You monster!",
                 "My baby!",
                 "What have you done!?",
@@ -457,7 +455,7 @@ public class TranslationCustomConfig {
                 "You broke him!"
         ));
 
-        this.getTranslationConfig().addDefault("ZombieParents.ZombieDialog", Arrays.asList(
+        configuration.addDefault("ZombieParents.ZombieDialog", Arrays.asList(
                 "You're embarrassing me!",
                 "He's bullying me!",
                 "He's the one picking on me!",
@@ -469,7 +467,7 @@ public class TranslationCustomConfig {
                 "He's bullying me!"
         ));
 
-        this.getTranslationConfig().addDefault("ZombieParents.ZombieDadDialog", Arrays.asList(
+        configuration.addDefault("ZombieParents.ZombieDadDialog", Arrays.asList(
                 "Get away from my son!",
                 "Stand up for yourself son!",
                 "I'll deal with him!",
@@ -481,7 +479,7 @@ public class TranslationCustomConfig {
                 "Nice punch kiddo!"
         ));
 
-        this.getTranslationConfig().addDefault("ZombieParents.ZombieMomDialog", Arrays.asList(
+        configuration.addDefault("ZombieParents.ZombieMomDialog", Arrays.asList(
                 "Hands off my child!",
                 "Are you hurt sweety?",
                 "Did he hurt you sweety?",
@@ -494,33 +492,9 @@ public class TranslationCustomConfig {
                 "Did you take out the garbage?"
         ));
 
-        getTranslationConfig().options().copyDefaults(true);
-        saveDefaultCustomConfig();
-        saveCustomConfig();
-
-    }
-
-    public FileConfiguration getTranslationConfig() {
-
-        return customConfigLoader.getCustomConfig("translation.yml");
-
-    }
-
-    public void reloadCustomConfig() {
-
-        customConfigLoader.reloadCustomConfig("translation.yml");
-
-    }
-
-    public void saveCustomConfig() {
-
-        customConfigLoader.saveCustomDefaultConfig("translation.yml");
-
-    }
-
-    public void saveDefaultCustomConfig() {
-
-        customConfigLoader.saveDefaultCustomConfig("translation.yml");
+        configuration.options().copyDefaults(true);
+        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
+        customConfigLoader.saveCustomConfig(CONFIG_NAME);
 
     }
 

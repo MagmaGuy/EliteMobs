@@ -40,12 +40,11 @@ import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
  */
 public class ZombieFriends extends MajorPowers implements Listener {
 
+    private static Random random = new Random();
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ZOMBIE_FRIENDS_MD;
     int processID;
-
     Configuration configuration = ConfigValues.translationConfig;
-    private static Random random = new Random();
 
     @Override
     public void applyPowers(Entity entity) {

@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.elitedrops.ProceduralItemGenerator;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -31,7 +32,8 @@ public class SimLootHandler {
 
         Random random = new Random();
 
-        level = (int) ((level * ConfigValues.randomItemsConfig.getDouble("Mob level to item rank multiplier")) + (random.nextInt(6) + 1 - 3));
+        level = (int) ((level * ConfigValues.itemsProceduralSettingsConfig.getDouble(ItemsProceduralSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER)) +
+                (random.nextInt(6) + 1 - 3));
 
         if (level < 1) {
 

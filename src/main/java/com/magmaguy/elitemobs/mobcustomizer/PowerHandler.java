@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobPowersCustomConfig;
+import com.magmaguy.elitemobs.config.MobPowersConfig;
 import com.magmaguy.elitemobs.majorpowers.*;
 import com.magmaguy.elitemobs.minorpowers.MinorPowers;
 import org.bukkit.Bukkit;
@@ -41,7 +41,7 @@ public class PowerHandler {
 
     private static Random random = new Random();
 
-    private static MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
+    private static MobPowersConfig mobPowersConfig = new MobPowersConfig();
     private static ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
     private static ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
     private static ZombieParents zombieParents = new ZombieParents();
@@ -245,7 +245,7 @@ public class PowerHandler {
 
         for (String string : MetadataHandler.minorPowerList) {
 
-            if (mobPowersCustomConfig.getMobPowersConfig().getBoolean("Powers.Minor Powers." + string)) {
+            if (ConfigValues.mobPowerConfig.getBoolean("Powers.Minor Powers." + string)) {
 
                 try {
 

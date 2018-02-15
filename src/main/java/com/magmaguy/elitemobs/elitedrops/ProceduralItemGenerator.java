@@ -19,7 +19,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.RandomItemsSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -34,6 +34,11 @@ import java.util.*;
  */
 public class ProceduralItemGenerator {
 
+    private static ArrayList<String> nouns = (ArrayList<String>) ConfigValues.itemsProceduralSettingsConfig.getList("Valid nouns");
+    private static ArrayList<String> adjectives = (ArrayList<String>) ConfigValues.itemsProceduralSettingsConfig.getList("Valid adjectives");
+    private static ArrayList<String> verbs = (ArrayList<String>) ConfigValues.itemsProceduralSettingsConfig.getList("Valid verbs");
+    private static ArrayList<String> verbers = (ArrayList<String>) ConfigValues.itemsProceduralSettingsConfig.getList("Valid verb-er (noun)");
+    HashMap<Enchantment, Integer> validEnchantments = new HashMap();
     private Random random = new Random();
 
     public ItemStack randomItemGenerator(int itemRank, Entity entity) {
@@ -55,9 +60,9 @@ public class ProceduralItemGenerator {
 
         randomItem.setItemMeta(itemMeta);
 
-        DropQuality.dropQualityColorizer(randomItem);
+        ItemQuality.dropQualityColorizer(randomItem);
 
-        if (ConfigValues.randomItemsConfig.getBoolean(RandomItemsSettingsConfig.MONITOR_ITEMS_ON_CONSOLE)) {
+        if (ConfigValues.itemsProceduralSettingsConfig.getBoolean(ItemsProceduralSettingsConfig.MONITOR_ITEMS_ON_CONSOLE)) {
 
             Bukkit.getLogger().info("[EliteMobs] Procedurally generated item with the following attributes:");
             Bukkit.getLogger().info("[EliteMobs] Item type: " + randomItem.getType());
@@ -92,7 +97,7 @@ public class ProceduralItemGenerator {
 
         List<Material> validMaterials = new ArrayList<>();
 
-        for (Object object : ConfigValues.randomItemsConfig.getList("Valid material list for random items")) {
+        for (Object object : ConfigValues.itemsProceduralSettingsConfig.getList("Valid material list for random items")) {
 
             try {
 
@@ -196,11 +201,6 @@ public class ProceduralItemGenerator {
         return Material.AIR;
 
     }
-
-    private static ArrayList<String> nouns = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid nouns");
-    private static ArrayList<String> adjectives = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid adjectives");
-    private static ArrayList<String> verbs = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid verbs");
-    private static ArrayList<String> verbers = (ArrayList<String>) ConfigValues.randomItemsConfig.getList("Valid verb-er (noun)");
 
     private String randomItemNameConstructor(Material material) {
 
@@ -332,71 +332,71 @@ public class ProceduralItemGenerator {
                 material.equals(Material.IRON_SWORD) || material.equals(Material.STONE_SWORD) ||
                 material.equals(Material.WOOD_SWORD)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Sword");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Sword");
 
         } else if (material.equals(Material.BOW)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Bow");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Bow");
 
         } else if (material.equals(Material.DIAMOND_PICKAXE) || material.equals(Material.GOLD_PICKAXE) ||
                 material.equals(Material.IRON_PICKAXE) || material.equals(Material.STONE_PICKAXE) ||
                 material.equals(Material.WOOD_PICKAXE)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Pickaxe");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Pickaxe");
 
         } else if (material.equals(Material.DIAMOND_SPADE) || material.equals(Material.GOLD_SPADE) ||
                 material.equals(Material.IRON_SPADE) || material.equals(Material.STONE_SPADE) ||
                 material.equals(Material.WOOD_SPADE)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Spade");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Spade");
 
         } else if (material.equals(Material.DIAMOND_HOE) || material.equals(Material.GOLD_HOE) ||
                 material.equals(Material.IRON_HOE) || material.equals(Material.STONE_HOE) ||
                 material.equals(Material.WOOD_HOE)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Hoe");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Hoe");
 
         } else if (material.equals(Material.DIAMOND_AXE) || material.equals(Material.GOLD_AXE) ||
                 material.equals(Material.IRON_AXE) || material.equals(Material.STONE_AXE) ||
                 material.equals(Material.WOOD_AXE)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Axe");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Axe");
 
         } else if (material.equals(Material.CHAINMAIL_HELMET) || material.equals(Material.DIAMOND_HELMET) ||
                 material.equals(Material.GOLD_HELMET) || material.equals(Material.IRON_HELMET) ||
                 material.equals(Material.LEATHER_HELMET)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Helmet");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Helmet");
 
         } else if (material.equals(Material.CHAINMAIL_CHESTPLATE) || material.equals(Material.DIAMOND_CHESTPLATE) ||
                 material.equals(Material.GOLD_CHESTPLATE) || material.equals(Material.IRON_CHESTPLATE) ||
                 material.equals(Material.LEATHER_CHESTPLATE)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Chestplate");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Chestplate");
 
         } else if (material.equals(Material.CHAINMAIL_LEGGINGS) || material.equals(Material.DIAMOND_LEGGINGS) ||
                 material.equals(Material.GOLD_LEGGINGS) || material.equals(Material.IRON_LEGGINGS) ||
                 material.equals(Material.LEATHER_LEGGINGS)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Leggings");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Leggings");
 
         } else if (material.equals(Material.CHAINMAIL_BOOTS) || material.equals(Material.DIAMOND_BOOTS) ||
                 material.equals(Material.GOLD_BOOTS) || material.equals(Material.IRON_BOOTS) ||
                 material.equals(Material.LEATHER_BOOTS)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Boots");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Boots");
 
         } else if (material.equals(Material.SHEARS)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Shears");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Shears");
 
         } else if (material.equals(Material.FISHING_ROD)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Fishing Rod");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Fishing Rod");
 
         } else if (material.equals(Material.SHIELD)) {
 
-            return ConfigValues.randomItemsConfig.getString("Material name.Shield");
+            return ConfigValues.itemsProceduralSettingsConfig.getString("Material name.Shield");
 
         }
 
@@ -405,14 +405,13 @@ public class ProceduralItemGenerator {
 
     }
 
-
     private List<String> proceduralItemLoreConstructor(ItemStack itemStack, Entity entity) {
 
         String line1 = "";
 
         if (entity != null) {
 
-            line1 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_MOB_LEVEL_SOURCE).replace("$level",
+            line1 = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_MOB_LEVEL_SOURCE).replace("$level",
                     entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + "");
 
             String newName = "";
@@ -439,7 +438,7 @@ public class ProceduralItemGenerator {
 
         } else {
 
-            line1 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_SHOP_SOURCE);
+            line1 = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_SHOP_SOURCE);
 
         }
 
@@ -448,15 +447,15 @@ public class ProceduralItemGenerator {
         if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) {
 
             String itemWorth = ItemWorthCalculator.determineItemWorth(itemStack) + "";
-            line2 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_WORTH).replace("$currencyName",
+            line2 = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_WORTH).replace("$currencyName",
                     ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
             line2 = line2.replace("$worth", itemWorth);
 
         }
 
-        String line3 = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_SIGNATURE);
+        String line3 = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_SIGNATURE);
 
-        String loreStructure = ConfigValues.randomItemsConfig.getString(RandomItemsSettingsConfig.LORE_STRUCTURE);
+        String loreStructure = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_STRUCTURE);
 
         if (line1.length() > 0) {
 
@@ -497,8 +496,6 @@ public class ProceduralItemGenerator {
         return lore;
 
     }
-
-    HashMap<Enchantment, Integer> validEnchantments = new HashMap();
 
     private ItemMeta randomItemEnchantmentConstructor(Material material, ItemMeta oldMeta, int rankLevel) {
 
@@ -694,7 +691,7 @@ public class ProceduralItemGenerator {
 
             validEnchantments.put(enchantment, validEnchantments.get(enchantment) - 1);
 
-            if (ConfigValues.randomItemsConfig.contains("Valid Enchantments." + enchantmentString + ".Max Level")) {
+            if (ConfigValues.itemsProceduralSettingsConfig.contains("Valid Enchantments." + enchantmentString + ".Max Level")) {
 
                 int finalEnchantLevel = validEnchantmentsClone.get(enchantment) - validEnchantments.get(enchantment);
 
@@ -724,13 +721,13 @@ public class ProceduralItemGenerator {
 
         String mainString = "Valid Enchantments." + string;
 
-        if (ConfigValues.randomItemsConfig.getBoolean(mainString + ".Allow")) {
+        if (ConfigValues.itemsProceduralSettingsConfig.getBoolean(mainString + ".Allow")) {
 
             int enchantmentLevel;
 
-            if (ConfigValues.randomItemsConfig.contains(mainString + ".Max Level")) {
+            if (ConfigValues.itemsProceduralSettingsConfig.contains(mainString + ".Max Level")) {
 
-                enchantmentLevel = ConfigValues.randomItemsConfig.getInt(mainString + ".Max Level");
+                enchantmentLevel = ConfigValues.itemsProceduralSettingsConfig.getInt(mainString + ".Max Level");
 
             } else {
 

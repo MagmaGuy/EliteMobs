@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
@@ -45,13 +46,12 @@ import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
  */
 public class ZombieNecronomicon extends MajorPowers implements Listener {
 
+    private static Random random = new Random();
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ZOMBIE_NECRONOMICON_MD;
+    Configuration configuration = ConfigValues.translationConfig;
     private int chantIndex = 0;
     private boolean summoningEffectOn = false;
-
-    Configuration configuration = ConfigValues.translationConfig;
-    private static Random random = new Random();
 
     @Override
     public void applyPowers(Entity entity) {
@@ -197,7 +197,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
         summoningEffectOn = true;
         nameScroller(zombie);
 
-        if (!ConfigValues.defaultConfig.getBoolean("Turn on visual effects that indicate an attack is about to happen")) {
+        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_WARNING_VISUAL_EFFECTS)) {
 
             return;
 

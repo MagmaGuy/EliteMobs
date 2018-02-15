@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,15 +39,15 @@ import java.util.List;
  */
 public class MajorPowerPowerStance implements Listener {
 
-    private Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private static int trackAmount = 4;
     private static int itemsPerTrack = 2;
+    private Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     public void itemEffect(Entity entity) {
 
-        if (ConfigValues.defaultConfig.getBoolean("Turn on visual effects for natural or plugin-spawned EliteMobs")) {
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS)) {
 
-            if (ConfigValues.defaultConfig.getBoolean("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs")
+            if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS)
                     && !entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
                 return;

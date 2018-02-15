@@ -16,7 +16,7 @@
 package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.CustomLootSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemsCustomLootSettingsConfig;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -28,7 +28,7 @@ public class PlaceEventPrevent implements Listener {
     @EventHandler
     public void onPlaceForbiddenItem(PlayerInteractEvent event) {
 
-        if (!ConfigValues.customLootSettingsConfig.getBoolean(CustomLootSettingsConfig.PREVENT_CUSTOM_ITEM_PLACING))
+        if (!ConfigValues.itemsCustomLootSettingsConfig.getBoolean(ItemsCustomLootSettingsConfig.PREVENT_CUSTOM_ITEM_PLACING))
             return;
 
         if (!event.isBlockInHand()) return;
@@ -38,7 +38,7 @@ public class PlaceEventPrevent implements Listener {
         if (event.getItem() == null || event.getItem().getItemMeta() == null) return;
 
 
-        for (ItemStack itemStack : CustomDropsConstructor.customItemList) {
+        for (ItemStack itemStack : CustomItemConstructor.customItemList) {
 
             if (itemStack.getItemMeta().equals(event.getItem().getItemMeta()) && itemStack.getType().equals(event.getItem().getType())) {
 

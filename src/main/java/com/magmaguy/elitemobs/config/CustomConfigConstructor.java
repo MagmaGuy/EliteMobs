@@ -32,9 +32,9 @@ import java.io.InputStreamReader;
 
 public class CustomConfigConstructor extends YamlConfiguration {
 
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private File file;
     private String defaults;
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     /**
      * Creates new PluginFile, without defaults

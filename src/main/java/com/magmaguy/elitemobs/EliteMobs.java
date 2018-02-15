@@ -19,10 +19,7 @@ package com.magmaguy.elitemobs;
  * Created by MagmaGuy on 07/10/2016.
  */
 
-import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
-import com.magmaguy.elitemobs.collateralminecraftchanges.EntityDeathMetadataFlusher;
-import com.magmaguy.elitemobs.collateralminecraftchanges.OfflinePlayerCacher;
-import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
+import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
@@ -32,10 +29,7 @@ import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ItemSaleEvent;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
-import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
-import com.magmaguy.elitemobs.elitedrops.PlaceEventPrevent;
-import com.magmaguy.elitemobs.elitedrops.PotionEffectApplier;
+import com.magmaguy.elitemobs.elitedrops.*;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
@@ -77,27 +71,51 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Load loot from config
         DefaultConfig defaultConfig = new DefaultConfig();
         defaultConfig.loadConfiguration();
-        MobPowersCustomConfig mobPowersCustomConfig = new MobPowersCustomConfig();
-        mobPowersCustomConfig.initializeMobPowersConfig();
-        LootCustomConfig lootCustomConfig = new LootCustomConfig();
-        lootCustomConfig.LootCustomConfig();
-        CustomLootSettingsConfig customLootSettingsConfig = new CustomLootSettingsConfig();
-        customLootSettingsConfig.initializeCustomLootSettingsConfig();
-        TranslationCustomConfig translationCustomConfig = new TranslationCustomConfig();
-        translationCustomConfig.initializeTranslationConfig();
-        RandomItemsSettingsConfig randomItemsSettingsConfig = new RandomItemsSettingsConfig();
-        randomItemsSettingsConfig.initializeRandomItemsSettingsConfig();
+
+        MobPowersConfig mobPowersConfig = new MobPowersConfig();
+        mobPowersConfig.initializeConfig();
+
+        ItemsCustomLootListConfig itemsCustomLootListConfig = new ItemsCustomLootListConfig();
+        itemsCustomLootListConfig.intializeConfig();
+
+        ItemsCustomLootSettingsConfig itemsCustomLootSettingsConfig = new ItemsCustomLootSettingsConfig();
+        itemsCustomLootSettingsConfig.initializeConfig();
+
+        TranslationConfig translationConfig = new TranslationConfig();
+        translationConfig.initializeConfig();
+
+        ItemsProceduralSettingsConfig itemsProceduralSettingsConfig = new ItemsProceduralSettingsConfig();
+        itemsProceduralSettingsConfig.intializeConfig();
+
         EconomySettingsConfig economySettingsConfig = new EconomySettingsConfig();
-        economySettingsConfig.intializeEconomySettingsConfig();
+        economySettingsConfig.initializeConfig();
+
         PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
-        playerMoneyDataConfig.intializeEconomySettingsConfig();
+        playerMoneyDataConfig.intializeConfig();
+
+        PlayerCacheConfig playerCacheConfig = new PlayerCacheConfig();
+        playerCacheConfig.initializeConfig();
+
         EventsConfig eventsConfig = new EventsConfig();
-        eventsConfig.initializeEventsConfig();
+        eventsConfig.initializeConfig();
+
+        ValidWorldsConfig validWorldsConfig = new ValidWorldsConfig();
+        validWorldsConfig.initializeConfig();
+
+        ValidMobsConfig validMobsConfig = new ValidMobsConfig();
+        validMobsConfig.initializeConfig();
+
+        ItemsUniqueConfig itemsUniqueConfig = new ItemsUniqueConfig();
+        itemsUniqueConfig.initializeConfig();
+
         ConfigValues.initializeConfigValues();
 
         //Parse loot
-        CustomDropsConstructor superDrops = new CustomDropsConstructor();
+        CustomItemConstructor superDrops = new CustomItemConstructor();
         superDrops.superDropParser();
+
+        UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
+        uniqueItemConstructor.intializeUniqueItems();
 
         //Get world list
         worldScanner();
@@ -202,7 +220,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MergeHandler(), this);
 
         //Natural EliteMobs Spawning
-        if (ConfigValues.defaultConfig.getBoolean("Natural EliteMob spawning")) {
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.NATURAL_MOB_SPAWNING)) {
 
             this.getServer().getPluginManager().registerEvents(new NaturalMobSpawner(this), this);
 
@@ -228,9 +246,9 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new ItemSaleEvent(), this);
 
         //Minecraft behavior canceller
-        if (ConfigValues.defaultConfig.getBoolean("Prevent creepers from killing passive mobs")) {
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER)) {
 
-            this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(this), this);
+            this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(), this);
 
             getLogger().info("EliteMobs - Creeper passive mob collateral damage canceller enabled!");
 
@@ -282,7 +300,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         for (World world : Bukkit.getWorlds()) {
 
-            if (getConfig().getBoolean("Valid worlds." + world.getName().toString())) {
+            if (ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + world.getName())) {
 
                 worldList.add(world);
 
@@ -315,7 +333,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
             public void run() {
 
                 potionEffectApplier.potionEffectApplier();
-                if (ConfigValues.defaultConfig.getBoolean("Use scoreboards (requires permission)")) {
+                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_POWER_SCOREBOARDS)) {
                     scoreboardHandler.scanSight();
                 }
 
@@ -323,11 +341,11 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }.runTaskTimer(this, 20, 20);
 
-        if (ConfigValues.defaultConfig.getBoolean("Allow Passive EliteMobs") &&
-                ConfigValues.defaultConfig.getBoolean("Valid passive EliteMobs.Chicken") &&
-                ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount") > 0) {
+        if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
+                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.CHICKEN) &&
+                ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0) {
 
-            int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt("Passive EliteMob stack amount");
+            int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
 
             ChickenHandler chickenHandler = new ChickenHandler();
 
@@ -342,6 +360,23 @@ public class EliteMobs extends JavaPlugin implements Listener {
                 }
 
             }.runTaskTimer(this, eggTimerInterval, eggTimerInterval);
+
+        }
+
+        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS)) {
+
+            new BukkitRunnable() {
+
+                @Override
+                public void run() {
+
+                    //this is quite resource intensive
+                    OptionalNameTagAssigner.entityScanner();
+
+                }
+
+            }.runTaskTimer(this, 1, 1);
+
 
         }
 

@@ -17,7 +17,6 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.configuration.Configuration;
 
 /**
@@ -25,7 +24,6 @@ import org.bukkit.configuration.Configuration;
  */
 public class DefaultConfig {
 
-    public static final String SHOW_NAME_TAGS_ON_TARGET = "Only show nametags when targeting a mob";
     public static final String ELITE_ARMOR = "Elite Mobs wear armor";
     public static final String ELITE_HELMETS = "Elite Mobs wear helmets";
     public static final String ELITE_ITEM_FLAT_DROP_RATE = "EliteMob base percentual plugin item drop chance";
@@ -35,71 +33,73 @@ public class DefaultConfig {
     public static final String CUSTOM_STATIC_ITEM_WEIGHT = "Custom static item weight";
     public static final String ENABLE_PLUGIN_LOOT = "Enable plugin loot";
     public static final String DROP_CUSTOM_ITEMS = "Elite Mobs can drop custom loot";
+    public static final String ALWAYS_SHOW_NAMETAGS = "Dangerous! Always show Elite Mob nametags";
+    public static final String NAME_TAG_RANGE = "Nametag display range";
+    public static final String NATURAL_MOB_SPAWNING = "Natural EliteMob spawning";
+    public static final String AGGRESSIVE_MOB_CONVERSION_PERCENTAGE = "Percentage of aggressive mobs that get converted to EliteMobs when they spawn";
+    public static final String AGGRESSIVE_MOB_STACKING = "Aggressive mob stacking";
+    public static final String ELITEMOB_STACKING_CAP = "EliteMob stacking cap";
+    public static final String NATURAL_ELITEMOB_LEVEL_CAP = "Natural elite mob level cap";
+    public static final String STACK_AGGRESSIVE_SPAWNER_MOBS = "Stack aggressive spawner mobs";
+    public static final String STACK_AGGRESSIVE_NATURAL_MOBS = "Stack aggressive natural mobs";
+    public static final String SUPERMOB_STACK_AMOUNT = "SuperMob (passive EliteMobs) stack amount";
+    public static final String MMORPG_COLORS = "Use MMORPG colors for item ranks";
+    public static final String MMORPG_COLORS_FOR_CUSTOM_ITEMS = "Use MMORPG colors for custom items";
+    public static final String CREEPER_PASSIVE_DAMAGE_PREVENTER = "Prevent creepers from killing passive mobs";
+    public static final String LIFE_MULTIPLIER = "EliteMob life multiplier";
+    public static final String DAMAGE_MULTIPLIER = "EliteMob damage multiplier";
+    public static final String DEFAULT_LOOT_MULTIPLIER = "EliteMob default loot multiplier";
+    public static final String SPAWNER_DEFAULT_LOOT_MULTIPLIER = "Drop multiplied default loot from elite mobs spawned in spawners";
+    public static final String ELITE_CREEPER_EXPLOSION_MULTIPLIER = "SuperCreeper explosion nerf multiplier";
+    public static final String ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS = "Turn on visual effects for natural or plugin-spawned EliteMobs";
+    public static final String DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS = "Dangerous! Turn off visual effects for non-natural or non-plugin-spawned EliteMobs";
+    public static final String ENABLE_WARNING_VISUAL_EFFECTS = "Turn on visual effects that indicate an attack is about to happen";
+    public static final String ENABLE_PERMISSION_TITLES = "Use titles to warn players they are missing a permission";
+    public static final String ENABLE_POWER_SCOREBOARDS = "Use scoreboards to display mob powers using permissions";
+
+    public static void reloadConfig() {
+
+        Bukkit.getPluginManager().getPlugin("EliteMobs").reloadConfig();
+
+    }
 
     public void loadConfiguration() {
 
         Configuration configuration = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
 
-        //check defaults
-        configuration.addDefault("Allow aggressive EliteMobs", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Blaze", true);
-        configuration.addDefault("Valid aggressive EliteMobs.CaveSpider", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Creeper", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Enderman", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Endermite", true);
-        configuration.addDefault("Valid aggressive EliteMobs.IronGolem", true);
-        configuration.addDefault("Valid aggressive EliteMobs.PigZombie", true);
-        configuration.addDefault("Valid aggressive EliteMobs.PolarBear", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Silverfish", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Skeleton", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Spider", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Witch", true);
-        configuration.addDefault("Valid aggressive EliteMobs.Zombie", true);
-        configuration.addDefault("Allow Passive EliteMobs", true);
-        configuration.addDefault("Valid passive EliteMobs.Chicken", true);
-        configuration.addDefault("Valid passive EliteMobs.Cow", true);
-        configuration.addDefault("Valid passive EliteMobs.MushroomCow", true);
-        configuration.addDefault("Valid passive EliteMobs.Pig", true);
-        configuration.addDefault("Valid passive EliteMobs.Sheep", true);
-        configuration.addDefault("Natural aggressive EliteMob spawning", true);
-
-        for (World world : Bukkit.getWorlds()) {
-
-            configuration.addDefault("Valid worlds." + world.getName().toString(), true);
-
-        }
-
-        configuration.addDefault("Percentage (%) of aggressive mobs that get converted to EliteMobs when they spawn", 20);
-        configuration.addDefault("Aggressive mob stacking", true);
-        configuration.addDefault("Aggressive mob stacking cap", 50);
-        configuration.addDefault("Natural elite mob level cap", 200);
-        configuration.addDefault("Stack aggressive spawner mobs", true);
-        configuration.addDefault("Stack aggressive natural mobs", true);
-        configuration.addDefault("Passive EliteMob stack amount", 50);
+        configuration.addDefault(NATURAL_MOB_SPAWNING, true);
+        configuration.addDefault(AGGRESSIVE_MOB_CONVERSION_PERCENTAGE, 020.00);
+        configuration.addDefault(NATURAL_ELITEMOB_LEVEL_CAP, 200);
+        configuration.addDefault(AGGRESSIVE_MOB_STACKING, true);
+        configuration.addDefault(ELITEMOB_STACKING_CAP, 50);
+        configuration.addDefault(STACK_AGGRESSIVE_SPAWNER_MOBS, true);
+        configuration.addDefault(STACK_AGGRESSIVE_NATURAL_MOBS, true);
+        configuration.addDefault(SUPERMOB_STACK_AMOUNT, 50);
         configuration.addDefault(ENABLE_PLUGIN_LOOT, true);
         configuration.addDefault(DROP_CUSTOM_ITEMS, true);
-        configuration.addDefault(ELITE_ITEM_FLAT_DROP_RATE, 25);
-        configuration.addDefault(ELITE_ITEM_LEVEL_DROP_RATE, 1);
+        configuration.addDefault(ELITE_ITEM_FLAT_DROP_RATE, 025.00);
+        configuration.addDefault(ELITE_ITEM_LEVEL_DROP_RATE, 001.00);
         configuration.addDefault(PROCEDURAL_ITEM_WEIGHT, 29);
         configuration.addDefault(CUSTOM_DYNAMIC_ITEM_WEIGHT, 70);
         configuration.addDefault(CUSTOM_STATIC_ITEM_WEIGHT, 1);
-        configuration.addDefault("Use MMORPG colors for item ranks", true);
-        configuration.addDefault("Use MMORPG colors for custom items", true);
-        configuration.addDefault("Prevent creepers from killing passive mobs", true);
-        configuration.addDefault("Aggressive EliteMob life multiplier", 1.0);
-        configuration.addDefault("Aggressive EliteMob damage multiplier", 1.0);
-        configuration.addDefault("Aggressive EliteMob default loot multiplier", 1.0);
-        configuration.addDefault("Drop multiplied default loot from aggressive elite mobs spawned in spawners", true);
-        configuration.addDefault("SuperCreeper explosion nerf multiplier", 1.0);
-        configuration.addDefault("Turn on visual effects for natural or plugin-spawned EliteMobs", true);
-        configuration.addDefault("Turn off visual effects for non-natural or non-plugin-spawned EliteMobs", true);
-        configuration.addDefault("Turn on visual effects that indicate an attack is about to happen", true);
-        configuration.addDefault("Use titles to warn players they are missing a permission", true);
-        configuration.addDefault("Show item rank on custom item drops", true);
-        configuration.addDefault("Use scoreboards (requires permission)", false);
-        configuration.addDefault(SHOW_NAME_TAGS_ON_TARGET, false);
+        configuration.addDefault(MMORPG_COLORS, true);
+        configuration.addDefault(MMORPG_COLORS_FOR_CUSTOM_ITEMS, true);
+        configuration.addDefault(CREEPER_PASSIVE_DAMAGE_PREVENTER, true);
+        configuration.addDefault(LIFE_MULTIPLIER, 1.0);
+        configuration.addDefault(DAMAGE_MULTIPLIER, 1.0);
+        configuration.addDefault(DEFAULT_LOOT_MULTIPLIER, 1.0);
+        configuration.addDefault(SPAWNER_DEFAULT_LOOT_MULTIPLIER, true);
+        configuration.addDefault(ELITE_CREEPER_EXPLOSION_MULTIPLIER, 1.0);
+        configuration.addDefault(ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS, true);
+        configuration.addDefault(DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS, true);
+        configuration.addDefault(ENABLE_WARNING_VISUAL_EFFECTS, true);
+        configuration.addDefault(ENABLE_PERMISSION_TITLES, true);
+        configuration.addDefault(ENABLE_POWER_SCOREBOARDS, false);
         configuration.addDefault(ELITE_ARMOR, true);
         configuration.addDefault(ELITE_HELMETS, true);
+        configuration.addDefault(ALWAYS_SHOW_NAMETAGS, true);
+        configuration.addDefault(NAME_TAG_RANGE, 10);
+
         configuration.options().copyDefaults(true);
 
         //save the config when changed
@@ -107,12 +107,6 @@ public class DefaultConfig {
         Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).saveDefaultConfig();
 
         Bukkit.getLogger().info("EliteMobs config loaded!");
-
-    }
-
-    public static void reloadConfig() {
-
-        Bukkit.getPluginManager().getPlugin("EliteMobs").reloadConfig();
 
     }
 

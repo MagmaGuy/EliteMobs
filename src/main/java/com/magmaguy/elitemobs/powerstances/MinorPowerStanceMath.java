@@ -26,11 +26,11 @@ import java.util.List;
  */
 public class MinorPowerStanceMath {
 
-    private static double a, b, c;
+    public final static double NUMBER_OF_POINTS_PER_FULL_ROTATION = 10;
     private final static double X = 1;
     private final static double Y = 0;
     private final static double Z = 0;
-    public final static double NUMBER_OF_POINTS_PER_FULL_ROTATION = 10;
+    private static double a, b, c;
     private static HashMap<Integer, HashMap<Integer, List<Vector>>> storedRotatedValues = new HashMap();
 
     public static HashMap<Integer, List<Vector>> majorPowerLocationConstructor(int trackAmount, int itemsPerTrack, int counter) {

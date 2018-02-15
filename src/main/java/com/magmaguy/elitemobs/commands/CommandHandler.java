@@ -21,10 +21,10 @@ import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.LootCustomConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
-import com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor;
+import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
@@ -41,7 +41,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
-import static com.magmaguy.elitemobs.elitedrops.CustomDropsConstructor.customItemList;
+import static com.magmaguy.elitemobs.elitedrops.CustomItemConstructor.customItemList;
 import static org.bukkit.Bukkit.getLogger;
 import static org.bukkit.Bukkit.getServer;
 
@@ -206,11 +206,10 @@ public class CommandHandler implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("reload") && args[1].equalsIgnoreCase("loot")
                         && permCheck(RELOAD_LOOT, commandSender)) {
 
-                    LootCustomConfig lootCustomConfig = new LootCustomConfig();
-                    lootCustomConfig.reloadLootConfig();
+                    ConfigValues.initializeConfigValues();
 
-                    CustomDropsConstructor customDropsConstructor = new CustomDropsConstructor();
-                    customDropsConstructor.superDropParser();
+                    CustomItemConstructor customItemConstructor = new CustomItemConstructor();
+                    customItemConstructor.superDropParser();
 
                     commandSender.sendMessage("EliteMobs configs reloaded!");
 
@@ -514,7 +513,7 @@ public class CommandHandler implements CommandExecutor {
         }
 
         if (commandSender instanceof Player &&
-                Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean("Use titles to warn players they are missing a permission")) {
+                Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean(DefaultConfig.ENABLE_PERMISSION_TITLES)) {
 
             Player player = (Player) commandSender;
 

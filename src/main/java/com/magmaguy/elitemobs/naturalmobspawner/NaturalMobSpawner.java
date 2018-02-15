@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import org.bukkit.Bukkit;
@@ -80,9 +81,9 @@ public class NaturalMobSpawner implements Listener {
 
             eliteMobLevel += levelCalculator(threatLevel);
 
-            if (eliteMobLevel > ConfigValues.defaultConfig.getInt("Natural elite mob level cap")) {
+            if (eliteMobLevel > ConfigValues.defaultConfig.getInt(DefaultConfig.NATURAL_ELITEMOB_LEVEL_CAP)) {
 
-                eliteMobLevel = ConfigValues.defaultConfig.getInt("Natural elite mob level cap");
+                eliteMobLevel = ConfigValues.defaultConfig.getInt(DefaultConfig.NATURAL_ELITEMOB_LEVEL_CAP);
 
             }
 
@@ -139,7 +140,6 @@ public class NaturalMobSpawner implements Listener {
         return ItemRankHandler.guessItemRank(itemStack);
 
     }
-
 
 
     private int threatLevelCalculator(int armorRating, int potionEffectRating) {

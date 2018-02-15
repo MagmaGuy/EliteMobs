@@ -16,56 +16,34 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.Configuration;
 
 /**
  * Created by MagmaGuy on 01/05/2017.
  */
-public class MobPowersCustomConfig {
+public class MobPowersConfig {
 
+    public static final String CONFIG_NAME = "MobPowers.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+    private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
-    public void initializeMobPowersConfig() {
+    public void initializeConfig() {
 
         for (String string : MetadataHandler.minorPowerList) {
 
-            this.getMobPowersConfig().addDefault("Powers.Minor Powers." + string, true);
+            configuration.addDefault("Powers.Minor Powers." + string, true);
 
         }
 
         for (String string : MetadataHandler.majorPowerList) {
 
-            this.getMobPowersConfig().addDefault("Powers.Major Powers." + string, true);
+            configuration.addDefault("Powers.Major Powers." + string, true);
 
         }
 
-        getMobPowersConfig().options().copyDefaults(true);
-        saveDefaultCustomConfig();
-        saveCustomConfig();
-
-    }
-
-    public FileConfiguration getMobPowersConfig() {
-
-        return customConfigLoader.getCustomConfig("mobPowers.yml");
-
-    }
-
-    public void reloadCustomConfig() {
-
-        customConfigLoader.reloadCustomConfig("mobPowers.yml");
-
-    }
-
-    public void saveCustomConfig() {
-
-        customConfigLoader.saveCustomDefaultConfig("mobPowers.yml");
-
-    }
-
-    public void saveDefaultCustomConfig() {
-
-        customConfigLoader.saveDefaultCustomConfig("mobPowers.yml");
+        customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
+        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
+        customConfigLoader.saveCustomConfig(CONFIG_NAME);
 
     }
 
