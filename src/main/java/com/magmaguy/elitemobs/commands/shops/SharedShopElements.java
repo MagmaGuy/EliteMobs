@@ -52,6 +52,15 @@ public class SharedShopElements {
 
     }
 
+    public static boolean sellInventoryNullPointerPreventer(InventoryClickEvent event) {
+
+        //Check if economy is enabled
+        if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return false;
+        //Check if current item is valid
+        if (event.getCurrentItem() == null) return false;
+        return !event.getCurrentItem().getType().equals(Material.AIR);
+    }
+
     public static void buyMessage(Player player, String itemDisplayName, double itemValue) {
 
         new BukkitRunnable() {
@@ -91,12 +100,13 @@ public class SharedShopElements {
 
     public static void sellMessage(Player player, String itemDisplayName, double amountDeduced) {
 
+        player.sendMessage("You have sold " + itemDisplayName + " for " + amountDeduced + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                player.sendMessage("You have sold " + itemDisplayName + " for " + amountDeduced + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
                 player.sendMessage("You have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
 
             }
