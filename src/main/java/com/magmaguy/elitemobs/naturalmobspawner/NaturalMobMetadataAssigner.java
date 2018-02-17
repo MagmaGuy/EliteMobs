@@ -99,8 +99,6 @@ public class NaturalMobMetadataAssigner implements Listener {
                             if (uniqueItemConstructor.huntingSetItemDetector(boots)) huntingGearChanceAdder++;
                             if (uniqueItemConstructor.huntingSetItemDetector(heldItem)) huntingGearChanceAdder++;
 
-                            Bukkit.getLogger().info(huntingGearChanceAdder + "");
-
                         }
 
                     }

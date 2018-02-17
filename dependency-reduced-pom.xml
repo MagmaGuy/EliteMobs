@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>4.5.11</version>
+    <version>4.5.13</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>

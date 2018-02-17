@@ -15,6 +15,8 @@
 
 package com.magmaguy.elitemobs.elitedrops;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ItemsCustomLootSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -284,7 +286,23 @@ public class PotionEffectApplier implements Listener {
 
     private PotionEffect eventPotionEffect(PotionEffectType potionEffectType, int potionEffectMagnitude) {
         //TODO: put real settings in
-        return new PotionEffect(potionEffectType, 5 * 20, potionEffectMagnitude);
+        return new PotionEffect(potionEffectType, potionEffectDuration(potionEffectType), potionEffectMagnitude);
+
+    }
+
+    private int potionEffectDuration(PotionEffectType potionEffectType) {
+
+        if (ConfigValues.itemsCustomLootSettingsConfig.contains(ItemsCustomLootSettingsConfig.DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + potionEffectType.getName())) {
+
+            return 20 * ConfigValues.itemsCustomLootSettingsConfig.getInt(ItemsCustomLootSettingsConfig.DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + potionEffectType.getName());
+
+        } else {
+
+            Bukkit.getLogger().info("Potion effect " + potionEffectType.getName() + " not found in config. Defaulting duration.");
+
+            return 5 * 20;
+
+        }
 
     }
 

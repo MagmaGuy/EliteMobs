@@ -123,7 +123,7 @@ public class CurrencyCommandsHandler {
 
         }
 
-        FileConfiguration playerCacheConfiguration = (FileConfiguration) ConfigValues.defaultConfig;
+        FileConfiguration playerCacheConfiguration = (FileConfiguration) ConfigValues.playerCacheConfig;
 
         for (int i = 0; i < iterationAmount; i++) {
 
