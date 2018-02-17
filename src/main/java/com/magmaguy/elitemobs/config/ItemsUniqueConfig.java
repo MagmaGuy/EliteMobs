@@ -93,7 +93,7 @@ public class ItemsUniqueConfig {
                 "    Drop Weight: 1");
         configuration.addDefault(HUNTING_SET_BOW, "\n" +
                 "    Item Type: BOW\n" +
-                "    Item Name: \"&4Elite Mob Hunting Bow\n" +
+                "    Item Name: &4Elite Mob Hunting Bow\n" +
                 "    Item Lore:\n" +
                 "    - Wielding this bow will\n" +
                 "    - increase the number of\n" +

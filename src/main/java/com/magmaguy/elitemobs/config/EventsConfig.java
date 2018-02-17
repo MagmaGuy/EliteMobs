@@ -39,7 +39,7 @@ public class EventsConfig {
         configuration.addDefault(ENABLE_EVENTS, true);
         configuration.addDefault(MINIMUM_ONLINE_PLAYERS, 2);
         configuration.addDefault(MAXIMUM_ONLINE_PLAYERS, 100);
-        configuration.addDefault(MINIMUM_EVENT_FREQUENCY, 30);
+        configuration.addDefault(MINIMUM_EVENT_FREQUENCY, 45);
         configuration.addDefault(MAXIMUM_EVENT_FREQUENCY, 10);
         configuration.addDefault(ENABLED_EVENTS + "." + TREASURE_GOBLIN_SMALL, true);
         configuration.addDefault(SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT, "&7&m-----------------------------------------------------\n&7[&aEvent&7] &fA &ctreasure goblin &fhas appeared in&c $world &fat&c $location \n &fMake sure to take a hunting party with you!\n&7&m-----------------------------------------------------");

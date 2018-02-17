@@ -17,7 +17,7 @@ Loot:
     Enchantments:
     - VANISHING_CURSE,1
     Potion Effects:
-    - JUMP,2,self,continuous
+    - JUMP,3,self,continuous
     Drop Weight: 1
   Camel Charm:
     Item Type: COOKED_BEEF
@@ -44,6 +44,7 @@ Loot:
     - HEAL,1,self,onHit
     - BLINDNESS,1,self,onHit
     - SLOW,1,self,onHit
+    Drop Weight: 1
   Scorpion Charm:
     Item Type: POISONOUS_POTATO
     Item Name: "Scorpion Charm"
@@ -108,4 +109,75 @@ Loot:
     Potion Effects:
     - SPEED,3,self,continuous
     - HUNGER,1,self,continuous
+    Drop Weight: 1
+  Lucky Charms:
+    Item Type: COOKIE
+    Item Name: "Lucky Charms"
+    Item Lore:
+    - "Part of a complete breakfast!"
+    - "Note: Absolutely not a part of"
+    - "a complete breakfast."
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - LUCK,1,self,continuous
+    Drop Weight: 1
+  Salamander Charm:
+    Item Type: BLAZE_POWDER
+    Item Name: "Salamander Charm"
+    Item Lore:
+    - "Almost as hot as MagmaGuy's"
+    - "new mixtape, coming out soon"
+    - "to an alleyway near you!"
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - FIRE_RESISTANCE,1,self,continuous
+    Drop Weight: 1
+  Berserker Charm:
+    Item Type: TOTEM
+    Item Name: "Berserker Charm"
+    Item Lore:
+    - "Lose yourself in the face of"
+    - "overwhelming adversity in more"
+    - "ways that one..."
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - BLINDNESS,1,self,onHit
+    - FAST_DIGGING,1,self,onHit
+    Drop Weight: 1
+  Firefly Charm:
+    Item Type: GLASS_BOTTLE
+    Item Name: "Firefly Charm"
+    Item Lore:
+    - "Light up the night!"
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - NIGHT_VISION,1,self,continuous
+    - GLOWING,1,target,onHit
+    Drop Weight: 1
+  Slowpoke Charm:
+    Item Type: CARROT_STICK
+    Item Name: "Slowpoke Charm"
+    Item Lore:
+    - "Let's just hope it doesn't hit"
+    - "itself in its confusion..."
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - SLOW,1,self,onHit
+    - CONFUSION,1,target,onHit
+    Drop Weight: 1
+  Fishy Charm:
+    Item Type: RAW_FISH
+    Item Name: "Fishy Charm"
+    Item Lore:
+    - "There's just something not"
+    - "quite right with this one..."
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - WATER_BREATHING,1,self,continuous
     Drop Weight: 1
