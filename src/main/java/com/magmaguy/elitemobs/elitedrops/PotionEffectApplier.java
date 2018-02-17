@@ -298,9 +298,7 @@ public class PotionEffectApplier implements Listener {
 
         } else {
 
-            Bukkit.getLogger().info("Potion effect " + potionEffectType.getName() + " not found in config. Defaulting duration.");
-
-            return 5 * 20;
+            return 1;
 
         }
 

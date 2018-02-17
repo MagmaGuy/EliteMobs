@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -42,6 +43,7 @@ public class UniqueItemConstructor {
 
             //add helmet
             ItemStack helmet = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_HELMET));
+            helmet = tempWorthLoreAdder(helmet);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_HELMET)) > 0) {
 
@@ -57,6 +59,7 @@ public class UniqueItemConstructor {
             CustomItemConstructor.customItemList.add(helmet);
 
             ItemStack chestplate = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_CHESTPLATE));
+            chestplate = tempWorthLoreAdder(chestplate);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_CHESTPLATE)) > 0) {
 
@@ -72,6 +75,7 @@ public class UniqueItemConstructor {
 
             //add leggings
             ItemStack leggings = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_LEGGINGS));
+            leggings = tempWorthLoreAdder(leggings);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_LEGGINGS)) > 0) {
 
@@ -87,6 +91,7 @@ public class UniqueItemConstructor {
 
             //add boots
             ItemStack boots = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOOTS));
+            boots = tempWorthLoreAdder(boots);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOOTS)) > 0) {
 
@@ -98,10 +103,12 @@ public class UniqueItemConstructor {
 
             }
 
+
             CustomItemConstructor.customItemList.add(boots);
 
             //add bow
             ItemStack bow = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOW));
+            bow = tempWorthLoreAdder(bow);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOW)) > 0) {
 
@@ -116,6 +123,20 @@ public class UniqueItemConstructor {
             CustomItemConstructor.customItemList.add(bow);
 
         }
+
+    }
+
+    private ItemStack tempWorthLoreAdder(ItemStack itemStack) {
+
+        List<String> newLore = new ArrayList<>();
+        newLore.addAll(itemStack.getItemMeta().getLore());
+        newLore.add("Worth " + ItemWorthCalculator.determineItemWorth(itemStack) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setLore(newLore);
+        itemStack.setItemMeta(itemMeta);
+
+        return itemStack;
 
     }
 

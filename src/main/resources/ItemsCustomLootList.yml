@@ -140,7 +140,7 @@ Loot:
     Item Lore:
     - "Lose yourself in the face of"
     - "overwhelming adversity in more"
-    - "ways that one..."
+    - "ways than one..."
     Enchantments:
     - VANISHING_CURSE,1
     Potion Effects:
@@ -181,3 +181,17 @@ Loot:
     Potion Effects:
     - WATER_BREATHING,1,self,continuous
     Drop Weight: 1
+  Owl Charm:
+    Item Type: ELYTRA
+    Item Name: "Owl Charm"
+    Item Lore:
+    - "Become the ultimate nocturnal"
+    - "predator!"
+    Enchantments:
+    - VANISHING_CURSE,1
+    Potion Effects:
+    - GLOWING,1,target,onHit
+    - JUMP,3,self,continuous
+    - NIGHT_VISION,1,self,continuous
+    - WEAKNESS,2,self,continuous
+    Drop Weight: 0.1

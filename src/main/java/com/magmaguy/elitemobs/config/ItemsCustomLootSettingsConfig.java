@@ -31,9 +31,7 @@ public class ItemsCustomLootSettingsConfig {
     public static final String DAMAGE_RESISTANCE = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "DAMAGE_RESISTANCE";
     public static final String FAST_DIGGING = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "FAST_DIGGING";
     public static final String FIRE_RESISTANCE = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "FIRE_RESISTANCE";
-    public static final String HARM = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "HARM";
     public static final String GLOWING = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "GLOWING";
-    public static final String HEAL = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "HEAL";
     public static final String HEALTH_BOOST = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "HEALTH_BOOST";
     public static final String HUNGER = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "HUNGER";
     public static final String INCREASE_DAMAGE = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "INCREASE_DAMAGE";
@@ -43,7 +41,6 @@ public class ItemsCustomLootSettingsConfig {
     public static final String NIGHT_VISION = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "NIGHT_VISION";
     public static final String POISON = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "POISON";
     public static final String REGENERATION = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "REGENERATION";
-    public static final String SATURATION = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "SATURATION";
     public static final String SLOW = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "SLOW";
     public static final String SLOW_DIGGING = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "SLOW_DIGGING";
     public static final String SPEED = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "SPEED";
@@ -67,8 +64,6 @@ public class ItemsCustomLootSettingsConfig {
         configuration.addDefault(FAST_DIGGING, 30);
         configuration.addDefault(FIRE_RESISTANCE, 15);
         configuration.addDefault(GLOWING, 60);
-        configuration.addDefault(HARM, 1);
-        configuration.addDefault(HEAL, 2);
         configuration.addDefault(HEALTH_BOOST, 90);
         configuration.addDefault(HUNGER, 30);
         configuration.addDefault(INCREASE_DAMAGE, 30);
@@ -78,7 +73,6 @@ public class ItemsCustomLootSettingsConfig {
         configuration.addDefault(NIGHT_VISION, 30);
         configuration.addDefault(POISON, 20);
         configuration.addDefault(REGENERATION, 20);
-        configuration.addDefault(SATURATION, 5);
         configuration.addDefault(SLOW, 15);
         configuration.addDefault(SLOW_DIGGING, 10);
         configuration.addDefault(SPEED, 30);
