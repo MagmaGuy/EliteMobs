@@ -285,7 +285,7 @@ public class PotionEffectApplier implements Listener {
     }
 
     private PotionEffect eventPotionEffect(PotionEffectType potionEffectType, int potionEffectMagnitude) {
-        //TODO: put real settings in
+
         return new PotionEffect(potionEffectType, potionEffectDuration(potionEffectType), potionEffectMagnitude);
 
     }

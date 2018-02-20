@@ -56,7 +56,8 @@ public class NaturalMobSpawner implements Listener {
 
             if (player.getWorld().equals(entity.getWorld()) && player.getLocation().distance(entity.getLocation()) < range) {
 
-                if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
+                if (!player.getGameMode().equals(GameMode.SPECTATOR) && (!player.hasMetadata("vanished") ||
+                        player.hasMetadata("vanished") && !player.getMetadata("vanished").get(0).asBoolean())) {
 
                     closePlayers.add(player);
 
