@@ -193,5 +193,5 @@ Loot:
     - GLOWING,1,target,onHit
     - JUMP,3,self,continuous
     - NIGHT_VISION,1,self,continuous
-    - WEAKNESS,2,self,continuous
+    - WEAKNESS,1,self,continuous
     Drop Weight: 0.1

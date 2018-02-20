@@ -77,7 +77,9 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
 
-                    if (player.getWorld().equals(entity.getWorld())) {
+                    if (player.getWorld().equals(entity.getWorld()) &&
+                            (!player.hasMetadata("vanished") ||
+                                    player.hasMetadata("vanished") && !player.getMetadata("vanished").get(0).asBoolean())) {
 
                         if (player.getLocation().distance(entity.getLocation()) < range) {
 

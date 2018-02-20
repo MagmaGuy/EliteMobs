@@ -19,7 +19,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -179,8 +178,6 @@ public class EliteDropsDropper implements Listener {
                 if (selectedLootSystem.equals(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
                     dropCustomDynamicLoot(itemRankWeighedWithMobLevel, entity);
                 if (selectedLootSystem.equals(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT)) dropCustomStaticLoot(entity);
-
-                Bukkit.getLogger().info(selectedLootSystem);
 
                 return;
 
