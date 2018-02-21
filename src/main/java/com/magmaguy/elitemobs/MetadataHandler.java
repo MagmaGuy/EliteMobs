@@ -128,6 +128,7 @@ public class MetadataHandler implements Listener {
 
     //third party compatibility
     public final static String BETTERDROPS_COMPATIBILITY_MD = "betterdrops_ignore";
+    public final static String VANISH_NO_PACKET = "vanished";
 
     //events
     public final static String PERSISTENT_ENTITY = "PersistentEntity";

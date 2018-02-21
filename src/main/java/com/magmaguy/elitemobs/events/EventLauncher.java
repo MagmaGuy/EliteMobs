@@ -28,7 +28,7 @@ public class EventLauncher {
 
     public void eventRepeatingTask() {
 
-        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.ENABLED_EVENTS)) return;
+        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.ENABLE_EVENTS)) return;
 
         new BukkitRunnable() {
 
@@ -96,7 +96,6 @@ public class EventLauncher {
     private void eventSelector() {
 
         //todo: once more events are added, randomize which one gets picked in a weighed fashion
-        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.ENABLED_EVENTS)) return;
         SmallTreasureGoblin.initializeEvent();
 
     }
