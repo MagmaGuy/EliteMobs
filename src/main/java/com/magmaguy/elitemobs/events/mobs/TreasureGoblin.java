@@ -50,8 +50,9 @@ public class TreasureGoblin implements Listener {
 
                 if (((LivingEntity) entity).getKiller() != null) {
 
-                    player.sendMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.chatColorConverter(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT)
-                            .replace("$player", ((LivingEntity) entity).getKiller().getDisplayName())));
+                    String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT).replace("$player", ((LivingEntity) entity).getKiller().getDisplayName());
+
+                    player.sendMessage(ChatColorConverter.chatColorConverter(newMessage));
 
                 } else {
 
