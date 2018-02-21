@@ -35,7 +35,6 @@ public class ItemsProceduralSettingsConfig {
     public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
     public static final String MONITOR_ITEMS_ON_CONSOLE = "Monitor procedurally generated items on console";
     public static final String MOB_LEVEL_TO_RANK_MULTIPLIER = "Mob level to item rank multiplier";
-    public static final String PERCENTAGE_PROCEDURAL_ITEM_INSTEAD_OF_CUSTOM = "Percentage (%) of times random item drop instead of custom loot";
     public static final String PROCEDURAL_ITEM_VALID_MATERIALS = "Valid material list for random items";
     public static String ARROW_DAMAGE_BOOL, ARROW_DAMAGE_MAX_LEVEL,
             ARROW_FIRE_BOOL, ARROW_FIRE_MAX_LEVEL,
@@ -75,7 +74,6 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(DROP_ITEMS_ON_DEATH, true);
         configuration.addDefault(MOB_LEVEL_TO_RANK_MULTIPLIER, 0.5);
         configuration.addDefault(MONITOR_ITEMS_ON_CONSOLE, false);
-        configuration.addDefault(PERCENTAGE_PROCEDURAL_ITEM_INSTEAD_OF_CUSTOM, 20);
         configuration.addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from a level $level Elite $mob");
         configuration.addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
         configuration.addDefault(LORE_WORTH, "Worth $worth $currencyName");
