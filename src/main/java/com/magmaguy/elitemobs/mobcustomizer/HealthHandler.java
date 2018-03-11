@@ -29,11 +29,7 @@ public class HealthHandler {
 
     public static void aggressiveHealthHandler(Entity entity, Entity deletedEntity) {
 
-        if (entity.hasMetadata(MetadataHandler.CUSTOM_HEALTH)) {
-
-            return;
-
-        }
+        if (entity.hasMetadata(MetadataHandler.CUSTOM_HEALTH)) return;
 
         Damageable damageableEntity = ((Damageable) entity);
         Damageable damageableDeleted = ((Damageable) deletedEntity);
@@ -58,7 +54,7 @@ public class HealthHandler {
 
         }
 
-        damageableEntity.setMaxHealth(ScalingFormula.PowerFormula(defaultMaxHealth, newEliteMobLevel) * ConfigValues.defaultConfig.getDouble(DefaultConfig.LIFE_MULTIPLIER));
+        damageableEntity.setMaxHealth(maxHealthFormula(newEliteMobLevel, defaultMaxHealth));
 
         if (damageableEntity.getHealth() + damageableDeleted.getHealth() > damageableEntity.getMaxHealth()) {
 
@@ -69,6 +65,15 @@ public class HealthHandler {
             damageableEntity.setHealth(damageableEntity.getHealth() + damageableDeleted.getHealth());
 
         }
+
+    }
+
+    private static double maxHealthFormula(int mobLevel, double defaultMaxHealth) {
+
+        //Baseline calc is made for zombies, increments health in 10% leaps
+        double newMaxHealth = (mobLevel * 0.1 * defaultMaxHealth + defaultMaxHealth) * ConfigValues.defaultConfig.getDouble(DefaultConfig.LIFE_MULTIPLIER);
+
+        return newMaxHealth;
 
     }
 
@@ -104,8 +109,14 @@ public class HealthHandler {
 
         }
 
-        damageable.setMaxHealth(ScalingFormula.PowerFormula(defaultMaxHealth, newEliteMobLevel));
+        damageable.setMaxHealth(maxHealthFormula(newEliteMobLevel, defaultMaxHealth));
         damageable.setHealth(damageable.getMaxHealth());
+
+    }
+
+    public static double reversePowerFormula(double currentValue, double baseAmount) {
+
+        return (currentValue - baseAmount) / 2;
 
     }
 

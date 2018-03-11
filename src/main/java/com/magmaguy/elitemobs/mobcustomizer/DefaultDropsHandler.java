@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Created by MagmaGuy on 04/06/2017.
  */
-public class DropsHandler implements Listener {
+public class DefaultDropsHandler implements Listener {
 
     private List<ItemStack> wornItems = new ArrayList<>();
 
@@ -72,7 +72,7 @@ public class DropsHandler implements Listener {
 
                 if (!itemIsWorn) {
 
-                    for (int i = 0; i < mobLevel; i++) {
+                    for (int i = 0; i < mobLevel * 0.1; i++) {
 
                         event.getEntity().getLocation().getWorld().dropItem(event.getEntity().getLocation(), itemStack);
 
@@ -82,7 +82,7 @@ public class DropsHandler implements Listener {
 
             }
 
-            int droppedXP = event.getDroppedExp() * mobLevel;
+            int droppedXP = (int) (event.getDroppedExp() + event.getDroppedExp() * 0.1 * mobLevel);
             event.setDroppedExp(0);
             event.getEntity().getWorld().spawn(event.getEntity().getLocation(), ExperienceOrb.class).setExperience(droppedXP);
 

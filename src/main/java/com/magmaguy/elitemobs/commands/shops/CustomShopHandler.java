@@ -31,6 +31,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -57,13 +58,14 @@ public class CustomShopHandler implements Listener {
 
     }
 
+    private static List<Integer> validSlots = (List<Integer>) ConfigValues.economyConfig.getList(EconomySettingsConfig.CUSTOM_SHOP_VALID_SLOTS);
+
     private void shopContents(Inventory shopInventory) {
 
         //Anything after 8 is populated
         Random random = new Random();
 
-
-        for (int i = 9; i < 54; i++) {
+        for (int i : validSlots) {
 
             int itemEntryIndex = random.nextInt(CustomItemConstructor.customItemList.size());
 
@@ -107,7 +109,7 @@ public class CustomShopHandler implements Listener {
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
         //These slots are for buying items
-        if (8 < event.getSlot() && event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME)) {
+        if (validSlots.contains(event.getSlot()) && event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME)) {
 
             if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
                 //player has enough money

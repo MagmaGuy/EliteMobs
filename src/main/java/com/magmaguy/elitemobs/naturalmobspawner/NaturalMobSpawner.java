@@ -21,14 +21,17 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,20 +70,16 @@ public class NaturalMobSpawner implements Listener {
 
         }
 
-        int eliteMobLevel = 0;
+        int eliteMobLevel = 1;
 
         for (Player player : closePlayers) {
 
-            int armorRating = 0;
+            int armorRating = armorRatingHandler(player);
+            int potionEffectRating = potionEffectRankCalculator(player);
 
-            armorRating = armorRatingHandler(player, armorRating);
+            int threatLevel = armorRating + potionEffectRating;
 
-            int potionEffectRating = player.getActivePotionEffects().size();
-
-            int threatLevel = 0;
-            threatLevel = threatLevelCalculator(armorRating, potionEffectRating);
-
-            eliteMobLevel += levelCalculator(threatLevel);
+            eliteMobLevel += threatLevel;
 
             if (eliteMobLevel > ConfigValues.defaultConfig.getInt(DefaultConfig.NATURAL_ELITEMOB_LEVEL_CAP)) {
 
@@ -98,13 +97,15 @@ public class NaturalMobSpawner implements Listener {
     }
 
 
-    private int armorRatingHandler(Player player, int armorRating) {
+    private int armorRatingHandler(Player player) {
+
+        int armorRating = 0;
 
         if (player.getEquipment().getHelmet() != null) {
 
             ItemStack helmet = player.getEquipment().getHelmet();
 
-            armorRating += itemRankCalculator(helmet);
+            armorRating += itemThreatCalculator(helmet);
 
         }
 
@@ -112,7 +113,7 @@ public class NaturalMobSpawner implements Listener {
 
             ItemStack chestplate = player.getEquipment().getChestplate();
 
-            armorRating += itemRankCalculator(chestplate);
+            armorRating += itemThreatCalculator(chestplate);
 
         }
 
@@ -120,7 +121,7 @@ public class NaturalMobSpawner implements Listener {
 
             ItemStack leggings = player.getEquipment().getLeggings();
 
-            armorRating += itemRankCalculator(leggings);
+            armorRating += itemThreatCalculator(leggings);
 
         }
 
@@ -128,33 +129,94 @@ public class NaturalMobSpawner implements Listener {
 
             ItemStack boots = player.getEquipment().getBoots();
 
-            armorRating += itemRankCalculator(boots);
+            armorRating += itemThreatCalculator(boots);
 
         }
+
+        armorRating += weaponGrabber(player);
 
         return armorRating;
 
     }
 
-    private int itemRankCalculator(ItemStack itemStack) {
+    private int weaponGrabber (Player player) {
 
-        return ItemRankHandler.guessItemRank(itemStack);
+        List<ItemStack> itemList = new ArrayList<>();
+
+        if (player.getInventory().getItemInOffHand() != null && !player.getInventory().getItemInOffHand().getType().equals(Material.AIR)) {
+
+            itemList.add(player.getInventory().getItemInOffHand());
+
+        }
+
+        for (int i = 0; i < 9; i++) {
+
+            if (player.getInventory().getItem(i) != null && !player.getInventory().getItem(i).getType().equals(Material.AIR)) {
+
+                Material material = player.getInventory().getItem(i).getType();
+
+                if (material.equals(Material.DIAMOND_SWORD) || material.equals(Material.DIAMOND_AXE) ||
+                        material.equals(Material.IRON_SWORD) || material.equals(Material.IRON_AXE) ||
+                        material.equals(Material.STONE_SWORD) || material.equals(Material.STONE_AXE) ||
+                        material.equals(Material.GOLD_SWORD) || material.equals(Material.GOLD_AXE) ||
+                        material.equals(Material.WOOD_SWORD) || material.equals(Material.WOOD_AXE) ||
+                        material.equals(Material.BOW)) {
+
+                    itemList.add(player.getInventory().getItem(i));
+
+                }
+
+            }
+
+        }
+
+        int highestThreat = 0;
+
+        if (itemList.size() > 0) {
+
+            for (ItemStack itemStack : itemList) {
+
+                int currentThreat = ItemRankHandler.guessItemThreat(itemStack);
+
+                if (currentThreat > highestThreat) {
+
+                    highestThreat = currentThreat;
+
+                }
+
+            }
+
+        }
+
+        return highestThreat;
 
     }
 
+    private int itemThreatCalculator(ItemStack itemStack) {
 
-    private int threatLevelCalculator(int armorRating, int potionEffectRating) {
-
-        int threatLevel = armorRating / 2 + potionEffectRating;
-
-        return threatLevel;
+        return ItemRankHandler.guessItemThreat(itemStack);
 
     }
 
+    private int potionEffectRankCalculator (Player player) {
 
-    private int levelCalculator(int threatLevel) {
+        int potionEffectRank = 0;
 
-        return threatLevel;
+        if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+
+            potionEffectRank += (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1) *
+                    DamageAdjuster.ENCHANTMENT_OR_POTION_EFFECT_THREAT_INCREMENTER;
+
+        }
+
+        if (player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
+
+            potionEffectRank += (player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE).getAmplifier() + 1) *
+                    DamageAdjuster.ENCHANTMENT_OR_POTION_EFFECT_THREAT_INCREMENTER;
+
+        }
+
+        return potionEffectRank;
 
     }
 

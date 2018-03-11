@@ -15,11 +15,11 @@
 
 package com.magmaguy.elitemobs.elitedrops;
 
+import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,126 +27,144 @@ import java.util.Map;
  */
 public class ItemRankHandler {
 
-    public static int guessItemRank(ItemStack itemStack) {
+    /*
+    Item rank directly translates to Elite Mob level increases
+     */
 
-        int itemTypePowerCount = itemTypePower(itemStack.getType());
+    public static int guessItemThreat(ItemStack itemStack) {
+
+        double itemTypePowerCount = itemTypePower(itemStack.getType());
 
         int enchantmentCount = countEnchantments(itemStack);
 
-        int adjustedPotionEffectCount = getPotionEffectCount(itemStack) * 15;
+        double total = itemTypePowerCount + enchantmentCount;
 
-        int total = itemTypePowerCount + enchantmentCount + adjustedPotionEffectCount;
-
-        return total;
+        return (int) total;
 
     }
 
-    public static int itemTypePower(Material material) {
+    public static double itemTypePower(Material material) {
+
+        //Divide the tier rank by the 4 armor slots and 1 weapon slot
+        double diamondLevel = DamageAdjuster.DIAMOND_TIER_LEVEL / 5;
+        double ironLevel = DamageAdjuster.IRON_TIER_LEVEL / 5;
+        double stoneChainLevel = DamageAdjuster.STONE_CHAIN_TIER_LEVEL / 5;
+        double goldWoodLeatherLevel = DamageAdjuster.GOLD_WOOD_LEATHER_TIER_LEVEL / 5;
 
         switch (material) {
 
             case DIAMOND:
-                return 5;
+                return diamondLevel;
             case DIAMOND_AXE:
-                return 5;
+                return diamondLevel;
             case DIAMOND_BARDING:
-                return 5;
+                return diamondLevel;
             case DIAMOND_BLOCK:
-                return 5;
+                return diamondLevel;
             case DIAMOND_BOOTS:
-                return 5;
+                return diamondLevel;
             case DIAMOND_CHESTPLATE:
-                return 5;
+                return diamondLevel;
             case DIAMOND_HELMET:
-                return 5;
+                return diamondLevel;
             case DIAMOND_HOE:
-                return 5;
+                return diamondLevel;
             case DIAMOND_LEGGINGS:
-                return 5;
+                return diamondLevel;
             case DIAMOND_ORE:
-                return 5;
+                return diamondLevel;
             case DIAMOND_PICKAXE:
-                return 5;
+                return diamondLevel;
             case DIAMOND_SPADE:
-                return 5;
+                return diamondLevel;
             case DIAMOND_SWORD:
-                return 5;
+                return diamondLevel;
             case IRON_AXE:
-                return 4;
+                return ironLevel;
             case IRON_BARDING:
-                return 4;
+                return ironLevel;
             case IRON_BLOCK:
-                return 4;
+                return ironLevel;
             case IRON_BOOTS:
-                return 4;
+                return ironLevel;
             case IRON_CHESTPLATE:
-                return 4;
+                return ironLevel;
             case IRON_HELMET:
-                return 4;
+                return ironLevel;
             case IRON_HOE:
-                return 4;
+                return ironLevel;
             case IRON_INGOT:
-                return 4;
+                return ironLevel;
             case IRON_LEGGINGS:
-                return 4;
+                return ironLevel;
             case IRON_NUGGET:
-                return 4;
+                return ironLevel;
             case IRON_ORE:
-                return 4;
+                return ironLevel;
             case IRON_PICKAXE:
-                return 4;
+                return ironLevel;
             case IRON_SPADE:
-                return 4;
+                return ironLevel;
             case IRON_SWORD:
-                return 4;
+                return ironLevel;
             case CHAINMAIL_BOOTS:
-                return 3;
+                return stoneChainLevel;
             case CHAINMAIL_CHESTPLATE:
-                return 3;
+                return stoneChainLevel;
             case CHAINMAIL_HELMET:
-                return 3;
+                return stoneChainLevel;
             case CHAINMAIL_LEGGINGS:
-                return 3;
+                return stoneChainLevel;
+            case STONE_SWORD:
+                return stoneChainLevel;
             case GOLD_AXE:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_BARDING:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_BLOCK:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_BOOTS:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_CHESTPLATE:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_HELMET:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_HOE:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_INGOT:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_LEGGINGS:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_NUGGET:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_ORE:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_PICKAXE:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_SPADE:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLD_SWORD:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLDEN_APPLE:
-                return 2;
+                return goldWoodLeatherLevel;
             case GOLDEN_CARROT:
-                return 2;
+                return goldWoodLeatherLevel;
             case LEATHER_BOOTS:
-                return 1;
+                return goldWoodLeatherLevel;
             case LEATHER_CHESTPLATE:
-                return 1;
+                return goldWoodLeatherLevel;
             case LEATHER_HELMET:
-                return 1;
+                return goldWoodLeatherLevel;
             case LEATHER_LEGGINGS:
-                return 1;
+                return goldWoodLeatherLevel;
+            case WOOD_SWORD:
+                return goldWoodLeatherLevel;
+            case WOOD_AXE:
+                return goldWoodLeatherLevel;
+            case WOOD_PICKAXE:
+                return goldWoodLeatherLevel;
+            case WOOD_HOE:
+                return goldWoodLeatherLevel;
             default:
                 return 0;
 
@@ -160,42 +178,42 @@ public class ItemRankHandler {
 
         if (!itemStack.getEnchantments().isEmpty()) {
 
+            int enchantmentCount = 0;
+
             for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
 
-                enchantments += entry.getValue();
+                if (entry.getKey().equals(Enchantment.PROTECTION_ENVIRONMENTAL)) {
 
-            }
+                    enchantments += entry.getValue();
 
-        }
+                }
 
-        return enchantments;
+                if (entry.getKey().equals(Enchantment.THORNS)) {
 
-    }
+                    enchantmentCount += entry.getValue();
 
-    private static int getPotionEffectCount(ItemStack itemStack) {
+                }
 
-        if (itemStack.getItemMeta().getLore() == null) return 0;
+                if (entry.getKey().equals(Enchantment.DAMAGE_ALL)) {
 
-        PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
-        List<String> potionList = potionEffectApplier.loreDeobfuscator(itemStack);
+                    enchantmentCount += entry.getValue();
 
-        int potionEffectCount = 0;
+                }
 
-        for (String string : potionList) {
+                if (entry.getKey().equals(Enchantment.ARROW_DAMAGE)) {
 
-            for (String string1 : string.split(",")) {
-
-                if (string1.equals(string.split(",")[1])) {
-
-                    potionEffectCount++;
+                    enchantmentCount += entry.getValue();
 
                 }
 
             }
 
+            enchantments += enchantmentCount;
+
         }
 
-        return potionEffectCount;
+        //multiply my 4/5 because a full set of enchants involves 4 protection and 1 offensive
+        return (int) (enchantments * DamageAdjuster.ENCHANTMENT_OR_POTION_EFFECT_THREAT_INCREMENTER);
 
     }
 

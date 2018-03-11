@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -41,17 +42,22 @@ public class ProceduralItemGenerator {
     HashMap<Enchantment, Integer> validEnchantments = new HashMap();
     private Random random = new Random();
 
-    public ItemStack randomItemGenerator(int itemRank, Entity entity) {
+    /*
+    In order to create an item, check the level of the mob and add just slightly more value to an item than would be necessary
+    to defeat it assuming that every enchantment is combat-oriented.
+     */
+
+    public ItemStack proceduralItemGenerator(int mobLevel, Entity entity) {
 
         //Create itemstack, generate material
-        ItemStack randomItem = new ItemStack(randomMaterialConstructor(itemRank), 1);
+        ItemStack randomItem = new ItemStack(randomMaterialConstructor(mobLevel), 1);
         ItemMeta itemMeta = randomItem.getItemMeta();
 
         //Apply item name
         itemMeta.setDisplayName(ChatColorConverter.chatColorConverter(randomItemNameConstructor(randomItem.getType())));
 
         //Apply enchantments
-        itemMeta = randomItemEnchantmentConstructor(randomItem.getType(), itemMeta, itemRank);
+        itemMeta = randomItemEnchantmentConstructor(randomItem.getType(), itemMeta, mobLevel);
 
         randomItem.setItemMeta(itemMeta);
 
@@ -85,11 +91,11 @@ public class ProceduralItemGenerator {
 
     }
 
-    public ItemStack randomItemGeneratorCommand(int itemRank) {
+    public ItemStack randomItemGeneratorCommand(int mobLevel) {
 
         Entity entity = null;
 
-        return randomItemGenerator(itemRank, entity);
+        return proceduralItemGenerator(mobLevel, entity);
 
     }
 
@@ -97,7 +103,7 @@ public class ProceduralItemGenerator {
 
         List<Material> validMaterials = new ArrayList<>();
 
-        for (Object object : ConfigValues.itemsProceduralSettingsConfig.getList("Valid material list for random items")) {
+        for (Object object : ConfigValues.itemsProceduralSettingsConfig.getList(ItemsProceduralSettingsConfig.PROCEDURAL_ITEM_VALID_MATERIALS)) {
 
             try {
 
@@ -113,7 +119,7 @@ public class ProceduralItemGenerator {
 
         }
 
-        if (mobLevel < 5) {
+        if (mobLevel < DamageAdjuster.DIAMOND_TIER_LEVEL) {
 
             validMaterials.remove(Material.DIAMOND);
             validMaterials.remove(Material.DIAMOND_AXE);
@@ -130,7 +136,7 @@ public class ProceduralItemGenerator {
 
         }
 
-        if (mobLevel < 4) {
+        if (mobLevel < DamageAdjuster.IRON_TIER_LEVEL) {
 
             validMaterials.remove(Material.IRON_AXE);
             validMaterials.remove(Material.IRON_BARDING);
@@ -150,55 +156,25 @@ public class ProceduralItemGenerator {
 
         }
 
-        if (mobLevel < 3) {
+        if (mobLevel < DamageAdjuster.STONE_CHAIN_TIER_LEVEL) {
 
             validMaterials.remove(Material.CHAINMAIL_BOOTS);
             validMaterials.remove(Material.CHAINMAIL_CHESTPLATE);
             validMaterials.remove(Material.CHAINMAIL_HELMET);
             validMaterials.remove(Material.CHAINMAIL_LEGGINGS);
+            validMaterials.remove(Material.STONE_SWORD);
+            validMaterials.remove(Material.STONE_HOE);
+            validMaterials.remove(Material.STONE_SPADE);
+            validMaterials.remove(Material.STONE_PICKAXE);
+            validMaterials.remove(Material.STONE_AXE);
 
         }
 
-        if (mobLevel < 2) {
+        int index = random.nextInt(validMaterials.size());
 
-            validMaterials.remove(Material.GOLD_AXE);
-            validMaterials.remove(Material.GOLD_BARDING);
-            validMaterials.remove(Material.GOLD_BLOCK);
-            validMaterials.remove(Material.GOLD_BOOTS);
-            validMaterials.remove(Material.GOLD_CHESTPLATE);
-            validMaterials.remove(Material.GOLD_HELMET);
-            validMaterials.remove(Material.GOLD_HOE);
-            validMaterials.remove(Material.GOLD_INGOT);
-            validMaterials.remove(Material.GOLD_NUGGET);
-            validMaterials.remove(Material.GOLD_ORE);
-            validMaterials.remove(Material.GOLD_PICKAXE);
-            validMaterials.remove(Material.GOLD_SPADE);
-            validMaterials.remove(Material.GOLD_SWORD);
-            validMaterials.remove(Material.GOLDEN_APPLE);
-            validMaterials.remove(Material.GOLDEN_CARROT);
+        Material material = validMaterials.get(index);
 
-        }
-
-        if (mobLevel < 1) {
-
-            validMaterials.remove(Material.LEATHER_BOOTS);
-            validMaterials.remove(Material.LEATHER_CHESTPLATE);
-            validMaterials.remove(Material.LEATHER_HELMET);
-            validMaterials.remove(Material.LEATHER_LEGGINGS);
-
-        }
-
-        if (!validMaterials.isEmpty()) {
-
-            int index = random.nextInt(validMaterials.size());
-
-            Material material = validMaterials.get(index);
-
-            return material;
-
-        }
-
-        return Material.AIR;
+        return material;
 
     }
 
@@ -497,7 +473,7 @@ public class ProceduralItemGenerator {
 
     }
 
-    private ItemMeta randomItemEnchantmentConstructor(Material material, ItemMeta oldMeta, int rankLevel) {
+    private ItemMeta randomItemEnchantmentConstructor(Material material, ItemMeta oldMeta, int mobLevel) {
 
         if (material.equals(Material.DIAMOND_SWORD) || material.equals(Material.GOLD_SWORD) ||
                 material.equals(Material.IRON_SWORD) || material.equals(Material.STONE_SWORD) ||
@@ -663,11 +639,17 @@ public class ProceduralItemGenerator {
 
         HashMap<Enchantment, Integer> validEnchantmentsClone = (HashMap<Enchantment, Integer>) validEnchantments.clone();
 
-        int materialRank = ItemRankHandler.itemTypePower(material);
-        rankLevel -= materialRank;
+        /*
+        Take item worth into account
+         */
 
-        //randomizer for enchantments
-        for (int i = 0; i < rankLevel; i++) {
+        double targetItemWorth = ItemWorthCalculator.targetItemWorth(mobLevel);
+
+        double materialWorth = ItemWorthCalculator.itemTypeWorth(material);
+
+        double itemWorthLeft = targetItemWorth - materialWorth;
+
+        while (itemWorthLeft > 0) {
 
             if (validEnchantments.size() < 1) {
 
@@ -696,10 +678,12 @@ public class ProceduralItemGenerator {
                 int finalEnchantLevel = validEnchantmentsClone.get(enchantment) - validEnchantments.get(enchantment);
 
                 newMeta.addEnchant(enchantment, finalEnchantLevel, true);
+                itemWorthLeft -= ItemWorthCalculator.enchantmentWorthGetter(enchantment);
 
             } else {
 
                 newMeta.addEnchant(enchantment, 1, true);
+                itemWorthLeft -= ItemWorthCalculator.enchantmentWorthGetter(enchantment);
 
             }
 
@@ -712,6 +696,53 @@ public class ProceduralItemGenerator {
             }
 
         }
+
+        //randomizer for enchantments
+//        for (int i = 0; i < mobLevel; i++) {
+//
+//            if (validEnchantments.size() < 1) {
+//
+//                break;
+//
+//            }
+//
+//            int randomIndex = random.nextInt(validEnchantments.size());
+//
+//            List<Enchantment> enchantmentList = new ArrayList();
+//
+//            for (Enchantment enchantment : validEnchantments.keySet()) {
+//
+//                enchantmentList.add(enchantment);
+//
+//            }
+//
+//            String enchantmentString = enchantmentList.get(randomIndex).getName();
+//
+//            Enchantment enchantment = enchantmentList.get(randomIndex);
+//
+//            validEnchantments.put(enchantment, validEnchantments.get(enchantment) - 1);
+//
+//            if (ConfigValues.itemsProceduralSettingsConfig.contains("Valid Enchantments." + enchantmentString + ".Max Level")) {
+//
+//                int finalEnchantLevel = validEnchantmentsClone.get(enchantment) - validEnchantments.get(enchantment);
+//
+//                newMeta.addEnchant(enchantment, finalEnchantLevel, true);
+//
+//            } else {
+//
+//                newMeta.addEnchant(enchantment, 1, true);
+//
+//            }
+//
+//            int newEnchantInt = validEnchantments.get(enchantment);
+//
+//            if (newEnchantInt == 0) {
+//
+//                validEnchantments.remove(enchantment);
+//
+//            }
+//
+//        }
 
         return newMeta;
 

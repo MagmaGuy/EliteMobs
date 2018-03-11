@@ -54,12 +54,12 @@ public class PowerHandler {
 
         if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity.isValid() && ((LivingEntity) entity).getHealth() > 0) {
 
-            if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= 5) {
+            if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= 10) {
 
                 int EliteMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-                availableMinorPowers = (EliteMobLevel - 5) / 10 + 1;
-                availableMajorPowers = EliteMobLevel / 10;
+                availableMinorPowers = (EliteMobLevel - 10) / 20 + 1;
+                availableMajorPowers = EliteMobLevel / 30;
 
             }
 

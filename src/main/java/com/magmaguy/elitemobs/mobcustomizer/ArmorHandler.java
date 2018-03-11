@@ -46,7 +46,7 @@ public class ArmorHandler {
 
             int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-            if (mobLevel >= 2) {
+            if (mobLevel >= 34) {
 
                 if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
                     ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
@@ -54,52 +54,25 @@ public class ArmorHandler {
 
             }
 
-            if (mobLevel >= 4) {
+            if (mobLevel >= 36) {
 
                 ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
 
             }
 
-            if (mobLevel >= 6) {
+            if (mobLevel >= 38) {
 
                 ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
 
             }
 
-            if (mobLevel >= 8) {
+            if (mobLevel >= 40) {
 
                 ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
 
             }
 
-            if (mobLevel >= 12) {
-
-                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
-                    ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
-                }
-
-
-            }
-
-            if (mobLevel >= 14) {
-
-                ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.GOLD_BOOTS));
-
-            }
-
-            if (mobLevel >= 16) {
-
-                ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.GOLD_LEGGINGS));
-
-            }
-
-            if (mobLevel >= 18) {
-
-                ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.GOLD_CHESTPLATE));
-
-            }
-
-            if (mobLevel >= 22) {
+            if (mobLevel >= 44) {
 
                 if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
                     ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
@@ -107,25 +80,25 @@ public class ArmorHandler {
 
             }
 
-            if (mobLevel >= 24) {
+            if (mobLevel >= 46) {
 
                 ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
 
             }
 
-            if (mobLevel >= 26) {
+            if (mobLevel >= 48) {
 
                 ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
 
             }
 
-            if (mobLevel >= 28) {
+            if (mobLevel >= 50) {
 
                 ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
 
             }
 
-            if (mobLevel >= 32) {
+            if (mobLevel >= 54) {
 
                 if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
                     ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
@@ -133,31 +106,31 @@ public class ArmorHandler {
 
             }
 
-            if (mobLevel >= 34) {
+            if (mobLevel >= 56) {
 
                 ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
 
             }
 
-            if (mobLevel >= 36) {
+            if (mobLevel >= 57) {
 
                 ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
 
             }
 
-            if (mobLevel >= 38) {
+            if (mobLevel >= 60) {
 
                 ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
 
             }
 
-            if (mobLevel >= 42) {
+            if (mobLevel >= 64) {
 
                 ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 
             }
 
-            if (mobLevel >= 44) {
+            if (mobLevel >= 66) {
 
                 if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ELITE_HELMETS)) {
                     ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
@@ -165,13 +138,13 @@ public class ArmorHandler {
 
             }
 
-            if (mobLevel >= 46) {
+            if (mobLevel >= 68) {
 
                 ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
 
             }
 
-            if (mobLevel >= 48) {
+            if (mobLevel >= 70) {
 
                 ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 
