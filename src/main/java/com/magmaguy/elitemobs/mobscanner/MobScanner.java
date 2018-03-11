@@ -127,7 +127,7 @@ public class MobScanner implements Listener {
                 if (entity instanceof IronGolem && !entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
                         ((IronGolem) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
-                    entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, ScalingFormula.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
+                    entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, HealthHandler.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
                             DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity))));
                     customAggressiveName(entity);
 

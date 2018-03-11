@@ -261,7 +261,7 @@ public class CustomItemConstructor implements Listener {
             if (!loreAddDropFrequency(previousPath, itemStack)) {
 
                 //Add item to ranked item list for drop math
-                rankedItemMapCreator(ItemRankHandler.guessItemRank(itemStack), itemStack);
+                rankedItemMapCreator(itemStack);
 
             }
 
@@ -444,23 +444,26 @@ public class CustomItemConstructor implements Listener {
 
     }
 
-    private void rankedItemMapCreator(int itemPower, ItemStack itemStack) {
+    private void rankedItemMapCreator(ItemStack itemStack) {
 
-        if (dynamicRankedItemStacks.get(itemPower) == null) {
+        double itemWorth = ItemWorthCalculator.determineItemWorth(itemStack);
+        int itemRank = (int) (itemWorth / 10);
+
+        if (dynamicRankedItemStacks.get(itemRank) == null) {
 
             List<ItemStack> list = new ArrayList<>();
 
             list.add(itemStack);
 
-            dynamicRankedItemStacks.put(itemPower, list);
+            dynamicRankedItemStacks.put(itemRank, list);
 
         } else {
 
-            List<ItemStack> list = dynamicRankedItemStacks.get(itemPower);
+            List<ItemStack> list = dynamicRankedItemStacks.get(itemRank);
 
             list.add(itemStack);
 
-            dynamicRankedItemStacks.put(itemPower, list);
+            dynamicRankedItemStacks.put(itemRank, list);
 
         }
 

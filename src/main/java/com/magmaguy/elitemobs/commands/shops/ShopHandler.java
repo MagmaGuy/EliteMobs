@@ -18,7 +18,6 @@ package com.magmaguy.elitemobs.commands.shops;
 import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.ItemWorthCalculator;
@@ -59,12 +58,11 @@ public class ShopHandler implements Listener {
 
     }
 
+    private static List<Integer> validSlots = (List<Integer>) ConfigValues.economyConfig.getList(EconomySettingsConfig.SHOP_VALID_SLOTS);
+
     private void shopContents(Inventory shopInventory) {
 
-        //Anything after 8 is populated
         Random random = new Random();
-
-        List<Integer> validSlots = (List<Integer>) ConfigValues.economyConfig.getList(EconomySettingsConfig.SHOP_VALID_SLOTS);
 
         for (int i : validSlots) {
 
@@ -77,8 +75,7 @@ public class ShopHandler implements Listener {
             int randomLevel = random.nextInt(balancedMax + 1) + balancedMin;
 
             //adjust to item rank
-            int level = (int) ((randomLevel * ConfigValues.itemsProceduralSettingsConfig.getDouble(ItemsProceduralSettingsConfig.MOB_LEVEL_TO_RANK_MULTIPLIER))
-                    + (random.nextInt(6) + 1 - 3));
+            int level = randomLevel;
 
             if (level < 1) {
 
@@ -126,7 +123,7 @@ public class ShopHandler implements Listener {
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
         //These slots are for buying items
-        if (event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME) && 8 < event.getSlot()) {
+        if (event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME) && validSlots.contains(event.getSlot())) {
 
             if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
                 //player has enough money

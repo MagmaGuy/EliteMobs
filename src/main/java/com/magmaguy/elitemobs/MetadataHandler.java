@@ -126,6 +126,9 @@ public class MetadataHandler implements Listener {
     public final static String SHOOTING_ARROWS = "ShootingArrows";
     public final static String SHOOTING_FIREBALLS = "ShootingFireballs";
 
+    //displays
+    public final static String ARMOR_STAND_DISPLAY = "ArmorStandDisplay";
+
     //third party compatibility
     public final static String BETTERDROPS_COMPATIBILITY_MD = "betterdrops_ignore";
     public final static String VANISH_NO_PACKET = "vanished";
@@ -184,7 +187,8 @@ public class MetadataHandler implements Listener {
             ZOMBIE_PARENTS_ACTIVATED,
             ZOMBIE_CHANTING,
             SHOOTING_ARROWS,
-            SHOOTING_FIREBALLS
+            SHOOTING_FIREBALLS,
+            ARMOR_STAND_DISPLAY
     ));
     public static List<String> powerListHumanFormat = new ArrayList<>(Arrays.asList( //add major and minor power lists
             //minor powers
@@ -321,7 +325,8 @@ public class MetadataHandler implements Listener {
 
                 if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
                         !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
-                        (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity))) {
+                        (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) ||
+                        entity.hasMetadata(ARMOR_STAND_DISPLAY) && string.equals(ARMOR_STAND_DISPLAY)) {
 
                     entity.remove();
 

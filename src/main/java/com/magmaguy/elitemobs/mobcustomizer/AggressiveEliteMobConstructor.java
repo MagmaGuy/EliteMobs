@@ -27,7 +27,7 @@ public class AggressiveEliteMobConstructor {
 
     public static void constructAggressiveEliteMob(Entity entity) {
 
-        if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) {
+        if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 1) {
 
             entity.remove();
             return;

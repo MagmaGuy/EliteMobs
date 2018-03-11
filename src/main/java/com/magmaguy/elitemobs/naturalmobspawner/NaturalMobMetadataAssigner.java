@@ -65,6 +65,8 @@ public class NaturalMobMetadataAssigner implements Listener {
 
         }
 
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.SPAWNERS_SPAWN_ELITE_MOBS)) return;
+
         if (event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM) {
 
             Entity entity = event.getEntity();

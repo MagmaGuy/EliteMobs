@@ -40,6 +40,7 @@ public class DefaultConfig {
     public static final String AGGRESSIVE_MOB_STACKING = "Aggressive mob stacking";
     public static final String ELITEMOB_STACKING_CAP = "EliteMob stacking cap";
     public static final String NATURAL_ELITEMOB_LEVEL_CAP = "Natural elite mob level cap";
+    public static final String SPAWNERS_SPAWN_ELITE_MOBS = "Spawners can spawn Elite Mobs";
     public static final String STACK_AGGRESSIVE_SPAWNER_MOBS = "Stack aggressive spawner mobs";
     public static final String STACK_AGGRESSIVE_NATURAL_MOBS = "Stack aggressive natural mobs";
     public static final String SUPERMOB_STACK_AMOUNT = "SuperMob (passive EliteMobs) stack amount";
@@ -69,9 +70,10 @@ public class DefaultConfig {
 
         configuration.addDefault(NATURAL_MOB_SPAWNING, true);
         configuration.addDefault(AGGRESSIVE_MOB_CONVERSION_PERCENTAGE, 020.00);
-        configuration.addDefault(NATURAL_ELITEMOB_LEVEL_CAP, 200);
+        configuration.addDefault(NATURAL_ELITEMOB_LEVEL_CAP, 2500);
+        configuration.addDefault(SPAWNERS_SPAWN_ELITE_MOBS, false);
         configuration.addDefault(AGGRESSIVE_MOB_STACKING, true);
-        configuration.addDefault(ELITEMOB_STACKING_CAP, 50);
+        configuration.addDefault(ELITEMOB_STACKING_CAP, 100);
         configuration.addDefault(STACK_AGGRESSIVE_SPAWNER_MOBS, true);
         configuration.addDefault(STACK_AGGRESSIVE_NATURAL_MOBS, true);
         configuration.addDefault(SUPERMOB_STACK_AMOUNT, 50);

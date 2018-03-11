@@ -33,8 +33,8 @@ import com.magmaguy.elitemobs.elitedrops.*;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
-import com.magmaguy.elitemobs.mobcustomizer.DamageHandler;
-import com.magmaguy.elitemobs.mobcustomizer.DropsHandler;
+import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
+import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
@@ -135,10 +135,10 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(this, this);
 
         //Mob damage
-        this.getServer().getPluginManager().registerEvents(new DamageHandler(this), this);
+        this.getServer().getPluginManager().registerEvents(new DamageAdjuster(), this);
 
         //Mob loot
-        this.getServer().getPluginManager().registerEvents(new DropsHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new DefaultDropsHandler(), this);
 
         //potion effects
         this.getServer().getPluginManager().registerEvents(new PotionEffectApplier(), this);
