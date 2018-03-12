@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.elitedrops;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
@@ -50,33 +51,33 @@ public class ProceduralItemGenerator {
     public ItemStack proceduralItemGenerator(int mobLevel, Entity entity) {
 
         //Create itemstack, generate material
-        ItemStack randomItem = new ItemStack(randomMaterialConstructor(mobLevel), 1);
-        ItemMeta itemMeta = randomItem.getItemMeta();
+        ItemStack proceduralItem = new ItemStack(randomMaterialConstructor(mobLevel), 1);
+        ItemMeta itemMeta = proceduralItem.getItemMeta();
 
         //Apply item name
-        itemMeta.setDisplayName(ChatColorConverter.chatColorConverter(randomItemNameConstructor(randomItem.getType())));
+        itemMeta.setDisplayName(ChatColorConverter.chatColorConverter(randomItemNameConstructor(proceduralItem.getType())));
 
         //Apply enchantments
-        itemMeta = randomItemEnchantmentConstructor(randomItem.getType(), itemMeta, mobLevel);
+        itemMeta = randomItemEnchantmentConstructor(proceduralItem.getType(), itemMeta, mobLevel);
 
-        randomItem.setItemMeta(itemMeta);
+        proceduralItem.setItemMeta(itemMeta);
 
         //Apply lore
-        itemMeta.setLore(proceduralItemLoreConstructor(randomItem, entity));
+        itemMeta.setLore(proceduralItemLoreConstructor(proceduralItem, entity));
 
-        randomItem.setItemMeta(itemMeta);
+        proceduralItem.setItemMeta(itemMeta);
 
-        ItemQuality.dropQualityColorizer(randomItem);
+        ItemQuality.dropQualityColorizer(proceduralItem);
 
         if (ConfigValues.itemsProceduralSettingsConfig.getBoolean(ItemsProceduralSettingsConfig.MONITOR_ITEMS_ON_CONSOLE)) {
 
             Bukkit.getLogger().info("[EliteMobs] Procedurally generated item with the following attributes:");
-            Bukkit.getLogger().info("[EliteMobs] Item type: " + randomItem.getType());
-            Bukkit.getLogger().info("[EliteMobs] Item name: " + randomItem.getItemMeta().getDisplayName());
-            Bukkit.getLogger().info("[EliteMobs] Item lore: " + randomItem.getItemMeta().getLore().get(0));
+            Bukkit.getLogger().info("[EliteMobs] Item type: " + proceduralItem.getType());
+            Bukkit.getLogger().info("[EliteMobs] Item name: " + proceduralItem.getItemMeta().getDisplayName());
+            Bukkit.getLogger().info("[EliteMobs] Item lore: " + proceduralItem.getItemMeta().getLore().get(0));
             Bukkit.getLogger().info("[EliteMobs] Item enchantments:");
 
-            for (Map.Entry<Enchantment, Integer> entry : randomItem.getItemMeta().getEnchants().entrySet()) {
+            for (Map.Entry<Enchantment, Integer> entry : proceduralItem.getItemMeta().getEnchants().entrySet()) {
 
                 Bukkit.getLogger().info(entry.getKey() + " level " + entry.getValue());
 
@@ -85,9 +86,12 @@ public class ProceduralItemGenerator {
         }
 
         //Add hidden lore for shops to validate
-        ObfuscatedSignatureLoreData.obfuscateSignatureData(randomItem);
+        ObfuscatedSignatureLoreData.obfuscateSignatureData(proceduralItem);
 
-        return randomItem;
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
+            EnchantmentHider.hideEnchantments(proceduralItem);
+
+        return proceduralItem;
 
     }
 

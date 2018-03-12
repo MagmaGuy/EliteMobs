@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,9 +45,9 @@ public class MajorPowerPowerStance implements Listener {
 
     public void itemEffect(Entity entity) {
 
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS)) {
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS)) {
 
-            if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS)
+            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS)
                     && !entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
                 return;

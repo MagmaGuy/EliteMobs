@@ -16,6 +16,8 @@
 package com.magmaguy.elitemobs.mobcustomizer.displays;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,6 +30,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class HealthDisplay {
 
     public static void displayHealth(LivingEntity livingEntity) {
+
+        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_HEALTH_DISPLAY)) return;
 
         int maxHealth = (int) livingEntity.getMaxHealth();
         int currentHealth = (int) livingEntity.getHealth();

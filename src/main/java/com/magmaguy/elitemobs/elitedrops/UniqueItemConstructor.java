@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
 import org.bukkit.Material;
@@ -368,6 +369,9 @@ public class UniqueItemConstructor {
 
         itemStack.setItemMeta(itemMeta);
         ObfuscatedSignatureLoreData.obfuscateSignatureData(itemStack);
+
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
+            EnchantmentHider.hideEnchantments(itemStack);
 
         return itemStack;
 

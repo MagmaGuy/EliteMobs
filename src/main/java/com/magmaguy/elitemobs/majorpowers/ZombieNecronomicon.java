@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
@@ -197,7 +197,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
         summoningEffectOn = true;
         nameScroller(zombie);
 
-        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_WARNING_VISUAL_EFFECTS)) {
+        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS)) {
 
             return;
 

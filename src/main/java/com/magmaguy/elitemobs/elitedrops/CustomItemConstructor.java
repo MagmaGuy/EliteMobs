@@ -257,6 +257,9 @@ public class CustomItemConstructor implements Listener {
             //Add hidden lore for shops to validate
             ObfuscatedSignatureLoreData.obfuscateSignatureData(itemStack);
 
+            if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
+                EnchantmentHider.hideEnchantments(itemStack);
+
             //Add custom item to customItemList
             if (!loreAddDropFrequency(previousPath, itemStack)) {
 

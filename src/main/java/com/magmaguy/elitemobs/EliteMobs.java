@@ -108,6 +108,12 @@ public class EliteMobs extends JavaPlugin implements Listener {
         ItemsUniqueConfig itemsUniqueConfig = new ItemsUniqueConfig();
         itemsUniqueConfig.initializeConfig();
 
+        MobCombatSettingsConfig mobCombatSettingsConfig = new MobCombatSettingsConfig();
+        mobCombatSettingsConfig.initializeConfig();
+
+        ItemsDropSettingsConfig itemsDropSettingsConfig = new ItemsDropSettingsConfig();
+        itemsDropSettingsConfig.initializeConfig();
+
         ConfigValues.initializeConfigValues();
 
         //Parse loot
@@ -220,7 +226,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MergeHandler(), this);
 
         //Natural EliteMobs Spawning
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.NATURAL_MOB_SPAWNING)) {
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING)) {
 
             this.getServer().getPluginManager().registerEvents(new NaturalMobSpawner(this), this);
 

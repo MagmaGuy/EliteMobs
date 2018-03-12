@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.elitedrops;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -39,7 +39,7 @@ public class EliteDropsDropper implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
-        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_PLUGIN_LOOT)) return;
+        if (!ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_PLUGIN_LOOT)) return;
 
         Entity entity = event.getEntity();
 
@@ -55,15 +55,15 @@ public class EliteDropsDropper implements Listener {
     public void dropItem(Entity entity) {
 
         //remember that this is used by other classes, like the extra loot power
-        double chanceToDrop = ConfigValues.defaultConfig.getDouble(DefaultConfig.ELITE_ITEM_FLAT_DROP_RATE) / 100 +
-                (ConfigValues.defaultConfig.getDouble(DefaultConfig.ELITE_ITEM_LEVEL_DROP_RATE) / 100 *
+        double chanceToDrop = ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.ELITE_ITEM_FLAT_DROP_RATE) / 100 +
+                (ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.ELITE_ITEM_LEVEL_DROP_RATE) / 100 *
                         entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
 
         if (random.nextDouble() > chanceToDrop) return;
 
         boolean proceduralItemsOn = ConfigValues.itemsProceduralSettingsConfig.getBoolean(ItemsProceduralSettingsConfig.DROP_ITEMS_ON_DEATH);
 
-        boolean customItemsOn = ConfigValues.defaultConfig.getBoolean(DefaultConfig.DROP_CUSTOM_ITEMS);
+        boolean customItemsOn = ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.DROP_CUSTOM_ITEMS);
 
         boolean staticCustomItemsExist = CustomItemConstructor.staticCustomItemHashMap.size() > 0;
 
@@ -104,14 +104,15 @@ public class EliteDropsDropper implements Listener {
             if (customDynamicDropExists && staticCustomItemsExist) {
 
                 HashMap<String, Double> weighedConfigValues = new HashMap<>();
-                weighedConfigValues.put(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
-                weighedConfigValues.put(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT));
 
                 String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
-                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
                     dropCustomDynamicLoot(mobLevel, entity);
-                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT)) dropCustomStaticLoot(entity);
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT))
+                    dropCustomStaticLoot(entity);
 
                 return;
 
@@ -131,14 +132,15 @@ public class EliteDropsDropper implements Listener {
             if (!customDynamicDropExists && staticCustomItemsExist) {
 
                 HashMap<String, Double> weighedConfigValues = new HashMap<>();
-                weighedConfigValues.put(DefaultConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.PROCEDURAL_ITEM_WEIGHT));
-                weighedConfigValues.put(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT));
 
                 String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
-                if (selectedLootSystem.equals(DefaultConfig.PROCEDURAL_ITEM_WEIGHT))
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT))
                     dropProcedurallyGeneratedItem(mobLevel, entity);
-                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT)) dropCustomStaticLoot(entity);
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT))
+                    dropCustomStaticLoot(entity);
 
                 return;
 
@@ -147,14 +149,14 @@ public class EliteDropsDropper implements Listener {
             if (customDynamicDropExists && !staticCustomItemsExist) {
 
                 HashMap<String, Double> weighedConfigValues = new HashMap<>();
-                weighedConfigValues.put(DefaultConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.PROCEDURAL_ITEM_WEIGHT));
-                weighedConfigValues.put(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
 
                 String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
-                if (selectedLootSystem.equals(DefaultConfig.PROCEDURAL_ITEM_WEIGHT))
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT))
                     dropProcedurallyGeneratedItem(mobLevel, entity);
-                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
                     dropCustomDynamicLoot(mobLevel, entity);
 
                 return;
@@ -164,17 +166,18 @@ public class EliteDropsDropper implements Listener {
             if (customDynamicDropExists && staticCustomItemsExist) {
 
                 HashMap<String, Double> weighedConfigValues = new HashMap<>();
-                weighedConfigValues.put(DefaultConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.PROCEDURAL_ITEM_WEIGHT));
-                weighedConfigValues.put(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
-                weighedConfigValues.put(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.defaultConfig.getDouble(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT));
+                weighedConfigValues.put(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT, ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT));
 
                 String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
-                if (selectedLootSystem.equals(DefaultConfig.PROCEDURAL_ITEM_WEIGHT))
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT))
                     dropProcedurallyGeneratedItem(mobLevel, entity);
-                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
                     dropCustomDynamicLoot(mobLevel, entity);
-                if (selectedLootSystem.equals(DefaultConfig.CUSTOM_STATIC_ITEM_WEIGHT)) dropCustomStaticLoot(entity);
+                if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT))
+                    dropCustomStaticLoot(entity);
 
                 return;
 

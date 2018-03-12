@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
 import com.magmaguy.elitemobs.mobcustomizer.displays.HealthDisplay;
 import org.bukkit.Material;
@@ -134,7 +134,7 @@ public class DamageAdjuster implements Listener {
 
 
     //this event deals with elite mobs damaging players
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void eliteMobDamageHandler(EntityDamageByEntityEvent event) {
 
         if (event.isCancelled()) return;
@@ -193,8 +193,9 @@ public class DamageAdjuster implements Listener {
     }
 
     //Deal with creeper explosions
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEliteCreeperDetonation(ExplosionPrimeEvent event) {
+        if (event.isCancelled()) return;
 
         if (!(event.getEntity() instanceof Creeper && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)))
             return;
@@ -213,7 +214,7 @@ public class DamageAdjuster implements Listener {
 
         }
 
-        float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.1 * mobLevel * event.getRadius() * ConfigValues.defaultConfig.getDouble(DefaultConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
+        float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.1 * mobLevel * event.getRadius() * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
 
         if (newExplosionRange > Integer.MAX_VALUE) {
 
@@ -410,7 +411,7 @@ public class DamageAdjuster implements Listener {
     /*
     This deals with elite mobs being damaged by non-player entities
      */
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void eliteMobDamageGeneric(EntityDamageEvent event) {
 
         if (event.isCancelled()) return;
@@ -437,7 +438,7 @@ public class DamageAdjuster implements Listener {
     /*
     This deals with players hitting the elite mob
      */
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void eliteMobDamageByPlayer(EntityDamageByEntityEvent event) {
 
         if (event.isCancelled()) return;
