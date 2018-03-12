@@ -25,7 +25,8 @@ import org.bukkit.configuration.Configuration;
 public class ConfigValues {
 
     public static Configuration defaultConfig, itemsCustomLootListConfig, mobPowerConfig, translationConfig, itemsProceduralSettingsConfig,
-            economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, validMobsConfig, validWorldsConfig, itemsUniqueConfig;
+            economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, validMobsConfig, validWorldsConfig, itemsUniqueConfig,
+            mobCombatSettingsConfig, itemsDropSettingsConfig;
 
     public static void initializeConfigValues() {
 
@@ -65,6 +66,12 @@ public class ConfigValues {
 
         customConfigLoader = new CustomConfigLoader();
         itemsUniqueConfig = customConfigLoader.getCustomConfig(ItemsUniqueConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        mobCombatSettingsConfig = customConfigLoader.getCustomConfig(MobCombatSettingsConfig.CONFIG_NAME);
+
+        customConfigLoader = new CustomConfigLoader();
+        itemsDropSettingsConfig = customConfigLoader.getCustomConfig(ItemsDropSettingsConfig.CONFIG_NAME);
 
     }
 

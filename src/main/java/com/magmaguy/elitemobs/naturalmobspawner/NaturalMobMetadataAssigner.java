@@ -18,8 +18,8 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
@@ -57,7 +57,7 @@ public class NaturalMobMetadataAssigner implements Listener {
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.NATURAL_MOB_SPAWNING) ||
+        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING) ||
                 !ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) ||
                 !ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName())) {
 
@@ -65,7 +65,8 @@ public class NaturalMobMetadataAssigner implements Listener {
 
         }
 
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.SPAWNERS_SPAWN_ELITE_MOBS)) return;
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && !ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.SPAWNERS_SPAWN_ELITE_MOBS))
+            return;
 
         if (event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM) {
 
@@ -109,7 +110,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                 }
 
-                Double validChance = (ConfigValues.defaultConfig.getDouble(DefaultConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
+                Double validChance = (ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
                         (huntingGearChanceAdder * ConfigValues.itemsUniqueConfig.getInt(ItemsUniqueConfig.HUNTING_SET_CHANCE_INCREASER))) / 100;
 
                 if (random.nextDouble() < validChance) {

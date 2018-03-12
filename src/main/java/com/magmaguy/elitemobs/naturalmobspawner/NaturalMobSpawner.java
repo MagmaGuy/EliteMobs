@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.elitedrops.ItemRankHandler;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
@@ -81,9 +81,9 @@ public class NaturalMobSpawner implements Listener {
 
             eliteMobLevel += threatLevel;
 
-            if (eliteMobLevel > ConfigValues.defaultConfig.getInt(DefaultConfig.NATURAL_ELITEMOB_LEVEL_CAP)) {
+            if (eliteMobLevel > ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP)) {
 
-                eliteMobLevel = ConfigValues.defaultConfig.getInt(DefaultConfig.NATURAL_ELITEMOB_LEVEL_CAP);
+                eliteMobLevel = ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP);
 
             }
 

@@ -16,6 +16,8 @@
 package com.magmaguy.elitemobs.mobcustomizer.displays;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -31,6 +33,8 @@ import java.util.Random;
 public class DamageDisplay {
 
     public static void displayDamage(Entity entity, double damage) {
+
+        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_DAMAGE_DISPLAY)) return;
 
         Location entityLocation = entity.getLocation();
 

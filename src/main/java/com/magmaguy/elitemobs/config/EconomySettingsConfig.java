@@ -28,11 +28,8 @@ public class EconomySettingsConfig {
     public static final String CONFIG_NAME = "EconomySettings.yml";
     public static final String ENABLE_ECONOMY = "Enable economy";
     public static final String RESALE_VALUE = "Item resale value (percentage)";
-    public static final String TIER_PRICE_PROGRESSION = "Tier price progression";
     public static final String LOWEST_PROCEDURALLY_SIMULATED_LOOT = "Procedurally Generated Loot.Lowest simulated elite mob level loot";
     public static final String HIGHEST_PROCEDURALLY_SIMULATED_LOOT = "Procedurally Generated Loot.Highest simulated elite mob level loot";
-    public static final String LOWEST_SIMULATED_CUSTOM_LOOT = "Custom Loot.Lowest simulated elite mob level loot";
-    public static final String HIGHEST_SIMULATED_CUSTOM_LOOT = "Custom Loot.Highest simulated elite mob level loot";
     public static final String CURRENCY_NAME = "Currency name";
     public static final String SHOP_NAME = "Shop name";
     public static final String CUSTOM_SHOP_NAME = "Custom shop name";
@@ -174,11 +171,8 @@ public class EconomySettingsConfig {
 
         configuration.addDefault(ENABLE_ECONOMY, true);
         configuration.addDefault(RESALE_VALUE, 5);
-        configuration.addDefault(TIER_PRICE_PROGRESSION, 20);
         configuration.addDefault(LOWEST_PROCEDURALLY_SIMULATED_LOOT, 1);
         configuration.addDefault(HIGHEST_PROCEDURALLY_SIMULATED_LOOT, 2000);
-        configuration.addDefault(LOWEST_SIMULATED_CUSTOM_LOOT, 1);
-        configuration.addDefault(HIGHEST_SIMULATED_CUSTOM_LOOT, 2000);
         configuration.addDefault(CURRENCY_NAME, "Elite Coins");
         configuration.addDefault(SHOP_NAME, "EliteMobs Shop");
         configuration.addDefault(CUSTOM_SHOP_NAME, "EliteMobs Custom Shop");

@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.commands.guiconfig;
 
-import com.magmaguy.elitemobs.commands.guiconfig.configurers.MobSpawningAndLoot;
 import com.magmaguy.elitemobs.commands.guiconfig.configurers.ValidMobsConfigurer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -312,7 +311,7 @@ public class GUIConfigHandler implements Listener {
                     player.closeInventory();
                     Inventory largeInventory = GUIConfigHandler.sixRowInventory("Miscellaneous");
                     player.openInventory(largeInventory);
-                    MobSpawningAndLoot.mobSpawningAndLootPopulator(largeInventory);
+//                    MobSpawningAndLoot.mobSpawningAndLootPopulator(largeInventory);
 
                     return;
 
