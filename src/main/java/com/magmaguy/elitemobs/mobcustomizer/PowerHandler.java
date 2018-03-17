@@ -18,8 +18,8 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobPowersConfig;
-import com.magmaguy.elitemobs.majorpowers.*;
-import com.magmaguy.elitemobs.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -46,6 +46,7 @@ public class PowerHandler {
     private static ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
     private static ZombieParents zombieParents = new ZombieParents();
     private static ZombieFriends zombieFriends = new ZombieFriends();
+    private static ZombieBloat zombieBloat = new ZombieBloat();
 
     public static void powerHandler(Entity entity) {
 
@@ -179,6 +180,12 @@ public class PowerHandler {
 
                     }
 
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieBloat")) {
+
+                        majorPowersArrayList.add(zombieBloat);
+
+                    }
+
                 }
 
             }
@@ -249,7 +256,7 @@ public class PowerHandler {
 
                 try {
 
-                    String earlyPath = "com.magmaguy.elitemobs.minorpowers.";
+                    String earlyPath = "com.magmaguy.elitemobs.mobpowers.minorpowers.";
 
                     String finalString = earlyPath + string;
 

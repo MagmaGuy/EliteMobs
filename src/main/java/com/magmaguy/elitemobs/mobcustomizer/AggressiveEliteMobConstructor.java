@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 
 import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customAggressiveName;
 
@@ -38,6 +39,7 @@ public class AggressiveEliteMobConstructor {
         customAggressiveName(entity);
         PowerHandler.powerHandler(entity);
         ArmorHandler.ArmorHandler(entity);
+        ((LivingEntity) entity).setCanPickupItems(false);
 
     }
 

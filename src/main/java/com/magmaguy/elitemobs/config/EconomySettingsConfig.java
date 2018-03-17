@@ -64,6 +64,8 @@ public class EconomySettingsConfig {
     public static final String IRON_PICKAXE = MATERIAL_WORTH + "IRON_PICKAXE";
     public static final String IRON_SPADE = MATERIAL_WORTH + "IRON_SPADE";
     public static final String IRON_SWORD = MATERIAL_WORTH + "IRON_SWORD";
+    public static final String SHIELD = MATERIAL_WORTH + "SHIELD";
+    public static final String BOW = MATERIAL_WORTH + "BOW";
     public static final String CHAINMAIL_BOOTS = MATERIAL_WORTH + "CHAINMAIL_BOOTS";
     public static final String CHAINMAIL_CHESTPLATE = MATERIAL_WORTH + "CHAINMAIL_CHESTPLATE";
     public static final String CHAINMAIL_HELMET = MATERIAL_WORTH + "CHAINMAIL_HELMET";
@@ -210,6 +212,8 @@ public class EconomySettingsConfig {
         configuration.addDefault(IRON_PICKAXE, ironLevel);
         configuration.addDefault(IRON_SPADE, ironLevel);
         configuration.addDefault(IRON_SWORD, ironLevel);
+        configuration.addDefault(SHIELD, ironLevel);
+        configuration.addDefault(BOW, ironLevel);
         configuration.addDefault(CHAINMAIL_BOOTS, stoneChainLevel);
         configuration.addDefault(CHAINMAIL_CHESTPLATE, stoneChainLevel);
         configuration.addDefault(CHAINMAIL_HELMET, stoneChainLevel);

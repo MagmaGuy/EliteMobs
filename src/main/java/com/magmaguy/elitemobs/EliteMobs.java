@@ -168,7 +168,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
                 try {
 
-                    String earlypath = "com.magmaguy.elitemobs.minorpowers.";
+                    String earlypath = "com.magmaguy.elitemobs.mobpowers.minorpowers.";
                     String finalString = earlypath + string;
 
                     Class<?> clazz = Class.forName(finalString);
@@ -194,7 +194,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
             //don't load powers that require no event listeners
             try {
 
-                String earlypath = "com.magmaguy.elitemobs.majorpowers.";
+                String earlypath = "com.magmaguy.elitemobs.mobpowers.majorpowers.";
                 String finalString = earlypath + string;
 
                 Class<?> clazz = Class.forName(finalString);

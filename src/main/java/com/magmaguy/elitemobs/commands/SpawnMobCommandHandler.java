@@ -318,6 +318,12 @@ public class SpawnMobCommandHandler {
                             powerCount++;
                         }
                         break;
+                    case MetadataHandler.ZOMBIE_BLOAT_H:
+                        if (entity instanceof Zombie) {
+                            entity.setMetadata(MetadataHandler.ZOMBIE_BLOAT_MD, new FixedMetadataValue(plugin, true));
+                            powerCount++;
+                        }
+                        break;
                     //minor powers
                     case MetadataHandler.ATTACK_ARROW_H:
                         entity.setMetadata(MetadataHandler.ATTACK_ARROW_MD, new FixedMetadataValue(plugin, true));
@@ -399,7 +405,6 @@ public class SpawnMobCommandHandler {
                         break;
                     case MetadataHandler.INVULNERABILITY_FIRE_H:
                         entity.setMetadata(MetadataHandler.INVULNERABILITY_FIRE_MD, new FixedMetadataValue(plugin, true));
-//                        minorPowerPowerStance.invulnerabilityFireEffect(entity);
                         powerCount++;
                         break;
                     case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:

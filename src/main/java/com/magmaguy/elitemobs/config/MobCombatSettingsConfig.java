@@ -22,6 +22,7 @@ public class MobCombatSettingsConfig {
     public static final String CONFIG_NAME = "MobCombatSettings.yml";
 
     public static final String NATURAL_MOB_SPAWNING = "Natural EliteMob spawning";
+    public static final String PLAYER_DEATH_MESSAGE = "Player death message from Elite Mob";
     public static final String SPAWNERS_SPAWN_ELITE_MOBS = "Spawners can spawn Elite Mobs";
     public static final String AGGRESSIVE_MOB_CONVERSION_PERCENTAGE = "Percentage of aggressive mobs that get converted to EliteMobs when they spawn";
     public static final String AGGRESSIVE_MOB_STACKING = "Aggressive mob stacking";
@@ -46,6 +47,7 @@ public class MobCombatSettingsConfig {
     public void initializeConfig() {
 
         configuration.addDefault(NATURAL_MOB_SPAWNING, true);
+        configuration.addDefault(PLAYER_DEATH_MESSAGE, "$player has been slain by $entity");
         configuration.addDefault(SPAWNERS_SPAWN_ELITE_MOBS, false);
         configuration.addDefault(AGGRESSIVE_MOB_CONVERSION_PERCENTAGE, 020.00);
         configuration.addDefault(AGGRESSIVE_MOB_STACKING, true);

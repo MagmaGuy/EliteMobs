@@ -203,6 +203,10 @@ public class ItemWorthCalculator {
                 return configGetter(IRON_SPADE);
             case IRON_SWORD:
                 return configGetter(IRON_SWORD);
+            case BOW:
+                return configGetter(BOW);
+            case SHIELD:
+                return configGetter(SHIELD);
             case CHAINMAIL_BOOTS:
                 return configGetter(CHAINMAIL_BOOTS);
             case CHAINMAIL_CHESTPLATE:

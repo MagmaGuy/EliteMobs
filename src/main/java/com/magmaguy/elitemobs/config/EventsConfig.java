@@ -25,8 +25,8 @@ public class EventsConfig {
     public static final String MAXIMUM_ONLINE_PLAYERS = "Maximum amount of online players after which the event frequency won't increase";
     public static final String MINIMUM_EVENT_FREQUENCY = "Minimum event frequency (minutes)";
     public static final String MAXIMUM_EVENT_FREQUENCY = "Maximum event frequency (minutes)";
-    public static final String ENABLED_EVENTS = "Enabled events";
-    public static final String TREASURE_GOBLIN_SMALL = "Small treasure goblin";
+    private static final String ENABLED_EVENTS = "Enabled events.";
+    public static final String TREASURE_GOBLIN_SMALL = ENABLED_EVENTS + "Small treasure goblin";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT = "Small treasure goblin event announcement text";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT = "Small treasure goblin killed by players message";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT = "Small treasure goblin nondescript death message";
@@ -41,7 +41,7 @@ public class EventsConfig {
         configuration.addDefault(MAXIMUM_ONLINE_PLAYERS, 100);
         configuration.addDefault(MINIMUM_EVENT_FREQUENCY, 45);
         configuration.addDefault(MAXIMUM_EVENT_FREQUENCY, 10);
-        configuration.addDefault(ENABLED_EVENTS + "." + TREASURE_GOBLIN_SMALL, true);
+        configuration.addDefault(TREASURE_GOBLIN_SMALL, true);
         configuration.addDefault(SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT, "&7&m-----------------------------------------------------\n&7[&aEvent&7] &fA &ctreasure goblin &fhas appeared in&c $world &fat&c $location \n &fMake sure to take a hunting party with you!\n&7&m-----------------------------------------------------");
         configuration.addDefault(SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT, "A Treasure Goblin has been slain by $player!");
         configuration.addDefault(SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT, "A Treasure Goblin has been slain!");

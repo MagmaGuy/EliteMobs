@@ -165,6 +165,17 @@ public class MajorPowerPowerStance implements Listener {
 
                     }
 
+                    if (entity.hasMetadata(MetadataHandler.ZOMBIE_BLOAT_MD)) {
+
+                        ItemStack itemStack = new ItemStack(Material.RED_MUSHROOM, 1);
+
+                        itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter));
+
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
+
+                    }
+
                     if (!entity.isValid() || entity.isDead()) {
 
                         for (int i = 0; i < powerItemLocationTracker.size(); i++) {

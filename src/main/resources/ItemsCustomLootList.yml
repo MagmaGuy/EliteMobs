@@ -19,18 +19,6 @@ Loot:
     Potion Effects:
     - JUMP,3,self,continuous
     Drop Weight: 1
-  Camel Charm:
-    Item Type: COOKED_BEEF
-    Item Name: "Camel Charm"
-    Item Lore:
-    - "Camels can go for 7 months"
-    - "without drinking water. With"
-    - "this, you won't ever need it!"
-    Enchantments:
-    - VANISHING_CURSE,1
-    Potion Effects:
-    - SATURATION,1
-    Drop Weight: 1
   Vampiric Charm:
     Item Type: STICK
     Item Name: "Vampiric Charm"

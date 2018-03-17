@@ -46,6 +46,11 @@ public class ArmorHandler {
 
             int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
+            ((LivingEntity) entity).getEquipment().setBoots(new ItemStack(Material.AIR));
+            ((LivingEntity) entity).getEquipment().setLeggings(new ItemStack(Material.AIR));
+            ((LivingEntity) entity).getEquipment().setChestplate(new ItemStack(Material.AIR));
+            ((LivingEntity) entity).getEquipment().setHelmet(new ItemStack(Material.AIR));
+
             if (mobLevel >= 17) {
 
                 if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS)) {
