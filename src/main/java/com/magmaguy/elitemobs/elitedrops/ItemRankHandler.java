@@ -107,6 +107,10 @@ public class ItemRankHandler {
                 return ironLevel;
             case IRON_SWORD:
                 return ironLevel;
+            case BOW:
+                return ironLevel;
+            case SHIELD:
+                return ironLevel;
             case CHAINMAIL_BOOTS:
                 return stoneChainLevel;
             case CHAINMAIL_CHESTPLATE:

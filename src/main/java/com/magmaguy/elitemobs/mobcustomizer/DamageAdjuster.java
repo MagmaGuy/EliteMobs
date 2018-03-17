@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
@@ -29,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -173,6 +175,7 @@ public class DamageAdjuster implements Listener {
 
 
         newDamage -= potionEffectReduction(player);
+        newDamage = newDamage * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.DAMAGE_MULTIPLIER);
 
         //Prevent untouchable armor and 1-shots
         if (newDamage < 1) newDamage = 1;
@@ -182,6 +185,12 @@ public class DamageAdjuster implements Listener {
 
             player.setHealth(0);
 
+            /*
+            Send custom player death message
+             */
+            PlayerDeathMessageByEliteMob.handleDeathMessage(player, livingEntity);
+
+
         } else {
 
             player.setHealth(player.getHealth() - newDamage);
@@ -189,6 +198,16 @@ public class DamageAdjuster implements Listener {
         }
 
         event.setDamage(0);
+
+    }
+
+    /*
+    Deal with players dying from Elite Mobs
+     */
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+
+        if (event.getEntity().hasMetadata(MetadataHandler.KILLED_BY_ELITE_MOB)) event.setDeathMessage("");
 
     }
 

@@ -42,6 +42,10 @@ public class MetadataHandler implements Listener {
 
     //plugin name
     public final static String ELITE_MOBS = "EliteMobs";
+
+    //plugin getter
+    public final static Plugin PLUGIN = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+
     //plugin metadata
     public final static String ELITE_MOB_MD = "EliteMob";
     public final static String PASSIVE_ELITE_MOB_MD = "PassiveEliteMob";
@@ -57,16 +61,21 @@ public class MetadataHandler implements Listener {
     public final static String FORBIDDEN_MD = "Forbidden";
     public final static String CUSTOM_POWERS_MD = "Custom";
     public final static String EVENT_CREATURE = "EventCreature";
+
     //Major powers
     public final static String ZOMBIE_FRIENDS_MD = "ZombieFriends";
     public final static String ZOMBIE_NECRONOMICON_MD = "ZombieNecronomicon";
     public final static String ZOMBIE_TEAM_ROCKET_MD = "ZombieTeamRocket";
     public final static String ZOMBIE_PARENTS_MD = "ZombieParents";
+    public final static String ZOMBIE_BLOAT_MD = "ZombieBloat";
+
     //Major powers human format
     public final static String ZOMBIE_FRIENDS_H = "ZombieFriends";
     public final static String ZOMBIE_NECRONOMICON_H = "ZombieNecronomicon";
     public final static String ZOMBIE_TEAM_ROCKET_H = "ZombieTeamRocket";
     public final static String ZOMBIE_PARENTS_H = "ZombieParents";
+    public final static String ZOMBIE_BLOAT_H = "ZombieBloat";
+
     //Minor powers
     public final static String ATTACK_ARROW_MD = "AttackArrow";
     public final static String ATTACK_BLINDING_MD = "AttackBlinding";
@@ -90,6 +99,7 @@ public class MetadataHandler implements Listener {
     public final static String MOVEMENT_SPEED_MD = "MovementSpeed";
     public final static String INVISIBILITY_MD = "Invisibility";
     public final static String TAUNT_MD = "Taunt";
+
     //Minor powers human format
     public final static String ATTACK_ARROW_H = "Archer";
     public final static String ATTACK_BLINDING_H = "Blindness";
@@ -117,7 +127,6 @@ public class MetadataHandler implements Listener {
 
     //powerEffects
     public final static String FROZEN = "Frozen";
-    public final static String FROZEN_COOLDOWN = "FrozenCooldown";
     public final static String ZOMBIE_FRIENDS_ACTIVATED = "ZombieFriendsActivated";
     public final static String TEAM_ROCKET_MEMBER = "TeamRocketMember";
     public final static String TEAM_ROCKET_ACTIVATED = "TeamRocketActivated";
@@ -125,6 +134,18 @@ public class MetadataHandler implements Listener {
     public final static String ZOMBIE_CHANTING = "ZombieChanting";
     public final static String SHOOTING_ARROWS = "ShootingArrows";
     public final static String SHOOTING_FIREBALLS = "ShootingFireballs";
+
+    //powerCooldowns
+    public final static String FROZEN_COOLDOWN = "FrozenCooldown";
+    public final static String ZOMBIE_BLOAT_COOLDOWN = "ZombieBloatCooldown";
+    public final static String ATTACK_CONFUSING_COOLDOWN = "AttackConfusingCooldown";
+    public final static String ATTACK_BLINDING_COOLDOWN = "AttackBlindingCooldown";
+    public final static String ATTACK_FIRE_COOLDOWN = "AttackFireCooldown";
+    public final static String ATTACK_GRAVITY_COOLDOWN = "AttackGravityCooldown";
+    public final static String ATTACK_POISON_COOLDOWN = "AttackPoisonCooldown";
+    public final static String ATTACK_PUSH_COOLDOWN = "AttackPushCooldown";
+    public final static String ATTACK_WITHER_COOLDOWN = "AttackWitherCooldown";
+    public final static String TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN = "TreasureGoblinRadialGoldExplosionCooldown";
 
     //displays
     public final static String ARMOR_STAND_DISPLAY = "ArmorStandDisplay";
@@ -134,8 +155,12 @@ public class MetadataHandler implements Listener {
     public final static String VANISH_NO_PACKET = "vanished";
 
     //events
-    public final static String PERSISTENT_ENTITY = "PersistentEntity";
+//    public final static String PERSISTENT_ENTITY = "PersistentEntity";
     public final static String TREASURE_GOBLIN = "TreasureGoblin";
+
+    //player metadata
+    public final static String KILLED_BY_ELITE_MOB = "KilledByEliteMob";
+
     public static List<String> minorPowerList = new ArrayList<>(Arrays.asList(
             ATTACK_ARROW_MD,
             ATTACK_BLINDING_MD,
@@ -164,7 +189,8 @@ public class MetadataHandler implements Listener {
             ZOMBIE_FRIENDS_MD,
             ZOMBIE_NECRONOMICON_MD,
             ZOMBIE_TEAM_ROCKET_MD,
-            ZOMBIE_PARENTS_MD
+            ZOMBIE_PARENTS_MD,
+            ZOMBIE_BLOAT_MD
     ));
     public static List<String> forMetadataList = new ArrayList<>(Arrays.asList( //add major and minor power lists
             ELITE_MOB_MD,
@@ -181,6 +207,14 @@ public class MetadataHandler implements Listener {
             FORBIDDEN_MD,
             FROZEN,
             FROZEN_COOLDOWN,
+            ZOMBIE_BLOAT_COOLDOWN,
+            ATTACK_CONFUSING_COOLDOWN,
+            ATTACK_BLINDING_COOLDOWN,
+            ATTACK_FIRE_COOLDOWN,
+            ATTACK_GRAVITY_COOLDOWN,
+            ATTACK_POISON_COOLDOWN,
+            ATTACK_WITHER_COOLDOWN,
+            TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN,
             ZOMBIE_FRIENDS_ACTIVATED,
             TEAM_ROCKET_ACTIVATED,
             TEAM_ROCKET_MEMBER,
@@ -188,7 +222,8 @@ public class MetadataHandler implements Listener {
             ZOMBIE_CHANTING,
             SHOOTING_ARROWS,
             SHOOTING_FIREBALLS,
-            ARMOR_STAND_DISPLAY
+            ARMOR_STAND_DISPLAY,
+            KILLED_BY_ELITE_MOB
     ));
     public static List<String> powerListHumanFormat = new ArrayList<>(Arrays.asList( //add major and minor power lists
             //minor powers
@@ -218,7 +253,8 @@ public class MetadataHandler implements Listener {
             ZOMBIE_PARENTS_H,
             ZOMBIE_NECRONOMICON_H,
             ZOMBIE_TEAM_ROCKET_H,
-            ZOMBIE_PARENTS_H
+            ZOMBIE_PARENTS_H,
+            ZOMBIE_BLOAT_H
     ));
     Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
 
@@ -257,6 +293,8 @@ public class MetadataHandler implements Listener {
                 return ZOMBIE_TEAM_ROCKET_H;
             case ZOMBIE_PARENTS_MD:
                 return ZOMBIE_PARENTS_H;
+            case ZOMBIE_BLOAT_MD:
+                return ZOMBIE_BLOAT_H;
 
             case ATTACK_ARROW_MD:
                 return ATTACK_ARROW_H;

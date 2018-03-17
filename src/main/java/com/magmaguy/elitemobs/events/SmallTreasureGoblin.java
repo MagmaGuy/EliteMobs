@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -43,11 +44,11 @@ public class SmallTreasureGoblin implements Listener {
     public void createGoblin(Entity entity) {
 
         //Give custom setup to entity
-        entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 200));
+        entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 600));
         entity.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
         entity.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
         entity.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
-//        entity.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
         entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(plugin, true));
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
 
@@ -58,6 +59,7 @@ public class SmallTreasureGoblin implements Listener {
         entity.setCustomNameVisible(true);
 
         entity.setMetadata(MetadataHandler.TREASURE_GOBLIN, new FixedMetadataValue(plugin, true));
+        TreasureGoblin.equipTreasureGoblin((Zombie) entity);
 
         String coordinates = entity.getLocation().getBlockX() + ", " + entity.getLocation().getBlockY() + ", " + entity.getLocation().getBlockZ();
 
@@ -92,6 +94,7 @@ public class SmallTreasureGoblin implements Listener {
         entityQueued = false;
 
     }
+
 
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {

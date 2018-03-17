@@ -111,7 +111,24 @@ public class CustomShopHandler implements Listener {
         //These slots are for buying items
         if (validSlots.contains(event.getSlot()) && event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME)) {
 
-            if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
+            boolean inventoryFull = false;
+            for (ItemStack iteratedStack : player.getInventory()) {
+
+                if (iteratedStack == null) {
+
+                    inventoryFull = true;
+                    break;
+
+                }
+
+            }
+
+            if (inventoryFull) {
+
+                player.sendMessage("Your inventory is full! You can't buy items until you get some free space.");
+                player.closeInventory();
+
+            } else if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
                 //player has enough money
                 EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(player.getName()), itemValue);
                 player.getInventory().addItem(itemStack);
