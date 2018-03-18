@@ -22,7 +22,6 @@ public class MobCombatSettingsConfig {
     public static final String CONFIG_NAME = "MobCombatSettings.yml";
 
     public static final String NATURAL_MOB_SPAWNING = "Natural EliteMob spawning";
-    public static final String PLAYER_DEATH_MESSAGE = "Player death message from Elite Mob";
     public static final String SPAWNERS_SPAWN_ELITE_MOBS = "Spawners can spawn Elite Mobs";
     public static final String AGGRESSIVE_MOB_CONVERSION_PERCENTAGE = "Percentage of aggressive mobs that get converted to EliteMobs when they spawn";
     public static final String AGGRESSIVE_MOB_STACKING = "Aggressive mob stacking";
@@ -40,6 +39,19 @@ public class MobCombatSettingsConfig {
     public static final String ENABLE_WARNING_VISUAL_EFFECTS = "Turn on visual effects that indicate an attack is about to happen";
     public static final String ENABLE_DAMAGE_DISPLAY = " Display damage when Elite Mob is hit";
     public static final String ENABLE_HEALTH_DISPLAY = "Display health when Elite Mob is hit";
+    private static final String DEATH_MESSAGES = "Player death messages cause by.";
+    public static final String BLAZE_DEATH_MESSAGE = DEATH_MESSAGES + "blazes";
+    public static final String CREEPER_DEATH_MESSAGE = DEATH_MESSAGES + "creeper";
+    public static final String ENDERMAN_DEATH_MESSAGE = DEATH_MESSAGES + "enderman";
+    public static final String ENDERMITE_DEATH_MESSAGE = DEATH_MESSAGES + "endermite";
+    public static final String IRONGOLEM_DEATH_MESSAGE = DEATH_MESSAGES + "iron golem";
+    public static final String POLARBEAR_DEATH_MESSAGE = DEATH_MESSAGES + "polar bear";
+    public static final String SILVERFISH_DEATH_MESSAGE = DEATH_MESSAGES + "silverfish";
+    public static final String SKELETON_DEATH_MESSAGE = DEATH_MESSAGES + "skeleton";
+    public static final String SPIDER_DEATH_MESSAGE = DEATH_MESSAGES + "spider";
+    public static final String WITCH_DEATH_MESSAGE = DEATH_MESSAGES + "witch";
+    public static final String ZOMBIE_DEATH_MESSAGE = DEATH_MESSAGES + "zombie";
+    public static final String DEFAULT_DEATH_MESSAGE = DEATH_MESSAGES + "default";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -47,7 +59,6 @@ public class MobCombatSettingsConfig {
     public void initializeConfig() {
 
         configuration.addDefault(NATURAL_MOB_SPAWNING, true);
-        configuration.addDefault(PLAYER_DEATH_MESSAGE, "$player has been slain by $entity");
         configuration.addDefault(SPAWNERS_SPAWN_ELITE_MOBS, false);
         configuration.addDefault(AGGRESSIVE_MOB_CONVERSION_PERCENTAGE, 020.00);
         configuration.addDefault(AGGRESSIVE_MOB_STACKING, true);
@@ -65,6 +76,18 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(ENABLE_WARNING_VISUAL_EFFECTS, true);
         configuration.addDefault(ENABLE_DAMAGE_DISPLAY, true);
         configuration.addDefault(ENABLE_HEALTH_DISPLAY, true);
+        configuration.addDefault(BLAZE_DEATH_MESSAGE, "$player was lit ablaze by $entity!");
+        configuration.addDefault(CREEPER_DEATH_MESSAGE, "$player was blasted away by $entity!");
+        configuration.addDefault(ENDERMAN_DEATH_MESSAGE, "$entity sent $player into the void!");
+        configuration.addDefault(ENDERMITE_DEATH_MESSAGE, "$player was glitched to death by $entity!");
+        configuration.addDefault(IRONGOLEM_DEATH_MESSAGE, "$player messed with the wrong $entity!");
+        configuration.addDefault(POLARBEAR_DEATH_MESSAGE, "$player was clawed to death by $entity!");
+        configuration.addDefault(SILVERFISH_DEATH_MESSAGE, "$player mistook $entity for a stone block!");
+        configuration.addDefault(SKELETON_DEATH_MESSAGE, "$player became $entity's pin cushion!");
+        configuration.addDefault(SPIDER_DEATH_MESSAGE, "$player became entangled in $entity's web!");
+        configuration.addDefault(WITCH_DEATH_MESSAGE, "$player became $entity's test subject!");
+        configuration.addDefault(ZOMBIE_DEATH_MESSAGE, "$player was devoured by $entity!");
+        configuration.addDefault(DEFAULT_DEATH_MESSAGE, "$player has been slain by $entity");
 
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);

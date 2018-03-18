@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -26,7 +27,49 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class PlayerDeathMessageByEliteMob {
 
-    public static void handleDeathMessage(Player player, LivingEntity livingEntity) {
+    public static void intializeDeathMessage(Player player, LivingEntity livingEntity) {
+
+        String deathMessage;
+
+        switch (livingEntity.getType()) {
+
+            case BLAZE:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.BLAZE_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case CREEPER:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.CREEPER_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case ENDERMAN:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.ENDERMAN_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case ENDERMITE:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.ENDERMITE_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case IRON_GOLEM:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.IRONGOLEM_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case POLAR_BEAR:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.POLARBEAR_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case SILVERFISH:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.SILVERFISH_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case SKELETON:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.SKELETON_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case SPIDER:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.SPIDER_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case WITCH:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.WITCH_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case ZOMBIE:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.ZOMBIE_DEATH_MESSAGE, player, livingEntity);
+                break;
+            default:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.DEFAULT_DEATH_MESSAGE, player, livingEntity);
+                break;
+        }
 
         player.setMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
 
@@ -35,14 +78,30 @@ public class PlayerDeathMessageByEliteMob {
             /*
             Send death message
             */
-            String deathMessage = ConfigValues.mobCombatSettingsConfig.getString(MobCombatSettingsConfig.PLAYER_DEATH_MESSAGE);
-            deathMessage = deathMessage.replace("$player", player.getDisplayName());
-            deathMessage = deathMessage.replace("$entity", livingEntity.getCustomName());
-            deathMessage = ChatColorConverter.chatColorConverter(deathMessage);
-
             onlinePlayer.sendMessage(deathMessage);
 
         }
+
+    }
+
+    private static String deathMessageSender(String configNode, Player player, LivingEntity livingEntity) {
+
+        String deathMessage = ConfigValues.mobCombatSettingsConfig.getString(configNode);
+        deathMessage = deathMessagePlaceholderConversion(deathMessage, player, livingEntity);
+
+        return deathMessage;
+
+    }
+
+    private static String deathMessagePlaceholderConversion(String deathMessage, Player player, LivingEntity livingEntity) {
+
+        String livingEntityName = NameHandler.customAggressiveName(livingEntity);
+
+        deathMessage = deathMessage.replace("$player", player.getDisplayName());
+        deathMessage = deathMessage.replace("$entity", livingEntityName);
+        deathMessage = ChatColorConverter.chatColorConverter(deathMessage);
+
+        return deathMessage;
 
     }
 

@@ -122,7 +122,6 @@ public class ShopHandler implements Listener {
 
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
-        //These slots are for buying items
         boolean inventoryFull = false;
         for (ItemStack iteratedStack : player.getInventory()) {
 
@@ -135,14 +134,15 @@ public class ShopHandler implements Listener {
 
         }
 
-        if (inventoryFull) {
+        //These slots are for buying items
+        if (event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME) && validSlots.contains(event.getSlot())) {
 
-            player.sendMessage("Your inventory is full! You can't buy items until you get some free space.");
-            player.closeInventory();
+            if (inventoryFull) {
 
-        } else if (event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME) && validSlots.contains(event.getSlot())) {
+                player.sendMessage("Your inventory is full! You can't buy items until you get some free space.");
+                player.closeInventory();
 
-            if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
+            } else if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
                 //player has enough money
                 EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(player.getName()), itemValue);
                 player.getInventory().addItem(itemStack);

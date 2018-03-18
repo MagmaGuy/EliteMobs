@@ -245,7 +245,7 @@ public class TreasureGoblin implements Listener {
 
                     if (entity instanceof Player) {
 
-                        PlayerDeathMessageByEliteMob.handleDeathMessage((Player) entity, eliteMob);
+                        PlayerDeathMessageByEliteMob.intializeDeathMessage((Player) entity, eliteMob);
 
                     }
 
