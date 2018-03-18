@@ -188,7 +188,7 @@ public class DamageAdjuster implements Listener {
             /*
             Send custom player death message
              */
-            PlayerDeathMessageByEliteMob.handleDeathMessage(player, livingEntity);
+            PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity);
 
 
         } else {
