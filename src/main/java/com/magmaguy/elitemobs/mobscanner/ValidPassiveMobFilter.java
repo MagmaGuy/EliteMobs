@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.*;
 
@@ -28,11 +29,11 @@ public class ValidPassiveMobFilter {
 
         Configuration config = ConfigValues.validMobsConfig;
 
-        return entity instanceof Chicken && config.getBoolean("Valid passive EliteMobs.Chicken") ||
-                entity instanceof Cow && config.getBoolean("Valid passive EliteMobs.Cow") ||
-                entity instanceof MushroomCow && config.getBoolean("Valid passive EliteMobs.MushroomCow") ||
-                entity instanceof Pig && config.getBoolean("Valid passive EliteMobs.Pig") ||
-                entity instanceof Sheep && config.getBoolean("Valid passive EliteMobs.Sheep");
+        return entity instanceof Chicken && config.getBoolean(ValidMobsConfig.CHICKEN) ||
+                entity instanceof Cow && config.getBoolean(ValidMobsConfig.COW) ||
+                entity instanceof MushroomCow && config.getBoolean(ValidMobsConfig.MUSHROOM_COW) ||
+                entity instanceof Pig && config.getBoolean(ValidMobsConfig.PIG) ||
+                entity instanceof Sheep && config.getBoolean(ValidMobsConfig.SHEEP);
 
     }
 

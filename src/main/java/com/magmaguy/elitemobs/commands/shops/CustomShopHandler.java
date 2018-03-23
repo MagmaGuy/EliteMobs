@@ -111,19 +111,19 @@ public class CustomShopHandler implements Listener {
         //These slots are for buying items
         if (validSlots.contains(event.getSlot()) && event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME)) {
 
-            boolean inventoryFull = false;
+            boolean inventoryHasFreeSlots = false;
             for (ItemStack iteratedStack : player.getInventory()) {
 
                 if (iteratedStack == null) {
 
-                    inventoryFull = true;
+                    inventoryHasFreeSlots = true;
                     break;
 
                 }
 
             }
 
-            if (inventoryFull) {
+            if (!inventoryHasFreeSlots) {
 
                 player.sendMessage("Your inventory is full! You can't buy items until you get some free space.");
                 player.closeInventory();

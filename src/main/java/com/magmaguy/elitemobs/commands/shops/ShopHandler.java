@@ -122,12 +122,12 @@ public class ShopHandler implements Listener {
 
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
-        boolean inventoryFull = false;
+        boolean inventoryHasFreeSlots = false;
         for (ItemStack iteratedStack : player.getInventory()) {
 
             if (iteratedStack == null) {
 
-                inventoryFull = true;
+                inventoryHasFreeSlots = true;
                 break;
 
             }
@@ -137,7 +137,7 @@ public class ShopHandler implements Listener {
         //These slots are for buying items
         if (event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME) && validSlots.contains(event.getSlot())) {
 
-            if (inventoryFull) {
+            if (!inventoryHasFreeSlots) {
 
                 player.sendMessage("Your inventory is full! You can't buy items until you get some free space.");
                 player.closeInventory();

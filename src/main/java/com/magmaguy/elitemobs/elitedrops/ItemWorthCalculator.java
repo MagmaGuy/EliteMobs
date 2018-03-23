@@ -30,9 +30,17 @@ public class ItemWorthCalculator {
 
     public static double determineItemWorth(ItemStack itemStack) {
 
-        double itemWorth = itemTypeWorth(itemStack.getType()) + getAllEnchantmentsValue(itemStack) + potionEffectValue(itemStack);
+        double itemWorth = Math.round((itemTypeWorth(itemStack.getType()) + getAllEnchantmentsValue(itemStack) + potionEffectValue(itemStack)) * 100.0) / 100.0;
 
         return itemWorth;
+
+    }
+
+    public static double determineResaleWorth(ItemStack itemStack) {
+
+        double resaleWorth = Math.round((determineItemWorth(itemStack) * (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.RESALE_VALUE) / 100)) * 100.0) / 100.0;
+
+        return resaleWorth;
 
     }
 
