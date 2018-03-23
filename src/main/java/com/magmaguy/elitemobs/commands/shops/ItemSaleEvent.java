@@ -15,8 +15,6 @@
 
 package com.magmaguy.elitemobs.commands.shops;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.ItemWorthCalculator;
@@ -64,9 +62,7 @@ public class ItemSaleEvent implements Listener {
         ItemStack itemStack = event.getCurrentItem();
         String itemDisplayName = itemStack.getItemMeta().getDisplayName();
 
-        double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
-
-        double amountDeduced = itemValue * (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.RESALE_VALUE) / 100);
+        double amountDeduced = ItemWorthCalculator.determineResaleWorth(itemStack);
 
         EconomyHandler.addCurrency(UUIDFilter.guessUUI(player.getName()), amountDeduced);
 

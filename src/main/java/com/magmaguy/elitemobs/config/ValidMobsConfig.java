@@ -22,11 +22,12 @@ public class ValidMobsConfig {
     public static final String CONFIG_NAME = "ValidMobs.yml";
     public static final String ALLOW_AGGRESSIVE_ELITEMOBS = "Allow aggressive EliteMobs";
     public static final String ALLOW_PASSIVE_SUPERMOBS = "Allow Passive SuperMobs";
-    public static final String CHICKEN = "Chicken";
-    public static final String COW = "Cow";
-    public static final String MUSHROOM_COW = "MushroomCow";
-    public static final String PIG = "Pig";
-    public static final String SHEEP = "Sheep";
+    private static final String VALID_SUPERMOBS = "Valid Super Mobs.";
+    public static final String CHICKEN = VALID_SUPERMOBS + "Chicken";
+    public static final String COW = VALID_SUPERMOBS + "Cow";
+    public static final String MUSHROOM_COW = VALID_SUPERMOBS + "MushroomCow";
+    public static final String PIG = VALID_SUPERMOBS + "Pig";
+    public static final String SHEEP = VALID_SUPERMOBS + "Sheep";
     private static final String VALID_AGGRESSIVE_ELITEMOBS = "Valid aggressive EliteMobs.";
     public static final String BLAZE = VALID_AGGRESSIVE_ELITEMOBS + "Blaze";
     public static final String CAVE_SPIDER = VALID_AGGRESSIVE_ELITEMOBS + "CaveSpider";
@@ -41,7 +42,6 @@ public class ValidMobsConfig {
     public static final String SPIDER = VALID_AGGRESSIVE_ELITEMOBS + "Spider";
     public static final String WITCH = VALID_AGGRESSIVE_ELITEMOBS + "Witch";
     public static final String ZOMBIE = VALID_AGGRESSIVE_ELITEMOBS + "Zombie";
-    private static final String VALID_PASSIVE_MOBS = "Valid passive EliteMobs.";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
@@ -62,11 +62,11 @@ public class ValidMobsConfig {
         configuration.addDefault(WITCH, true);
         configuration.addDefault(ZOMBIE, true);
         configuration.addDefault(ALLOW_PASSIVE_SUPERMOBS, true);
-        configuration.addDefault("Valid passive EliteMobs.Chicken", true);
-        configuration.addDefault("Valid passive EliteMobs.Cow", true);
-        configuration.addDefault("Valid passive EliteMobs.MushroomCow", true);
-        configuration.addDefault("Valid passive EliteMobs.Pig", true);
-        configuration.addDefault("Valid passive EliteMobs.Sheep", true);
+        configuration.addDefault(CHICKEN, true);
+        configuration.addDefault(COW, true);
+        configuration.addDefault(MUSHROOM_COW, true);
+        configuration.addDefault(PIG, true);
+        configuration.addDefault(SHEEP, true);
 
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);

@@ -386,6 +386,17 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }
 
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                DynamicLore.refreshDynamicLore();
+
+            }
+
+        }.runTaskTimer(this, 20, 20 * 2);
+
     }
 
 }
