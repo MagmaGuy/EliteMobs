@@ -23,7 +23,7 @@ import org.bukkit.configuration.Configuration;
  */
 public class MobPowersConfig {
 
-    public static final String CONFIG_NAME = "1MobPowers.yml";
+    public static final String CONFIG_NAME = "MobPowers.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 

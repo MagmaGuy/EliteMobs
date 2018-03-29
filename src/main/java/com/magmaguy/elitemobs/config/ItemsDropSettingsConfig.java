@@ -19,7 +19,7 @@ import org.bukkit.configuration.Configuration;
 
 public class ItemsDropSettingsConfig {
 
-    public static final String CONFIG_NAME = "1ItemsDropSettings.yml";
+    public static final String CONFIG_NAME = "ItemsDropSettings.yml";
 
     public static final String ENABLE_PLUGIN_LOOT = "Enable plugin loot";
     public static final String DROP_CUSTOM_ITEMS = "Elite Mobs can drop custom loot";

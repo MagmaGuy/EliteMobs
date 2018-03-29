@@ -221,7 +221,7 @@ public class PotionEffectApplier implements Listener {
 
                     } else {
 
-                        Bukkit.getLogger().info("[EliteMobs] Error with 1ItemsCustomLootList.yml: was expecting '" + TARGET + "' or '"
+                        Bukkit.getLogger().info("[EliteMobs] Error with ItemsCustomLootList.yml: was expecting '" + TARGET + "' or '"
                                 + SELF + "' values but got '" + victim + "' instead.");
 
                     }
@@ -240,7 +240,7 @@ public class PotionEffectApplier implements Listener {
 
                     } else {
 
-                        Bukkit.getLogger().info("[EliteMobs] Error with 1ItemsCustomLootList.yml: was expecting '" + CONTINUOUS +
+                        Bukkit.getLogger().info("[EliteMobs] Error with ItemsCustomLootList.yml: was expecting '" + CONTINUOUS +
                                 "' or '" + ONHIT + "' value but got '" + substring + "' instead.");
 
                     }

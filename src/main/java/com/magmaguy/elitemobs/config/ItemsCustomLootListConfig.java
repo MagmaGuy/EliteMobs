@@ -25,7 +25,7 @@ import java.io.File;
  */
 public class ItemsCustomLootListConfig {
 
-    public static final String CONFIG_NAME = "1ItemsCustomLootList.yml";
+    public static final String CONFIG_NAME = "ItemsCustomLootList.yml";
 
     public void intializeConfig() {
 

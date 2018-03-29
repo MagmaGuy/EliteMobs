@@ -19,7 +19,7 @@ import org.bukkit.configuration.Configuration;
 
 public class ItemsUniqueConfig {
 
-    public static final String CONFIG_NAME = "1ItemsUnique.yml";
+    public static final String CONFIG_NAME = "ItemsUnique.yml";
     public static final String ENABLE_UNIQUE_ITEMS = "Enable unique items";
     public static final String ENABLE_HUNTING_SET = "Enable Mob Hunting set";
     public static final String HUNTING_SET_CHANCE_INCREASER = "EliteMob percentual spawn chance increase per hunting set item";
