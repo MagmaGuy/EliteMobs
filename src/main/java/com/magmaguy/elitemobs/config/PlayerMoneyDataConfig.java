@@ -22,7 +22,7 @@ import org.bukkit.configuration.Configuration;
  */
 public class PlayerMoneyDataConfig {
 
-    public static final String CONFIG_NAME = "playerMoneyData.yml";
+    public static final String CONFIG_NAME = "1playerMoneyData.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 

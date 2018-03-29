@@ -19,7 +19,7 @@ import org.bukkit.configuration.Configuration;
 
 public class ItemsCustomLootSettingsConfig {
 
-    public static final String CONFIG_NAME = "ItemsCustomLootSettings.yml";
+    public static final String CONFIG_NAME = "1ItemsCustomLootSettings.yml";
     public static final String SHOW_POTION_EFFECTS = "Show potion effects on lore";
     public static final String SHOW_ITEM_VALUE = "Show item value on lore";
     public static final String LORE_STRUCTURE = "Lore structure";

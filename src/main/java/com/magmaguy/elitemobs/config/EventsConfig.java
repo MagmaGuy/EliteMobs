@@ -19,7 +19,7 @@ import org.bukkit.configuration.Configuration;
 
 public class EventsConfig {
 
-    public static final String CONFIG_NAME = "events.yml";
+    public static final String CONFIG_NAME = "1events.yml";
     public static final String ENABLE_EVENTS = "Enable events";
     public static final String MINIMUM_ONLINE_PLAYERS = "Minimum amount of online players for event to trigger";
     public static final String MAXIMUM_ONLINE_PLAYERS = "Maximum amount of online players after which the event frequency won't increase";

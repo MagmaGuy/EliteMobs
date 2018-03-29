@@ -22,7 +22,7 @@ import org.bukkit.configuration.Configuration;
  */
 public class PlayerCacheConfig {
 
-    public static final String CONFIG_NAME = "playerCache.yml";
+    public static final String CONFIG_NAME = "1playerCache.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
