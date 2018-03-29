@@ -24,13 +24,29 @@ import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-public class DamageDisplay {
+public class DamageDisplay implements Listener {
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onHit(EntityDamageEvent event) {
+
+        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
+
+            if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getDamage());
+
+        }
+
+    }
 
     public static void displayDamage(Entity entity, double damage) {
 

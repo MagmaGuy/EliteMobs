@@ -101,7 +101,7 @@ public class ShopHandler implements Listener {
         if (!event.getInventory().getName().equals(SHOP_NAME)) return;
 
         //reroll loot button
-        if (event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.signatureItem().getItemMeta().getDisplayName())) {
+        if (event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName())) {
 
             populateShop(event.getInventory());
             event.setCancelled(true);

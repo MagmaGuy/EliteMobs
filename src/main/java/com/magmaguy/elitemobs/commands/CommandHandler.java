@@ -25,19 +25,26 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
+import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
+import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
+import com.magmaguy.elitemobs.events.mobs.ZombieKing;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.Random;
 
@@ -72,6 +79,7 @@ public class CommandHandler implements CommandExecutor {
     private final static String VERSION = "elitemobs.version";
     private final static String CONFIG = "elitemobs.config";
     private final static String EVENT_SMALL_TREASURE_GOBLIN = "elitemobs.event.smalltreasuregoblin";
+    private final static String EVENT_DEAD_MOON = "elitemobs.event.deadmoon";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -321,6 +329,42 @@ public class CommandHandler implements CommandExecutor {
                         permCheck(EVENT_SMALL_TREASURE_GOBLIN, commandSender)) {
 
                     SmallTreasureGoblin.initializeEvent();
+                    commandSender.sendMessage("Queued small treasure goblin event for next valid zombie spawn");
+
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("event") && args[1].equalsIgnoreCase("deadmoon") &&
+                        permCheck(EVENT_DEAD_MOON, commandSender)) {
+
+                    DeadMoon.initializeEvent();
+                    commandSender.sendMessage("Queued deadmoon event for next new moon");
+
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("spawnbossmob") && userPermCheck(SPAWNMOB, commandSender)) {
+
+                    Player player = (Player) commandSender;
+                    Location cursorLocation = player.getTargetBlock(null, 5).getLocation().add(new Vector(0.5, 2, 0.5));
+
+                    if (args[1].equalsIgnoreCase("treasuregoblin")) {
+
+                        Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
+                        TreasureGoblin.createGoblin(zombie);
+                        commandSender.sendMessage("Spawned treasure goblin");
+
+                    }
+
+                    if (args[1].equalsIgnoreCase("zombieking")) {
+
+                        Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
+                        ZombieKing.spawnZombieKing(zombie);
+                        commandSender.sendMessage("Spawned zombie king");
+
+                    }
 
                     return true;
 

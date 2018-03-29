@@ -145,7 +145,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                             Zombie zombie = (Zombie) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.ZOMBIE);
                             zombie.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 1));
-                            zombie.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+                            zombie.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
                             zombie.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
                             zombie.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
                             zombie.setMetadata(MetadataHandler.CUSTOM_HEALTH, new FixedMetadataValue(plugin, true));
@@ -162,7 +162,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                             Skeleton skeleton = (Skeleton) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.SKELETON);
                             skeleton.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 1));
-                            skeleton.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+                            skeleton.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
                             skeleton.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
                             skeleton.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
                             skeleton.setMetadata(MetadataHandler.CUSTOM_HEALTH, new FixedMetadataValue(plugin, true));

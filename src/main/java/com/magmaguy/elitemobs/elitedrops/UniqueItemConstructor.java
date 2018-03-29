@@ -26,15 +26,26 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class UniqueItemConstructor {
 
-    CustomItemConstructor customItemConstructor = new CustomItemConstructor();
+    static CustomItemConstructor customItemConstructor = new CustomItemConstructor();
 
-    ArrayList<ItemStack> uniqueItems = new ArrayList<>();
+    public static HashMap<String, ItemStack> uniqueItems = new HashMap();
+    public static final String HUNTING_HELMET = "HuntingHelmet";
+    public static final String HUNTING_CHESTPLATE = "HuntingChestplate";
+    public static final String HUNTING_LEGGINGS = "HuntingLeggings";
+    public static final String HUNTING_BOOTS = "HuntingBoots";
+    public static final String HUNTING_BOW = "HuntingBow";
+    public static final String ZOMBIE_KING_AXE = "ZombieKingAxe";
 
     public static final String HUNTING_SET_IDENTIFIER = " Hunting set";
+    public static final String ZOMBIE_KING_AXE_IDENTIFIER = " King Axe";
+
+    public UniqueItemConstructor() {
+    }
 
     public void intializeUniqueItems() {
 
@@ -43,7 +54,7 @@ public class UniqueItemConstructor {
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_HUNTING_SET)) {
 
             //add helmet
-            ItemStack helmet = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_HELMET));
+            ItemStack helmet = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_HELMET), UniqueItemType.ELITE_MOB_HUNTING_SET);
             helmet = tempWorthLoreAdder(helmet);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_HELMET)) > 0) {
@@ -58,8 +69,9 @@ public class UniqueItemConstructor {
 
             //add helmet
             CustomItemConstructor.customItemList.add(helmet);
+            uniqueItems.put(HUNTING_HELMET, helmet);
 
-            ItemStack chestplate = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_CHESTPLATE));
+            ItemStack chestplate = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_CHESTPLATE), UniqueItemType.ELITE_MOB_HUNTING_SET);
             chestplate = tempWorthLoreAdder(chestplate);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_CHESTPLATE)) > 0) {
@@ -73,9 +85,10 @@ public class UniqueItemConstructor {
             }
 
             CustomItemConstructor.customItemList.add(chestplate);
+            uniqueItems.put(HUNTING_CHESTPLATE, chestplate);
 
             //add leggings
-            ItemStack leggings = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_LEGGINGS));
+            ItemStack leggings = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_LEGGINGS), UniqueItemType.ELITE_MOB_HUNTING_SET);
             leggings = tempWorthLoreAdder(leggings);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_LEGGINGS)) > 0) {
@@ -89,9 +102,10 @@ public class UniqueItemConstructor {
             }
 
             CustomItemConstructor.customItemList.add(leggings);
+            uniqueItems.put(HUNTING_LEGGINGS, leggings);
 
             //add boots
-            ItemStack boots = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOOTS));
+            ItemStack boots = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOOTS), UniqueItemType.ELITE_MOB_HUNTING_SET);
             boots = tempWorthLoreAdder(boots);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOOTS)) > 0) {
@@ -104,11 +118,11 @@ public class UniqueItemConstructor {
 
             }
 
-
             CustomItemConstructor.customItemList.add(boots);
+            uniqueItems.put(HUNTING_BOOTS, boots);
 
             //add bow
-            ItemStack bow = itemStackConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOW));
+            ItemStack bow = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOW), UniqueItemType.ELITE_MOB_HUNTING_SET);
             bow = tempWorthLoreAdder(bow);
 
             if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOW)) > 0) {
@@ -122,6 +136,28 @@ public class UniqueItemConstructor {
             }
 
             CustomItemConstructor.customItemList.add(bow);
+            uniqueItems.put(HUNTING_BOW, bow);
+
+        }
+
+        if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_ZOMBIE_KING_AXE)) {
+
+            //add axe
+            ItemStack zombieKingAxe = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.ZOMBIE_KING_AXE), UniqueItemType.ZOMBIE_KING_AXE);
+            zombieKingAxe = tempWorthLoreAdder(zombieKingAxe);
+
+            if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.ZOMBIE_KING_AXE)) > 0) {
+
+                CustomItemConstructor.staticCustomItemHashMap.put(zombieKingAxe, dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOW)));
+
+            } else {
+
+                //todo: add in case of dynamic
+
+            }
+
+            CustomItemConstructor.customItemList.add(zombieKingAxe);
+            uniqueItems.put(ZOMBIE_KING_AXE, zombieKingAxe);
 
         }
 
@@ -298,7 +334,7 @@ public class UniqueItemConstructor {
 
     }
 
-    private ItemStack itemStackConstructor(String string) {
+    private ItemStack uniqueItemConstructor(String string, UniqueItemType uniqueItemType) {
 
         ItemStack itemStack = new ItemStack(itemMaterial(string), 1);
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -349,11 +385,26 @@ public class UniqueItemConstructor {
 
             List<String> obfuscatedLore = new ArrayList<>();
 
+            /*
+            Hide unique lore
+             */
+            String uniqueLore = "";
+            switch (uniqueItemType) {
+
+                case ELITE_MOB_HUNTING_SET:
+                    uniqueLore = HUNTING_SET_IDENTIFIER;
+                    break;
+                case ZOMBIE_KING_AXE:
+                    uniqueLore = ZOMBIE_KING_AXE_IDENTIFIER;
+                    break;
+
+            }
+
             for (String line : itemMeta.getLore()) {
 
                 if (line.equals(itemMeta.getLore().get(0))) {
 
-                    obfuscatedLore.add(line + obfuscatedPotionEffects + customItemConstructor.loreObfuscator(HUNTING_SET_IDENTIFIER));
+                    obfuscatedLore.add(line + obfuscatedPotionEffects + customItemConstructor.loreObfuscator(uniqueLore));
 
                 } else {
 
@@ -377,6 +428,13 @@ public class UniqueItemConstructor {
 
     }
 
+    private enum UniqueItemType {
+
+        ELITE_MOB_HUNTING_SET,
+        ZOMBIE_KING_AXE
+
+    }
+
     public boolean huntingSetItemDetector(ItemStack itemStack) {
 
         if (itemStack == null) return false;
@@ -387,6 +445,27 @@ public class UniqueItemConstructor {
         for (String string : itemStack.getItemMeta().getLore()) {
 
             if (string.contains(customItemConstructor.loreObfuscator(HUNTING_SET_IDENTIFIER))) {
+
+                return true;
+
+            }
+
+        }
+
+        return false;
+
+    }
+
+    public static boolean zombieKingAxeDetector(ItemStack itemStack) {
+
+        if (itemStack == null) return false;
+        if (itemStack.getType() == Material.AIR) return false;
+        if (!itemStack.hasItemMeta()) return false;
+        if (!itemStack.getItemMeta().hasLore()) return false;
+
+        for (String string : itemStack.getItemMeta().getLore()) {
+
+            if (string.contains(customItemConstructor.loreObfuscator(ZOMBIE_KING_AXE_IDENTIFIER))) {
 
                 return true;
 

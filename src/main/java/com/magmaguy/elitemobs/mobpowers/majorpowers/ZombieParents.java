@@ -92,8 +92,8 @@ public class ZombieParents extends MajorPowers implements Listener {
 
             zombieDad.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
             zombieMom.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            zombieDad.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
-            zombieMom.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+            zombieDad.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
+            zombieMom.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
             zombieDad.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             zombieMom.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             zombieDad.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));

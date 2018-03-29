@@ -85,8 +85,8 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
             friend1.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
             friend2.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            friend1.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
-            friend2.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+            friend1.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
+            friend2.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
             friend1.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             friend2.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             friend1.setCustomName(chatColorConverter(configuration.getString("ZombieFriends.Friend 1")));

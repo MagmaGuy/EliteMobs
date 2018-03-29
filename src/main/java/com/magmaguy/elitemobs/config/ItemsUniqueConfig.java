@@ -28,6 +28,8 @@ public class ItemsUniqueConfig {
     public static final String HUNTING_SET_LEGGINGS = "Hunting Leggings";
     public static final String HUNTING_SET_BOOTS = "Hunting Boots";
     public static final String HUNTING_SET_BOW = "Hunting Bow";
+    public static final String ENABLE_ZOMBIE_KING_AXE = "Enable Zombie King Axe";
+    public static final String ZOMBIE_KING_AXE = "Zombie King Axe";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
@@ -105,6 +107,30 @@ public class ItemsUniqueConfig {
                 "    - ARROW_DAMAGE,3\n" +
                 "    Potion Effects:\n" +
                 "    - LEVITATION,1,target,onHit\n" +
+                "    Drop Weight: 1");
+        configuration.addDefault(ENABLE_ZOMBIE_KING_AXE, true);
+        configuration.addDefault(ZOMBIE_KING_AXE, "\n" +
+                "    Item Type: GOLD_AXE\n" +
+                "    Item Name: &4Zombie King's Axe\n" +
+                "    Item Lore:\n" +
+                "    - The axe of the one Zombies\n" +
+                "    - call their king.\n" +
+                "    - The bloodshed is palpable.\n" +
+                "    Enchantments:\n" +
+                "    - DAMAGE_ALL,10\n" +
+                "    - DAMAGE_UNDEAD,5\n" +
+                "    - DIG_SPEED,5\n" +
+                "    - DURABILITY,5\n" +
+                "    - KNOCKBACK,3\n" +
+                "    - FIRE_ASPECT,4\n" +
+                "    - LOOT_BONUS_MOBS,5\n" +
+                "    - WATER_WORKER,5\n" +
+                "    Potion Effects:\n" +
+                "    - FAST_DIGGING,1,self,onHit\n" +
+                "    - POISON,1,target,onHit\n" +
+                "    - GLOWING,1,target,onHit\n" +
+                "    - NIGHT_VISION,1,target,continuous\n" +
+                "    - WITHER,1,target,onHit\n" +
                 "    Drop Weight: 1");
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);

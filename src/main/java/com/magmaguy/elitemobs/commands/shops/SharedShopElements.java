@@ -34,7 +34,7 @@ public class SharedShopElements {
 
     public static void shopHeader(Inventory shopInventory) {
 
-        ItemStack signature = SignatureItem.signatureItem();
+        ItemStack signature = SignatureItem.SIGNATURE_ITEMSTACK;
 
         shopInventory.setItem(ConfigValues.economyConfig.getInt(EconomySettingsConfig.SIGNATURE_ITEM_LOCATION_SHOPS), signature);
 

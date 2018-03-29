@@ -61,7 +61,7 @@ public class MobScanner implements Listener {
                     //scan for stacked EliteMobs
                     if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) &&
                             ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) &&
-                            !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
+                            !entity.hasMetadata(MetadataHandler.CUSTOM_STACK)) {
 
                         if (!(entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
                                 entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.ELITEMOB_STACKING_CAP))) {
@@ -145,7 +145,7 @@ public class MobScanner implements Listener {
         for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange)) {
 
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
-                    && !entity.hasMetadata(MetadataHandler.FORBIDDEN_MD) && !secondEntity.hasMetadata(MetadataHandler.FORBIDDEN_MD)) {
+                    && !entity.hasMetadata(MetadataHandler.CUSTOM_STACK) && !secondEntity.hasMetadata(MetadataHandler.CUSTOM_STACK)) {
 
                 //If the sum of both entities is above level 50, don't add both entities together
                 if (levelCap(entity, secondEntity)) {
