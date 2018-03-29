@@ -52,6 +52,8 @@ public class MobCombatSettingsConfig {
     public static final String WITCH_DEATH_MESSAGE = DEATH_MESSAGES + "witch";
     public static final String ZOMBIE_DEATH_MESSAGE = DEATH_MESSAGES + "zombie";
     public static final String DEFAULT_DEATH_MESSAGE = DEATH_MESSAGES + "default";
+    public static final String DISPLAY_HEALTH_ON_HIT = "Display Elite Mob health on hit";
+    public static final String DISPLAY_DAMAGE_ON_HIT = "Display damage deal to Elite Mobs on hit";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -88,6 +90,8 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(WITCH_DEATH_MESSAGE, "$player became $entity's test subject!");
         configuration.addDefault(ZOMBIE_DEATH_MESSAGE, "$player was devoured by $entity!");
         configuration.addDefault(DEFAULT_DEATH_MESSAGE, "$player has been slain by $entity");
+        configuration.addDefault(DISPLAY_HEALTH_ON_HIT, true);
+        configuration.addDefault(DISPLAY_DAMAGE_ON_HIT, true);
 
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);

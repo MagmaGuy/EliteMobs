@@ -25,7 +25,6 @@ import org.bukkit.configuration.Configuration;
 public class DefaultConfig {
 
     public static final String ALWAYS_SHOW_NAMETAGS = "Dangerous! Always show Elite Mob nametags";
-    public static final String NAME_TAG_RANGE = "Nametag display range";
     public static final String SUPERMOB_STACK_AMOUNT = "SuperMob (passive EliteMobs) stack amount";
     public static final String MMORPG_COLORS = "Use MMORPG colors for item ranks";
     public static final String MMORPG_COLORS_FOR_CUSTOM_ITEMS = "Use MMORPG colors for custom items";
@@ -51,7 +50,6 @@ public class DefaultConfig {
         configuration.addDefault(ENABLE_PERMISSION_TITLES, true);
         configuration.addDefault(ENABLE_POWER_SCOREBOARDS, false);
         configuration.addDefault(ALWAYS_SHOW_NAMETAGS, true);
-        configuration.addDefault(NAME_TAG_RANGE, 10);
         configuration.addDefault(HIDE_ENCHANTMENTS_ATTRIBUTE, false);
 
         configuration.options().copyDefaults(true);

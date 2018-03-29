@@ -15,81 +15,25 @@
 
 package com.magmaguy.elitemobs.events;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
-import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 
 public class SmallTreasureGoblin implements Listener {
 
     public static boolean entityQueued = false;
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     public static void initializeEvent() {
         entityQueued = true;
     }
 
-    public void createGoblin(Entity entity) {
+    public static void initalizeEvent(Entity treasureGoblin) {
 
-        //Give custom setup to entity
-        entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 600));
-        entity.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-        entity.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
-        entity.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
-        entity.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
-        entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(plugin, true));
-        AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
-
-        ((Zombie) entity).setBaby(true);
-        ((Zombie) entity).setRemoveWhenFarAway(false);
-
-        entity.setCustomName("Treasure Goblin");
-        entity.setCustomNameVisible(true);
-
-        entity.setMetadata(MetadataHandler.TREASURE_GOBLIN, new FixedMetadataValue(plugin, true));
-        TreasureGoblin.equipTreasureGoblin((Zombie) entity);
-
-        String coordinates = entity.getLocation().getBlockX() + ", " + entity.getLocation().getBlockY() + ", " + entity.getLocation().getBlockZ();
-
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-
-            String sendString = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT).replace("$location", coordinates);
-
-            String worldName = "";
-
-            if (entity.getWorld().getName().contains("_")) {
-
-                for (String string : entity.getWorld().getName().split("_")) {
-
-                    worldName += string.substring(0, 1).toUpperCase() + string.toLowerCase() + " ";
-
-                }
-
-            } else {
-
-                worldName = entity.getWorld().getName().substring(0, 1).toUpperCase() + entity.getWorld().getName().substring(1).toLowerCase();
-
-            }
-
-            sendString = sendString.replace("$world", worldName);
-
-            sendString = ChatColorConverter.chatColorConverter(sendString);
-
-            player.sendMessage(sendString);
-
-        }
+        TreasureGoblin.createGoblin(treasureGoblin);
 
         entityQueued = false;
 
@@ -105,7 +49,7 @@ public class SmallTreasureGoblin implements Listener {
                     event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) &&
                     event.getEntity() instanceof Zombie) {
 
-                createGoblin(event.getEntity());
+                initalizeEvent(event.getEntity());
 
             }
 

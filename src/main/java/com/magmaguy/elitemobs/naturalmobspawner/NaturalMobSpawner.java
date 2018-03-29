@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.naturalmobspawner;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -30,7 +29,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
@@ -41,15 +39,7 @@ import java.util.List;
  */
 public class NaturalMobSpawner implements Listener {
 
-    private EliteMobs plugin;
     private int range = Bukkit.getServer().getViewDistance() * 16;
-
-
-    public NaturalMobSpawner(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
 
     public void naturalMobProcessor(Entity entity) {
 
@@ -91,7 +81,7 @@ public class NaturalMobSpawner implements Listener {
 
         if (eliteMobLevel < 2) return;
 
-        entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, eliteMobLevel));
+        entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, eliteMobLevel));
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
 
     }

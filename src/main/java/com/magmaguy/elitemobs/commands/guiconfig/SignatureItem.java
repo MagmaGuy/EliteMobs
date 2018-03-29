@@ -27,6 +27,8 @@ import java.util.List;
  */
 public class SignatureItem {
 
+    public static final ItemStack SIGNATURE_ITEMSTACK = signatureItem();
+
     public static ItemStack signatureItem() {
 
         ItemStack signature = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);

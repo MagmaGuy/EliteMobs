@@ -24,10 +24,24 @@ import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class HealthDisplay {
+public class HealthDisplay implements Listener {
+
+    @EventHandler
+    public void onHit(EntityDamageEvent event) {
+
+        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
+
+            displayHealth((LivingEntity) event.getEntity());
+
+        }
+
+    }
 
     public static void displayHealth(LivingEntity livingEntity) {
 

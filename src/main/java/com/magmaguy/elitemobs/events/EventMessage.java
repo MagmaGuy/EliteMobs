@@ -13,26 +13,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.collateralminecraftchanges;
+package com.magmaguy.elitemobs.events;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.entity.Entity;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
+public class EventMessage {
 
-/**
- * Created by MagmaGuy on 20/12/2016.
- */
-public class ChunkUnloadMetadataPurge implements Listener {
+    public static void sendEventMessage(String message) {
 
-    @EventHandler
-    public void onUnload(ChunkUnloadEvent event) {
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 
-        for (Entity entity : event.getChunk().getEntities()) {
-
-            MetadataHandler.flushMetadata(entity);
+            player.sendMessage(message);
 
         }
 

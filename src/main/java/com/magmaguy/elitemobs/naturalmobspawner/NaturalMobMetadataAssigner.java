@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.naturalmobspawner;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
@@ -27,11 +26,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
@@ -44,18 +43,13 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 public class NaturalMobMetadataAssigner implements Listener {
 
     private static Random random = new Random();
-    private EliteMobs plugin;
     private int range = Bukkit.getServer().getViewDistance() * 16;
 
-
-    public NaturalMobMetadataAssigner(Plugin plugin) {
-
-        this.plugin = (EliteMobs) plugin;
-
-    }
-
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
+
+        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+        if (event.getEntity().getCustomName() != null) return;
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING) ||
                 !ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) ||
@@ -74,7 +68,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
             if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
 
-                entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(plugin, true));
+                entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
 
                 int huntingGearChanceAdder = 0;
 
@@ -115,7 +109,7 @@ public class NaturalMobMetadataAssigner implements Listener {
 
                 if (random.nextDouble() < validChance) {
 
-                    NaturalMobSpawner naturalMobSpawner = new NaturalMobSpawner(plugin);
+                    NaturalMobSpawner naturalMobSpawner = new NaturalMobSpawner();
                     naturalMobSpawner.naturalMobProcessor(entity);
 
                 }

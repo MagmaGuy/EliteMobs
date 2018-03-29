@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -58,7 +59,7 @@ public class MetadataHandler implements Listener {
     public final static String CUSTOM_ARMOR = "CustomArmor";
     public final static String CUSTOM_HEALTH = "CustomHealth";
     public final static String TAUNT_NAME = "Taunt_Name";
-    public final static String FORBIDDEN_MD = "Forbidden";
+    public final static String CUSTOM_STACK = "Forbidden";
     public final static String CUSTOM_POWERS_MD = "Custom";
     public final static String EVENT_CREATURE = "EventCreature";
 
@@ -146,6 +147,9 @@ public class MetadataHandler implements Listener {
     public final static String ATTACK_PUSH_COOLDOWN = "AttackPushCooldown";
     public final static String ATTACK_WITHER_COOLDOWN = "AttackWitherCooldown";
     public final static String TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN = "TreasureGoblinRadialGoldExplosionCooldown";
+    public final static String TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN = "TreasureGoblinGoldShotgunCooldown";
+    public final static String ZOMBIE_KING_FLAMETHROWER_COOLDOWN = "ZombieKingFlamethrowerCooldown";
+    public final static String ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN = "ZombieKingUnholySmiteCooldown";
 
     //displays
     public final static String ARMOR_STAND_DISPLAY = "ArmorStandDisplay";
@@ -155,11 +159,14 @@ public class MetadataHandler implements Listener {
     public final static String VANISH_NO_PACKET = "vanished";
 
     //events
-//    public final static String PERSISTENT_ENTITY = "PersistentEntity";
+    public final static String PERSISTENT_ENTITY = "PersistentEntity";
     public final static String TREASURE_GOBLIN = "TreasureGoblin";
+    public final static String THE_RETURNED = "TheReturned";
+    public final static String ZOMBIE_KING = "ZombieKing";
 
     //player metadata
     public final static String KILLED_BY_ELITE_MOB = "KilledByEliteMob";
+    public final static String USING_ZOMBIE_KING_AXE = "UsingZombieKingAxe";
 
     public static List<String> minorPowerList = new ArrayList<>(Arrays.asList(
             ATTACK_ARROW_MD,
@@ -204,7 +211,7 @@ public class MetadataHandler implements Listener {
             CUSTOM_ARMOR,
             CUSTOM_HEALTH,
             TAUNT_NAME,
-            FORBIDDEN_MD,
+            CUSTOM_STACK,
             FROZEN,
             FROZEN_COOLDOWN,
             ZOMBIE_BLOAT_COOLDOWN,
@@ -215,6 +222,9 @@ public class MetadataHandler implements Listener {
             ATTACK_POISON_COOLDOWN,
             ATTACK_WITHER_COOLDOWN,
             TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN,
+            TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN,
+            ZOMBIE_KING_FLAMETHROWER_COOLDOWN,
+            ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN,
             ZOMBIE_FRIENDS_ACTIVATED,
             TEAM_ROCKET_ACTIVATED,
             TEAM_ROCKET_MEMBER,
@@ -223,7 +233,8 @@ public class MetadataHandler implements Listener {
             SHOOTING_ARROWS,
             SHOOTING_FIREBALLS,
             ARMOR_STAND_DISPLAY,
-            KILLED_BY_ELITE_MOB
+            KILLED_BY_ELITE_MOB,
+            USING_ZOMBIE_KING_AXE
     ));
     public static List<String> powerListHumanFormat = new ArrayList<>(Arrays.asList( //add major and minor power lists
             //minor powers
@@ -256,7 +267,6 @@ public class MetadataHandler implements Listener {
             ZOMBIE_PARENTS_H,
             ZOMBIE_BLOAT_H
     ));
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(ELITE_MOBS);
 
     public static List<String> metadataList() {
 
@@ -348,7 +358,7 @@ public class MetadataHandler implements Listener {
 
     }
 
-    public void flushMetadata(Entity entity) {
+    public static void flushMetadata(Entity entity) {
 
         if (entity.hasMetadata(EVENT_CREATURE)) {
 
@@ -366,11 +376,28 @@ public class MetadataHandler implements Listener {
                         (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) ||
                         entity.hasMetadata(ARMOR_STAND_DISPLAY) && string.equals(ARMOR_STAND_DISPLAY)) {
 
-                    entity.remove();
+                    /*
+                    Take into account entities spawned by other plugins
+                     */
+                    if (!entity.hasMetadata(ELITE_MOB_MD) ||
+                            entity.hasMetadata(ELITE_MOB_MD) && NameHandler.compareCustomAggressiveNameIgnoresCustomName(entity)) {
+
+                        entity.remove();
+
+                    }
+
 
                 }
 
-                entity.removeMetadata(string, plugin);
+                if (!(entity.hasMetadata(ZOMBIE_KING) || entity.hasMetadata(TREASURE_GOBLIN))) {
+
+                    //todo: add improved flushing for permanent mobs
+
+                } else {
+
+                    entity.removeMetadata(string, PLUGIN);
+
+                }
 
 
             }
@@ -378,7 +405,7 @@ public class MetadataHandler implements Listener {
             if (entity instanceof Player) {
 
 
-                entity.removeMetadata(string, plugin);
+                entity.removeMetadata(string, PLUGIN);
 
             }
 
@@ -389,7 +416,8 @@ public class MetadataHandler implements Listener {
     public void fullMetadataFlush(Entity entity) {
 
         if (entity.hasMetadata(EVENT_CREATURE)) {
-            entity.removeMetadata(EVENT_CREATURE, plugin);
+            entity.removeMetadata(EVENT_CREATURE, PLUGIN);
+            entity.remove();
         }
 
         flushMetadata(entity);
@@ -405,7 +433,7 @@ public class MetadataHandler implements Listener {
 
             if (player.hasMetadata(string)) {
 
-                player.removeMetadata(string, plugin);
+                player.removeMetadata(string, PLUGIN);
 
             }
 
@@ -423,7 +451,7 @@ public class MetadataHandler implements Listener {
 
             if (player.hasMetadata(string)) {
 
-                player.removeMetadata(string, plugin);
+                player.removeMetadata(string, PLUGIN);
 
             }
 

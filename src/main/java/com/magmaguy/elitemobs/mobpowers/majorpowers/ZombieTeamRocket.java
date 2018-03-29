@@ -118,7 +118,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             jesse.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
             jesse.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
             jesse.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
-            jesse.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+            jesse.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
             jesse.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             jesse.setMetadata(MetadataHandler.TEAM_ROCKET_MEMBER, new FixedMetadataValue(plugin, true));
             jesse.setCustomName("Jesse");
@@ -132,7 +132,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             james.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
             james.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
             james.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
-            james.setMetadata(MetadataHandler.FORBIDDEN_MD, new FixedMetadataValue(plugin, true));
+            james.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
             james.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
             james.setMetadata(MetadataHandler.TEAM_ROCKET_MEMBER, new FixedMetadataValue(plugin, true));
             james.setCustomName("James");
@@ -264,15 +264,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
 
             entity.setCustomName(chatColorConverter(configuration.getString("ZombieTeamRocket.DeathMessage")));
 
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-
-                    entity.setVelocity(new Vector(0, 10, 0));
-
-                }
-
-            }, 10);
+            entity.setVelocity(new Vector(0, 3, 0));
 
         }
 

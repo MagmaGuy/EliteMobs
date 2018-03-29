@@ -95,7 +95,7 @@ public class PlayerDeathMessageByEliteMob {
 
     private static String deathMessagePlaceholderConversion(String deathMessage, Player player, LivingEntity livingEntity) {
 
-        String livingEntityName = NameHandler.customAggressiveName(livingEntity);
+        String livingEntityName = NameHandler.customAggressiveNameIgnoresCustomName(livingEntity);
 
         deathMessage = deathMessage.replace("$player", player.getDisplayName());
         deathMessage = deathMessage.replace("$entity", livingEntityName);

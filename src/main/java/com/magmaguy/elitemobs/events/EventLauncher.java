@@ -22,6 +22,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
+
 public class EventLauncher {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
@@ -96,7 +98,61 @@ public class EventLauncher {
     private void eventSelector() {
 
         //todo: once more events are added, randomize which one gets picked in a weighed fashion
-        SmallTreasureGoblin.initializeEvent();
+        HashMap<String, Double> weighedConfigValues = new HashMap<>();
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.TREASURE_GOBLIN_SMALL_ENABLED)) {
+
+            weighedConfigValues.put(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT, ConfigValues.eventsConfig.getDouble(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT));
+
+        }
+
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.DEAD_MOON_ENABLED)) {
+
+            weighedConfigValues.put(EventsConfig.DEAD_MOON_EVENT_WEIGHT, ConfigValues.eventsConfig.getDouble(EventsConfig.DEAD_MOON_EVENT_WEIGHT));
+
+        }
+
+        switch (pickWeighedEvent(weighedConfigValues)) {
+
+            case EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT:
+                SmallTreasureGoblin.initializeEvent();
+                return;
+            case EventsConfig.DEAD_MOON_EVENT_WEIGHT:
+                DeadMoon.initializeEvent();
+                return;
+
+        }
+
+    }
+
+    private String pickWeighedEvent(HashMap<String, Double> weighedConfigValues) {
+
+        double totalWeight = 0;
+
+        for (String string : weighedConfigValues.keySet()) {
+
+            totalWeight += weighedConfigValues.get(string);
+
+        }
+
+        String selectedLootSystem = null;
+        double random = Math.random() * totalWeight;
+
+        for (String string : weighedConfigValues.keySet()) {
+
+            random -= weighedConfigValues.get(string);
+
+
+            if (random <= 0) {
+
+                selectedLootSystem = string;
+
+                break;
+
+            }
+
+        }
+
+        return selectedLootSystem;
 
     }
 

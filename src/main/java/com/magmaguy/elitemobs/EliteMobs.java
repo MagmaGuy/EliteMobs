@@ -19,7 +19,10 @@ package com.magmaguy.elitemobs;
  * Created by MagmaGuy on 07/10/2016.
  */
 
-import com.magmaguy.elitemobs.collateralminecraftchanges.*;
+import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
+import com.magmaguy.elitemobs.collateralminecraftchanges.EntityDeathMetadataFlusher;
+import com.magmaguy.elitemobs.collateralminecraftchanges.OfflinePlayerCacher;
+import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
@@ -30,11 +33,17 @@ import com.magmaguy.elitemobs.commands.shops.ItemSaleEvent;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.elitedrops.*;
+import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
+import com.magmaguy.elitemobs.events.eventitems.ZombieKingAxe;
+import com.magmaguy.elitemobs.events.mobs.TheReturned;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
+import com.magmaguy.elitemobs.events.mobs.ZombieKing;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
+import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
+import com.magmaguy.elitemobs.mobcustomizer.displays.HealthDisplay;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
@@ -228,14 +237,14 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Natural EliteMobs Spawning
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING)) {
 
-            this.getServer().getPluginManager().registerEvents(new NaturalMobSpawner(this), this);
+            this.getServer().getPluginManager().registerEvents(new NaturalMobSpawner(), this);
 
             getLogger().info("EliteMobs - Natural EliteMob Spawning enabled!");
 
         }
 
         //Natural Mob Metadata Assigner
-        this.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(this), this);
+        this.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(), this);
 
         //Visual effects
         this.getServer().getPluginManager().registerEvents(new EffectEventHandlers(), this);
@@ -246,6 +255,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
         this.getServer().getPluginManager().registerEvents(new PlaceEventPrevent(), this);
 
+
         //Shops
         this.getServer().getPluginManager().registerEvents(new ShopHandler(), this);
         this.getServer().getPluginManager().registerEvents(new CustomShopHandler(), this);
@@ -255,7 +265,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER)) {
 
             this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(), this);
-
             getLogger().info("EliteMobs - Creeper passive mob collateral damage canceller enabled!");
 
         }
@@ -267,6 +276,18 @@ public class EliteMobs extends JavaPlugin implements Listener {
         //Initialize custom events
         this.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), this);
         this.getServer().getPluginManager().registerEvents(new TreasureGoblin(), this);
+        this.getServer().getPluginManager().registerEvents(new DeadMoon(), this);
+        this.getServer().getPluginManager().registerEvents(new TheReturned(), this);
+        this.getServer().getPluginManager().registerEvents(new ZombieKing(), this);
+
+        //Set up health and damage displays
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT))
+            this.getServer().getPluginManager().registerEvents(new HealthDisplay(), this);
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_DAMAGE_ON_HIT))
+            this.getServer().getPluginManager().registerEvents(new DamageDisplay(), this);
+
+        //Initialize items from custom events
+        this.getServer().getPluginManager().registerEvents(new ZombieKingAxe(), this);
 
         //Commands
         this.getCommand("elitemobs").setExecutor(new CommandHandler());
@@ -366,23 +387,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
                 }
 
             }.runTaskTimer(this, eggTimerInterval, eggTimerInterval);
-
-        }
-
-        if (!ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS)) {
-
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-
-                    //this is quite resource intensive
-                    OptionalNameTagAssigner.entityScanner();
-
-                }
-
-            }.runTaskTimer(this, 1, 1);
-
 
         }
 
