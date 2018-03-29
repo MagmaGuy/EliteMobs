@@ -25,7 +25,7 @@ import java.util.Arrays;
  */
 public class EconomySettingsConfig {
 
-    public static final String CONFIG_NAME = "1EconomySettings.yml";
+    public static final String CONFIG_NAME = "EconomySettings.yml";
     public static final String ENABLE_ECONOMY = "Enable economy";
     public static final String RESALE_VALUE = "Item resale value (percentage)";
     public static final String LOWEST_PROCEDURALLY_SIMULATED_LOOT = "Procedurally Generated Loot.Lowest simulated elite mob level loot";

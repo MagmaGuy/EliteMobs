@@ -19,7 +19,7 @@ import org.bukkit.configuration.Configuration;
 
 public class ValidMobsConfig {
 
-    public static final String CONFIG_NAME = "1ValidMobs.yml";
+    public static final String CONFIG_NAME = "ValidMobs.yml";
     public static final String ALLOW_AGGRESSIVE_ELITEMOBS = "Allow aggressive EliteMobs";
     public static final String ALLOW_PASSIVE_SUPERMOBS = "Allow Passive SuperMobs";
     private static final String VALID_SUPERMOBS = "Valid Super Mobs.";

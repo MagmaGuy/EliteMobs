@@ -46,7 +46,7 @@ public class LootGUI implements Listener {
 
     public void lootGUI(Player player) {
 
-        Inventory fakeChestInventory = Bukkit.createInventory(null, 54, "EliteMobs 1ItemsCustomLootList.yml");
+        Inventory fakeChestInventory = Bukkit.createInventory(null, 54, "EliteMobs ItemsCustomLootList.yml");
         tierConstructor(fakeChestInventory);
         headerConstructor(fakeChestInventory);
         lootNavigationConstructor(fakeChestInventory);
@@ -182,7 +182,7 @@ public class LootGUI implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (event.getInventory().getName().equalsIgnoreCase("EliteMobs 1ItemsCustomLootList.yml")) {
+        if (event.getInventory().getName().equalsIgnoreCase("EliteMobs ItemsCustomLootList.yml")) {
 
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
 

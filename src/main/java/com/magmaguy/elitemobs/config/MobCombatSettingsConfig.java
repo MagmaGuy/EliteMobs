@@ -19,7 +19,7 @@ import org.bukkit.configuration.Configuration;
 
 public class MobCombatSettingsConfig {
 
-    public static final String CONFIG_NAME = "1MobCombatSettings.yml";
+    public static final String CONFIG_NAME = "MobCombatSettings.yml";
 
     public static final String NATURAL_MOB_SPAWNING = "Natural EliteMob spawning";
     public static final String SPAWNERS_SPAWN_ELITE_MOBS = "Spawners can spawn Elite Mobs";

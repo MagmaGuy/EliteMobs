@@ -122,7 +122,7 @@ public class MobSpawningAndLoot implements Listener {
 //
 //        List<String> customLootLore = new ArrayList<>(Arrays.asList(
 //                "Sets whether or not naturally spawned",
-//                "Elite Mobs can drop the loot in 1ItemsCustomLootList.yml"));
+//                "Elite Mobs can drop the loot in ItemsCustomLootList.yml"));
 //        ItemStack customLootItem = boolItemStackConstructor(DefaultConfig.DROP_CUSTOM_ITEMS,
 //                customLootLore, customLoot);
 //        optionsList.add(customLootItem);
@@ -152,7 +152,7 @@ public class MobSpawningAndLoot implements Listener {
 //        optionsList.add(mmorpgColorsItem);
 //
 //        List<String> mmorpgColorsCustomLore = new ArrayList<>(Arrays.asList(
-//                "Sets whether or not items in 1ItemsCustomLootList.yml",
+//                "Sets whether or not items in ItemsCustomLootList.yml",
 //                "will have their color codes overwritten",
 //                "to follow the WoW item power format"));
 //        ItemStack mmorpgColorsCustomItem = boolItemStackConstructor(DefaultConfig.MMORPG_COLORS_FOR_CUSTOM_ITEMS,

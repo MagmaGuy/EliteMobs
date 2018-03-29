@@ -25,7 +25,7 @@ import java.util.Arrays;
  */
 public class ItemsProceduralSettingsConfig {
 
-    public static final String CONFIG_NAME = "1ItemsProceduralSettings.yml";
+    public static final String CONFIG_NAME = "ItemsProceduralSettings.yml";
     public static final String LORE_MOB_LEVEL_SOURCE = "Item source (mob) (line 1)";
     public static final String LORE_SHOP_SOURCE = "Item source (shop) (line 1)";
     public static final String LORE_WORTH = "Item worth (line 2)";
