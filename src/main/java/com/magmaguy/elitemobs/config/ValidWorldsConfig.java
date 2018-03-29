@@ -21,7 +21,7 @@ import org.bukkit.configuration.Configuration;
 
 public class ValidWorldsConfig {
 
-    public static final String CONFIG_NAME = "ValidWorlds.yml";
+    public static final String CONFIG_NAME = "1ValidWorlds.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
