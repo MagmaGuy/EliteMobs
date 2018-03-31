@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -379,12 +378,12 @@ public class MetadataHandler implements Listener {
                     /*
                     Take into account entities spawned by other plugins
                      */
-                    if (!entity.hasMetadata(ELITE_MOB_MD) ||
-                            entity.hasMetadata(ELITE_MOB_MD) && NameHandler.compareCustomAggressiveNameIgnoresCustomName(entity)) {
+//                    if (!entity.hasMetadata(ELITE_MOB_MD) ||
+//                            entity.hasMetadata(ELITE_MOB_MD) && NameHandler.compareCustomAggressiveNameIgnoresCustomName(entity)) {
 
                         entity.remove();
 
-                    }
+//                    }
 
 
                 }

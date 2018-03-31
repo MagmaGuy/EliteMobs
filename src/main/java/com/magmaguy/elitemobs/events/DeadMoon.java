@@ -55,7 +55,7 @@ public class DeadMoon implements Listener {
         if (MoonPhaseDetector.detectMoonPhase(event.getEntity().getWorld()) != MoonPhaseDetector.moonPhase.NEW_MOON)
             return;
 
-        if (event.getEntity().getWorld().getTime() < 13184 && event.getEntity().getWorld().getTime() > 22800) return;
+        if (event.getEntity().getWorld().getTime() < 13184 || event.getEntity().getWorld().getTime() > 22800) return;
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING) ||
                 !ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS)) {

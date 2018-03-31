@@ -25,6 +25,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
+import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
@@ -200,8 +201,7 @@ public class CommandHandler implements CommandExecutor {
 
                     Player player = (Player) commandSender;
 
-                    ReloadConfigCommandHandler reloadConfigCommandHandler = new ReloadConfigCommandHandler();
-                    reloadConfigCommandHandler.reloadConfiguration();
+                    ConfigValues.initializeConfigValues();
 
                     getLogger().info("EliteMobs configs reloaded!");
                     player.sendTitle("EliteMobs config reloaded!", "Reloaded config, loot, mobPowers and translation");
@@ -216,8 +216,16 @@ public class CommandHandler implements CommandExecutor {
 
                     ConfigValues.initializeConfigValues();
 
+                    CustomItemConstructor.customItemList.clear();
+                    CustomItemConstructor.staticCustomItemHashMap.clear();
+                    CustomItemConstructor.dynamicRankedItemStacks.clear();
+                    UniqueItemConstructor.uniqueItems.clear();
+
                     CustomItemConstructor customItemConstructor = new CustomItemConstructor();
                     customItemConstructor.superDropParser();
+
+                    UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
+                    uniqueItemConstructor.intializeUniqueItems();
 
                     commandSender.sendMessage("EliteMobs configs reloaded!");
 

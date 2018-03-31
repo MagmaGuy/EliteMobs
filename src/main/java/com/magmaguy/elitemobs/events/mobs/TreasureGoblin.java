@@ -31,7 +31,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -97,7 +96,7 @@ public class TreasureGoblin implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
         if (event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN)) {
@@ -193,7 +192,7 @@ public class TreasureGoblin implements Listener {
             @Override
             public void run() {
 
-                if (counter == 20 * 2) {
+                if (counter == 20 * 1.5) {
 
                     radialGoldExplosion(zombie);
                     zombie.setAI(true);
@@ -311,7 +310,7 @@ public class TreasureGoblin implements Listener {
 
     }
 
-    private static void goldShotgunInitializer(Zombie zombie, Location playerLocation) {
+    private static void goldShotgunInitializer(Zombie zombie, Location targetLocation) {
 
         zombie.setAI(false);
 
@@ -325,7 +324,7 @@ public class TreasureGoblin implements Listener {
             double y = random.nextDouble() * 2 - 1;
             double z = random.nextDouble() * 2 - 1;
 
-            Location tempLocation = playerLocation.clone();
+            Location tempLocation = targetLocation.clone();
 
             Location simulatedLocation = tempLocation.add(new Location(tempLocation.getWorld(), 0.0, 1.0, 0.0))
                     .add(new Location(tempLocation.getWorld(), x, y, z));
@@ -337,10 +336,10 @@ public class TreasureGoblin implements Listener {
         }
 
         //todo: use particles with vectors instead
-        ArmorStand armorStand = (ArmorStand) zombie.getWorld().spawnEntity(zombie.getLocation(), EntityType.ARMOR_STAND);
-        armorStand.setMarker(true);
-        armorStand.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        armorStand.setVisible(false);
+//        ArmorStand armorStand = (ArmorStand) zombie.getWorld().spawnEntity(zombie.getLocation(), EntityType.ARMOR_STAND);
+//        armorStand.setMarker(true);
+//        armorStand.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+//        armorStand.setVisible(false);
 
         new BukkitRunnable() {
 
@@ -349,10 +348,10 @@ public class TreasureGoblin implements Listener {
             @Override
             public void run() {
 
-                if (counter == 20 * 2) {
+                if (counter == 20 * 1) {
 
-                    armorStand.remove();
-                    goldShotgun(zombie, playerLocation);
+//                    armorStand.remove();
+                    goldShotgun(zombie, targetLocation);
                     zombie.setAI(true);
                     cancel();
 
@@ -360,11 +359,30 @@ public class TreasureGoblin implements Listener {
 
                 if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS)) {
 
-                    Location tempZombieLocation = zombie.getLocation().clone().add(new Vector(0, 1, 0));
-                    Location tempPlayerLocation = playerLocation.clone().add(new Vector(0, 1, 0));
 
-                    armorStand.teleport(tempZombieLocation.add(tempPlayerLocation.subtract(tempZombieLocation).multiply(0.025).multiply(counter)));
-                    armorStand.getWorld().spawnParticle(Particle.REDSTONE, armorStand.getLocation(), counter, 0.5, 0.5, 0.5, 0.5);
+                    Location zombieLocation = zombie.getLocation().clone();
+
+                    int particleCount = 20;
+
+                    for (int i = 0; i < particleCount; i++) {
+
+                        double x = random.nextDouble() * 2 - 1;
+                        double y = random.nextDouble() * 2 - 1;
+                        double z = random.nextDouble() * 2 - 1;
+
+                        Location tempLocation = targetLocation.clone();
+
+                        Location simulatedLocation = tempLocation.add(new Location(tempLocation.getWorld(), 0.0, 1.0, 0.0))
+                                .add(new Location(tempLocation.getWorld(), x, y, z));
+
+                        Vector toTarget = simulatedLocation.subtract(zombie.getLocation()).toVector().normalize();
+
+                        zombieLocation.getWorld().spawnParticle(Particle.SMOKE_NORMAL, zombieLocation.clone().add(new Vector(0, 0.5, 0)), 0, toTarget.getX(), toTarget.getY(), toTarget.getZ(), 0.75);
+
+                    }
+
+//                    armorStand.teleport(tempZombieLocation.add(tempPlayerLocation.subtract(tempZombieLocation).multiply(0.025).multiply(counter)));
+//                    armorStand.getWorld().spawnParticle(Particle.REDSTONE, armorStand.getLocation(), counter, 0.5, 0.5, 0.5, 0.5);
 
                 }
 
@@ -377,7 +395,7 @@ public class TreasureGoblin implements Listener {
 
     }
 
-    private static void goldShotgun(Zombie zombie, Location playerLocation) {
+    private static void goldShotgun(Zombie zombie, Location livingEntityLocation) {
 
         int projectileCount = 200;
         ItemStack visualProjectileItemStack = new ItemStack(Material.GOLD_NUGGET, 1);
@@ -389,7 +407,7 @@ public class TreasureGoblin implements Listener {
             double y = random.nextDouble() * 2 - 1;
             double z = random.nextDouble() * 2 - 1;
 
-            Location tempLocation = playerLocation.clone();
+            Location tempLocation = livingEntityLocation.clone();
 
             Location simulatedLocation = tempLocation.add(new Location(tempLocation.getWorld(), 0.0, 1.0, 0.0))
                     .add(new Location(tempLocation.getWorld(), x, y, z));
@@ -405,7 +423,7 @@ public class TreasureGoblin implements Listener {
             itemMeta.setLore(lore);
             visualProjectileItemStack.setItemMeta(itemMeta);
 
-            Item visualProjectile = zombie.getLocation().add(new Location(playerLocation.getWorld(), 0.0, 1.0, 0.0)).getWorld().dropItem(zombie.getLocation(), visualProjectileItemStack);
+            Item visualProjectile = zombie.getLocation().add(new Location(livingEntityLocation.getWorld(), 0.0, 1.0, 0.0)).getWorld().dropItem(zombie.getLocation(), visualProjectileItemStack);
 
             visualProjectile.setGravity(false);
             visualProjectile.setVelocity(toPlayer.multiply(0.9));
@@ -437,7 +455,7 @@ public class TreasureGoblin implements Listener {
 
                     } else {
 
-                        if (goldNuggetDamage(item.getNearbyEntities(0, 0, 0), zombie)) {
+                        if (goldNuggetDamage(item.getNearbyEntities(0.5, 0.5, 0.5), zombie)) {
 
                             iterator.remove();
                             item.remove();

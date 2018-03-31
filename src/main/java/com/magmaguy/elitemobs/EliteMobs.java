@@ -319,6 +319,11 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         }
 
+        CustomItemConstructor.customItemList.clear();
+        CustomItemConstructor.staticCustomItemHashMap.clear();
+        CustomItemConstructor.dynamicRankedItemStacks.clear();
+        UniqueItemConstructor.uniqueItems.clear();
+
         getLogger().info("EliteMobs - Disabled!");
 
     }
