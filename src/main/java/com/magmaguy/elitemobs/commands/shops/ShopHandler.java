@@ -123,7 +123,7 @@ public class ShopHandler implements Listener {
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
         boolean inventoryHasFreeSlots = false;
-        for (ItemStack iteratedStack : player.getInventory()) {
+        for (ItemStack iteratedStack : player.getInventory().getStorageContents()) {
 
             if (iteratedStack == null) {
 
