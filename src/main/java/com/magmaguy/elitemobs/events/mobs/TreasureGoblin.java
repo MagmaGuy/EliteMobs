@@ -335,12 +335,6 @@ public class TreasureGoblin implements Listener {
 
         }
 
-        //todo: use particles with vectors instead
-//        ArmorStand armorStand = (ArmorStand) zombie.getWorld().spawnEntity(zombie.getLocation(), EntityType.ARMOR_STAND);
-//        armorStand.setMarker(true);
-//        armorStand.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-//        armorStand.setVisible(false);
-
         new BukkitRunnable() {
 
             int counter = 0;
@@ -381,11 +375,7 @@ public class TreasureGoblin implements Listener {
 
                     }
 
-//                    armorStand.teleport(tempZombieLocation.add(tempPlayerLocation.subtract(tempZombieLocation).multiply(0.025).multiply(counter)));
-//                    armorStand.getWorld().spawnParticle(Particle.REDSTONE, armorStand.getLocation(), counter, 0.5, 0.5, 0.5, 0.5);
-
                 }
-
 
                 counter++;
 

@@ -151,7 +151,7 @@ public class ZombieKing implements Listener {
 
         if (random.nextDouble() < 0.20) {
 
-            if (random.nextDouble() < 0.50) {
+            if (random.nextDouble() < 0.33) {
 
                 if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_FLAMETHROWER_COOLDOWN)) {
 
@@ -160,12 +160,21 @@ public class ZombieKing implements Listener {
 
                 }
 
-            } else {
+            } else if (random.nextDouble() < 0.66) {
 
                 if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN)) {
 
                     PowerCooldown.cooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN, 20 * 20);
                     initializeUnholySmite((LivingEntity) event.getEntity());
+
+                }
+
+            } else {
+
+                if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN)) {
+
+                    PowerCooldown.cooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN, 20 * 20);
+                    initializeSummonMinions((LivingEntity) event.getEntity());
 
                 }
 
@@ -180,17 +189,17 @@ public class ZombieKing implements Listener {
         Vector toTarget = targetLocation.clone().subtract(sourceLocation).toVector().normalize();
         shooter.setAI(false);
 
-        initializeFlamethrower(sourceLocation, toTarget, shooter);
+        initializeFlamethrower(sourceLocation, toTarget, shooter, false);
 
     }
 
-    public static void initializeFlamethrower(Location sourceLocation, Vector targetVector, LivingEntity shooter) {
+    public static void initializeFlamethrower(Location sourceLocation, Vector targetVector, LivingEntity shooter, boolean shotByPlayer) {
 
-        createDamagePath(sourceLocation.add(new Vector(0, 1, 0)), targetVector, shooter);
+        createDamagePath(sourceLocation.add(new Vector(0, 1, 0)), targetVector, shooter, shotByPlayer);
 
     }
 
-    private static void createDamagePath(Location sourceLocation, Vector toTarget, LivingEntity shooter) {
+    private static void createDamagePath(Location sourceLocation, Vector toTarget, LivingEntity shooter, boolean shotByPlayer) {
 
         int flamePoints = 20;
 
@@ -214,7 +223,7 @@ public class ZombieKing implements Listener {
                 flamethrowerDamagePoint.setVisible(false);
                 flamethrowerDamagePoint.setMarker(true);
                 flamethrowerDamagePoint.setGravity(false);
-                flamethrowerDamage(flamethrowerDamagePoint, shooter, toTarget);
+                flamethrowerDamage(flamethrowerDamagePoint, shooter, toTarget, shotByPlayer);
 
                 counter++;
 
@@ -224,7 +233,7 @@ public class ZombieKing implements Listener {
 
     }
 
-    private static void flamethrowerDamage(ArmorStand armorStand, LivingEntity shooter, Vector directionVector) {
+    private static void flamethrowerDamage(ArmorStand armorStand, LivingEntity shooter, Vector directionVector, boolean shotByPlayer) {
 
         new BukkitRunnable() {
 
@@ -269,7 +278,15 @@ public class ZombieKing implements Listener {
 
                         if (!entity.equals(shooter) && entity instanceof LivingEntity) {
 
-                            BossSpecialAttackDamage.dealSpecialDamage(shooter, (LivingEntity) entity, 1);
+                            if (shotByPlayer && entity instanceof Player) {
+
+                                //TODO: add pvp mechanics here
+
+                            } else {
+
+                                BossSpecialAttackDamage.dealSpecialDamage(shooter, (LivingEntity) entity, 1);
+
+                            }
 
                         }
 
@@ -483,6 +500,47 @@ public class ZombieKing implements Listener {
             }
 
         }
+
+    }
+
+    private void initializeSummonMinions(LivingEntity zombieKing) {
+
+        zombieKing.setAI(false);
+        summonMinions(zombieKing);
+
+    }
+
+    private void summonMinions(LivingEntity zombieKing) {
+
+        new BukkitRunnable() {
+
+            int counter = 0;
+
+            @Override
+            public void run() {
+
+                if (counter > 20 * 3) {
+
+                    int amountOfSummonedMobs = 10;
+
+                    for (int i = 0; i < amountOfSummonedMobs; i++) {
+
+                        TheReturned.theReturnedConstructor(50, (Zombie) zombieKing);
+
+                    }
+
+                    zombieKing.setAI(true);
+                    cancel();
+
+                }
+
+                zombieKing.getWorld().spawnParticle(Particle.PORTAL, zombieKing.getLocation().add(new Vector(0, 1, 0)), 50, 0.01, 0.01, 0.01, 1);
+
+                counter++;
+
+            }
+
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
     }
 

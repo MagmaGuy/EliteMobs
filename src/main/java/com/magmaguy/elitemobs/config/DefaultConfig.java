@@ -32,6 +32,7 @@ public class DefaultConfig {
     public static final String ENABLE_PERMISSION_TITLES = "Use titles to warn players they are missing a permission";
     public static final String ENABLE_POWER_SCOREBOARDS = "Use scoreboards to display mob powers using permissions";
     public static final String HIDE_ENCHANTMENTS_ATTRIBUTE = "Hide enchantment attributes on plugin-generated items";
+    public static final String PREVENT_ITEM_PICKUP = "Prevent item pickup from all aggressive mobs";
 
     public static void reloadConfig() {
 
@@ -51,6 +52,7 @@ public class DefaultConfig {
         configuration.addDefault(ENABLE_POWER_SCOREBOARDS, false);
         configuration.addDefault(ALWAYS_SHOW_NAMETAGS, true);
         configuration.addDefault(HIDE_ENCHANTMENTS_ATTRIBUTE, false);
+        configuration.addDefault(PREVENT_ITEM_PICKUP, false);
 
         configuration.options().copyDefaults(true);
 

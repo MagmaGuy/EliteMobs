@@ -149,6 +149,7 @@ public class MetadataHandler implements Listener {
     public final static String TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN = "TreasureGoblinGoldShotgunCooldown";
     public final static String ZOMBIE_KING_FLAMETHROWER_COOLDOWN = "ZombieKingFlamethrowerCooldown";
     public final static String ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN = "ZombieKingUnholySmiteCooldown";
+    public final static String ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN = "ZombieKingSummonMinionsCooldown";
 
     //displays
     public final static String ARMOR_STAND_DISPLAY = "ArmorStandDisplay";
@@ -224,6 +225,7 @@ public class MetadataHandler implements Listener {
             TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN,
             ZOMBIE_KING_FLAMETHROWER_COOLDOWN,
             ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN,
+            ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN,
             ZOMBIE_FRIENDS_ACTIVATED,
             TEAM_ROCKET_ACTIVATED,
             TEAM_ROCKET_MEMBER,
