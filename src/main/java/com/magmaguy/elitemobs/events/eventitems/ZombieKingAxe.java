@@ -49,7 +49,7 @@ public class ZombieKingAxe implements Listener {
 //                player.getInventory().removeItem(zombieKingAxe);
             } else zombieKingAxe.setDurability((short) (zombieKingAxe.getDurability() + 4));
 
-            ZombieKing.initializeFlamethrower(player.getLocation(), player.getLocation().getDirection(), player);
+            ZombieKing.initializeFlamethrower(player.getLocation(), player.getLocation().getDirection(), player, true);
             player.setMetadata(MetadataHandler.USING_ZOMBIE_KING_AXE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
 
             new BukkitRunnable() {

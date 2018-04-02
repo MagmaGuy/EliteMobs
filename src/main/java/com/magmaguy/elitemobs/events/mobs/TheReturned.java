@@ -39,7 +39,7 @@ import java.util.Random;
 
 public class TheReturned implements Listener {
 
-    private Random random = new Random();
+    private static Random random = new Random();
 
     private void spawnTheReturned(Zombie zombie) {
 
@@ -67,7 +67,7 @@ public class TheReturned implements Listener {
 
     }
 
-    private void theReturnedConstructor(int mobLevel, Zombie zombie) {
+    public static void theReturnedConstructor(int mobLevel, Zombie zombie) {
 
         Location spawnLocation = zombie.getLocation();
 

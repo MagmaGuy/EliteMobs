@@ -19,10 +19,7 @@ package com.magmaguy.elitemobs;
  * Created by MagmaGuy on 07/10/2016.
  */
 
-import com.magmaguy.elitemobs.collateralminecraftchanges.ChunkUnloadMetadataPurge;
-import com.magmaguy.elitemobs.collateralminecraftchanges.EntityDeathMetadataFlusher;
-import com.magmaguy.elitemobs.collateralminecraftchanges.OfflinePlayerCacher;
-import com.magmaguy.elitemobs.collateralminecraftchanges.PreventCreeperPassiveEntityDamage;
+import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
@@ -40,6 +37,7 @@ import com.magmaguy.elitemobs.events.eventitems.ZombieKingAxe;
 import com.magmaguy.elitemobs.events.mobs.TheReturned;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
+import com.magmaguy.elitemobs.events.mobs.sharedeventpowers.SpiritWalk;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
@@ -271,7 +269,11 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(), this);
         this.getServer().getPluginManager().registerEvents(new EntityDeathMetadataFlusher(), this);
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP)) {
 
+            this.getServer().getPluginManager().registerEvents(new PreventMobItemPickup(), this);
+
+        }
 
         //Initialize custom events
         this.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), this);
@@ -279,6 +281,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new DeadMoon(), this);
         this.getServer().getPluginManager().registerEvents(new TheReturned(), this);
         this.getServer().getPluginManager().registerEvents(new ZombieKing(), this);
+        this.getServer().getPluginManager().registerEvents(new SpiritWalk(), this);
 
         //Set up health and damage displays
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT))
