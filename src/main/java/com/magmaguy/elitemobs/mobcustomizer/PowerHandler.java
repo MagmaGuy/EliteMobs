@@ -50,6 +50,8 @@ public class PowerHandler {
 
     public static void powerHandler(Entity entity) {
 
+        if (entity.hasMetadata(MetadataHandler.CUSTOM_POWERS_MD)) return;
+
         int availableMinorPowers = 0;
         int availableMajorPowers = 0;
 
@@ -69,12 +71,6 @@ public class PowerHandler {
         if (availableMinorPowers >= 1) {
 
             int currentMinorPowerAmount = 0;
-
-            if (entity.hasMetadata(MetadataHandler.CUSTOM_POWERS_MD)) {
-
-                return;
-
-            }
 
             if (minorPowerArray.isEmpty()) {
 
