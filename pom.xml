@@ -21,7 +21,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>6.2.4</version>
+    <version>6.3.0</version>
     <packaging>jar</packaging>
 
     <properties>
