@@ -40,7 +40,17 @@ public class DamageDisplay implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
+        if (event.isCancelled()) return;
+
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS)) {
+
+            if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
+
+                if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getDamage());
+
+            }
+
+        } else {
 
             if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getDamage());
 

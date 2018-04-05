@@ -35,7 +35,17 @@ public class HealthDisplay implements Listener {
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
+        if (event.isCancelled()) return;
+
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_HEALTH_FOR_ELITE_MOBS)) {
+
+            if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
+
+                displayHealth((LivingEntity) event.getEntity());
+
+            }
+
+        } else {
 
             displayHealth((LivingEntity) event.getEntity());
 

@@ -16,10 +16,7 @@
 package com.magmaguy.elitemobs.naturalmobspawner;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
@@ -49,7 +46,8 @@ public class NaturalMobMetadataAssigner implements Listener {
     public void onSpawn(CreatureSpawnEvent event) {
 
         if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
-        if (event.getEntity().getCustomName() != null) return;
+        if (event.getEntity().getCustomName() != null && ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS))
+            return;
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING) ||
                 !ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) ||

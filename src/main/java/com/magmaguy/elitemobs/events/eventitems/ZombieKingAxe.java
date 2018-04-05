@@ -46,7 +46,6 @@ public class ZombieKingAxe implements Listener {
 
             if (zombieKingAxe.getDurability() + 4 > zombieKingAxe.getType().getMaxDurability()) {
                 return;
-//                player.getInventory().removeItem(zombieKingAxe);
             } else zombieKingAxe.setDurability((short) (zombieKingAxe.getDurability() + 4));
 
             ZombieKing.initializeFlamethrower(player.getLocation(), player.getLocation().getDirection(), player, true);
