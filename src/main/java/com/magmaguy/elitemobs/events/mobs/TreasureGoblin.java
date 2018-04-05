@@ -344,7 +344,6 @@ public class TreasureGoblin implements Listener {
 
                 if (counter == 20 * 1) {
 
-//                    armorStand.remove();
                     goldShotgun(zombie, targetLocation);
                     zombie.setAI(true);
                     cancel();

@@ -146,15 +146,7 @@ public class UniqueItemConstructor {
             ItemStack zombieKingAxe = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.ZOMBIE_KING_AXE), UniqueItemType.ZOMBIE_KING_AXE);
             zombieKingAxe = tempWorthLoreAdder(zombieKingAxe);
 
-            if (dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.ZOMBIE_KING_AXE)) > 0) {
-
-                CustomItemConstructor.staticCustomItemHashMap.put(zombieKingAxe, dropWeight(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_BOW)));
-
-            } else {
-
-                //todo: add in case of dynamic
-
-            }
+            //This item only ever drops when the Zombie King gets slain
 
             CustomItemConstructor.customItemList.add(zombieKingAxe);
             uniqueItems.put(ZOMBIE_KING_AXE, zombieKingAxe);

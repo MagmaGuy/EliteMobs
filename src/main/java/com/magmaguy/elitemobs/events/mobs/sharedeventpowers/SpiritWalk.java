@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -57,6 +58,8 @@ public class SpiritWalk implements Listener {
     @EventHandler
     public void onBossMobHit(EntityDamageByEntityEvent event) {
 
+        if (event.getDamager() instanceof Projectile && !(((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
+            return;
         if (!(event.getDamager().hasMetadata(MetadataHandler.ZOMBIE_KING) || event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN)))
             return;
         if (!(event.getDamager() instanceof LivingEntity)) return;

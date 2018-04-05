@@ -54,6 +54,8 @@ public class MobCombatSettingsConfig {
     public static final String DEFAULT_DEATH_MESSAGE = DEATH_MESSAGES + "default";
     public static final String DISPLAY_HEALTH_ON_HIT = "Display Elite Mob health on hit";
     public static final String DISPLAY_DAMAGE_ON_HIT = "Display damage deal to Elite Mobs on hit";
+    public static final String ONLY_SHOW_HEALTH_FOR_ELITE_MOBS = "Only display health indicator for Elite Mobs";
+    public static final String ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS = "Only display damage indicator for Elite Mobs";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -92,6 +94,8 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(DEFAULT_DEATH_MESSAGE, "$player has been slain by $entity");
         configuration.addDefault(DISPLAY_HEALTH_ON_HIT, true);
         configuration.addDefault(DISPLAY_DAMAGE_ON_HIT, true);
+        configuration.addDefault(ONLY_SHOW_HEALTH_FOR_ELITE_MOBS, true);
+        configuration.addDefault(ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS, true);
 
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
