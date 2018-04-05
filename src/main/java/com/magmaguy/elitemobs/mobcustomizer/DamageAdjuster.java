@@ -635,7 +635,7 @@ public class DamageAdjuster implements Listener {
     private void customDamageEvent(Entity damager, LivingEntity damagee, EntityDamageEvent.DamageCause damageCause, double damage) {
 
         damageeList.add(damagee);
-        EntityDamageByEntityEvent customEvent = new EntityDamageByEntityEvent(damager, damagee, damageCause, damage);
+        EliteMobEntityDamageByEntityEvent customEvent = new EliteMobEntityDamageByEntityEvent(damager, damagee, damageCause, damage);
         Bukkit.getServer().getPluginManager().callEvent(customEvent);
 
     }
