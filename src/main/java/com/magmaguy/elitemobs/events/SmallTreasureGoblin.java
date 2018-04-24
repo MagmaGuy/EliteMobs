@@ -43,6 +43,8 @@ public class SmallTreasureGoblin implements Listener {
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {
 
+        if (!EventLauncher.verifyPlayerCount()) return;
+
         if (EliteMobs.worldList.contains(event.getEntity().getWorld())) {
 
             if (entityQueued && (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||

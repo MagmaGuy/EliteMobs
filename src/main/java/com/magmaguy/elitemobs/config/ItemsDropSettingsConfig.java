@@ -30,6 +30,7 @@ public class ItemsDropSettingsConfig {
     public static final String CUSTOM_STATIC_ITEM_WEIGHT = "Custom static item weight";
     public static final String SPAWNER_DEFAULT_LOOT_MULTIPLIER = "Drop multiplied default loot from elite mobs spawned in spawners";
     public static final String DEFAULT_LOOT_MULTIPLIER = "EliteMob default loot multiplier";
+    public static final String EXPERIENCE_LOOT_MULTIPLIER = "EliteMob xp multiplier";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -45,6 +46,7 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(CUSTOM_STATIC_ITEM_WEIGHT, 1);
         configuration.addDefault(SPAWNER_DEFAULT_LOOT_MULTIPLIER, true);
         configuration.addDefault(DEFAULT_LOOT_MULTIPLIER, 1.0);
+        configuration.addDefault(EXPERIENCE_LOOT_MULTIPLIER, 1.0);
 
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);

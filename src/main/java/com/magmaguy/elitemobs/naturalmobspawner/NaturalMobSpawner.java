@@ -25,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -76,6 +77,13 @@ public class NaturalMobSpawner implements Listener {
                 eliteMobLevel = ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP);
 
             }
+
+        }
+
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE)) {
+
+            int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease((LivingEntity) entity);
+            eliteMobLevel += levelIncrement;
 
         }
 

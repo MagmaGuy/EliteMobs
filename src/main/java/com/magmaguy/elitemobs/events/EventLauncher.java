@@ -60,7 +60,7 @@ public class EventLauncher {
 
     }
 
-    private boolean verifyPlayerCount() {
+    public static boolean verifyPlayerCount() {
 
         return ConfigValues.eventsConfig.getInt(EventsConfig.MINIMUM_ONLINE_PLAYERS) <= Bukkit.getOnlinePlayers().size();
 

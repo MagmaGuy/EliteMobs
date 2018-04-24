@@ -82,6 +82,9 @@ public class DefaultDropsHandler implements Listener {
 
             }
 
+            mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
+                    ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.EXPERIENCE_LOOT_MULTIPLIER));
+
             int droppedXP = (int) (event.getDroppedExp() + event.getDroppedExp() * 0.1 * mobLevel);
             event.setDroppedExp(0);
             event.getEntity().getWorld().spawn(event.getEntity().getLocation(), ExperienceOrb.class).setExperience(droppedXP);
