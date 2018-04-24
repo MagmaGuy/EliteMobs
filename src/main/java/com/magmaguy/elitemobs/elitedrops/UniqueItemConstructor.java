@@ -157,6 +157,8 @@ public class UniqueItemConstructor {
 
     private ItemStack tempWorthLoreAdder(ItemStack itemStack) {
 
+        if (!ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.SHOW_ITEM_WORTH)) return itemStack;
+
         List<String> newLore = new ArrayList<>();
         newLore.addAll(itemStack.getItemMeta().getLore());
         newLore.add("Worth " + ItemWorthCalculator.determineItemWorth(itemStack) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));

@@ -94,6 +94,8 @@ public class TreasureGoblin implements Listener {
 
         EventMessage.sendEventMessage(sendString);
 
+        BossMobDeathCountdown.startDeathCountdown((LivingEntity) treasureGoblin);
+
     }
 
     @EventHandler
@@ -121,7 +123,7 @@ public class TreasureGoblin implements Listener {
 
                 } else {
 
-                    player.sendMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.chatColorConverter(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
+                    player.sendMessage(ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
 
                 }
 

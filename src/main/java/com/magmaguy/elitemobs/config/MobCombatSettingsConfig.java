@@ -56,6 +56,9 @@ public class MobCombatSettingsConfig {
     public static final String DISPLAY_DAMAGE_ON_HIT = "Display damage deal to Elite Mobs on hit";
     public static final String ONLY_SHOW_HEALTH_FOR_ELITE_MOBS = "Only display health indicator for Elite Mobs";
     public static final String ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS = "Only display damage indicator for Elite Mobs";
+    public static final String INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE = "Increase level of mobs spawned based on distance from world spawn";
+    public static final String DISTANCE_TO_INCREMENT = "Distance between increments";
+    public static final String LEVEL_TO_INCREMENT = "Amount of levels incremented per distance";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -96,6 +99,9 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(DISPLAY_DAMAGE_ON_HIT, true);
         configuration.addDefault(ONLY_SHOW_HEALTH_FOR_ELITE_MOBS, true);
         configuration.addDefault(ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS, true);
+        configuration.addDefault(INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE, false);
+        configuration.addDefault(DISTANCE_TO_INCREMENT, 100);
+        configuration.addDefault(LEVEL_TO_INCREMENT, 1);
 
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);

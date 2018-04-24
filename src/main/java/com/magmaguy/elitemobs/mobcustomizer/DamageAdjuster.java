@@ -165,6 +165,7 @@ public class DamageAdjuster implements Listener {
 
         if (event.getEntity() instanceof LivingEntity && damageeList.contains(event.getEntity())) {
 
+            event.setCancelled(true);
             damageeList.remove(event.getEntity());
             dealSufficientDamage(player, event.getFinalDamage(), player, (LivingEntity) event.getDamager());
 

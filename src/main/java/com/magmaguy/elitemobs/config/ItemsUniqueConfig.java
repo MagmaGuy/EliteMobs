@@ -30,6 +30,7 @@ public class ItemsUniqueConfig {
     public static final String HUNTING_SET_BOW = "Hunting Bow";
     public static final String ENABLE_ZOMBIE_KING_AXE = "Enable Zombie King Axe";
     public static final String ZOMBIE_KING_AXE = "Zombie King Axe";
+    public static final String SHOW_ITEM_WORTH = "Show item worth";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
@@ -132,6 +133,7 @@ public class ItemsUniqueConfig {
                 "    - NIGHT_VISION,1,target,continuous\n" +
                 "    - WITHER,1,target,onHit\n" +
                 "    Drop Weight: 1");
+        configuration.addDefault(SHOW_ITEM_WORTH, true);
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);

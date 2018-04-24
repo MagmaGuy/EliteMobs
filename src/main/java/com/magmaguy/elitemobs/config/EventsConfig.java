@@ -41,6 +41,8 @@ public class EventsConfig {
     private static final String EVENT_WEIGHT = "Event weight.";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_WEIGHT = EVENT_WEIGHT + "Small treasure goblin";
     public static final String DEAD_MOON_EVENT_WEIGHT = EVENT_WEIGHT + "Blood moon";
+    public static final String EVENT_TIMEOUT_TIME = "Time before boss mob gets culled";
+    public static final String EVENT_TIMEOUT_MESSAGE = "Message for when boss mobs despawn if they are not killed withing 30 minutes";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -65,6 +67,9 @@ public class EventsConfig {
         configuration.addDefault(DEAD_MOON_ZOMBIE_KING_NAME, "&4Zombie King");
         configuration.addDefault(SMALL_TREASURE_GOBLIN_EVENT_WEIGHT, 40);
         configuration.addDefault(DEAD_MOON_EVENT_WEIGHT, 20);
+        configuration.addDefault(EVENT_TIMEOUT_TIME, 30);
+        configuration.addDefault(EVENT_TIMEOUT_MESSAGE, "$bossmob has escaped!");
+
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);

@@ -96,6 +96,8 @@ public class ZombieKing implements Listener {
 
         EventMessage.sendEventMessage(sendString);
 
+        BossMobDeathCountdown.startDeathCountdown(zombie);
+
     }
 
     private static void zombieKingFlair(Zombie zombieKing) {
