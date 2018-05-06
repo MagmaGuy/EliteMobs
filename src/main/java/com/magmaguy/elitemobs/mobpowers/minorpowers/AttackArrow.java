@@ -21,10 +21,7 @@ import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -83,12 +80,7 @@ public class AttackArrow extends MinorPowers implements Listener {
 
                     }
 
-                    Location offsetLocation = ProjectileLocationGenerator.generateLocation(eliteMob, player);
-                    Entity repeatingArrow = eliteMob.getWorld().spawnEntity(offsetLocation, EntityType.ARROW);
-                    Vector targetterToTargetted = player.getEyeLocation().subtract(repeatingArrow.getLocation()).toVector()
-                            .normalize().multiply(2);
-
-                    repeatingArrow.setVelocity(targetterToTargetted);
+                    fireArrow(eliteMob, player);
 
                 }
 
@@ -98,5 +90,17 @@ public class AttackArrow extends MinorPowers implements Listener {
 
     }
 
+    public static Arrow fireArrow(LivingEntity shooter, LivingEntity target) {
+
+        Location offsetLocation = ProjectileLocationGenerator.generateLocation(shooter, target);
+        Entity repeatingArrow = shooter.getWorld().spawnEntity(offsetLocation, EntityType.ARROW);
+        Vector targetterToTargetted = target.getEyeLocation().subtract(repeatingArrow.getLocation()).toVector()
+                .normalize().multiply(2);
+
+        repeatingArrow.setVelocity(targetterToTargetted);
+
+        return (Arrow) repeatingArrow;
+
+    }
 
 }

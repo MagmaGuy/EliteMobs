@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
+import com.magmaguy.elitemobs.elitedrops.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventMessage;
@@ -96,7 +97,9 @@ public class ZombieKing implements Listener {
 
         EventMessage.sendEventMessage(sendString);
 
-        BossMobDeathCountdown.startDeathCountdown(zombie);
+        BossMobDeathCountdown.startDeathCountdown(zombieKing);
+
+        HuntingBow.aliveBossMobList.add(zombieKing);
 
     }
 
@@ -568,6 +571,7 @@ public class ZombieKing implements Listener {
 
             }
 
+            HuntingBow.aliveBossMobList.remove(zombieKing);
 
         }
 

@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Zombie;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -47,6 +48,7 @@ public class PowerHandler {
     private static ZombieParents zombieParents = new ZombieParents();
     private static ZombieFriends zombieFriends = new ZombieFriends();
     private static ZombieBloat zombieBloat = new ZombieBloat();
+    private static SkeletonTrackingArrow skeletonTrackingArrow = new SkeletonTrackingArrow();
 
     public static void powerHandler(Entity entity) {
 
@@ -82,7 +84,6 @@ public class PowerHandler {
 
                 currentMinorPowerAmount = entity.getMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD).get(0).asInt();
 
-                //TODO: this is probably not working as intended
                 Iterator<MinorPowers> minorPowerIterator = minorPowerArray.iterator();
 
                 while (minorPowerIterator.hasNext()) {
@@ -179,6 +180,16 @@ public class PowerHandler {
                     if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.ZombieBloat")) {
 
                         majorPowersArrayList.add(zombieBloat);
+
+                    }
+
+                }
+
+                if (entity instanceof Skeleton) {
+
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.SkeletonTrackingArrow")) {
+
+                        majorPowersArrayList.add(skeletonTrackingArrow);
 
                     }
 

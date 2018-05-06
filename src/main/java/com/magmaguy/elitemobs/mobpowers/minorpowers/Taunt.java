@@ -53,7 +53,6 @@ public class Taunt extends MinorPowers implements Listener {
     private static Random random = new Random();
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.TAUNT_MD;
-    private int processID;
 
     @Override
     public void applyPowers(Entity entity) {
@@ -120,6 +119,7 @@ public class Taunt extends MinorPowers implements Listener {
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
 
+        if (event.getDamager() == null) return;
 
         if (event.getDamager().hasMetadata(powerMetadata) || event.getDamager() instanceof Projectile &&
                 ProjectileMetadataDetector.projectileMetadataDetector((Projectile) event.getDamager(), powerMetadata)) {

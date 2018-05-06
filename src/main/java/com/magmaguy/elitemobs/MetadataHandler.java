@@ -68,6 +68,7 @@ public class MetadataHandler implements Listener {
     public final static String ZOMBIE_TEAM_ROCKET_MD = "ZombieTeamRocket";
     public final static String ZOMBIE_PARENTS_MD = "ZombieParents";
     public final static String ZOMBIE_BLOAT_MD = "ZombieBloat";
+    public final static String SKELETON_TRACKING_ARROW_MD = "SkeletonTrackingArrow";
 
     //Major powers human format
     public final static String ZOMBIE_FRIENDS_H = "ZombieFriends";
@@ -75,6 +76,7 @@ public class MetadataHandler implements Listener {
     public final static String ZOMBIE_TEAM_ROCKET_H = "ZombieTeamRocket";
     public final static String ZOMBIE_PARENTS_H = "ZombieParents";
     public final static String ZOMBIE_BLOAT_H = "ZombieBloat";
+    public final static String SKELETON_TRACKING_ARROW_H = "SkeletonTrackingArrow";
 
     //Minor powers
     public final static String ATTACK_ARROW_MD = "AttackArrow";
@@ -134,6 +136,7 @@ public class MetadataHandler implements Listener {
     public final static String ZOMBIE_CHANTING = "ZombieChanting";
     public final static String SHOOTING_ARROWS = "ShootingArrows";
     public final static String SHOOTING_FIREBALLS = "ShootingFireballs";
+    public final static String TRACKING_ARROWS_ACTIVE = "TrackingArrowsActive";
 
     //powerCooldowns
     public final static String FROZEN_COOLDOWN = "FrozenCooldown";
@@ -150,6 +153,7 @@ public class MetadataHandler implements Listener {
     public final static String ZOMBIE_KING_FLAMETHROWER_COOLDOWN = "ZombieKingFlamethrowerCooldown";
     public final static String ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN = "ZombieKingUnholySmiteCooldown";
     public final static String ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN = "ZombieKingSummonMinionsCooldown";
+    public final static String TRACKING_ARROWS_COOLDOWN = "TrackingArrowsCooldown";
 
     //displays
     public final static String ARMOR_STAND_DISPLAY = "ArmorStandDisplay";
@@ -197,6 +201,7 @@ public class MetadataHandler implements Listener {
             ZOMBIE_NECRONOMICON_MD,
             ZOMBIE_TEAM_ROCKET_MD,
             ZOMBIE_PARENTS_MD,
+            SKELETON_TRACKING_ARROW_MD,
             ZOMBIE_BLOAT_MD
     ));
     public static List<String> forMetadataList = new ArrayList<>(Arrays.asList( //add major and minor power lists
@@ -226,6 +231,7 @@ public class MetadataHandler implements Listener {
             ZOMBIE_KING_FLAMETHROWER_COOLDOWN,
             ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN,
             ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN,
+            TRACKING_ARROWS_COOLDOWN,
             ZOMBIE_FRIENDS_ACTIVATED,
             TEAM_ROCKET_ACTIVATED,
             TEAM_ROCKET_MEMBER,
@@ -233,6 +239,7 @@ public class MetadataHandler implements Listener {
             ZOMBIE_CHANTING,
             SHOOTING_ARROWS,
             SHOOTING_FIREBALLS,
+            TRACKING_ARROWS_ACTIVE,
             ARMOR_STAND_DISPLAY,
             KILLED_BY_ELITE_MOB,
             USING_ZOMBIE_KING_AXE
@@ -266,7 +273,8 @@ public class MetadataHandler implements Listener {
             ZOMBIE_NECRONOMICON_H,
             ZOMBIE_TEAM_ROCKET_H,
             ZOMBIE_PARENTS_H,
-            ZOMBIE_BLOAT_H
+            ZOMBIE_BLOAT_H,
+            SKELETON_TRACKING_ARROW_H
     ));
 
     public static List<String> metadataList() {
@@ -306,6 +314,8 @@ public class MetadataHandler implements Listener {
                 return ZOMBIE_PARENTS_H;
             case ZOMBIE_BLOAT_MD:
                 return ZOMBIE_BLOAT_H;
+            case SKELETON_TRACKING_ARROW_MD:
+                return SKELETON_TRACKING_ARROW_H;
 
             case ATTACK_ARROW_MD:
                 return ATTACK_ARROW_H;

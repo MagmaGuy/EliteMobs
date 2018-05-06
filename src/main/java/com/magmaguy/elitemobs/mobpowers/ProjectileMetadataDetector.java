@@ -27,6 +27,8 @@ public class ProjectileMetadataDetector {
 
         ProjectileSource trueDamager = projectile.getShooter();
 
+        if (trueDamager == null) return false;
+
         if (trueDamager instanceof Blaze || trueDamager instanceof Skeleton || trueDamager instanceof Witch ||
                 trueDamager instanceof Stray) {
 

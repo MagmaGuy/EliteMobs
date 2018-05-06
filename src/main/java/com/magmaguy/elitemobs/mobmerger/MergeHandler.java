@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.mobmerger;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -65,7 +66,9 @@ public class MergeHandler implements Listener {
 
     private void validateEntityType(Entity eventEntity) {
 
-        if (!ConfigValues.defaultConfig.getBoolean("Valid worlds." + eventEntity.getWorld().getName().toString())) {
+        if (eventEntity == null) return;
+
+        if (!EliteMobs.worldList.contains(eventEntity.getWorld())) {
             return;
         }
 

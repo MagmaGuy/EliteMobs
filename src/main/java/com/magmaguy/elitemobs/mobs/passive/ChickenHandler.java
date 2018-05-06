@@ -25,8 +25,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.ItemMergeEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -156,12 +160,17 @@ public class ChickenHandler implements Listener {
 
     }
 
+    private List<String> lore = new ArrayList<>(Arrays.asList("SuperChicken Egg"));
+
     //Egg drop chance is based on the underlying timer
     public void dropEggs() {
 
         if (activeChickenList.isEmpty()) return;
 
         ItemStack eggStack = new ItemStack(Material.EGG, 1);
+        ItemMeta eggMeta = eggStack.getItemMeta();
+        eggMeta.setLore(lore);
+        eggStack.setItemMeta(eggMeta);
 
         Iterator<Chicken> superChickenIterator = activeChickenList.iterator();
 
@@ -178,8 +187,59 @@ public class ChickenHandler implements Listener {
 
                 Item droppedItem = chicken.getWorld().dropItem(chicken.getLocation(), eggStack);
                 droppedItem.setVelocity(ItemDropVelocity.ItemDropVelocity());
+                new BukkitRunnable() {
+
+                    @Override
+                    public void run() {
+
+                        if (droppedItem.isValid()) {
+
+                            droppedItem.remove();
+
+                        }
+
+                    }
+
+                }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
 
             }
+
+        }
+
+    }
+
+    @EventHandler
+    public void onHopperSuperEggPickup(InventoryPickupItemEvent event) {
+
+        if (event.getItem().getItemStack().hasItemMeta() && event.getItem().getItemStack().getItemMeta().hasLore() &&
+                event.getItem().getItemStack().getItemMeta().getLore().equals(lore)) {
+
+            event.setCancelled(true);
+
+        }
+
+    }
+
+    @EventHandler
+    public void onSuperEggMerge(ItemMergeEvent event) {
+
+        if (event.getEntity().getItemStack().hasItemMeta() && event.getEntity().getItemStack().getItemMeta().hasLore() &&
+                event.getEntity().getItemStack().getItemMeta().getLore().equals(lore)) {
+
+            new BukkitRunnable() {
+
+                @Override
+                public void run() {
+
+                    if (event.getTarget().isValid()) {
+
+                        event.getTarget().remove();
+
+                    }
+
+                }
+
+            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
 
         }
 
