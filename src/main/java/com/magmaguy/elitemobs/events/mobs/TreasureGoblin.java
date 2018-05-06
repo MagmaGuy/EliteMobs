@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
+import com.magmaguy.elitemobs.elitedrops.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
@@ -96,6 +97,8 @@ public class TreasureGoblin implements Listener {
 
         BossMobDeathCountdown.startDeathCountdown((LivingEntity) treasureGoblin);
 
+        HuntingBow.aliveBossMobList.add((LivingEntity) treasureGoblin);
+
     }
 
     @EventHandler
@@ -128,6 +131,8 @@ public class TreasureGoblin implements Listener {
                 }
 
             }
+
+            HuntingBow.aliveBossMobList.remove(entity);
 
         }
 

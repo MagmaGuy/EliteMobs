@@ -60,7 +60,8 @@ public class SpiritWalk implements Listener {
 
         if (event.getDamager() instanceof Projectile && !(((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
             return;
-        if (!(event.getDamager().hasMetadata(MetadataHandler.ZOMBIE_KING) || event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN)))
+        if (event.getDamager() instanceof LivingEntity &&
+                (!(event.getDamager().hasMetadata(MetadataHandler.ZOMBIE_KING) || event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN))))
             return;
         if (!(event.getDamager() instanceof LivingEntity)) return;
         entityHitCount.put((LivingEntity) event.getDamager(), 0);

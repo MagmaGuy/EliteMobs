@@ -30,6 +30,7 @@ import com.magmaguy.elitemobs.commands.shops.ItemSaleEvent;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.elitedrops.*;
+import com.magmaguy.elitemobs.elitedrops.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
@@ -408,6 +409,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
             }
 
         }.runTaskTimer(this, 20, 20 * 2);
+
+        HuntingBow.scanForBossMobs();
 
     }
 

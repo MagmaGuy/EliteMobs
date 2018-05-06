@@ -44,8 +44,6 @@ public class UniqueItemConstructor {
     public static final String HUNTING_SET_IDENTIFIER = " Hunting set";
     public static final String ZOMBIE_KING_AXE_IDENTIFIER = " King Axe";
 
-    public UniqueItemConstructor() {
-    }
 
     public void intializeUniqueItems() {
 

@@ -324,6 +324,11 @@ public class SpawnMobCommandHandler {
                             powerCount++;
                         }
                         break;
+                    case MetadataHandler.SKELETON_TRACKING_ARROW_H:
+                        if (entity instanceof Skeleton) {
+                            entity.setMetadata(MetadataHandler.SKELETON_TRACKING_ARROW_MD, new FixedMetadataValue(plugin, true));
+                            powerCount++;
+                        }
                     //minor powers
                     case MetadataHandler.ATTACK_ARROW_H:
                         entity.setMetadata(MetadataHandler.ATTACK_ARROW_MD, new FixedMetadataValue(plugin, true));

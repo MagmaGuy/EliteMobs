@@ -61,6 +61,8 @@ public class AttackWeakness extends MinorPowers implements Listener {
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
 
+        if (damager == null) return;
+
         if (damager.hasMetadata(powerMetadata)) {
 
             if (damagee instanceof Player) {

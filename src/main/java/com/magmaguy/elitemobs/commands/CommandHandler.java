@@ -199,12 +199,9 @@ public class CommandHandler implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("reload") && args[1].equalsIgnoreCase("configs")
                         && permCheck(RELOAD_CONFIGS, commandSender)) {
 
-                    Player player = (Player) commandSender;
-
                     ConfigValues.initializeConfigValues();
 
                     getLogger().info("EliteMobs configs reloaded!");
-                    player.sendTitle("EliteMobs config reloaded!", "Reloaded config, loot, mobPowers and translation");
 
                     return true;
 
