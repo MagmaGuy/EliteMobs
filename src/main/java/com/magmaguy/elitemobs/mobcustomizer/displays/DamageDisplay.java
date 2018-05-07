@@ -42,6 +42,8 @@ public class DamageDisplay implements Listener {
 
         if (event.isCancelled()) return;
 
+        if (!(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof ArmorStand) return;
+
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS)) {
 
             if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {

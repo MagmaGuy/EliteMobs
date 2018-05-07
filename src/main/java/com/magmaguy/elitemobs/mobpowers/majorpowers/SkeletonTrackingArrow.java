@@ -69,9 +69,8 @@ public class SkeletonTrackingArrow extends MajorPowers implements Listener {
     public void eliteMobAggro(EntityTargetLivingEntityEvent event) {
 
         if (!(event.getEntity() instanceof LivingEntity && event.getTarget() instanceof LivingEntity)) return;
-
-        if (!event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Skeleton) return;
-
+        if (!event.getEntity().hasMetadata(powerMetadata)) return;
+        if (!(event.getEntity() instanceof Skeleton)) return;
         if (!(event.getTarget() instanceof Player)) return;
 
         LivingEntity livingEntity = (LivingEntity) event.getEntity();
