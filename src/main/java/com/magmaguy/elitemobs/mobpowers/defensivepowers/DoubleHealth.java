@@ -13,9 +13,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.defensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -26,10 +27,10 @@ import org.bukkit.plugin.Plugin;
 /**
  * Created by MagmaGuy on 04/05/2017.
  */
-public class DoubleDamage extends MinorPowers {
+public class DoubleHealth extends MinorPowers {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.DOUBLE_DAMAGE_MD;
+    String powerMetadata = MetadataHandler.DOUBLE_HEALTH_MD;
 
     @Override
     public void applyPowers(Entity entity) {
@@ -47,7 +48,13 @@ public class DoubleDamage extends MinorPowers {
     @Override
     public boolean existingPowers(Entity entity) {
 
-        return entity.hasMetadata(powerMetadata);
+        if (!(entity instanceof IronGolem)) {
+
+            return entity.hasMetadata(powerMetadata);
+
+        }
+
+        return false;
 
     }
 

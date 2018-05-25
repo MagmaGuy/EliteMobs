@@ -448,7 +448,8 @@ public class SpawnMobCommandHandler {
 
             }
 
-            entity.setMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, powerCount));
+            //TODO: fix the fact that manually adding powers will not respect the pressuposed max amount of minor powers
+//            entity.setMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, powerCount));
 
             minorPowerPowerStance.itemEffect(entity);
             majorPowerPowerStance.itemEffect(entity);

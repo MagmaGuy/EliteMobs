@@ -13,10 +13,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.ProjectileMetadataDetector;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,16 +28,18 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class AttackWeb extends MinorPowers implements Listener {
+public class AttackFreeze extends MinorPowers implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.ATTACK_WEB_MD;
+    String powerMetadata = MetadataHandler.ATTACK_FREEZE_MD;
+
     private int processID;
 
     @Override
@@ -56,7 +59,7 @@ public class AttackWeb extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void attackWeb(EntityDamageByEntityEvent event) {
+    public void attackFreeze(EntityDamageByEntityEvent event) {
 
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
@@ -70,27 +73,20 @@ public class AttackWeb extends MinorPowers implements Listener {
 
         }
 
-        if (damager.hasMetadata(MetadataHandler.ATTACK_FREEZE_MD) || damager instanceof Projectile &&
-                ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, MetadataHandler.ATTACK_FREEZE_MD)) {
+        if (damagee.hasMetadata(MetadataHandler.FROZEN_COOLDOWN)) {
 
             return;
 
         }
 
-        if (damagee.hasMetadata("WebCooldown")) {
+        //if a block spawned by the plugin is already in place, skip effect
+        if (block.hasMetadata("TemporaryBlock")) {
 
             return;
 
         }
 
         if (damager.hasMetadata(powerMetadata)) {
-
-            //if a block spawned by the plugin is already in place, skip effect
-            if (block.hasMetadata("TemporaryBlock")) {
-
-                return;
-
-            }
 
             processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -99,12 +95,13 @@ public class AttackWeb extends MinorPowers implements Listener {
                 @Override
                 public void run() {
 
-                    webEffectApplier(counter, damagee, block);
+                    iceEffectApplier(counter, damagee, block);
                     counter++;
 
                 }
 
-            }, 2, 1);
+            }, 1, 1);
+
 
         }
 
@@ -119,7 +116,7 @@ public class AttackWeb extends MinorPowers implements Listener {
                     @Override
                     public void run() {
 
-                        webEffectApplier(counter, damagee, block);
+                        iceEffectApplier(counter, damagee, block);
                         counter++;
 
                     }
@@ -128,34 +125,66 @@ public class AttackWeb extends MinorPowers implements Listener {
 
             }
 
-        }
 
+        }
 
     }
 
-    private void webEffectApplier(int counter, Entity damagee, Block block) {
+    public void iceEffectApplier(int counter, Entity damagee, Block block) {
 
         if (counter == 0) {
 
-            damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
-            block.setType(Material.WEB);
+            damagee.setMetadata(MetadataHandler.FROZEN, new FixedMetadataValue(plugin, true));
+            damagee.setMetadata(MetadataHandler.FROZEN_COOLDOWN, new FixedMetadataValue(plugin, true));
 
-            block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+            if (block.getType() == Material.AIR) {
+
+                block.setType(Material.PACKED_ICE);
+                block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+
+            }
+
+
+            if (damagee instanceof Player) {
+
+                Player player = (Player) damagee;
+
+                player.sendTitle("", "Frozen!");
+
+            }
 
         }
 
-        if (counter == 20 * 4) {
+        if (counter == 40) {
 
-            block.setType(Material.AIR);
+            damagee.removeMetadata(MetadataHandler.FROZEN, plugin);
 
-            block.removeMetadata("TemporaryBlock", plugin);
+            if (block.getType() == Material.PACKED_ICE) {
+
+                block.setType(Material.AIR);
+                block.removeMetadata("TemporaryBlock", plugin);
+
+            }
 
         }
 
         if (counter == 20 * 7) {
 
-            damagee.removeMetadata("WebCooldown", plugin);
+            damagee.removeMetadata(MetadataHandler.FROZEN_COOLDOWN, plugin);
             Bukkit.getScheduler().cancelTask(processID);
+
+        }
+
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+
+        Player player = event.getPlayer();
+
+        if (player.hasMetadata(MetadataHandler.FROZEN)) {
+
+            event.setCancelled(true);
 
         }
 

@@ -13,31 +13,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
- * Created by MagmaGuy on 30/04/2017.
+ * Created by MagmaGuy on 05/11/2016.
  */
-public class InvulnerabilityKnockback extends MinorPowers implements Listener {
+public class MovementSpeed extends MinorPowers {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.INVULNERABILITY_KNOCKBACK_MD;
+    String powerMetadata = MetadataHandler.MOVEMENT_SPEED_MD;
 
     @Override
     public void applyPowers(Entity entity) {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
@@ -47,29 +48,6 @@ public class InvulnerabilityKnockback extends MinorPowers implements Listener {
     public boolean existingPowers(Entity entity) {
 
         return entity.hasMetadata(powerMetadata);
-
-    }
-
-    @EventHandler
-    public void invulnerabilityKnockback(EntityDamageEvent event) {
-
-        if (event.getEntity().hasMetadata(powerMetadata)) {
-
-            event.getEntity().setVelocity(new Vector(0, 0, 0));
-
-
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-                @Override
-                public void run() {
-
-                    event.getEntity().setVelocity(new Vector(0, 0, 0));
-
-                }
-
-            }, 1);
-
-        }
 
     }
 

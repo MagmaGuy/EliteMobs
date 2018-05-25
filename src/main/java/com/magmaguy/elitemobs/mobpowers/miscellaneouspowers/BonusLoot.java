@@ -13,26 +13,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 /**
- * Created by MagmaGuy on 28/11/2016.
+ * Created by MagmaGuy on 28/04/2017.
  */
-public class InvulnerabilityFallDamage extends MinorPowers implements Listener {
+public class BonusLoot extends MinorPowers implements Listener {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD;
+    String powerMetadata = MetadataHandler.BONUS_LOOT_MD;
 
     @Override
     public void applyPowers(Entity entity) {
@@ -51,13 +52,16 @@ public class InvulnerabilityFallDamage extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void invulnerabilityFallDamage(EntityDamageEvent event) {
+    public void onDeath(EntityDeathEvent event) {
 
-        Entity entity = event.getEntity();
+        if (event.getEntity().hasMetadata(powerMetadata)) {
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL && entity.hasMetadata(powerMetadata)) {
+            Entity entity = event.getEntity();
 
-            event.setCancelled(true);
+            EliteDropsDropper eliteDropsDropper = new EliteDropsDropper();
+
+            //drops item
+            eliteDropsDropper.dropItem(entity);
 
         }
 

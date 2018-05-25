@@ -188,7 +188,10 @@ public class CustomItemConstructor implements Listener {
 
                         for (String string1 : potionEffectLore) {
 
-                            parsedStructuredLore.add(ChatColorConverter.chatColorConverter(string1));
+                            String potionEffectEntryString = string.replace("$potionEffect", "");
+                            potionEffectEntryString += ChatColorConverter.chatColorConverter(string1);
+
+                            parsedStructuredLore.add(ChatColorConverter.chatColorConverter(potionEffectEntryString));
 
                         }
 

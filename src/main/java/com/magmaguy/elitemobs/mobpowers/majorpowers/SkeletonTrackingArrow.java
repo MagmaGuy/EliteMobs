@@ -31,7 +31,7 @@
 package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.AttackArrow;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackArrow;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;

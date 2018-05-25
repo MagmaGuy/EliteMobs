@@ -128,7 +128,8 @@ public class ScoreboardHandler implements Listener {
 
                             Score score = null;
 
-                            if (MetadataHandler.minorPowerList.contains(string)) {
+                            if (MetadataHandler.defensivePowerList.contains(string) || MetadataHandler.offensivePowerList.contains(string) ||
+                                    MetadataHandler.miscellaneousPowerList.contains(string)) {
 
                                 score = objective.getScore(ChatColor.AQUA + finalString);
 
@@ -155,7 +156,8 @@ public class ScoreboardHandler implements Listener {
 
                             Score score;
 
-                            if (MetadataHandler.minorPowerList.contains(string)) {
+                            if (MetadataHandler.defensivePowerList.contains(string) || MetadataHandler.offensivePowerList.contains(string) ||
+                                    MetadataHandler.miscellaneousPowerList.contains(string)) {
 
                                 score = objective.getScore(ChatColor.AQUA + finalString);
 
