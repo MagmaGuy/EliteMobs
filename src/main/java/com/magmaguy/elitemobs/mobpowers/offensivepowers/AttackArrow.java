@@ -13,11 +13,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.LivingEntityFinder;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

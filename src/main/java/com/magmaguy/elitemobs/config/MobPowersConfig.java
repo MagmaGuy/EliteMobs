@@ -29,9 +29,21 @@ public class MobPowersConfig {
 
     public void initializeConfig() {
 
-        for (String string : MetadataHandler.minorPowerList) {
+        for (String string : MetadataHandler.defensivePowerList) {
 
-            configuration.addDefault("Powers.Minor Powers." + string, true);
+            configuration.addDefault("Powers.Defensive Powers." + string, true);
+
+        }
+
+        for (String string : MetadataHandler.offensivePowerList) {
+
+            configuration.addDefault("Powers.Offensive Powers." + string, true);
+
+        }
+
+        for (String string : MetadataHandler.miscellaneousPowerList) {
+
+            configuration.addDefault("Powers.Miscellaneous Powers." + string, true);
 
         }
 

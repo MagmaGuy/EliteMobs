@@ -166,7 +166,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MobSpawningAndLoot(), this);
 
         //Minor mob powers
-        for (String string : MetadataHandler.minorPowerList) {
+        for (String string : MetadataHandler.defensivePowerList) {
 
             //don't load powers that require no event listeners
             if (!(string.equalsIgnoreCase("MovementSpeed"))
@@ -176,7 +176,69 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
                 try {
 
-                    String earlypath = "com.magmaguy.elitemobs.mobpowers.minorpowers.";
+                    String earlypath = "com.magmaguy.elitemobs.mobpowers.defensivepowers.";
+                    String finalString = earlypath + string;
+
+                    Class<?> clazz = Class.forName(finalString);
+
+                    Object instance = clazz.newInstance();
+
+                    this.getServer().getPluginManager().registerEvents((Listener) instance, this);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+
+        for (String string : MetadataHandler.offensivePowerList) {
+
+            //don't load powers that require no event listeners
+            if (!(string.equalsIgnoreCase("MovementSpeed"))
+                    && !(string.equalsIgnoreCase("Invisibility"))
+                    && !(string.equalsIgnoreCase("DoubleHealth"))
+                    && !(string.equalsIgnoreCase("DoubleDamage"))) {
+
+                try {
+
+                    String earlypath = "com.magmaguy.elitemobs.mobpowers.offensivepowers.";
+                    String finalString = earlypath + string;
+
+                    Class<?> clazz = Class.forName(finalString);
+
+                    Object instance = clazz.newInstance();
+
+                    this.getServer().getPluginManager().registerEvents((Listener) instance, this);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+
+        for (String string : MetadataHandler.miscellaneousPowerList) {
+
+            //don't load powers that require no event listeners
+            if (!(string.equalsIgnoreCase("MovementSpeed"))
+                    && !(string.equalsIgnoreCase("Invisibility"))
+                    && !(string.equalsIgnoreCase("DoubleHealth"))
+                    && !(string.equalsIgnoreCase("DoubleDamage"))) {
+
+                try {
+
+                    String earlypath = "com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.";
                     String finalString = earlypath + string;
 
                     Class<?> clazz = Class.forName(finalString);

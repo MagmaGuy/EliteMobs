@@ -13,11 +13,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.LivingEntityFinder;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -32,17 +34,18 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Created by MagmaGuy on 30/04/2017.
  */
-public class AttackBlinding extends MinorPowers implements Listener {
+public class AttackConfusing extends MinorPowers implements Listener {
 
-    String powerMetadata = MetadataHandler.ATTACK_BLINDING_MD;
-    String cooldownMetadata = MetadataHandler.ATTACK_BLINDING_COOLDOWN;
+    String powerMetadata = MetadataHandler.ATTACK_CONFUSING_MD;
+    String cooldownMetadata = MetadataHandler.ATTACK_CONFUSING_COOLDOWN;
 
     @Override
     public void applyPowers(Entity entity) {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
+        //TODO: READD THIS VISUAL EFFECT
+//        minorPowerPowerStance.attackConfusing(entity);
 
     }
 
@@ -54,7 +57,7 @@ public class AttackBlinding extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void attackBlinding(EntityDamageByEntityEvent event) {
+    public void attackConfusing(EntityDamageByEntityEvent event) {
 
         Player player = LivingEntityFinder.findPlayer(event);
         LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
@@ -62,7 +65,7 @@ public class AttackBlinding extends MinorPowers implements Listener {
         if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
         if (PowerCooldown.cooldownActive(player, eliteMob, cooldownMetadata)) return;
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 3));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 10, 3));
         PowerCooldown.cooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
 
     }

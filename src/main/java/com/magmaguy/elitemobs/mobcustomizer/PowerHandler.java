@@ -38,7 +38,9 @@ import java.util.Random;
 public class PowerHandler {
 
     private static Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    private static ArrayList<MinorPowers> minorPowerArray = new ArrayList();
+    private static ArrayList<MinorPowers> defensivePowerArray = new ArrayList();
+    private static ArrayList<MinorPowers> offensivePowerArray = new ArrayList();
+    private static ArrayList<MinorPowers> miscellaneousPowerArray = new ArrayList();
 
     private static Random random = new Random();
 
@@ -54,43 +56,69 @@ public class PowerHandler {
 
         if (entity.hasMetadata(MetadataHandler.CUSTOM_POWERS_MD)) return;
 
-        int availableMinorPowers = 0;
+        if (defensivePowerArray.isEmpty()) defensivePowerArrayInitializer();
+        if (offensivePowerArray.isEmpty()) offensivePowerArrayInitializer();
+        if (miscellaneousPowerArray.isEmpty()) miscellaneousPowerArrayInitializer();
+
+        ArrayList<MinorPowers> defensivePowerArrayCopy = (ArrayList<MinorPowers>) defensivePowerArray.clone();
+        ArrayList<MinorPowers> offensivePowerArrayCopy = (ArrayList<MinorPowers>) offensivePowerArray.clone();
+        ArrayList<MinorPowers> miscellaneousPowerArrayCopy = (ArrayList<MinorPowers>) miscellaneousPowerArray.clone();
+
+        int availableDefensivePowers = 0;
+        int availableOffensivePowers = 0;
+        int availableMiscellaneousPowers = 0;
         int availableMajorPowers = 0;
 
         if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && entity.isValid() && ((LivingEntity) entity).getHealth() > 0) {
 
             if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= 10) {
 
-                int EliteMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+                int eliteMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-                availableMinorPowers = (EliteMobLevel - 10) / 20 + 1;
-                availableMajorPowers = EliteMobLevel / 30;
+                if (eliteMobLevel >= 50) availableDefensivePowers = 1;
+                if (eliteMobLevel >= 100) availableOffensivePowers = 1;
+                if (eliteMobLevel >= 150) availableMiscellaneousPowers = 1;
+                if (eliteMobLevel >= 200) availableMajorPowers = 1;
+                if (eliteMobLevel >= 250) availableDefensivePowers = 2;
+                if (eliteMobLevel >= 300) availableOffensivePowers = 2;
+                if (eliteMobLevel >= 350) availableMiscellaneousPowers = 2;
+                if (eliteMobLevel >= 400) availableMajorPowers = 2;
 
             }
 
         }
 
-        if (availableMinorPowers >= 1) {
+        //apply defensive powers
+        applyMinorPowers(entity, availableDefensivePowers, defensivePowerArrayCopy, MetadataHandler.DEFENSIVE_POWER_AMOUNT_MD);
+
+        //apply offensive powers
+        applyMinorPowers(entity, availableOffensivePowers, offensivePowerArrayCopy, MetadataHandler.OFFENSIVE_POWER_AMOUNT_MD);
+
+        //apply miscellaneous powers
+        applyMinorPowers(entity, availableMiscellaneousPowers, miscellaneousPowerArrayCopy, MetadataHandler.MISCELLANEOUS_POWER_AMOUNT_MD);
+
+        //apply major powers
+        applyMajorPowers(entity, availableMajorPowers);
+
+    }
+
+    private static void applyMinorPowers(Entity entity, int availableMinorPowers, ArrayList<MinorPowers> minorPowerArrayCopy, String minorPowerAmountMetadata) {
+
+        if (availableMinorPowers > 0) {
 
             int currentMinorPowerAmount = 0;
 
-            if (minorPowerArray.isEmpty()) {
+            if (entity.hasMetadata(minorPowerAmountMetadata)) {
 
-                minorPowerArrayInitializer();
+                currentMinorPowerAmount = entity.getMetadata(minorPowerAmountMetadata).get(0).asInt();
 
-            }
-
-            if (entity.hasMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD)) {
-
-                currentMinorPowerAmount = entity.getMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD).get(0).asInt();
-
-                Iterator<MinorPowers> minorPowerIterator = minorPowerArray.iterator();
+                Iterator<MinorPowers> minorPowerIterator = minorPowerArrayCopy.iterator();
 
                 while (minorPowerIterator.hasNext()) {
 
-                    MinorPowers minorPower = minorPowerIterator.next();
+                    MinorPowers minorPowers = minorPowerIterator.next();
 
-                    if (minorPower.existingPowers(entity)) {
+                    if (minorPowers.existingPowers(entity)) {
 
                         minorPowerIterator.remove();
 
@@ -102,26 +130,26 @@ public class PowerHandler {
 
             int missingMinorPowerAmount = availableMinorPowers - currentMinorPowerAmount;
 
-            if (missingMinorPowerAmount > 0 && minorPowerArray.size() > 0) {
+            if (missingMinorPowerAmount > 0 && minorPowerArrayCopy.size() > 0) {
 
                 for (int i = 0; i < missingMinorPowerAmount; i++) {
 
-                    if (minorPowerArray.size() > 0) {
+                    if (minorPowerArrayCopy.size() > 0) {
 
-                        int randomizer = random.nextInt(minorPowerArray.size());
-                        MinorPowers selectedMinorPower = minorPowerArray.get(randomizer);
-                        minorPowerArray.remove(minorPowerArray.get(randomizer));
+                        int randomizer = random.nextInt(minorPowerArrayCopy.size());
+                        MinorPowers selectedMinorPower = minorPowerArrayCopy.get(randomizer);
+                        minorPowerArrayCopy.remove(selectedMinorPower);
 
-                        if (entity.hasMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD)) {
+                        if (entity.hasMetadata(minorPowerAmountMetadata)) {
 
-                            int oldMinorPowerAmount = entity.getMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD).get(0).asInt();
+                            int oldMinorPowerAmount = entity.getMetadata(minorPowerAmountMetadata).get(0).asInt();
                             int newMinorPowerAmount = oldMinorPowerAmount + 1;
 
-                            entity.setMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, newMinorPowerAmount));
+                            entity.setMetadata(minorPowerAmountMetadata, new FixedMetadataValue(plugin, newMinorPowerAmount));
 
                         } else {
 
-                            entity.setMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, 1));
+                            entity.setMetadata(minorPowerAmountMetadata, new FixedMetadataValue(plugin, 1));
 
                         }
 
@@ -134,6 +162,10 @@ public class PowerHandler {
             }
 
         }
+
+    }
+
+    private static void applyMajorPowers(Entity entity, int availableMajorPowers) {
 
         if (availableMajorPowers >= 1) {
 
@@ -254,16 +286,15 @@ public class PowerHandler {
 
     }
 
+    public static void defensivePowerArrayInitializer() {
 
-    public static void minorPowerArrayInitializer() {
+        for (String string : MetadataHandler.defensivePowerList) {
 
-        for (String string : MetadataHandler.minorPowerList) {
-
-            if (ConfigValues.mobPowerConfig.getBoolean("Powers.Minor Powers." + string)) {
+            if (ConfigValues.mobPowerConfig.getBoolean("Powers.Defensive Powers." + string)) {
 
                 try {
 
-                    String earlyPath = "com.magmaguy.elitemobs.mobpowers.minorpowers.";
+                    String earlyPath = "com.magmaguy.elitemobs.mobpowers.defensivepowers.";
 
                     String finalString = earlyPath + string;
 
@@ -271,7 +302,71 @@ public class PowerHandler {
 
                     Object instance = clazz.newInstance();
 
-                    minorPowerArray.add((MinorPowers) instance);
+                    defensivePowerArray.add((MinorPowers) instance);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+
+    }
+
+    public static void offensivePowerArrayInitializer() {
+
+        for (String string : MetadataHandler.offensivePowerList) {
+
+            if (ConfigValues.mobPowerConfig.getBoolean("Powers.Offensive Powers." + string)) {
+
+                try {
+
+                    String earlyPath = "com.magmaguy.elitemobs.mobpowers.offensivepowers.";
+
+                    String finalString = earlyPath + string;
+
+                    Class<?> clazz = Class.forName(finalString);
+
+                    Object instance = clazz.newInstance();
+
+                    offensivePowerArray.add((MinorPowers) instance);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+
+    }
+
+    public static void miscellaneousPowerArrayInitializer() {
+
+        for (String string : MetadataHandler.miscellaneousPowerList) {
+
+            if (ConfigValues.mobPowerConfig.getBoolean("Powers.Miscellaneous Powers." + string)) {
+
+                try {
+
+                    String earlyPath = "com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.";
+
+                    String finalString = earlyPath + string;
+
+                    Class<?> clazz = Class.forName(finalString);
+
+                    Object instance = clazz.newInstance();
+
+                    miscellaneousPowerArray.add((MinorPowers) instance);
 
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();

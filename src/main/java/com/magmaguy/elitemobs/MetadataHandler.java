@@ -51,7 +51,9 @@ public class MetadataHandler implements Listener {
     public final static String PASSIVE_ELITE_MOB_MD = "PassiveEliteMob";
     public final static String NATURAL_MOB_MD = "NaturalMob";
     public final static String MAJOR_POWER_AMOUNT_MD = "MajorPowerAmount";
-    public final static String MINOR_POWER_AMOUNT_MD = "MinorPowerAmount";
+    public final static String DEFENSIVE_POWER_AMOUNT_MD = "DefensivePowerAmount";
+    public final static String OFFENSIVE_POWER_AMOUNT_MD = "OffensivePowerAmount";
+    public final static String MISCELLANEOUS_POWER_AMOUNT_MD = "MiscellaneousPowerAmount";
     public final static String MAJOR_VISUAL_EFFECT_MD = "MajorVisualEffect";
     public final static String VISUAL_EFFECT_MD = "VisualEffect";
     public final static String CUSTOM_NAME = "CustomName";
@@ -172,7 +174,15 @@ public class MetadataHandler implements Listener {
     public final static String KILLED_BY_ELITE_MOB = "KilledByEliteMob";
     public final static String USING_ZOMBIE_KING_AXE = "UsingZombieKingAxe";
 
-    public static List<String> minorPowerList = new ArrayList<>(Arrays.asList(
+    public static List<String> defensivePowerList = new ArrayList<>(Arrays.asList(
+            INVULNERABILITY_ARROW_MD,
+            INVULNERABILITY_FALL_DAMAGE_MD,
+            INVULNERABILITY_FIRE_MD,
+            INVULNERABILITY_KNOCKBACK_MD,
+            DOUBLE_HEALTH_MD,
+            INVISIBILITY_MD
+    ));
+    public static List<String> offensivePowerList = new ArrayList<>(Arrays.asList(
             ATTACK_ARROW_MD,
             ATTACK_BLINDING_MD,
             ATTACK_CONFUSING_MD,
@@ -185,15 +195,11 @@ public class MetadataHandler implements Listener {
             ATTACK_WEAKNESS_MD,
             ATTACK_WEB_MD,
             ATTACK_WITHER_MD,
+            DOUBLE_DAMAGE_MD
+    ));
+    public static List<String> miscellaneousPowerList = new ArrayList<>(Arrays.asList(
             BONUS_LOOT_MD,
-            DOUBLE_DAMAGE_MD,
-            DOUBLE_HEALTH_MD,
-            INVULNERABILITY_ARROW_MD,
-            INVULNERABILITY_FALL_DAMAGE_MD,
-            INVULNERABILITY_FIRE_MD,
-            INVULNERABILITY_KNOCKBACK_MD,
             MOVEMENT_SPEED_MD,
-            INVISIBILITY_MD,
             TAUNT_MD
     ));
     public static List<String> majorPowerList = new ArrayList<>(Arrays.asList(
@@ -209,7 +215,9 @@ public class MetadataHandler implements Listener {
             PASSIVE_ELITE_MOB_MD,
             NATURAL_MOB_MD,
             MAJOR_POWER_AMOUNT_MD,
-            MINOR_POWER_AMOUNT_MD,
+            DEFENSIVE_POWER_AMOUNT_MD,
+            OFFENSIVE_POWER_AMOUNT_MD,
+            MISCELLANEOUS_POWER_AMOUNT_MD,
             MAJOR_VISUAL_EFFECT_MD,
             VISUAL_EFFECT_MD,
             CUSTOM_NAME,
@@ -285,7 +293,9 @@ public class MetadataHandler implements Listener {
 
         metadataList.addAll(majorPowerList);
 
-        metadataList.addAll(minorPowerList);
+        metadataList.addAll(defensivePowerList);
+        metadataList.addAll(offensivePowerList);
+        metadataList.addAll(miscellaneousPowerList);
 
 
         return metadataList;
@@ -294,7 +304,7 @@ public class MetadataHandler implements Listener {
 
     public static List<String> allPowersList() {
 
-        List metadataList = Stream.of(minorPowerList, majorPowerList).flatMap(List::stream).collect(Collectors.toList());
+        List metadataList = Stream.of(defensivePowerList, offensivePowerList, miscellaneousPowerList, majorPowerList).flatMap(List::stream).collect(Collectors.toList());
 
         return metadataList;
 

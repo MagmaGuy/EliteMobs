@@ -13,11 +13,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.LivingEntityFinder;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -30,20 +32,19 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 /**
- * Created by MagmaGuy on 30/04/2017.
+ * Created by MagmaGuy on 05/11/2016.
  */
-public class AttackConfusing extends MinorPowers implements Listener {
+public class AttackGravity extends MinorPowers implements Listener {
 
-    String powerMetadata = MetadataHandler.ATTACK_CONFUSING_MD;
-    String cooldownMetadata = MetadataHandler.ATTACK_CONFUSING_COOLDOWN;
+    String powerMetadata = MetadataHandler.ATTACK_GRAVITY_MD;
+    String cooldownMetadata = MetadataHandler.ATTACK_GRAVITY_COOLDOWN;
 
     @Override
     public void applyPowers(Entity entity) {
 
         entity.setMetadata(powerMetadata, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        //TODO: READD THIS VISUAL EFFECT
-//        minorPowerPowerStance.attackConfusing(entity);
+        minorPowerPowerStance.itemEffect(entity);
 
     }
 
@@ -55,7 +56,7 @@ public class AttackConfusing extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void attackConfusing(EntityDamageByEntityEvent event) {
+    public void attackGravity(EntityDamageByEntityEvent event) {
 
         Player player = LivingEntityFinder.findPlayer(event);
         LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
@@ -63,7 +64,7 @@ public class AttackConfusing extends MinorPowers implements Listener {
         if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
         if (PowerCooldown.cooldownActive(player, eliteMob, cooldownMetadata)) return;
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 10, 3));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 3));
         PowerCooldown.cooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
 
     }

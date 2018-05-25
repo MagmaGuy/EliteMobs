@@ -13,33 +13,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 /**
- * Created by MagmaGuy on 28/04/2017.
+ * Created by MagmaGuy on 04/05/2017.
  */
-public class BonusLoot extends MinorPowers implements Listener {
+public class DoubleDamage extends MinorPowers {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.BONUS_LOOT_MD;
+    String powerMetadata = MetadataHandler.DOUBLE_DAMAGE_MD;
 
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
+        if (!(entity instanceof IronGolem)) {
+
+            entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
+            minorPowerPowerStance.itemEffect(entity);
+
+        }
 
     }
 
@@ -47,22 +49,6 @@ public class BonusLoot extends MinorPowers implements Listener {
     public boolean existingPowers(Entity entity) {
 
         return entity.hasMetadata(powerMetadata);
-
-    }
-
-    @EventHandler
-    public void onDeath(EntityDeathEvent event) {
-
-        if (event.getEntity().hasMetadata(powerMetadata)) {
-
-            Entity entity = event.getEntity();
-
-            EliteDropsDropper eliteDropsDropper = new EliteDropsDropper();
-
-            //drops item
-            eliteDropsDropper.dropItem(entity);
-
-        }
 
     }
 

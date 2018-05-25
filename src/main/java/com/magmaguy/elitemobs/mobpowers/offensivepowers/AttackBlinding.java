@@ -13,11 +13,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.LivingEntityFinder;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -30,12 +32,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 /**
- * Created by MagmaGuy on 12/12/2016.
+ * Created by MagmaGuy on 30/04/2017.
  */
-public class AttackPoison extends MinorPowers implements Listener {
+public class AttackBlinding extends MinorPowers implements Listener {
 
-    String powerMetadata = MetadataHandler.ATTACK_POISON_MD;
-    String cooldownMetadata = MetadataHandler.ATTACK_POISON_COOLDOWN;
+    String powerMetadata = MetadataHandler.ATTACK_BLINDING_MD;
+    String cooldownMetadata = MetadataHandler.ATTACK_BLINDING_COOLDOWN;
 
     @Override
     public void applyPowers(Entity entity) {
@@ -54,7 +56,7 @@ public class AttackPoison extends MinorPowers implements Listener {
     }
 
     @EventHandler
-    public void onHit(EntityDamageByEntityEvent event) {
+    public void attackBlinding(EntityDamageByEntityEvent event) {
 
         Player player = LivingEntityFinder.findPlayer(event);
         LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
@@ -62,7 +64,7 @@ public class AttackPoison extends MinorPowers implements Listener {
         if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
         if (PowerCooldown.cooldownActive(player, eliteMob, cooldownMetadata)) return;
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 50, 3));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 3));
         PowerCooldown.cooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
 
     }

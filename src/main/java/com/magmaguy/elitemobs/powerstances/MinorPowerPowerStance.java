@@ -133,7 +133,27 @@ public class MinorPowerPowerStance implements Listener {
                     int effectQuantityChecksum = 0;
 
                     //count amount of active effects
-                    for (String string : MetadataHandler.minorPowerList) {
+                    for (String string : MetadataHandler.defensivePowerList) {
+
+                        if (entity.hasMetadata(string)) {
+
+                            effectQuantityChecksum++;
+
+                        }
+
+                    }
+
+                    for (String string : MetadataHandler.offensivePowerList) {
+
+                        if (entity.hasMetadata(string)) {
+
+                            effectQuantityChecksum++;
+
+                        }
+
+                    }
+
+                    for (String string : MetadataHandler.miscellaneousPowerList) {
 
                         if (entity.hasMetadata(string)) {
 

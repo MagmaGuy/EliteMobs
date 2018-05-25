@@ -13,11 +13,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.minorpowers;
+package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.LivingEntityFinder;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -26,14 +28,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 /**
- * Created by MagmaGuy on 28/04/2017.
+ * Created by MagmaGuy on 05/11/2016.
  */
-public class AttackFire extends MinorPowers implements Listener {
+public class AttackPush extends MinorPowers implements Listener {
 
-    String powerMetadata = MetadataHandler.ATTACK_FIRE_MD;
-    String cooldownMetadata = MetadataHandler.ATTACK_FIRE_COOLDOWN;
+    String powerMetadata = MetadataHandler.ATTACK_PUSH_MD;
+    String cooldownMetadata = MetadataHandler.ATTACK_PUSH_COOLDOWN;
 
     @Override
     public void applyPowers(Entity entity) {
@@ -46,11 +49,13 @@ public class AttackFire extends MinorPowers implements Listener {
 
     @Override
     public boolean existingPowers(Entity entity) {
+
         return entity.hasMetadata(powerMetadata);
+
     }
 
     @EventHandler
-    public void attackFire(EntityDamageByEntityEvent event) {
+    public void attackPush(EntityDamageByEntityEvent event) {
 
         Player player = LivingEntityFinder.findPlayer(event);
         LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
@@ -58,7 +63,13 @@ public class AttackFire extends MinorPowers implements Listener {
         if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
         if (PowerCooldown.cooldownActive(player, eliteMob, cooldownMetadata)) return;
 
-        player.setFireTicks(40);
+        int pushbackStrength = 3;
+
+        Vector pushbackDirection = player.getLocation().subtract(eliteMob.getLocation()).toVector();
+        Vector pushbackApplied = pushbackDirection.normalize().multiply(pushbackStrength);
+
+        player.setVelocity(pushbackApplied);
+
         PowerCooldown.cooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
 
     }
