@@ -27,7 +27,7 @@ public class PowerCooldown {
     /*
     This class just removes metadata after a variable delay, allows
      */
-    public static void cooldownTimer(Entity entity, String cooldownMetadata, int duration) {
+    public static void startCooldownTimer(Entity entity, String cooldownMetadata, int duration) {
 
         entity.setMetadata(cooldownMetadata, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
 
@@ -47,7 +47,7 @@ public class PowerCooldown {
     /*
     This method checks if the cooldown is active
      */
-    public static boolean cooldownActive(Player player, LivingEntity eliteMob, String cooldownMetadata) {
+    public static boolean cooldownChecker(Player player, LivingEntity eliteMob, String cooldownMetadata) {
 
         return player == null || eliteMob == null || eliteMob.hasMetadata(cooldownMetadata);
 

@@ -44,6 +44,7 @@ import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
 import com.magmaguy.elitemobs.mobcustomizer.displays.HealthDisplay;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonPillar;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
@@ -345,6 +346,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new TheReturned(), this);
         this.getServer().getPluginManager().registerEvents(new ZombieKing(), this);
         this.getServer().getPluginManager().registerEvents(new SpiritWalk(), this);
+        this.getServer().getPluginManager().registerEvents(new SkeletonPillar(), this);
 
         //Set up health and damage displays
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT))

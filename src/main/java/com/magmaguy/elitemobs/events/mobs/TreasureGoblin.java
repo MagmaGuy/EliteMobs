@@ -166,7 +166,7 @@ public class TreasureGoblin implements Listener {
 
                     if (!event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN)) {
 
-                        PowerCooldown.cooldownTimer(event.getEntity(), MetadataHandler.TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN, 20 * 20);
+                        PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_RADIAL_EXPLOSION));
                         radialGoldExplosionInitializer((Zombie) event.getEntity());
 
                     }
@@ -175,7 +175,7 @@ public class TreasureGoblin implements Listener {
 
                     if (!event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN)) {
 
-                        PowerCooldown.cooldownTimer(event.getEntity(), MetadataHandler.TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN, 20 * 20);
+                        PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL));
                         goldShotgunInitializer((Zombie) event.getEntity(), livingEntity.getLocation());
 
                     }

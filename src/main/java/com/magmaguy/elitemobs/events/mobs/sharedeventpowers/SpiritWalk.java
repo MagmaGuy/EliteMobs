@@ -16,6 +16,8 @@
 package com.magmaguy.elitemobs.events.mobs.sharedeventpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EventsConfig;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -47,7 +49,7 @@ public class SpiritWalk implements Listener {
             entityHitCount.put((LivingEntity) event.getEntity(), entityHitCount.get(event.getEntity()) + 1);
         else entityHitCount.put((LivingEntity) event.getEntity(), 1);
 
-        if (entityHitCount.get(event.getEntity()) > 15) {
+        if (entityHitCount.get(event.getEntity()) > ConfigValues.eventsConfig.getInt(EventsConfig.SPIRIT_WALK_HIT_INTERVAL)) {
 
             initializeSpiritWalk((LivingEntity) event.getEntity());
             entityHitCount.put((LivingEntity) event.getEntity(), 0);
@@ -96,7 +98,6 @@ public class SpiritWalk implements Listener {
                     if (newValidLocation != null) {
 
                         spiritWalkAnimation(bossMob, bossMob.getLocation(), newValidLocation.add(new Vector(0.5, 1, 0.5)));
-//                        bossMob.teleport(newValidLocation.add(new Vector(0, 1, 0)));
                         cancel();
                         break;
                     }

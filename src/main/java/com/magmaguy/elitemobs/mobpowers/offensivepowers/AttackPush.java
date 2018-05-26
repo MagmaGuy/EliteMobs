@@ -61,7 +61,7 @@ public class AttackPush extends MinorPowers implements Listener {
         LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
 
         if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
-        if (PowerCooldown.cooldownActive(player, eliteMob, cooldownMetadata)) return;
+        if (PowerCooldown.cooldownChecker(player, eliteMob, cooldownMetadata)) return;
 
         int pushbackStrength = 3;
 
@@ -70,7 +70,7 @@ public class AttackPush extends MinorPowers implements Listener {
 
         player.setVelocity(pushbackApplied);
 
-        PowerCooldown.cooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
+        PowerCooldown.startCooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
 
     }
 

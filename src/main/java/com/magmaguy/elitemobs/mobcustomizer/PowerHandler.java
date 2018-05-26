@@ -51,6 +51,7 @@ public class PowerHandler {
     private static ZombieFriends zombieFriends = new ZombieFriends();
     private static ZombieBloat zombieBloat = new ZombieBloat();
     private static SkeletonTrackingArrow skeletonTrackingArrow = new SkeletonTrackingArrow();
+    private static SkeletonPillar skeletonPillar = new SkeletonPillar();
 
     public static void powerHandler(Entity entity) {
 
@@ -222,6 +223,12 @@ public class PowerHandler {
                     if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.SkeletonTrackingArrow")) {
 
                         majorPowersArrayList.add(skeletonTrackingArrow);
+
+                    }
+
+                    if (ConfigValues.mobPowerConfig.getBoolean("Powers.Major Powers.SkeletonPillar")) {
+
+                        majorPowersArrayList.add(skeletonPillar);
 
                     }
 
