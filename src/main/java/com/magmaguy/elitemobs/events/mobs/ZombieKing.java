@@ -160,7 +160,7 @@ public class ZombieKing implements Listener {
 
                 if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_FLAMETHROWER_COOLDOWN)) {
 
-                    PowerCooldown.cooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_FLAMETHROWER_COOLDOWN, 20 * 20);
+                    PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_FLAMETHROWER_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_FLAMETHROWER_INTERVAL));
                     initializeFlamethrower(event.getEntity().getLocation(), livingEntity.getLocation(), (LivingEntity) event.getEntity());
 
                 }
@@ -169,7 +169,7 @@ public class ZombieKing implements Listener {
 
                 if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN)) {
 
-                    PowerCooldown.cooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN, 20 * 20);
+                    PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_UNHOLY_SMITE_INTERVAL));
                     initializeUnholySmite((LivingEntity) event.getEntity());
 
                 }
@@ -178,7 +178,7 @@ public class ZombieKing implements Listener {
 
                 if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN)) {
 
-                    PowerCooldown.cooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN, 20 * 20);
+                    PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_SUMMON_MINIONS_INTERVAL));
                     initializeSummonMinions((LivingEntity) event.getEntity());
 
                 }

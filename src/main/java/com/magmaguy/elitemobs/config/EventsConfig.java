@@ -43,6 +43,12 @@ public class EventsConfig {
     public static final String DEAD_MOON_EVENT_WEIGHT = EVENT_WEIGHT + "Blood moon";
     public static final String EVENT_TIMEOUT_TIME = "Time before boss mob gets culled";
     public static final String EVENT_TIMEOUT_MESSAGE = "Message for when boss mobs despawn if they are not killed withing 30 minutes";
+    public static final String SPIRIT_WALK_HIT_INTERVAL = "Number of hits before spirit walk gets activated";
+    public static final String ZOMBIE_KING_FLAMETHROWER_INTERVAL = "Time interval between zombie king flamethrower attacks";
+    public static final String ZOMBIE_KING_UNHOLY_SMITE_INTERVAL = "Time interval between zombie king unholy smite attacks";
+    public static final String ZOMBIE_KING_SUMMON_MINIONS_INTERVAL = "Time interval between zombie king minion summons";
+    public static final String TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL = "Time interval between treasure goblin gold shotgun shots";
+    public static final String TREASURE_GOBLIN_RADIAL_EXPLOSION = "Time interval between treasure goblin radial explosions";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -69,6 +75,12 @@ public class EventsConfig {
         configuration.addDefault(DEAD_MOON_EVENT_WEIGHT, 20);
         configuration.addDefault(EVENT_TIMEOUT_TIME, 30);
         configuration.addDefault(EVENT_TIMEOUT_MESSAGE, "$bossmob has escaped!");
+        configuration.addDefault(SPIRIT_WALK_HIT_INTERVAL, 15);
+        configuration.addDefault(ZOMBIE_KING_FLAMETHROWER_INTERVAL, 20);
+        configuration.addDefault(ZOMBIE_KING_UNHOLY_SMITE_INTERVAL, 20);
+        configuration.addDefault(ZOMBIE_KING_SUMMON_MINIONS_INTERVAL, 20);
+        configuration.addDefault(TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL, 20);
+        configuration.addDefault(TREASURE_GOBLIN_RADIAL_EXPLOSION, 20);
 
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);

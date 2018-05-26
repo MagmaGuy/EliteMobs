@@ -130,7 +130,7 @@ public class ZombieBloat extends MajorPowers implements Listener {
                     /*
                     Start power cooldown, 10 seconds
                     */
-                    PowerCooldown.cooldownTimer(eventZombie, MetadataHandler.ZOMBIE_BLOAT_COOLDOWN, 10 * 20);
+                    PowerCooldown.startCooldownTimer(eventZombie, MetadataHandler.ZOMBIE_BLOAT_COOLDOWN, 10 * 20);
 
                 }
 
@@ -146,7 +146,7 @@ public class ZombieBloat extends MajorPowers implements Listener {
 
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 0);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
 
     }

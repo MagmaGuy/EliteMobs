@@ -58,10 +58,10 @@ public class AttackFire extends MinorPowers implements Listener {
         LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
 
         if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
-        if (PowerCooldown.cooldownActive(player, eliteMob, cooldownMetadata)) return;
+        if (PowerCooldown.cooldownChecker(player, eliteMob, cooldownMetadata)) return;
 
         player.setFireTicks(40);
-        PowerCooldown.cooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
+        PowerCooldown.startCooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
 
     }
 

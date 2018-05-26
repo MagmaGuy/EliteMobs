@@ -62,10 +62,10 @@ public class AttackBlinding extends MinorPowers implements Listener {
         LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
 
         if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
-        if (PowerCooldown.cooldownActive(player, eliteMob, cooldownMetadata)) return;
+        if (PowerCooldown.cooldownChecker(player, eliteMob, cooldownMetadata)) return;
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 3));
-        PowerCooldown.cooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
+        PowerCooldown.startCooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
 
     }
 
