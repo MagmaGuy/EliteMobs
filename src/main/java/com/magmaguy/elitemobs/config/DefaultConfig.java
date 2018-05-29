@@ -34,6 +34,7 @@ public class DefaultConfig {
     public static final String HIDE_ENCHANTMENTS_ATTRIBUTE = "Hide enchantment attributes on plugin-generated items";
     public static final String PREVENT_ITEM_PICKUP = "Prevent item pickup from all aggressive mobs";
     public static final String PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS = "Make aggressive named mobs unable to become Elite Mobs";
+    public static final String PREVENT_MOUNT_EXPLOIT = "Prevent Minecraft living entity mount exploit for Elite Mobs";
 
     public static void reloadConfig() {
 
@@ -55,6 +56,7 @@ public class DefaultConfig {
         configuration.addDefault(HIDE_ENCHANTMENTS_ATTRIBUTE, false);
         configuration.addDefault(PREVENT_ITEM_PICKUP, false);
         configuration.addDefault(PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS, true);
+        configuration.addDefault(PREVENT_MOUNT_EXPLOIT, true);
 
         configuration.options().copyDefaults(true);
 

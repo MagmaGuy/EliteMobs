@@ -16,8 +16,10 @@
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Zombie;
 
 import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customAggressiveName;
 
@@ -28,7 +30,7 @@ public class AggressiveEliteMobConstructor {
 
     public static void constructAggressiveEliteMob(Entity entity) {
 
-        if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 1) {
+        if (!entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) || entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 1) {
 
             entity.remove();
             return;
