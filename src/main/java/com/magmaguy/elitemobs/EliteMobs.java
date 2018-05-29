@@ -317,27 +317,21 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
         this.getServer().getPluginManager().registerEvents(new PlaceEventPrevent(), this);
 
-
         //Shops
         this.getServer().getPluginManager().registerEvents(new ShopHandler(), this);
         this.getServer().getPluginManager().registerEvents(new CustomShopHandler(), this);
         this.getServer().getPluginManager().registerEvents(new ItemSaleEvent(), this);
 
         //Minecraft behavior canceller
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER)) {
-
-            this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(), this);
-            getLogger().info("EliteMobs - Creeper passive mob collateral damage canceller enabled!");
-
-        }
 
         this.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(), this);
         this.getServer().getPluginManager().registerEvents(new EntityDeathMetadataFlusher(), this);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP)) {
-
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
             this.getServer().getPluginManager().registerEvents(new PreventMobItemPickup(), this);
-
-        }
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_MOUNT_EXPLOIT))
+            this.getServer().getPluginManager().registerEvents(new PreventMountExploit(), this);
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
+            this.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(), this);
 
         //Initialize custom events
         this.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), this);

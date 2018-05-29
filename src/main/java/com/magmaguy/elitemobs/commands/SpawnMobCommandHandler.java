@@ -31,7 +31,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -46,135 +45,116 @@ import static org.bukkit.Bukkit.getConsoleSender;
  */
 public class SpawnMobCommandHandler {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    public static void spawnMob(CommandSender commandSender, String[] args) {
 
-    private MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-    private MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
 
-    public void spawnMob(CommandSender commandSender, String[] args) {
+        Location location = getLocation(commandSender, args);
+        EntityType entityType = getEntityType(commandSender, args);
+        Integer mobLevel = getLevel(commandSender, args);
 
-        World world = null;
+        if (location == null || entityType == null) return;
+
+        ArrayList<String> mobPowers = getPowers(commandSender, args);
+
+        spawnEliteMob(mobLevel, entityType, location, mobPowers, commandSender);
+
+    }
+
+    private static Location getLocation(CommandSender commandSender, String args[]) {
+
         Location location = null;
-        String entityInput = null;
-        int mobLevel = 0;
-        List<String> mobPower = new ArrayList<>();
 
         if (commandSender instanceof Player) {
 
-            Player player = (Player) commandSender;
-
-            if (args.length == 1) {
-
-                player.sendMessage("Valid command syntax:");
-                player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower(you can keep adding these mobPowers as many as you'd like)]");
-
-            }
-
-            world = player.getWorld();
-            location = player.getTargetBlock(null, 30).getLocation().add(0.5, 1, 0.5);
-
-            entityInput = args[1].toLowerCase();
-
-            if (args.length > 2) {
-
-                try {
-
-                    mobLevel = Integer.valueOf(args[2]);
-
-                } catch (NumberFormatException ex) {
-
-                    player.sendMessage("Not a valid level.");
-                    player.sendMessage("Valid command syntax:");
-                    player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower(you can keep adding these mobPowers as many as you'd like)]");
-
-                }
-
-            }
-
-            if (args.length > 3) {
-
-                int index = 0;
-
-                for (String arg : args) {
-
-                    //mob powers start after arg 2
-                    if (index > 2) {
-
-                        mobPower.add(arg);
-
-                    }
-
-                    index++;
-
-                }
-
-            }
+            location = ((Player) commandSender).getTargetBlock(null, 30).getLocation().add(0.5, 1, 0.5);
 
         } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
 
-            for (World worldIterator : worldList) {
+            World world = null;
 
-                //find world
-                if (worldIterator.getName().equals(args[1])) {
+            try {
 
-                    world = worldIterator;
+                for (World worldIterator : worldList) {
 
-                    //find x coord
-                    try {
+                    if (worldIterator.getName().equals(args[1])) {
 
-                        double xCoord = Double.parseDouble(args[2]);
-                        double yCoord = Double.parseDouble(args[3]);
-                        double zCoord = Double.parseDouble(args[4]);
-
-                        location = new Location(worldIterator, xCoord, yCoord, zCoord);
-
-                        entityInput = args[5].toLowerCase();
-
-                        break;
-
-                    } catch (NumberFormatException ex) {
-
-                        getConsoleSender().sendMessage("At least one of the coordinates (x:" + args[2] + ", y:" +
-                                args[3] + ", z:" + args[4] + ") is not valid");
-                        getConsoleSender().sendMessage("Valid command syntax: /elitemobs SpawnMob worldName xCoord yCoord " +
-                                "zCoord mobType mobLevel mobPower mobPower(you can keep adding these mobPowers as many as you'd like)");
-
-                    }
-
-                    if (args.length > 6) {
-
-                        int index = 0;
-
-                        for (String arg : args) {
-
-                            //mob powers start after arg 2
-                            if (index > 2) {
-
-                                mobPower.add(arg);
-
-                            }
-
-                            index++;
-
-                        }
+                        world = worldIterator;
 
                     }
 
                 }
 
-            }
+            } catch (Exception e) {
 
-            if (world == null) {
-
-                getConsoleSender().sendMessage("World " + args[1] + "not found. Valid command syntax: /elitemobs SpawnMob" +
-                        " [worldName] [xCoord] [yCoord] [zCoord] [mobType] [mobLevel] [mobPower] [mobPower(you can keep adding these " +
-                        "mobPowers as many as you'd like)]");
+                commandSender.sendMessage("[EliteMobs] Error when trying to obtain world name of console / command" +
+                        "block spawned Elite Mob");
+                return null;
 
             }
+
+            double xCoord, yCoord, zCoord;
+
+            try {
+
+                xCoord = Double.parseDouble(args[2]);
+                yCoord = Double.parseDouble(args[3]);
+                zCoord = Double.parseDouble(args[4]);
+
+            } catch (Exception e) {
+
+                commandSender.sendMessage("[EliteMobs] Error when trying to obtain X Y Z coordinates of console / " +
+                        "command block spawned Elite Mob");
+                return null;
+
+            }
+
+            location = new Location(world, xCoord, yCoord, zCoord);
 
         }
 
+        return location;
+
+    }
+
+    private static final String VALID_MOB_TYPES = "Valid mob types: blaze, cavespider, creeper, enderman, endermite, husk," +
+            " irongolem, pigzombie, polarbear, silverfish, skeleton, spider, stray, witch, witherskeleton," +
+            "zombie, chicken, cow, mushroomcow, pig, sheep";
+
+    private static EntityType getEntityType(CommandSender commandSender, String args[]) {
+
         EntityType entityType = null;
+        String entityInput = "";
+
+        if (commandSender instanceof Player) {
+
+            try {
+
+                entityInput = args[1].toLowerCase();
+
+            } catch (Exception e) {
+
+                commandSender.sendMessage("[EliteMobs] Error tryin to obtain mob type.");
+                commandSender.sendMessage(VALID_MOB_TYPES);
+
+            }
+
+
+        } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
+
+
+            try {
+
+                entityInput = args[5].toLowerCase();
+
+            } catch (Exception e) {
+
+                commandSender.sendMessage("[EliteMobs] Error trying to obtain mob type.");
+                commandSender.sendMessage(VALID_MOB_TYPES);
+
+            }
+
+
+        }
 
         switch (entityInput) {
 
@@ -242,237 +222,275 @@ public class SpawnMobCommandHandler {
                 entityType = EntityType.SHEEP;
                 break;
             default:
-                if (commandSender instanceof Player) {
-
-                    ((Player) commandSender).getPlayer().sendTitle("Could not spawn mob type " + entityInput,
-                            "If this is incorrect, please contact the dev.");
-
-                } else if (commandSender instanceof ConsoleCommandSender) {
-
-                    getConsoleSender().sendMessage("Could not spawn mob type " + entityInput + ". If this is incorrect, " +
-                            "please contact the dev.");
-
-                }
+                commandSender.sendMessage("Could not spawn mob type " + entityInput +
+                        " If this is incorrect, please contact the dev.");
+                commandSender.sendMessage(VALID_MOB_TYPES);
                 break;
 
         }
 
-        Entity entity = null;
+        return entityType;
 
-        if (entityType != null) {
+    }
 
-            entity = world.spawnEntity(location, entityType);
+    private static Integer getLevel(CommandSender commandSender, String args[]) {
+
+        int mobLevel = 0;
+
+        if (commandSender instanceof Player) {
+
+            if (args.length > 2) {
+
+                try {
+
+                    mobLevel = Integer.valueOf(args[2]);
+
+                } catch (Error error) {
+
+                    commandSender.sendMessage("Error assigning mob level to Elite Mob. Mob level must be above 0.");
+
+                }
+
+            }
+
+
+        } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
+
+            if (args.length > 6) {
+
+                try {
+
+                    mobLevel = Integer.valueOf(args[6]);
+
+                } catch (Error error) {
+
+                    commandSender.sendMessage("Error assigning mob level to Elite Mob. Mob level must be above 0.");
+
+                }
+
+            }
 
         }
 
-        if (entityType == EntityType.CHICKEN || entityType == EntityType.COW || entityType == EntityType.MUSHROOM_COW ||
-                entityType == EntityType.PIG || entityType == EntityType.SHEEP) {
+        return mobLevel;
+
+    }
+
+    private static ArrayList<String> getPowers (CommandSender commandSender, String args[]) {
+
+        ArrayList<String> mobPowers = new ArrayList();
+
+        if (commandSender instanceof Player){
+
+            if (args.length > 3) {
+
+                int index = 0;
+
+                for (String arg : args) {
+
+                    //mob powers start after arg 2
+                    if (index > 2) {
+
+                        mobPowers.add(arg);
+
+                    }
+
+                    index++;
+
+                }
+
+            }
+
+        } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
+
+            if (args.length > 6) {
+
+                int index = 0;
+
+                for (String arg : args) {
+
+                    //mob powers start after arg 6
+                    if (index > 6) {
+
+                        mobPowers.add(arg);
+
+                    }
+
+                    index++;
+
+                }
+
+            }
+
+        }
+
+        return mobPowers;
+
+    }
+
+    private static Entity spawnEliteMob(int mobLevel, EntityType mobType, Location location, ArrayList<String> mobPowers, CommandSender commandSender) {
+
+        Entity entity = location.getWorld().spawnEntity(location, mobType);
+
+        if (mobType == EntityType.CHICKEN || mobType == EntityType.COW || mobType == EntityType.MUSHROOM_COW ||
+                mobType == EntityType.PIG || mobType == EntityType.SHEEP) {
 
             HealthHandler.passiveHealthHandler(entity, ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT));
-            NameHandler.customPassiveName(entity, plugin);
+            NameHandler.customPassiveName(entity, MetadataHandler.PLUGIN);
 
-            return;
+            return entity;
+
+        } else {
+
+            if (mobLevel > 0) {
+
+                Bukkit.getLogger().info("test");
+                entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, mobLevel));
+                applyPowers(entity, mobPowers, commandSender);
+
+                AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
+
+            } else {
+
+                commandSender.sendMessage("[EliteMobs] Elite Mob level must be over 0!");
+
+            }
 
         }
 
-        if (mobLevel > 0) {
+        return location.getWorld().spawnEntity(location, mobType);
 
-            entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, mobLevel));
+    }
 
-        }
+    private static void applyPowers(Entity entity, ArrayList<String> mobPowers, CommandSender commandSender) {
 
+        if (mobPowers.size() > 0) {
 
-        //todo: get alt system to spawn unstackable EliteMobs with fixed powers
-
-        if (mobPower.size() > 0) {
-
-            boolean inputError = false;
-
-            int powerCount = 0;
-
-            for (String string : mobPower) {
+            for (String string : mobPowers) {
 
                 switch (string) {
                     //major powers
                     case MetadataHandler.ZOMBIE_FRIENDS_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD, new FixedMetadataValue(plugin, true));
-                            powerCount++;
+                            entity.setMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
                         break;
                     case MetadataHandler.ZOMBIE_NECRONOMICON_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD, new FixedMetadataValue(plugin, true));
-                            powerCount++;
+                            entity.setMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
                         break;
                     case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD, new FixedMetadataValue(plugin, true));
-                            powerCount++;
+                            entity.setMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
                         break;
                     case MetadataHandler.ZOMBIE_PARENTS_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_PARENTS_MD, new FixedMetadataValue(plugin, true));
-                            powerCount++;
+                            entity.setMetadata(MetadataHandler.ZOMBIE_PARENTS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
                         break;
                     case MetadataHandler.ZOMBIE_BLOAT_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_BLOAT_MD, new FixedMetadataValue(plugin, true));
-                            powerCount++;
+                            entity.setMetadata(MetadataHandler.ZOMBIE_BLOAT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
                         break;
                     case MetadataHandler.SKELETON_TRACKING_ARROW_H:
                         if (entity instanceof Skeleton) {
-                            entity.setMetadata(MetadataHandler.SKELETON_TRACKING_ARROW_MD, new FixedMetadataValue(plugin, true));
-                            powerCount++;
+                            entity.setMetadata(MetadataHandler.SKELETON_TRACKING_ARROW_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
-                    //minor powers
+                        //minor powers
                     case MetadataHandler.ATTACK_ARROW_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_ARROW_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_ARROW_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_BLINDING_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_BLINDING_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_BLINDING_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_CONFUSING_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_CONFUSING_MD, new FixedMetadataValue(plugin, true));
-//                        minorPowerPowerStance.attackConfusing(entity);
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_CONFUSING_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_FIRE_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_FIRE_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_FIRE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_FIREBALL_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_FIREBALL_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_FIREBALL_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_FREEZE_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_FREEZE_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_FREEZE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_GRAVITY_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_GRAVITY_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_GRAVITY_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_POISON_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_POISON_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_POISON_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_PUSH_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_PUSH_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_PUSH_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_WEAKNESS_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_WEAKNESS_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_WEAKNESS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_WEB_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_WEB_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_WEB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_WITHER_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_WITHER_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.ATTACK_WITHER_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.BONUS_LOOT_H:
-                        entity.setMetadata(MetadataHandler.BONUS_LOOT_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.BONUS_LOOT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.DOUBLE_DAMAGE_H:
                         if (!(entity instanceof IronGolem)) {
-                            entity.setMetadata(MetadataHandler.DOUBLE_DAMAGE_MD, new FixedMetadataValue(plugin, true));
+                            entity.setMetadata(MetadataHandler.DOUBLE_DAMAGE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
-                        powerCount++;
                         break;
                     case MetadataHandler.DOUBLE_HEALTH_H:
                         if (!(entity instanceof IronGolem)) {
-                            entity.setMetadata(MetadataHandler.DOUBLE_HEALTH_MD, new FixedMetadataValue(plugin, true));
+                            entity.setMetadata(MetadataHandler.DOUBLE_HEALTH_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
-                        powerCount++;
                         break;
                     case MetadataHandler.INVISIBILITY_H:
-                        entity.setMetadata(MetadataHandler.INVISIBILITY_MD, new FixedMetadataValue(plugin, true));
+                        entity.setMetadata(MetadataHandler.INVISIBILITY_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
-                        powerCount++;
                         break;
                     case MetadataHandler.INVULNERABILITY_ARROW_H:
-                        entity.setMetadata(MetadataHandler.INVULNERABILITY_ARROW_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.INVULNERABILITY_ARROW_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.INVULNERABILITY_FALL_DAMAGE_H:
-                        entity.setMetadata(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.INVULNERABILITY_FIRE_H:
-                        entity.setMetadata(MetadataHandler.INVULNERABILITY_FIRE_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.INVULNERABILITY_FIRE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:
-                        entity.setMetadata(MetadataHandler.INVULNERABILITY_KNOCKBACK_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.INVULNERABILITY_KNOCKBACK_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.MOVEMENT_SPEED_H:
-                        entity.setMetadata(MetadataHandler.MOVEMENT_SPEED_MD, new FixedMetadataValue(plugin, true));
+                        entity.setMetadata(MetadataHandler.MOVEMENT_SPEED_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
-                        powerCount++;
                         break;
                     case MetadataHandler.TAUNT_H:
-                        entity.setMetadata(MetadataHandler.TAUNT_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.TAUNT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case "custom":
-                        entity.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-                        powerCount++;
+                        entity.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     default:
-                        if (commandSender instanceof Player) {
-
-                            Player player = (Player) commandSender;
-
-                            player.sendMessage(string + " is not a valid power.");
-
-                        } else if (commandSender instanceof ConsoleCommandSender) {
-
-                            getConsoleSender().sendMessage(string + " is not a valid power.");
-
-                        }
-
-                        inputError = true;
+                        commandSender.sendMessage(string + " is not a valid power.");
+                        commandSender.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList + " custom");
+                        break;
 
                 }
 
             }
 
-            //TODO: fix the fact that manually adding powers will not respect the pressuposed max amount of minor powers
-//            entity.setMetadata(MetadataHandler.MINOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, powerCount));
+            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
+            MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
 
             minorPowerPowerStance.itemEffect(entity);
             majorPowerPowerStance.itemEffect(entity);
 
-            if (inputError) {
-
-                if (commandSender instanceof Player) {
-
-                    Player player = (Player) commandSender;
-
-                    player.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + " custom");
-
-                } else if (commandSender instanceof ConsoleCommandSender) {
-
-                    getConsoleSender().sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList + " custom");
-
-                }
-
-            }
-
         }
-
-        AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
 
     }
 

@@ -163,15 +163,15 @@ public class DamageAdjuster implements Listener {
 
         Player player = (Player) event.getEntity();
 
-        if (event.getEntity() instanceof LivingEntity && damageeList.contains(event.getEntity())) {
-
-            event.setCancelled(true);
-            damageeList.remove(event.getEntity());
-            dealSufficientDamage(player, event.getFinalDamage(), player, (LivingEntity) event.getDamager());
-
-            return;
-
-        }
+//        if (event.getEntity() instanceof LivingEntity && damageeList.contains(event.getEntity())) {
+//
+//            event.setCancelled(true);
+//            damageeList.remove(event.getEntity());
+//            dealSufficientDamage(player, event.getFinalDamage(), player, (LivingEntity) event.getDamager());
+//
+//            return;
+//
+//        }
 
         int mobLevel = livingEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
@@ -194,9 +194,20 @@ public class DamageAdjuster implements Listener {
         if (newDamage < 1) newDamage = 1;
         if (newDamage > 19) newDamage = 19;
 
-        customDamageEvent(livingEntity, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, newDamage);
+//        customDamageEvent(livingEntity, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, newDamage);
 
-        event.setDamage(0);
+        for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
+            if (event.isApplicable(modifier))
+                event.setDamage(modifier, 0);
+
+        event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
+
+        if (player.getHealth() - event.getDamage() <= 0) {
+
+            player.setMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+            PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity);
+
+        }
 
     }
 
@@ -443,8 +454,14 @@ public class DamageAdjuster implements Listener {
 
             double eventDamage = event.getDamage();
 
-            dealSufficientDamage(livingEntity, eventDamage);
-            event.setDamage(0);
+            for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
+                if (event.isApplicable(modifier))
+                    event.setDamage(modifier, 0);
+
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, eventDamage);
+//
+//            dealSufficientDamage(livingEntity, eventDamage);
+//            event.setDamage(0);
 
         }
 
@@ -468,22 +485,28 @@ public class DamageAdjuster implements Listener {
         else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
             damagingLivingEntity = (LivingEntity) ((Projectile) event.getDamager()).getShooter();
 
-        if (event.getEntity() instanceof LivingEntity && damageeList.contains(event.getEntity())) {
-
-            damageeList.remove(event.getEntity());
-            dealSufficientDamage(damagedLivingEntity, event.getFinalDamage());
-
-            return;
-
-        }
+//        if (event.getEntity() instanceof LivingEntity && damageeList.contains(event.getEntity())) {
+//
+//            damageeList.remove(event.getEntity());
+//            dealSufficientDamage(damagedLivingEntity, event.getFinalDamage());
+//
+//            return;
+//
+//        }
 
         /*
         Case in which the player is not the entity dealing damage, just do raw damage
          */
         if (!(damagingLivingEntity instanceof Player)) {
 
-            customDamageEvent(damagingLivingEntity, damagedLivingEntity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, event.getDamage());
-            event.setDamage(0);
+            for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
+                if (event.isApplicable(modifier))
+                    event.setDamage(modifier, 0);
+
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
+
+//            customDamageEvent(damagingLivingEntity, damagedLivingEntity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, event.getDamage());
+//            event.setDamage(0);
 //            event.setCancelled(true);
             return;
 
@@ -529,8 +552,14 @@ public class DamageAdjuster implements Listener {
 
             newDamage += damageIncrease * TIER_DAMAGE_INCREASE;
 
-            customDamageEvent(damagingLivingEntity, damagedLivingEntity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, newDamage);
-            event.setDamage(0);
+            for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
+                if (event.isApplicable(modifier))
+                    event.setDamage(modifier, 0);
+
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
+
+//            customDamageEvent(damagingLivingEntity, damagedLivingEntity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, newDamage);
+//            event.setDamage(0);
             return;
 
         }
@@ -601,44 +630,44 @@ public class DamageAdjuster implements Listener {
 
     }
 
-    private void dealSufficientDamage(LivingEntity damageEntity, Double rawDamage) {
+//    private void dealSufficientDamage(LivingEntity damageEntity, Double rawDamage) {
+//
+//        if (damageEntity.getHealth() - rawDamage < 0) {
+//
+//            damageEntity.setHealth(0);
+//
+//        } else {
+//
+//            damageEntity.setHealth(damageEntity.getHealth() - rawDamage);
+//
+//        }
+//
+//    }
 
-        if (damageEntity.getHealth() - rawDamage < 0) {
+//    private void dealSufficientDamage(LivingEntity damageEntity, Double rawDamage, Player player, LivingEntity attacker) {
+//
+//        if (damageEntity.getHealth() - rawDamage < 0) {
+//
+//            player.setMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+//            damageEntity.setHealth(0);
+//            PlayerDeathMessageByEliteMob.intializeDeathMessage(player, attacker);
+//
+//        } else {
+//
+//            damageEntity.setHealth(damageEntity.getHealth() - rawDamage);
+//
+//        }
+//
+//    }
 
-            damageEntity.setHealth(0);
+//    private List<LivingEntity> damageeList = new ArrayList<>();
 
-        } else {
-
-            damageEntity.setHealth(damageEntity.getHealth() - rawDamage);
-
-        }
-
-    }
-
-    private void dealSufficientDamage(LivingEntity damageEntity, Double rawDamage, Player player, LivingEntity attacker) {
-
-        if (damageEntity.getHealth() - rawDamage < 0) {
-
-            player.setMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-            damageEntity.setHealth(0);
-            PlayerDeathMessageByEliteMob.intializeDeathMessage(player, attacker);
-
-        } else {
-
-            damageEntity.setHealth(damageEntity.getHealth() - rawDamage);
-
-        }
-
-    }
-
-    private List<LivingEntity> damageeList = new ArrayList<>();
-
-    private void customDamageEvent(Entity damager, LivingEntity damagee, EntityDamageEvent.DamageCause damageCause, double damage) {
-
-        damageeList.add(damagee);
-        EliteMobEntityDamageByEntityEvent customEvent = new EliteMobEntityDamageByEntityEvent(damager, damagee, damageCause, damage);
-        Bukkit.getServer().getPluginManager().callEvent(customEvent);
-
-    }
+//    private void customDamageEvent(Entity damager, LivingEntity damagee, EntityDamageEvent.DamageCause damageCause, double damage) {
+//
+//        damageeList.add(damagee);
+//        EliteMobEntityDamageByEntityEvent customEvent = new EliteMobEntityDamageByEntityEvent(damager, damagee, damageCause, damage);
+//        Bukkit.getServer().getPluginManager().callEvent(customEvent);
+//
+//    }
 
 }
