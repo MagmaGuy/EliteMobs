@@ -28,6 +28,7 @@ import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
 import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
+import com.magmaguy.elitemobs.events.mobs.Kraken;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
@@ -40,10 +41,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -359,6 +357,7 @@ public class CommandHandler implements CommandExecutor {
 
                         Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
                         TreasureGoblin.createGoblin(zombie);
+                        zombie.remove();
                         commandSender.sendMessage("Spawned treasure goblin");
 
                     }
@@ -367,7 +366,17 @@ public class CommandHandler implements CommandExecutor {
 
                         Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
                         ZombieKing.spawnZombieKing(zombie);
+                        zombie.remove();
                         commandSender.sendMessage("Spawned zombie king");
+
+                    }
+
+                    if (args[1].equalsIgnoreCase("kraken")) {
+
+                        Squid squid = (Squid) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.SQUID);
+                        Kraken.spawnKraken(squid.getLocation());
+                        squid.remove();
+                        commandSender.sendMessage("Spawned Kraken");
 
                     }
 

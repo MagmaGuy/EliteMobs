@@ -34,12 +34,14 @@ public class UniqueItemConstructor {
     static CustomItemConstructor customItemConstructor = new CustomItemConstructor();
 
     public static HashMap<String, ItemStack> uniqueItems = new HashMap();
+    public static List<ItemStack> uniqueItemsList = new ArrayList();
     public static final String HUNTING_HELMET = "HuntingHelmet";
     public static final String HUNTING_CHESTPLATE = "HuntingChestplate";
     public static final String HUNTING_LEGGINGS = "HuntingLeggings";
     public static final String HUNTING_BOOTS = "HuntingBoots";
     public static final String HUNTING_BOW = "HuntingBow";
     public static final String ZOMBIE_KING_AXE = "ZombieKingAxe";
+    public static final String DEPTHS_SEEKER = "DepthsSeeker";
 
     public static final String HUNTING_SET_IDENTIFIER = " Hunting set";
     public static final String ZOMBIE_KING_AXE_IDENTIFIER = " King Axe";
@@ -67,6 +69,7 @@ public class UniqueItemConstructor {
 
             //add helmet
             CustomItemConstructor.customItemList.add(helmet);
+            uniqueItemsList.add(helmet);
             uniqueItems.put(HUNTING_HELMET, helmet);
 
             ItemStack chestplate = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.HUNTING_SET_CHESTPLATE), UniqueItemType.ELITE_MOB_HUNTING_SET);
@@ -83,6 +86,7 @@ public class UniqueItemConstructor {
             }
 
             CustomItemConstructor.customItemList.add(chestplate);
+            uniqueItemsList.add(chestplate);
             uniqueItems.put(HUNTING_CHESTPLATE, chestplate);
 
             //add leggings
@@ -100,6 +104,7 @@ public class UniqueItemConstructor {
             }
 
             CustomItemConstructor.customItemList.add(leggings);
+            uniqueItemsList.add(leggings);
             uniqueItems.put(HUNTING_LEGGINGS, leggings);
 
             //add boots
@@ -117,6 +122,7 @@ public class UniqueItemConstructor {
             }
 
             CustomItemConstructor.customItemList.add(boots);
+            uniqueItemsList.add(boots);
             uniqueItems.put(HUNTING_BOOTS, boots);
 
             //add bow
@@ -134,6 +140,7 @@ public class UniqueItemConstructor {
             }
 
             CustomItemConstructor.customItemList.add(bow);
+            uniqueItemsList.add(bow);
             uniqueItems.put(HUNTING_BOW, bow);
 
         }
@@ -146,8 +153,23 @@ public class UniqueItemConstructor {
 
             //This item only ever drops when the Zombie King gets slain
 
-            CustomItemConstructor.customItemList.add(zombieKingAxe);
+//            CustomItemConstructor.customItemList.add(zombieKingAxe);
+            uniqueItemsList.add(zombieKingAxe);
             uniqueItems.put(ZOMBIE_KING_AXE, zombieKingAxe);
+
+        }
+
+        if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_KRAKEN_FISHING_ROD)) {
+
+            //add axe
+            ItemStack depthsSeeker = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.DEPTHS_SEEKER), UniqueItemType.DEPTHS_SEEKER);
+            depthsSeeker = tempWorthLoreAdder(depthsSeeker);
+
+            //This item only ever drops when the Zombie King gets slain
+
+//            CustomItemConstructor.customItemList.add(depthsSeeker);
+            uniqueItemsList.add(depthsSeeker);
+            uniqueItems.put(DEPTHS_SEEKER, depthsSeeker);
 
         }
 
@@ -423,7 +445,8 @@ public class UniqueItemConstructor {
     private enum UniqueItemType {
 
         ELITE_MOB_HUNTING_SET,
-        ZOMBIE_KING_AXE
+        ZOMBIE_KING_AXE,
+        DEPTHS_SEEKER
 
     }
 

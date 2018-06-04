@@ -34,7 +34,9 @@ import com.magmaguy.elitemobs.elitedrops.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
+import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.eventitems.ZombieKingAxe;
+import com.magmaguy.elitemobs.events.mobs.Kraken;
 import com.magmaguy.elitemobs.events.mobs.TheReturned;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
@@ -340,7 +342,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new TheReturned(), this);
         this.getServer().getPluginManager().registerEvents(new ZombieKing(), this);
         this.getServer().getPluginManager().registerEvents(new SpiritWalk(), this);
-        this.getServer().getPluginManager().registerEvents(new SkeletonPillar(), this);
+        this.getServer().getPluginManager().registerEvents(new Kraken(), this);
+        this.getServer().getPluginManager().registerEvents(new KrakenEvent(), this);
 
         //Set up health and damage displays
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT))
