@@ -19,11 +19,10 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -80,11 +79,15 @@ public class AttackFireball extends MinorPowers implements Listener {
 
                         }
 
-                        Entity repeatingFireball = targetter.getWorld().spawnEntity(targetter.getLocation().add(0, 3, 0), EntityType.FIREBALL);
+                        Fireball repeatingFireball = (Fireball) targetter.getWorld().spawnEntity(targetter.getLocation().add(0, 3, 0), EntityType.FIREBALL);
 
                         Vector targetterToTargetted = targetted.getLocation().toVector().subtract(repeatingFireball.getLocation().toVector()).normalize();
 
+                        repeatingFireball.setDirection(targetterToTargetted);
                         repeatingFireball.setVelocity(targetterToTargetted);
+
+                        repeatingFireball.setYield(2F);
+                        repeatingFireball.setIsIncendiary(true);
 
                     }
 
@@ -96,6 +99,5 @@ public class AttackFireball extends MinorPowers implements Listener {
         }
 
     }
-
 
 }

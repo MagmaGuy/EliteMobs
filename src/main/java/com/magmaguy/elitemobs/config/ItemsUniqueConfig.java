@@ -31,12 +31,15 @@ public class ItemsUniqueConfig {
     public static final String ENABLE_ZOMBIE_KING_AXE = "Enable Zombie King Axe";
     public static final String ZOMBIE_KING_AXE = "Zombie King Axe";
     public static final String SHOW_ITEM_WORTH = "Show item worth";
+    public static final String ENABLE_KRAKEN_FISHING_ROD = "Enable Depths Seeker Fishing Rod";
+    public static final String DEPTHS_SEEKER = "Depths Seeker";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
     public void initializeConfig() {
 
         configuration.addDefault(ENABLE_UNIQUE_ITEMS, true);
+        configuration.addDefault(SHOW_ITEM_WORTH, true);
         configuration.addDefault(ENABLE_HUNTING_SET, true);
         configuration.addDefault(HUNTING_SET_CHANCE_INCREASER, 10);
         configuration.addDefault(HUNTING_SET_HELMET, "\n" +
@@ -133,7 +136,24 @@ public class ItemsUniqueConfig {
                 "    - NIGHT_VISION,1,target,continuous\n" +
                 "    - WITHER,1,target,onHit\n" +
                 "    Drop Weight: 1");
-        configuration.addDefault(SHOW_ITEM_WORTH, true);
+        configuration.addDefault(ENABLE_KRAKEN_FISHING_ROD, true);
+        configuration.addDefault(DEPTHS_SEEKER, "\n" +
+                "    Item Type: FISHING_ROD\n" +
+                "    Item Name: &cDepths Seeker\n" +
+                "    Item Lore:\n" +
+                "    - &9Come from depths immeasurable\n" +
+                "    - &9and looted from a vile monster,\n" +
+                "    - &9there is no telling what horrors\n" +
+                "    - &9this fishing rod has seen.\n" +
+                "    Enchantments:\n" +
+                "    - LURE,3\n" +
+                "    - LUCK,3\n" +
+                "    - DURABILITY,10\n" +
+                "    - FIRE_ASPECT,1\n" +
+                "    Potion Effects:\n" +
+                "    - WATER_BREATHING,1,self,continuous\n" +
+                "    - LUCK,1,self,continuous\n" +
+                "    Drop Weight: 1");
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);

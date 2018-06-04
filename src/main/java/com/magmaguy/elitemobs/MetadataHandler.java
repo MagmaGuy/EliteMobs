@@ -172,6 +172,8 @@ public class MetadataHandler implements Listener {
     public final static String TREASURE_GOBLIN = "TreasureGoblin";
     public final static String THE_RETURNED = "TheReturned";
     public final static String ZOMBIE_KING = "ZombieKing";
+    public final static String KRAKEN = "Kraken";
+    public final static String KRAKEN_FIREBALL = "KrakenFireball";
 
     //player metadata
     public final static String KILLED_BY_ELITE_MOB = "KilledByEliteMob";
@@ -255,7 +257,8 @@ public class MetadataHandler implements Listener {
             TRACKING_ARROWS_ACTIVE,
             ARMOR_STAND_DISPLAY,
             KILLED_BY_ELITE_MOB,
-            USING_ZOMBIE_KING_AXE
+            USING_ZOMBIE_KING_AXE,
+            KRAKEN_FIREBALL
     ));
     public static List<String> powerListHumanFormat = new ArrayList<>(Arrays.asList( //add major and minor power lists
             //minor powers
@@ -418,7 +421,7 @@ public class MetadataHandler implements Listener {
 
                 }
 
-                if (!(entity.hasMetadata(ZOMBIE_KING) || entity.hasMetadata(TREASURE_GOBLIN))) {
+                if (!(entity.hasMetadata(ZOMBIE_KING) || entity.hasMetadata(TREASURE_GOBLIN) || entity.hasMetadata(KRAKEN))) {
 
                     //todo: add improved flushing for permanent mobs
 

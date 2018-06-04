@@ -28,6 +28,7 @@ public class EventsConfig {
     private static final String ENABLED_EVENTS = "Enabled events.";
     public static final String TREASURE_GOBLIN_SMALL_ENABLED = ENABLED_EVENTS + "Small treasure goblin";
     public static final String DEAD_MOON_ENABLED = ENABLED_EVENTS + "Dead moon";
+    public static final String KRAKEN_ENABLED = ENABLED_EVENTS + "Kraken";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT = "Small treasure goblin event announcement text";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT = "Small treasure goblin killed by players message";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT = "Small treasure goblin nondescript death message";
@@ -49,6 +50,7 @@ public class EventsConfig {
     public static final String ZOMBIE_KING_SUMMON_MINIONS_INTERVAL = "Time interval between zombie king minion summons";
     public static final String TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL = "Time interval between treasure goblin gold shotgun shots";
     public static final String TREASURE_GOBLIN_RADIAL_EXPLOSION = "Time interval between treasure goblin radial explosions";
+    public static final String KRAKEN_CHANCE_ON_FISH = "Kraken on fish chance";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -81,6 +83,8 @@ public class EventsConfig {
         configuration.addDefault(ZOMBIE_KING_SUMMON_MINIONS_INTERVAL, 20);
         configuration.addDefault(TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL, 20);
         configuration.addDefault(TREASURE_GOBLIN_RADIAL_EXPLOSION, 20);
+        configuration.addDefault(KRAKEN_ENABLED, true);
+        configuration.addDefault(KRAKEN_CHANCE_ON_FISH, 0.01);
 
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
