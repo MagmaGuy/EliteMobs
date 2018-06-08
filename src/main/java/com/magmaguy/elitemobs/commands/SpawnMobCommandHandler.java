@@ -23,7 +23,6 @@ import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
@@ -35,10 +34,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import static com.magmaguy.elitemobs.EliteMobs.worldList;
-import static org.bukkit.Bukkit.getConsoleSender;
+import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
 
 /**
  * Created by MagmaGuy on 01/05/2017.
@@ -74,7 +71,7 @@ public class SpawnMobCommandHandler {
 
             try {
 
-                for (World worldIterator : worldList) {
+                for (World worldIterator : validWorldList) {
 
                     if (worldIterator.getName().equals(args[1])) {
 
@@ -344,7 +341,6 @@ public class SpawnMobCommandHandler {
 
             if (mobLevel > 0) {
 
-                Bukkit.getLogger().info("test");
                 entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, mobLevel));
                 applyPowers(entity, mobPowers, commandSender);
 
@@ -358,7 +354,7 @@ public class SpawnMobCommandHandler {
 
         }
 
-        return location.getWorld().spawnEntity(location, mobType);
+        return entity;
 
     }
 
@@ -398,6 +394,10 @@ public class SpawnMobCommandHandler {
                     case MetadataHandler.SKELETON_TRACKING_ARROW_H:
                         if (entity instanceof Skeleton) {
                             entity.setMetadata(MetadataHandler.SKELETON_TRACKING_ARROW_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        }
+                    case MetadataHandler.SKELETON_PILLAR_H:
+                        if (entity instanceof Skeleton){
+                            entity.setMetadata(MetadataHandler.SKELETON_PILLAR_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         }
                         //minor powers
                     case MetadataHandler.ATTACK_ARROW_H:

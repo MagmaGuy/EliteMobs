@@ -64,6 +64,7 @@ public class CommandHandler implements CommandExecutor {
     private final static String RELOAD_LOOT = "elitemobs.reload.loot";
     private final static String GIVELOOT = "elitemobs.giveloot";
     private final static String SPAWNMOB = "elitemobs.spawnmob";
+    private final static String SPAWN_BOSS_MOB = "elitemobs.spawnbossmob";
     private final static String KILLALL_AGGRESSIVEELITES = "elitemobs.killall.aggressiveelites";
     private final static String KILLALL_PASSIVEELITES = "elitemobs.killall.passiveelites";
     private final static String SHOP = "elitemobs.shop";
@@ -77,8 +78,8 @@ public class CommandHandler implements CommandExecutor {
     private final static String CURRENCY_COINTOP = "elitemobs.currency.cointop";
     private final static String VERSION = "elitemobs.version";
     private final static String CONFIG = "elitemobs.config";
-    private final static String EVENT_SMALL_TREASURE_GOBLIN = "elitemobs.event.smalltreasuregoblin";
-    private final static String EVENT_DEAD_MOON = "elitemobs.event.deadmoon";
+    private final static String EVENT_LAUNCH_SMALLTREASUREGOBLIN = "elitemobs.events.smalltreasuregoblin";
+    private final static String EVENT_LAUNCH_DEADMOON = "elitemobs.events.smalltreasuregoblin";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -256,7 +257,7 @@ public class CommandHandler implements CommandExecutor {
 
                     int counter = 0;
 
-                    for (World world : EliteMobs.worldList) {
+                    for (World world : EliteMobs.validWorldList) {
 
                         for (LivingEntity livingEntity : world.getLivingEntities()) {
 
@@ -280,7 +281,7 @@ public class CommandHandler implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("passiveelites") &&
                         permCheck(KILLALL_PASSIVEELITES, commandSender)) {
 
-                    for (World world : EliteMobs.worldList) {
+                    for (World world : EliteMobs.validWorldList) {
 
                         for (LivingEntity livingEntity : world.getLivingEntities()) {
 
@@ -329,7 +330,7 @@ public class CommandHandler implements CommandExecutor {
                 }
 
                 if (args[0].equalsIgnoreCase("event") && args[1].equalsIgnoreCase("smalltreasuregoblin") &&
-                        permCheck(EVENT_SMALL_TREASURE_GOBLIN, commandSender)) {
+                        permCheck(EVENT_LAUNCH_SMALLTREASUREGOBLIN, commandSender)) {
 
                     SmallTreasureGoblin.initializeEvent();
                     commandSender.sendMessage("Queued small treasure goblin event for next valid zombie spawn");
@@ -339,7 +340,7 @@ public class CommandHandler implements CommandExecutor {
                 }
 
                 if (args[0].equalsIgnoreCase("event") && args[1].equalsIgnoreCase("deadmoon") &&
-                        permCheck(EVENT_DEAD_MOON, commandSender)) {
+                        permCheck(EVENT_LAUNCH_DEADMOON, commandSender)) {
 
                     DeadMoon.initializeEvent();
                     commandSender.sendMessage("Queued deadmoon event for next new moon");
@@ -564,11 +565,7 @@ public class CommandHandler implements CommandExecutor {
 
     private boolean permCheck(String permission, CommandSender commandSender) {
 
-        if (commandSender.hasPermission(permission)) {
-
-            return true;
-
-        }
+        if (commandSender.hasPermission(permission)) return true;
 
         if (commandSender instanceof Player &&
                 Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean(DefaultConfig.ENABLE_PERMISSION_TITLES)) {
@@ -610,60 +607,44 @@ public class CommandHandler implements CommandExecutor {
             Player player = (Player) commandSender;
 
             player.sendMessage("[EliteMobs] Valid commands:");
-            if (silentPermCheck(STATS, commandSender)) {
+            if (silentPermCheck(STATS, commandSender))
                 player.sendMessage("/elitemobs stats");
-            }
-            if (silentPermCheck(SHOP, commandSender)) {
+            if (silentPermCheck(SHOP, commandSender))
                 player.sendMessage("/elitemobs shop");
-            }
-            if (silentPermCheck(CUSTOMSHOP, commandSender)) {
+            if (silentPermCheck(CUSTOMSHOP, commandSender))
                 player.sendMessage("/elitemobs customshop");
-            }
-            if (silentPermCheck(CURRENCY_WALLET, commandSender)) {
+            if (silentPermCheck(CURRENCY_WALLET, commandSender))
                 player.sendMessage("/elitemobs wallet");
-            }
-            if (silentPermCheck(CURRENCY_COINTOP, commandSender)) {
+            if (silentPermCheck(CURRENCY_COINTOP, commandSender))
                 player.sendMessage("/elitemobs cointop");
-            }
-            if (silentPermCheck(CURRENCY_PAY, commandSender)) {
+            if (silentPermCheck(CURRENCY_PAY, commandSender))
                 player.sendMessage("/elitemobs pay [username]");
-            }
-            if (silentPermCheck(CURRENCY_ADD, commandSender)) {
+            if (silentPermCheck(CURRENCY_ADD, commandSender))
                 player.sendMessage("/elitemobs add [username]");
-            }
-            if (silentPermCheck(CURRENCY_SUBTRACT, commandSender)) {
+            if (silentPermCheck(CURRENCY_SUBTRACT, commandSender))
                 player.sendMessage("/elitemobs subtract [username]");
-            }
-            if (silentPermCheck(CURRENCY_SET, commandSender)) {
+            if (silentPermCheck(CURRENCY_SET, commandSender))
                 player.sendMessage("/elitemobs set [username]");
-            }
-            if (silentPermCheck(CURRENCY_CHECK, commandSender)) {
+            if (silentPermCheck(CURRENCY_CHECK, commandSender))
                 player.sendMessage("/elitemobs check [username]");
-            }
-            if (silentPermCheck(RELOAD_CONFIGS, commandSender)) {
+            if (silentPermCheck(RELOAD_CONFIGS, commandSender))
                 player.sendMessage("/elitemobs reload configs");
-            }
-            if (silentPermCheck(RELOAD_LOOT, commandSender)) {
+            if (silentPermCheck(RELOAD_LOOT, commandSender))
                 player.sendMessage("/elitemobs reload loot");
-            }
-            if (silentPermCheck(KILLALL_AGGRESSIVEELITES, commandSender)) {
+            if (silentPermCheck(KILLALL_AGGRESSIVEELITES, commandSender))
                 player.sendMessage("/elitemobs killall aggressiveelites");
-            }
-            if (silentPermCheck(KILLALL_PASSIVEELITES, commandSender)) {
+            if (silentPermCheck(KILLALL_PASSIVEELITES, commandSender))
                 player.sendMessage("/elitemobs killall passiveelites");
-            }
-            if (silentPermCheck(SIMLOOT, commandSender)) {
+            if (silentPermCheck(SIMLOOT, commandSender))
                 player.sendMessage("/elitemobs simloot [mob level]");
-            }
-            if (silentPermCheck(GETLOOT, commandSender)) {
+            if (silentPermCheck(GETLOOT, commandSender))
                 player.sendMessage("/elitemobs getloot [loot name (no loot name = GUI)]");
-            }
-            if (silentPermCheck(GIVELOOT, commandSender)) {
+            if (silentPermCheck(GIVELOOT, commandSender))
                 player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
-            }
-            if (silentPermCheck(SPAWNMOB, commandSender)) {
+            if (silentPermCheck(SPAWNMOB, commandSender))
                 player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
-            }
+            if (silentPermCheck(SPAWN_BOSS_MOB, commandSender))
+                commandSender.sendMessage("/elitemobs spawnBossMob [bossName]");
 
 
         } else if (commandSender instanceof ConsoleCommandSender) {

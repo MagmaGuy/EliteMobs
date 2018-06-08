@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.magmaguy.elitemobs.EliteMobs.worldList;
+import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
 import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customAggressiveName;
 import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customPassiveName;
 
@@ -48,7 +48,7 @@ public class MobScanner implements Listener {
 
     public void scanMobs() {
 
-        for (World world : worldList) {
+        for (World world : validWorldList) {
 
             Iterator<LivingEntity> iterator = world.getLivingEntities().iterator();
 

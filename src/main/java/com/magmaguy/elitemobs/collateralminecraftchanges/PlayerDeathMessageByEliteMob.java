@@ -66,6 +66,18 @@ public class PlayerDeathMessageByEliteMob {
             case ZOMBIE:
                 deathMessage = deathMessageSender(MobCombatSettingsConfig.ZOMBIE_DEATH_MESSAGE, player, livingEntity);
                 break;
+            case HUSK:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.HUSK_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case PIG_ZOMBIE:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.ZOMBIE_PIGMAN_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case STRAY:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.STRAY_DEATH_MESSAGE, player, livingEntity);
+                break;
+            case WITHER_SKELETON:
+                deathMessage = deathMessageSender(MobCombatSettingsConfig.WITHER_SKELETON_DEATH_MESSAGE, player, livingEntity);
+                break;
             default:
                 deathMessage = deathMessageSender(MobCombatSettingsConfig.DEFAULT_DEATH_MESSAGE, player, livingEntity);
                 break;
@@ -81,6 +93,8 @@ public class PlayerDeathMessageByEliteMob {
             onlinePlayer.sendMessage(deathMessage);
 
         }
+
+        Bukkit.getLogger().info(deathMessage);
 
     }
 

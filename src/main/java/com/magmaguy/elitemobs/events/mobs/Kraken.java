@@ -70,6 +70,8 @@ public class Kraken implements Listener {
         krakenDamageLoop(kraken);
         krakenVisualEffectLoop(kraken);
 
+        BossMobDeathCountdown.startDeathCountdown(kraken);
+
     }
 
     private static void krakenDamageLoop(Squid kraken) {
