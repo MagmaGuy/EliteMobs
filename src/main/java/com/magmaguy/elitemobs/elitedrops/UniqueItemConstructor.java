@@ -152,8 +152,6 @@ public class UniqueItemConstructor {
             zombieKingAxe = tempWorthLoreAdder(zombieKingAxe);
 
             //This item only ever drops when the Zombie King gets slain
-
-//            CustomItemConstructor.customItemList.add(zombieKingAxe);
             uniqueItemsList.add(zombieKingAxe);
             uniqueItems.put(ZOMBIE_KING_AXE, zombieKingAxe);
 
@@ -166,8 +164,6 @@ public class UniqueItemConstructor {
             depthsSeeker = tempWorthLoreAdder(depthsSeeker);
 
             //This item only ever drops when the Zombie King gets slain
-
-//            CustomItemConstructor.customItemList.add(depthsSeeker);
             uniqueItemsList.add(depthsSeeker);
             uniqueItems.put(DEPTHS_SEEKER, depthsSeeker);
 

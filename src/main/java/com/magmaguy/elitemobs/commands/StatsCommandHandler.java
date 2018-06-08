@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.magmaguy.elitemobs.EliteMobs.worldList;
+import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
 import static org.bukkit.Bukkit.getLogger;
 import static org.bukkit.Bukkit.getServer;
 
@@ -71,7 +71,7 @@ public class StatsCommandHandler {
         int pigCount = 0;
         int sheepCount = 0;
 
-        for (World world : worldList) {
+        for (World world : validWorldList) {
 
             for (LivingEntity livingEntity : world.getLivingEntities()) {
 

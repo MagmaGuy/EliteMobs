@@ -68,7 +68,7 @@ public class MergeHandler implements Listener {
 
         if (eventEntity == null) return;
 
-        if (!EliteMobs.worldList.contains(eventEntity.getWorld())) {
+        if (!EliteMobs.validWorldList.contains(eventEntity.getWorld())) {
             return;
         }
 

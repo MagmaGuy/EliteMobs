@@ -79,7 +79,7 @@ public class TreasureGoblin implements Listener {
 
             for (String string : treasureGoblin.getWorld().getName().split("_")) {
 
-                worldName += string.substring(0, 1).toUpperCase() + string.toLowerCase() + " ";
+                worldName += string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase() + " ";
 
             }
 

@@ -51,6 +51,10 @@ public class MobCombatSettingsConfig {
     public static final String SPIDER_DEATH_MESSAGE = DEATH_MESSAGES + "spider";
     public static final String WITCH_DEATH_MESSAGE = DEATH_MESSAGES + "witch";
     public static final String ZOMBIE_DEATH_MESSAGE = DEATH_MESSAGES + "zombie";
+    public static final String HUSK_DEATH_MESSAGE = DEATH_MESSAGES + "husk";
+    public static final String ZOMBIE_PIGMAN_DEATH_MESSAGE = DEATH_MESSAGES + "zombie pigman";
+    public static final String STRAY_DEATH_MESSAGE = DEATH_MESSAGES + "stray";
+    public static final String WITHER_SKELETON_DEATH_MESSAGE = DEATH_MESSAGES + "wither skeleton";
     public static final String DEFAULT_DEATH_MESSAGE = DEATH_MESSAGES + "default";
     public static final String DISPLAY_HEALTH_ON_HIT = "Display Elite Mob health on hit";
     public static final String DISPLAY_DAMAGE_ON_HIT = "Display damage deal to Elite Mobs on hit";
@@ -94,6 +98,10 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(SPIDER_DEATH_MESSAGE, "$player became entangled in $entity's web!");
         configuration.addDefault(WITCH_DEATH_MESSAGE, "$player became $entity's test subject!");
         configuration.addDefault(ZOMBIE_DEATH_MESSAGE, "$player was devoured by $entity!");
+        configuration.addDefault(HUSK_DEATH_MESSAGE, "$player was hollowed out by $entity!");
+        configuration.addDefault(ZOMBIE_PIGMAN_DEATH_MESSAGE, "$player was mobbed to death by $entity!");
+        configuration.addDefault(STRAY_DEATH_MESSAGE, "$player was led astray by $entity!");
+        configuration.addDefault(WITHER_SKELETON_DEATH_MESSAGE, "$entity's arrows withered away $player!");
         configuration.addDefault(DEFAULT_DEATH_MESSAGE, "$player has been slain by $entity");
         configuration.addDefault(DISPLAY_HEALTH_ON_HIT, true);
         configuration.addDefault(DISPLAY_DAMAGE_ON_HIT, true);

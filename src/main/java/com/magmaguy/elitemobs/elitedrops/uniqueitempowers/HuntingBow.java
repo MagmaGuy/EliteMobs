@@ -16,6 +16,8 @@
 package com.magmaguy.elitemobs.elitedrops.uniqueitempowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
 import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -31,6 +33,8 @@ public class HuntingBow {
     public static ArrayList<LivingEntity> aliveBossMobList = new ArrayList();
 
     public static void scanForBossMobs() {
+
+        if (!ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_UNIQUE_ITEMS) || !ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_HUNTING_SET)) return;
 
         new BukkitRunnable() {
 

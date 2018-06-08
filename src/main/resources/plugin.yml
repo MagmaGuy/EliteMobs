@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.4.1
+version: 6.4.2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -30,6 +30,7 @@ permissions:
       elitemobs.currency.cointop: true
       elitemobs.scoreboard: false
       elitemobs.config: true
+      elitemobs.events.*: true
     default: op
   elitemobs.currency.user:
     description: Gives access to the commands users need to use the economy features (shops, paying other players)
@@ -110,9 +111,18 @@ permissions:
   elitemobs.conf:
     description: Allows players to run /elitemobs config
     default: op
-  elitemobs.event.smalltreasuregoblin:
-    description: Allows players to launch the smalltreasuregoblin event
+  elitemobs.events.*:
+    description: Allows players to launch all events
+    children:
+      elitemobs.events.smalltreasuregoblin: true
+      elitemobs.events.deadmoon: true
     default: op
-  elitemobs.event.deadmoon:
-    description: Allows players to launch the dead moon event
+  elitemobs.events.smalltreasuregoblin:
+    description: Allows players to run /elitemobs event smalltreasuregoblin
     default: op
+  elitemobs.events.deadmoon:
+    description: Allows players to run /elitemobs event deadmoon
+    default: op
+  elitemobs.events.kraken:
+    description: Allows players to randomly trigger the Kraken event when fishing;
+    defaut: true

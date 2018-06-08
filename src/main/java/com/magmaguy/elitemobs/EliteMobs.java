@@ -46,7 +46,6 @@ import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
 import com.magmaguy.elitemobs.mobcustomizer.displays.HealthDisplay;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonPillar;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobMetadataAssigner;
@@ -69,7 +68,7 @@ import java.util.List;
 
 public class EliteMobs extends JavaPlugin implements Listener {
 
-    public static List<World> worldList = new ArrayList();
+    public static List<World> validWorldList = new ArrayList();
 
     @Override
     public void onEnable() {
@@ -342,8 +341,10 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new TheReturned(), this);
         this.getServer().getPluginManager().registerEvents(new ZombieKing(), this);
         this.getServer().getPluginManager().registerEvents(new SpiritWalk(), this);
-        this.getServer().getPluginManager().registerEvents(new Kraken(), this);
-        this.getServer().getPluginManager().registerEvents(new KrakenEvent(), this);
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
+            this.getServer().getPluginManager().registerEvents(new Kraken(), this);
+            this.getServer().getPluginManager().registerEvents(new KrakenEvent(), this);
+        }
 
         //Set up health and damage displays
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT))
@@ -368,7 +369,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
         MetadataHandler metadataHandler = new MetadataHandler();
 
-        for (World world : worldList) {
+        for (World world : validWorldList) {
 
             for (Entity entity : world.getEntities()) {
 
@@ -388,6 +389,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
         CustomItemConstructor.staticCustomItemHashMap.clear();
         CustomItemConstructor.dynamicRankedItemStacks.clear();
         UniqueItemConstructor.uniqueItems.clear();
+        validWorldList.clear();
 
         getLogger().info("EliteMobs - Disabled!");
 
@@ -399,7 +401,7 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
             if (ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + world.getName())) {
 
-                worldList.add(world);
+                validWorldList.add(world);
 
             }
 
