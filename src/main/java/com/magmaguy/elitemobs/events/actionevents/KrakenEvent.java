@@ -17,9 +17,9 @@ public class KrakenEvent implements Listener {
     public void onFishingStart(PlayerFishEvent event) {
 
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
-        if (!event.getPlayer().hasPermission("elitemobs.events.kraken")) return;
+//        if (!event.getPlayer().hasPermission("elitemobs.events.kraken")) return;
 
-        if (event.getHook().getLocation().getBlock().isEmpty() || event.getHook().getLocation().getBlock().isEmpty() &&
+        if (event.getHook().getLocation().getBlock().isEmpty() || !event.getHook().getLocation().getBlock().isEmpty() &&
                 !event.getHook().getLocation().getBlock().getType().equals(Material.WATER)) return;
         if (ThreadLocalRandom.current().nextDouble() > ConfigValues.eventsConfig.getDouble(EventsConfig.KRAKEN_CHANCE_ON_FISH))
             return;

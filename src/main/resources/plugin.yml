@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.4.2
+version: 6.4.3
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -126,3 +126,9 @@ permissions:
   elitemobs.events.kraken:
     description: Allows players to randomly trigger the Kraken event when fishing;
     defaut: true
+  elitemobs.events.balrog:
+    description: Allows players to randomly trigger the Balrog event when mining ore veins
+    default: true
+  elitemobs.events.fae:
+    description: Allows players to randomly trigger the Fae event when chopping down trees
+    default: true

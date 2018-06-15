@@ -29,6 +29,8 @@ public class EventsConfig {
     public static final String TREASURE_GOBLIN_SMALL_ENABLED = ENABLED_EVENTS + "Small treasure goblin";
     public static final String DEAD_MOON_ENABLED = ENABLED_EVENTS + "Dead moon";
     public static final String KRAKEN_ENABLED = ENABLED_EVENTS + "Kraken";
+    public static final String BALROG_ENABLED = ENABLED_EVENTS + "Balrog";
+    public static final String FAE_ENABLED = ENABLED_EVENTS + "Fae";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT = "Small treasure goblin event announcement text";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT = "Small treasure goblin killed by players message";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT = "Small treasure goblin nondescript death message";
@@ -51,6 +53,14 @@ public class EventsConfig {
     public static final String TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL = "Time interval between treasure goblin gold shotgun shots";
     public static final String TREASURE_GOBLIN_RADIAL_EXPLOSION = "Time interval between treasure goblin radial explosions";
     public static final String KRAKEN_CHANCE_ON_FISH = "Kraken on fish chance";
+    public static final String KRAKEN_NAME = "Name of mob in Kraken event";
+    public static final String BALROG_CHANCE_ON_MINE = "Balrog chance on mine";
+    public static final String BALROG_NAME = "Name of mob in Balrog event";
+    public static final String BALROG_LEVEL = "Level of Balrog";
+    public static final String BALROG_TRASH_MOB_NAME = "Name of trash mobs in Balrog event";
+    public static final String FAE_NAME = "Name of mob in Fae event";
+    public static final String FAE_LEVEL = "Level of mob in Fae event";
+    public static final String FAE_CHANCE_ON_CHOP = "Fae chance on chop";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -84,7 +94,17 @@ public class EventsConfig {
         configuration.addDefault(TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL, 20);
         configuration.addDefault(TREASURE_GOBLIN_RADIAL_EXPLOSION, 20);
         configuration.addDefault(KRAKEN_ENABLED, true);
+        configuration.addDefault(BALROG_ENABLED, true);
         configuration.addDefault(KRAKEN_CHANCE_ON_FISH, 0.01);
+        configuration.addDefault(KRAKEN_NAME, "&1Kraken");
+        configuration.addDefault(BALROG_CHANCE_ON_MINE, 0.01);
+        configuration.addDefault(BALROG_NAME, "&cBalrog");
+        configuration.addDefault(BALROG_LEVEL, 100);
+        configuration.addDefault(BALROG_TRASH_MOB_NAME, "&cRaug");
+        configuration.addDefault(FAE_ENABLED, true);
+        configuration.addDefault(FAE_NAME, "&aFae");
+        configuration.addDefault(FAE_LEVEL, 20);
+        configuration.addDefault(FAE_CHANCE_ON_CHOP, 0.001);
 
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);

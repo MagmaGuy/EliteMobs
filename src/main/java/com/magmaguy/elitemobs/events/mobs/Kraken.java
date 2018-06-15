@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.events.mobs;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import org.bukkit.Bukkit;
@@ -60,7 +62,7 @@ public class Kraken implements Listener {
         kraken.setMaxHealth(1000);
         kraken.setHealth(1000);
 
-        kraken.setCustomName(ChatColorConverter.chatColorConverter("&cKraken"));
+        kraken.setCustomName(ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.KRAKEN_NAME)));
         kraken.setCustomNameVisible(true);
 
         kraken.setMetadata(MetadataHandler.KRAKEN, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
@@ -183,8 +185,6 @@ public class Kraken implements Listener {
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, 2);
 
             event.getDamager().removeMetadata(MetadataHandler.KRAKEN_FIREBALL, MetadataHandler.PLUGIN);
-
-            Bukkit.getLogger().info("Final damage: " + event.getFinalDamage());
 
         }
 

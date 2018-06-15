@@ -28,9 +28,7 @@ import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
 import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
-import com.magmaguy.elitemobs.events.mobs.Kraken;
-import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
-import com.magmaguy.elitemobs.events.mobs.ZombieKing;
+import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.Bukkit;
@@ -378,6 +376,24 @@ public class CommandHandler implements CommandExecutor {
                         Kraken.spawnKraken(squid.getLocation());
                         squid.remove();
                         commandSender.sendMessage("Spawned Kraken");
+
+                    }
+
+                    if (args[1].equalsIgnoreCase("balrog")) {
+
+                        Silverfish balrog = (Silverfish) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.SILVERFISH);
+                        Balrog.spawnBalrog(balrog.getLocation());
+                        balrog.remove();
+                        commandSender.sendMessage("Spawned Balrog");
+
+                    }
+
+                    if (args[1].equalsIgnoreCase("fae")) {
+
+                        Vex fae = (Vex) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.VEX);
+                        Fae.spawnFae(fae.getLocation());
+                        fae.remove();
+                        commandSender.sendMessage("Spawned Fae");
 
                     }
 
