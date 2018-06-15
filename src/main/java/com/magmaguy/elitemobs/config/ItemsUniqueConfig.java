@@ -33,6 +33,10 @@ public class ItemsUniqueConfig {
     public static final String SHOW_ITEM_WORTH = "Show item worth";
     public static final String ENABLE_KRAKEN_FISHING_ROD = "Enable Depths Seeker Fishing Rod";
     public static final String DEPTHS_SEEKER = "Depths Seeker";
+    public static final String ENABLE_GREED = "Enable Greed pickaxe";
+    public static final String GREED = "Greed";
+    public static final String ENABLE_THE_FELLER = "Enable The Feller";
+    public static final String THE_FELLER = "The Feller";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
@@ -150,9 +154,47 @@ public class ItemsUniqueConfig {
                 "    - LUCK,3\n" +
                 "    - DURABILITY,10\n" +
                 "    - FIRE_ASPECT,1\n" +
+                "    - VANISHING_CURSE,1\n" +
                 "    Potion Effects:\n" +
                 "    - WATER_BREATHING,1,self,continuous\n" +
                 "    - LUCK,1,self,continuous\n" +
+                "    Drop Weight: 1");
+        configuration.addDefault(ENABLE_GREED, true);
+        configuration.addDefault(GREED, "\n" +
+                "    Item Type: DIAMOND_PICKAXE\n" +
+                "    Item Name: &cGreed\n" +
+                "    Item Lore:\n" +
+                "    - &9Those who delve too greedily\n" +
+                "    - &9and too deep may wake ancient\n" +
+                "    - &9horrors of shadow and flame\n" +
+                "    - &9best left undisturbed.\n" +
+                "    Enchantments:\n" +
+                "    - LOOT_BONUS_BLOCKS,4\n" +
+                "    - SILK_TOUCH,1\n" +
+                "    - DURABILITY,6\n" +
+                "    - DIG_SPEED,6\n" +
+                "    - VANISHING_CURSE,1\n" +
+                "    Potion Effects:\n" +
+                "    - FAST_DIGGING,2,self,continuous\n" +
+                "    - NIGHT_VISION,1,self,continuous\n" +
+                "    Drop Weight: 1");
+        configuration.addDefault(ENABLE_THE_FELLER, true);
+        configuration.addDefault(THE_FELLER, "\n" +
+                "    Item Type: DIAMOND_AXE\n" +
+                "    Item Name: &cThe Feller\n" +
+                "    Item Lore:\n" +
+                "    - &9Even in your sleep,\n" +
+                "    - &9You can feel this axe's\n" +
+                "    - &9bloodlust for trees\n" +
+                "    Enchantments:\n" +
+                "    - LOOT_BONUS_BLOCKS,4\n" +
+                "    - SILK_TOUCH,1\n" +
+                "    - DURABILITY,6\n" +
+                "    - DIG_SPEED,6\n" +
+                "    - VANISHING_CURSE,1\n" +
+                "    Potion Effects:\n" +
+                "    - FAST_DIGGING,2,self,continuous\n" +
+                "    - NIGHT_VISION,1,self,continuous\n" +
                 "    Drop Weight: 1");
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);

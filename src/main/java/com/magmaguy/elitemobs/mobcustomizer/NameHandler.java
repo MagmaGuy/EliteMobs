@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -127,6 +128,10 @@ public class NameHandler {
             case IRON_GOLEM:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.IronGolem").get(0)) + mobLevel
                         + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.IronGolem").get(1)));
+                break;
+            case VEX:
+                entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vex").get(0)) + mobLevel
+                        + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vex").get(1)));
                 break;
             default:
                 getLogger().info("Error: Couldn't assign custom mob name due to unexpected aggressive boss mob (talk to the dev!)");
@@ -237,7 +242,7 @@ public class NameHandler {
 
         entity.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
 
-        entity.setCustomName(name);
+        entity.setCustomName(ChatColorConverter.chatColorConverter(name));
 
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
             entity.setCustomNameVisible(true);

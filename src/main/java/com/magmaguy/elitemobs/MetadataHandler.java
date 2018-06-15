@@ -174,6 +174,8 @@ public class MetadataHandler implements Listener {
     public final static String ZOMBIE_KING = "ZombieKing";
     public final static String KRAKEN = "Kraken";
     public final static String KRAKEN_FIREBALL = "KrakenFireball";
+    public final static String BALROG = "Balrog";
+    public final static String FAE = "Vex";
 
     //player metadata
     public final static String KILLED_BY_ELITE_MOB = "KilledByEliteMob";
@@ -258,7 +260,9 @@ public class MetadataHandler implements Listener {
             ARMOR_STAND_DISPLAY,
             KILLED_BY_ELITE_MOB,
             USING_ZOMBIE_KING_AXE,
-            KRAKEN_FIREBALL
+            KRAKEN_FIREBALL,
+            BALROG,
+            FAE
     ));
     public static List<String> powerListHumanFormat = new ArrayList<>(Arrays.asList( //add major and minor power lists
             //minor powers

@@ -49,7 +49,6 @@ public class MoonPhaseDetector {
 
         }
 
-
     }
 
     public enum moonPhase {

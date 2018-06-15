@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import org.bukkit.entity.Entity;
 
 import static org.bukkit.Bukkit.getLogger;
+import static org.bukkit.Bukkit.recipeIterator;
 
 /**
  * Created by MagmaGuy on 02/11/2016.
@@ -40,6 +41,7 @@ public class DefaultMaxHealthGuesser {
     public static final double witchHealth = 26;
     public static final double endermiteHealth = 8;
     public static final double polarBearHealth = 30;
+    public static final double vexHealth = 14;
 
     public static final double chickenHealth = 4;
     public static final double cowHealthHealth = 10;
@@ -97,6 +99,8 @@ public class DefaultMaxHealthGuesser {
                 return pigHealth;
             case SHEEP:
                 return sheepHealth;
+            case VEX:
+                return vexHealth;
             default:
                 getLogger().info("Error: Couldn't assign custom mob name due to unexpected boss mob (talk to the dev!)");
                 getLogger().info("Missing mob type: " + entity.getType());

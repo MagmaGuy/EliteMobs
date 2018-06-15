@@ -34,12 +34,11 @@ import com.magmaguy.elitemobs.elitedrops.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
+import com.magmaguy.elitemobs.events.actionevents.BalrogEvent;
+import com.magmaguy.elitemobs.events.actionevents.FaeEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.eventitems.ZombieKingAxe;
-import com.magmaguy.elitemobs.events.mobs.Kraken;
-import com.magmaguy.elitemobs.events.mobs.TheReturned;
-import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
-import com.magmaguy.elitemobs.events.mobs.ZombieKing;
+import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.events.mobs.sharedeventpowers.SpiritWalk;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
@@ -344,6 +343,14 @@ public class EliteMobs extends JavaPlugin implements Listener {
         if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
             this.getServer().getPluginManager().registerEvents(new Kraken(), this);
             this.getServer().getPluginManager().registerEvents(new KrakenEvent(), this);
+        }
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
+            this.getServer().getPluginManager().registerEvents(new Balrog(), this);
+            this.getServer().getPluginManager().registerEvents(new BalrogEvent(), this);
+        }
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
+            this.getServer().getPluginManager().registerEvents(new FaeEvent(), this);
+            this.getServer().getPluginManager().registerEvents(new Fae(), this);
         }
 
         //Set up health and damage displays

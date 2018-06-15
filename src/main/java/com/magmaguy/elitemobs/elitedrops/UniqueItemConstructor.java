@@ -42,6 +42,8 @@ public class UniqueItemConstructor {
     public static final String HUNTING_BOW = "HuntingBow";
     public static final String ZOMBIE_KING_AXE = "ZombieKingAxe";
     public static final String DEPTHS_SEEKER = "DepthsSeeker";
+    public static final String GREED = "Greed";
+    public static final String THE_FELLER = "TheFeller";
 
     public static final String HUNTING_SET_IDENTIFIER = " Hunting set";
     public static final String ZOMBIE_KING_AXE_IDENTIFIER = " King Axe";
@@ -166,6 +168,30 @@ public class UniqueItemConstructor {
             //This item only ever drops when the Zombie King gets slain
             uniqueItemsList.add(depthsSeeker);
             uniqueItems.put(DEPTHS_SEEKER, depthsSeeker);
+
+        }
+
+        if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_GREED)) {
+
+            //add axe
+            ItemStack greed = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.GREED), UniqueItemType.GREED);
+            greed = tempWorthLoreAdder(greed);
+
+            //This item only ever drops when the Zombie King gets slain
+            uniqueItemsList.add(greed);
+            uniqueItems.put(GREED, greed);
+
+        }
+
+        if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_THE_FELLER)) {
+
+            //add axe
+            ItemStack theFeller = uniqueItemConstructor(ConfigValues.itemsUniqueConfig.getString(ItemsUniqueConfig.THE_FELLER), UniqueItemType.THE_FELLER);
+            theFeller = tempWorthLoreAdder(theFeller);
+
+            //This item only ever drops when the Zombie King gets slain
+            uniqueItemsList.add(theFeller);
+            uniqueItems.put(THE_FELLER, theFeller);
 
         }
 
@@ -442,7 +468,9 @@ public class UniqueItemConstructor {
 
         ELITE_MOB_HUNTING_SET,
         ZOMBIE_KING_AXE,
-        DEPTHS_SEEKER
+        DEPTHS_SEEKER,
+        GREED,
+        THE_FELLER
 
     }
 

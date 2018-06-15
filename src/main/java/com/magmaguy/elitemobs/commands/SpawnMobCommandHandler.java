@@ -44,7 +44,6 @@ public class SpawnMobCommandHandler {
 
     public static void spawnMob(CommandSender commandSender, String[] args) {
 
-
         Location location = getLocation(commandSender, args);
         EntityType entityType = getEntityType(commandSender, args);
         Integer mobLevel = getLevel(commandSender, args);
@@ -193,6 +192,9 @@ public class SpawnMobCommandHandler {
                 break;
             case "stray":
                 entityType = EntityType.STRAY;
+                break;
+            case "vex":
+                entityType = EntityType.VEX;
                 break;
             case "witch":
                 entityType = EntityType.WITCH;
