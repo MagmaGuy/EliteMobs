@@ -162,7 +162,7 @@ public class ItemsUniqueConfig {
         configuration.addDefault(ENABLE_GREED, true);
         configuration.addDefault(GREED, "\n" +
                 "    Item Type: DIAMOND_PICKAXE\n" +
-                "    Item Name: &cGreed\n" +
+                "    Item Name: &cDwarven Greed\n" +
                 "    Item Lore:\n" +
                 "    - &9Those who delve too greedily\n" +
                 "    - &9and too deep may wake ancient\n" +
