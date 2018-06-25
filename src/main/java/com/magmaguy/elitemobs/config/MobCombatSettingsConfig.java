@@ -25,12 +25,13 @@ public class MobCombatSettingsConfig {
     public static final String SPAWNERS_SPAWN_ELITE_MOBS = "Spawners can spawn Elite Mobs";
     public static final String AGGRESSIVE_MOB_CONVERSION_PERCENTAGE = "Percentage of aggressive mobs that get converted to EliteMobs when they spawn";
     public static final String AGGRESSIVE_MOB_STACKING = "Aggressive mob stacking";
-    public static final String ELITEMOB_STACKING_CAP = "EliteMob stacking cap";
+    public static final String ELITEMOB_STACKING_CAP = "Elite mob stacking cap";
+    public static final String PER_TIER_LEVEL_INCREASE = "Elite mob per level tier increase";
     public static final String STACK_AGGRESSIVE_SPAWNER_MOBS = "Stack aggressive spawner mobs";
     public static final String STACK_AGGRESSIVE_NATURAL_MOBS = "Stack aggressive natural mobs";
     public static final String NATURAL_ELITEMOB_LEVEL_CAP = "Natural elite mob level cap";
-    public static final String LIFE_MULTIPLIER = "EliteMob life multiplier";
-    public static final String DAMAGE_MULTIPLIER = "EliteMob damage multiplier";
+    public final static String TARGET_HITS_TO_KILL = "Target hits to kill Elite Mob";
+    public final static String BASE_DAMAGE_DEALT_TO_PLAYER = "Base damage dealt to players by Elite Mobs";
     public static final String ELITE_CREEPER_EXPLOSION_MULTIPLIER = "SuperCreeper explosion nerf multiplier";
     public static final String ELITE_ARMOR = "Elite Mobs wear armor";
     public static final String ELITE_HELMETS = "Elite Mobs wear helmets";
@@ -65,7 +66,7 @@ public class MobCombatSettingsConfig {
     public static final String LEVEL_TO_INCREMENT = "Amount of levels incremented per distance";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
     public void initializeConfig() {
 
@@ -75,10 +76,10 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(AGGRESSIVE_MOB_STACKING, true);
         configuration.addDefault(ELITEMOB_STACKING_CAP, 100);
         configuration.addDefault(STACK_AGGRESSIVE_SPAWNER_MOBS, true);
-        configuration.addDefault(STACK_AGGRESSIVE_NATURAL_MOBS, true);
+        configuration.addDefault(STACK_AGGRESSIVE_NATURAL_MOBS, false);
         configuration.addDefault(NATURAL_ELITEMOB_LEVEL_CAP, 2500);
-        configuration.addDefault(LIFE_MULTIPLIER, 1.0);
-        configuration.addDefault(DAMAGE_MULTIPLIER, 1.0);
+        configuration.addDefault(TARGET_HITS_TO_KILL, 10);
+        configuration.addDefault(BASE_DAMAGE_DEALT_TO_PLAYER, 5);
         configuration.addDefault(ELITE_CREEPER_EXPLOSION_MULTIPLIER, 1.0);
         configuration.addDefault(ELITE_ARMOR, true);
         configuration.addDefault(ELITE_HELMETS, true);
@@ -87,6 +88,7 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(ENABLE_WARNING_VISUAL_EFFECTS, true);
         configuration.addDefault(ENABLE_DAMAGE_DISPLAY, true);
         configuration.addDefault(ENABLE_HEALTH_DISPLAY, true);
+        configuration.addDefault(PER_TIER_LEVEL_INCREASE, 50);
         configuration.addDefault(BLAZE_DEATH_MESSAGE, "$player was lit ablaze by $entity!");
         configuration.addDefault(CREEPER_DEATH_MESSAGE, "$player was blasted away by $entity!");
         configuration.addDefault(ENDERMAN_DEATH_MESSAGE, "$entity sent $player into the void!");

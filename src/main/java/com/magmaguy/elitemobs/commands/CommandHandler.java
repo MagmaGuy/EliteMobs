@@ -15,20 +15,21 @@
 
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
-import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
-import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.events.mobs.*;
+import com.magmaguy.elitemobs.items.CustomItemConstructor;
+import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.Bukkit;
@@ -45,7 +46,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-import static com.magmaguy.elitemobs.elitedrops.CustomItemConstructor.customItemList;
+import static com.magmaguy.elitemobs.items.CustomItemConstructor.customItemList;
 import static org.bukkit.Bukkit.getLogger;
 import static org.bukkit.Bukkit.getServer;
 
@@ -78,6 +79,10 @@ public class CommandHandler implements CommandExecutor {
     private final static String CONFIG = "elitemobs.config";
     private final static String EVENT_LAUNCH_SMALLTREASUREGOBLIN = "elitemobs.events.smalltreasuregoblin";
     private final static String EVENT_LAUNCH_DEADMOON = "elitemobs.events.smalltreasuregoblin";
+    private final static String CHECK_TIER = "elitemobs.checktier";
+    private final static String SET_MAX_TIER = "elitemobs.config.setmaxtier";
+    private final static String GET_TIER = "elitemobs.gettier";
+    private final static String CHECK_MAX_TIER = "elitemobs.checkmaxtier";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -177,10 +182,25 @@ public class CommandHandler implements CommandExecutor {
 
                 }
 
-                if (args[0].equalsIgnoreCase("config") && permCheck(CONFIG, commandSender)) {
+//                if (args[0].equalsIgnoreCase("config") && permCheck(CONFIG, commandSender)) {
+//
+//                    GUIConfigHandler guiConfigHandler = new GUIConfigHandler();
+//                    guiConfigHandler.GUIConfigHandler((Player) commandSender);
+//                    return true;
+//
+//                }
 
-                    GUIConfigHandler guiConfigHandler = new GUIConfigHandler();
-                    guiConfigHandler.GUIConfigHandler((Player) commandSender);
+                if (args[0].equalsIgnoreCase("checktier") && userPermCheck(CHECK_TIER, commandSender)) {
+
+                    commandSender.sendMessage("You are tier " + ItemTierFinder.findPlayerTier((Player) commandSender));
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("checkmaxtier") && userPermCheck(CHECK_MAX_TIER, commandSender)) {
+
+                    CheckMaxItemTierCommand.checkMaxItemTier(commandSender);
+                    return true;
 
                 }
 
@@ -396,6 +416,22 @@ public class CommandHandler implements CommandExecutor {
                         commandSender.sendMessage("Spawned Fae");
 
                     }
+
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("gettier") && commandSender instanceof Player && userPermCheck(GET_TIER, commandSender)) {
+
+                    TierSetSpawner.spawnTierItem(Integer.parseInt(args[1]), (Player) commandSender);
+
+                    return true;
+
+                }
+
+                if (args[0].equalsIgnoreCase("setmaxtier") && userPermCheck(SET_MAX_TIER, commandSender)) {
+
+                    SetMaxItemTierCommand.setMaxItemTier(Double.parseDouble(args[1]), commandSender);
 
                     return true;
 
@@ -661,6 +697,14 @@ public class CommandHandler implements CommandExecutor {
                 player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
             if (silentPermCheck(SPAWN_BOSS_MOB, commandSender))
                 commandSender.sendMessage("/elitemobs spawnBossMob [bossName]");
+            if (silentPermCheck(CHECK_TIER, commandSender))
+                commandSender.sendMessage("/elitemobs checktier");
+            if (silentPermCheck(CHECK_MAX_TIER, commandSender))
+                commandSender.sendMessage("/elitemobs checkmaxtier");
+            if (silentPermCheck(SET_MAX_TIER, commandSender))
+                commandSender.sendMessage("/elitemobs setmaxtier [tier]");
+            if (silentPermCheck(GET_TIER, commandSender))
+                commandSender.sendMessage("/elitemobs gettier [tier]");
 
 
         } else if (commandSender instanceof ConsoleCommandSender) {

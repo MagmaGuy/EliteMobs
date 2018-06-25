@@ -29,8 +29,6 @@ import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ItemSaleEvent;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
-import com.magmaguy.elitemobs.elitedrops.*;
-import com.magmaguy.elitemobs.elitedrops.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
@@ -40,6 +38,8 @@ import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.eventitems.ZombieKingAxe;
 import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.events.mobs.sharedeventpowers.SpiritWalk;
+import com.magmaguy.elitemobs.items.*;
+import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
@@ -71,8 +71,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-
-        getLogger().info("EliteMobs - Enabled!");
 
         //Enable stats
         Metrics metrics = new Metrics(this);
@@ -297,13 +295,8 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MergeHandler(), this);
 
         //Natural EliteMobs Spawning
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING)) {
-
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING))
             this.getServer().getPluginManager().registerEvents(new NaturalMobSpawner(), this);
-
-            getLogger().info("EliteMobs - Natural EliteMob Spawning enabled!");
-
-        }
 
         //Natural Mob Metadata Assigner
         this.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(), this);
@@ -314,8 +307,10 @@ public class EliteMobs extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(new MajorPowerPowerStance(), this);
 
         //Loot
-        this.getServer().getPluginManager().registerEvents(new EliteDropsDropper(), this);
-        this.getServer().getPluginManager().registerEvents(new PlaceEventPrevent(), this);
+        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_PLUGIN_LOOT)) {
+            this.getServer().getPluginManager().registerEvents(new ItemDropper(), this);
+            this.getServer().getPluginManager().registerEvents(new PlaceEventPrevent(), this);
+        }
 
         //Shops
         this.getServer().getPluginManager().registerEvents(new ShopHandler(), this);
@@ -397,8 +392,6 @@ public class EliteMobs extends JavaPlugin implements Listener {
         CustomItemConstructor.dynamicRankedItemStacks.clear();
         UniqueItemConstructor.uniqueItems.clear();
         validWorldList.clear();
-
-        getLogger().info("EliteMobs - Disabled!");
 
     }
 

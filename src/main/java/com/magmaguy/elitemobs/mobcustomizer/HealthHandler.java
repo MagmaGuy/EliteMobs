@@ -16,8 +16,6 @@
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -71,7 +69,7 @@ public class HealthHandler {
     private static double maxHealthFormula(int mobLevel, double defaultMaxHealth) {
 
         //Baseline calc is made for zombies, increments health in 10% leaps
-        double newMaxHealth = (mobLevel * 0.1 * defaultMaxHealth + defaultMaxHealth) * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.LIFE_MULTIPLIER);
+        double newMaxHealth = (mobLevel * DamageAdjuster.PER_LEVEL_POWER_INCREASE * defaultMaxHealth + defaultMaxHealth);
 
         return newMaxHealth;
 

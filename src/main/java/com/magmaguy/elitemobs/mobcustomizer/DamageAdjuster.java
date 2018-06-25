@@ -19,124 +19,41 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.items.MobTierFinder;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class DamageAdjuster implements Listener {
 
-
-    /*
-    The math presented here for damage is based on server with hard difficulty.
-    More specifically, it's based around creating a fair, scalable challenge around Zombies.
-    With each level, mobs gain 10% more power (2 health and 0.45 damage) (based on their base attributes, not based on each subsequent level).
-    The item tiers are based around swords.
-    It should take ~10 hits to kill an Elite Mob.
-    It should take ~5 hits to die from an Elite Mob.
-     */
-
-    /*
-    Goal hits to kill: 10
-    NOTE: since the system doesn't take into account the base health of the mob, mobs take a few more hits than what is
-    set here to kill
-     */
-
     public static final double PER_LEVEL_POWER_INCREASE = 0.1;
-    public static final double HITS_TO_KILL = 10;
-    public static final double BASE_DAMAGE = 4.5;
-    public static final double BASE_HEALTH_INCREASE = 20 * PER_LEVEL_POWER_INCREASE;
+    public static final double TARGET_HITS_TO_KILL = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.TARGET_HITS_TO_KILL);
+    public static final double BASE_DAMAGE_DEALT_TO_PLAYERS = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.BASE_DAMAGE_DEALT_TO_PLAYER);
+    public static final double TO_PLAYER_DAMAGE_TIER_HANDICAP = 0.75;
+    public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.33;
 
-    /*
-    Determine vanilla weapon damage
-     */
+    public static final double DIAMOND_TIER_LEVEL = 1;
+    public static final double IRON_TIER_LEVEL = 0.66;
+    public static final double STONE_CHAIN_TIER_LEVEL = 0.25;
+    public static final double GOLD_WOOD_LEATHER_TIER_LEVEL = 0;
 
-    public static final double DIAMOND_TIER_DAMAGE = 7;
-    public static final double IRON_TIER_DAMAGE = 6;
-    public static final double STONE_CHAIN_TIER_DAMAGE = 5;
-    public static final double GOLD_WOOD_LEATHER_TIER_DAMAGE = 4;
-
-    /*
-    Find how much damage gets dealt in the goal HTK (HITS TO KILL)
-    Since raw damage is dealt to mobs, this means that this is also mob health
-     */
-
-    public static final double HTK_DIAMOND = HITS_TO_KILL * DIAMOND_TIER_DAMAGE;
-    public static final double HTK_IRON = HITS_TO_KILL * IRON_TIER_DAMAGE;
-    public static final double HTK_STONE_CHAIN = HITS_TO_KILL * STONE_CHAIN_TIER_DAMAGE;
-    public static final double HTK_GOLD_WOOD_LEATHER = HITS_TO_KILL * GOLD_WOOD_LEATHER_TIER_DAMAGE;
-
-    /*
-    Determine appropriate mob level for tier knowing each level increases mob health by 10% (2) and the previously
-    calculated mob health ignoring base health for scaling's sake (only accounts for the 2% increase over time)
-     */
-
-    public static final double DIAMOND_TIER_LEVEL = HTK_DIAMOND / BASE_HEALTH_INCREASE;
-    public static final double IRON_TIER_LEVEL = HTK_IRON / BASE_HEALTH_INCREASE;
-    public static final double STONE_CHAIN_TIER_LEVEL = HTK_STONE_CHAIN / BASE_HEALTH_INCREASE;
-    public static final double GOLD_WOOD_LEATHER_TIER_LEVEL = HTK_GOLD_WOOD_LEATHER / BASE_HEALTH_INCREASE;
-
-    /*
-    Determine the necessary damage reduction from armor in order to scale to mob damage, knowing that mob damage should
-    always aim to nullify armor (since default damage is 4.5 which is close to the desired value)
-    R = reduction    x = mob level
-    R(4.5+0.45x) = 4.5 <=> R = 4.5/(4.5+0.45x)
-    0.45 is picked as it is 10% of 4.5 which is the default damage of a zombie in hard mode
-     */
-
-    public static final double DIAMOND_SET_REDUCTION = 1 - BASE_DAMAGE / (BASE_DAMAGE + BASE_DAMAGE * PER_LEVEL_POWER_INCREASE * DIAMOND_TIER_LEVEL);
-    public static final double IRON_SET_REDUCTION = 1 - BASE_DAMAGE / (BASE_DAMAGE + BASE_DAMAGE * PER_LEVEL_POWER_INCREASE * IRON_TIER_LEVEL);
-    public static final double STONE_CHAIN_SET_REDUCTION = 1 - BASE_DAMAGE / (BASE_DAMAGE + BASE_DAMAGE * PER_LEVEL_POWER_INCREASE * STONE_CHAIN_TIER_LEVEL);
-    public static final double GOLD_WOOD_LEATHER_SET_REDUCTION = 1 - BASE_DAMAGE / (BASE_DAMAGE + BASE_DAMAGE * PER_LEVEL_POWER_INCREASE * GOLD_WOOD_LEATHER_TIER_LEVEL);
-
-    /*
-    Determine damage reduction per armor slot for 4 armor slots
-     */
-
-    public static final double DIAMOND_REDUCTION = DIAMOND_SET_REDUCTION / 4;
-    public static final double IRON_REDUCTION = IRON_SET_REDUCTION / 4;
-    public static final double STONE_CHAIN_REDUCTION = STONE_CHAIN_SET_REDUCTION / 4;
-    public static final double GOLD_WOOD_LEATHER_REDUCTION = GOLD_WOOD_LEATHER_SET_REDUCTION / 4;
-
-    /*
-    Determine level increase resulting from a potion effect or enchantment blocking 1 damage
-    To calculate this, assume that a full set of armor gets a +1 enchantment, resulting in +4 defense
-    Knowing the damage increase per level is 0.45
-     */
-
-    public static final double DEFENSIVE_ENCHANTMENT_OR_POTION_EFFECT_LEVEL_INCREASE = 4 / (BASE_DAMAGE * PER_LEVEL_POWER_INCREASE);
-
-    /*
-    Determine how much damage 1 level of an enchantment or potion effect should do taking into account that it is a part
-    of a full set of armor where everything is presumed to have 1 level of enchantments
-    Remember that all damage is raw and that it should always roughly take the same amount of hits to kill an elite mob
-     */
-
-    public static final double TIER_DAMAGE_INCREASE = (DEFENSIVE_ENCHANTMENT_OR_POTION_EFFECT_LEVEL_INCREASE * BASE_HEALTH_INCREASE) / HITS_TO_KILL;
-
-    /*
-    Determine the threat increase from 1 level of potion effects or enchantments. Since these values are bundled into sets,
-    the level increase from 4 defensive enchantment or potion effect levels should be the base for threat calculation.
-    Since weapons are taken into account and 1 level of offensive enchants is supposed to cover for the level increase of
-    4 protection enchantments, this means the threat calc needs to get distributed over 5 items (from the original 4).
-     */
-
-    public static final double ENCHANTMENT_OR_POTION_EFFECT_THREAT_INCREMENTER = DEFENSIVE_ENCHANTMENT_OR_POTION_EFFECT_LEVEL_INCREASE * 4 / 5;
-
+    //TODO: Handle thorns damage and potion effects
 
     //this event deals with elite mobs damaging players
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -152,7 +69,6 @@ public class DamageAdjuster implements Listener {
         if (event.getDamager() instanceof Projectile && !(((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
             return;
 
-
         LivingEntity livingEntity = null;
 
         if (event.getDamager() instanceof LivingEntity) livingEntity = (LivingEntity) event.getDamager();
@@ -161,40 +77,87 @@ public class DamageAdjuster implements Listener {
 
         if (livingEntity == null) return;
 
-        Player player = (Player) event.getEntity();
 
-        int mobLevel = livingEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+        //From this point on, the damage event is fully altered by Elite Mobs
 
-        double newDamage = newAdjustedDamageToPlayer(event.getDamage(), mobLevel, player);
 
-        if (event.getDamager() instanceof Arrow) {
-            newDamage -= arrowEnchantmentReduction(player);
-        } else if (event.getDamager() instanceof Fireball || event.getDamager() instanceof Creeper) {
-            newDamage -= explosionEnchantmentReduction(player);
-        }
-
-        //this checks for simple protection, which always applies
-        newDamage -= enchantmentReduction(player);
-
-        newDamage -= potionEffectReduction(player);
-        newDamage = newDamage * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.DAMAGE_MULTIPLIER);
-
-        //Prevent untouchable armor and 1-shots
-        if (newDamage < 1) newDamage = 1;
-        if (newDamage > 19) newDamage = 19;
-
+        //Get rid of all vanilla armor reduction
         for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
             if (event.isApplicable(modifier))
                 event.setDamage(modifier, 0);
 
+        Player player = (Player) event.getEntity();
+
+        //Determine tiers
+        double eliteTier = MobTierFinder.findMobTier(livingEntity);
+        double playerTier = ItemTierFinder.findArmorSetTier(player);
+
+        double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, event);
+
+        //Prevent untouchable armor and 1-shots
+
+        if (newDamage < 1) newDamage = 1;
+        if (newDamage > 19) newDamage = 19;
+
+
+        //Set the final damage value
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
+        //Deal with the player getting killed
         if (player.getHealth() - event.getDamage() <= 0) {
 
             player.setMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
             PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity);
 
         }
+
+    }
+
+    private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EntityDamageByEntityEvent event) {
+
+        double tierDifference = eliteTier - playerTier;
+        tierDifference = (Math.abs(tierDifference) < 2) ? tierDifference : tierDifference > 0 ? 2 : -2;
+
+        /*
+        Apply secondary enchantment damage reduction
+         */
+        double newBaseDamage = BASE_DAMAGE_DEALT_TO_PLAYERS - secondaryEnchantmentDamageReduction(player, event) * 2;
+
+        return newBaseDamage +
+                newBaseDamage * (tierDifference) * TO_PLAYER_DAMAGE_TIER_HANDICAP;
+
+    }
+
+    private double secondaryEnchantmentDamageReduction(Player player, EntityDamageByEntityEvent event) {
+
+        double totalReductionLevel = 0;
+
+        for (ItemStack itemStack : player.getInventory().getArmorContents()) {
+
+            if (itemStack == null) continue;
+
+            for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
+
+                if (enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()) && event.getDamager() instanceof Projectile) {
+
+                    totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
+
+                }
+
+                if (enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) && event.getCause().equals(EntityDamageByEntityEvent.DamageCause.ENTITY_EXPLOSION)) {
+
+                    totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
+
+                }
+
+            }
+
+        }
+
+        totalReductionLevel = totalReductionLevel / 4;
+        totalReductionLevel = totalReductionLevel > 1 ? 1 : totalReductionLevel;
+
+        return totalReductionLevel;
 
     }
 
@@ -213,27 +176,26 @@ public class DamageAdjuster implements Listener {
 
     }
 
-    //Deal with creeper explosions
+    /*
+    Deal with elite creeper explosions (visually)
+    Damage is dealt by eliteMobDamageHandler
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEliteCreeperDetonation(ExplosionPrimeEvent event) {
-        if (event.isCancelled()) return;
 
+        if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Creeper && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)))
             return;
 
-        for (PotionEffect potionEffect : ((Creeper) event.getEntity()).getActivePotionEffects()) {
-
+        /*
+        This is necessary because the propagate the same duration as they have, which is nearly infinite
+         */
+        for (PotionEffect potionEffect : ((Creeper) event.getEntity()).getActivePotionEffects())
             ((Creeper) event.getEntity()).removePotionEffect(potionEffect.getType());
 
-        }
 
-        int mobLevel = event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
-
-        if (mobLevel <= 1) {
-
-            return;
-
-        }
+        int mobLevel = event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 1 ?
+                1 : event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
         float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.01 * mobLevel * event.getRadius() * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
 
@@ -244,180 +206,6 @@ public class DamageAdjuster implements Listener {
         }
 
         event.setRadius(newExplosionRange);
-
-    }
-
-
-    private double newAdjustedDamageToPlayer(double rawDamage, int mobLevel, Player player) {
-
-        double newRawDamage = rawDamage + rawDamage * 0.1 * mobLevel;
-
-        double postArmorReductionDamage = newRawDamage - totalArmorReduction(player) * newRawDamage;
-
-        return postArmorReductionDamage;
-
-    }
-
-    private double totalArmorReduction(Player player) {
-
-        double armorReduction = 0;
-
-        for (ItemStack itemStack : player.getInventory().getArmorContents()) {
-
-            if (itemStack != null && itemStack.getType() != Material.AIR) {
-
-                armorReduction += materialGrabber(itemStack);
-
-            }
-
-        }
-
-        return armorReduction;
-
-    }
-
-    private double materialGrabber(ItemStack itemStack) {
-
-        return materialRating(itemStack.getType());
-
-    }
-
-    private double materialRating(Material material) {
-
-        switch (material) {
-
-            case DIAMOND_HELMET:
-                return DIAMOND_REDUCTION;
-            case DIAMOND_CHESTPLATE:
-                return DIAMOND_REDUCTION;
-            case DIAMOND_LEGGINGS:
-                return DIAMOND_REDUCTION;
-            case DIAMOND_BOOTS:
-                return DIAMOND_REDUCTION;
-            case IRON_HELMET:
-                return IRON_REDUCTION;
-            case IRON_CHESTPLATE:
-                return IRON_REDUCTION;
-            case IRON_LEGGINGS:
-                return IRON_REDUCTION;
-            case IRON_BOOTS:
-                return IRON_REDUCTION;
-            case CHAINMAIL_HELMET:
-                return STONE_CHAIN_REDUCTION;
-            case CHAINMAIL_CHESTPLATE:
-                return STONE_CHAIN_REDUCTION;
-            case CHAINMAIL_LEGGINGS:
-                return STONE_CHAIN_REDUCTION;
-            case CHAINMAIL_BOOTS:
-                return STONE_CHAIN_REDUCTION;
-            case GOLD_HELMET:
-                return GOLD_WOOD_LEATHER_REDUCTION;
-            case GOLD_CHESTPLATE:
-                return GOLD_WOOD_LEATHER_REDUCTION;
-            case GOLD_LEGGINGS:
-                return GOLD_WOOD_LEATHER_REDUCTION;
-            case GOLD_BOOTS:
-                return GOLD_WOOD_LEATHER_REDUCTION;
-            case LEATHER_HELMET:
-                return GOLD_WOOD_LEATHER_REDUCTION;
-            case LEATHER_CHESTPLATE:
-                return GOLD_WOOD_LEATHER_REDUCTION;
-            case LEATHER_LEGGINGS:
-                return GOLD_WOOD_LEATHER_REDUCTION;
-            case LEATHER_BOOTS:
-                return GOLD_WOOD_LEATHER_REDUCTION;
-
-        }
-
-        return 0;
-
-    }
-
-    /*
-    For the purposes of Elite Mobs, every enchantment reduces damage by 1
-    This isn't done through percentual scaling because not doing so allows for nearly infinite progression
-     */
-    private int enchantmentReduction(Player player) {
-
-        int reducedDamage = 0;
-
-        for (ItemStack itemStack : player.getInventory().getArmorContents()) {
-
-            if (itemStack != null && !(itemStack.getType().equals(Material.AIR))) {
-
-                if (itemStack.containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL)) {
-
-                    reducedDamage += itemStack.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
-
-                }
-
-            }
-
-        }
-
-        return reducedDamage;
-
-    }
-
-    private int arrowEnchantmentReduction(Player player) {
-
-        int reducedDamage = 0;
-
-        for (ItemStack itemStack : player.getInventory().getArmorContents()) {
-
-            if (itemStack != null && !(itemStack.getType().equals(Material.AIR))) {
-
-                if (itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)) {
-
-                    reducedDamage += itemStack.getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE);
-
-                }
-
-            }
-
-        }
-
-        return reducedDamage;
-
-    }
-
-    private int explosionEnchantmentReduction(Player player) {
-
-        int reducedDamage = 0;
-
-        for (ItemStack itemStack : player.getInventory().getArmorContents()) {
-
-            if (itemStack != null && !(itemStack.getType().equals(Material.AIR))) {
-
-                if (itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS)) {
-
-                    reducedDamage += itemStack.getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS);
-
-                }
-
-            }
-
-        }
-
-        return reducedDamage;
-
-    }
-
-    /*
-    The damage resistance potion effect will only reduce damage by 1.
-     */
-
-    private int potionEffectReduction(Player player) {
-
-        int reducedDamage = 0;
-
-        if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-
-            reducedDamage = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1;
-
-        }
-
-        return reducedDamage;
 
     }
 
@@ -433,24 +221,20 @@ public class DamageAdjuster implements Listener {
     public void eliteMobDamageGeneric(EntityDamageEvent event) {
 
         if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof LivingEntity)) return;
         if (!event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
         if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
         if (!event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
-
-            LivingEntity livingEntity = (LivingEntity) event.getEntity();
-
-            double eventDamage = event.getDamage();
 
             for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
                 if (event.isApplicable(modifier))
                     event.setDamage(modifier, 0);
 
-            event.setDamage(EntityDamageEvent.DamageModifier.BASE, eventDamage);
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
 
         }
 
     }
-
 
     /*
     This deals with players hitting the elite mob
@@ -469,132 +253,151 @@ public class DamageAdjuster implements Listener {
         else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
             damagingLivingEntity = (LivingEntity) ((Projectile) event.getDamager()).getShooter();
 
+        if (damagingLivingEntity == null) return;
+
+
+        //From this point on, the event damage is handled by Elite Mobs
+
+
+        for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
+            if (event.isApplicable(modifier))
+                event.setDamage(modifier, 0);
+
         /*
-        Case in which the player is not the entity dealing damage, just do raw damage
+        Case in which the player is not the entity dealing damage, just deal raw damage
          */
         if (!(damagingLivingEntity instanceof Player)) {
-
-            for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
-                if (event.isApplicable(modifier))
-                    event.setDamage(modifier, 0);
 
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
 
             return;
 
-        } else {
-
-            //added damage done by players is fixed, not percentual
-            double newDamage = event.getDamage();
-            int damageIncrease = 0;
-
-            Player player = (Player) damagingLivingEntity;
-
-            ItemStack mainHand = player.getInventory().getItemInMainHand();
-            ItemStack offHand = player.getInventory().getItemInOffHand();
-
-            if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)) {
-
-                if (mainHand != null && mainHand.getType().equals(Material.BOW) && offHand != null && offHand.getType().equals(Material.BOW)) {
-
-                    damageIncrease += addedBowEnchantmentComparator(Enchantment.ARROW_DAMAGE, mainHand);
-
-                } else if (mainHand != null && mainHand.getType().equals(Material.BOW)) {
-
-                    damageIncrease += addedBowEnchantmentComparator(Enchantment.ARROW_DAMAGE, mainHand);
-
-                } else if (offHand != null && offHand.getType().equals(Material.BOW)) {
-
-                    damageIncrease += addedBowEnchantmentComparator(Enchantment.ARROW_DAMAGE, offHand);
-
-                }
-
-            } else {
-
-                //Minecraft can only do main hand damage from this point on
-                if (mainHand != null) {
-
-                    damageIncrease += addedOtherItemEnchantmentComparator(mainHand, damagedLivingEntity);
-
-                }
-
-            }
-
-            damageIncrease += addedPotionEffect(player);
-
-            newDamage += damageIncrease * TIER_DAMAGE_INCREASE;
-
-            for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
-                if (event.isApplicable(modifier))
-                    event.setDamage(modifier, 0);
-
-            event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
-
-            return;
-
         }
+
+        /*
+        Case in which a player has hit the Elite Mob
+         */
+
+        Player player = (Player) damagingLivingEntity;
+
+        double playerTier;
+        if (player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType().equals(Material.BOW) && event.getDamager() instanceof Player)
+            playerTier = 0;
+        else
+            playerTier = ItemTierFinder.findItemTier(player.getInventory().getItemInMainHand());
+        double eliteTier = MobTierFinder.findMobTier(damagedLivingEntity);
+        double maxHealth = damagedLivingEntity.getMaxHealth();
+
+        double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, damagedLivingEntity);
+
+        event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
     }
 
-    private int addedBowEnchantmentComparator(Enchantment enchantment, ItemStack itemStack) {
+    private double playerToEliteDamageFormula(double eliteTier, double playerTier, double maxHealth, Player player, LivingEntity eliteMob) {
 
-        int addedDamage = 0;
+        double tierDifference = playerTier - eliteTier;
 
-        if (itemStack.containsEnchantment(enchantment)) {
+        /*
+        This caps the tier difference between mobs and players to prevent insurmountable boss fights
+         */
+        tierDifference = Math.abs(tierDifference) > 2.5 ? (tierDifference > 0 ? 2.5 : -2.5) : tierDifference;
 
-            addedDamage += itemStack.getEnchantmentLevel(enchantment);
+        /*
+        This applies secondary enchantments, that is, it applies enchantments that only affect specific mob types
+        such as smite which only works with undead mobs
+         */
+        double bonusSecondaryEnchantmentDamage = 3 * secondaryEnchantmentDamageIncrease(player.getInventory().getItemInMainHand(), eliteMob);
+        double newTargetHitsToKill = TARGET_HITS_TO_KILL - bonusSecondaryEnchantmentDamage;
 
-        }
+        double finalDamage = getCooledAttackStrength(player) * (maxHealth / newTargetHitsToKill +
+                maxHealth / newTargetHitsToKill * (tierDifference) * TO_ELITE_DAMAGE_TIER_HANDICAP);
 
-        return addedDamage;
+        /*
+        Make sure that players are dealing at least 1 damage as to not create unkillable bosses
+         */
+        return finalDamage < 1 ? 1 : finalDamage;
 
     }
 
-    private int addedOtherItemEnchantmentComparator(ItemStack itemStack, LivingEntity livingEntity) {
+    /*
+    This deals with cooldown damage reduction based on the default cooldown property of minecraft and a custom
+    cooldown penalty on top of it (just linear)
+     */
+    private float getCooledAttackStrength(Player player) {
 
-        int addedDamage = 0;
+        if (!playerHitCooldownHashMap.containsKey(player)) return 1;
 
-        if (itemStack.containsEnchantment(Enchantment.DAMAGE_ALL)) {
+        float swingDelay = player.getWorld().getFullTime() - playerHitCooldownHashMap.get(player);
+        float cooldownPeriod = getCooldownPeriod(player);
 
-            addedDamage += itemStack.getEnchantmentLevel(Enchantment.DAMAGE_ALL);
+        if (swingDelay > cooldownPeriod) return 1;
 
-        }
+        return swingDelay / cooldownPeriod;
 
-        if (livingEntity instanceof Spider) {
+    }
 
-            if (itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)) {
+    /*
+    This part is pretty much a copy of how Minecraft does the cooldown check
+     */
+    private float getCooldownPeriod(Player player) {
 
-                addedDamage += itemStack.getEnchantmentLevel(Enchantment.DAMAGE_ARTHROPODS);
+        return (float) (1.0D / player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue() * 20.0D);
+
+    }
+
+
+    /*
+    This deals with damage increases specific to specific mob types
+    It returns a percentage where 0 is no relevant enchantment present and 1 is maximum potential level reached for
+    relevant enchantment
+     */
+    private double secondaryEnchantmentDamageIncrease(ItemStack weapon, LivingEntity eliteMob) {
+
+        for (Enchantment enchantment : weapon.getEnchantments().keySet()) {
+
+            if (enchantment.getName().equals(Enchantment.DAMAGE_ARTHROPODS.getName()) && (eliteMob instanceof Spider || eliteMob instanceof Silverfish)) {
+
+                return getDamageIncreasePercentage(enchantment, weapon);
+
+            }
+
+            if (enchantment.getName().equals(Enchantment.DAMAGE_UNDEAD.getName()) && (eliteMob instanceof Zombie || eliteMob instanceof Skeleton)) {
+
+                return getDamageIncreasePercentage(enchantment, weapon);
 
             }
 
         }
 
-        if (livingEntity instanceof Zombie || livingEntity instanceof Skeleton || livingEntity instanceof Wither || livingEntity instanceof SkeletonHorse) {
-
-            if (itemStack.containsEnchantment(Enchantment.DAMAGE_UNDEAD)) {
-
-                addedDamage += itemStack.getEnchantmentLevel(Enchantment.DAMAGE_UNDEAD);
-
-            }
-
-        }
-
-        return addedDamage;
+        return 0;
 
     }
 
-    private int addedPotionEffect(Player player) {
+    private double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
 
-        int addedDamage = 0;
+        double maxEnchantmentLevel = getMaxEnchantmentLevel(enchantment);
+        double currentEnchantmentLevel = weapon.getEnchantmentLevel(enchantment);
 
-        if (player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
+        return currentEnchantmentLevel / maxEnchantmentLevel <= 1 ? currentEnchantmentLevel / maxEnchantmentLevel : 1;
 
-            addedDamage += player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE).getAmplifier() + 1;
+    }
 
-        }
+    private int getMaxEnchantmentLevel(Enchantment enchantment) {
 
-        return addedDamage;
+        return ConfigValues.itemsProceduralSettingsConfig.getInt("Valid Enchantments." + enchantment.getName() + ".Max Level");
+
+    }
+
+    private HashMap<Player, Long> playerHitCooldownHashMap = new HashMap<>();
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerInteract(PlayerInteractEvent event) {
+
+        if (!(event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK) ||
+                event.getAction().equals(Action.PHYSICAL))) return;
+
+        playerHitCooldownHashMap.put(event.getPlayer(), event.getPlayer().getWorld().getFullTime());
 
     }
 

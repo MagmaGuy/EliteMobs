@@ -166,15 +166,15 @@ public class EconomySettingsConfig {
 
     public void initializeConfig() {
 
-        double diamondLevel = DamageAdjuster.DIAMOND_TIER_LEVEL / 4;
-        double ironLevel = DamageAdjuster.IRON_TIER_LEVEL / 4;
-        double stoneChainLevel = DamageAdjuster.STONE_CHAIN_TIER_LEVEL / 4;
-        double goldWoodLeatherLevel = DamageAdjuster.GOLD_WOOD_LEATHER_TIER_LEVEL / 4;
+        double diamondLevel = DamageAdjuster.DIAMOND_TIER_LEVEL + 10;
+        double ironLevel = DamageAdjuster.IRON_TIER_LEVEL + 10;
+        double stoneChainLevel = DamageAdjuster.STONE_CHAIN_TIER_LEVEL + 10;
+        double goldWoodLeatherLevel = DamageAdjuster.GOLD_WOOD_LEATHER_TIER_LEVEL + 10;
 
         configuration.addDefault(ENABLE_ECONOMY, true);
         configuration.addDefault(RESALE_VALUE, 5);
         configuration.addDefault(LOWEST_PROCEDURALLY_SIMULATED_LOOT, 1);
-        configuration.addDefault(HIGHEST_PROCEDURALLY_SIMULATED_LOOT, 2000);
+        configuration.addDefault(HIGHEST_PROCEDURALLY_SIMULATED_LOOT, 250);
         configuration.addDefault(CURRENCY_NAME, "Elite Coins");
         configuration.addDefault(SHOP_NAME, "EliteMobs Shop");
         configuration.addDefault(CUSTOM_SHOP_NAME, "EliteMobs Custom Shop");

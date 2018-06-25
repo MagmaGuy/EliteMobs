@@ -25,6 +25,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -32,47 +33,56 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class HealthDisplay implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onHitArmorStand(EntityDamageEvent event) {
+
+        if (event.getEntity() instanceof ArmorStand && event.getEntity().hasMetadata(MetadataHandler.ARMOR_STAND_DISPLAY))
+            event.setCancelled(true);
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onHit(EntityDamageEvent event) {
 
         if (event.isCancelled()) return;
+
         if (!(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof ArmorStand) return;
 
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_HEALTH_FOR_ELITE_MOBS)) {
 
             if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
 
-                displayHealth((LivingEntity) event.getEntity());
+                displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
 
             }
 
         } else {
 
-            displayHealth((LivingEntity) event.getEntity());
+            displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
 
         }
 
     }
 
-    public static void displayHealth(LivingEntity livingEntity) {
+    public static void displayHealth(LivingEntity livingEntity, double damage) {
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_HEALTH_DISPLAY)) return;
 
         int maxHealth = (int) livingEntity.getMaxHealth();
-        int currentHealth = (int) livingEntity.getHealth();
+        int currentHealth = (int) (livingEntity.getHealth() - damage);
 
         Location entityLocation = new Location(livingEntity.getWorld(), livingEntity.getLocation().getX(),
                 livingEntity.getLocation().getY() + livingEntity.getEyeHeight() + 0.5, livingEntity.getLocation().getZ());
 
         ArmorStand armorStand = (ArmorStand) entityLocation.getWorld().spawnEntity(entityLocation, EntityType.ARMOR_STAND);
 
+        armorStand.setVisible(false);
         armorStand.setMarker(true);
         armorStand.setCustomName(setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
         armorStand.setCustomNameVisible(true);
         armorStand.setGravity(false);
         armorStand.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY,
                 new FixedMetadataValue(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), true));
-        armorStand.setVisible(false);
 
         new BukkitRunnable() {
 

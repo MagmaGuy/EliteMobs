@@ -17,8 +17,8 @@ package com.magmaguy.elitemobs.commands.shops;
 
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
-import com.magmaguy.elitemobs.elitedrops.ItemWorthCalculator;
-import com.magmaguy.elitemobs.elitedrops.ObfuscatedSignatureLoreData;
+import com.magmaguy.elitemobs.items.ItemWorthCalculator;
+import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

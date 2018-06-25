@@ -18,7 +18,6 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import org.bukkit.entity.Entity;
 
 import static org.bukkit.Bukkit.getLogger;
-import static org.bukkit.Bukkit.recipeIterator;
 
 /**
  * Created by MagmaGuy on 02/11/2016.

@@ -15,13 +15,13 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static com.magmaguy.elitemobs.elitedrops.CustomItemConstructor.customItemList;
+import static com.magmaguy.elitemobs.items.CustomItemConstructor.customItemList;
 
 /**
  * Created by MagmaGuy on 01/05/2017.

@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.elitedrops;
+package com.magmaguy.elitemobs.items;
 
 import com.google.common.collect.Lists;
 import com.magmaguy.elitemobs.ChatColorConverter;
@@ -177,10 +177,12 @@ public class CustomItemConstructor implements Listener {
             itemMeta.setLore(tempLore);
             itemStack.setItemMeta(itemMeta);
 
-            List<String> structuredLore = Lists.newArrayList(ConfigValues.itemsCustomLootSettingsConfig.getString(ItemsCustomLootSettingsConfig.LORE_STRUCTURE).split("\n"));
+            List structuredLore = ConfigValues.itemsCustomLootSettingsConfig.getList(ItemsCustomLootSettingsConfig.LORE_STRUCTURE);
             List<String> parsedStructuredLore = new ArrayList<>();
 
-            for (String string : structuredLore) {
+            for (Object object : structuredLore) {
+
+                String string = object.toString();
 
                 if (string.contains("$potionEffect")) {
 
@@ -215,6 +217,14 @@ public class CustomItemConstructor implements Listener {
                     if (loreWorthParser(itemStack) != null) {
 
                         parsedStructuredLore.add(ChatColorConverter.chatColorConverter(loreWorthParser(itemStack)));
+
+                    }
+
+                } else if (string.contains("$itemTier")) {
+
+                    if (ConfigValues.itemsCustomLootSettingsConfig.getBoolean(ItemsCustomLootSettingsConfig.SHOW_ITEM_TIER)) {
+
+                        parsedStructuredLore.add(ChatColorConverter.chatColorConverter(string.replace("$itemTier", "Tier " + ItemTierFinder.findItemTier(itemStack))));
 
                     }
 
@@ -452,24 +462,23 @@ public class CustomItemConstructor implements Listener {
 
     private void rankedItemMapCreator(ItemStack itemStack) {
 
-        double itemWorth = ItemWorthCalculator.determineItemWorth(itemStack);
-        int itemRank = (int) (itemWorth / 10);
+        int itemTier = (int) ItemTierFinder.findItemTier(itemStack);
 
-        if (dynamicRankedItemStacks.get(itemRank) == null) {
+        if (dynamicRankedItemStacks.get(itemTier) == null) {
 
             List<ItemStack> list = new ArrayList<>();
 
             list.add(itemStack);
 
-            dynamicRankedItemStacks.put(itemRank, list);
+            dynamicRankedItemStacks.put(itemTier, list);
 
         } else {
 
-            List<ItemStack> list = dynamicRankedItemStacks.get(itemRank);
+            List<ItemStack> list = dynamicRankedItemStacks.get(itemTier);
 
             list.add(itemStack);
 
-            dynamicRankedItemStacks.put(itemRank, list);
+            dynamicRankedItemStacks.put(itemTier, list);
 
         }
 

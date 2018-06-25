@@ -218,7 +218,7 @@ public class MetadataHandler implements Listener {
             ZOMBIE_BLOAT_MD,
             SKELETON_PILLAR_MD
     ));
-    public static List<String> forMetadataList = new ArrayList<>(Arrays.asList( //add major and minor power lists
+    private static List<String> forMetadataList = new ArrayList<>(Arrays.asList( //add major and minor power lists
             ELITE_MOB_MD,
             PASSIVE_ELITE_MOB_MD,
             NATURAL_MOB_MD,

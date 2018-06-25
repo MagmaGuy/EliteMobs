@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.elitedrops.CustomItemConstructor;
+import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -15,9 +15,11 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.elitedrops.ProceduralItemGenerator;
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.items.ItemDropper;
+import com.magmaguy.elitemobs.items.ProceduralItemGenerator;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  * Created by MagmaGuy on 08/06/2017.
@@ -26,18 +28,17 @@ public class SimLootHandler {
 
     public void simLoot(Player player, int level) {
 
-        level = level;
-
         if (level < 1) {
 
             level = 0;
 
         }
 
-        ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
-        ItemStack randomItem = proceduralItemGenerator.randomItemGeneratorCommand(level);
+        ItemDropper proceduralItemGenerator = new ItemDropper();
 
-        player.getInventory().addItem(randomItem);
+        player.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, level));
+        proceduralItemGenerator.determineItemTier(player);
+        player.removeMetadata(MetadataHandler.ELITE_MOB_MD, MetadataHandler.PLUGIN);
 
     }
 

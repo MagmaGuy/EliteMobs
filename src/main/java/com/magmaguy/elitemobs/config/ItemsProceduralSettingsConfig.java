@@ -31,7 +31,8 @@ public class ItemsProceduralSettingsConfig {
     public static final String LORE_WORTH = "Item worth (line 2)";
     public static final String LORE_RESALE_WORTH = "Item resale worth (line 2)";
     public static final String LORE_SIGNATURE = "Elite Mobs drop (line 3)";
-    public static final String LORE_STRUCTURE = "Lore structure";
+    public static final String LORE_TIER = "Tier level (line 4)";
+    public static final String LORE_STRUCTURE = "Lore structure (you can delete and add elements)";
     public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
     public static final String MONITOR_ITEMS_ON_CONSOLE = "Monitor procedurally generated items on console";
     public static final String PROCEDURAL_ITEM_VALID_MATERIALS = "Valid material list for random items";
@@ -66,7 +67,7 @@ public class ItemsProceduralSettingsConfig {
             VANISHING_CURSE_BOOL,
             WATER_WORKER_BOOL, WATER_WORKER_MAX_LEVEL;
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
     public void intializeConfig() {
 
@@ -77,7 +78,15 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(LORE_WORTH, "Worth $worth $currencyName");
         configuration.addDefault(LORE_RESALE_WORTH, "$resale $currencyName resale value");
         configuration.addDefault(LORE_SIGNATURE, "Elite Mobs drop");
-        configuration.addDefault(LORE_STRUCTURE, ChatColorConverter.chatColorConverter("&m----------------------\n $line1 \n $line2 \n $line3 \n&m----------------------"));
+        configuration.addDefault(LORE_TIER, "Tier $tier");
+        configuration.addDefault(LORE_STRUCTURE, Arrays.asList(
+                ChatColorConverter.chatColorConverter("&m----------------------"),
+                ChatColorConverter.chatColorConverter(" $line1 "),
+                ChatColorConverter.chatColorConverter( " $line2 "),
+                ChatColorConverter.chatColorConverter(" $line3 "),
+                ChatColorConverter.chatColorConverter("&m----------------------"),
+                ChatColorConverter.chatColorConverter(" $line4 ")
+        ));
         configuration.addDefault(PROCEDURAL_ITEM_VALID_MATERIALS, Arrays.asList(
                 "DIAMOND_SWORD",
                 "GOLD_SWORD",

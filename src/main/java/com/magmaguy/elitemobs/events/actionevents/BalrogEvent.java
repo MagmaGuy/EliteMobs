@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.Balrog;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +18,7 @@ public class BalrogEvent implements Listener {
     public void onMine(BlockBreakEvent event) {
 
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
+        if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
 //        if (!event.getPlayer().hasPermission("elitemobs.events.balrog")) return;
         if (!(event.getBlock().getType().equals(Material.DIAMOND_ORE) || event.getBlock().getType().equals(Material.IRON_ORE) ||
                 event.getBlock().getType().equals(Material.COAL_ORE) || event.getBlock().getType().equals(Material.REDSTONE_ORE) ||

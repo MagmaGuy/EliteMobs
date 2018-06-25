@@ -20,10 +20,10 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
-import com.magmaguy.elitemobs.elitedrops.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.EventMessage;
+import com.magmaguy.elitemobs.items.ItemDropper;
+import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
@@ -106,13 +106,13 @@ public class TreasureGoblin implements Listener {
 
         if (event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN)) {
 
-            EliteDropsDropper eliteDropsDropper = new EliteDropsDropper();
+            ItemDropper itemDropper = new ItemDropper();
 
             Entity entity = event.getEntity();
 
             for (int i = 0; i < ConfigValues.eventsConfig.getInt(EventsConfig.SMALL_TREASURE_GOBLIN_REWARD); i++) {
 
-                eliteDropsDropper.dropItem(entity);
+                itemDropper.determineItemTier((LivingEntity) entity);
 
             }
 
