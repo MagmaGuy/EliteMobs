@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.LivingEntity;
@@ -53,6 +54,9 @@ public class DefaultDropsHandler implements Listener {
             List<ItemStack> droppedItems = event.getDrops();
             int mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
                     ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.DEFAULT_LOOT_MULTIPLIER));
+
+            if (mobLevel > ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER))
+                mobLevel = ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER);
 
             inventoryItemsConstructor(event.getEntity());
 

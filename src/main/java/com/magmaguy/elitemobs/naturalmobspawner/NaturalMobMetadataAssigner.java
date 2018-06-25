@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.naturalmobspawner;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
-import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;

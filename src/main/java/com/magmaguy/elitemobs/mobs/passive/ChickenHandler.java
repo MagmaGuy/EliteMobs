@@ -16,7 +16,7 @@
 package com.magmaguy.elitemobs.mobs.passive;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.elitedrops.ItemDropVelocity;
+import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;

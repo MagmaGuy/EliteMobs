@@ -13,13 +13,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.elitedrops;
+package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -28,31 +30,115 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by MagmaGuy on 04/06/2017.
  */
-public class EliteDropsDropper implements Listener {
+public class ItemDropper implements Listener {
 
     private Random random = new Random();
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
-        if (!ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_PLUGIN_LOOT)) return;
-
         Entity entity = event.getEntity();
 
+        if (entity == null) return;
         if (!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) ||
                 !entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
 
         if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) return;
 
-        dropItem(entity);
+        determineItemTier((LivingEntity) entity);
 
     }
 
-    public void dropItem(Entity entity) {
+    public void determineItemTier(LivingEntity entity) {
+
+        int mobTier = (int) MobTierFinder.findMobTier(entity);
+
+        if (mobTier == 0) {
+
+            generateItem(entity, mobTier);
+            return;
+
+        }
+
+        generateTieredItem(mobTier, entity);
+    }
+
+    public void generateTieredItem(int mobTier, LivingEntity entity) {
+
+        double chanceToUpgradeTier = 1 / (double) mobTier * ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER);
+
+//        Bukkit.getLogger().info("Chance to upgrade: " + chanceToUpgradeTier);
+//        Bukkit.getLogger().info("Mob Tier: " + mobTier);
+//        Bukkit.getLogger().info("Max loot tier: " + ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER));
+
+        if (ThreadLocalRandom.current().nextDouble() * 100 < chanceToUpgradeTier) {
+
+            generateItem(entity, mobTier + 1);
+            return;
+
+        }
+
+        double diceRoll = ThreadLocalRandom.current().nextDouble();
+
+        if (diceRoll < 0.20) {
+
+            generateItem(entity, mobTier);
+            return;
+
+        }
+
+        if (diceRoll < 0.40) {
+
+            mobTier -= 1;
+
+            if (mobTier < 0) mobTier = 0;
+
+            generateItem(entity, mobTier);
+            return;
+
+        }
+
+        if (diceRoll < 0.60) {
+
+            mobTier -= 2;
+
+            if (mobTier < 0) mobTier = 0;
+
+            generateItem(entity, mobTier);
+            return;
+
+        }
+
+        if (diceRoll < 0.80) {
+
+            mobTier -= 3;
+
+            if (mobTier < 0) mobTier = 0;
+
+            generateItem(entity, mobTier);
+            return;
+
+        }
+
+        if (diceRoll < 1.00) {
+
+            mobTier -= 4;
+
+            if (mobTier < 0) mobTier = 0;
+
+            generateItem(entity, mobTier);
+            return;
+
+        }
+
+    }
+
+    public void generateItem(LivingEntity entity, int itemTier) {
 
         //remember that this is used by other classes, like the extra loot power
         double chanceToDrop = ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.ELITE_ITEM_FLAT_DROP_RATE) / 100 +
@@ -67,15 +153,11 @@ public class EliteDropsDropper implements Listener {
 
         boolean staticCustomItemsExist = CustomItemConstructor.staticCustomItemHashMap.size() > 0;
 
-        int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
-
-        if (mobLevel < 1) mobLevel = 0;
-
-        boolean customDynamicDropExists = CustomItemConstructor.dynamicRankedItemStacks.containsKey((int) (ItemWorthCalculator.targetItemWorth(mobLevel) / 10));
+        boolean customDynamicDropExists = CustomItemConstructor.dynamicRankedItemStacks.containsKey(itemTier);
 
         if (proceduralItemsOn && !customItemsOn) {
 
-            dropProcedurallyGeneratedItem(mobLevel, entity);
+            dropProcedurallyGeneratedItem(itemTier, entity);
             return;
 
         }
@@ -97,7 +179,7 @@ public class EliteDropsDropper implements Listener {
 
             if (customDynamicDropExists && !staticCustomItemsExist) {
 
-                dropCustomDynamicLoot(mobLevel, entity);
+                dropCustomDynamicLoot(itemTier, entity);
 
             }
 
@@ -110,7 +192,7 @@ public class EliteDropsDropper implements Listener {
                 String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
-                    dropCustomDynamicLoot(mobLevel, entity);
+                    dropCustomDynamicLoot(itemTier, entity);
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT))
                     dropCustomStaticLoot(entity);
 
@@ -124,7 +206,7 @@ public class EliteDropsDropper implements Listener {
 
             if (!customDynamicDropExists && !staticCustomItemsExist) {
 
-                dropProcedurallyGeneratedItem(mobLevel, entity);
+                dropProcedurallyGeneratedItem(itemTier, entity);
                 return;
 
             }
@@ -138,7 +220,7 @@ public class EliteDropsDropper implements Listener {
                 String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT))
-                    dropProcedurallyGeneratedItem(mobLevel, entity);
+                    dropProcedurallyGeneratedItem(itemTier, entity);
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT))
                     dropCustomStaticLoot(entity);
 
@@ -155,9 +237,9 @@ public class EliteDropsDropper implements Listener {
                 String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT))
-                    dropProcedurallyGeneratedItem(mobLevel, entity);
+                    dropProcedurallyGeneratedItem(itemTier, entity);
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
-                    dropCustomDynamicLoot(mobLevel, entity);
+                    dropCustomDynamicLoot(itemTier, entity);
 
                 return;
 
@@ -173,9 +255,9 @@ public class EliteDropsDropper implements Listener {
                 String selectedLootSystem = pickWeighedLootSystem(weighedConfigValues);
 
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT))
-                    dropProcedurallyGeneratedItem(mobLevel, entity);
+                    dropProcedurallyGeneratedItem(itemTier, entity);
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_DYNAMIC_ITEM_WEIGHT))
-                    dropCustomDynamicLoot(mobLevel, entity);
+                    dropCustomDynamicLoot(itemTier, entity);
                 if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT))
                     dropCustomStaticLoot(entity);
 
@@ -219,15 +301,15 @@ public class EliteDropsDropper implements Listener {
 
     }
 
-    private void dropCustomDynamicLoot(int mobLevel, Entity entity) {
+    private void dropCustomDynamicLoot(int itemTier, Entity entity) {
 
-        double targetItemWorth = ItemWorthCalculator.targetItemWorth(mobLevel);
-        int itemRank = (int) (targetItemWorth / 10);
+//        double targetItemWorth = ItemWorthCalculator.targetItemWorth(itemTier);
+//        int itemRank = (int) (targetItemWorth / 10);
 
-        int randomCustomDrop = random.nextInt(CustomItemConstructor.dynamicRankedItemStacks.get(itemRank).size());
+        int randomCustomDrop = random.nextInt(CustomItemConstructor.dynamicRankedItemStacks.get(itemTier).size());
 
         //get rank matching randomizer and item matching randomized index
-        entity.getWorld().dropItem(entity.getLocation(), CustomItemConstructor.dynamicRankedItemStacks.get(itemRank).get(randomCustomDrop));
+        entity.getWorld().dropItem(entity.getLocation(), CustomItemConstructor.dynamicRankedItemStacks.get(itemTier).get(randomCustomDrop));
 
     }
 
@@ -261,10 +343,10 @@ public class EliteDropsDropper implements Listener {
 
     }
 
-    private void dropProcedurallyGeneratedItem(int mobLevel, Entity entity) {
+    public void dropProcedurallyGeneratedItem(int tierLevel, Entity entity) {
 
         ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
-        ItemStack randomLoot = proceduralItemGenerator.proceduralItemGenerator(mobLevel, entity);
+        ItemStack randomLoot = proceduralItemGenerator.tieredProceduralItemGenerator(tierLevel, entity);
 
         entity.getWorld().dropItem(entity.getLocation(), randomLoot);
 

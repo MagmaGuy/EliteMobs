@@ -16,10 +16,8 @@
 package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Zombie;
 
 import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customAggressiveName;
 

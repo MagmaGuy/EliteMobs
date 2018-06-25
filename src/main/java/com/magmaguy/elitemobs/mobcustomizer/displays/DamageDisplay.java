@@ -31,13 +31,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.util.Random;
 
 public class DamageDisplay implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onHitArmorStand(EntityDamageEvent event) {
+
+        if (event.getEntity() instanceof ArmorStand && event.getEntity().hasMetadata(MetadataHandler.ARMOR_STAND_DISPLAY))
+            event.setCancelled(true);
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onHit(EntityDamageEvent event) {
 
         if (event.isCancelled()) return;
@@ -48,13 +55,13 @@ public class DamageDisplay implements Listener {
 
             if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
 
-                if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getDamage());
+                if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getFinalDamage());
 
             }
 
         } else {
 
-            if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getDamage());
+            if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getFinalDamage());
 
         }
 
@@ -74,6 +81,7 @@ public class DamageDisplay implements Listener {
 
         ArmorStand armorStand = (ArmorStand) newLocation.getWorld().spawnEntity(newLocation, EntityType.ARMOR_STAND);
 
+        armorStand.setVisible(false);
         armorStand.setMarker(true);
         int newDisplayDamage = (int) damage;
         armorStand.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + "" + newDisplayDamage + "");
@@ -81,8 +89,6 @@ public class DamageDisplay implements Listener {
         armorStand.setGravity(false);
         armorStand.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY,
                 new FixedMetadataValue(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), true));
-        armorStand.setVisible(false);
-        armorStand.setVelocity(new Vector(0, 3, 0));
 
         new BukkitRunnable() {
 

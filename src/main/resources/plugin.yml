@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.5.0
+version: 6.5.1
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -29,7 +29,6 @@ permissions:
       elitemobs.currency.add: true
       elitemobs.currency.cointop: true
       elitemobs.scoreboard: false
-      elitemobs.config: true
       elitemobs.events.*: true
     default: op
   elitemobs.currency.user:
@@ -45,6 +44,14 @@ permissions:
       children:
         elitemobs.killall.aggressiveelites: true
         elitemobs.killall.passiveelites: true
+  elitemobs.user:
+      description: Gives access to all recommended user commands
+      children:
+        elitemobs.stats: true
+        elitemobs.events.kraken: true
+        elitemobs.events.balrog: true
+        elitemobs.events.fae: true
+        elitemobs.checktier: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -108,8 +115,6 @@ permissions:
   elitemobs.currency.cointop:
     description: Allows players to run /elitemobs highscore
     default: op
-  elitemobs.conf:
-    description: Allows players to run /elitemobs config
     default: op
   elitemobs.events.*:
     description: Allows players to launch all events
@@ -132,3 +137,15 @@ permissions:
   elitemobs.events.fae:
     description: Allows players to randomly trigger the Fae event when chopping down trees
     default: true
+  elitemobs.config.setmaxtier:
+    description: Allows players to run /elitemobs setmaxtier [tier]
+    default: op
+  elitemobs.checktier:
+    description: Allows players to run /elitemobs checktier
+    default: op
+  elitemobs.checkmaxtier:
+    description: Allows players to run /elitemobs checkmaxtier
+    default: op
+  elitemobs.gettier:
+    description: Allows players tu run /elitemobs gettier [tier]
+    default: op

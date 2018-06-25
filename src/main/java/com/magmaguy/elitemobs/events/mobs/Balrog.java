@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.events.mobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
-import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import org.bukkit.Location;

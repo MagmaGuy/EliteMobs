@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.elitedrops;
+package com.magmaguy.elitemobs.items;
 
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;

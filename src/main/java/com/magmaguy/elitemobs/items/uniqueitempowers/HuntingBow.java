@@ -13,12 +13,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.elitedrops.uniqueitempowers;
+package com.magmaguy.elitemobs.items.uniqueitempowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
-import com.magmaguy.elitemobs.elitedrops.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

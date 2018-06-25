@@ -16,11 +16,12 @@
 package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.elitedrops.EliteDropsDropper;
+import com.magmaguy.elitemobs.items.ItemDropper;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -58,10 +59,10 @@ public class BonusLoot extends MinorPowers implements Listener {
 
             Entity entity = event.getEntity();
 
-            EliteDropsDropper eliteDropsDropper = new EliteDropsDropper();
+            ItemDropper itemDropper = new ItemDropper();
 
             //drops item
-            eliteDropsDropper.dropItem(entity);
+            itemDropper.determineItemTier((LivingEntity) entity);
 
         }
 
