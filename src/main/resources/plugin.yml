@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.5.1
+version: 6.5.2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -7,7 +7,7 @@ commands:
   elitemobs:
     description: Catch-all command
     usage: /elitemobs
-    aliases: [em]
+    aliases: [em, adventurerguild, adventurersguild, ag]
 permissions:
   elitemobs.*:
     description: Gives access to all elitemobs commands
@@ -52,6 +52,8 @@ permissions:
         elitemobs.events.balrog: true
         elitemobs.events.fae: true
         elitemobs.checktier: true
+        elitemobs.adventurersguild: true
+        elitemobs.currency.user: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -149,3 +151,9 @@ permissions:
   elitemobs.gettier:
     description: Allows players tu run /elitemobs gettier [tier]
     default: op
+  elitemobs.versionnotification:
+    description: Allows players to get notified about plugin updates
+    default: op
+  elitemobs.adventurersguild:
+    description: Allows players to use the /ag command to set their difficulty level and get quests
+    default: true

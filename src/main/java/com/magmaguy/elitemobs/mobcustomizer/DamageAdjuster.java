@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierFinder;
+import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -37,6 +38,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
@@ -226,10 +228,6 @@ public class DamageAdjuster implements Listener {
         if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
         if (!event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
 
-            for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
-                if (event.isApplicable(modifier))
-                    event.setDamage(modifier, 0);
-
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
 
         }
@@ -328,7 +326,7 @@ public class DamageAdjuster implements Listener {
 
         if (!playerHitCooldownHashMap.containsKey(player)) return 1;
 
-        float swingDelay = player.getWorld().getFullTime() - playerHitCooldownHashMap.get(player);
+        float swingDelay = clock - playerHitCooldownHashMap.get(player);
         float cooldownPeriod = getCooldownPeriod(player);
 
         if (swingDelay > cooldownPeriod) return 1;
@@ -343,6 +341,25 @@ public class DamageAdjuster implements Listener {
     private float getCooldownPeriod(Player player) {
 
         return (float) (1.0D / player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue() * 20.0D);
+
+    }
+
+    private static int clock = 0;
+
+    public static void launchInternalClock () {
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                if (clock == Integer.MAX_VALUE) clock = 0;
+
+                clock++;
+
+            }
+
+        }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
 
     }
 
@@ -389,7 +406,7 @@ public class DamageAdjuster implements Listener {
 
     }
 
-    private HashMap<Player, Long> playerHitCooldownHashMap = new HashMap<>();
+    private HashMap<Player, Integer> playerHitCooldownHashMap = new HashMap<>();
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -397,7 +414,7 @@ public class DamageAdjuster implements Listener {
         if (!(event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK) ||
                 event.getAction().equals(Action.PHYSICAL))) return;
 
-        playerHitCooldownHashMap.put(event.getPlayer(), event.getPlayer().getWorld().getFullTime());
+        playerHitCooldownHashMap.put(event.getPlayer(), clock);
 
     }
 

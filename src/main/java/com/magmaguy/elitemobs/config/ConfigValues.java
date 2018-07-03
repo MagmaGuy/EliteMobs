@@ -26,7 +26,7 @@ public class ConfigValues {
 
     public static Configuration defaultConfig, itemsCustomLootListConfig, mobPowerConfig, translationConfig, itemsProceduralSettingsConfig,
             economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, validMobsConfig, validWorldsConfig, itemsUniqueConfig,
-            mobCombatSettingsConfig, itemsDropSettingsConfig;
+            mobCombatSettingsConfig, itemsDropSettingsConfig, playerMoneyData, playerRankData, playerMaxRankData;
 
     public static void initializeConfigValues() {
 
@@ -35,7 +35,7 @@ public class ConfigValues {
         defaultConfig = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
 
         customConfigLoader = new CustomConfigLoader();
-        itemsCustomLootListConfig = customConfigLoader.getCustomConfig(ItemsCustomLootListConfig.CONFIG_NAME);
+        itemsCustomLootListConfig = customConfigLoader.getCustomConfig(ItemsCustomLootListConfig.CONFIG_NAME, true);
 
         customConfigLoader = new CustomConfigLoader();
         mobPowerConfig = customConfigLoader.getCustomConfig(MobPowersConfig.CONFIG_NAME);
@@ -53,7 +53,16 @@ public class ConfigValues {
         economyConfig = customConfigLoader.getCustomConfig(EconomySettingsConfig.CONFIG_NAME);
 
         customConfigLoader = new CustomConfigLoader();
-        playerCacheConfig = customConfigLoader.getCustomConfig(PlayerCacheConfig.CONFIG_NAME);
+        playerCacheConfig = customConfigLoader.getCustomConfig(PlayerCacheData.CONFIG_NAME, true);
+
+        customConfigLoader = new CustomConfigLoader();
+        playerMoneyData = customConfigLoader.getCustomConfig(PlayerMoneyData.CONFIG_NAME, true);
+
+        customConfigLoader = new CustomConfigLoader();
+        playerRankData = customConfigLoader.getCustomConfig(PlayerGuildRank.CONFIG_NAME, true);
+
+        customConfigLoader = new CustomConfigLoader();
+        playerMaxRankData = customConfigLoader.getCustomConfig(PlayerMaxGuildRank.CONFIG_NAME, true);
 
         customConfigLoader = new CustomConfigLoader();
         eventsConfig = customConfigLoader.getCustomConfig(EventsConfig.CONFIG_NAME);
@@ -72,6 +81,61 @@ public class ConfigValues {
 
         customConfigLoader = new CustomConfigLoader();
         itemsDropSettingsConfig = customConfigLoader.getCustomConfig(ItemsDropSettingsConfig.CONFIG_NAME);
+
+    }
+
+    public static void intializeConfigurations(){
+
+        DefaultConfig defaultConfig = new DefaultConfig();
+        defaultConfig.loadConfiguration();
+
+        MobPowersConfig mobPowersConfig = new MobPowersConfig();
+        mobPowersConfig.initializeConfig();
+
+        ItemsCustomLootListConfig itemsCustomLootListConfig = new ItemsCustomLootListConfig();
+        itemsCustomLootListConfig.intializeConfig();
+
+        ItemsCustomLootSettingsConfig itemsCustomLootSettingsConfig = new ItemsCustomLootSettingsConfig();
+        itemsCustomLootSettingsConfig.initializeConfig();
+
+        TranslationConfig translationConfig = new TranslationConfig();
+        translationConfig.initializeConfig();
+
+        ItemsProceduralSettingsConfig itemsProceduralSettingsConfig = new ItemsProceduralSettingsConfig();
+        itemsProceduralSettingsConfig.intializeConfig();
+
+        EconomySettingsConfig economySettingsConfig = new EconomySettingsConfig();
+        economySettingsConfig.initializeConfig();
+
+        PlayerMoneyData playerMoneyData = new PlayerMoneyData();
+        playerMoneyData.intializeConfig();
+
+        PlayerCacheData playerCacheData = new PlayerCacheData();
+        playerCacheData.initializeConfig();
+
+        EventsConfig eventsConfig = new EventsConfig();
+        eventsConfig.initializeConfig();
+
+        ValidWorldsConfig validWorldsConfig = new ValidWorldsConfig();
+        validWorldsConfig.initializeConfig();
+
+        ValidMobsConfig validMobsConfig = new ValidMobsConfig();
+        validMobsConfig.initializeConfig();
+
+        ItemsUniqueConfig itemsUniqueConfig = new ItemsUniqueConfig();
+        itemsUniqueConfig.initializeConfig();
+
+        MobCombatSettingsConfig mobCombatSettingsConfig = new MobCombatSettingsConfig();
+        mobCombatSettingsConfig.initializeConfig();
+
+        ItemsDropSettingsConfig itemsDropSettingsConfig = new ItemsDropSettingsConfig();
+        itemsDropSettingsConfig.initializeConfig();
+
+        PlayerGuildRank playerGuildRank = new PlayerGuildRank();
+        playerGuildRank.intializeConfig();
+
+        PlayerMaxGuildRank playerMaxGuildRank = new PlayerMaxGuildRank();
+        playerMaxGuildRank.intializeConfig();
 
     }
 

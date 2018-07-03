@@ -18,20 +18,20 @@ package com.magmaguy.elitemobs.config;
 import org.bukkit.configuration.Configuration;
 
 /**
- * Created by MagmaGuy on 17/06/2017.
+ * Created by MagmaGuy on 02/07/2017.
  */
-public class PlayerMoneyDataConfig {
+public class PlayerCacheData {
 
-    public static final String CONFIG_NAME = "playerMoneyData.yml";
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    public static final String CONFIG_NAME = "playerCache.yml";
+    public CustomConfigLoader customConfigLoader = new CustomConfigLoader();
+    public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME, true);
 
-    public void intializeConfig() {
+    public void initializeConfig() {
 
         //no real defaults, just a data file
-        customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME);
+        customConfigLoader.getCustomConfig(CONFIG_NAME, true).options().copyDefaults(true);
+        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME, true);
+        customConfigLoader.saveCustomConfig(CONFIG_NAME, true);
 
     }
 

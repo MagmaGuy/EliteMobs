@@ -53,7 +53,9 @@ public class CustomConfigConstructor extends YamlConfiguration {
      */
     public CustomConfigConstructor(String fileName, String defaultsName) {
         this.defaults = defaultsName;
-        this.file = new File(plugin.getDataFolder(), fileName);
+        File newFile = new File(plugin.getDataFolder().getPath()+"/data");
+        Bukkit.getLogger().info("ATTENTION: " + newFile.toString());
+        this.file = new File(newFile, fileName);
         reload();
     }
 

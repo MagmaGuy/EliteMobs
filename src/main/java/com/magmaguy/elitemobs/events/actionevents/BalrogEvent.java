@@ -17,6 +17,7 @@ public class BalrogEvent implements Listener {
     @EventHandler
     public void onMine(BlockBreakEvent event) {
 
+        if (event.isCancelled()) return;
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
 //        if (!event.getPlayer().hasPermission("elitemobs.events.balrog")) return;

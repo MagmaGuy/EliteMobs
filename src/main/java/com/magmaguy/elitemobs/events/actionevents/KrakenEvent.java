@@ -17,6 +17,7 @@ public class KrakenEvent implements Listener {
     @EventHandler
     public void onFishingStart(PlayerFishEvent event) {
 
+        if (event.isCancelled()) return;
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
 //        if (!event.getPlayer().hasPermission("elitemobs.events.kraken")) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
