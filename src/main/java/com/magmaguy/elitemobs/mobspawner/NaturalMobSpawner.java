@@ -13,15 +13,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.naturalmobspawner;
+package com.magmaguy.elitemobs.mobspawner;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.commands.CheckTierCommand;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -63,9 +64,9 @@ public class NaturalMobSpawner implements Listener {
 
         for (Player player : closePlayers) {
 
-            int perPlayerEliteMobLevel = (int) (ItemTierFinder.findPlayerTier(player) * MobTierFinder.PER_TIER_LEVEL_INCREASE);
+            int finalTieredMobLevel = MobLevelCalculator.determineMobLevel(player);
 
-            eliteMobLevel += perPlayerEliteMobLevel;
+            eliteMobLevel += finalTieredMobLevel;
 
             if (eliteMobLevel > ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP))
                 eliteMobLevel = ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP);

@@ -3,14 +3,18 @@ package com.magmaguy.elitemobs.events.mobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevel;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -57,7 +61,7 @@ public class Balrog implements Listener {
     private static void intializeBalrog(Location location) {
 
         Silverfish balrog = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
-        balrog.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, ConfigValues.eventsConfig.getDouble(EventsConfig.BALROG_LEVEL)));
+        balrog.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, DynamicBossLevel.determineDynamicBossLevel(balrog)));
         balrog.setMetadata(MetadataHandler.BALROG, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
         balrog.setMetadata(MetadataHandler.EVENT_CREATURE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
         balrog.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
@@ -70,6 +74,8 @@ public class Balrog implements Listener {
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(balrog);
 
         balrogVisualEffectLoop(balrog);
+
+        BossMobDeathCountdown.startDeathCountdown(balrog);
 
     }
 
@@ -105,10 +111,12 @@ public class Balrog implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onHit(EntityDamageEvent event) {
 
+        if (event.isCancelled()) return;
         if (!event.getEntity().hasMetadata(MetadataHandler.BALROG)) return;
+        if (event.getFinalDamage() < 2) return;
 
         spawnTrashMobs((Silverfish) event.getEntity());
         spawnTrashMobs((Silverfish) event.getEntity());

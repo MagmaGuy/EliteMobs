@@ -56,10 +56,8 @@ public class EventsConfig {
     public static final String KRAKEN_NAME = "Name of mob in Kraken event";
     public static final String BALROG_CHANCE_ON_MINE = "Balrog chance on mine";
     public static final String BALROG_NAME = "Name of mob in Balrog event";
-    public static final String BALROG_LEVEL = "Level of Balrog";
     public static final String BALROG_TRASH_MOB_NAME = "Name of trash mobs in Balrog event";
     public static final String FAE_NAME = "Name of mob in Fae event";
-    public static final String FAE_LEVEL = "Level of mob in Fae event";
     public static final String FAE_CHANCE_ON_CHOP = "Fae chance on chop";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
@@ -95,15 +93,13 @@ public class EventsConfig {
         configuration.addDefault(TREASURE_GOBLIN_RADIAL_EXPLOSION, 20);
         configuration.addDefault(KRAKEN_ENABLED, true);
         configuration.addDefault(BALROG_ENABLED, true);
-        configuration.addDefault(KRAKEN_CHANCE_ON_FISH, 0.01);
+        configuration.addDefault(KRAKEN_CHANCE_ON_FISH, 0.005);
         configuration.addDefault(KRAKEN_NAME, "&1Kraken");
-        configuration.addDefault(BALROG_CHANCE_ON_MINE, 0.01);
+        configuration.addDefault(BALROG_CHANCE_ON_MINE, 0.005);
         configuration.addDefault(BALROG_NAME, "&cBalrog");
-        configuration.addDefault(BALROG_LEVEL, 100);
         configuration.addDefault(BALROG_TRASH_MOB_NAME, "&cRaug");
         configuration.addDefault(FAE_ENABLED, true);
         configuration.addDefault(FAE_NAME, "&aFae");
-        configuration.addDefault(FAE_LEVEL, 20);
         configuration.addDefault(FAE_CHANCE_ON_CHOP, 0.001);
 
         configuration.options().copyDefaults(true);

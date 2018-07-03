@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import org.bukkit.Location;
@@ -58,8 +59,8 @@ public class Kraken implements Listener {
 
         Squid kraken = (Squid) location.getWorld().spawnEntity(location, EntityType.SQUID);
 
-        kraken.setMaxHealth(1000);
-        kraken.setHealth(1000);
+        kraken.setMaxHealth(200);
+        kraken.setHealth(200);
 
         kraken.setCustomName(ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.KRAKEN_NAME)));
         kraken.setCustomNameVisible(true);

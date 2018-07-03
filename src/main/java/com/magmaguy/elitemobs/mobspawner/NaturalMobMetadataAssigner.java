@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.naturalmobspawner;
+package com.magmaguy.elitemobs.mobspawner;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;

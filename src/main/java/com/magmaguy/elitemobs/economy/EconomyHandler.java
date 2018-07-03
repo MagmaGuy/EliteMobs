@@ -15,10 +15,9 @@
 
 package com.magmaguy.elitemobs.economy;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.CustomConfigLoader;
-import com.magmaguy.elitemobs.config.PlayerMoneyDataConfig;
-import org.bukkit.configuration.Configuration;
+import com.magmaguy.elitemobs.config.PlayerMoneyData;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
+import org.bukkit.Bukkit;
 
 import java.util.UUID;
 
@@ -27,114 +26,74 @@ import java.util.UUID;
  */
 public class EconomyHandler {
 
-    private static PlayerMoneyDataConfig playerMoneyDataConfig = new PlayerMoneyDataConfig();
+    private static PlayerMoneyData playerMoneyData = new PlayerMoneyData();
 
-    public static double addCurrency(UUID user, double amount) {
+    public static void addCurrency(UUID user, double amount) {
 
-        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
+        if (!checkUserExists(user)) createUser(user);
 
-        if (!checkUserExists(user.toString())) {
-
-            createUser(user);
-
-        }
-
-        double currentAmount = configuration.getDouble(user.toString());
-        double newAmount = currentAmount + amount;
-
-        configuration.set(user.toString(), newAmount);
-        customConfigLoader.saveCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
-
-        return newAmount;
+        PlayerData.playerCurrency.put(user, roundDecimals(checkCurrency(user) + amount));
+        PlayerData.playerCurrencyChanged = true;
 
     }
 
 
-    public static double subtractCurrency(UUID user, double amount) {
+    public static void subtractCurrency(UUID user, double amount) {
 
-        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
+        if (!checkUserExists(user)) createUser(user);
 
-        if (!checkUserExists(user.toString())) {
-
-            createUser(user);
-
-        }
-
-        double currentAmount = configuration.getDouble(user.toString());
-        double newAmount = currentAmount - amount;
-
-        configuration.set(user.toString(), newAmount);
-        customConfigLoader.saveCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
-
-        ConfigValues.initializeConfigValues();
-
-        return newAmount;
+        PlayerData.playerCurrency.put(user, roundDecimals(checkCurrency(user) - amount));
+        PlayerData.playerCurrencyChanged = true;
 
     }
 
     public static void setCurrency(UUID user, double amount) {
 
-        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
+        if (!checkUserExists(user)) createUser(user);
 
-        if (!checkUserExists(user.toString())) {
-
-            createUser(user);
-
-        }
-
-        configuration.set(user.toString(), amount);
-        customConfigLoader.saveCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
-
-        ConfigValues.initializeConfigValues();
+        PlayerData.playerCurrency.put(user, roundDecimals(amount));
+        PlayerData.playerCurrencyChanged = true;
 
     }
 
     public static double checkCurrency(UUID user) {
 
-        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
-
-        if (!checkUserExists(user.toString())) {
-
+        if (!checkUserExists(user))
             createUser(user);
 
-        }
-
-        return configuration.getDouble(user.toString());
+        return PlayerData.playerCurrency.get(user);
 
     }
 
-    public static void createUser(UUID user) {
+    private static void createUser(UUID uuid) {
 
-        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
-
-        configuration.set(user.toString(), 0);
-        customConfigLoader.saveCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
-
-        ConfigValues.initializeConfigValues();
+        PlayerData.playerCurrency.put(uuid, 0.0);
+        PlayerData.playerCurrencyChanged = true;
 
     }
 
-    public static boolean checkUserExists(String name) {
+    private static boolean checkUserExists(UUID uuid) {
 
-        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
+        checkUserIsCached(uuid);
+        return PlayerData.playerCurrency.containsKey(uuid);
 
-        for (String string : configuration.getKeys(false)) {
+    }
 
-            if (string.equals(name)) {
+    private static void checkUserIsCached(UUID uuid) {
 
-                return true;
+        if (!PlayerData.playerDisplayName.containsKey(uuid) ||
+                !PlayerData.playerDisplayName.get(uuid).equals(Bukkit.getPlayer(uuid).getDisplayName())) {
 
-            }
+            PlayerData.playerDisplayName.put(uuid, Bukkit.getPlayer(uuid).getDisplayName());
+            PlayerData.playerCacheChanged = true;
 
         }
 
-        return false;
+    }
+
+    private static double roundDecimals(double rawValue) {
+
+        return (double) Math.round(rawValue * 100) / 100;
 
     }
 

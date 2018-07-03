@@ -222,7 +222,7 @@ public class ValidMobsConfigurer implements Listener {
 //            return;
 //        }
 //
-//        if (event.getClickedInventory().getName().equals("Config GUI - Valid Mobs")) {
+//        if (event.getClickedInventory().getName().equals("Config AdventurersGuildGUI - Valid Mobs")) {
 //
 //            event.setCancelled(true);
 //
@@ -236,7 +236,7 @@ public class ValidMobsConfigurer implements Listener {
 //                if (name.equals("Back To Main Menu")) {
 //
 //                    player.closeInventory();
-//                    Inventory smallInventory = GUIConfigHandler.threeRowInventory("Config GUI");
+//                    Inventory smallInventory = GUIConfigHandler.threeRowInventory("Config AdventurersGuildGUI");
 //                    player.openInventory(smallInventory);
 //                    GUIConfigHandler.configPickerPopulator(smallInventory);
 //

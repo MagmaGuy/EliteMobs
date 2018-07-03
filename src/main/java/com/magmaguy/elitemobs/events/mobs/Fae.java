@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.events.mobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevel;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
@@ -81,7 +83,7 @@ public class Fae implements Listener {
 
     private static void faeConstructor(Vex fae) {
 
-        fae.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, ConfigValues.eventsConfig.getInt(EventsConfig.FAE_LEVEL)));
+        fae.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, (DynamicBossLevel.determineDynamicBossLevel(fae)/3)));
         fae.setMetadata(MetadataHandler.FAE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
         fae.setMetadata(MetadataHandler.EVENT_CREATURE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
         fae.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
@@ -92,6 +94,8 @@ public class Fae implements Listener {
 
         NameHandler.customUniqueNameAssigner(fae, ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME));
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(fae);
+
+        BossMobDeathCountdown.startDeathCountdown(fae);
 
     }
 

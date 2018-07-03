@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
@@ -76,13 +77,14 @@ public class CommandHandler implements CommandExecutor {
     private final static String CURRENCY_WALLET = "elitemobs.currency.wallet";
     private final static String CURRENCY_COINTOP = "elitemobs.currency.cointop";
     private final static String VERSION = "elitemobs.version";
-    private final static String CONFIG = "elitemobs.config";
+//    private final static String CONFIG = "elitemobs.config";
     private final static String EVENT_LAUNCH_SMALLTREASUREGOBLIN = "elitemobs.events.smalltreasuregoblin";
     private final static String EVENT_LAUNCH_DEADMOON = "elitemobs.events.smalltreasuregoblin";
     private final static String CHECK_TIER = "elitemobs.checktier";
     private final static String SET_MAX_TIER = "elitemobs.config.setmaxtier";
     private final static String GET_TIER = "elitemobs.gettier";
     private final static String CHECK_MAX_TIER = "elitemobs.checkmaxtier";
+    private final static String ADVENTURERS_GUILD = "elitemobs.adventurersguild";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -99,6 +101,17 @@ public class CommandHandler implements CommandExecutor {
                 return true;
 
             }
+
+        }
+
+        if ((label.equalsIgnoreCase("ag") || label.equalsIgnoreCase("adventurerguild") ||
+                label.equalsIgnoreCase("adventurersguild")) && userPermCheck(ADVENTURERS_GUILD, commandSender) ) {
+
+            Player player = (Player) commandSender;
+
+            AdventurersGuildGUI.mainMenu(player);
+
+            return true;
 
         }
 
@@ -192,7 +205,7 @@ public class CommandHandler implements CommandExecutor {
 
                 if (args[0].equalsIgnoreCase("checktier") && userPermCheck(CHECK_TIER, commandSender)) {
 
-                    commandSender.sendMessage("You are tier " + ItemTierFinder.findPlayerTier((Player) commandSender));
+                    CheckTierCommand.checkTier(((Player)commandSender));
                     return true;
 
                 }
@@ -207,7 +220,7 @@ public class CommandHandler implements CommandExecutor {
                 validCommands(commandSender);
                 return true;
 
-            // /elitemobs reload config | /elitemobs reload loot | /elitemobs giveloot [player] (for GUI menu) |
+            // /elitemobs reload config | /elitemobs reload loot | /elitemobs giveloot [player] (for AdventurersGuildGUI menu) |
             // /elitemobs killall aggressiveelites | /elitemobs killall passiveelites | /elitemobs simloot [level] |
             // /elitemobs check [playerName]
             case 2:
@@ -690,7 +703,7 @@ public class CommandHandler implements CommandExecutor {
             if (silentPermCheck(SIMLOOT, commandSender))
                 player.sendMessage("/elitemobs simloot [mob level]");
             if (silentPermCheck(GETLOOT, commandSender))
-                player.sendMessage("/elitemobs getloot [loot name (no loot name = GUI)]");
+                player.sendMessage("/elitemobs getloot [loot name (no loot name = AdventurersGuildGUI)]");
             if (silentPermCheck(GIVELOOT, commandSender))
                 player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
             if (silentPermCheck(SPAWNMOB, commandSender))

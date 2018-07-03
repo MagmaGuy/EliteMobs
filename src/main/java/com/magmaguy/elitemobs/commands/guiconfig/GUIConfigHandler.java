@@ -106,7 +106,7 @@ public class GUIConfigHandler implements Listener {
 //    public void GUIConfigHandler(Player player) {
 //
 //        //this is the first method called, every other method is summoned by clicking options in it
-//        Inventory introInventory = threeRowInventory("Config GUI");
+//        Inventory introInventory = threeRowInventory("Config AdventurersGuildGUI");
 //
 //        List<String> cautionLore = new ArrayList<>(Arrays.asList("Please read the wiki on GitHub.",
 //                "You can get support on the discord channel.", "Support plugins you enjoy!"));
@@ -197,7 +197,7 @@ public class GUIConfigHandler implements Listener {
 //            return;
 //        }
 //
-//        if (event.getClickedInventory().getName().equals("Config GUI")) {
+//        if (event.getClickedInventory().getName().equals("Config AdventurersGuildGUI")) {
 //
 //            event.setCancelled(true);
 //
@@ -264,7 +264,7 @@ public class GUIConfigHandler implements Listener {
 //                if (name.equals("Back To Main Menu")) {
 //
 //                    player.closeInventory();
-//                    Inventory smallInventory = threeRowInventory("Config GUI");
+//                    Inventory smallInventory = threeRowInventory("Config AdventurersGuildGUI");
 //                    player.openInventory(smallInventory);
 //                    configPickerPopulator(smallInventory);
 //
@@ -284,7 +284,7 @@ public class GUIConfigHandler implements Listener {
 //                if (name.equals("Configure Valid Elite Mobs")) {
 //
 //                    player.closeInventory();
-//                    Inventory largeInventory = GUIConfigHandler.sixRowInventory("Config GUI - Valid Mobs");
+//                    Inventory largeInventory = GUIConfigHandler.sixRowInventory("Config AdventurersGuildGUI - Valid Mobs");
 //                    player.openInventory(largeInventory);
 //                    ValidMobsConfigurer.validMobsPickerPopulator(largeInventory);
 //

@@ -18,9 +18,10 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.CustomConfigLoader;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.PlayerMoneyDataConfig;
+import com.magmaguy.elitemobs.config.PlayerMoneyData;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -29,6 +30,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
@@ -77,37 +79,33 @@ public class CurrencyCommandsHandler {
 
     public static void coinTop(CommandSender commandSender) {
 
-        ArrayList<String> arrayList = new ArrayList();
+        ArrayList<UUID> arrayList = new ArrayList();
 
-        CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-        Configuration configuration = customConfigLoader.getCustomConfig(PlayerMoneyDataConfig.CONFIG_NAME);
-
-
-        for (String string : configuration.getKeys(false)) {
+        for (UUID uuid : PlayerData.playerCurrency.keySet()) {
 
             if (arrayList.size() == 0) {
 
-                arrayList.add(string);
+                arrayList.add(uuid);
 
             } else {
 
                 int index = arrayList.size();
 
-                for (String inArrayString : arrayList) {
+                for (UUID inArrayUUID : arrayList) {
 
-                    double arrayEntryValue = configuration.getDouble(inArrayString);
-                    double newValue = configuration.getDouble(string);
+                    double arrayEntryValue = PlayerData.playerCurrency.get(inArrayUUID);
+                    double newValue = PlayerData.playerCurrency.get(uuid);
 
                     if (newValue > arrayEntryValue) {
 
-                        index = arrayList.indexOf(inArrayString);
+                        index = arrayList.indexOf(inArrayUUID);
                         break;
 
                     }
 
                 }
 
-                arrayList.add(index, string);
+                arrayList.add(index, uuid);
 
             }
 
@@ -123,28 +121,15 @@ public class CurrencyCommandsHandler {
 
         }
 
-        FileConfiguration playerCacheConfiguration = (FileConfiguration) ConfigValues.playerCacheConfig;
-
         for (int i = 0; i < iterationAmount; i++) {
 
-            String name = "";
-
-            if (playerCacheConfiguration.contains(arrayList.get(i))) {
-
-                name = playerCacheConfiguration.getString(arrayList.get(i));
-
-            } else {
-
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(arrayList.get(i));
-                name = offlinePlayer.getName();
-
-            }
+            String name = PlayerData.playerDisplayName.get(arrayList.get(i));
+            double amount = PlayerData.playerCurrency.get(arrayList.get(i));
 
             int place = i + 1;
 
             commandSender.sendMessage(ChatColor.GREEN + "#" + place + " " + ChatColor.WHITE + name + " with " +
-                    ChatColor.DARK_GREEN + configuration.getDouble(arrayList.get(i)) + " " + ChatColor.GREEN +
-                    ConfigValues.economyConfig.get(EconomySettingsConfig.CURRENCY_NAME));
+                    ChatColor.DARK_GREEN + amount + " " + ChatColor.GREEN + ConfigValues.economyConfig.get(EconomySettingsConfig.CURRENCY_NAME));
 
         }
 

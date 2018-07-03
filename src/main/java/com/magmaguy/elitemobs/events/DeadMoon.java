@@ -21,7 +21,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
-import com.magmaguy.elitemobs.naturalmobspawner.NaturalMobSpawner;
+import com.magmaguy.elitemobs.mobspawner.NaturalMobSpawner;
 import org.bukkit.World;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;

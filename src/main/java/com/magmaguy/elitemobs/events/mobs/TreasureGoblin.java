@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.EventMessage;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.items.ItemDropper;
 import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
