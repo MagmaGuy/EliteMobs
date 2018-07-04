@@ -324,7 +324,6 @@ public class AdventurersGuildGUI implements Listener {
         if (!(event.getWhoClicked() instanceof Player)) return;
         if (!event.getInventory().getName().equalsIgnoreCase("Adventurer's guild")) return;
         if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
-
         if (event.getCurrentItem().equals(difficulty))
             difficultyMenu((Player) event.getWhoClicked());
         if (event.getCurrentItem().equals(quest)) {
@@ -342,6 +341,13 @@ public class AdventurersGuildGUI implements Listener {
         if (!(event.getWhoClicked() instanceof Player)) return;
         if (!event.getInventory().getName().equalsIgnoreCase("Guild rank selector")) return;
         if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
+
+        event.setCancelled(true);
+
+        if (!event.getClickedInventory().getName().equals("Guild rank selector")){
+            event.setCancelled(true);
+            return;
+        }
 
         int maxTier = PlayerData.playerMaxGuildRank.get(event.getWhoClicked().getUniqueId());
         int selectedTier = event.getSlot() + 1;
@@ -369,7 +375,7 @@ public class AdventurersGuildGUI implements Listener {
             event.getWhoClicked().sendMessage("[EliteMobs] You need to unlock other ranks first!");
         }
 
-        event.setCancelled(true);
+
 
     }
 
