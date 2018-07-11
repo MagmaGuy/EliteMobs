@@ -43,8 +43,8 @@ import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customPassiveName
 public class MobScanner implements Listener {
 
     private Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    private int aggressiveRange = 2;
-    private int passiveRange = 15;
+    private int aggressiveRange = ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.AGGRESSIVE_STACK_RANGE);
+    private int passiveRange = ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.PASSIVE_STACK_RANGE);
 
     public void scanMobs() {
 
@@ -156,19 +156,14 @@ public class MobScanner implements Listener {
 
                     }
 
-                    //remove duplicate
-                    secondEntity.remove();
-
                     //setup new EliteMob
                     LevelHandler.LevelHandler(entity, secondEntity, plugin);
                     HealthHandler.aggressiveHealthHandler(entity, secondEntity);
                     customAggressiveName(entity);
 
-                    if (secondEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
-
-                        secondEntity.removeMetadata(MetadataHandler.ELITE_MOB_MD, plugin);
-
-                    }
+                    //remove duplicate
+                    secondEntity.remove();
+                    MetadataHandler.flushMetadata(secondEntity);
 
                     return;
 
@@ -205,6 +200,7 @@ public class MobScanner implements Listener {
                     for (LivingEntity livingEntity : animalContainer) {
 
                         livingEntity.remove();
+                        MetadataHandler.flushMetadata(livingEntity);
 
                     }
 

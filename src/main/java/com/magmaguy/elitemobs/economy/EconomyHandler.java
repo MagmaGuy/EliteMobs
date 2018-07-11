@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.economy;
 import com.magmaguy.elitemobs.config.PlayerMoneyData;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -81,7 +82,16 @@ public class EconomyHandler {
 
     private static void checkUserIsCached(UUID uuid) {
 
-        if (!PlayerData.playerDisplayName.containsKey(uuid) ||
+        boolean playerIsOnline = false;
+
+        for (Player player : Bukkit.getOnlinePlayers())
+            if(player.getUniqueId().equals(uuid)){
+                playerIsOnline = true;
+                break;
+            }
+
+
+        if (!PlayerData.playerDisplayName.containsKey(uuid) || playerIsOnline &&
                 !PlayerData.playerDisplayName.get(uuid).equals(Bukkit.getPlayer(uuid).getDisplayName())) {
 
             PlayerData.playerDisplayName.put(uuid, Bukkit.getPlayer(uuid).getDisplayName());

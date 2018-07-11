@@ -21,7 +21,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierFinder;
-import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -40,6 +40,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.BatchUpdateException;
 import java.util.HashMap;
 
 public class DamageAdjuster implements Listener {
@@ -81,7 +82,6 @@ public class DamageAdjuster implements Listener {
 
 
         //From this point on, the damage event is fully altered by Elite Mobs
-
 
         //Get rid of all vanilla armor reduction
         for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
@@ -172,7 +172,8 @@ public class DamageAdjuster implements Listener {
         if (event.getEntity().hasMetadata(MetadataHandler.KILLED_BY_ELITE_MOB)) {
 
             event.setDeathMessage("");
-            event.getEntity().removeMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, MetadataHandler.PLUGIN);
+            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_DEATH_MESSAGES))
+                event.getEntity().removeMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, MetadataHandler.PLUGIN);
 
         }
 
@@ -256,21 +257,22 @@ public class DamageAdjuster implements Listener {
 
         //From this point on, the event damage is handled by Elite Mobs
 
-
-        for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
-            if (event.isApplicable(modifier))
-                event.setDamage(modifier, 0);
-
         /*
         Case in which the player is not the entity dealing damage, just deal raw damage
          */
-        if (!(damagingLivingEntity instanceof Player)) {
 
-            event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
+        if (!(damagingLivingEntity instanceof Player) &&
+                (damagingLivingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) || damagedLivingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD))) {
+
+            event.setDamage(event.getDamage());
 
             return;
 
         }
+
+        for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
+            if (event.isApplicable(modifier))
+                event.setDamage(modifier, 0);
 
         /*
         Case in which a player has hit the Elite Mob
@@ -346,7 +348,7 @@ public class DamageAdjuster implements Listener {
 
     private static int clock = 0;
 
-    public static void launchInternalClock () {
+    public static void launchInternalClock() {
 
         new BukkitRunnable() {
 

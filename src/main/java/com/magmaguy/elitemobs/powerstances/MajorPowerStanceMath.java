@@ -29,7 +29,7 @@ import static java.lang.Math.sin;
  */
 public class MajorPowerStanceMath {
 
-    public final static double NUMBER_OF_POINTS_PER_FULL_ROTATION = 10;
+    public final static double NUMBER_OF_POINTS_PER_FULL_ROTATION = 30;
     private final static double X = 0;
     private final static double Y = 1;
     private final static double Z = 0;

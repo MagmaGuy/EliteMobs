@@ -15,10 +15,8 @@
 
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -180,6 +178,7 @@ public class MetadataHandler implements Listener {
     //player metadata
     public final static String KILLED_BY_ELITE_MOB = "KilledByEliteMob";
     public final static String USING_ZOMBIE_KING_AXE = "UsingZombieKingAxe";
+    public final static String SAFE_FALL = "SafeFall";
 
     public static List<String> defensivePowerList = new ArrayList<>(Arrays.asList(
             INVULNERABILITY_ARROW_MD,
@@ -260,6 +259,7 @@ public class MetadataHandler implements Listener {
             ARMOR_STAND_DISPLAY,
             KILLED_BY_ELITE_MOB,
             USING_ZOMBIE_KING_AXE,
+            SAFE_FALL,
             KRAKEN_FIREBALL,
             BALROG,
             FAE
@@ -396,67 +396,27 @@ public class MetadataHandler implements Listener {
 
     public static void flushMetadata(Entity entity) {
 
-        if (entity.hasMetadata(EVENT_CREATURE)) {
-
-            return;
-
-        }
-
         for (String string : metadataList()) {
 
-            if (entity.hasMetadata(string) && !string.equals(NATURAL_MOB_MD)) {
+            if (entity.hasMetadata(string)) {
 
+                if (!(entity instanceof Player)) {
 
-                if (!(entity instanceof IronGolem) && entity.hasMetadata(VISUAL_EFFECT_MD) ||
-                        !(entity instanceof IronGolem) && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
-                        (entity.hasMetadata(ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) ||
-                        entity.hasMetadata(ARMOR_STAND_DISPLAY) && string.equals(ARMOR_STAND_DISPLAY)) {
-
-                    /*
-                    Take into account entities spawned by other plugins
-                     */
-//                    if (!entity.hasMetadata(ELITE_MOB_MD) ||
-//                            entity.hasMetadata(ELITE_MOB_MD) && NameHandler.compareCustomAggressiveNameIgnoresCustomName(entity)) {
-
+                    if (!entity.isDead() && entity.hasMetadata(ELITE_MOB_MD) ||
+                            !entity.isDead() && entity.hasMetadata(VISUAL_EFFECT_MD) ||
+                            !entity.isDead() && entity.hasMetadata(MAJOR_VISUAL_EFFECT_MD) ||
+                            !entity.isDead() && entity.hasMetadata(ARMOR_STAND_DISPLAY))
                         entity.remove();
-
-//                    }
-
-
-                }
-
-                if (!(entity.hasMetadata(ZOMBIE_KING) || entity.hasMetadata(TREASURE_GOBLIN) || entity.hasMetadata(KRAKEN))) {
-
-                    //todo: add improved flushing for permanent mobs
-
-                } else {
 
                     entity.removeMetadata(string, PLUGIN);
 
-                }
+                } else
+                    entity.removeMetadata(string, PLUGIN);
 
 
             }
 
-            if (entity instanceof Player) {
-
-
-                entity.removeMetadata(string, PLUGIN);
-
-            }
-
         }
-
-    }
-
-    public void fullMetadataFlush(Entity entity) {
-
-        if (entity.hasMetadata(EVENT_CREATURE)) {
-            entity.removeMetadata(EVENT_CREATURE, PLUGIN);
-            entity.remove();
-        }
-
-        flushMetadata(entity);
 
     }
 

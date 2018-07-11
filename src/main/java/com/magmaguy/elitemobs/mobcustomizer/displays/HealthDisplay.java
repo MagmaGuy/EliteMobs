@@ -66,7 +66,7 @@ public class HealthDisplay implements Listener {
 
     public static void displayHealth(LivingEntity livingEntity, double damage) {
 
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_HEALTH_DISPLAY)) return;
+        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT)) return;
 
         int maxHealth = (int) livingEntity.getMaxHealth();
         int currentHealth = (int) (livingEntity.getHealth() - damage);

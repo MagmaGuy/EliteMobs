@@ -15,7 +15,9 @@
 
 package com.magmaguy.elitemobs.economy;
 
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -34,6 +36,13 @@ public class UUIDFilter {
                 return player.getUniqueId();
 
             }
+
+        }
+
+        for (UUID uuid : PlayerData.playerDisplayName.keySet()) {
+
+            if (ChatColor.stripColor(PlayerData.playerDisplayName.get(uuid)).equalsIgnoreCase(string))
+                return uuid;
 
         }
 

@@ -17,7 +17,6 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.items.ItemDropper;
-import com.magmaguy.elitemobs.items.ProceduralItemGenerator;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 

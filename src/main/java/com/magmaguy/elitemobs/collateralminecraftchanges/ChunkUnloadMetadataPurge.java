@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -32,7 +33,9 @@ public class ChunkUnloadMetadataPurge implements Listener {
 
         for (Entity entity : event.getChunk().getEntities()) {
 
-            MetadataHandler.flushMetadata(entity);
+            if (!(entity instanceof LivingEntity) ||
+                    entity instanceof LivingEntity && ((LivingEntity) entity).getRemoveWhenFarAway())
+                MetadataHandler.flushMetadata(entity);
 
         }
 

@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.items;
 
-import com.google.common.collect.Lists;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.*;
 import org.bukkit.Bukkit;

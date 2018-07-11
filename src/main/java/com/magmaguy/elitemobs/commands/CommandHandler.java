@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
@@ -29,7 +28,6 @@ import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
@@ -77,7 +75,7 @@ public class CommandHandler implements CommandExecutor {
     private final static String CURRENCY_WALLET = "elitemobs.currency.wallet";
     private final static String CURRENCY_COINTOP = "elitemobs.currency.cointop";
     private final static String VERSION = "elitemobs.version";
-//    private final static String CONFIG = "elitemobs.config";
+    //    private final static String CONFIG = "elitemobs.config";
     private final static String EVENT_LAUNCH_SMALLTREASUREGOBLIN = "elitemobs.events.smalltreasuregoblin";
     private final static String EVENT_LAUNCH_DEADMOON = "elitemobs.events.smalltreasuregoblin";
     private final static String CHECK_TIER = "elitemobs.checktier";
@@ -105,7 +103,7 @@ public class CommandHandler implements CommandExecutor {
         }
 
         if ((label.equalsIgnoreCase("ag") || label.equalsIgnoreCase("adventurerguild") ||
-                label.equalsIgnoreCase("adventurersguild")) && userPermCheck(ADVENTURERS_GUILD, commandSender) ) {
+                label.equalsIgnoreCase("adventurersguild")) && userPermCheck(ADVENTURERS_GUILD, commandSender)) {
 
             Player player = (Player) commandSender;
 
@@ -205,7 +203,7 @@ public class CommandHandler implements CommandExecutor {
 
                 if (args[0].equalsIgnoreCase("checktier") && userPermCheck(CHECK_TIER, commandSender)) {
 
-                    CheckTierCommand.checkTier(((Player)commandSender));
+                    CheckTierCommand.checkTier(((Player) commandSender));
                     return true;
 
                 }
@@ -352,7 +350,7 @@ public class CommandHandler implements CommandExecutor {
 
                     } catch (Exception e) {
 
-                        commandSender.sendMessage("Input not valid. Command format: /em set [playerName] [amount]");
+                        commandSender.sendMessage("Input not valid. Command format: /em check [playerName]");
 
                     }
 

@@ -16,26 +16,23 @@
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.LivingEntityFinder;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackArrow extends MinorPowers implements Listener {
+public class AttackArrow extends MinorPowers {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ATTACK_ARROW_MD;
@@ -46,6 +43,7 @@ public class AttackArrow extends MinorPowers implements Listener {
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
+        repeatingArrowTask(entity);
 
     }
 
@@ -56,53 +54,43 @@ public class AttackArrow extends MinorPowers implements Listener {
 
     }
 
-    @EventHandler
-    public void attackArrow(EntityTargetEvent event) {
+    private void repeatingArrowTask(Entity entity) {
 
-        if (event.getEntity().hasMetadata(powerMetadata) && !event.getEntity().hasMetadata(MetadataHandler.SHOOTING_ARROWS)) {
+        new BukkitRunnable() {
 
-            Player player = LivingEntityFinder.findPlayer(event);
-            LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
+            @Override
+            public void run() {
 
-            if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
+                if (!entity.isValid() || entity.isDead()) {
 
-            eliteMob.setMetadata(MetadataHandler.SHOOTING_ARROWS, new FixedMetadataValue(plugin, true));
-
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-
-                    if (!player.isValid() || !eliteMob.isValid() || eliteMob.getWorld() != player.getWorld()
-                            || player.getLocation().distance(eliteMob.getLocation()) > 20) {
-
-                        eliteMob.removeMetadata(MetadataHandler.SHOOTING_ARROWS, plugin);
-                        cancel();
-                        return;
-
-                    }
-
-                    fireArrow(eliteMob, player);
+                    cancel();
+                    return;
 
                 }
 
-            }.runTaskTimer(plugin, 0, 100);
+                for (Entity nearbyEntity : entity.getNearbyEntities(20, 20, 20))
+                    if (nearbyEntity instanceof Player)
+                        if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
+                                ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL))
+                            shootArrow(entity, (Player) nearbyEntity);
 
-        }
+            }
+
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 8);
 
     }
 
-    public static Arrow fireArrow(LivingEntity shooter, LivingEntity target) {
+    public static Arrow shootArrow(Entity entity, Player player) {
 
-        Location offsetLocation = ProjectileLocationGenerator.generateLocation(shooter, target);
-        Entity repeatingArrow = shooter.getWorld().spawnEntity(offsetLocation, EntityType.ARROW);
-        Vector targetterToTargetted = target.getEyeLocation().subtract(repeatingArrow.getLocation()).toVector()
+        Location offsetLocation = ProjectileLocationGenerator.generateLocation((LivingEntity) entity, player);
+        Arrow repeatingArrow = (Arrow) entity.getWorld().spawnEntity(offsetLocation, EntityType.ARROW);
+        Vector targetterToTargetted = player.getEyeLocation().subtract(repeatingArrow.getLocation()).toVector()
                 .normalize().multiply(2);
 
         repeatingArrow.setVelocity(targetterToTargetted);
+        repeatingArrow.setShooter((ProjectileSource) entity);
 
-        return (Arrow) repeatingArrow;
-
+        return repeatingArrow;
     }
 
 }

@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

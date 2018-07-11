@@ -100,13 +100,11 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        MetadataHandler metadataHandler = new MetadataHandler();
-
         for (World world : validWorldList) {
 
             for (Entity entity : world.getEntities()) {
 
-                metadataHandler.fullMetadataFlush(entity);
+                MetadataHandler.flushMetadata(entity);
 
                 if (entity instanceof Player) {
 
