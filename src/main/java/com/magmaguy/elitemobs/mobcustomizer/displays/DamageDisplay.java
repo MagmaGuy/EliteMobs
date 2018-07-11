@@ -69,7 +69,7 @@ public class DamageDisplay implements Listener {
 
     public static void displayDamage(Entity entity, double damage) {
 
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_DAMAGE_DISPLAY)) return;
+        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_DAMAGE_ON_HIT)) return;
 
         Location entityLocation = entity.getLocation();
 

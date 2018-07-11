@@ -187,121 +187,15 @@ public class ProceduralItemGenerator {
 
         String finalName = "";
 
-        int nounConstructorSelector = random.nextInt(7) + 1;
+        int nounConstructorSelector = random.nextInt(ConfigValues.itemsProceduralSettingsConfig.getList(ItemsProceduralSettingsConfig.ITEM_NAME_FORMAT).size());
 
-        if (nounConstructorSelector == 1) {
-
-            finalName = verbTypeAdjectiveNoun(material);
-
-        } else if (nounConstructorSelector == 2) {
-
-            finalName = typeAdjectiveNoun(material);
-
-        } else if (nounConstructorSelector == 3) {
-
-            finalName = nounVerbType(material);
-
-        } else if (nounConstructorSelector == 4) {
-
-            finalName = verbType(material);
-
-        } else if (nounConstructorSelector == 5) {
-
-            finalName = adjectiveVerbType(material);
-
-        } else if (nounConstructorSelector == 6) {
-
-            finalName = articleVerber();
-
-        } else if (nounConstructorSelector == 7) {
-
-            finalName = articleAdjectiveVerber();
-
-        }
-
-        return finalName;
-
-    }
-
-    private String verbTypeAdjectiveNoun(Material material) {
-
-        String randomVerb = verbs.get(random.nextInt(verbs.size()));
-        String itemType = itemTypeStringParser(material);
-        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
-        String randomNoun = nouns.get(random.nextInt(nouns.size()));
-
-        String finalName = randomVerb + " " + itemType + " " + "of the" + " " + randomAdjective + " " + randomNoun;
-
-        return finalName;
-
-    }
-
-    private String typeAdjectiveNoun(Material material) {
-
-        String itemType = itemTypeStringParser(material);
-        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
-        String randomNoun = nouns.get(random.nextInt(nouns.size()));
-
-        String finalName = itemType + " " + "of the" + " " + randomAdjective + " " + randomNoun;
-
-        return finalName;
-
-    }
-
-    private String nounVerbType(Material material) {
-
-        String randomNoun = nouns.get(random.nextInt(nouns.size()));
-        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
-        String randomVerb = verbs.get(random.nextInt(verbs.size()));
-        String itemType = itemTypeStringParser(material);
-
-        String finalName = randomNoun + "'s" + " " + randomAdjective + " " + randomVerb + " " + itemType;
-
-        return finalName;
-
-    }
-
-    private String verbType(Material material) {
-
-        String randomVerb = verbs.get(random.nextInt(verbs.size()));
-        String itemType = itemTypeStringParser(material);
-
-        String finalName = randomVerb + " " + itemType;
-
-        return finalName;
-
-    }
-
-    private String adjectiveVerbType(Material material) {
-
-        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
-        String randomVerb = verbs.get(random.nextInt(verbs.size()));
-        String itemType = itemTypeStringParser(material);
-
-        String finalName = randomAdjective + " " + randomVerb + " " + itemType;
-
-        return finalName;
-
-    }
-
-    private String articleVerber() {
-
-        String article = "The";
-        String randomVerber = verbers.get(random.nextInt(verbers.size()));
-
-        String finalName = article + " " + randomVerber;
-
-        return finalName;
-
-    }
-
-    private String articleAdjectiveVerber() {
-
-        String article = "The";
-        String randomAdjective = adjectives.get(random.nextInt(adjectives.size()));
-        String randomVerber = verbers.get(random.nextInt(verbers.size()));
-
-        String finalName = article + " " + randomAdjective + " " + randomVerber;
+        finalName = ((String) ConfigValues.itemsProceduralSettingsConfig.getList(ItemsProceduralSettingsConfig.ITEM_NAME_FORMAT)
+                .get(nounConstructorSelector))
+                .replace("$noun", nouns.get(random.nextInt(nouns.size())))
+                .replace("$verb-er", verbers.get(random.nextInt(verbers.size())))
+                .replace("$verb", verbs.get(random.nextInt(verbs.size())))
+                .replace("$itemType", itemTypeStringParser(material))
+                .replace("$adjective", adjectives.get(random.nextInt(adjectives.size())));
 
         return finalName;
 
@@ -710,11 +604,14 @@ public class ProceduralItemGenerator {
 
     private void validateSecondaryEnchantments(String string) {
 
-        if (string.equalsIgnoreCase("SWEEP") && Integer.getInteger(Bukkit.getVersion().split(".")[1]) < 11 ||
-                string.equalsIgnoreCase("SWEEP") && Integer.getInteger(Bukkit.getVersion().split(".")[1]) == 11 &&
-                        Bukkit.getVersion().split(".").length < 2) {
-            return;
-        }
+        if (enchantmentBackwardsCompatibility(7, 0, string, "LURE")) return;
+        if (enchantmentBackwardsCompatibility(7, 0, string, "LUCK")) return;
+        if (enchantmentBackwardsCompatibility(8, 0, string, "DEPTH_STRIDER")) return;
+        if (enchantmentBackwardsCompatibility(9, 0, string, "MENDING")) return;
+        if (enchantmentBackwardsCompatibility(9, 0, string, "FROST_WALKER")) return;
+        if (enchantmentBackwardsCompatibility(11, 0, string, "VANISHING_CURSE")) return;
+        if (enchantmentBackwardsCompatibility(11, 0, string, "BINDING_CURSE")) return;
+        if (enchantmentBackwardsCompatibility(11, 1, string, "SWEEP")) return;
 
         String mainString = "Valid Enchantments." + string;
 
@@ -738,6 +635,15 @@ public class ProceduralItemGenerator {
             validEnchantments.put(Enchantment.getByName(string), enchantmentLevel);
 
         }
+
+    }
+
+    //Version and subVersion should be set to the update at which the enchantment was introduced
+    private boolean enchantmentBackwardsCompatibility(int version, int subVersion, String actualEnchantement, String enchantmentToAvoid) {
+
+        return actualEnchantement.equalsIgnoreCase(enchantmentToAvoid) && Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) < version ||
+                actualEnchantement.equalsIgnoreCase(enchantmentToAvoid) && Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) == version &&
+                        Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[2].substring(0, Bukkit.getBukkitVersion().split("[.]")[2].indexOf("-"))) < subVersion;
 
     }
 

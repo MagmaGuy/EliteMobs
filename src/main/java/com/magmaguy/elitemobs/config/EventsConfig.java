@@ -103,6 +103,7 @@ public class EventsConfig {
         configuration.addDefault(FAE_CHANCE_ON_CHOP, 0.001);
 
         configuration.options().copyDefaults(true);
+        configuration = UnusedNodeHandler.clearNodes(configuration);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);
 

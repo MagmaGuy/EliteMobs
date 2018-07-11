@@ -19,22 +19,21 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackFireball extends MinorPowers implements Listener {
+public class AttackFireball extends MinorPowers {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ATTACK_FIREBALL_MD;
@@ -45,6 +44,7 @@ public class AttackFireball extends MinorPowers implements Listener {
         entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
+        repeatingFireballTask(entity);
 
     }
 
@@ -55,50 +55,42 @@ public class AttackFireball extends MinorPowers implements Listener {
 
     }
 
-    @EventHandler
-    public void attackFireball(EntityTargetEvent event) {
+    private void repeatingFireballTask(Entity entity) {
 
-        if (event.getEntity().hasMetadata(powerMetadata) && !event.getEntity().hasMetadata(MetadataHandler.SHOOTING_FIREBALLS)) {
+        new BukkitRunnable() {
 
-            Entity targetter = event.getEntity();
-            Entity targetted = event.getTarget();
+            @Override
+            public void run() {
 
-            if (targetted instanceof Player) {
+                if (!entity.isValid() || entity.isDead()) {
 
-                targetter.setMetadata(MetadataHandler.SHOOTING_FIREBALLS, new FixedMetadataValue(plugin, true));
+                    cancel();
+                    return;
 
-                new BukkitRunnable() {
+                }
 
-                    @Override
-                    public void run() {
-
-                        if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
-                                || targetted.getLocation().distance(targetter.getLocation()) > 20) {
-
-                            targetter.removeMetadata(MetadataHandler.SHOOTING_FIREBALLS, plugin);
-                            cancel();
-                            return;
-
-                        }
-
-                        Fireball repeatingFireball = (Fireball) targetter.getWorld().spawnEntity(targetter.getLocation().add(0, 3, 0), EntityType.FIREBALL);
-
-                        Vector targetterToTargetted = targetted.getLocation().toVector().subtract(repeatingFireball.getLocation().toVector()).normalize();
-
-                        repeatingFireball.setDirection(targetterToTargetted);
-                        repeatingFireball.setVelocity(targetterToTargetted);
-
-                        repeatingFireball.setYield(2F);
-                        repeatingFireball.setIsIncendiary(true);
-
-                    }
-
-                }.runTaskTimer(plugin, 0, 20 * 8);
-
+                for (Entity nearbyEntity : entity.getNearbyEntities(20, 20, 20))
+                    if (nearbyEntity instanceof Player)
+                        if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
+                                ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL))
+                            shootFireball(entity, (Player) nearbyEntity);
 
             }
 
-        }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 8);
+
+    }
+
+    private static void shootFireball(Entity entity, Player player) {
+
+        Fireball repeatingFireball = (Fireball) entity.getWorld().spawnEntity(entity.getLocation().add(0, 3, 0), EntityType.FIREBALL);
+
+        Vector targetterToTargetted = player.getLocation().toVector().subtract(repeatingFireball.getLocation().toVector()).normalize();
+
+        repeatingFireball.setVelocity(targetterToTargetted);
+        repeatingFireball.setYield(2F);
+        repeatingFireball.setIsIncendiary(true);
+        repeatingFireball.setShooter((ProjectileSource) entity);
 
     }
 

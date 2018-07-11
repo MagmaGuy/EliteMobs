@@ -29,6 +29,8 @@ public class MobCombatSettingsConfig {
     public static final String PER_TIER_LEVEL_INCREASE = "Elite mob per level tier increase";
     public static final String STACK_AGGRESSIVE_SPAWNER_MOBS = "Stack aggressive spawner mobs";
     public static final String STACK_AGGRESSIVE_NATURAL_MOBS = "Stack aggressive natural mobs";
+    public static final String AGGRESSIVE_STACK_RANGE = "Range to stack aggressive mobs";
+    public static final String PASSIVE_STACK_RANGE = "Range to stack passive mobs";
     public static final String NATURAL_ELITEMOB_LEVEL_CAP = "Natural elite mob level cap";
     public final static String TARGET_HITS_TO_KILL = "Target hits to kill Elite Mob";
     public final static String BASE_DAMAGE_DEALT_TO_PLAYER = "Base damage dealt to players by Elite Mobs";
@@ -38,8 +40,7 @@ public class MobCombatSettingsConfig {
     public static final String ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS = "Turn on visual effects for natural or plugin-spawned EliteMobs";
     public static final String DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS = "Dangerous! Turn off visual effects for non-natural or non-plugin-spawned EliteMobs";
     public static final String ENABLE_WARNING_VISUAL_EFFECTS = "Turn on visual effects that indicate an attack is about to happen";
-    public static final String ENABLE_DAMAGE_DISPLAY = " Display damage when Elite Mob is hit";
-    public static final String ENABLE_HEALTH_DISPLAY = "Display health when Elite Mob is hit";
+    public static final String ENABLE_DEATH_MESSAGES = "Enable EliteMobs death messages";
     private static final String DEATH_MESSAGES = "Player death messages cause by.";
     public static final String BLAZE_DEATH_MESSAGE = DEATH_MESSAGES + "blazes";
     public static final String CREEPER_DEATH_MESSAGE = DEATH_MESSAGES + "creeper";
@@ -58,12 +59,13 @@ public class MobCombatSettingsConfig {
     public static final String WITHER_SKELETON_DEATH_MESSAGE = DEATH_MESSAGES + "wither skeleton";
     public static final String DEFAULT_DEATH_MESSAGE = DEATH_MESSAGES + "default";
     public static final String DISPLAY_HEALTH_ON_HIT = "Display Elite Mob health on hit";
-    public static final String DISPLAY_DAMAGE_ON_HIT = "Display damage deal to Elite Mobs on hit";
+    public static final String DISPLAY_DAMAGE_ON_HIT = "Display damage dealt to Elite Mobs on hit";
     public static final String ONLY_SHOW_HEALTH_FOR_ELITE_MOBS = "Only display health indicator for Elite Mobs";
     public static final String ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS = "Only display damage indicator for Elite Mobs";
     public static final String INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE = "Increase level of mobs spawned based on distance from world spawn";
     public static final String DISTANCE_TO_INCREMENT = "Distance between increments";
     public static final String LEVEL_TO_INCREMENT = "Amount of levels incremented per distance";
+    public static final String ENABLE_COMBAT_TAG = "Enable combat tag";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -77,6 +79,8 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(ELITEMOB_STACKING_CAP, 100);
         configuration.addDefault(STACK_AGGRESSIVE_SPAWNER_MOBS, true);
         configuration.addDefault(STACK_AGGRESSIVE_NATURAL_MOBS, false);
+        configuration.addDefault(AGGRESSIVE_STACK_RANGE, 1);
+        configuration.addDefault(PASSIVE_STACK_RANGE, 15);
         configuration.addDefault(NATURAL_ELITEMOB_LEVEL_CAP, 2500);
         configuration.addDefault(TARGET_HITS_TO_KILL, 10);
         configuration.addDefault(BASE_DAMAGE_DEALT_TO_PLAYER, 5);
@@ -86,9 +90,8 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS, true);
         configuration.addDefault(DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS, true);
         configuration.addDefault(ENABLE_WARNING_VISUAL_EFFECTS, true);
-        configuration.addDefault(ENABLE_DAMAGE_DISPLAY, true);
-        configuration.addDefault(ENABLE_HEALTH_DISPLAY, true);
         configuration.addDefault(PER_TIER_LEVEL_INCREASE, 50);
+        configuration.addDefault(ENABLE_DEATH_MESSAGES, true);
         configuration.addDefault(BLAZE_DEATH_MESSAGE, "$player was lit ablaze by $entity!");
         configuration.addDefault(CREEPER_DEATH_MESSAGE, "$player was blasted away by $entity!");
         configuration.addDefault(ENDERMAN_DEATH_MESSAGE, "$entity sent $player into the void!");
@@ -112,7 +115,9 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE, false);
         configuration.addDefault(DISTANCE_TO_INCREMENT, 100);
         configuration.addDefault(LEVEL_TO_INCREMENT, 1);
+        configuration.addDefault(ENABLE_COMBAT_TAG, true);
 
+        configuration = UnusedNodeHandler.clearNodes(configuration);
         configuration.options().copyDefaults(true);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);

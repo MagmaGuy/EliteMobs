@@ -29,28 +29,32 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class EntityDeathMetadataFlusher implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDeathFlushMetadata(EntityDeathEvent event) {
 
         Entity entity = event.getEntity();
 
-        if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) || entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+        for (String metadata : MetadataHandler.metadataList()) {
 
-            new BukkitRunnable() {
+            if (entity.hasMetadata(metadata)) {
 
-                @Override
-                public void run() {
+                new BukkitRunnable() {
 
-                    MetadataHandler metadataHandler = new MetadataHandler();
+                    @Override
+                    public void run() {
 
-                    metadataHandler.flushMetadata(entity);
+                        MetadataHandler.flushMetadata(entity);
 
-                }
+                    }
 
-            }.runTaskLater(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 1);
+                }.runTaskLater(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 10);
+
+                return;
+            }
 
         }
 
     }
+
 
 }

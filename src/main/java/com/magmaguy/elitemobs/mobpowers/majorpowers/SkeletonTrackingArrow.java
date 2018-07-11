@@ -33,28 +33,27 @@ package com.magmaguy.elitemobs.mobpowers.majorpowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackArrow;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
-import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Particle;
-import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SkeletonTrackingArrow extends MajorPowers implements Listener {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.SKELETON_TRACKING_ARROW_MD;
 
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(powerMetadata, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
         MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
         majorPowerStanceMath.itemEffect(entity);
+        repeatingTrackingArrowTask(entity);
 
     }
 
@@ -65,49 +64,34 @@ public class SkeletonTrackingArrow extends MajorPowers implements Listener {
 
     }
 
-    @EventHandler
-    public void eliteMobAggro(EntityTargetLivingEntityEvent event) {
+    private void repeatingTrackingArrowTask(Entity entity) {
 
-        if (!(event.getEntity() instanceof LivingEntity && event.getTarget() instanceof LivingEntity)) return;
-        if (!event.getEntity().hasMetadata(powerMetadata)) return;
-        if (!(event.getEntity() instanceof Skeleton)) return;
-        if (!(event.getTarget() instanceof Player)) return;
-
-        LivingEntity livingEntity = (LivingEntity) event.getEntity();
-        Player player = (Player) event.getTarget();
-
-        if (livingEntity.hasMetadata(MetadataHandler.TRACKING_ARROWS_ACTIVE)) return;
-
-        startFiringTrackingArrows(livingEntity, player);
-
-    }
-
-    private static void startFiringTrackingArrows(LivingEntity skeleton, Player player) {
-
-        //fire arrows every 10 seconds
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                if (skeleton.isValid() && !skeleton.isDead() && player.isValid() && !player.isDead() &&
-                        skeleton.getWorld().equals(player.getWorld()) && skeleton.getLocation().distance(player.getLocation()) < 16) {
+                if (!entity.isValid() || entity.isDead()) {
 
-                    Arrow eventArrow = AttackArrow.fireArrow(skeleton, player);
-                    eventArrow.setVelocity(eventArrow.getVelocity().multiply(0.1));
-                    trackingArrowLoop(player, eventArrow);
-                    eventArrow.setGravity(false);
-
-                } else {
-
-                    skeleton.removeMetadata(MetadataHandler.TRACKING_ARROWS_ACTIVE, MetadataHandler.PLUGIN);
                     cancel();
+                    return;
 
                 }
 
+                for (Entity nearbyEntity : entity.getNearbyEntities(20, 20, 20))
+                    if (nearbyEntity instanceof Player)
+                        if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
+                                ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)) {
+                            Arrow arrow = AttackArrow.shootArrow(entity, (Player) nearbyEntity);
+                            arrow.setVelocity(arrow.getVelocity().multiply(0.1));
+                            arrow.setGravity(false);
+                            trackingArrowLoop((Player) nearbyEntity, arrow);
+                        }
+
+
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 10 * 20, 10 * 20);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 8);
 
     }
 

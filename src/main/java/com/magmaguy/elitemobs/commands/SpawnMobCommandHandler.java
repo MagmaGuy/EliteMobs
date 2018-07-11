@@ -21,6 +21,9 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackArrow;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackFireball;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Location;
@@ -395,7 +398,8 @@ public class SpawnMobCommandHandler {
                         break;
                     case MetadataHandler.SKELETON_TRACKING_ARROW_H:
                         if (entity instanceof Skeleton) {
-                            entity.setMetadata(MetadataHandler.SKELETON_TRACKING_ARROW_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                            SkeletonTrackingArrow skeletonTrackingArrow = new SkeletonTrackingArrow();
+                            skeletonTrackingArrow.applyPowers(entity);
                         }
                     case MetadataHandler.SKELETON_PILLAR_H:
                         if (entity instanceof Skeleton){
@@ -403,7 +407,8 @@ public class SpawnMobCommandHandler {
                         }
                         //minor powers
                     case MetadataHandler.ATTACK_ARROW_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_ARROW_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackArrow attackArrow = new AttackArrow();
+                        attackArrow.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_BLINDING_H:
                         entity.setMetadata(MetadataHandler.ATTACK_BLINDING_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
@@ -415,7 +420,8 @@ public class SpawnMobCommandHandler {
                         entity.setMetadata(MetadataHandler.ATTACK_FIRE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
                         break;
                     case MetadataHandler.ATTACK_FIREBALL_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_FIREBALL_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackFireball attackFireball = new AttackFireball();
+                        attackFireball.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_FREEZE_H:
                         entity.setMetadata(MetadataHandler.ATTACK_FREEZE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));

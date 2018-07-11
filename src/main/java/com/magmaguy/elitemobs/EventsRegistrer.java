@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
+import com.magmaguy.elitemobs.combattag.CombatTag;
 import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
 import com.magmaguy.elitemobs.commands.guiconfig.configurers.MobSpawningAndLoot;
@@ -38,7 +39,7 @@ import org.bukkit.event.Listener;
 
 public class EventsRegistrer {
 
-    public static void registerEvents(){
+    public static void registerEvents() {
 
         //Load passive mobs TODO: find generic alternative to this
         Bukkit.getServer().getPluginManager().registerEvents(new ChickenHandler(), MetadataHandler.PLUGIN);
@@ -103,7 +104,9 @@ public class EventsRegistrer {
             if (!(string.equalsIgnoreCase("MovementSpeed"))
                     && !(string.equalsIgnoreCase("Invisibility"))
                     && !(string.equalsIgnoreCase("DoubleHealth"))
-                    && !(string.equalsIgnoreCase("DoubleDamage"))) {
+                    && !(string.equalsIgnoreCase("DoubleDamage"))
+                    && !(string.equalsIgnoreCase("AttackArrow"))
+                    && !(string.equalsIgnoreCase("AttackFireball"))) {
 
                 try {
 
@@ -134,8 +137,7 @@ public class EventsRegistrer {
             if (!(string.equalsIgnoreCase("MovementSpeed"))
                     && !(string.equalsIgnoreCase("Invisibility"))
                     && !(string.equalsIgnoreCase("DoubleHealth"))
-                    && !(string.equalsIgnoreCase("DoubleDamage"))) {
-
+                    && !(string.equalsIgnoreCase("DoubleDamage")))
                 try {
 
                     String earlypath = "com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.";
@@ -155,31 +157,31 @@ public class EventsRegistrer {
                     e.printStackTrace();
                 }
 
-            }
 
         }
 
         for (String string : MetadataHandler.majorPowerList) {
 
             //don't load powers that require no event listeners
-            try {
+            if (!(string.equalsIgnoreCase("SkeletonTrackingArrow")))
+                try {
 
-                String earlypath = "com.magmaguy.elitemobs.mobpowers.majorpowers.";
-                String finalString = earlypath + string;
+                    String earlypath = "com.magmaguy.elitemobs.mobpowers.majorpowers.";
+                    String finalString = earlypath + string;
 
-                Class<?> clazz = Class.forName(finalString);
+                    Class<?> clazz = Class.forName(finalString);
 
-                Object instance = clazz.newInstance();
+                    Object instance = clazz.newInstance();
 
-                Bukkit.getServer().getPluginManager().registerEvents((Listener) instance, MetadataHandler.PLUGIN);
+                    Bukkit.getServer().getPluginManager().registerEvents((Listener) instance, MetadataHandler.PLUGIN);
 
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                }
 
         }
 
@@ -221,10 +223,18 @@ public class EventsRegistrer {
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDeathMetadataFlusher(), MetadataHandler.PLUGIN);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
             Bukkit.getServer().getPluginManager().registerEvents(new PreventMobItemPickup(), MetadataHandler.PLUGIN);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_MOUNT_EXPLOIT))
-            Bukkit.getServer().getPluginManager().registerEvents(new PreventMountExploit(), MetadataHandler.PLUGIN);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
             Bukkit.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(), MetadataHandler.PLUGIN);
+        //Prevent exploits
+        //Prevent mount exploit
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_MOUNT_EXPLOIT))
+            Bukkit.getServer().getPluginManager().registerEvents(new PreventMountExploit(), MetadataHandler.PLUGIN);
+        //Prevent darkroom exploit
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_DARKROOM_EXPLOIT))
+            Bukkit.getServer().getPluginManager().registerEvents(new PreventDarkroomExploit(), MetadataHandler.PLUGIN);
+        //Prevent tower exploit
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_TOWER_EXPLOIT))
+            Bukkit.getServer().getPluginManager().registerEvents(new PreventTowerExploit(), MetadataHandler.PLUGIN);
 
         //Initialize custom events
         Bukkit.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), MetadataHandler.PLUGIN);
@@ -257,6 +267,10 @@ public class EventsRegistrer {
 
         //Initialize adventurer's guild
         Bukkit.getServer().getPluginManager().registerEvents(new AdventurersGuildGUI(), MetadataHandler.PLUGIN);
+
+        //Combat tag
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_COMBAT_TAG))
+            Bukkit.getServer().getPluginManager().registerEvents(new CombatTag(), MetadataHandler.PLUGIN);
 
     }
 

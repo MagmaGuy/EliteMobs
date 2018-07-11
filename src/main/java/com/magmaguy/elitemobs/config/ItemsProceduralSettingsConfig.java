@@ -66,6 +66,7 @@ public class ItemsProceduralSettingsConfig {
             THORNS_BOOL, THORNS_MAX_LEVEL,
             VANISHING_CURSE_BOOL,
             WATER_WORKER_BOOL, WATER_WORKER_MAX_LEVEL;
+    public static final String ITEM_NAME_FORMAT = "Procedurally generated item name format";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
@@ -323,6 +324,16 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault("Material name.Chestplate", "Chestplate");
         configuration.addDefault("Material name.Leggings", "Leggings");
         configuration.addDefault("Material name.Boots", "Boots");
+
+        configuration.addDefault(ITEM_NAME_FORMAT, Arrays.asList(
+                "$verb $itemType of the $adjective $noun",
+                "$itemType of the $adjective $noun",
+                "$noun's $adjective $verb $itemType",
+                "$verb $itemType",
+                "$adjective $verb $itemType",
+                "The $verb-er",
+                "The $adjective $verb-er"
+        ));
 
         configuration.addDefault("Valid nouns", Arrays.asList(
                 "MagmaGuy",
@@ -1529,6 +1540,7 @@ public class ItemsProceduralSettingsConfig {
         ));
 
         configuration.options().copyDefaults(true);
+        configuration = UnusedNodeHandler.clearNodes(configuration);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);
 

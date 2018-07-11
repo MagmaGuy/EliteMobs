@@ -45,6 +45,8 @@ public class DeadMoon implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
 
+        if (event.isCancelled()) return;
+
         if (!(event.getEntity() instanceof Zombie)) return;
         if (!EventLauncher.verifyPlayerCount()) return;
 

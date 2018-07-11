@@ -16,13 +16,9 @@
 package com.magmaguy.elitemobs.mobspawner;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.commands.CheckTierCommand;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -39,9 +35,9 @@ import java.util.List;
  */
 public class NaturalMobSpawner implements Listener {
 
-    private int range = Bukkit.getServer().getViewDistance() * 16;
+    private static int range = Bukkit.getServer().getViewDistance() * 16;
 
-    public void naturalMobProcessor(Entity entity) {
+    public static void naturalMobProcessor(Entity entity) {
 
         List<Player> closePlayers = new ArrayList<>();
 
@@ -80,7 +76,7 @@ public class NaturalMobSpawner implements Listener {
 
         }
 
-        if (eliteMobLevel < 2) return;
+        if (eliteMobLevel < 1) return;
 
         entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, eliteMobLevel));
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);

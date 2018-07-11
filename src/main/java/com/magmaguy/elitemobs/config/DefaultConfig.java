@@ -35,6 +35,9 @@ public class DefaultConfig {
     public static final String PREVENT_ITEM_PICKUP = "Prevent item pickup from all aggressive mobs";
     public static final String PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS = "Make aggressive named mobs unable to become Elite Mobs";
     public static final String PREVENT_MOUNT_EXPLOIT = "Prevent Minecraft living entity mount exploit for Elite Mobs";
+    public static final String STRICT_SPAWNING_RULES = "Strict spawning rules mode for better compatibility with other plugins";
+    public static final String PREVENT_TOWER_EXPLOIT = "Prevent tower exploit";
+    public static final String PREVENT_DARKROOM_EXPLOIT = "Prevent tower exploit";
 
     public static void reloadConfig() {
 
@@ -56,9 +59,14 @@ public class DefaultConfig {
         configuration.addDefault(HIDE_ENCHANTMENTS_ATTRIBUTE, false);
         configuration.addDefault(PREVENT_ITEM_PICKUP, false);
         configuration.addDefault(PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS, true);
+        configuration.addDefault(STRICT_SPAWNING_RULES, false);
         configuration.addDefault(PREVENT_MOUNT_EXPLOIT, true);
+        configuration.addDefault(PREVENT_TOWER_EXPLOIT, true);
+        configuration.addDefault(PREVENT_DARKROOM_EXPLOIT, true);
 
         configuration.options().copyDefaults(true);
+
+        configuration = UnusedNodeHandler.clearNodes(configuration);
 
         //save the config when changed
         Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).saveConfig();

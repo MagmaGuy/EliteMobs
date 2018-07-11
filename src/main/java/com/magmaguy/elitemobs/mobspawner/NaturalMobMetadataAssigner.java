@@ -29,7 +29,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
@@ -39,82 +39,84 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
  */
 public class NaturalMobMetadataAssigner implements Listener {
 
-    private static Random random = new Random();
-    private int range = Bukkit.getServer().getViewDistance() * 16;
+    private static int range = Bukkit.getServer().getViewDistance() * 16;
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
 
+        if (event.isCancelled()) return;
+        /*
+        Deal with entities spawned within the plugin
+         */
         if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
-        if (event.getEntity().getCustomName() != null && ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS))
+
+        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING))
             return;
-
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING) ||
-                !ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) ||
-                !ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName())) {
-
+        if (!ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS))
             return;
-
-        }
-
+        if (!ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
+            return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && !ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.SPAWNERS_SPAWN_ELITE_MOBS))
             return;
+        if (event.getEntity().getCustomName() != null && ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS))
+            return;
+        if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES)))
+            return;
+        if (!ValidAgressiveMobFilter.ValidAgressiveMobFilter(event.getEntity()))
+            return;
 
-        if (event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM) {
+        Entity entity = event.getEntity();
+        entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
 
-            Entity entity = event.getEntity();
+        int huntingGearChanceAdder = getHuntingGearBonus(entity);
 
-            if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
+        Double validChance = (ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
+                (huntingGearChanceAdder * ConfigValues.itemsUniqueConfig.getInt(ItemsUniqueConfig.HUNTING_SET_CHANCE_INCREASER))) / 100;
 
-                entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        if (!(ThreadLocalRandom.current().nextDouble() < validChance))
+            return;
 
-                int huntingGearChanceAdder = 0;
+        NaturalMobSpawner.naturalMobProcessor(entity);
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
+    }
 
-                    if (player.getWorld().equals(entity.getWorld()) &&
-                            (!player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) ||
-                                    player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) && !player.getMetadata(MetadataHandler.VANISH_NO_PACKET).get(0).asBoolean())) {
+    private static int getHuntingGearBonus(Entity entity) {
 
-                        if (player.getLocation().distance(entity.getLocation()) < range) {
+        int huntingGearChanceAdder = 0;
 
-                            ItemStack helmet = player.getInventory().getHelmet();
+        for (Player player : Bukkit.getOnlinePlayers()) {
 
-                            ItemStack chestplate = player.getInventory().getChestplate();
+            if (player.getWorld().equals(entity.getWorld()) &&
+                    (!player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) ||
+                            player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) && !player.getMetadata(MetadataHandler.VANISH_NO_PACKET).get(0).asBoolean())) {
 
-                            ItemStack leggings = player.getInventory().getLeggings();
+                if (player.getLocation().distance(entity.getLocation()) < range) {
 
-                            ItemStack boots = player.getInventory().getBoots();
+                    ItemStack helmet = player.getInventory().getHelmet();
 
-                            ItemStack heldItem = player.getInventory().getItemInMainHand();
+                    ItemStack chestplate = player.getInventory().getChestplate();
 
-                            UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
+                    ItemStack leggings = player.getInventory().getLeggings();
 
-                            if (uniqueItemConstructor.huntingSetItemDetector(helmet)) huntingGearChanceAdder++;
-                            if (uniqueItemConstructor.huntingSetItemDetector(chestplate)) huntingGearChanceAdder++;
-                            if (uniqueItemConstructor.huntingSetItemDetector(leggings)) huntingGearChanceAdder++;
-                            if (uniqueItemConstructor.huntingSetItemDetector(boots)) huntingGearChanceAdder++;
-                            if (uniqueItemConstructor.huntingSetItemDetector(heldItem)) huntingGearChanceAdder++;
+                    ItemStack boots = player.getInventory().getBoots();
 
-                        }
+                    ItemStack heldItem = player.getInventory().getItemInMainHand();
 
-                    }
+                    UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
 
-                }
-
-                Double validChance = (ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
-                        (huntingGearChanceAdder * ConfigValues.itemsUniqueConfig.getInt(ItemsUniqueConfig.HUNTING_SET_CHANCE_INCREASER))) / 100;
-
-                if (random.nextDouble() < validChance) {
-
-                    NaturalMobSpawner naturalMobSpawner = new NaturalMobSpawner();
-                    naturalMobSpawner.naturalMobProcessor(entity);
+                    if (uniqueItemConstructor.huntingSetItemDetector(helmet)) huntingGearChanceAdder++;
+                    if (uniqueItemConstructor.huntingSetItemDetector(chestplate)) huntingGearChanceAdder++;
+                    if (uniqueItemConstructor.huntingSetItemDetector(leggings)) huntingGearChanceAdder++;
+                    if (uniqueItemConstructor.huntingSetItemDetector(boots)) huntingGearChanceAdder++;
+                    if (uniqueItemConstructor.huntingSetItemDetector(heldItem)) huntingGearChanceAdder++;
 
                 }
 
             }
 
         }
+
+        return huntingGearChanceAdder;
 
     }
 
