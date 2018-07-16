@@ -25,7 +25,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class ZombieKingAxe implements Listener {
@@ -49,7 +48,7 @@ public class ZombieKingAxe implements Listener {
             } else zombieKingAxe.setDurability((short) (zombieKingAxe.getDurability() + 4));
 
             ZombieKing.initializeFlamethrower(player.getLocation(), player.getLocation().getDirection(), player, true);
-            player.setMetadata(MetadataHandler.USING_ZOMBIE_KING_AXE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+            MetadataHandler.registerMetadata(player, MetadataHandler.USING_ZOMBIE_KING_AXE, true);
 
             new BukkitRunnable() {
 

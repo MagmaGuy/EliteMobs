@@ -25,7 +25,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Zombie;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -146,11 +145,11 @@ public class PowerHandler {
                             int oldMinorPowerAmount = entity.getMetadata(minorPowerAmountMetadata).get(0).asInt();
                             int newMinorPowerAmount = oldMinorPowerAmount + 1;
 
-                            entity.setMetadata(minorPowerAmountMetadata, new FixedMetadataValue(plugin, newMinorPowerAmount));
+                            MetadataHandler.registerMetadata(entity, minorPowerAmountMetadata, newMinorPowerAmount);
 
                         } else {
 
-                            entity.setMetadata(minorPowerAmountMetadata, new FixedMetadataValue(plugin, 1));
+                            MetadataHandler.registerMetadata(entity, minorPowerAmountMetadata, 1);
 
                         }
 
@@ -273,11 +272,11 @@ public class PowerHandler {
                             int oldMajorPowerAmount = entity.getMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD).get(0).asInt();
                             int newMajorPowerAmount = oldMajorPowerAmount + 1;
 
-                            entity.setMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, newMajorPowerAmount));
+                            MetadataHandler.registerMetadata(entity, MetadataHandler.MAJOR_POWER_AMOUNT_MD, newMajorPowerAmount);
 
                         } else {
 
-                            entity.setMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD, new FixedMetadataValue(plugin, 1));
+                            MetadataHandler.registerMetadata(entity, MetadataHandler.MAJOR_POWER_AMOUNT_MD, 1);
 
                         }
 

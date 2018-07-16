@@ -27,9 +27,9 @@ import java.util.List;
  */
 public class SignatureItem {
 
-    public static final ItemStack SIGNATURE_ITEMSTACK = signatureItem();
+    public static final ItemStack SIGNATURE_ITEMSTACK = setSignatureItem();
 
-    public static ItemStack signatureItem() {
+    private static ItemStack setSignatureItem() {
 
         ItemStack signature = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         SkullMeta signatureSkullMeta = (SkullMeta) signature.getItemMeta();

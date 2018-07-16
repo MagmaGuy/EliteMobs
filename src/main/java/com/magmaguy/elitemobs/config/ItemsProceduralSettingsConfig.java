@@ -26,13 +26,9 @@ import java.util.Arrays;
 public class ItemsProceduralSettingsConfig {
 
     public static final String CONFIG_NAME = "ItemsProceduralSettings.yml";
-    public static final String LORE_MOB_LEVEL_SOURCE = "Item source (mob) (line 1)";
-    public static final String LORE_SHOP_SOURCE = "Item source (shop) (line 1)";
-    public static final String LORE_WORTH = "Item worth (line 2)";
-    public static final String LORE_RESALE_WORTH = "Item resale worth (line 2)";
-    public static final String LORE_SIGNATURE = "Elite Mobs drop (line 3)";
-    public static final String LORE_TIER = "Tier level (line 4)";
-    public static final String LORE_STRUCTURE = "Lore structure (you can delete and add elements)";
+    public static final String LORE_MOB_LEVEL_SOURCE = "Item source (mob)";
+    public static final String LORE_SHOP_SOURCE = "Item source (shop)";
+    public static final String LORE_STRUCTURE = "Lore structure";
     public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
     public static final String MONITOR_ITEMS_ON_CONSOLE = "Monitor procedurally generated items on console";
     public static final String PROCEDURAL_ITEM_VALID_MATERIALS = "Valid material list for random items";
@@ -67,6 +63,21 @@ public class ItemsProceduralSettingsConfig {
             VANISHING_CURSE_BOOL,
             WATER_WORKER_BOOL, WATER_WORKER_MAX_LEVEL;
     public static final String ITEM_NAME_FORMAT = "Procedurally generated item name format";
+    private static final String MATERIAL_NAME = "Material name.";
+    public static final String SWORD_MATERIAL_NAME = MATERIAL_NAME + "Sword";
+    public static final String BOW_MATERIAL_NAME = MATERIAL_NAME + "Bow";
+    public static final String PICKAXE_MATERIAL_NAME = MATERIAL_NAME + "Pickaxe";
+    public static final String SPADE_MATERIAL_NAME = MATERIAL_NAME + "Spade";
+    public static final String HOE_MATERIAL_NAME = MATERIAL_NAME + "Hoe";
+    public static final String AXE_MATERIAL_NAME = MATERIAL_NAME + "Axe";
+    public static final String HELMET_MATERIAL_NAME = MATERIAL_NAME + "Helmet";
+    public static final String CHESTPLATE_MATERIAL_NAME = MATERIAL_NAME + "Chestplate";
+    public static final String LEGGINGS_MATERIAL_NAME = MATERIAL_NAME + "Leggings";
+    public static final String BOOTS_MATERIAL_NAME = MATERIAL_NAME + "Boots";
+    public static final String SHEARS_MATERIAL_NAME = MATERIAL_NAME + "Shears";
+    public static final String FISHING_ROD_MATERIAL_NAME = MATERIAL_NAME + "Fishing Rod";
+    public static final String SHIELD_MATERIAL_NAME = MATERIAL_NAME + "Shield";
+
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
@@ -76,17 +87,15 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(MONITOR_ITEMS_ON_CONSOLE, false);
         configuration.addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from a level $level Elite $mob");
         configuration.addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
-        configuration.addDefault(LORE_WORTH, "Worth $worth $currencyName");
-        configuration.addDefault(LORE_RESALE_WORTH, "$resale $currencyName resale value");
-        configuration.addDefault(LORE_SIGNATURE, "Elite Mobs drop");
-        configuration.addDefault(LORE_TIER, "Tier $tier");
         configuration.addDefault(LORE_STRUCTURE, Arrays.asList(
+                ChatColorConverter.chatColorConverter("$enchantments"),
+                ChatColorConverter.chatColorConverter("$potionEffects"),
                 ChatColorConverter.chatColorConverter("&m----------------------"),
-                ChatColorConverter.chatColorConverter(" $line1 "),
-                ChatColorConverter.chatColorConverter( " $line2 "),
-                ChatColorConverter.chatColorConverter(" $line3 "),
+                ChatColorConverter.chatColorConverter("$itemSource"),
+                ChatColorConverter.chatColorConverter( "$itemValue"),
+                ChatColorConverter.chatColorConverter("Elite Mobs drop"),
                 ChatColorConverter.chatColorConverter("&m----------------------"),
-                ChatColorConverter.chatColorConverter(" $line4 ")
+                ChatColorConverter.chatColorConverter("Tier $tier")
         ));
         configuration.addDefault(PROCEDURAL_ITEM_VALID_MATERIALS, Arrays.asList(
                 "DIAMOND_SWORD",
@@ -311,19 +320,19 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(WATER_WORKER_BOOL, true);
         configuration.addDefault(WATER_WORKER_MAX_LEVEL, 1);
 
-        configuration.addDefault("Material name.Sword", "Sword");
-        configuration.addDefault("Material name.Bow", "Bow");
-        configuration.addDefault("Material name.Pickaxe", "Pickaxe");
-        configuration.addDefault("Material name.Spade", "Spade");
-        configuration.addDefault("Material name.Hoe", "Hoe");
-        configuration.addDefault("Material name.Axe", "Axe");
-        configuration.addDefault("Material name.Fishing Rod", "Fishing Rod");
-        configuration.addDefault("Material name.Shield", "Shield");
-        configuration.addDefault("Material name.Shears", "Shears");
-        configuration.addDefault("Material name.Helmet", "Helmet");
-        configuration.addDefault("Material name.Chestplate", "Chestplate");
-        configuration.addDefault("Material name.Leggings", "Leggings");
-        configuration.addDefault("Material name.Boots", "Boots");
+        configuration.addDefault(SWORD_MATERIAL_NAME, "Sword");
+        configuration.addDefault(BOW_MATERIAL_NAME, "Bow");
+        configuration.addDefault(PICKAXE_MATERIAL_NAME, "Pickaxe");
+        configuration.addDefault(SPADE_MATERIAL_NAME, "Spade");
+        configuration.addDefault(HOE_MATERIAL_NAME, "Hoe");
+        configuration.addDefault(AXE_MATERIAL_NAME, "Axe");
+        configuration.addDefault(FISHING_ROD_MATERIAL_NAME, "Fishing Rod");
+        configuration.addDefault(SHIELD_MATERIAL_NAME, "Shield");
+        configuration.addDefault(SHEARS_MATERIAL_NAME, "Shears");
+        configuration.addDefault(HELMET_MATERIAL_NAME, "Helmet");
+        configuration.addDefault(CHESTPLATE_MATERIAL_NAME, "Chestplate");
+        configuration.addDefault(LEGGINGS_MATERIAL_NAME, "Leggings");
+        configuration.addDefault(BOOTS_MATERIAL_NAME, "Boots");
 
         configuration.addDefault(ITEM_NAME_FORMAT, Arrays.asList(
                 "$verb $itemType of the $adjective $noun",

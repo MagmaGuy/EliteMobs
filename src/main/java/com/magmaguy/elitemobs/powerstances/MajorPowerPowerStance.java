@@ -23,7 +23,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class MajorPowerPowerStance implements Listener {
         if (entity.hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD))
             return;
 
-        entity.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, 0));
+        MetadataHandler.registerMetadata(entity, MetadataHandler.MAJOR_VISUAL_EFFECT_MD, 0);
 
         //First integer counts the visual effects it's in, hashmap is from MajorPowerStance's trackHashMap
         HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker = new HashMap<>();

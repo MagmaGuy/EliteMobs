@@ -25,7 +25,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -39,7 +38,7 @@ public class BonusLoot extends MinorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 

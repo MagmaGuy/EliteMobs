@@ -31,7 +31,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -73,11 +72,11 @@ public class TheReturned implements Listener {
 
         Husk theReturned = (Husk) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.HUSK);
 
-        theReturned.setMetadata(MetadataHandler.THE_RETURNED, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        theReturned.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, mobLevel));
-        theReturned.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        theReturned.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        theReturned.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(theReturned, MetadataHandler.THE_RETURNED, true);
+        MetadataHandler.registerMetadata(theReturned, MetadataHandler.ELITE_MOB_MD, mobLevel);
+        MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_ARMOR, true);
+        MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_POWERS_MD, true);
+        MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_STACK, true);
         NameHandler.customUniqueNameAssigner(theReturned, ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME)));
 
         double x = random.nextDouble() - 0.5;

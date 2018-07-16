@@ -15,16 +15,13 @@
 
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,227 +49,22 @@ public class CustomItemConstructor implements Listener {
 
             String previousPath = path.toString();
 
-
-            Material itemType = itemTypeHandler(previousPath);
+            Material itemType = getMaterial(previousPath);
             Bukkit.getLogger().info("Adding: " + previousPath);
-            String itemName = itemNameHandler(previousPath);
+            String itemName = getName(previousPath);
 
             if (itemType == null) {
 
-                Bukkit.getLogger().info(ChatColorConverter.chatColorConverter("&4[EliteMobs] Material type used for " + itemName + " is not valid."));
-                break;
+                continue;
 
             }
 
-            List itemEnchantments = itemEnchantmentHandler(previousPath);
-            List potionEffects = itemPotionEffectHandler(previousPath);
+            HashMap<Enchantment, Integer> itemEnchantments = getEnchantments(previousPath);
+            List potionList = itemPotionEffectHandler(previousPath);
+            List<String> loreList = getCustomLore(previousPath);
 
-            ItemStack itemStack = new ItemStack(itemType, 1);
+            ItemStack itemStack = ItemConstructor.constructItem(itemName, itemType, itemEnchantments, potionList, loreList);
 
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(itemName);
-
-            //Add enchantments
-            if (itemEnchantments != null) {
-
-                for (Object object : itemEnchantments) {
-
-                    String string = object.toString();
-
-                    String[] parsedString = string.split(",");
-
-                    String enchantmentName = parsedString[0];
-                    Enchantment enchantmentType = Enchantment.getByName(enchantmentName);
-
-                    int enchantmentLevel = Integer.parseInt(parsedString[1]);
-
-                    itemMeta.addEnchant(enchantmentType, enchantmentLevel, true);
-
-                }
-
-            }
-
-            //All obfuscated potion effect lore is stored in the first line of lore, so it gets temporarily stored in a single string
-            String allObfuscatedPotionEffects = "";
-
-            List<String> potionEffectLore = new ArrayList<>();
-            //Add potion effects
-            if (potionEffects != null) {
-
-                for (Object object : potionEffects) {
-
-                    //Add potion effects to item rank
-                    String string = object.toString();
-
-                    String[] parsedString = string.split(",");
-
-                    //check if the input is correct
-                    if (parsedString.length == 1) {
-
-                        Bukkit.getLogger().info("[EliteMobs] Your item " + itemName + " does not have a level for its potion effect.");
-                        Bukkit.getLogger().info("[EliteMobs] You need to add a number (probably 1) after the comma for the potion effect.");
-                        Bukkit.getLogger().info("[EliteMobs] THIS MIGHT BREAK THE PLUGIN!");
-                        break;
-
-                    } else if (parsedString.length > 1) {
-
-                        if (PotionEffectType.getByName(parsedString[0]) == null) {
-
-                            break;
-
-                        }
-
-                        try {
-
-                            Integer.parseInt(parsedString[1]);
-
-                        } catch (NumberFormatException e) {
-
-                            Bukkit.getLogger().info("[EliteMobs] Your item " + itemName + " does not have a valid level for its potion effect.");
-                            Bukkit.getLogger().info("[EliteMobs] The item is therefore broken. Fix it!");
-
-                            break;
-                        }
-
-                    }
-
-                    String lore = "";
-
-                    //Add hidden lore to identify powers
-                    //Legacy support: potion effects used to only require two tags
-                    if (ConfigValues.itemsCustomLootSettingsConfig.getBoolean(ItemsCustomLootSettingsConfig.SHOW_POTION_EFFECTS)) {
-
-                        lore = parsedString[0].toLowerCase().substring(0, 1).toUpperCase() +
-                                parsedString[0].toLowerCase().substring(1, (parsedString[0].length())).replace("_", " ") +
-                                " " + parsedString[1];
-
-//                        if (parsedString.length > 2) {
-//
-//                            lore += "," + parsedString[2];
-//
-//                        }
-//
-//                        if (parsedString.length > 3) {
-//
-//                            lore +=  "," + parsedString[3];
-//
-//                        }
-
-                    }
-
-                    String obfuscatedString = loreObfuscator(" " + string);
-                    allObfuscatedPotionEffects += obfuscatedString;
-//                    lore += obfuscatedString;
-
-                    potionEffectLore.add(lore);
-
-                }
-
-            }
-
-            //temporarily add enchantments ahead of time so the worth parser knows what potion effects are in play
-            List<String> tempLore = new ArrayList<>();
-            tempLore.add(allObfuscatedPotionEffects);
-            itemMeta.setLore(tempLore);
-            itemStack.setItemMeta(itemMeta);
-
-            List structuredLore = ConfigValues.itemsCustomLootSettingsConfig.getList(ItemsCustomLootSettingsConfig.LORE_STRUCTURE);
-            List<String> parsedStructuredLore = new ArrayList<>();
-
-            for (Object object : structuredLore) {
-
-                String string = object.toString();
-
-                if (string.contains("$potionEffect")) {
-
-                    if (potionEffectLore.size() > 0) {
-
-                        for (String string1 : potionEffectLore) {
-
-                            String potionEffectEntryString = string.replace("$potionEffect", "");
-                            potionEffectEntryString += ChatColorConverter.chatColorConverter(string1);
-
-                            parsedStructuredLore.add(ChatColorConverter.chatColorConverter(potionEffectEntryString));
-
-                        }
-
-                    }
-
-                } else if (string.contains("$customLore")) {
-
-                    if (customLoreParser(previousPath) != null && customLoreParser(previousPath).size() > 0) {
-
-                        for (String string1 : customLoreParser(previousPath)) {
-
-
-                            parsedStructuredLore.add(ChatColorConverter.chatColorConverter(string1));
-
-                        }
-
-                    }
-
-                } else if (string.contains("$itemValue")) {
-
-                    if (loreWorthParser(itemStack) != null) {
-
-                        parsedStructuredLore.add(ChatColorConverter.chatColorConverter(loreWorthParser(itemStack)));
-
-                    }
-
-                } else if (string.contains("$itemTier")) {
-
-                    if (ConfigValues.itemsCustomLootSettingsConfig.getBoolean(ItemsCustomLootSettingsConfig.SHOW_ITEM_TIER)) {
-
-                        parsedStructuredLore.add(ChatColorConverter.chatColorConverter(string.replace("$itemTier", "Tier " + ItemTierFinder.findItemTier(itemStack))));
-
-                    }
-
-                } else {
-
-                    parsedStructuredLore.add(ChatColorConverter.chatColorConverter(string));
-
-                }
-
-            }
-
-            //Add config lore
-            itemMeta.setLore(parsedStructuredLore);
-            itemStack.setItemMeta(itemMeta);
-
-            if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.MMORPG_COLORS_FOR_CUSTOM_ITEMS) && ChatColor.stripColor(itemName).equals(itemName)) {
-
-                ItemQuality.dropQualityColorizer(itemStack);
-
-            }
-
-            itemMeta = itemStack.getItemMeta();
-
-            List<String> obfuscatedLore = new ArrayList<>();
-            //Add the identifying line of lore
-            for (String string : itemMeta.getLore()) {
-
-                if (string.equals(itemMeta.getLore().get(0))) {
-
-                    obfuscatedLore.add(string + allObfuscatedPotionEffects);
-
-                } else {
-
-                    obfuscatedLore.add(string);
-
-                }
-
-            }
-
-            itemMeta.setLore(obfuscatedLore);
-            itemStack.setItemMeta(itemMeta);
-
-            //Add hidden lore for shops to validate
-            ObfuscatedSignatureLoreData.obfuscateSignatureData(itemStack);
-
-            if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
-                EnchantmentHider.hideEnchantments(itemStack);
-
-            //Add custom item to customItemList
             if (!loreAddDropFrequency(previousPath, itemStack)) {
 
                 //Add item to ranked item list for drop math
@@ -283,29 +75,6 @@ public class CustomItemConstructor implements Listener {
             customItemList.add(itemStack);
 
         }
-
-    }
-
-    public String loreObfuscator(String textToObfuscate) {
-
-        String insert = "§";
-        int period = 1;
-
-        StringBuilder stringBuilder = new StringBuilder(textToObfuscate.length() + insert.length() * (textToObfuscate.length() / period) + 0);
-
-        int index = 0;
-        String prefix = "";
-
-        while (index < textToObfuscate.length()) {
-
-            stringBuilder.append(prefix);
-            prefix = insert;
-            stringBuilder.append(textToObfuscate.substring(index, Math.min(index + period, textToObfuscate.length())));
-            index += period;
-
-        }
-
-        return stringBuilder.toString();
 
     }
 
@@ -358,36 +127,40 @@ public class CustomItemConstructor implements Listener {
 
     }
 
-    private Material itemTypeHandler(String previousPath) {
+    private Material getMaterial(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Type");
 
-        Material itemType;
+        Material material;
 
         try {
 
-            itemType = Material.getMaterial(ConfigValues.itemsCustomLootListConfig.getString(path));
+            material = Material.getMaterial(ConfigValues.itemsCustomLootListConfig.getString(path));
 
         } catch (Error error) {
 
+            Bukkit.getLogger().warning("[EliteMobs] Invalid material!");
             return null;
 
         }
 
 
-        return itemType;
+        return material;
 
     }
 
-    private String itemNameHandler(String previousPath) {
+    private String getName(String previousPath) {
 
-        String path = automatedStringBuilder(previousPath, "Item Name");
+        String name = automatedStringBuilder(previousPath, "Item Name");
 
-        return chatColorConverter(ConfigValues.itemsCustomLootListConfig.getString(path));
+        if (name.isEmpty())
+            Bukkit.getLogger().warning("[EliteMobs] Invalid name!");
+
+        return chatColorConverter(ConfigValues.itemsCustomLootListConfig.getString(name));
 
     }
 
-    private List<String> customLoreParser(String previousPath) {
+    private List<String> getCustomLore(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Lore");
 
@@ -395,57 +168,41 @@ public class CustomItemConstructor implements Listener {
 
         List<String> newList = new ArrayList<>();
 
-        if (itemLore != null && !itemLore.isEmpty()) {
-
-            for (String string : itemLore) {
-
-                if (string != null && !string.isEmpty()) {
-
+        if (itemLore != null && !itemLore.isEmpty())
+            for (String string : itemLore)
+                if (string != null && !string.isEmpty())
                     newList.add(chatColorConverter(string));
 
-                }
 
-            }
-
-        }
-
-        if (newList.isEmpty()) {
-
+        if (newList.isEmpty())
             return itemLore;
 
-        }
 
         return newList;
 
     }
 
-    private String loreWorthParser(ItemStack itemStack) {
-
-        if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) {
-
-            String valueLore;
-
-            String value = ItemWorthCalculator.determineItemWorth(itemStack) + "";
-
-            valueLore = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_WORTH);
-            valueLore = valueLore.replace("$worth", value);
-            valueLore = valueLore.replace("$currencyName", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-
-            return valueLore;
-
-        }
-
-        return null;
-
-    }
-
-    private List itemEnchantmentHandler(String previousPath) {
+    private HashMap<Enchantment, Integer> getEnchantments(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
 
         List enchantments = ConfigValues.itemsCustomLootListConfig.getList(path);
 
-        return enchantments;
+        HashMap enchantmentMap = new HashMap();
+
+        for (Object object : enchantments) {
+
+            try {
+                String string = (String) object;
+                enchantmentMap.put(Enchantment.getByName(string.split(",")[0]), Integer.parseInt(string.split(",")[1]));
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("Warning: entry " + object + " is invalid.");
+                Bukkit.getLogger().warning("Make sure you add a valid enchantment type and a valid level for it!");
+            }
+
+        }
+
+        return enchantmentMap;
 
     }
 
@@ -461,7 +218,7 @@ public class CustomItemConstructor implements Listener {
 
     private void rankedItemMapCreator(ItemStack itemStack) {
 
-        int itemTier = (int) ItemTierFinder.findItemTier(itemStack);
+        int itemTier = (int) ItemTierFinder.findBattleTier(itemStack);
 
         if (dynamicRankedItemStacks.get(itemTier) == null) {
 

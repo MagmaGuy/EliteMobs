@@ -21,7 +21,6 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierFinder;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -36,11 +35,9 @@ import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.sql.BatchUpdateException;
 import java.util.HashMap;
 
 public class DamageAdjuster implements Listener {
@@ -108,7 +105,7 @@ public class DamageAdjuster implements Listener {
         //Deal with the player getting killed
         if (player.getHealth() - event.getDamage() <= 0) {
 
-            player.setMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+            MetadataHandler.registerMetadata(player, MetadataHandler.KILLED_BY_ELITE_MOB, true);
             PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity);
 
         }
@@ -284,7 +281,7 @@ public class DamageAdjuster implements Listener {
         if (player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType().equals(Material.BOW) && event.getDamager() instanceof Player)
             playerTier = 0;
         else
-            playerTier = ItemTierFinder.findItemTier(player.getInventory().getItemInMainHand());
+            playerTier = ItemTierFinder.findBattleTier(player.getInventory().getItemInMainHand());
         double eliteTier = MobTierFinder.findMobTier(damagedLivingEntity);
         double maxHealth = damagedLivingEntity.getMaxHealth();
 

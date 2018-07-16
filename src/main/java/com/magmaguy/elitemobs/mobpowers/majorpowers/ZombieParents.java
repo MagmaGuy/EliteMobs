@@ -59,7 +59,6 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
@@ -80,7 +79,7 @@ public class ZombieParents extends MajorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
         majorPowerStanceMath.itemEffect(entity);
 
@@ -101,7 +100,7 @@ public class ZombieParents extends MajorPowers implements Listener {
 
             Entity entity = event.getEntity();
 
-            entity.setMetadata(MetadataHandler.ZOMBIE_PARENTS_ACTIVATED, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.ZOMBIE_PARENTS_ACTIVATED, true);
 
             int assistMobLevel = (int) Math.floor(entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 4);
 
@@ -120,14 +119,15 @@ public class ZombieParents extends MajorPowers implements Listener {
             zombieDad.setCustomNameVisible(true);
             zombieMom.setCustomNameVisible(true);
 
-            zombieDad.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            zombieMom.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            zombieDad.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
-            zombieMom.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
-            zombieDad.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-            zombieMom.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-            zombieDad.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
-            zombieMom.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(zombieDad, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
+            MetadataHandler.registerMetadata(zombieMom, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
+            MetadataHandler.registerMetadata(zombieDad, MetadataHandler.CUSTOM_STACK, true);
+            MetadataHandler.registerMetadata(zombieMom, MetadataHandler.CUSTOM_STACK, true);
+            MetadataHandler.registerMetadata(zombieDad, MetadataHandler.CUSTOM_POWERS_MD, true);
+            MetadataHandler.registerMetadata(zombieMom, MetadataHandler.CUSTOM_POWERS_MD, true);
+            MetadataHandler.registerMetadata(zombieDad, MetadataHandler.CUSTOM_NAME, true);
+            MetadataHandler.registerMetadata(zombieMom, MetadataHandler.CUSTOM_NAME, true);
+
             AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombieDad);
             AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombieMom);
 

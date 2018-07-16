@@ -25,15 +25,11 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
-import com.magmaguy.elitemobs.items.DynamicLore;
-import com.magmaguy.elitemobs.items.PotionEffectApplier;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
-import com.magmaguy.elitemobs.mobs.passive.ChickenHandler;
-import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
-import com.magmaguy.elitemobs.scoreboard.ScoreboardHandler;
+import com.magmaguy.elitemobs.runnables.*;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import org.bstats.Metrics;
@@ -42,7 +38,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +74,7 @@ public class EliteMobs extends JavaPlugin {
         worldScanner();
 
         //Start the repeating tasks such as scanners
-        repeatingTaskRunner();
+        launchRunnables();
 
         //Commands
         this.getCommand("elitemobs").setExecutor(new CommandHandler());
@@ -91,9 +86,17 @@ public class EliteMobs extends JavaPlugin {
         //launch internal clock for attack cooldown
         DamageAdjuster.launchInternalClock();
 
+        /*
+        Check for new plugin version
+         */
         VersionChecker.updateComparer();
         if (!VersionChecker.pluginIsUpToDate)
             this.getServer().getPluginManager().registerEvents(new VersionWarner(), this);
+
+        /*
+        Metadata wiper repeating task
+         */
+        MetadataHandler.metadataWiper();
 
     }
 
@@ -145,70 +148,19 @@ public class EliteMobs extends JavaPlugin {
 
     }
 
-    public void repeatingTaskRunner() {
+    public void launchRunnables() {
 
-        MobScanner mobScanner = new MobScanner();
-        PotionEffectApplier potionEffectApplier = new PotionEffectApplier();
-        ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
+        int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
 
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                mobScanner.scanMobs();
-
-            }
-
-        }.runTaskTimer(this, 20, 20 * 10);
-
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                potionEffectApplier.potionEffectApplier();
-                if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_POWER_SCOREBOARDS)) {
-                    scoreboardHandler.scanSight();
-                }
-
-            }
-
-        }.runTaskTimer(this, 20, 20);
-
+        new EntityScanner().runTaskTimer(this, 20, 20 * 10);
+        new PotionEffectApplier().runTaskTimer(this, 20, 20);
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_POWER_SCOREBOARDS))
+            new ScoreboardUpdater().runTaskTimer(this, 20, 20);
         if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
                 ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.CHICKEN) &&
-                ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0) {
-
-            int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
-
-            ChickenHandler chickenHandler = new ChickenHandler();
-
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-
-                    //drops 1 egg for every loaded super chicken
-                    chickenHandler.dropEggs();
-
-                }
-
-            }.runTaskTimer(this, eggTimerInterval, eggTimerInterval);
-
-        }
-
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                DynamicLore.refreshDynamicLore();
-
-            }
-
-        }.runTaskTimer(this, 20, 20 * 2);
-
+                ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
+            new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
+        new DynamicLoreUpdater().runTaskTimer(this, 20, 20 * 2);
         HuntingBow.scanForBossMobs();
 
     }

@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.5.4
+version: 6.5.6
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -22,6 +22,7 @@ permissions:
       elitemobs.spawnmob: true
       elitemobs.killall.aggressiveelites: true
       elitemobs.killall.passiveelites: true
+      elitemobs.killall.specificentity: true
       elitemobs.currency.user: true
       elitemobs.currency.subtract: true
       elitemobs.currency.set: true
@@ -40,10 +41,11 @@ permissions:
       elitemobs.currency.wallet: true
       elitemobs.currency.cointop: true
   elitemobs.killall.*:
-      description: Allows players to run /elitemobs killall passiveelites and /elitemobs killall aggressiveelites
+      description: Allows players to run all /elitemobs kill variations
       children:
         elitemobs.killall.aggressiveelites: true
         elitemobs.killall.passiveelites: true
+        elitemobs.killall.specificentity: true
   elitemobs.user:
       description: Gives access to all recommended user commands
       children:
@@ -85,10 +87,13 @@ permissions:
     description: Shows a scoreboard with info about the elite mob a player might be standing next to
     default: false
   elitemobs.killall.aggressiveelites:
-    description: Allows players to run /elitemobs killall aggressiveelites
+    description: Allows players to run /elitemobs kill aggressive
     default: op
   elitemobs.killall.passiveelites:
-    description: Allows players to run /elitemobs killall passiveelites
+    description: Allows players to run /elitemobs kill passive
+    default: op
+  elitemobs.killall.specificentity:
+    description: Allows players to run /elitemobs kill [entityType]
     default: op
   elitemobs.shop:
     description: Allows players to run /elitemobs shop

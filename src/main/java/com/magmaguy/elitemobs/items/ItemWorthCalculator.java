@@ -17,10 +17,14 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.magmaguy.elitemobs.config.EconomySettingsConfig.*;
@@ -35,6 +39,22 @@ public class ItemWorthCalculator {
 
     }
 
+    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap) {
+
+        double itemWorth = Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap)) * 100.0) / 100.0;
+
+        return itemWorth;
+
+    }
+
+    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap, List<String> potionsMap) {
+
+        double itemWorth = Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap) + potionEffectValue(potionsMap)) * 100.0) / 100.0;
+
+        return itemWorth;
+
+    }
+
     public static double determineResaleWorth(ItemStack itemStack) {
 
         double resaleWorth = Math.round((determineItemWorth(itemStack) * (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.RESALE_VALUE) / 100)) * 100.0) / 100.0;
@@ -42,111 +62,6 @@ public class ItemWorthCalculator {
         return resaleWorth;
 
     }
-
-    /*
-    Find out the worth on an item capable of spawning a mob of this level and then find out the value of said item.
-     */
-//    public static double targetItemWorth(int mobLevel) {
-//
-//        double totalWorth = 0;
-//        double currentThreat = mobLevel;
-//
-//        /*
-//        Mobs should drop items that allow mobs of higher levels to be generated and killed. Hence, the worth of the item
-//        should be higher than the theoretical worth of the item required to spawn the mob in the first place, assuming
-//        a fully optimized generated item.
-//
-//        Reminder: This spawns 1 item. That means that hte threat level has to get spread over 5 items.
-//         */
-//
-//        /*
-//        Find which material tier worth to use
-//         */
-//
-//        if (mobLevel > DamageAdjuster.DIAMOND_TIER_LEVEL) {
-//
-//            totalWorth = (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.DIAMOND_SWORD) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.DIAMOND_HELMET) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.DIAMOND_CHESTPLATE) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.DIAMOND_LEGGINGS) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.DIAMOND_BOOTS)) / 5;
-//
-//            currentThreat -= DamageAdjuster.DIAMOND_TIER_LEVEL;
-//
-//        } else if (mobLevel > DamageAdjuster.IRON_TIER_LEVEL) {
-//
-//            totalWorth = (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.IRON_SWORD) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.IRON_HELMET) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.IRON_CHESTPLATE) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.IRON_LEGGINGS) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.IRON_BOOTS)) / 5;
-//
-//            currentThreat -= DamageAdjuster.IRON_TIER_LEVEL;
-//
-//        } else if (mobLevel > DamageAdjuster.STONE_CHAIN_TIER_LEVEL) {
-//
-//            totalWorth = (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.STONE_SWORD) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.CHAINMAIL_HELMET) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.CHAINMAIL_CHESTPLATE) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.CHAINMAIL_LEGGINGS) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.CHAINMAIL_BOOTS)) / 5;
-//
-//            currentThreat -= DamageAdjuster.STONE_CHAIN_TIER_LEVEL;
-//
-//        } else if (mobLevel > DamageAdjuster.GOLD_WOOD_LEATHER_TIER_LEVEL) {
-//
-//            totalWorth = (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.GOLD_SWORD) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.GOLD_HELMET) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.GOLD_CHESTPLATE) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.GOLD_LEGGINGS) +
-//                    ConfigValues.economyConfig.getDouble(EconomySettingsConfig.GOLD_BOOTS)) / 5;
-//
-//            currentThreat -= DamageAdjuster.GOLD_WOOD_LEATHER_TIER_LEVEL;
-//
-//        }
-//
-//        /*
-//        Find the item worth of protection enchantments
-//         */
-//
-//        double protectionEnchantmentValue = ConfigValues.economyConfig.getDouble(EconomySettingsConfig.PROTECTION_ENVIRONMENTAL);
-//
-//
-//        /*
-//        Find the item worth of sharpness enchantments
-//         */
-//
-//        double sharpnessEnchantmentValue = ConfigValues.economyConfig.getDouble(EconomySettingsConfig.DAMAGE_ALL);
-//
-//        /*
-//        Find the average value of these enchantments
-//         */
-//
-//        double averageEnchantmentWorth = (protectionEnchantmentValue * 4 + sharpnessEnchantmentValue) / 5;
-//
-//        /*
-//        Find how many enchantments should be necessary to spawn a mob (keeping in mind that this is for 1 of 5 items that
-//        will contribute to the max level
-//         */
-//
-//        double worthOfAllNecessaryEnchantments = currentThreat / DamageAdjuster.ENCHANTMENT_OR_POTION_EFFECT_THREAT_INCREMENTER * averageEnchantmentWorth;
-//
-//        /*
-//        Merge enchantment worth with total worth
-//         */
-//
-//        totalWorth += worthOfAllNecessaryEnchantments;
-//
-//        /*
-//        Add 1 enchantment worth to allow incrementing the mob level
-//         */
-//
-//        //todo: find a cleaner finish to this
-//        totalWorth += averageEnchantmentWorth;
-//
-//        return totalWorth;
-//
-//    }
 
     private static double configGetter(String string) {
 
@@ -303,6 +218,24 @@ public class ItemWorthCalculator {
 
     }
 
+    private static double getAllEnchantmentsValue(HashMap<Enchantment, Integer> enchantmentsMap) {
+
+        double enchantmentsValue = 0;
+
+        if (!enchantmentsMap.isEmpty()) {
+
+            for (Enchantment enchantment : enchantmentsMap.keySet()) {
+
+                enchantmentsValue += enchantmentWorthGetter(enchantment) * enchantmentsMap.get(enchantment);
+
+            }
+
+        }
+
+        return enchantmentsValue;
+
+    }
+
     public static double enchantmentWorthGetter(Enchantment enchantment) {
 
         String enchantmentName = enchantment.getName();
@@ -378,41 +311,16 @@ public class ItemWorthCalculator {
     private static double potionEffectValue(ItemStack itemStack) {
 
         double potionEffectValue = 0;
+        if (!itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore()) return potionEffectValue;
 
-        if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore()) {
+        String potionEffectLoreLine = itemStack.getItemMeta().getLore().get(0).replace("§", "");
+        if (!potionEffectLoreLine.contains(LoreGenerator.OBFUSCATED_POTIONS)) return potionEffectValue;
 
-            String potionEffectLoreLine = itemStack.getItemMeta().getLore().get(0);
+        for (String substring : potionEffectLoreLine.split(",")) {
 
-            for (String substring : potionEffectLoreLine.split(" ")) {
-
-                if (substring.contains("§") && substring.contains(",")) {
-
-                    String deobfuscatedSubstring = substring.replace("§", "");
-                    int index = 0;
-                    double currentValue = 0;
-
-                    for (String subSubstring : deobfuscatedSubstring.split(",")) {
-
-                        if (index == 0) {
-
-                            currentValue += potionEffectValueGetter(subSubstring);
-
-                        }
-
-                        if (index == 1) {
-
-                            currentValue = currentValue * (Integer.valueOf(subSubstring) + 1);
-
-                        }
-
-                        index++;
-
-                    }
-
-                    potionEffectValue += currentValue;
-
-                }
-
+            List<String> parsedSubstring = Arrays.asList(substring.split(":"));
+            if (parsedSubstring.size() > 1) {
+                potionEffectValue += getPotionEffectValue(parsedSubstring.get(0)) * (Integer.valueOf(parsedSubstring.get(1)) + 1);
             }
 
         }
@@ -421,7 +329,20 @@ public class ItemWorthCalculator {
 
     }
 
-    private static double potionEffectValueGetter(String string) {
+    private static double potionEffectValue(List<String> potionString) {
+
+        double potionEffectValue = 0;
+
+        if (potionString == null || potionString.isEmpty()) return potionEffectValue;
+
+        for (String string : potionString)
+            potionEffectValue += getPotionEffectValue(string.split(",")[0]) * (Integer.parseInt(string.split(",")[1]) + 1);
+
+        return potionEffectValue;
+
+    }
+
+    private static double getPotionEffectValue(String string) {
 
         switch (string) {
 

@@ -26,7 +26,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -128,8 +127,8 @@ public class MobScanner implements Listener {
                 if (entity instanceof IronGolem && !entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
                         ((IronGolem) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
-                    entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, HealthHandler.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
-                            DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity))));
+                    MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, HealthHandler.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
+                            DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)));
                     customAggressiveName(entity);
 
                 }

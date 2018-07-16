@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevel;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import org.bukkit.Location;
@@ -15,7 +16,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -65,9 +65,9 @@ public class Kraken implements Listener {
         kraken.setCustomName(ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.KRAKEN_NAME)));
         kraken.setCustomNameVisible(true);
 
-        kraken.setMetadata(MetadataHandler.KRAKEN, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        kraken.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, 500));
-        kraken.setMetadata(MetadataHandler.EVENT_CREATURE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(kraken, MetadataHandler.KRAKEN, true);
+        MetadataHandler.registerMetadata(kraken, MetadataHandler.ELITE_MOB_MD, DynamicBossLevel.determineDynamicBossLevel(kraken));
+        MetadataHandler.registerMetadata(kraken, MetadataHandler.EVENT_CREATURE, true);
 
         krakenDamageLoop(kraken);
         krakenVisualEffectLoop(kraken);
@@ -117,7 +117,7 @@ public class Kraken implements Listener {
         repeatingFireball.setIsIncendiary(true);
         repeatingFireball.setYield(2F);
 
-        repeatingFireball.setMetadata(MetadataHandler.KRAKEN_FIREBALL, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(repeatingFireball, MetadataHandler.KRAKEN_FIREBALL, true);
 
 //        repeatingFireball.setShooter(kraken);
 

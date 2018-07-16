@@ -15,39 +15,17 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.economy.UUIDFilter;
-import com.magmaguy.elitemobs.events.DeadMoon;
-import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
-import com.magmaguy.elitemobs.events.mobs.*;
-import com.magmaguy.elitemobs.items.CustomItemConstructor;
-import com.magmaguy.elitemobs.items.UniqueItemConstructor;
-import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
-import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.*;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-
-import java.util.Random;
-
-import static com.magmaguy.elitemobs.items.CustomItemConstructor.customItemList;
-import static org.bukkit.Bukkit.getLogger;
-import static org.bukkit.Bukkit.getServer;
+import org.bukkit.entity.Player;
 
 /**
  * Created by MagmaGuy on 21/01/2017.
@@ -58,13 +36,14 @@ public class CommandHandler implements CommandExecutor {
     private final static String STATS = "elitemobs.stats";
     private final static String GETLOOT = "elitemobs.getloot";
     private final static String SIMLOOT = "elitemobs.simloot";
-    private final static String RELOAD_CONFIGS = "elitemobs.reload.configs";
+    public final static String RELOAD_CONFIGS = "elitemobs.reload.configs";
     private final static String RELOAD_LOOT = "elitemobs.reload.loot";
     private final static String GIVELOOT = "elitemobs.giveloot";
     private final static String SPAWNMOB = "elitemobs.spawnmob";
     private final static String SPAWN_BOSS_MOB = "elitemobs.spawnbossmob";
-    private final static String KILLALL_AGGRESSIVEELITES = "elitemobs.killall.aggressiveelites";
-    private final static String KILLALL_PASSIVEELITES = "elitemobs.killall.passiveelites";
+    public final static String KILLALL_AGGRESSIVEELITES = "elitemobs.killall.aggressiveelites";
+    public final static String KILLALL_PASSIVEELITES = "elitemobs.killall.passiveelites";
+    public final static String KILLALL_SPECIFICENTITY = "elitemobs.killall.specificentity";
     private final static String SHOP = "elitemobs.shop";
     private final static String CUSTOMSHOP = "elitemobs.customshop";
     private final static String CURRENCY_PAY = "elitemobs.currency.pay";
@@ -75,9 +54,8 @@ public class CommandHandler implements CommandExecutor {
     private final static String CURRENCY_WALLET = "elitemobs.currency.wallet";
     private final static String CURRENCY_COINTOP = "elitemobs.currency.cointop";
     private final static String VERSION = "elitemobs.version";
-    //    private final static String CONFIG = "elitemobs.config";
-    private final static String EVENT_LAUNCH_SMALLTREASUREGOBLIN = "elitemobs.events.smalltreasuregoblin";
-    private final static String EVENT_LAUNCH_DEADMOON = "elitemobs.events.smalltreasuregoblin";
+    public final static String EVENT_LAUNCH_SMALLTREASUREGOBLIN = "elitemobs.events.smalltreasuregoblin";
+    public final static String EVENT_LAUNCH_DEADMOON = "elitemobs.events.smalltreasuregoblin";
     private final static String CHECK_TIER = "elitemobs.checktier";
     private final static String SET_MAX_TIER = "elitemobs.config.setmaxtier";
     private final static String GET_TIER = "elitemobs.gettier";
@@ -87,538 +65,163 @@ public class CommandHandler implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
 
-        // /elitemobs SpawnMob with variable arg length
-        if (args.length > 0 && args[0].equalsIgnoreCase("SpawnMob")) {
-
-            if (permCheck(SPAWNMOB, commandSender)) {
-
-                SpawnMobCommandHandler spawnMob = new SpawnMobCommandHandler();
-
-                spawnMob.spawnMob(commandSender, args);
-
+        switch (label) {
+            case "ag":
+            case "adventurersguild":
+            case "adventurerguild":
+                if (userPermCheck(ADVENTURERS_GUILD, commandSender))
+                    AdventurersGuildGUI.mainMenu((Player) commandSender);
                 return true;
-
-            }
-
         }
 
-        if ((label.equalsIgnoreCase("ag") || label.equalsIgnoreCase("adventurerguild") ||
-                label.equalsIgnoreCase("adventurersguild")) && userPermCheck(ADVENTURERS_GUILD, commandSender)) {
-
-            Player player = (Player) commandSender;
-
-            AdventurersGuildGUI.mainMenu(player);
-
+        if (args.length == 0) {
+            validCommands(commandSender);
             return true;
-
         }
 
-        switch (args.length) {
+        args[0] = args[0].toLowerCase();
 
-            //just /elitemobs
-            case 0:
-
-                validCommands(commandSender);
+        switch (args[0]) {
+            case "spawn":
+            case "spawnmob":
+                if (permCheck(SPAWNMOB, commandSender))
+                    SpawnMobCommandHandler.spawnMob(commandSender, args);
                 return true;
-
-            // /elitemobs stats | /elitemobs getloot (for GUI menu) | /elitemobs shop
-            case 1:
-
-                if (args[0].equalsIgnoreCase("stats") && permCheck(STATS, commandSender)) {
-
-                    StatsCommandHandler stats = new StatsCommandHandler();
-
-                    stats.statsHandler(commandSender);
-
-                    return true;
-
-                }
-
-                if ((args[0].equalsIgnoreCase("getloot") || args[0].equalsIgnoreCase("gl")) &&
-                        userPermCheck(GETLOOT, commandSender)) {
-
+            case "ag":
+            case "adventurersguild":
+            case "adventurerguild":
+                if (userPermCheck(ADVENTURERS_GUILD, commandSender))
+                    AdventurersGuildGUI.mainMenu((Player) commandSender);
+                return true;
+            case "stats":
+                if (permCheck(STATS, commandSender))
+                    StatsCommandHandler.statsHandler(commandSender);
+                return true;
+            case "getloot":
+            case "gl":
+                if (userPermCheck(GETLOOT, commandSender) && args.length == 1) {
                     LootGUI lootGUI = new LootGUI();
                     lootGUI.lootGUI((Player) commandSender);
-                    return true;
-
+                } else {
+                    if (GetLootCommandHandler.getLoot(((Player) commandSender), args[1]))
+                        return true;
+                    else
+                        ((Player) commandSender).sendTitle("", "Could not find that item name.");
                 }
-
-                if (args[0].equalsIgnoreCase("shop") && userPermCheck(SHOP, commandSender)) {
-
+                return true;
+            case "shop":
+            case "store":
+                if (userPermCheck(SHOP, commandSender)) {
                     ShopHandler shopHandler = new ShopHandler();
-
                     shopHandler.initializeShop((Player) commandSender);
-
-                    return true;
-
                 }
-
-                if ((args[0].equalsIgnoreCase("customShop") || args[0].equalsIgnoreCase("cShop")) &&
-                        userPermCheck(CUSTOMSHOP, commandSender)) {
-
+                return true;
+            case "customshop":
+            case "cshop":
+            case "customstore":
+            case "cstore":
+                if (userPermCheck(CUSTOMSHOP, commandSender)) {
                     CustomShopHandler customShopHandler = new CustomShopHandler();
-
                     customShopHandler.initializeShop((Player) commandSender);
-
-                    return true;
-
                 }
-
-                if (args[0].equalsIgnoreCase("wallet") && userPermCheck(CURRENCY_WALLET, commandSender)) {
-
-                    String name = commandSender.getName();
-
-                    Double money = CurrencyCommandsHandler.walletCommand(name);
-
-                    commandSender.sendMessage(ChatColor.GREEN + "You have " + money + " " + ConfigValues.economyConfig.getString("Currency name"));
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("coinTop") && userPermCheck(CURRENCY_COINTOP, commandSender)) {
-
+                return true;
+            case "wallet":
+            case "bal":
+            case "balance":
+            case "currency":
+            case "money":
+            case "$":
+                if (userPermCheck(CURRENCY_WALLET, commandSender))
+                    CurrencyCommandsHandler.walletCommand(commandSender, args);
+                return true;
+            case "cointop":
+            case "baltop":
+            case "cashtop":
+            case "currencytop":
+            case "$top":
+                if (userPermCheck(CURRENCY_COINTOP, commandSender))
                     CurrencyCommandsHandler.coinTop(commandSender);
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("version") && permCheck(VERSION, commandSender)) {
-
-                    commandSender.sendMessage(ChatColor.DARK_GREEN + "[EliteMobs]" + ChatColor.WHITE + " version " + ChatColor.GREEN +
-                            Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion());
-
-                    return true;
-
-                }
-
-//                if (args[0].equalsIgnoreCase("config") && permCheck(CONFIG, commandSender)) {
-//
-//                    GUIConfigHandler guiConfigHandler = new GUIConfigHandler();
-//                    guiConfigHandler.GUIConfigHandler((Player) commandSender);
-//                    return true;
-//
-//                }
-
-                if (args[0].equalsIgnoreCase("checktier") && userPermCheck(CHECK_TIER, commandSender)) {
-
+                return true;
+            case "version":
+                if (permCheck(VERSION, commandSender))
+                    VersionHandler.versionCommand(commandSender, args);
+                return true;
+            case "checktier":
+            case "tiercheck":
+            case "tier":
+                if (permCheck(CHECK_TIER, commandSender))
                     CheckTierCommand.checkTier(((Player) commandSender));
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("checkmaxtier") && userPermCheck(CHECK_MAX_TIER, commandSender)) {
-
+                return true;
+            case "checkmaxtier":
+            case "maxtier":
+                if (permCheck(CHECK_MAX_TIER, commandSender))
                     CheckMaxItemTierCommand.checkMaxItemTier(commandSender);
-                    return true;
-
-                }
-
-                validCommands(commandSender);
                 return true;
-
-            // /elitemobs reload config | /elitemobs reload loot | /elitemobs giveloot [player] (for AdventurersGuildGUI menu) |
-            // /elitemobs killall aggressiveelites | /elitemobs killall passiveelites | /elitemobs simloot [level] |
-            // /elitemobs check [playerName]
-            case 2:
-
-                // /elitemobs reload config
-                if (args[0].equalsIgnoreCase("reload") && args[1].equalsIgnoreCase("configs")
-                        && permCheck(RELOAD_CONFIGS, commandSender)) {
-
-                    ConfigValues.initializeConfigValues();
-
-                    getLogger().info("EliteMobs configs reloaded!");
-
-                    return true;
-
-                }
-
-                // /elitemobs reload loot
-                if (args[0].equalsIgnoreCase("reload") && args[1].equalsIgnoreCase("loot")
-                        && permCheck(RELOAD_LOOT, commandSender)) {
-
-                    ConfigValues.initializeConfigValues();
-
-                    CustomItemConstructor.customItemList.clear();
-                    CustomItemConstructor.staticCustomItemHashMap.clear();
-                    CustomItemConstructor.dynamicRankedItemStacks.clear();
-                    UniqueItemConstructor.uniqueItems.clear();
-
-                    CustomItemConstructor customItemConstructor = new CustomItemConstructor();
-                    customItemConstructor.superDropParser();
-
-                    UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
-                    uniqueItemConstructor.intializeUniqueItems();
-
-                    commandSender.sendMessage("EliteMobs configs reloaded!");
-
-                    return true;
-
-                }
-
-                // /elitemobs getloot | /elitemobs gl
-                if ((args[0].equalsIgnoreCase("getloot") || args[0].equalsIgnoreCase("gl"))
-                        && userPermCheck(GETLOOT, commandSender)) {
-
-                    Player player = (Player) commandSender;
-
-                    GetLootCommandHandler getLootCommandHandler = new GetLootCommandHandler();
-
-                    if (getLootCommandHandler.getLootHandler(player, args[1])) {
-
-                        return true;
-
-                    } else {
-
-                        player.sendTitle("", "Could not find that item name.");
-
-                        return true;
-
-                    }
-
-                }
-
-                if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("aggressiveelites") &&
-                        permCheck(KILLALL_AGGRESSIVEELITES, commandSender)) {
-
-
-                    int counter = 0;
-
-                    for (World world : EliteMobs.validWorldList) {
-
-                        for (LivingEntity livingEntity : world.getLivingEntities()) {
-
-                            if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(livingEntity)) {
-
-                                livingEntity.remove();
-                                counter++;
-
-                            }
-
-                        }
-
-                    }
-
-                    commandSender.sendMessage("Killed " + counter + " aggressive EliteMobs.");
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("killall") && args[1].equalsIgnoreCase("passiveelites") &&
-                        permCheck(KILLALL_PASSIVEELITES, commandSender)) {
-
-                    for (World world : EliteMobs.validWorldList) {
-
-                        for (LivingEntity livingEntity : world.getLivingEntities()) {
-
-                            if (livingEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && ValidPassiveMobFilter.ValidPassiveMobFilter(livingEntity)) {
-
-                                livingEntity.remove();
-
-                            }
-
-                        }
-
-                    }
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("simloot") && commandSender instanceof Player &&
-                        userPermCheck(SIMLOOT, commandSender)) {
-
-
-                    SimLootHandler simLootHandler = new SimLootHandler();
-
-                    simLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]));
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("check") && permCheck(CURRENCY_CHECK, commandSender)) {
-
-                    try {
-
-                        Double money = CurrencyCommandsHandler.checkCommand(args[1]);
-
-                        commandSender.sendMessage(args[1] + " has " + money + " " + ConfigValues.economyConfig.get("Currency name"));
-
-                    } catch (Exception e) {
-
-                        commandSender.sendMessage("Input not valid. Command format: /em check [playerName]");
-
-                    }
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("event") && args[1].equalsIgnoreCase("smalltreasuregoblin") &&
-                        permCheck(EVENT_LAUNCH_SMALLTREASUREGOBLIN, commandSender)) {
-
-                    SmallTreasureGoblin.initializeEvent();
-                    commandSender.sendMessage("Queued small treasure goblin event for next valid zombie spawn");
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("event") && args[1].equalsIgnoreCase("deadmoon") &&
-                        permCheck(EVENT_LAUNCH_DEADMOON, commandSender)) {
-
-                    DeadMoon.initializeEvent();
-                    commandSender.sendMessage("Queued deadmoon event for next new moon");
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("spawnbossmob") && userPermCheck(SPAWNMOB, commandSender)) {
-
-                    Player player = (Player) commandSender;
-                    Location cursorLocation = player.getTargetBlock(null, 5).getLocation().add(new Vector(0.5, 2, 0.5));
-
-                    if (args[1].equalsIgnoreCase("treasuregoblin")) {
-
-                        Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
-                        TreasureGoblin.createGoblin(zombie);
-                        zombie.remove();
-                        commandSender.sendMessage("Spawned treasure goblin");
-
-                    }
-
-                    if (args[1].equalsIgnoreCase("zombieking")) {
-
-                        Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
-                        ZombieKing.spawnZombieKing(zombie);
-                        zombie.remove();
-                        commandSender.sendMessage("Spawned zombie king");
-
-                    }
-
-                    if (args[1].equalsIgnoreCase("kraken")) {
-
-                        Squid squid = (Squid) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.SQUID);
-                        Kraken.spawnKraken(squid.getLocation());
-                        squid.remove();
-                        commandSender.sendMessage("Spawned Kraken");
-
-                    }
-
-                    if (args[1].equalsIgnoreCase("balrog")) {
-
-                        Silverfish balrog = (Silverfish) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.SILVERFISH);
-                        Balrog.spawnBalrog(balrog.getLocation());
-                        balrog.remove();
-                        commandSender.sendMessage("Spawned Balrog");
-
-                    }
-
-                    if (args[1].equalsIgnoreCase("fae")) {
-
-                        Vex fae = (Vex) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.VEX);
-                        Fae.spawnFae(fae.getLocation());
-                        fae.remove();
-                        commandSender.sendMessage("Spawned Fae");
-
-                    }
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("gettier") && commandSender instanceof Player && userPermCheck(GET_TIER, commandSender)) {
-
+            case "reload":
+            case "restart":
+                if (permCheck(RELOAD_CONFIGS, commandSender))
+                    ReloadHandler.reloadCommand(commandSender, args);
+                return true;
+            case "killall":
+            case "kill":
+                KillHandler.killCommand(commandSender, args);
+                return true;
+            case "simloot":
+            case "simulateloot":
+            case "simdrop":
+            case "simulatedrop":
+                if (userPermCheck(SIMLOOT, commandSender))
+                    SimLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]));
+                return true;
+            case "check":
+            case "checkcurrency":
+            case "checkbal":
+            case "checkbalance":
+            case "check$":
+                if (permCheck(CURRENCY_CHECK, commandSender))
+                    CurrencyCommandsHandler.checkCommand(commandSender, args);
+                return true;
+            case "event":
+            case "launchevent":
+            case "startevent":
+            case "triggerevent":
+                TriggerEventHandler.triggerEventCommand(commandSender, args);
+                return true;
+            case "spawnbossmob":
+            case "spawnboss":
+                if (userPermCheck(SPAWNMOB, commandSender))
+                    SpawnMobCommandHandler.spawnBossMob((Player) commandSender, args);
+                return true;
+            case "gettier":
+            case "spawntier":
+                if (userPermCheck(GET_TIER, commandSender))
                     TierSetSpawner.spawnTierItem(Integer.parseInt(args[1]), (Player) commandSender);
-
-                    return true;
-
-                }
-
-                if (args[0].equalsIgnoreCase("setmaxtier") && userPermCheck(SET_MAX_TIER, commandSender)) {
-
+                return true;
+            case "setmaxtier":
+                if (permCheck(SET_MAX_TIER, commandSender))
                     SetMaxItemTierCommand.setMaxItemTier(Double.parseDouble(args[1]), commandSender);
-
-                    return true;
-
-                }
-
-                validCommands(commandSender);
                 return true;
-
-            // /elitemobs giveloot [player] [loot] || /elitemobs paycoins [player] [amount] || /elitemobs subtractcoins [player] [amount]
-            // || /elitemobs setcoins [player] [amount]
-            case 3:
-
-                if (args[0].equalsIgnoreCase("giveloot") && permCheck(GIVELOOT, commandSender)) {
-
-                    if (validPlayer(args[1])) {
-
-                        Player receiver = Bukkit.getServer().getPlayer(args[1]);
-
-                        GetLootCommandHandler getLootCommandHandler = new GetLootCommandHandler();
-
-                        if (args[2].equalsIgnoreCase("random") || args[2].equalsIgnoreCase("r")) {
-
-                            Random random = new Random();
-
-                            int index = random.nextInt(customItemList.size());
-
-                            ItemStack itemStack = new ItemStack(customItemList.get(index));
-
-                            receiver.getInventory().addItem(itemStack);
-
-                            return true;
-
-                        } else if (getLootCommandHandler.getLootHandler(receiver, args[2])) {
-
-                            return true;
-
-                        } else if (!getLootCommandHandler.getLootHandler(receiver, args[2])) {
-
-                            if (commandSender instanceof ConsoleCommandSender) {
-
-                                getLogger().info("Can't give loot to player - loot not found.");
-
-                                return true;
-
-                            } else if (commandSender instanceof Player) {
-
-                                Player player = (Player) commandSender;
-
-                                player.sendTitle("Can't give loot to player - loot not found.", "");
-
-                                return true;
-
-                            }
-
-                        }
-
-                    } else {
-
-                        if (commandSender instanceof ConsoleCommandSender) {
-
-                            getLogger().info("Can't give loot to player - player not found.");
-
-                            return true;
-
-                        } else if (commandSender instanceof Player) {
-
-                            Player player = (Player) commandSender;
-
-                            player.sendTitle("Can't give loot to player - player not found.", "");
-
-                            return true;
-
-                        }
-
-                    }
-
-                }
-
-                if (args[0].equals("pay") && userPermCheck(CURRENCY_PAY, commandSender)) {
-
-                    try {
-
-                        if (Double.parseDouble(args[2]) > 0 && Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))) {
-
-                            CurrencyCommandsHandler.payCommand(args[1], Integer.parseInt(args[2]));
-                            CurrencyCommandsHandler.subtractCommand(commandSender.getName(), Integer.parseInt(args[2]));
-
-                            commandSender.sendMessage("You have paid " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " to " + args[1]);
-                            commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())) + " " + ConfigValues.economyConfig.get("Currency name"));
-
-                            Player recipient = getServer().getPlayer(args[1]);
-                            recipient.sendMessage("You have received " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " from " + ((Player) commandSender).getDisplayName());
-
-                        } else if (Double.parseDouble(args[2]) < 0) {
-
-                            commandSender.sendMessage("Nice try. This plugin doesn't make the same mistake as banks have in the past.");
-
-                        } else {
-
-                            commandSender.sendMessage("You don't have enough " + ConfigValues.economyConfig.get("Currency name") + " to do that!");
-
-                        }
-
-
-                    } catch (Exception e) {
-
-                        commandSender.sendMessage("Input not valid. Command format: /em pay [playerName] [amount]");
-
-                    }
-
-                    return true;
-
-                }
-
-                if (args[0].equals("add") && userPermCheck(CURRENCY_ADD, commandSender)) {
-
-                    try {
-
-                        CurrencyCommandsHandler.addCommand(args[1], Integer.parseInt(args[2]));
-
-                        commandSender.sendMessage("You have added " + args[2] + " to " + args[1]);
-                        commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
-
-                    } catch (Exception e) {
-
-                        commandSender.sendMessage("Input not valid. Command format: /em subtract [playerName] [amount]");
-
-                    }
-
-                    return true;
-
-                }
-
-                if (args[0].equals("subtract") && userPermCheck(CURRENCY_SUBTRACT, commandSender)) {
-
-                    try {
-
-                        CurrencyCommandsHandler.subtractCommand(args[1], Integer.parseInt(args[2]));
-
-                        commandSender.sendMessage("You have subtracted " + args[2] + " from " + args[1]);
-                        commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
-
-                    } catch (Exception e) {
-
-                        commandSender.sendMessage("Input not valid. Command format: /em subtract [playerName] [amount]");
-
-                    }
-
-                    return true;
-
-                }
-
-                if (args[0].equals("set") && permCheck(CURRENCY_SET, commandSender)) {
-
-                    try {
-
-                        CurrencyCommandsHandler.setCommand(args[1], Integer.parseInt(args[2]));
-
-                        commandSender.sendMessage("You set " + args[1] + "'s " + ConfigValues.economyConfig.get("Currency name") + " to " + args[2]);
-
-                    } catch (Exception e) {
-
-                        commandSender.sendMessage("Input not valid. Command format: /em set [playerName] [amount]");
-
-                    }
-
-                    return true;
-
-                }
-
-                validCommands(commandSender);
+            case "giveloot":
+                if (permCheck(GIVELOOT, commandSender))
+                    GiveLootHandler.giveLootCommand(commandSender, args);
                 return true;
-
-            //invalid commands
+            case "pay":
+                if (userPermCheck(CURRENCY_PAY, commandSender))
+                    CurrencyCommandsHandler.payCommand((Player) commandSender, args);
+                return true;
+            case "add":
+                if (permCheck(CURRENCY_ADD, commandSender))
+                    CurrencyCommandsHandler.addCommand(commandSender, args);
+                return true;
+            case ("subtract"):
+                if (permCheck(CURRENCY_SUBTRACT, commandSender))
+                    CurrencyCommandsHandler.subtractCommand(commandSender, args);
+                return true;
+            case ("set"):
+                if (permCheck(CURRENCY_SET, commandSender))
+                    CurrencyCommandsHandler.setCommand(commandSender, args);
+                return true;
             default:
-
                 validCommands(commandSender);
                 return true;
 
@@ -626,7 +229,7 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
-    private boolean permCheck(String permission, CommandSender commandSender) {
+    public static boolean permCheck(String permission, CommandSender commandSender) {
 
         if (commandSender.hasPermission(permission)) return true;
 
@@ -649,7 +252,7 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
-    private boolean userPermCheck(String permission, CommandSender commandSender) {
+    public static boolean userPermCheck(String permission, CommandSender commandSender) {
 
         if (commandSender instanceof Player) {
 
@@ -663,7 +266,7 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
-    private void validCommands(CommandSender commandSender) {
+    private static void validCommands(CommandSender commandSender) {
 
         if (commandSender instanceof Player) {
 
@@ -691,13 +294,11 @@ public class CommandHandler implements CommandExecutor {
             if (silentPermCheck(CURRENCY_CHECK, commandSender))
                 player.sendMessage("/elitemobs check [username]");
             if (silentPermCheck(RELOAD_CONFIGS, commandSender))
-                player.sendMessage("/elitemobs reload configs");
-            if (silentPermCheck(RELOAD_LOOT, commandSender))
-                player.sendMessage("/elitemobs reload loot");
+                player.sendMessage("/elitemobs reload");
             if (silentPermCheck(KILLALL_AGGRESSIVEELITES, commandSender))
-                player.sendMessage("/elitemobs killall aggressiveelites");
+                player.sendMessage("/elitemobs kill aggressive");
             if (silentPermCheck(KILLALL_PASSIVEELITES, commandSender))
-                player.sendMessage("/elitemobs killall passiveelites");
+                player.sendMessage("/elitemobs kill passive");
             if (silentPermCheck(SIMLOOT, commandSender))
                 player.sendMessage("/elitemobs simloot [mob level]");
             if (silentPermCheck(GETLOOT, commandSender))
@@ -722,8 +323,7 @@ public class CommandHandler implements CommandExecutor {
 
             commandSender.sendMessage("[EliteMobs] Command not recognized. Valid commands:");
             commandSender.sendMessage("elitemobs stats");
-            commandSender.sendMessage("elitemobs reload loot");
-            commandSender.sendMessage("elitemobs reload configs");
+            commandSender.sendMessage("elitemobs reload");
             commandSender.sendMessage("elitemobs check [username]");
             commandSender.sendMessage("elitemobs set [username]");
             commandSender.sendMessage("elitemobs add [username]");
@@ -737,30 +337,11 @@ public class CommandHandler implements CommandExecutor {
 
     }
 
-    private boolean silentPermCheck(String permission, CommandSender commandSender) {
+    private static boolean silentPermCheck(String permission, CommandSender commandSender) {
 
         return commandSender.hasPermission(permission);
 
     }
 
-
-    private boolean validPlayer(String arg2) {
-
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-
-            String currentName = player.getName();
-
-            if (currentName.equals(arg2)) {
-
-                return true;
-
-            }
-
-        }
-
-        //TODO: hunt down stuff that errors when this is changed to false
-        return true;
-
-    }
 
 }

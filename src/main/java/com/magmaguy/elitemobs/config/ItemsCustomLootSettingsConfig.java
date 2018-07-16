@@ -23,10 +23,11 @@ import java.util.Arrays;
 public class ItemsCustomLootSettingsConfig {
 
     public static final String CONFIG_NAME = "ItemsCustomLootSettings.yml";
-    public static final String SHOW_POTION_EFFECTS = "Show potion effects on lore";
+    public static final String MMORPG_COLORS_FOR_CUSTOM_ITEMS = "Use MMORPG colors for custom items";
+//    public static final String SHOW_POTION_EFFECTS = "Show potion effects on lore";
     public static final String SHOW_ITEM_VALUE = "Show item value on lore";
     public static final String SHOW_ITEM_TIER = "Show item tier on lore";
-    public static final String LORE_STRUCTURE = "Lore structure (you can change the order)";
+    public static final String LORE_STRUCTURE = "Lore structure";
     public static final String PREVENT_CUSTOM_ITEM_PLACING = "Prevent players from placing pleaceable Elite custom items";
     public static final String DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX = "Default potion effect duration (seconds, on hit).";
     public static final String ABSORPTION = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "ABSORPTION";
@@ -57,17 +58,19 @@ public class ItemsCustomLootSettingsConfig {
 
     public void initializeConfig() {
 
-        configuration.addDefault(SHOW_POTION_EFFECTS, true);
+        configuration.addDefault(MMORPG_COLORS_FOR_CUSTOM_ITEMS, true);
+//        configuration.addDefault(SHOW_POTION_EFFECTS, true);
         configuration.addDefault(SHOW_ITEM_VALUE, true);
         configuration.addDefault(SHOW_ITEM_TIER, true);
         configuration.addDefault(PREVENT_CUSTOM_ITEM_PLACING, true);
         configuration.addDefault(LORE_STRUCTURE, Arrays.asList(
+                ChatColorConverter.chatColorConverter("$enchantments"),
                 ChatColorConverter.chatColorConverter("$potionEffect"),
                 ChatColorConverter.chatColorConverter("&m----------------------"),
                 ChatColorConverter.chatColorConverter(" $customLore "),
-                ChatColorConverter.chatColorConverter( " $itemValue "),
+                ChatColorConverter.chatColorConverter(" $itemValue "),
                 ChatColorConverter.chatColorConverter("&m----------------------"),
-                ChatColorConverter.chatColorConverter(" $itemTier ")
+                ChatColorConverter.chatColorConverter(" Tier $tier ")
         ));
         configuration.addDefault(ABSORPTION, 2);
         configuration.addDefault(BLINDNESS, 5);

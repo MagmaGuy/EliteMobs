@@ -24,7 +24,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,9 +38,7 @@ import static org.bukkit.Bukkit.getServer;
  */
 public class StatsCommandHandler {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-
-    public void statsHandler(CommandSender commandSender) {
+    public static void statsHandler(CommandSender commandSender) {
 
         int mobLevelSavingsCount = 0;
         int totalMobCount = 0;
@@ -296,7 +293,7 @@ public class StatsCommandHandler {
 
     }
 
-    private void unsortedMobCountFilter(HashMap unsortedMobCount, int count, String mobTypeName) {
+    private static void unsortedMobCountFilter(HashMap unsortedMobCount, int count, String mobTypeName) {
 
         if (count > 0) {
 
@@ -306,7 +303,7 @@ public class StatsCommandHandler {
 
     }
 
-    private String messageStringAppender(String countMessage, HashMap unsortedMobCount) {
+    private static String messageStringAppender(String countMessage, HashMap unsortedMobCount) {
 
         Iterator iterator = unsortedMobCount.entrySet().iterator();
 

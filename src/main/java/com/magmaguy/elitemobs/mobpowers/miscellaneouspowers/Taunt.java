@@ -32,7 +32,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -58,7 +57,7 @@ public class Taunt extends MinorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
@@ -164,7 +163,7 @@ public class Taunt extends MinorPowers implements Listener {
 
         }
 
-        entity.setMetadata(MetadataHandler.TAUNT_NAME, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, MetadataHandler.TAUNT_NAME, true);
 
         String originalName = entity.getCustomName();
 

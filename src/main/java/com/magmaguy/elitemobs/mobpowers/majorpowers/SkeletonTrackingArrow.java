@@ -39,7 +39,6 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -50,7 +49,7 @@ public class SkeletonTrackingArrow extends MajorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
         majorPowerStanceMath.itemEffect(entity);
         repeatingTrackingArrowTask(entity);

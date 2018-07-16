@@ -415,7 +415,7 @@ public class UniqueItemConstructor {
 
             for (String line : potionEffect(string)) {
 
-                obfuscatedPotionEffects += customItemConstructor.loreObfuscator(" " + line);
+//                obfuscatedPotionEffects += customItemConstructor.loreObfuscator(" " + line);
 
             }
 
@@ -440,7 +440,7 @@ public class UniqueItemConstructor {
 
                 if (line.equals(itemMeta.getLore().get(0))) {
 
-                    obfuscatedLore.add(line + obfuscatedPotionEffects + customItemConstructor.loreObfuscator(uniqueLore));
+//                    obfuscatedLore.add(line + obfuscatedPotionEffects + customItemConstructor.loreObfuscator(uniqueLore));
 
                 } else {
 
@@ -455,7 +455,7 @@ public class UniqueItemConstructor {
         }
 
         itemStack.setItemMeta(itemMeta);
-        ObfuscatedSignatureLoreData.obfuscateSignatureData(itemStack);
+//        ObfuscatedSignatureLoreData.obfuscateSignatureData(itemStack);
 
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
             EnchantmentHider.hideEnchantments(itemStack);
@@ -483,11 +483,11 @@ public class UniqueItemConstructor {
 
         for (String string : itemStack.getItemMeta().getLore()) {
 
-            if (string.contains(customItemConstructor.loreObfuscator(HUNTING_SET_IDENTIFIER))) {
-
-                return true;
-
-            }
+//            if (string.contains(customItemConstructor.loreObfuscator(HUNTING_SET_IDENTIFIER))) {
+//
+//                return true;
+//
+//            }
 
         }
 
@@ -504,11 +504,11 @@ public class UniqueItemConstructor {
 
         for (String string : itemStack.getItemMeta().getLore()) {
 
-            if (string.contains(customItemConstructor.loreObfuscator(ZOMBIE_KING_AXE_IDENTIFIER))) {
-
-                return true;
-
-            }
+//            if (string.contains(customItemConstructor.loreObfuscator(ZOMBIE_KING_AXE_IDENTIFIER))) {
+//
+//                return true;
+//
+//            }
 
         }
 

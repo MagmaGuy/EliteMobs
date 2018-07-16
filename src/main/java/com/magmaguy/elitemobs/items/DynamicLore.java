@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,46 +36,32 @@ public class DynamicLore {
      */
     public static void refreshDynamicLore() {
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-
+        for (Player player : Bukkit.getOnlinePlayers())
             for (ItemStack itemStack : player.getInventory().getContents()) {
 
-                if (itemStack != null && itemStack.hasItemMeta()
-                        && itemStack.getItemMeta().hasLore()) {
+                if (!(itemStack != null && itemStack.hasItemMeta()
+                        && itemStack.getItemMeta().hasLore()))
+                    continue;
 
-                    boolean eliteItem = false;
+                if (ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(itemStack)
+                        && !player.getInventory().getItemInMainHand().equals(itemStack)
+                        && !player.getInventory().getItemInOffHand().equals(itemStack)) {
 
-                    for (String string : itemStack.getItemMeta().getLore()) {
+                    if (displayWorth) {
 
-                        if (string.contains(ObfuscatedSignatureLoreData.loreObfuscator(ObfuscatedSignatureLoreData.ITEM_SIGNATURE))) {
+                        setLoreToWorth(itemStack);
 
-                            eliteItem = true;
+                    } else {
 
-                        }
-
-                    }
-
-                    if (eliteItem && !player.getInventory().getItemInMainHand().equals(itemStack)
-                            && !player.getInventory().getItemInOffHand().equals(itemStack)) {
-
-                        if (displayWorth) {
-
-                            setLoreToWorth(itemStack);
-
-                        } else {
-
-                            setLoreToResale(itemStack);
-
-                        }
+                        setLoreToResale(itemStack);
 
                     }
 
                 }
 
+
             }
 
-
-        }
 
         displayWorth = !displayWorth;
 
@@ -92,7 +78,7 @@ public class DynamicLore {
 
         for (String loreLine : itemMeta.getLore()) {
 
-            if (findEconomyLoreLine(loreLine, itemWorth, itemResale)) {
+            if (isEconomyLoreLine(loreLine, itemWorth, itemResale)) {
 
                 String lorePrefix = lorePrefix(loreLine, itemWorth, itemResale);
 
@@ -122,7 +108,7 @@ public class DynamicLore {
 
         for (String loreLine : itemMeta.getLore()) {
 
-            if (findEconomyLoreLine(loreLine, itemWorth, itemResale)) {
+            if (isEconomyLoreLine(loreLine, itemWorth, itemResale)) {
 
                 String lorePrefix = lorePrefix(loreLine, itemWorth, itemResale);
 
@@ -141,7 +127,7 @@ public class DynamicLore {
 
     }
 
-    private static boolean findEconomyLoreLine(String loreLine, double worth, double resale) {
+    private static boolean isEconomyLoreLine(String loreLine, double worth, double resale) {
 
         String targetWorthLine = targetValueLine(worth);
         String targetResaleLine = targetResaleLine(resale);
@@ -174,7 +160,7 @@ public class DynamicLore {
 
     private static String targetValueLine(double worthOrResale) {
 
-        String worthLore = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_WORTH);
+        String worthLore = ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LORE_WORTH);
         worthLore = worthLore.replace("$worth", worthOrResale + "");
         worthLore = worthLore.replace("$currencyName", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
         worthLore = ChatColorConverter.chatColorConverter(worthLore);
@@ -185,7 +171,7 @@ public class DynamicLore {
 
     private static String targetResaleLine(double resale) {
 
-        String resaleLore = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_RESALE_WORTH);
+        String resaleLore = ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LORE_RESALE_WORTH);
         resaleLore = resaleLore.replace("$resale", resale + "");
         resaleLore = resaleLore.replace("$currencyName", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
         resaleLore = ChatColorConverter.chatColorConverter(resaleLore);

@@ -21,7 +21,6 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
@@ -239,7 +238,7 @@ public class NameHandler {
 
     public static void customUniqueNameAssigner(Entity entity, String name) {
 
-        entity.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(entity, MetadataHandler.CUSTOM_NAME, true);
 
         entity.setCustomName(ChatColorConverter.chatColorConverter(name));
 
@@ -276,7 +275,7 @@ public class NameHandler {
 
         entity.setCustomNameVisible(true);
 
-        entity.setMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, MetadataHandler.PASSIVE_ELITE_MOB_MD, true);
 
     }
 

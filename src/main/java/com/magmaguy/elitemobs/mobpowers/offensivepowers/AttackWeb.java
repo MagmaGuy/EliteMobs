@@ -28,22 +28,19 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
 public class AttackWeb extends MinorPowers implements Listener {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ATTACK_WEB_MD;
     private int processID;
 
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
@@ -93,7 +90,7 @@ public class AttackWeb extends MinorPowers implements Listener {
 
             }
 
-            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MetadataHandler.PLUGIN, new Runnable() {
 
                 int counter = 0;
 
@@ -113,7 +110,7 @@ public class AttackWeb extends MinorPowers implements Listener {
 
             if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
 
-                processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MetadataHandler.PLUGIN, new Runnable() {
 
                     int counter = 0;
 
@@ -138,10 +135,10 @@ public class AttackWeb extends MinorPowers implements Listener {
 
         if (counter == 0) {
 
-            damagee.setMetadata("WebCooldown", new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(damagee, MetadataHandler.WEB_COOLDOWN, true);
             block.setType(Material.WEB);
 
-            block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(block, MetadataHandler.TEMPORARY_BLOCK, true);
 
         }
 
@@ -149,13 +146,13 @@ public class AttackWeb extends MinorPowers implements Listener {
 
             block.setType(Material.AIR);
 
-            block.removeMetadata("TemporaryBlock", plugin);
+            block.removeMetadata("TemporaryBlock", MetadataHandler.PLUGIN);
 
         }
 
         if (counter == 20 * 7) {
 
-            damagee.removeMetadata("WebCooldown", plugin);
+            damagee.removeMetadata("WebCooldown", MetadataHandler.PLUGIN);
             Bukkit.getScheduler().cancelTask(processID);
 
         }

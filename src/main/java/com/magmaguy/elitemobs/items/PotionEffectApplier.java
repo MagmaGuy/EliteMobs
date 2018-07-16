@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsCustomLootSettingsConfig;
+import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -102,6 +103,12 @@ public class PotionEffectApplier implements Listener {
 
     }
 
+    private void itemPotionEffectCheck(ItemStack itemStack, Player player, boolean event) {
+
+        itemPotionEffectCheck(itemStack, player, event, null);
+
+    }
+
     private void itemPotionEffectCheck(ItemStack itemStack, Player player, boolean event, LivingEntity livingEntity) {
 
         if (itemStack.getItemMeta() == null || itemStack.getItemMeta().getLore() == null) return;
@@ -128,59 +135,30 @@ public class PotionEffectApplier implements Listener {
 
     }
 
-    private void itemPotionEffectCheck(ItemStack itemStack, Player player, boolean event) {
-
-        itemPotionEffectCheck(itemStack, player, event, null);
-
-    }
-
     public List<String> loreDeobfuscator(ItemStack itemStack) {
 
         List<String> lore = itemStack.getItemMeta().getLore();
-        List<String> deobfuscatedString = new ArrayList<>();
+        List<String> deobfuscatedPotionEffect = new ArrayList<>();
 
-        for (String string : lore) {
+        if (lore.isEmpty()) return deobfuscatedPotionEffect;
 
-            if (string.contains("§")) {
+        String deobfuscatedString = lore.get(0).replace("§", "");
 
-                string = string.replaceAll("§", "");
+        if (!deobfuscatedString.contains(LoreGenerator.OBFUSCATED_POTIONS)) return deobfuscatedPotionEffect;
 
-                for (PotionEffectType potionEffectType : PotionEffectType.values()) {
+        for (PotionEffectType potionEffectType : PotionEffectType.values())
+            if (potionEffectType != null)
+                for (String spaceSeparation : deobfuscatedString.split(",")) {
+                    //individual potion effects are separated at this level
+                    List<String> amplifierSeparation = Arrays.asList(spaceSeparation.split(":"));
 
-                    if (potionEffectType != null) {
-
-                        for (String spaceSeparation : string.split(" ")) {
-
-                            //individual potion effects are separated at this level
-                            boolean validPotionEffect = false;
-
-                            for (String commaSeparation : spaceSeparation.split(",")) {
-
-                                if (commaSeparation.equals(potionEffectType.getName()) && spaceSeparation.contains(",")) {
-
-                                    validPotionEffect = true;
-
-                                }
-
-                            }
-
-                            if (validPotionEffect) {
-
-                                deobfuscatedString.add(spaceSeparation);
-
-                            }
-
-                        }
-
-                    }
+                    if (amplifierSeparation.size() > 1 && amplifierSeparation.get(0).equals(potionEffectType.getName()))
+                        deobfuscatedPotionEffect.add(spaceSeparation);
 
                 }
 
-            }
 
-        }
-
-        return deobfuscatedString;
+        return deobfuscatedPotionEffect;
 
     }
 
@@ -198,7 +176,7 @@ public class PotionEffectApplier implements Listener {
             List<String> tags = new ArrayList<>();
 
 
-            for (String substring : string.split(",")) {
+            for (String substring : string.split(":")) {
 
                 if (substringIndex == 0) {
 
@@ -304,7 +282,8 @@ public class PotionEffectApplier implements Listener {
 
     }
 
-    private void continuousPotionEffectApplier(HashMap<PotionEffect, List<String>> potionEffects, Player player) {
+    private void continuousPotionEffectApplier(HashMap<PotionEffect, List<String>> potionEffects, Player
+            player) {
 
         for (PotionEffect potionEffect : potionEffects.keySet()) {
 
@@ -354,7 +333,8 @@ public class PotionEffectApplier implements Listener {
 
     }
 
-    private void eventPotionEffectApplier(HashMap<PotionEffect, List<String>> potionEffects, Player player, LivingEntity livingEntity) {
+    private void eventPotionEffectApplier(HashMap<PotionEffect, List<String>> potionEffects, Player
+            player, LivingEntity livingEntity) {
 
         for (PotionEffect potionEffect : potionEffects.keySet()) {
 

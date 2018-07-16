@@ -58,7 +58,6 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
@@ -79,7 +78,7 @@ public class ZombieFriends extends MajorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
         majorPowerStanceMath.itemEffect(entity);
 
@@ -100,7 +99,7 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
             Entity entity = event.getEntity();
 
-            entity.setMetadata(MetadataHandler.ZOMBIE_FRIENDS_ACTIVATED, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.ZOMBIE_FRIENDS_ACTIVATED, true);
 
             int assistMobLevel = (int) Math.floor(entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 4);
 
@@ -113,12 +112,12 @@ public class ZombieFriends extends MajorPowers implements Listener {
             Zombie friend1 = (Zombie) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.ZOMBIE);
             Zombie friend2 = (Zombie) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.ZOMBIE);
 
-            friend1.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            friend2.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            friend1.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
-            friend2.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
-            friend1.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-            friend2.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(friend1, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
+            MetadataHandler.registerMetadata(friend2, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
+            MetadataHandler.registerMetadata(friend1, MetadataHandler.CUSTOM_STACK, true);
+            MetadataHandler.registerMetadata(friend2, MetadataHandler.CUSTOM_STACK, true);
+            MetadataHandler.registerMetadata(friend1, MetadataHandler.CUSTOM_POWERS_MD, true);
+            MetadataHandler.registerMetadata(friend2, MetadataHandler.CUSTOM_POWERS_MD, true);
             friend1.setCustomName(chatColorConverter(configuration.getString("ZombieFriends.Friend 1")));
             friend2.setCustomName(chatColorConverter(configuration.getString("ZombieFriends.Friend 2")));
             friend1.setCustomNameVisible(true);

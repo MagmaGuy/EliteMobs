@@ -62,7 +62,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -86,7 +85,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
         majorPowerStanceMath.itemEffect(entity);
 
@@ -111,7 +110,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
         }
 
-        targetter.setMetadata(MetadataHandler.ZOMBIE_CHANTING, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(targetter, MetadataHandler.ZOMBIE_CHANTING, true);
 
         if (targetted instanceof Player && targetter.hasMetadata(powerMetadata)) {
 
@@ -174,11 +173,11 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                         if (randomizedNumber < 5) {
 
                             Zombie zombie = (Zombie) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.ZOMBIE);
-                            zombie.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 1));
-                            zombie.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
-                            zombie.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-                            zombie.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
-                            zombie.setMetadata(MetadataHandler.CUSTOM_HEALTH, new FixedMetadataValue(plugin, true));
+                            MetadataHandler.registerMetadata(zombie, MetadataHandler.ELITE_MOB_MD, 1);
+                            MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_STACK, true);
+                            MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_POWERS_MD, true);
+                            MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_NAME, true);
+                            MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_HEALTH, true);
                             zombie.setMaxHealth(zombie.getMaxHealth() / 2);
                             zombie.setCustomName(chatColorConverter(configuration.getString("ZombieNecronomicon.Summoned zombie")));
                             zombie.setCustomNameVisible(true);
@@ -191,11 +190,11 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                         } else {
 
                             Skeleton skeleton = (Skeleton) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.SKELETON);
-                            skeleton.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 1));
-                            skeleton.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
-                            skeleton.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-                            skeleton.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
-                            skeleton.setMetadata(MetadataHandler.CUSTOM_HEALTH, new FixedMetadataValue(plugin, true));
+                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.ELITE_MOB_MD, 1);
+                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_STACK, true);
+                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_POWERS_MD, true);
+                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_NAME, true);
+                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_HEALTH, true);
                             skeleton.setMaxHealth(skeleton.getMaxHealth() / 2);
                             skeleton.setCustomName(chatColorConverter(configuration.getString("ZombieNecronomicon.Summoned skeleton")));
                             skeleton.setCustomNameVisible(true);
@@ -281,8 +280,8 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             Item item = zombie.getWorld().dropItem(zombie.getLocation(), itemStack);
                             item.setGravity(false);
                             item.setPickupDelay(Integer.MAX_VALUE);
-                            item.setMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, new FixedMetadataValue(plugin, true));
-                            item.setMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, new FixedMetadataValue(plugin, true));
+                            MetadataHandler.registerMetadata(item, MetadataHandler.MAJOR_POWER_AMOUNT_MD, true);
+                            MetadataHandler.registerMetadata(item, MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, true);
 
                             itemList.add(item);
 

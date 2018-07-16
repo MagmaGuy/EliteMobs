@@ -29,7 +29,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Random;
@@ -87,8 +86,7 @@ public class DamageDisplay implements Listener {
         armorStand.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + "" + newDisplayDamage + "");
         armorStand.setCustomNameVisible(true);
         armorStand.setGravity(false);
-        armorStand.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY,
-                new FixedMetadataValue(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), true));
+        MetadataHandler.registerMetadata(armorStand, MetadataHandler.ARMOR_STAND_DISPLAY, true);
 
         new BukkitRunnable() {
 

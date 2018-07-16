@@ -27,7 +27,6 @@ public class DefaultConfig {
     public static final String ALWAYS_SHOW_NAMETAGS = "Dangerous! Always show Elite Mob nametags";
     public static final String SUPERMOB_STACK_AMOUNT = "SuperMob (passive EliteMobs) stack amount";
     public static final String MMORPG_COLORS = "Use MMORPG colors for item ranks";
-    public static final String MMORPG_COLORS_FOR_CUSTOM_ITEMS = "Use MMORPG colors for custom items";
     public static final String CREEPER_PASSIVE_DAMAGE_PREVENTER = "Prevent creepers from killing passive mobs";
     public static final String ENABLE_PERMISSION_TITLES = "Use titles to warn players they are missing a permission";
     public static final String ENABLE_POWER_SCOREBOARDS = "Use scoreboards to display mob powers using permissions";
@@ -37,7 +36,7 @@ public class DefaultConfig {
     public static final String PREVENT_MOUNT_EXPLOIT = "Prevent Minecraft living entity mount exploit for Elite Mobs";
     public static final String STRICT_SPAWNING_RULES = "Strict spawning rules mode for better compatibility with other plugins";
     public static final String PREVENT_TOWER_EXPLOIT = "Prevent tower exploit";
-    public static final String PREVENT_DARKROOM_EXPLOIT = "Prevent tower exploit";
+    public static final String PREVENT_DARKROOM_EXPLOIT = "Prevent dark room spawner exploit";
 
     public static void reloadConfig() {
 
@@ -51,7 +50,6 @@ public class DefaultConfig {
 
         configuration.addDefault(SUPERMOB_STACK_AMOUNT, 50);
         configuration.addDefault(MMORPG_COLORS, true);
-        configuration.addDefault(MMORPG_COLORS_FOR_CUSTOM_ITEMS, true);
         configuration.addDefault(CREEPER_PASSIVE_DAMAGE_PREVENTER, true);
         configuration.addDefault(ENABLE_PERMISSION_TITLES, true);
         configuration.addDefault(ENABLE_POWER_SCOREBOARDS, false);

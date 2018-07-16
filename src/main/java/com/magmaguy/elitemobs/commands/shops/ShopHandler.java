@@ -18,11 +18,12 @@ package com.magmaguy.elitemobs.commands.shops;
 import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
-import com.magmaguy.elitemobs.items.ProceduralItemGenerator;
+import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -66,24 +67,15 @@ public class ShopHandler implements Listener {
 
         for (int i : validSlots) {
 
-            ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
-
             int balancedMax = ConfigValues.economyConfig.getInt(EconomySettingsConfig.HIGHEST_PROCEDURALLY_SIMULATED_LOOT)
                     - ConfigValues.economyConfig.getInt(EconomySettingsConfig.LOWEST_PROCEDURALLY_SIMULATED_LOOT);
             int balancedMin = ConfigValues.economyConfig.getInt(EconomySettingsConfig.LOWEST_PROCEDURALLY_SIMULATED_LOOT);
 
             int randomLevel = random.nextInt(balancedMax + 1) + balancedMin;
 
-            //adjust to item rank
-            int level = randomLevel;
+            int itemTier = (int) (randomLevel / ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.PER_TIER_LEVEL_INCREASE));
 
-            if (level < 1) {
-
-                level = 0;
-
-            }
-
-            shopInventory.setItem(i, proceduralItemGenerator.randomItemGeneratorCommand(level));
+            shopInventory.setItem(i, ItemConstructor.constructItem(itemTier, null));
 
         }
 
