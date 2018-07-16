@@ -29,7 +29,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -45,7 +44,7 @@ public class AttackFreeze extends MinorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
         minorPowerPowerStance.itemEffect(entity);
 
@@ -134,13 +133,13 @@ public class AttackFreeze extends MinorPowers implements Listener {
 
         if (counter == 0) {
 
-            damagee.setMetadata(MetadataHandler.FROZEN, new FixedMetadataValue(plugin, true));
-            damagee.setMetadata(MetadataHandler.FROZEN_COOLDOWN, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(damagee, MetadataHandler.FROZEN, true);
+            MetadataHandler.registerMetadata(damagee, MetadataHandler.FROZEN_COOLDOWN, true);
 
             if (block.getType() == Material.AIR) {
 
                 block.setType(Material.PACKED_ICE);
-                block.setMetadata("TemporaryBlock", new FixedMetadataValue(plugin, true));
+                MetadataHandler.registerMetadata(block, MetadataHandler.TEMPORARY_BLOCK, true);
 
             }
 

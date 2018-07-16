@@ -19,7 +19,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class PowerCooldown {
@@ -29,7 +28,7 @@ public class PowerCooldown {
      */
     public static void startCooldownTimer(Entity entity, String cooldownMetadata, int duration) {
 
-        entity.setMetadata(cooldownMetadata, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(entity, cooldownMetadata, true);
 
         new BukkitRunnable() {
 

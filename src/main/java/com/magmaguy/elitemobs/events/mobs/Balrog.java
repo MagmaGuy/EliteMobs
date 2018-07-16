@@ -17,7 +17,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -60,12 +59,12 @@ public class Balrog implements Listener {
     private static void intializeBalrog(Location location) {
 
         Silverfish balrog = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
-        balrog.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, DynamicBossLevel.determineDynamicBossLevel(balrog)));
-        balrog.setMetadata(MetadataHandler.BALROG, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        balrog.setMetadata(MetadataHandler.EVENT_CREATURE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        balrog.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        balrog.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        balrog.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(balrog, MetadataHandler.ELITE_MOB_MD, DynamicBossLevel.determineDynamicBossLevel(balrog));
+        MetadataHandler.registerMetadata(balrog, MetadataHandler.BALROG, true);
+        MetadataHandler.registerMetadata(balrog, MetadataHandler.EVENT_CREATURE, true);
+        MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_ARMOR, true);
+        MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_POWERS_MD, true);
+        MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_STACK, true);
 
         balrog.setRemoveWhenFarAway(false);
 
@@ -126,11 +125,11 @@ public class Balrog implements Listener {
 
         Silverfish trashMob = (Silverfish) balrog.getLocation().getWorld().spawnEntity(balrog.getLocation(), EntityType.SILVERFISH);
 
-        trashMob.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, 1));
-        trashMob.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        trashMob.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        trashMob.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        trashMob.setMetadata(MetadataHandler.CUSTOM_HEALTH, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(trashMob, MetadataHandler.ELITE_MOB_MD, 1);
+        MetadataHandler.registerMetadata(trashMob, MetadataHandler.CUSTOM_ARMOR, true);
+        MetadataHandler.registerMetadata(trashMob, MetadataHandler.CUSTOM_POWERS_MD, true);
+        MetadataHandler.registerMetadata(trashMob, MetadataHandler.CUSTOM_STACK, true);
+        MetadataHandler.registerMetadata(trashMob, MetadataHandler.CUSTOM_HEALTH, true);
 
         trashMob.setMaxHealth(1);
         trashMob.setHealth(1);

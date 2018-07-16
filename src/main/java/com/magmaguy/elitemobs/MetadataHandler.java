@@ -16,17 +16,18 @@
 package com.magmaguy.elitemobs;
 
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -157,6 +158,7 @@ public class MetadataHandler implements Listener {
     public final static String ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN = "ZombieKingSummonMinionsCooldown";
     public final static String TRACKING_ARROWS_COOLDOWN = "TrackingArrowsCooldown";
     public final static String SKELETON_PILLAR_COOLDOWN = "SkeletonPillarCooldown";
+    public final static String WEB_COOLDOWN = "WebCooldown";
 
     //displays
     public final static String ARMOR_STAND_DISPLAY = "ArmorStandDisplay";
@@ -179,6 +181,9 @@ public class MetadataHandler implements Listener {
     public final static String KILLED_BY_ELITE_MOB = "KilledByEliteMob";
     public final static String USING_ZOMBIE_KING_AXE = "UsingZombieKingAxe";
     public final static String SAFE_FALL = "SafeFall";
+
+    //block metadata
+    public final static String TEMPORARY_BLOCK = "TemporaryBlock";
 
     public static List<String> defensivePowerList = new ArrayList<>(Arrays.asList(
             INVULNERABILITY_ARROW_MD,
@@ -248,6 +253,7 @@ public class MetadataHandler implements Listener {
             ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN,
             TRACKING_ARROWS_COOLDOWN,
             SKELETON_PILLAR_COOLDOWN,
+            WEB_COOLDOWN,
             ZOMBIE_FRIENDS_ACTIVATED,
             TEAM_ROCKET_ACTIVATED,
             TEAM_ROCKET_MEMBER,
@@ -392,6 +398,56 @@ public class MetadataHandler implements Listener {
                 return null;
         }
 
+    }
+
+    public static HashMap<Entity, ArrayList<String>> metadataEntityList = new HashMap<>();
+    public static HashMap<Block, String> metadataBlockList = new HashMap<>();
+
+    public static void registerMetadata(Entity entity, String metadata, Object value) {
+
+        entity.setMetadata(metadata, new FixedMetadataValue(PLUGIN, value));
+        if (!metadataEntityList.isEmpty() && metadataEntityList.containsKey(entity) && !metadataEntityList.get(entity).isEmpty()) {
+            ArrayList<String> newList = metadataEntityList.get(entity);
+            newList.add(metadata);
+            metadataEntityList.put(entity, newList);
+        } else {
+            ArrayList<String> newList = new ArrayList<>();
+            newList.add(metadata);
+            metadataEntityList.put(entity, newList);
+        }
+
+    }
+
+    public static void registerMetadata(Block block, String metadata, Object value) {
+
+        metadataBlockList.put(block, metadata);
+        block.setMetadata(metadata, new FixedMetadataValue(MetadataHandler.PLUGIN, value));
+
+    }
+
+    public static void metadataWiper() {
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                unregisterInvalidEntityMetadata();
+
+            }
+        }.runTaskTimer(PLUGIN, 5, 5);
+    }
+
+    private static void unregisterInvalidEntityMetadata() {
+        for (Iterator<Entity> iterator = metadataEntityList.keySet().iterator(); iterator.hasNext(); ) {
+            Entity iteratedEntity = iterator.next();
+            if (iteratedEntity == null || iteratedEntity.isDead() || !iteratedEntity.isValid()) {
+                for (String metadata : metadataEntityList.get(iteratedEntity)) {
+                    assert iteratedEntity != null;
+                    iteratedEntity.removeMetadata(metadata, PLUGIN);
+                }
+                iterator.remove();
+            }
+        }
     }
 
     public static void flushMetadata(Entity entity) {

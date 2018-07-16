@@ -27,7 +27,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -66,7 +65,7 @@ public class NaturalMobMetadataAssigner implements Listener {
             return;
 
         Entity entity = event.getEntity();
-        entity.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(entity, MetadataHandler.NATURAL_MOB_MD, true);
 
         int huntingGearChanceAdder = getHuntingGearBonus(entity);
 

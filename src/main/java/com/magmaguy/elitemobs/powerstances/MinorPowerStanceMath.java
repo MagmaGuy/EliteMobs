@@ -28,7 +28,7 @@ public class MinorPowerStanceMath {
 
     public final static double NUMBER_OF_POINTS_PER_FULL_ROTATION = 30;
     private final static double X = 1;
-    private final static double Y = 0;
+    private static double Y = 0;
     private final static double Z = 0;
     private static double a, b, c;
     private static HashMap<Integer, HashMap<Integer, List<Vector>>> storedRotatedValues = new HashMap();
@@ -47,9 +47,17 @@ public class MinorPowerStanceMath {
         for (int i = 0; i < trackAmount; i++) {
 
             //45 degree angle between tracks
-            a = 0;
+            if (i == 0) {
+                a = -0.6;
+                Y = 0.5;
+            } else {
+                a = 0.6;
+                Y = -0.5;
+            }
+
             b = 1;
             c = 0;
+
 
             List<Vector> rotations = new ArrayList<>();
 
@@ -57,7 +65,9 @@ public class MinorPowerStanceMath {
             for (int j = 0; j < itemsPerTrack; j++) {
 
                 //add current location
-                Vector rotationVector = GenericRotationMatrixMath.applyRotation(a, b, c, NUMBER_OF_POINTS_PER_FULL_ROTATION, X, Y, Z, (int) Math.ceil(counter + NUMBER_OF_POINTS_PER_FULL_ROTATION / itemsPerTrack * j));
+                Vector rotationVector = GenericRotationMatrixMath.applyRotation(a, b, c, NUMBER_OF_POINTS_PER_FULL_ROTATION, X, Y, Z,
+                        (int) Math.ceil(counter + NUMBER_OF_POINTS_PER_FULL_ROTATION / itemsPerTrack * j));
+
                 rotations.add(rotationVector);
 
             }

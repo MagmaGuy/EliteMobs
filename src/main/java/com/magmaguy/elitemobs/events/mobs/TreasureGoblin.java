@@ -38,7 +38,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -54,13 +53,13 @@ public class TreasureGoblin implements Listener {
     public static void createGoblin(Entity treasureGoblin) {
 
         //Give custom setup to entity
-        treasureGoblin.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, 600));
-        treasureGoblin.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        treasureGoblin.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        treasureGoblin.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        treasureGoblin.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        treasureGoblin.setMetadata(MetadataHandler.NATURAL_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        treasureGoblin.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.ELITE_MOB_MD, 600);
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_POWERS_MD, true);
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_NAME, true);
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_ARMOR, true);
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_STACK, true);
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.NATURAL_MOB_MD, true);
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_STACK, true);
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(treasureGoblin);
 
         ((Zombie) treasureGoblin).setBaby(true);
@@ -69,7 +68,7 @@ public class TreasureGoblin implements Listener {
         treasureGoblin.setCustomName("Treasure Goblin");
         treasureGoblin.setCustomNameVisible(true);
 
-        treasureGoblin.setMetadata(MetadataHandler.TREASURE_GOBLIN, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.TREASURE_GOBLIN, true);
         TreasureGoblin.equipTreasureGoblin((Zombie) treasureGoblin);
 
         String coordinates = treasureGoblin.getLocation().getBlockX() + ", " + treasureGoblin.getLocation().getBlockY() + ", " + treasureGoblin.getLocation().getBlockZ();
@@ -254,7 +253,7 @@ public class TreasureGoblin implements Listener {
             Vector velocity = new Vector(x, y, z).multiply(2);
             visualProjectile.setVelocity(velocity);
             visualProjectile.setPickupDelay(Integer.MAX_VALUE);
-            visualProjectile.setMetadata(MetadataHandler.VISUAL_EFFECT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+            MetadataHandler.registerMetadata(visualProjectile, MetadataHandler.VISUAL_EFFECT_MD, true);
 
             itemList.add(visualProjectile);
 
@@ -425,7 +424,7 @@ public class TreasureGoblin implements Listener {
             visualProjectile.setGravity(false);
             visualProjectile.setVelocity(toPlayer.multiply(0.9));
             visualProjectile.setPickupDelay(Integer.MAX_VALUE);
-            visualProjectile.setMetadata(MetadataHandler.VISUAL_EFFECT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+            MetadataHandler.registerMetadata(visualProjectile, MetadataHandler.VISUAL_EFFECT_MD, true);
 
             itemList.add(visualProjectile);
 

@@ -22,9 +22,12 @@ import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.UUID;
+
+import static org.bukkit.Bukkit.getServer;
 
 /**
  * Created by MagmaGuy on 17/06/2017.
@@ -33,9 +36,36 @@ public class CurrencyCommandsHandler {
 
     public static void payCommand(String playerName, double amount) {
 
-        if (amount > 0) {
-
+        if (amount > 0)
             EconomyHandler.addCurrency(UUIDFilter.guessUUI(playerName), amount);
+
+
+    }
+
+    public static void payCommand(Player commandSender, String[] args) {
+
+        try {
+
+            if (Double.parseDouble(args[2]) > 0 && Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))) {
+
+                payCommand(args[1], Integer.parseInt(args[2]));
+                subtractCommand(commandSender.getName(), Integer.parseInt(args[2]));
+
+                commandSender.sendMessage("You have paid " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " to " + args[1]);
+                commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())) + " " + ConfigValues.economyConfig.get("Currency name"));
+
+                Player recipient = getServer().getPlayer(args[1]);
+                recipient.sendMessage("You have received " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " from " + commandSender.getDisplayName());
+
+            } else if (Double.parseDouble(args[2]) < 0)
+                commandSender.sendMessage("Nice try. This plugin doesn't make the same mistake as some banks have in the past.");
+            else
+                commandSender.sendMessage("You don't have enough " + ConfigValues.economyConfig.get("Currency name") + " to do that!");
+
+
+        } catch (Exception e) {
+
+            commandSender.sendMessage("Input not valid. Command format: /em pay [playerName] [amount]");
 
         }
 
@@ -47,9 +77,43 @@ public class CurrencyCommandsHandler {
 
     }
 
+    public static void addCommand(CommandSender commandSender, String[] args) {
+
+        try {
+
+            addCommand(args[1], Integer.parseInt(args[2]));
+
+            commandSender.sendMessage("You have added " + args[2] + " to " + args[1]);
+            commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
+
+        } catch (Exception e) {
+
+            commandSender.sendMessage("Input not valid. Command format: /em add [playerName] [amount]");
+
+        }
+
+    }
+
     public static void subtractCommand(String playerName, double amount) {
 
         EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(playerName), amount);
+
+    }
+
+    public static void subtractCommand(CommandSender commandSender, String[] args) {
+
+        try {
+
+            subtractCommand(args[1], Integer.parseInt(args[2]));
+
+            commandSender.sendMessage("You have subtracted " + args[2] + " from " + args[1]);
+            commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
+
+        } catch (Exception e) {
+
+            commandSender.sendMessage("Input not valid. Command format: /em subtract [playerName] [amount]");
+
+        }
 
     }
 
@@ -59,15 +123,48 @@ public class CurrencyCommandsHandler {
 
     }
 
+    public static void setCommand(CommandSender commandSender, String[] args) {
+
+        try {
+
+            CurrencyCommandsHandler.setCommand(args[1], Integer.parseInt(args[2]));
+            commandSender.sendMessage("You set " + args[1] + "'s " + ConfigValues.economyConfig.get("Currency name") + " to " + args[2]);
+
+        } catch (Exception e) {
+
+            commandSender.sendMessage("Input not valid. Command format: /em set [playerName] [amount]");
+
+        }
+
+    }
+
     public static Double checkCommand(String playerName) {
 
         return EconomyHandler.checkCurrency(UUIDFilter.guessUUI(playerName));
 
     }
 
+    public static void checkCommand(CommandSender commandSender, String[] args) {
+
+        try {
+            Double money = CurrencyCommandsHandler.checkCommand(args[1]);
+            commandSender.sendMessage(args[1] + " has " + money + " " + ConfigValues.economyConfig.get("Currency name"));
+        } catch (Exception e) {
+            commandSender.sendMessage("Input not valid. Command format: /em check [playerName]");
+        }
+
+    }
+
     public static Double walletCommand(String playerName) {
 
         return EconomyHandler.checkCurrency(UUIDFilter.guessUUI(playerName));
+
+    }
+    public static void walletCommand(CommandSender commandSender, String[] args) {
+
+        commandSender.sendMessage(ChatColor.GREEN + "You have " +
+                CurrencyCommandsHandler.walletCommand(commandSender.getName()) + " " +
+                ConfigValues.economyConfig.getString("Currency name"));
 
     }
 

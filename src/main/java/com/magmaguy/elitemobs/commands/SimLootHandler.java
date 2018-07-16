@@ -18,14 +18,13 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.items.ItemDropper;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  * Created by MagmaGuy on 08/06/2017.
  */
 public class SimLootHandler {
 
-    public void simLoot(Player player, int level) {
+    public static void simLoot(Player player, int level) {
 
         if (level < 1) {
 
@@ -35,7 +34,7 @@ public class SimLootHandler {
 
         ItemDropper proceduralItemGenerator = new ItemDropper();
 
-        player.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, level));
+        MetadataHandler.registerMetadata(player, MetadataHandler.ELITE_MOB_MD, level);
         proceduralItemGenerator.determineItemTier(player);
         player.removeMetadata(MetadataHandler.ELITE_MOB_MD, MetadataHandler.PLUGIN);
 

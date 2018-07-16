@@ -18,12 +18,16 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
-import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackArrow;
-import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackFireball;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Location;
@@ -32,9 +36,7 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.*;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 
@@ -278,11 +280,11 @@ public class SpawnMobCommandHandler {
 
     }
 
-    private static ArrayList<String> getPowers (CommandSender commandSender, String args[]) {
+    private static ArrayList<String> getPowers(CommandSender commandSender, String args[]) {
 
         ArrayList<String> mobPowers = new ArrayList();
 
-        if (commandSender instanceof Player){
+        if (commandSender instanceof Player) {
 
             if (args.length > 3) {
 
@@ -346,7 +348,7 @@ public class SpawnMobCommandHandler {
 
             if (mobLevel > 0) {
 
-                entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, mobLevel));
+                MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, mobLevel);
                 applyPowers(entity, mobPowers, commandSender);
 
                 AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
@@ -373,27 +375,32 @@ public class SpawnMobCommandHandler {
                     //major powers
                     case MetadataHandler.ZOMBIE_FRIENDS_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                            ZombieFriends zombieFriends = new ZombieFriends();
+                            zombieFriends.applyPowers(entity);
                         }
                         break;
                     case MetadataHandler.ZOMBIE_NECRONOMICON_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                            ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
+                            zombieNecronomicon.applyPowers(entity);
                         }
                         break;
                     case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                            ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
+                            zombieTeamRocket.applyPowers(entity);
                         }
                         break;
                     case MetadataHandler.ZOMBIE_PARENTS_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_PARENTS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                            ZombieParents zombieParents = new ZombieParents();
+                            zombieParents.applyPowers(entity);
                         }
                         break;
                     case MetadataHandler.ZOMBIE_BLOAT_H:
                         if (entity instanceof Zombie) {
-                            entity.setMetadata(MetadataHandler.ZOMBIE_BLOAT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                            ZombieBloat zombieBloat = new ZombieBloat();
+                            zombieBloat.applyPowers(entity);
                         }
                         break;
                     case MetadataHandler.SKELETON_TRACKING_ARROW_H:
@@ -402,8 +409,9 @@ public class SpawnMobCommandHandler {
                             skeletonTrackingArrow.applyPowers(entity);
                         }
                     case MetadataHandler.SKELETON_PILLAR_H:
-                        if (entity instanceof Skeleton){
-                            entity.setMetadata(MetadataHandler.SKELETON_PILLAR_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        if (entity instanceof Skeleton) {
+                            SkeletonPillar skeletonPillar = new SkeletonPillar();
+                            skeletonPillar.applyPowers(entity);
                         }
                         //minor powers
                     case MetadataHandler.ATTACK_ARROW_H:
@@ -411,77 +419,95 @@ public class SpawnMobCommandHandler {
                         attackArrow.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_BLINDING_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_BLINDING_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackBlinding attackBlinding = new AttackBlinding();
+                        attackBlinding.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_CONFUSING_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_CONFUSING_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackConfusing attackConfusing = new AttackConfusing();
+                        attackConfusing.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_FIRE_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_FIRE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackFire attackFire = new AttackFire();
+                        attackFire.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_FIREBALL_H:
                         AttackFireball attackFireball = new AttackFireball();
                         attackFireball.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_FREEZE_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_FREEZE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackFreeze attackFreeze = new AttackFreeze();
+                        attackFreeze.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_GRAVITY_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_GRAVITY_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackGravity attackGravity = new AttackGravity();
+                        attackGravity.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_POISON_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_POISON_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackPoison attackPoison = new AttackPoison();
+                        attackPoison.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_PUSH_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_PUSH_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackPush attackPush = new AttackPush();
+                        attackPush.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_WEAKNESS_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_WEAKNESS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackWeakness attackWeakness = new AttackWeakness();
+                        attackWeakness.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_WEB_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_WEB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackWeb attackWeb = new AttackWeb();
+                        attackWeb.applyPowers(entity);
                         break;
                     case MetadataHandler.ATTACK_WITHER_H:
-                        entity.setMetadata(MetadataHandler.ATTACK_WITHER_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        AttackWither attackWither = new AttackWither();
+                        attackWither.applyPowers(entity);
                         break;
                     case MetadataHandler.BONUS_LOOT_H:
-                        entity.setMetadata(MetadataHandler.BONUS_LOOT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        BonusLoot bonusLoot = new BonusLoot();
+                        bonusLoot.applyPowers(entity);
                         break;
                     case MetadataHandler.DOUBLE_DAMAGE_H:
                         if (!(entity instanceof IronGolem)) {
-                            entity.setMetadata(MetadataHandler.DOUBLE_DAMAGE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                            DoubleDamage doubleDamage = new DoubleDamage();
+                            doubleDamage.applyPowers(entity);
                         }
                         break;
                     case MetadataHandler.DOUBLE_HEALTH_H:
                         if (!(entity instanceof IronGolem)) {
-                            entity.setMetadata(MetadataHandler.DOUBLE_HEALTH_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                            DoubleHealth doubleHealth = new DoubleHealth();
+                            doubleHealth.applyPowers(entity);
                         }
                         break;
                     case MetadataHandler.INVISIBILITY_H:
-                        entity.setMetadata(MetadataHandler.INVISIBILITY_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-                        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
+                        Invisibility invisibility = new Invisibility();
+                        invisibility.applyPowers(entity);
                         break;
                     case MetadataHandler.INVULNERABILITY_ARROW_H:
-                        entity.setMetadata(MetadataHandler.INVULNERABILITY_ARROW_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        InvulnerabilityArrow invulnerabilityArrow = new InvulnerabilityArrow();
+                        invulnerabilityArrow.applyPowers(entity);
                         break;
                     case MetadataHandler.INVULNERABILITY_FALL_DAMAGE_H:
-                        entity.setMetadata(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        InvulnerabilityFallDamage invulnerabilityFallDamage = new InvulnerabilityFallDamage();
+                        invulnerabilityFallDamage.applyPowers(entity);
                         break;
                     case MetadataHandler.INVULNERABILITY_FIRE_H:
-                        entity.setMetadata(MetadataHandler.INVULNERABILITY_FIRE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        InvulnerabilityFire invulnerabilityFire = new InvulnerabilityFire();
+                        invulnerabilityFire.applyPowers(entity);
                         break;
                     case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:
-                        entity.setMetadata(MetadataHandler.INVULNERABILITY_KNOCKBACK_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        InvulnerabilityKnockback invulnerabilityKnockback = new InvulnerabilityKnockback();
+                        invulnerabilityKnockback.applyPowers(entity);
                         break;
                     case MetadataHandler.MOVEMENT_SPEED_H:
-                        entity.setMetadata(MetadataHandler.MOVEMENT_SPEED_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-                        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
+                        MovementSpeed movementSpeed = new MovementSpeed();
+                        movementSpeed.applyPowers(entity);
                         break;
                     case MetadataHandler.TAUNT_H:
-                        entity.setMetadata(MetadataHandler.TAUNT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        Taunt taunt = new Taunt();
+                        taunt.applyPowers(entity);
                         break;
                     case "custom":
-                        entity.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                        MetadataHandler.registerMetadata(entity, MetadataHandler.CUSTOM_POWERS_MD, true);
                         break;
                     default:
                         commandSender.sendMessage(string + " is not a valid power.");
@@ -497,6 +523,56 @@ public class SpawnMobCommandHandler {
 
             minorPowerPowerStance.itemEffect(entity);
             majorPowerPowerStance.itemEffect(entity);
+
+        }
+
+    }
+
+    public static void spawnBossMob(Player player, String[] args) {
+
+        Location cursorLocation = player.getTargetBlock(null, 5).getLocation().add(new Vector(0.5, 2, 0.5));
+
+        if (args[1].equalsIgnoreCase("treasuregoblin")) {
+
+            Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
+            TreasureGoblin.createGoblin(zombie);
+            player.sendMessage("Spawned treasure goblin");
+
+        }
+
+        if (args[1].equalsIgnoreCase("zombieking")) {
+
+            Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
+            ZombieKing.spawnZombieKing(zombie);
+            zombie.remove();
+            player.sendMessage("Spawned zombie king");
+
+        }
+
+        if (args[1].equalsIgnoreCase("kraken")) {
+
+            Squid squid = (Squid) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.SQUID);
+            Kraken.spawnKraken(squid.getLocation());
+            squid.remove();
+            player.sendMessage("Spawned Kraken");
+
+        }
+
+        if (args[1].equalsIgnoreCase("balrog")) {
+
+            Silverfish balrog = (Silverfish) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.SILVERFISH);
+            Balrog.spawnBalrog(balrog.getLocation());
+            balrog.remove();
+            player.sendMessage("Spawned Balrog");
+
+        }
+
+        if (args[1].equalsIgnoreCase("fae")) {
+
+            Vex fae = (Vex) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.VEX);
+            Fae.spawnFae(fae.getLocation());
+            fae.remove();
+            player.sendMessage("Spawned Fae");
 
         }
 

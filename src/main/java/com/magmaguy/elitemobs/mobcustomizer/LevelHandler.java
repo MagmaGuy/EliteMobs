@@ -17,7 +17,6 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.entity.Entity;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import static org.bukkit.Bukkit.getLogger;
@@ -32,26 +31,26 @@ public class LevelHandler {
         //No previous metadata, assume it's the first level
         if (!entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && !deletedEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-            entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 2));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, 2);
 
         } else if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && !deletedEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             int finalMetadata = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + 1;
 
-            entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, finalMetadata));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, finalMetadata);
 
         } else if (!entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && deletedEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             int finalMetadata = deletedEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + 1;
 
-            entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, finalMetadata));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, finalMetadata);
 
         } else if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && deletedEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             int finalMetadata = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() +
                     deletedEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
-            entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, finalMetadata));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, finalMetadata);
 
         } else {
 
@@ -62,7 +61,7 @@ public class LevelHandler {
         //handle sub-2 levels, causes some issues and makes no logical sense
         if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) {
 
-            entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, 2));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, 2);
 
         }
 

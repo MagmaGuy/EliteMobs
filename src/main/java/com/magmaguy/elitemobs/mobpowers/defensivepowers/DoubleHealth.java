@@ -21,7 +21,6 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -37,7 +36,7 @@ public class DoubleHealth extends MinorPowers {
 
         if (!(entity instanceof IronGolem)) {
 
-            entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(entity, powerMetadata, true);
             MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
             minorPowerPowerStance.itemEffect(entity);
 

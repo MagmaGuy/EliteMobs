@@ -1,11 +1,14 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
+import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +28,7 @@ public class ItemTierFinder {
 
             ItemStack helmet = player.getEquipment().getHelmet();
 
-            totalArmorThreat += findItemTier(helmet);
+            totalArmorThreat += findBattleTier(helmet);
 
         }
 
@@ -33,7 +36,7 @@ public class ItemTierFinder {
 
             ItemStack chestplate = player.getEquipment().getChestplate();
 
-            totalArmorThreat += findItemTier(chestplate);
+            totalArmorThreat += findBattleTier(chestplate);
 
         }
 
@@ -41,7 +44,7 @@ public class ItemTierFinder {
 
             ItemStack leggings = player.getEquipment().getLeggings();
 
-            totalArmorThreat += findItemTier(leggings);
+            totalArmorThreat += findBattleTier(leggings);
 
         }
 
@@ -49,7 +52,7 @@ public class ItemTierFinder {
 
             ItemStack boots = player.getEquipment().getBoots();
 
-            totalArmorThreat += findItemTier(boots);
+            totalArmorThreat += findBattleTier(boots);
 
         }
 
@@ -96,7 +99,7 @@ public class ItemTierFinder {
 
             for (ItemStack itemStack : itemList) {
 
-                double currentTier = findItemTier(itemStack);
+                double currentTier = findBattleTier(itemStack);
 
                 if (currentTier > highestTier) {
 
@@ -112,96 +115,138 @@ public class ItemTierFinder {
 
     }
 
-    public static double findItemTier(ItemStack itemStack) {
+    private static final double IRON_TIER = DamageAdjuster.IRON_TIER_LEVEL;
+    private static final double STONE_CHAIN_TIER = DamageAdjuster.IRON_TIER_LEVEL;
+    private static final double GOLD_WOOD_LEATHER_TIER = DamageAdjuster.GOLD_WOOD_LEATHER_TIER_LEVEL;
+    private static final double DIAMOND_TIER = DamageAdjuster.DIAMOND_TIER_LEVEL;
 
-        //Divide the tier rank by the 4 armor slots and 1 weapon slot
-        double diamondTier = 1;
-        double ironTier = 0.66;
-        double stoneChainTier = 0.25;
-        double goldWoodLeatherTier = 0;
+    public static double findGenericTier(Material material, HashMap<Enchantment, Integer> enchantmentList) {
+
+        double tier = 0;
+
+        switch (material) {
+            case DIAMOND_PICKAXE:
+            case DIAMOND_SPADE:
+                return DIAMOND_TIER + findMainEnchantment(enchantmentList, Enchantment.DIG_SPEED);
+            case STONE_PICKAXE:
+            case STONE_SPADE:
+                return STONE_CHAIN_TIER + findMainEnchantment(enchantmentList, Enchantment.DIG_SPEED);
+            case IRON_PICKAXE:
+            case IRON_SPADE:
+                return IRON_TIER + findMainEnchantment(enchantmentList, Enchantment.DIG_SPEED);
+            case GOLD_PICKAXE:
+            case GOLD_SPADE:
+            case WOOD_PICKAXE:
+            case WOOD_SPADE:
+                return GOLD_WOOD_LEATHER_TIER + findMainEnchantment(enchantmentList, Enchantment.DIG_SPEED);
+        }
+
+        if (tier == 0)
+            tier = findBattleTier(material, enchantmentList);
+
+        return tier;
+
+    }
+
+    public static double findBattleTier(Material material, HashMap<Enchantment, Integer> enchantmentList) {
+
+        return parseMaterials(material, findMainEnchantment(enchantmentList, Enchantment.DAMAGE_ALL), findMainEnchantment(enchantmentList, Enchantment.PROTECTION_ENVIRONMENTAL), findMainEnchantment(enchantmentList, Enchantment.ARROW_DAMAGE));
+
+    }
+
+    public static double findBattleTier(ItemStack itemStack) {
 
         Material material = itemStack.getType();
 
-        switch (material) {
+        return parseMaterials(material, findMainEnchantment(itemStack, Enchantment.DAMAGE_ALL), findMainEnchantment(itemStack, Enchantment.PROTECTION_ENVIRONMENTAL), findMainEnchantment(itemStack, Enchantment.ARROW_DAMAGE));
 
-            case DIAMOND_AXE:
-                return diamondTier + findMeleeWeaponEnchantments(itemStack);
-            case DIAMOND_BOOTS:
-                return diamondTier + findArmorEnchantments(itemStack);
-            case DIAMOND_CHESTPLATE:
-                return diamondTier + findArmorEnchantments(itemStack);
-            case DIAMOND_HELMET:
-                return diamondTier + findArmorEnchantments(itemStack);
-            case DIAMOND_LEGGINGS:
-                return diamondTier + findArmorEnchantments(itemStack);
+    }
+
+    private static double parseMaterials(Material material, int mainEnchantment, int mainEnchantment2, int mainEnchantment3) {
+        switch (material) {
             case DIAMOND_SWORD:
-                return diamondTier + findMeleeWeaponEnchantments(itemStack);
+            case DIAMOND_AXE:
+                return DIAMOND_TIER + mainEnchantment;
+            case DIAMOND_BOOTS:
+            case DIAMOND_CHESTPLATE:
+            case DIAMOND_HELMET:
+            case DIAMOND_LEGGINGS:
+                return DIAMOND_TIER + mainEnchantment2;
             case IRON_AXE:
-                return ironTier + findMeleeWeaponEnchantments(itemStack);
-            case IRON_BOOTS:
-                return ironTier + findArmorEnchantments(itemStack);
-            case IRON_CHESTPLATE:
-                return ironTier + findArmorEnchantments(itemStack);
-            case IRON_HELMET:
-                return ironTier + findArmorEnchantments(itemStack);
-            case IRON_LEGGINGS:
-                return ironTier + findArmorEnchantments(itemStack);
             case IRON_SWORD:
-                return ironTier + findMeleeWeaponEnchantments(itemStack);
-            case BOW:
-                return ironTier + findRangedWeaponEnchantments(itemStack);
+                return IRON_TIER + mainEnchantment;
+            case IRON_BOOTS:
+            case IRON_CHESTPLATE:
+            case IRON_HELMET:
+            case IRON_LEGGINGS:
+                return IRON_TIER + mainEnchantment2;
             case SHIELD:
-                return ironTier + findArmorEnchantments(itemStack);
+                return IRON_TIER + mainEnchantment2;
             case CHAINMAIL_BOOTS:
-                return stoneChainTier + findArmorEnchantments(itemStack);
             case CHAINMAIL_CHESTPLATE:
-                return stoneChainTier + findArmorEnchantments(itemStack);
             case CHAINMAIL_HELMET:
-                return stoneChainTier + findArmorEnchantments(itemStack);
             case CHAINMAIL_LEGGINGS:
-                return stoneChainTier + findArmorEnchantments(itemStack);
+                return STONE_CHAIN_TIER + mainEnchantment2;
             case STONE_SWORD:
-                return stoneChainTier + findMeleeWeaponEnchantments(itemStack);
-            case GOLD_AXE:
-                return goldWoodLeatherTier + findMeleeWeaponEnchantments(itemStack);
+                return STONE_CHAIN_TIER + mainEnchantment;
             case GOLD_BOOTS:
-                return goldWoodLeatherTier + findArmorEnchantments(itemStack);
             case GOLD_CHESTPLATE:
-                return goldWoodLeatherTier + findArmorEnchantments(itemStack);
             case GOLD_HELMET:
-                return goldWoodLeatherTier + findArmorEnchantments(itemStack);
             case GOLD_LEGGINGS:
-                return goldWoodLeatherTier + findArmorEnchantments(itemStack);
-            case GOLD_SWORD:
-                return goldWoodLeatherTier + findMeleeWeaponEnchantments(itemStack);
             case LEATHER_BOOTS:
-                return goldWoodLeatherTier + findArmorEnchantments(itemStack);
             case LEATHER_CHESTPLATE:
-                return goldWoodLeatherTier + findArmorEnchantments(itemStack);
             case LEATHER_HELMET:
-                return goldWoodLeatherTier + findArmorEnchantments(itemStack);
             case LEATHER_LEGGINGS:
-                return goldWoodLeatherTier + findArmorEnchantments(itemStack);
+                return GOLD_WOOD_LEATHER_TIER + mainEnchantment2;
             case WOOD_SWORD:
-                return goldWoodLeatherTier + findMeleeWeaponEnchantments(itemStack);
             case WOOD_AXE:
-                return goldWoodLeatherTier + findMeleeWeaponEnchantments(itemStack);
+            case GOLD_SWORD:
+            case GOLD_AXE:
+                return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
+            case BOW:
+                return IRON_TIER + mainEnchantment3;
             default:
                 return 0;
+        }
+    }
+
+    private static int findMainEnchantment(HashMap<Enchantment, Integer> enchantmentMap, Enchantment enchantment) {
+
+        int enchantments = 0;
+
+        if (!enchantmentMap.isEmpty()) {
+
+            for (Enchantment currentEnchantment : enchantmentMap.keySet()) {
+
+                if (currentEnchantment.equals(enchantment)) {
+
+                    enchantments += enchantmentMap.get(currentEnchantment);
+
+                }
+
+            }
 
         }
 
+        return enchantments;
+
     }
 
-    private static int findArmorEnchantments(ItemStack itemStack) {
+    private static int findMainEnchantment(ItemStack itemStack, Enchantment enchantment) {
 
         int enchantments = 0;
+
+        if (ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(itemStack)) {
+            String deobfuscatedString = itemStack.getItemMeta().getLore().get(0).replace("§", "");
+            if (deobfuscatedString.contains(LoreGenerator.OBFUSCATED_ENCHANTMENTS))
+                return findObfuscatedMainEnchantment(deobfuscatedString, enchantment);
+        }
 
         if (!itemStack.getEnchantments().isEmpty()) {
 
             for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
 
-                if (entry.getKey().equals(Enchantment.PROTECTION_ENVIRONMENTAL)) {
+                if (entry.getKey().equals(enchantment)) {
 
                     enchantments += entry.getValue();
 
@@ -215,48 +260,12 @@ public class ItemTierFinder {
 
     }
 
-    private static int findMeleeWeaponEnchantments(ItemStack itemStack) {
+    private static int findObfuscatedMainEnchantment(String deobfuscatedLore, Enchantment enchantment) {
+        for (String string : deobfuscatedLore.split(","))
+            if (string.contains(enchantment.getName()))
+                return Integer.parseInt(string.split(":")[1]);
 
-        int enchantments = 0;
-
-        if (!itemStack.getEnchantments().isEmpty()) {
-
-            for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
-
-                if (entry.getKey().equals(Enchantment.DAMAGE_ALL)) {
-
-                    enchantments += entry.getValue();
-
-                }
-
-            }
-
-        }
-
-        return enchantments;
-
-    }
-
-    private static int findRangedWeaponEnchantments(ItemStack itemStack) {
-
-        int enchantments = 0;
-
-        if (!itemStack.getEnchantments().isEmpty()) {
-
-            for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
-
-                if (entry.getKey().equals(Enchantment.ARROW_DAMAGE)) {
-
-                    enchantments += entry.getValue();
-
-                }
-
-            }
-
-        }
-
-        return enchantments;
-
+        return 0;
     }
 
 }

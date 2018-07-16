@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -342,12 +343,11 @@ public class ItemDropper implements Listener {
 
     }
 
-    public void dropProcedurallyGeneratedItem(int tierLevel, Entity entity) {
+    public void dropProcedurallyGeneratedItem(int tierLevel, LivingEntity livingEntity) {
 
-        ProceduralItemGenerator proceduralItemGenerator = new ProceduralItemGenerator();
-        ItemStack randomLoot = proceduralItemGenerator.tieredProceduralItemGenerator(tierLevel, entity);
+        ItemStack randomLoot = ItemConstructor.constructItem(tierLevel, livingEntity);
 
-        entity.getWorld().dropItem(entity.getLocation(), randomLoot);
+        livingEntity.getWorld().dropItem(livingEntity.getLocation(), randomLoot);
 
     }
 

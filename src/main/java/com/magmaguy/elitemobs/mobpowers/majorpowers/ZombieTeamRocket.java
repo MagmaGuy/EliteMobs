@@ -63,7 +63,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
@@ -89,7 +88,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(plugin, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
         majorPowerStanceMath.itemEffect(entity);
 
@@ -110,7 +109,7 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
 
             Entity entity = event.getEntity();
 
-            entity.setMetadata(MetadataHandler.TEAM_ROCKET_ACTIVATED, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.TEAM_ROCKET_ACTIVATED, true);
 
             int assistMobLevel = (int) Math.floor(entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 4);
 
@@ -145,12 +144,12 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             jamesHelmet.setItemMeta(jamesHelmetMeta);
 
             Zombie jesse = (Zombie) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.ZOMBIE);
-            jesse.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            jesse.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
-            jesse.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
-            jesse.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
-            jesse.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-            jesse.setMetadata(MetadataHandler.TEAM_ROCKET_MEMBER, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(jesse, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
+            MetadataHandler.registerMetadata(jesse, MetadataHandler.CUSTOM_NAME, true);
+            MetadataHandler.registerMetadata(jesse, MetadataHandler.CUSTOM_ARMOR, true);
+            MetadataHandler.registerMetadata(jesse, MetadataHandler.CUSTOM_STACK, true);
+            MetadataHandler.registerMetadata(jesse, MetadataHandler.CUSTOM_POWERS_MD, true);
+            MetadataHandler.registerMetadata(jesse, MetadataHandler.TEAM_ROCKET_MEMBER, true);
             jesse.setCustomName("Jesse");
             jesse.getEquipment().setHelmet(jesseHelmet);
             jesse.getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
@@ -159,12 +158,12 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             AggressiveEliteMobConstructor.constructAggressiveEliteMob(jesse);
 
             Zombie james = (Zombie) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.ZOMBIE);
-            james.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(plugin, assistMobLevel));
-            james.setMetadata(MetadataHandler.CUSTOM_NAME, new FixedMetadataValue(plugin, true));
-            james.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
-            james.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(plugin, true));
-            james.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(plugin, true));
-            james.setMetadata(MetadataHandler.TEAM_ROCKET_MEMBER, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(james, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
+            MetadataHandler.registerMetadata(james, MetadataHandler.CUSTOM_NAME, true);
+            MetadataHandler.registerMetadata(james, MetadataHandler.CUSTOM_ARMOR, true);
+            MetadataHandler.registerMetadata(james, MetadataHandler.CUSTOM_STACK, true);
+            MetadataHandler.registerMetadata(james, MetadataHandler.CUSTOM_POWERS_MD, true);
+            MetadataHandler.registerMetadata(james, MetadataHandler.TEAM_ROCKET_MEMBER, true);
             james.setCustomName("James");
             james.getEquipment().setHelmet(jamesHelmet);
             james.getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
@@ -173,13 +172,13 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
             AggressiveEliteMobConstructor.constructAggressiveEliteMob(james);
 
             Ocelot meowth = (Ocelot) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.OCELOT);
-            meowth.setMetadata(MetadataHandler.TEAM_ROCKET_MEMBER, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(meowth, MetadataHandler.TEAM_ROCKET_MEMBER, true);
             meowth.setCustomName("Meowth");
 
             ((Zombie) entity).getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
             ((Zombie) entity).getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);
             ((Zombie) entity).getEquipment().setBoots(TEAM_ROCKET_BOOTS);
-            entity.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(plugin, true));
+            MetadataHandler.registerMetadata(entity, MetadataHandler.CUSTOM_ARMOR, true);
 
             Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 

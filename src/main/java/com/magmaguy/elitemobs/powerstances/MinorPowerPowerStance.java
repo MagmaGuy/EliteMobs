@@ -24,7 +24,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -35,7 +34,7 @@ import java.util.List;
  */
 public class MinorPowerPowerStance implements Listener {
 
-    private static int trackAmount = 1;
+    private static int trackAmount = 2;
     private static int itemsPerTrack = 2;
 
     //Secondary effect particle processing
@@ -103,7 +102,7 @@ public class MinorPowerPowerStance implements Listener {
         if (entity.hasMetadata(MetadataHandler.VISUAL_EFFECT_MD))
             return;
 
-        entity.setMetadata(MetadataHandler.VISUAL_EFFECT_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(entity, MetadataHandler.VISUAL_EFFECT_MD, true);
 
         //contains all items around a given entity
         HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker = new HashMap<>();

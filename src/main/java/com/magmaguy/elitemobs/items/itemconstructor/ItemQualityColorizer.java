@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.items;
+package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
@@ -28,11 +28,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemQuality {
+public class ItemQualityColorizer {
 
-    //item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
-    //calculate item quality percentually from the max item level set in configs
-    //6 ranks so 100/6 = 16,67% of theoretical max per rank
+    /*
+    item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
+     */
 
     private static final int ARROW_DAMAGE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_DAMAGE_BOOL, ItemsProceduralSettingsConfig.ARROW_DAMAGE_MAX_LEVEL);
     private static final int ARROW_FIRE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_FIRE_BOOL, ItemsProceduralSettingsConfig.ARROW_FIRE_MAX_LEVEL);

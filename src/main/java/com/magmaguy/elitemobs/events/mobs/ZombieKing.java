@@ -37,7 +37,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -54,12 +53,12 @@ public class ZombieKing implements Listener {
 
         Zombie zombieKing = (Zombie) location.getWorld().spawnEntity(location, EntityType.ZOMBIE);
 
-        zombieKing.setMetadata(MetadataHandler.ZOMBIE_KING, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        zombieKing.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, kingLevel));
-        zombieKing.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        zombieKing.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        zombieKing.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        zombieKing.setMetadata(MetadataHandler.EVENT_CREATURE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.ZOMBIE_KING, true);
+        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.ELITE_MOB_MD, kingLevel);
+        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_ARMOR, true);
+        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_POWERS_MD, true);
+        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_STACK, true);
+        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.EVENT_CREATURE, true);
         NameHandler.customUniqueNameAssigner(zombieKing, ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME)));
 
         zombieKing.setRemoveWhenFarAway(false);
@@ -225,7 +224,7 @@ public class ZombieKing implements Listener {
                 Location armorStandLocation = sourceLocation.add(toTarget);
 
                 ArmorStand flamethrowerDamagePoint = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
-                flamethrowerDamagePoint.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+                MetadataHandler.registerMetadata(flamethrowerDamagePoint, MetadataHandler.ARMOR_STAND_DISPLAY, true);
                 flamethrowerDamagePoint.setVisible(false);
                 flamethrowerDamagePoint.setMarker(true);
                 flamethrowerDamagePoint.setGravity(false);

@@ -16,9 +16,9 @@ public class VisualItemProcessor {
         return (int) ((numberOfPointsPerRotation / itemsPerTrack) / effectQuantity * individualPositionCounter + globalPositionCounter);
     }
 
-    public static void itemProcessor (HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker, ItemStack itemStack,
-                               int effectIteration, Entity entity, HashMap<Integer, List<Vector>> trackHashMap,
-                               int trackAmount, int itemsPerTrack) {
+    public static void itemProcessor(HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker, ItemStack itemStack,
+                                     int effectIteration, Entity entity, HashMap<Integer, List<Vector>> trackHashMap,
+                                     int trackAmount, int itemsPerTrack) {
 
         boolean effectAlreadyPresent = false;
 
@@ -80,7 +80,12 @@ public class VisualItemProcessor {
 
                     Vector vector = (newLocation.subtract(currentLocation)).toVector();
                     vector = vector.multiply(0.3);
-                    item.setVelocity(vector);
+                    if (Math.abs(vector.getX()) > 3 || Math.abs(vector.getY()) > 3 || Math.abs(vector.getZ()) > 3) {
+                        item.teleport(entity.getLocation());
+                        item.setVelocity(new Vector(0.01, 0.01, 0.01));
+                    } else
+
+                        item.setVelocity(vector);
 
                 }
 

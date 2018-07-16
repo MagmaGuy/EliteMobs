@@ -25,7 +25,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +77,7 @@ public class NaturalMobSpawner implements Listener {
 
         if (eliteMobLevel < 1) return;
 
-        entity.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, eliteMobLevel));
+        MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, eliteMobLevel);
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
 
     }

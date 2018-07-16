@@ -28,49 +28,39 @@ import static com.magmaguy.elitemobs.items.CustomItemConstructor.customItemList;
  */
 public class GetLootCommandHandler {
 
-    public boolean getLootHandler(Player player, String args1) {
+    public static boolean getLoot(Player player, String args1) {
 
-        for (ItemStack itemStack : customItemList) {
+        boolean itemExists = false;
 
-            String itemRawName = itemStack.getItemMeta().getDisplayName();
+        for (ItemStack itemStack : customItemList)
+            itemExists = getItem(itemStack, args1, player);
 
-            if (itemRawName != null) {
+        if (itemExists) return true;
 
-                Bukkit.getLogger().info(itemStack.getItemMeta().getDisplayName());
+        for (ItemStack itemStack : UniqueItemConstructor.uniqueItemsList)
+            itemExists = getItem(itemStack, args1, player);
 
-                String itemProcessedName = itemRawName.replaceAll(" ", "_").toLowerCase();
-                itemProcessedName = ChatColor.stripColor(itemProcessedName);
+        if (itemExists) return true;
+        return false;
 
-                if (itemProcessedName.equalsIgnoreCase(args1) && player.isValid()) {
+    }
 
-                    player.getInventory().addItem(itemStack);
+    private static boolean getItem(ItemStack itemStack, String args1, Player player) {
 
-                    return true;
+        String itemRawName = itemStack.getItemMeta().getDisplayName();
 
-                }
+        if (itemRawName != null) {
 
-            }
+            Bukkit.getLogger().info(itemStack.getItemMeta().getDisplayName());
 
-        }
+            String itemProcessedName = itemRawName.replaceAll(" ", "_").toLowerCase();
+            itemProcessedName = ChatColor.stripColor(itemProcessedName);
 
-        for (ItemStack itemStack : UniqueItemConstructor.uniqueItemsList) {
+            if (itemProcessedName.equalsIgnoreCase(args1) && player.isValid()) {
 
-            String itemRawName = itemStack.getItemMeta().getDisplayName();
+                player.getInventory().addItem(itemStack);
 
-            if (itemRawName != null) {
-
-                Bukkit.getLogger().info(itemStack.getItemMeta().getDisplayName());
-
-                String itemProcessedName = itemRawName.replaceAll(" ", "_").toLowerCase();
-                itemProcessedName = ChatColor.stripColor(itemProcessedName);
-
-                if (itemProcessedName.equalsIgnoreCase(args1) && player.isValid()) {
-
-                    player.getInventory().addItem(itemStack);
-
-                    return true;
-
-                }
+                return true;
 
             }
 

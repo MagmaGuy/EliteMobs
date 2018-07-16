@@ -23,7 +23,6 @@ import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class PlayerDeathMessageByEliteMob {
 
@@ -83,7 +82,7 @@ public class PlayerDeathMessageByEliteMob {
                 break;
         }
 
-        player.setMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(player, MetadataHandler.KILLED_BY_ELITE_MOB, true);
 
         for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
 

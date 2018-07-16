@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CombatTag implements Listener {
@@ -22,7 +21,7 @@ public class CombatTag implements Listener {
         if (player.isInvulnerable()) player.setInvulnerable(false);
         if (player.isFlying()) {
             player.setFlying(false);
-            player.setMetadata(MetadataHandler.SAFE_FALL, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+            MetadataHandler.registerMetadata(player, MetadataHandler.SAFE_FALL, true);
             new BukkitRunnable() {
                 @Override
                 public void run() {

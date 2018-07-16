@@ -10,7 +10,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -22,7 +21,7 @@ public class SkeletonPillar extends MajorPowers implements Listener {
     @Override
     public void applyPowers(Entity entity) {
 
-        entity.setMetadata(powerMetadata, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
         majorPowerStanceMath.itemEffect(entity);
 
@@ -52,13 +51,13 @@ public class SkeletonPillar extends MajorPowers implements Listener {
         ArmorStand armorStand1 = (ArmorStand) eventSkeleton.getWorld().spawnEntity(eventSkeleton.getLocation(), EntityType.ARMOR_STAND);
         armorStand1.setMarker(true);
         armorStand1.setVisible(false);
-        armorStand1.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(armorStand1, MetadataHandler.ARMOR_STAND_DISPLAY, true);
         armorStandMover(eventSkeleton, armorStand1, 20 * 1, 7);
 
         ArmorStand armorStand2 = (ArmorStand) eventSkeleton.getWorld().spawnEntity(eventSkeleton.getLocation(), EntityType.ARMOR_STAND);
         armorStand2.setMarker(true);
         armorStand2.setVisible(false);
-        armorStand2.setMetadata(MetadataHandler.ARMOR_STAND_DISPLAY, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(armorStand2, MetadataHandler.ARMOR_STAND_DISPLAY, true);
         armorStandMover(eventSkeleton, armorStand2, 20 * 1, -7);
 
         new BukkitRunnable() {

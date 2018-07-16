@@ -17,7 +17,6 @@ import org.bukkit.entity.Vex;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -66,8 +65,8 @@ public class Fae implements Listener {
         Vex fireFae = (Vex) location.getWorld().spawnEntity(location, EntityType.VEX);
         Vex frostFae = (Vex) location.getWorld().spawnEntity(location, EntityType.VEX);
 
-        fireFae.setMetadata(MetadataHandler.ATTACK_FIRE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        frostFae.setMetadata(MetadataHandler.ATTACK_FREEZE_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(fireFae, MetadataHandler.ATTACK_FIRE_MD, true);
+        MetadataHandler.registerMetadata(frostFae, MetadataHandler.ATTACK_FREEZE_MD, true);
 
         faeConstructor(lightningFae);
         faeConstructor(fireFae);
@@ -83,12 +82,12 @@ public class Fae implements Listener {
 
     private static void faeConstructor(Vex fae) {
 
-        fae.setMetadata(MetadataHandler.ELITE_MOB_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, (DynamicBossLevel.determineDynamicBossLevel(fae)/3)));
-        fae.setMetadata(MetadataHandler.FAE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        fae.setMetadata(MetadataHandler.EVENT_CREATURE, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        fae.setMetadata(MetadataHandler.CUSTOM_ARMOR, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        fae.setMetadata(MetadataHandler.CUSTOM_POWERS_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-        fae.setMetadata(MetadataHandler.CUSTOM_STACK, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        MetadataHandler.registerMetadata(fae, MetadataHandler.ELITE_MOB_MD, DynamicBossLevel.determineDynamicBossLevel(fae)/3);
+        MetadataHandler.registerMetadata(fae, MetadataHandler.FAE, true);
+        MetadataHandler.registerMetadata(fae, MetadataHandler.EVENT_CREATURE, true);
+        MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_ARMOR, true);
+        MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_POWERS_MD, true);
+        MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_STACK, true);
 
         fae.setRemoveWhenFarAway(false);
 
