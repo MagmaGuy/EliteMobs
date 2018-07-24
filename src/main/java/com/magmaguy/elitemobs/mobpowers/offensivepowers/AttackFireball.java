@@ -18,13 +18,11 @@ package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -34,7 +32,6 @@ import org.bukkit.util.Vector;
  */
 public class AttackFireball extends MinorPowers {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ATTACK_FIREBALL_MD;
 
     @Override
@@ -87,7 +84,7 @@ public class AttackFireball extends MinorPowers {
         Vector targetterToTargetted = player.getLocation().toVector().subtract(repeatingFireball.getLocation().toVector()).normalize();
 
         repeatingFireball.setVelocity(targetterToTargetted);
-        repeatingFireball.setYield(2F);
+        repeatingFireball.setYield(1F);
         repeatingFireball.setIsIncendiary(true);
         repeatingFireball.setShooter((ProjectileSource) entity);
 

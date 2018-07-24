@@ -48,6 +48,7 @@ public class TranslationConfig {
         configuration.addDefault("Elite Mob Names.WitherSkeleton", Arrays.asList("Level ", " Elite Wither Skeleton"));
         configuration.addDefault("Elite Mob Names.Zombie", Arrays.asList("Level ", " Elite Zombie"));
         configuration.addDefault("Elite Mob Names.Vex", Arrays.asList("Level ", " Elite Vex"));
+        configuration.addDefault("Elite Mob Names.Vex", Arrays.asList("Level ", " Elite Drowned"));
 
         configuration.addDefault("Elite Mob Names.Chicken", "Super Chicken");
         configuration.addDefault("Elite Mob Names.Cow", "Super Cow");

@@ -97,7 +97,7 @@ public class MobScanner implements Listener {
                 if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS)) {
 
                     //scan for passive mobs that might have lost their metadata
-                    if (((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT)) {
+                    if (((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity) * ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT)) {
 
                         customPassiveName(entity, plugin);
 
@@ -125,10 +125,10 @@ public class MobScanner implements Listener {
 
                 //scan for iron golems with missing metadata
                 if (entity instanceof IronGolem && !entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                        ((IronGolem) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
+                        ((IronGolem) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity)) {
 
                     MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, HealthHandler.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
-                            DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)));
+                            DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity)));
                     customAggressiveName(entity);
 
                 }
@@ -180,7 +180,7 @@ public class MobScanner implements Listener {
 
         List<LivingEntity> animalContainer = new ArrayList<>();
 
-        if (((LivingEntity) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
+        if (((LivingEntity) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity)) {
 
             return;
 
@@ -190,7 +190,7 @@ public class MobScanner implements Listener {
 
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
                     && !secondEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) &&
-                    ((LivingEntity) secondEntity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
+                    ((LivingEntity) secondEntity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity)) {
 
                 animalContainer.add((LivingEntity) secondEntity);
 

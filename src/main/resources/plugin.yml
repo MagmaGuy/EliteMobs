@@ -1,8 +1,9 @@
 name: EliteMobs
-version: 6.5.6
+version: 6.5.7
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
+
 commands:
   elitemobs:
     description: Catch-all command

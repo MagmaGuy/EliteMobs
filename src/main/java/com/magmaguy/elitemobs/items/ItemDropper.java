@@ -72,10 +72,6 @@ public class ItemDropper implements Listener {
 
         double chanceToUpgradeTier = 1 / (double) mobTier * ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER);
 
-//        Bukkit.getLogger().info("Chance to upgrade: " + chanceToUpgradeTier);
-//        Bukkit.getLogger().info("Mob Tier: " + mobTier);
-//        Bukkit.getLogger().info("Max loot tier: " + ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER));
-
         if (ThreadLocalRandom.current().nextDouble() * 100 < chanceToUpgradeTier) {
 
             generateItem(entity, mobTier + 1);

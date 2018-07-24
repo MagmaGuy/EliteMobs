@@ -31,7 +31,7 @@ public class HealthHandler {
 
         Damageable damageableEntity = ((Damageable) entity);
         Damageable damageableDeleted = ((Damageable) deletedEntity);
-        double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity);
+        double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity);
         int newEliteMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
 
         if (entity.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
@@ -86,7 +86,7 @@ public class HealthHandler {
     public static void naturalAgressiveHealthHandler(Entity entity, int eliteMobLevel) {
 
         Damageable damageable = (Damageable) entity;
-        double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity);
+        double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity);
         int newEliteMobLevel = eliteMobLevel;
 
         if (entity.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {

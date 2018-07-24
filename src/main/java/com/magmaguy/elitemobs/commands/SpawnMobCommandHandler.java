@@ -334,7 +334,7 @@ public class SpawnMobCommandHandler {
 
     private static Entity spawnEliteMob(int mobLevel, EntityType mobType, Location location, ArrayList<String> mobPowers, CommandSender commandSender) {
 
-        Entity entity = location.getWorld().spawnEntity(location, mobType);
+        LivingEntity entity = (LivingEntity) location.getWorld().spawnEntity(location, mobType);
 
         if (mobType == EntityType.CHICKEN || mobType == EntityType.COW || mobType == EntityType.MUSHROOM_COW ||
                 mobType == EntityType.PIG || mobType == EntityType.SHEEP) {
@@ -365,7 +365,7 @@ public class SpawnMobCommandHandler {
 
     }
 
-    private static void applyPowers(Entity entity, ArrayList<String> mobPowers, CommandSender commandSender) {
+    private static void applyPowers(LivingEntity entity, ArrayList<String> mobPowers, CommandSender commandSender) {
 
         if (mobPowers.size() > 0) {
 
@@ -509,6 +509,8 @@ public class SpawnMobCommandHandler {
                     case "custom":
                         MetadataHandler.registerMetadata(entity, MetadataHandler.CUSTOM_POWERS_MD, true);
                         break;
+                    case "display":
+                        entity.setAI(false);
                     default:
                         commandSender.sendMessage(string + " is not a valid power.");
                         commandSender.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList + " custom");

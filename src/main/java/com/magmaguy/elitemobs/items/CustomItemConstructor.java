@@ -189,17 +189,16 @@ public class CustomItemConstructor implements Listener {
         List enchantments = ConfigValues.itemsCustomLootListConfig.getList(path);
 
         HashMap enchantmentMap = new HashMap();
+        try {
+            for (Object object : enchantments) {
 
-        for (Object object : enchantments) {
-
-            try {
                 String string = (String) object;
                 enchantmentMap.put(Enchantment.getByName(string.split(",")[0]), Integer.parseInt(string.split(",")[1]));
-            } catch (Exception e) {
-                Bukkit.getLogger().warning("Warning: entry " + object + " is invalid.");
-                Bukkit.getLogger().warning("Make sure you add a valid enchantment type and a valid level for it!");
             }
 
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("Warning: something on ItemsCustomLootList.yml is invalid.");
+            Bukkit.getLogger().warning("Make sure you add a valid enchantment type and a valid level for it!");
         }
 
         return enchantmentMap;

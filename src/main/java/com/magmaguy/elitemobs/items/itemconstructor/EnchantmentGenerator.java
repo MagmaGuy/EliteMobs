@@ -31,7 +31,7 @@ public class EnchantmentGenerator {
      */
     public static HashMap<Enchantment, Integer> generateEnchantments(double itemTier, Material material) {
 
-        HashMap <Enchantment, Integer> enchantmentMap = new HashMap<>();
+        HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
         /*
         No enchantments for items too low tier to have one
@@ -322,7 +322,7 @@ public class EnchantmentGenerator {
 
     }
 
-    private static int totalSecondaryEnchantmentCount(HashMap<Enchantment, Integer> validSecondaryEnchantments){
+    private static int totalSecondaryEnchantmentCount(HashMap<Enchantment, Integer> validSecondaryEnchantments) {
 
         int totalCount = 0;
 
@@ -336,9 +336,15 @@ public class EnchantmentGenerator {
     //Version and subVersion should be set to the update at which the enchantment was introduced
     private static boolean enchantmentBackwardsCompatibility(int version, int subVersion, String actualEnchantement, String enchantmentToAvoid) {
 
+        //Version is always randomWords(MC: 1.xx.yy) xx is mandatory yy is optional
+        //For versions with only an xx
+        if (Bukkit.getBukkitVersion().split("[.]").length < 4) {
+            return actualEnchantement.equalsIgnoreCase(enchantmentToAvoid) && Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 2)) < version;
+        }
+        //For other versions with yy
         return actualEnchantement.equalsIgnoreCase(enchantmentToAvoid) && Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) < version ||
                 actualEnchantement.equalsIgnoreCase(enchantmentToAvoid) && Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) == version &&
-                        Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[2].substring(0, Bukkit.getBukkitVersion().split("[.]")[2].indexOf("-"))) < subVersion;
+                        Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[2].replace(")", "")) < subVersion;
 
     }
 
