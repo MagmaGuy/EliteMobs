@@ -35,9 +35,10 @@ public class LoreGenerator {
                 lore.add(itemWorth(material, enchantmentMap, potionList));
             else if (string.contains("$tier"))
                 lore.add(string.replace("$tier", ItemTierFinder.findGenericTier(material, enchantmentMap) + ""));
-            else if (string.contains("$customLore"))
-                lore.addAll(loreList);
-            else
+            else if (string.contains("$customLore")) {
+                if (loreList != null)
+                    lore.addAll(loreList);
+            } else
                 lore.add(string);
 
         }

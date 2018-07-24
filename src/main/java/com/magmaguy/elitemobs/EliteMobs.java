@@ -28,6 +28,7 @@ import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.runnables.*;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
@@ -35,6 +36,7 @@ import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -103,21 +105,24 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        for (World world : validWorldList) {
-
+        /*
+        Flush all elitemob entities
+        This deletes all metadata and all aggressive mobs
+         */
+        for (World world : validWorldList)
             for (Entity entity : world.getEntities()) {
-
                 MetadataHandler.flushMetadata(entity);
-
-                if (entity instanceof Player) {
-
+                if (entity instanceof Player)
                     ((Player) entity).setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-
-                }
-
             }
 
-        }
+
+        /*
+        Flush lingering arrows from the arrow tracking power
+         */
+        for (Arrow arrow : SkeletonTrackingArrow.trackingArrowList)
+            arrow.remove();
+        SkeletonTrackingArrow.trackingArrowList.clear();
 
         CustomItemConstructor.customItemList.clear();
         CustomItemConstructor.staticCustomItemHashMap.clear();

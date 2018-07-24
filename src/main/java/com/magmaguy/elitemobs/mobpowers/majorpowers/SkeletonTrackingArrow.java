@@ -42,6 +42,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SkeletonTrackingArrow extends MajorPowers implements Listener {
 
     String powerMetadata = MetadataHandler.SKELETON_TRACKING_ARROW_MD;
@@ -94,7 +97,11 @@ public class SkeletonTrackingArrow extends MajorPowers implements Listener {
 
     }
 
+    public static List<Arrow> trackingArrowList = new ArrayList();
+
     private static void trackingArrowLoop(Player player, Arrow arrow) {
+
+        trackingArrowList.add(arrow);
 
         new BukkitRunnable() {
 
@@ -103,7 +110,8 @@ public class SkeletonTrackingArrow extends MajorPowers implements Listener {
             @Override
             public void run() {
 
-                if (player.isValid() && !player.isDead() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())) {
+                if (player.isValid() && !player.isDead() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())
+                        && player.getLocation().distanceSquared(arrow.getLocation()) < 900 && !arrow.isOnGround()) {
 
                     if (counter % 10 == 0) {
 
@@ -115,12 +123,15 @@ public class SkeletonTrackingArrow extends MajorPowers implements Listener {
 
                 } else {
 
+                    arrow.setGravity(true);
+                    trackingArrowList.remove(arrow);
                     cancel();
 
                 }
 
                 if (counter > 20 * 60) {
                     arrow.setGravity(true);
+                    trackingArrowList.remove(arrow);
                     cancel();
                 }
 

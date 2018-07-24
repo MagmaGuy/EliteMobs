@@ -92,6 +92,7 @@ public class ItemsDropSettingsConfig {
     public static final String NIGHT_VISION_NAME = POTION_EFFECT_NAME + "NIGHT_VISION";
     public static final String POISON_NAME = POTION_EFFECT_NAME + "POISON";
     public static final String REGENERATION_NAME = POTION_EFFECT_NAME + "REGENERATION";
+    public static final String SATURATION_NAME = POTION_EFFECT_NAME + "SATURATION";
     public static final String SLOW_NAME = POTION_EFFECT_NAME + "SLOW";
     public static final String SLOW_DIGGING_NAME = POTION_EFFECT_NAME + "SLOW_DIGGING";
     public static final String SLOW_FALLING_NAME = POTION_EFFECT_NAME + "SLOW_FALLING";
@@ -175,6 +176,7 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(NIGHT_VISION_NAME, "Night Vision");
         configuration.addDefault(POISON_NAME, "Poison");
         configuration.addDefault(REGENERATION_NAME, "Regeneration");
+        configuration.addDefault(SATURATION_NAME, "Saturation");
         configuration.addDefault(SLOW_NAME, "Slowness");
         configuration.addDefault(SLOW_DIGGING_NAME, "Mining Fatigue");
         configuration.addDefault(SLOW_FALLING_NAME, "Slow Falling");

@@ -152,7 +152,7 @@ public class EconomySettingsConfig {
     public static final String NIGHT_VISION = POTION_EFFECT_WORTH + "NIGHT_VISION";
     public static final String POISON = POTION_EFFECT_WORTH + "POISON";
     public static final String REGENERATION = POTION_EFFECT_WORTH + "REGENERATION";
-    public static final String SATURATION = POTION_EFFECT_WORTH + "SATURATION";
+    public static final String SATURATION = POTION_EFFECT_WORTH + "SATURATION_NAME";
     public static final String SLOW = POTION_EFFECT_WORTH + "SLOW";
     public static final String SLOW_DIGGING = POTION_EFFECT_WORTH + "SLOW_DIGGING";
     public static final String SPEED = POTION_EFFECT_WORTH + "SPEED";

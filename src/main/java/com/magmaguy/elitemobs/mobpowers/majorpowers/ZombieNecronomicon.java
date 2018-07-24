@@ -240,7 +240,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
             @Override
             public void run() {
 
-                if (!zombie.isValid() || zombie.hasAI()) {
+                if (zombie == null || !zombie.isValid() || zombie.isDead() || zombie.hasAI()) {
 
                     for (List<Item> itemList : fourTrack.values()) {
 

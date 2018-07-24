@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
@@ -51,6 +52,7 @@ public class NameHandler {
     public static String customAggressiveNameIgnoresCustomName(Entity entity) {
 
         int mobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+        entity.setCustomName("Level " + mobLevel + " Elite Mob");
 
         if (entity.hasMetadata(MetadataHandler.TREASURE_GOBLIN))
             return ChatColorConverter.chatColorConverter("&aTreasure Goblin");
@@ -61,10 +63,6 @@ public class NameHandler {
             case ZOMBIE:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(0)) + mobLevel
                         + (chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(1))));
-                break;
-            case HUSK:
-                entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Husk").get(0)) + mobLevel
-                        + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Husk").get(1)));
                 break;
             case ZOMBIE_VILLAGER:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Zombie").get(0)) + mobLevel
@@ -78,10 +76,6 @@ public class NameHandler {
             case WITHER_SKELETON:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.WitherSkeleton").get(0)) + mobLevel
                         + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.WitherSkeleton").get(1)));
-                break;
-            case STRAY:
-                entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Stray").get(0)) + mobLevel
-                        + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Stray").get(1)));
                 break;
             case PIG_ZOMBIE:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PigZombie").get(0)) + mobLevel
@@ -115,31 +109,70 @@ public class NameHandler {
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Witch").get(0)) + mobLevel
                         + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Witch").get(1)));
                 break;
-            case ENDERMITE:
-                entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Endermite").get(0)) + mobLevel
-                        + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Endermite").get(1)));
-                break;
-            case POLAR_BEAR:
-                entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PolarBear").get(0)) + mobLevel
-                        + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PolarBear").get(1)));
-                break;
             case IRON_GOLEM:
                 entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.IronGolem").get(0)) + mobLevel
                         + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.IronGolem").get(1)));
                 break;
-            case VEX:
-                entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vex").get(0)) + mobLevel
-                        + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vex").get(1)));
-                break;
-            default:
-                getLogger().info("Error: Couldn't assign custom mob name due to unexpected aggressive boss mob (talk to the dev!)");
-                getLogger().info("Missing mob type: " + entity.getType());
-                break;
         }
+
+        /*
+        Post-1.8
+         */
+        if (!currentVersionUnder(1, 8))
+            switch (entity.getType()) {
+                case ENDERMITE:
+                    entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Endermite").get(0)) + mobLevel
+                            + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Endermite").get(1)));
+                    break;
+            }
+
+        /*
+        Post-1.11
+         */
+        if (!currentVersionUnder(1, 11))
+            switch (entity.getType()) {
+                case STRAY:
+                    entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Stray").get(0)) + mobLevel
+                            + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Stray").get(1)));
+                    break;
+                case HUSK:
+                    entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Husk").get(0)) + mobLevel
+                            + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Husk").get(1)));
+                    break;
+                case VEX:
+                    entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vex").get(0)) + mobLevel
+                            + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vex").get(1)));
+                    break;
+                case POLAR_BEAR:
+                    entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PolarBear").get(0)) + mobLevel
+                            + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PolarBear").get(1)));
+                    break;
+            }
+
+//        if (currentVersionUnder(1, 13))
+//                switch (entity.getType()){
+//                    case DROWNED:
+//                        entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Drowned").get(0)) + mobLevel
+//                                + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Drowned").get(1)));
+//                }
 
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
             entity.setCustomNameVisible(true);
         return entity.getCustomName();
+
+    }
+
+    /*
+    Don't compare to mobs that aren't in that mc version
+     */
+    public static boolean currentVersionUnder(int version, int subVersion) {
+
+        if (Bukkit.getBukkitVersion().split("[.]").length < 4)
+            return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 2)) < version;
+
+        return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) < version ||
+                Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) == version &&
+                        Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[2].replace(")", "")) < subVersion;
 
     }
 

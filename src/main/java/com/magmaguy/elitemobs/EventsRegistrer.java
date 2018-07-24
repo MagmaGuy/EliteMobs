@@ -27,6 +27,7 @@ import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
 import com.magmaguy.elitemobs.mobcustomizer.displays.HealthDisplay;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
+import com.magmaguy.elitemobs.mobpowers.AggroPrevention;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.mobspawner.NaturalMobMetadataAssigner;
@@ -271,6 +272,9 @@ public class EventsRegistrer {
         //Combat tag
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_COMBAT_TAG))
             Bukkit.getServer().getPluginManager().registerEvents(new CombatTag(), MetadataHandler.PLUGIN);
+
+        //Prevent elitemob on elitemob aggro
+        Bukkit.getServer().getPluginManager().registerEvents(new AggroPrevention(), MetadataHandler.PLUGIN);
 
     }
 

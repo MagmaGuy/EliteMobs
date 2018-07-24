@@ -12,7 +12,7 @@ public class MobLevelCalculator {
         //Add selected player gear tier modifier
         double perPlayerEliteMobLevel = ItemTierFinder.findPlayerTier(player);
         //Add selected guild rank modifier
-        perPlayerEliteMobLevel += GuildRank.getGuildRank(player.getUniqueId()) * 0.2;
+        perPlayerEliteMobLevel += (GuildRank.getGuildRank(player.getUniqueId()) - 10) * 0.2;
 
         int finalTieredMobLevel = (int) (perPlayerEliteMobLevel * MobTierFinder.PER_TIER_LEVEL_INCREASE);
 
