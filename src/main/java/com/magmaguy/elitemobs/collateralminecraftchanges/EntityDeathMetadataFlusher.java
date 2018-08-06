@@ -43,7 +43,7 @@ public class EntityDeathMetadataFlusher implements Listener {
                     @Override
                     public void run() {
 
-                        MetadataHandler.flushMetadata(entity);
+                        MetadataHandler.fullMetadataFlush(entity);
 
                     }
 

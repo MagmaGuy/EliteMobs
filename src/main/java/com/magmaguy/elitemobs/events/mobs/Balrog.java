@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevel
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
@@ -19,6 +20,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.UUID;
 
 public class Balrog implements Listener {
 
@@ -65,6 +68,7 @@ public class Balrog implements Listener {
         MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_ARMOR, true);
         MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_POWERS_MD, true);
         MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_STACK, true);
+        MetadataHandler.registerMetadata(balrog, MetadataHandler.PERSISTENT_ENTITY, true);
 
         balrog.setRemoveWhenFarAway(false);
 
@@ -81,18 +85,26 @@ public class Balrog implements Listener {
 
         new BukkitRunnable() {
 
+            UUID uuid = balrog.getUniqueId();
+
             @Override
             public void run() {
 
-                if (balrog.isDead() || !balrog.isValid()) {
+                Silverfish localBalrog = balrog;
+
+                if (!balrog.isValid())
+                    if (Bukkit.getEntity(uuid) != null)
+                        localBalrog = (Silverfish) Bukkit.getEntity(uuid);
+
+                if (balrog.isDead()) {
 
                     cancel();
                     return;
 
                 }
 
-                balrog.getWorld().spawnParticle(Particle.FLAME, balrog.getLocation(), 2, 0.1, 0.1, 0.1, 0.05);
-                balrog.getWorld().spawnParticle(Particle.SMOKE_LARGE, balrog.getLocation(), 4, 0.1, 0.1, 0.1, 0.05);
+                localBalrog.getWorld().spawnParticle(Particle.FLAME, localBalrog.getLocation(), 2, 0.1, 0.1, 0.1, 0.05);
+                localBalrog.getWorld().spawnParticle(Particle.SMOKE_LARGE, localBalrog.getLocation(), 4, 0.1, 0.1, 0.1, 0.05);
 
             }
 

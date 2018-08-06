@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -16,7 +17,7 @@ public class EnchantmentGenerator {
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
 
         for (Enchantment enchantment : enchantmentMap.keySet())
-            if (enchantmentMap.get(enchantment) > 5)
+            if (enchantmentMap.get(enchantment) > 5 && ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
                 itemMeta.addEnchant(enchantment, 5, true);
             else
                 itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
@@ -287,7 +288,7 @@ public class EnchantmentGenerator {
 
     private static HashMap<Enchantment, Integer> validateSecondaryEnchantments(String string) {
 
-        HashMap hashMap = new HashMap();
+        HashMap<Enchantment, Integer> hashMap = new HashMap();
 
         if (enchantmentBackwardsCompatibility(7, 0, string, "LURE")) return hashMap;
         if (enchantmentBackwardsCompatibility(7, 0, string, "LUCK")) return hashMap;

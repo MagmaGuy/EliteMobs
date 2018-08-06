@@ -225,6 +225,8 @@ public class SpawnMobCommandHandler {
             case "sheep":
                 entityType = EntityType.SHEEP;
                 break;
+            case "vindicator":
+                entityType = EntityType.VINDICATOR;
             default:
                 commandSender.sendMessage("Could not spawn mob type " + entityInput +
                         " If this is incorrect, please contact the dev.");

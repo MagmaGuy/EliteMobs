@@ -28,6 +28,7 @@ import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -41,6 +42,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
+import java.util.UUID;
 
 public class ZombieKing implements Listener {
 
@@ -59,6 +61,7 @@ public class ZombieKing implements Listener {
         MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_POWERS_MD, true);
         MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_STACK, true);
         MetadataHandler.registerMetadata(zombieKing, MetadataHandler.EVENT_CREATURE, true);
+        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.PERSISTENT_ENTITY, true);
         NameHandler.customUniqueNameAssigner(zombieKing, ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME)));
 
         zombieKing.setRemoveWhenFarAway(false);
@@ -96,9 +99,7 @@ public class ZombieKing implements Listener {
         sendString = ChatColorConverter.chatColorConverter(sendString);
 
         EventMessage.sendEventMessage(sendString);
-
         BossMobDeathCountdown.startDeathCountdown(zombieKing);
-
         HuntingBow.aliveBossMobList.add(zombieKing);
 
     }
@@ -107,20 +108,25 @@ public class ZombieKing implements Listener {
 
         new BukkitRunnable() {
 
+            UUID uuid = zombieKing.getUniqueId();
+
             @Override
             public void run() {
 
-                if (zombieKing.isValid() && !zombieKing.isDead()) {
+                Zombie localZombieKing = zombieKing;
 
-                    zombieKing.getWorld().spawnParticle(Particle.FLAME, zombieKing.getLocation(), 4, 0.05, 0.15, 0.05, 0.03);
-                    zombieKing.getWorld().spawnParticle(Particle.FLAME, zombieKing.getLocation().add(new Vector(0, 0.5, 0)), 3, 0.05, 0.15, 0.05, 0.03);
-                    zombieKing.getWorld().spawnParticle(Particle.FLAME, zombieKing.getLocation().add(new Vector(0, 1, 0)), 2, 0.05, 0.15, 0.05, 0.03);
+                if (!zombieKing.isValid())
+                    if (Bukkit.getEntity(uuid) != null && Bukkit.getEntity(uuid).isValid())
+                        localZombieKing = (Zombie) Bukkit.getEntity(uuid);
 
-                } else {
+                if (!zombieKing.isDead()) {
 
+                    localZombieKing.getWorld().spawnParticle(Particle.FLAME, localZombieKing.getLocation(), 4, 0.05, 0.15, 0.05, 0.03);
+                    localZombieKing.getWorld().spawnParticle(Particle.FLAME, localZombieKing.getLocation().add(new Vector(0, 0.5, 0)), 3, 0.05, 0.15, 0.05, 0.03);
+                    localZombieKing.getWorld().spawnParticle(Particle.FLAME, localZombieKing.getLocation().add(new Vector(0, 1, 0)), 2, 0.05, 0.15, 0.05, 0.03);
+
+                } else
                     cancel();
-
-                }
 
             }
 

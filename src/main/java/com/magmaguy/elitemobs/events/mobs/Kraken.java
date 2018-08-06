@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCoun
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevel;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.*;
@@ -18,6 +19,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.UUID;
 
 public class Kraken implements Listener {
 
@@ -68,6 +71,7 @@ public class Kraken implements Listener {
         MetadataHandler.registerMetadata(kraken, MetadataHandler.KRAKEN, true);
         MetadataHandler.registerMetadata(kraken, MetadataHandler.ELITE_MOB_MD, DynamicBossLevel.determineDynamicBossLevel(kraken));
         MetadataHandler.registerMetadata(kraken, MetadataHandler.EVENT_CREATURE, true);
+        MetadataHandler.registerMetadata(kraken, MetadataHandler.PERSISTENT_ENTITY, true);
 
         krakenDamageLoop(kraken);
         krakenVisualEffectLoop(kraken);
@@ -83,7 +87,7 @@ public class Kraken implements Listener {
             @Override
             public void run() {
 
-                if (kraken.isDead() || !kraken.isValid()) {
+                if (kraken.isDead()) {
 
                     cancel();
                     return;
@@ -127,17 +131,25 @@ public class Kraken implements Listener {
 
         new BukkitRunnable() {
 
+            UUID uuid = kraken.getUniqueId();
+
             @Override
             public void run() {
 
-                if (kraken.isDead() || !kraken.isValid()) {
+                Squid localKraken = kraken;
+
+                if (!kraken.isValid())
+                    if (Bukkit.getEntity(uuid) != null)
+                        localKraken = (Squid) Bukkit.getEntity(uuid);
+
+                if (kraken.isDead()) {
 
                     cancel();
                     return;
 
                 }
 
-                kraken.getWorld().spawnParticle(Particle.FLAME, kraken.getLocation(), 10, 0.1, 0.1, 0.1, 0.05);
+                localKraken.getWorld().spawnParticle(Particle.FLAME, localKraken.getLocation(), 10, 0.1, 0.1, 0.1, 0.05);
 
             }
 

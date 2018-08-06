@@ -60,6 +60,7 @@ public class TreasureGoblin implements Listener {
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_STACK, true);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.NATURAL_MOB_MD, true);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_STACK, true);
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.PERSISTENT_ENTITY, true);
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(treasureGoblin);
 
         ((Zombie) treasureGoblin).setBaby(true);
@@ -274,6 +275,14 @@ public class TreasureGoblin implements Listener {
 
                     Item item = iterator.next();
 
+                    if (counter > 20 * 5) {
+
+                        if (item != null && item.isValid()) iterator.remove();
+                        if (item != null && item.isValid()) item.remove();
+                        continue;
+
+                    }
+
                     if (item == null || !item.isValid() || item.isDead()) {
 
                         iterator.remove();
@@ -291,13 +300,6 @@ public class TreasureGoblin implements Listener {
                             item.remove();
 
                         }
-
-                    }
-
-                    if (counter > 20 * 5) {
-
-                        iterator.remove();
-                        if (item != null) item.remove();
 
                     }
 

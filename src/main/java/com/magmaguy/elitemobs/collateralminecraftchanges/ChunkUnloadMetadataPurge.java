@@ -35,7 +35,7 @@ public class ChunkUnloadMetadataPurge implements Listener {
 
             if (!(entity instanceof LivingEntity) ||
                     entity instanceof LivingEntity && ((LivingEntity) entity).getRemoveWhenFarAway())
-                MetadataHandler.flushMetadata(entity);
+                MetadataHandler.runtimeMetadataFlush(entity);
 
         }
 

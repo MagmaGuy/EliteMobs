@@ -30,6 +30,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.Random;
 
@@ -78,7 +79,10 @@ public class DamageDisplay implements Listener {
 
         Location newLocation = new Location(entityLocation.getWorld(), randomCoordX, entityLocation.getY() + 1.7, randomCoordZ);
 
-        ArmorStand armorStand = (ArmorStand) newLocation.getWorld().spawnEntity(newLocation, EntityType.ARMOR_STAND);
+         /*
+        Dirty fix: armorstands don't render invisibly on their first tick, so it gets moved elsewhere temporarily
+         */
+        ArmorStand armorStand = (ArmorStand) newLocation.getWorld().spawnEntity(newLocation.add(new Vector(0, 50, 0)), EntityType.ARMOR_STAND);
 
         armorStand.setVisible(false);
         armorStand.setMarker(true);
@@ -95,8 +99,12 @@ public class DamageDisplay implements Listener {
             @Override
             public void run() {
 
-                armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
-                        armorStand.getLocation().getY() + 0.1, armorStand.getLocation().getZ()));
+                if (taskTimer == 0)
+                    armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
+                            armorStand.getLocation().getY() - 50, armorStand.getLocation().getZ()));
+                else
+                    armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
+                            armorStand.getLocation().getY() + 0.1, armorStand.getLocation().getZ()));
 
                 taskTimer++;
 

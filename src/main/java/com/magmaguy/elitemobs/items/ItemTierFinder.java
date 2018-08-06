@@ -242,19 +242,10 @@ public class ItemTierFinder {
                 return findObfuscatedMainEnchantment(deobfuscatedString, enchantment);
         }
 
-        if (!itemStack.getEnchantments().isEmpty()) {
-
-            for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
-
-                if (entry.getKey().equals(enchantment)) {
-
+        if (!itemStack.getEnchantments().isEmpty())
+            for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet())
+                if (entry.getKey().equals(enchantment))
                     enchantments += entry.getValue();
-
-                }
-
-            }
-
-        }
 
         return enchantments;
 

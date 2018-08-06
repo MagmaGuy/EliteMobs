@@ -16,32 +16,70 @@
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+
+import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.currentVersionUnder;
 
 /**
  * Created by MagmaGuy on 10/10/2016.
  */
 public class ValidAgressiveMobFilter {
 
-    public static boolean ValidAgressiveMobFilter(Entity entity) {
+    public static boolean checkValidAggressiveMob(Entity entity) {
 
         Configuration config = ConfigValues.validMobsConfig;
 
-        return entity instanceof Blaze && config.getBoolean("Valid aggressive EliteMobs.Blaze") ||
-                entity instanceof CaveSpider && config.getBoolean("Valid aggressive EliteMobs.CaveSpider") ||
-                entity instanceof Creeper && config.getBoolean("Valid aggressive EliteMobs.Creeper") ||
-                entity instanceof Enderman && config.getBoolean("Valid aggressive EliteMobs.Enderman") ||
-                entity instanceof Endermite && config.getBoolean("Valid aggressive EliteMobs.Endermite") ||
-                entity instanceof IronGolem && config.getBoolean("Valid aggressive EliteMobs.IronGolem") ||
-                entity instanceof PigZombie && config.getBoolean("Valid aggressive EliteMobs.PigZombie") ||
-                entity instanceof PolarBear && config.getBoolean("Valid aggressive EliteMobs.PolarBear") ||
-                entity instanceof Silverfish && config.getBoolean("Valid aggressive EliteMobs.Silverfish") ||
-                entity instanceof Skeleton && config.getBoolean("Valid aggressive EliteMobs.Skeleton") ||
-                entity instanceof Spider && config.getBoolean("Valid aggressive EliteMobs.Spider") ||
-                entity instanceof Witch && config.getBoolean("Valid aggressive EliteMobs.Witch") ||
-                entity instanceof ZombieVillager && config.getBoolean("Valid aggressive EliteMobs.Zombie") ||
-                entity instanceof Zombie && config.getBoolean("Valid aggressive EliteMobs.Zombie");
+        switch (entity.getType()) {
+            case BLAZE:
+                return config.getBoolean(ValidMobsConfig.BLAZE);
+            case CAVE_SPIDER:
+                return config.getBoolean(ValidMobsConfig.CAVE_SPIDER);
+            case CREEPER:
+                return config.getBoolean(ValidMobsConfig.CREEPER);
+            case ENDERMAN:
+                return config.getBoolean(ValidMobsConfig.ENDERMAN);
+            case IRON_GOLEM:
+                return config.getBoolean(ValidMobsConfig.IRON_GOLEM);
+            case PIG_ZOMBIE:
+                return config.getBoolean(ValidMobsConfig.PIG_ZOMBIE);
+            case SILVERFISH:
+                return config.getBoolean(ValidMobsConfig.SILVERFISH);
+            case SKELETON:
+                return config.getBoolean(ValidMobsConfig.SKELETON);
+            case WITHER_SKELETON:
+                return config.getBoolean(ValidMobsConfig.WITHER_SKELETON);
+            case SPIDER:
+                return config.getBoolean(ValidMobsConfig.SPIDER);
+            case WITCH:
+                return config.getBoolean(ValidMobsConfig.WITCH);
+            case ZOMBIE:
+                return config.getBoolean(ValidMobsConfig.ZOMBIE);
+        }
+
+        if (currentVersionUnder(1, 8))
+            switch (entity.getType()) {
+                case ENDERMITE:
+                    return config.getBoolean(ValidMobsConfig.ENDERMITE);
+            }
+
+        if (!currentVersionUnder(1, 11))
+            switch (entity.getType()) {
+                case STRAY:
+                    return config.getBoolean(ValidMobsConfig.STRAY);
+                case HUSK:
+                    return config.getBoolean(ValidMobsConfig.HUSK);
+                case VEX:
+                    return config.getBoolean(ValidMobsConfig.VEX);
+                case POLAR_BEAR:
+                    return config.getBoolean(ValidMobsConfig.POLAR_BEAR);
+                case VINDICATOR:
+                    return config.getBoolean(ValidMobsConfig.VINDICATOR);
+            }
+
+
+        return false;
 
     }
 

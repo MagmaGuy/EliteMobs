@@ -53,7 +53,7 @@ public class KillHandler {
             int counter = 0;
             for (World world : EliteMobs.validWorldList)
                 for (LivingEntity livingEntity : world.getLivingEntities())
-                    if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(livingEntity)) {
+                    if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.checkValidAggressiveMob(livingEntity)) {
                         livingEntity.remove();
                         counter++;
                     }
@@ -115,7 +115,7 @@ public class KillHandler {
 
             int counter = 0;
             for (Entity entity : ((Player) commandSender).getNearbyEntities(Integer.parseInt(args[2]), Integer.parseInt(args[2]), Integer.parseInt(args[2])))
-                if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
+                if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.checkValidAggressiveMob(entity)) {
                     entity.remove();
                     counter++;
                 }

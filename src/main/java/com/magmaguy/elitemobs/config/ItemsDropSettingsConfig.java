@@ -35,6 +35,7 @@ public class ItemsDropSettingsConfig {
     public static final String MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER = "Maximum level of the Elite Mob default multiplier";
     public static final String EXPERIENCE_LOOT_MULTIPLIER = "EliteMob xp multiplier";
     public static final String MAXIMUM_LOOT_TIER = "Maximum loot tier (REQUIRES INCREASING SHARPNESS AND PROTECTION ENCHANTMENTS TO WORK PROPERLY, READ GITHUB WIKI!)";
+    public static final String ENABLE_CUSTOM_ENCHANTMENT_SYSTEM = "Enable custom echantment system (check the github wiki before changing)";
     public static final String ENCHANTMENT_NAME = "Enchantment name.";
     public static final String ARROW_DAMAGE_NAME = ENCHANTMENT_NAME +"ARROW_DAMAGE";
     public static final String ARROW_FIRE_NAME = ENCHANTMENT_NAME + "ARROW_FIRE";
@@ -121,6 +122,7 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER, 1000);
         configuration.addDefault(EXPERIENCE_LOOT_MULTIPLIER, 1.0);
         configuration.addDefault(MAXIMUM_LOOT_TIER, 5);
+        configuration.addDefault(ENABLE_CUSTOM_ENCHANTMENT_SYSTEM, true);
         configuration.addDefault(ARROW_DAMAGE_NAME, "Power");
         configuration.addDefault(ARROW_FIRE_NAME, "Flame");
         configuration.addDefault(ARROW_INFINITE_NAME, "Infinity");

@@ -66,6 +66,7 @@ public class MobCombatSettingsConfig {
     public static final String DISTANCE_TO_INCREMENT = "Distance between increments";
     public static final String LEVEL_TO_INCREMENT = "Amount of levels incremented per distance";
     public static final String ENABLE_COMBAT_TAG = "Enable combat tag";
+    public static final String COMBAT_TAG_TRIGGER_MESSAGE = "Combat tag trigger message";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -116,6 +117,7 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(DISTANCE_TO_INCREMENT, 100);
         configuration.addDefault(LEVEL_TO_INCREMENT, 1);
         configuration.addDefault(ENABLE_COMBAT_TAG, true);
+        configuration.addDefault(COMBAT_TAG_TRIGGER_MESSAGE, "&c[EliteMobs] Combat tag activated!");
 
         configuration = UnusedNodeHandler.clearNodes(configuration);
         configuration.options().copyDefaults(true);

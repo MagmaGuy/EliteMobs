@@ -88,6 +88,7 @@ public class Fae implements Listener {
         MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_ARMOR, true);
         MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_POWERS_MD, true);
         MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_STACK, true);
+        MetadataHandler.registerMetadata(fae, MetadataHandler.PERSISTENT_ENTITY, true);
 
         fae.setRemoveWhenFarAway(false);
 
@@ -131,7 +132,7 @@ public class Fae implements Listener {
             @Override
             public void run() {
 
-                if (!vex.isValid() || vex.isDead()) {
+                if (vex.isDead()) {
 
                     cancel();
                     return;
@@ -166,7 +167,7 @@ public class Fae implements Listener {
             @Override
             public void run() {
 
-                if (lightingFae.isDead() || !lightingFae.isValid()) {
+                if (lightingFae.isDead()) {
 
                     cancel();
                     return;
