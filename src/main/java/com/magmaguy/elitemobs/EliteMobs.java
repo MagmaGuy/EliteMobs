@@ -111,7 +111,7 @@ public class EliteMobs extends JavaPlugin {
          */
         for (World world : validWorldList)
             for (Entity entity : world.getEntities()) {
-                MetadataHandler.flushMetadata(entity);
+                MetadataHandler.fullMetadataFlush(entity);
                 if (entity instanceof Player)
                     ((Player) entity).setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
             }

@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -48,7 +50,8 @@ public class ItemConstructor {
         /*
         Remove vanilla enchantments
          */
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         /*
         Generate item name last as it relies on material type and quality
@@ -99,7 +102,8 @@ public class ItemConstructor {
         /*
         Remove vanilla enchantments
          */
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         /*
         Generate item name

@@ -13,11 +13,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobspawner;
+package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -32,7 +33,7 @@ import java.util.List;
 /**
  * Created by MagmaGuy on 10/10/2016.
  */
-public class NaturalMobSpawner implements Listener {
+public class NaturalSpawning implements Listener {
 
     private static int range = Bukkit.getServer().getViewDistance() * 16;
 
@@ -40,33 +41,30 @@ public class NaturalMobSpawner implements Listener {
 
         List<Player> closePlayers = new ArrayList<>();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-
-            if (player.getWorld().equals(entity.getWorld()) && player.getLocation().distance(entity.getLocation()) < range) {
-
+        for (Player player : Bukkit.getOnlinePlayers())
+            if (player.getWorld().equals(entity.getWorld()) && player.getLocation().distanceSquared(entity.getLocation()) < Math.pow(range, 2))
                 if (!player.getGameMode().equals(GameMode.SPECTATOR) && (!player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) ||
-                        player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) && !player.getMetadata(MetadataHandler.VANISH_NO_PACKET).get(0).asBoolean())) {
-
+                        player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) && !player.getMetadata(MetadataHandler.VANISH_NO_PACKET).get(0).asBoolean()))
                     closePlayers.add(player);
 
-                }
-
-            }
-
-        }
-
         int eliteMobLevel = 1;
+        int playerCount = 0;
 
         for (Player player : closePlayers) {
 
-            int finalTieredMobLevel = MobLevelCalculator.determineMobLevel(player);
+            int individualPlayerThreat = MobLevelCalculator.determineMobLevel(player);
+            playerCount++;
 
-            eliteMobLevel += finalTieredMobLevel;
-
-            if (eliteMobLevel > ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP))
-                eliteMobLevel = ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP);
+            if (individualPlayerThreat > eliteMobLevel)
+                eliteMobLevel = individualPlayerThreat;
 
         }
+
+        /*
+        Add in party system modifier
+        Each player adds a +0.2 tier bonus
+         */
+        eliteMobLevel += playerCount * 0.2 * MobTierFinder.PER_TIER_LEVEL_INCREASE;
 
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE)) {
 
@@ -75,7 +73,7 @@ public class NaturalMobSpawner implements Listener {
 
         }
 
-        if (eliteMobLevel < 1) return;
+        if (playerCount == 0 || eliteMobLevel < 1) return;
 
         MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, eliteMobLevel);
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);

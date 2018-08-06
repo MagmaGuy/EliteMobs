@@ -143,6 +143,10 @@ public class NameHandler {
                     entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vex").get(0)) + mobLevel
                             + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vex").get(1)));
                     break;
+                case VINDICATOR:
+                    entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vindicator").get(0)) + mobLevel
+                            + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Vindicator").get(1)));
+                    break;
                 case POLAR_BEAR:
                     entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PolarBear").get(0)) + mobLevel
                             + chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.PolarBear").get(1)));

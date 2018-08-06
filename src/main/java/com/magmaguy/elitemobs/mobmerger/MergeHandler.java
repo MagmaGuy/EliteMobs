@@ -78,7 +78,7 @@ public class MergeHandler implements Listener {
 
         MobScanner mobScanner = new MobScanner();
 
-        if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(eventEntity) && ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") &&
+        if (ValidAgressiveMobFilter.checkValidAggressiveMob(eventEntity) && ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") &&
                 ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) && !eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
 
             if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) && !eventEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {

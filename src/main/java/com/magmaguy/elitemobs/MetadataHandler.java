@@ -440,20 +440,22 @@ public class MetadataHandler implements Listener {
     private static void unregisterInvalidEntityMetadata() {
         for (Iterator<Entity> iterator = metadataEntityList.keySet().iterator(); iterator.hasNext(); ) {
             Entity iteratedEntity = iterator.next();
-            if (iteratedEntity == null || iteratedEntity.isDead() || !iteratedEntity.isValid()) {
-                for (String metadata : metadataEntityList.get(iteratedEntity)) {
-                    assert iteratedEntity != null;
+            if (iteratedEntity == null || metadataEntityList.get(iteratedEntity) == null) {
+                iterator.remove();
+                continue;
+            }
+            if (iteratedEntity.isDead()) {
+                for (String metadata : metadataEntityList.get(iteratedEntity))
                     iteratedEntity.removeMetadata(metadata, PLUGIN);
-                }
+
                 iterator.remove();
             }
         }
     }
 
-    public static void flushMetadata(Entity entity) {
+    public static void fullMetadataFlush(Entity entity) {
 
-        for (String string : metadataList()) {
-
+        for (String string : metadataList())
             if (entity.hasMetadata(string)) {
 
                 if (!(entity instanceof Player)) {
@@ -469,10 +471,14 @@ public class MetadataHandler implements Listener {
                 } else
                     entity.removeMetadata(string, PLUGIN);
 
-
             }
 
-        }
+    }
+
+    public static void runtimeMetadataFlush(Entity entity) {
+
+        if (entity.hasMetadata(PERSISTENT_ENTITY)) return;
+        fullMetadataFlush(entity);
 
     }
 

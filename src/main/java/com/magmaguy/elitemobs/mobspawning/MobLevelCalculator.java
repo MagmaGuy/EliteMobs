@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.mobspawner;
+package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.items.ItemTierFinder;

@@ -29,6 +29,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class HealthDisplay implements Listener {
 
@@ -73,7 +74,10 @@ public class HealthDisplay implements Listener {
         Location entityLocation = new Location(livingEntity.getWorld(), livingEntity.getLocation().getX(),
                 livingEntity.getLocation().getY() + livingEntity.getEyeHeight() + 0.5, livingEntity.getLocation().getZ());
 
-        ArmorStand armorStand = (ArmorStand) entityLocation.getWorld().spawnEntity(entityLocation, EntityType.ARMOR_STAND);
+        /*
+        Dirty fix: armorstands don't render invisibly on their first tick, so it gets moved elsewhere temporarily
+         */
+        ArmorStand armorStand = (ArmorStand) entityLocation.getWorld().spawnEntity(entityLocation.add(new Vector(0, 50, 0)), EntityType.ARMOR_STAND);
 
         armorStand.setVisible(false);
         armorStand.setMarker(true);
@@ -81,6 +85,8 @@ public class HealthDisplay implements Listener {
         armorStand.setCustomNameVisible(true);
         armorStand.setGravity(false);
         MetadataHandler.registerMetadata(armorStand, MetadataHandler.ARMOR_STAND_DISPLAY, true);
+
+
 
         new BukkitRunnable() {
 
@@ -106,7 +112,7 @@ public class HealthDisplay implements Listener {
 
             }
 
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 0, 1L);
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 1, 1L);
 
     }
 

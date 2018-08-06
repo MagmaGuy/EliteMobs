@@ -55,7 +55,7 @@ public class MobScanner implements Listener {
 
                 Entity entity = iterator.next();
 
-                if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(entity)) {
+                if (ValidAgressiveMobFilter.checkValidAggressiveMob(entity)) {
 
                     //scan for stacked EliteMobs
                     if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) &&
@@ -162,7 +162,7 @@ public class MobScanner implements Listener {
 
                     //remove duplicate
                     secondEntity.remove();
-                    MetadataHandler.flushMetadata(secondEntity);
+                    MetadataHandler.fullMetadataFlush(secondEntity);
 
                     return;
 
@@ -199,7 +199,7 @@ public class MobScanner implements Listener {
                     for (LivingEntity livingEntity : animalContainer) {
 
                         livingEntity.remove();
-                        MetadataHandler.flushMetadata(livingEntity);
+                        MetadataHandler.fullMetadataFlush(livingEntity);
 
                     }
 

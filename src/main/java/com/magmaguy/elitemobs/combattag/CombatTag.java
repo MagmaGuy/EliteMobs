@@ -1,12 +1,17 @@
 package com.magmaguy.elitemobs.combattag;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CombatTag implements Listener {
@@ -18,17 +23,20 @@ public class CombatTag implements Listener {
 
         if (player == null) return;
 
+        if (player.getGameMode().equals(GameMode.CREATIVE)) return;
+
         if (player.isInvulnerable()) player.setInvulnerable(false);
         if (player.isFlying()) {
             player.setFlying(false);
-            MetadataHandler.registerMetadata(player, MetadataHandler.SAFE_FALL, true);
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    TextComponent.fromLegacyText(ChatColorConverter.chatColorConverter(ConfigValues.mobCombatSettingsConfig.getString(MobCombatSettingsConfig.COMBAT_TAG_TRIGGER_MESSAGE))));
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     if (!player.isOnline() || player.isDead())
                         cancel();
                     if (player.isOnGround()) {
-                        event.getEntity().removeMetadata(MetadataHandler.SAFE_FALL, MetadataHandler.PLUGIN);
+                        player.setFallDistance(0F);
                         cancel();
                     }
                 }
@@ -45,16 +53,6 @@ public class CombatTag implements Listener {
             return (Player) ((Projectile) event.getDamager()).getShooter();
 
         return null;
-
-    }
-
-    @EventHandler
-    public void onFall(EntityDamageEvent event) {
-
-        if (!(event.getEntity() instanceof Player && event.getEntity().hasMetadata(MetadataHandler.SAFE_FALL))) return;
-
-        event.setCancelled(true);
-        event.getEntity().removeMetadata(MetadataHandler.SAFE_FALL, MetadataHandler.PLUGIN);
 
     }
 

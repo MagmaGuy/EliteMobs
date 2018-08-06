@@ -17,7 +17,7 @@ public class VisualItemRemover {
                 for (int h = 0; h < itemsPerTrack; h++) {
 
                     powerItemLocationTracker.get(i).get(j).get(h).remove();
-                    MetadataHandler.flushMetadata(powerItemLocationTracker.get(i).get(j).get(h));
+                    MetadataHandler.fullMetadataFlush(powerItemLocationTracker.get(i).get(j).get(h));
 
                 }
 

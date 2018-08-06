@@ -20,15 +20,31 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
-public class PlayerDeathMessageByEliteMob {
+public class PlayerDeathMessageByEliteMob implements Listener {
 
-    public static void intializeDeathMessage(Player player, LivingEntity livingEntity) {
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+
+        if (event.getEntity().hasMetadata(MetadataHandler.KILLED_BY_ELITE_MOB)) {
+            event.setDeathMessage(event.getEntity().getMetadata(MetadataHandler.KILLED_BY_ELITE_MOB).get(0).asString());
+            event.getEntity().removeMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, MetadataHandler.PLUGIN);
+        }
+
+    }
+
+    public static String intializeDeathMessage(Player player, LivingEntity livingEntity) {
 
         String deathMessage;
+
+        /*
+        Deal with players dying from Elite Mobs
+        */
 
         switch (livingEntity.getType()) {
 
@@ -82,18 +98,7 @@ public class PlayerDeathMessageByEliteMob {
                 break;
         }
 
-        MetadataHandler.registerMetadata(player, MetadataHandler.KILLED_BY_ELITE_MOB, true);
-
-        for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
-
-            /*
-            Send death message
-            */
-            onlinePlayer.sendMessage(deathMessage);
-
-        }
-
-        Bukkit.getLogger().info(deathMessage);
+        return deathMessage;
 
     }
 

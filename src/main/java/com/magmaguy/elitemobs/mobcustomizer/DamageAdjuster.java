@@ -21,6 +21,8 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierFinder;
+import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
+import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -32,7 +34,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -105,8 +106,8 @@ public class DamageAdjuster implements Listener {
         //Deal with the player getting killed
         if (player.getHealth() - event.getDamage() <= 0) {
 
-            MetadataHandler.registerMetadata(player, MetadataHandler.KILLED_BY_ELITE_MOB, true);
-            PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity);
+            MetadataHandler.registerMetadata(player, MetadataHandler.KILLED_BY_ELITE_MOB, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity));
+//            PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity);
 
         }
 
@@ -157,22 +158,6 @@ public class DamageAdjuster implements Listener {
         totalReductionLevel = totalReductionLevel > 1 ? 1 : totalReductionLevel;
 
         return totalReductionLevel;
-
-    }
-
-    /*
-    Deal with players dying from Elite Mobs
-     */
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-
-        if (event.getEntity().hasMetadata(MetadataHandler.KILLED_BY_ELITE_MOB)) {
-
-            event.setDeathMessage("");
-            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_DEATH_MESSAGES))
-                event.getEntity().removeMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, MetadataHandler.PLUGIN);
-
-        }
 
     }
 
@@ -370,24 +355,37 @@ public class DamageAdjuster implements Listener {
      */
     private double secondaryEnchantmentDamageIncrease(ItemStack weapon, LivingEntity eliteMob) {
 
+        if (ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(weapon)) {
+            String deobfuscatedString = weapon.getItemMeta().getLore().get(0).replace("§", "");
+            if (deobfuscatedString.contains(LoreGenerator.OBFUSCATED_ENCHANTMENTS)) {
+                if (eliteMob instanceof Spider || eliteMob instanceof Silverfish)
+                    return getDamageIncreasePercentage(Enchantment.DAMAGE_ARTHROPODS, findObfuscatedMainEnchantment(deobfuscatedString, Enchantment.DAMAGE_ARTHROPODS));
+
+                if (eliteMob instanceof Zombie || eliteMob instanceof Skeleton)
+                    return getDamageIncreasePercentage(Enchantment.DAMAGE_ARTHROPODS, findObfuscatedMainEnchantment(deobfuscatedString, Enchantment.DAMAGE_UNDEAD));
+            }
+        }
+
         for (Enchantment enchantment : weapon.getEnchantments().keySet()) {
 
-            if (enchantment.getName().equals(Enchantment.DAMAGE_ARTHROPODS.getName()) && (eliteMob instanceof Spider || eliteMob instanceof Silverfish)) {
-
+            if (enchantment.getName().equals(Enchantment.DAMAGE_ARTHROPODS.getName()) && (eliteMob instanceof Spider || eliteMob instanceof Silverfish))
                 return getDamageIncreasePercentage(enchantment, weapon);
 
-            }
-
-            if (enchantment.getName().equals(Enchantment.DAMAGE_UNDEAD.getName()) && (eliteMob instanceof Zombie || eliteMob instanceof Skeleton)) {
-
+            if (enchantment.getName().equals(Enchantment.DAMAGE_UNDEAD.getName()) && (eliteMob instanceof Zombie || eliteMob instanceof Skeleton))
                 return getDamageIncreasePercentage(enchantment, weapon);
-
-            }
 
         }
 
         return 0;
 
+    }
+
+    private static int findObfuscatedMainEnchantment(String deobfuscatedLore, Enchantment enchantment) {
+        for (String string : deobfuscatedLore.split(","))
+            if (string.contains(enchantment.getName()))
+                return Integer.parseInt(string.split(":")[1]);
+
+        return 0;
     }
 
     private double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
@@ -396,6 +394,14 @@ public class DamageAdjuster implements Listener {
         double currentEnchantmentLevel = weapon.getEnchantmentLevel(enchantment);
 
         return currentEnchantmentLevel / maxEnchantmentLevel <= 1 ? currentEnchantmentLevel / maxEnchantmentLevel : 1;
+
+    }
+
+    private double getDamageIncreasePercentage(Enchantment enchantment, double level) {
+
+        double maxEnchantmentLevel = getMaxEnchantmentLevel(enchantment);
+
+        return level / maxEnchantmentLevel <= 1 ? level / maxEnchantmentLevel : 1;
 
     }
 

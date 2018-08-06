@@ -27,7 +27,7 @@ public class PreventMobItemPickup implements Listener {
     public void onPickup(EntityPickupItemEvent event) {
 
         if (event.getEntity() instanceof Player) return;
-        if (ValidAgressiveMobFilter.ValidAgressiveMobFilter(event.getEntity())) {
+        if (ValidAgressiveMobFilter.checkValidAggressiveMob(event.getEntity())) {
 
             event.setCancelled(true);
 

@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobspawner;
+package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
@@ -61,7 +61,7 @@ public class NaturalMobMetadataAssigner implements Listener {
             return;
         if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES)))
             return;
-        if (!ValidAgressiveMobFilter.ValidAgressiveMobFilter(event.getEntity()))
+        if (!ValidAgressiveMobFilter.checkValidAggressiveMob(event.getEntity()))
             return;
 
         Entity entity = event.getEntity();
@@ -75,7 +75,7 @@ public class NaturalMobMetadataAssigner implements Listener {
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;
 
-        NaturalMobSpawner.naturalMobProcessor(entity);
+        NaturalSpawning.naturalMobProcessor(entity);
 
     }
 

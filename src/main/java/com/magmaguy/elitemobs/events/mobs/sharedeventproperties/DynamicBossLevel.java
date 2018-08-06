@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.events.mobs.sharedeventproperties;
 
-import com.magmaguy.elitemobs.mobspawner.MobLevelCalculator;
+import com.magmaguy.elitemobs.mobspawning.MobLevelCalculator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

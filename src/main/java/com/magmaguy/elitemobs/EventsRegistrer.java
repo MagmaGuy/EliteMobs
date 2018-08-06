@@ -30,8 +30,8 @@ import com.magmaguy.elitemobs.mobmerger.MergeHandler;
 import com.magmaguy.elitemobs.mobpowers.AggroPrevention;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobscanner.MobScanner;
-import com.magmaguy.elitemobs.mobspawner.NaturalMobMetadataAssigner;
-import com.magmaguy.elitemobs.mobspawner.NaturalMobSpawner;
+import com.magmaguy.elitemobs.mobspawning.NaturalMobMetadataAssigner;
+import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
@@ -52,6 +52,8 @@ public class EventsRegistrer {
 
         //Mob damage
         Bukkit.getServer().getPluginManager().registerEvents(new DamageAdjuster(), MetadataHandler.PLUGIN);
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_DEATH_MESSAGES))
+            Bukkit.getServer().getPluginManager().registerEvents(new PlayerDeathMessageByEliteMob(), MetadataHandler.PLUGIN);
 
         //Mob loot
         Bukkit.getServer().getPluginManager().registerEvents(new DefaultDropsHandler(), MetadataHandler.PLUGIN);
@@ -197,7 +199,7 @@ public class EventsRegistrer {
 
         //Natural EliteMobs Spawning
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING))
-            Bukkit.getServer().getPluginManager().registerEvents(new NaturalMobSpawner(), MetadataHandler.PLUGIN);
+            Bukkit.getServer().getPluginManager().registerEvents(new NaturalSpawning(), MetadataHandler.PLUGIN);
 
         //Natural Mob Metadata Assigner
         Bukkit.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(), MetadataHandler.PLUGIN);
