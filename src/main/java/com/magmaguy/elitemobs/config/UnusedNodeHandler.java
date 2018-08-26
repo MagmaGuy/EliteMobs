@@ -7,16 +7,13 @@ public class UnusedNodeHandler {
 
     public static Configuration clearNodes(Configuration configuration) {
 
-        for (String actual : configuration.getKeys(true)) {
+        for (String actual : configuration.getKeys(false)) {
 
             boolean keyExists = false;
 
             for (String defaults : configuration.getDefaults().getKeys(true)) {
 
                 if (actual.equals(defaults)) {
-
-                    if (actual.equals("test"))
-                        Bukkit.getLogger().warning("Oh shit");
 
                     keyExists = true;
 
@@ -27,6 +24,7 @@ public class UnusedNodeHandler {
             if (!keyExists) {
 
                 configuration.set(actual, null);
+                Bukkit.getLogger().warning(actual);
                 Bukkit.getLogger().info("[EliteMobs] Deleting unused config values.");
 
             }

@@ -247,7 +247,7 @@ public class LoreGenerator {
     private static String getPotionName(String string) {
 
         if (!ConfigValues.itemsDropSettingsConfig.getKeys(true).contains(ItemsDropSettingsConfig.POTION_EFFECT_NAME + string)) {
-            Bukkit.getLogger().warning("[EliteMobs] Missing enchantment name " + string);
+            Bukkit.getLogger().warning("[EliteMobs] Missing potion name " + string);
             Bukkit.getLogger().warning("[EliteMobs] Report this to the dev!");
             return string;
         }
