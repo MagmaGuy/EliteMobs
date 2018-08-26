@@ -27,10 +27,11 @@ public class LoreGenerator {
 
             String string = (String) object;
 
-            if (string.contains("$enchantments"))
-                if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
+            if (string.contains("$enchantments")) {
+                if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
                     lore.addAll(enchantmentLore(enchantmentMap));
-            if (string.contains("$potionEffect"))
+                }
+            } else if (string.contains("$potionEffect"))
                 lore.addAll(potionsLore(potionList));
             else if (string.contains("$itemValue"))
                 lore.add(itemWorth(material, enchantmentMap, potionList));
@@ -67,8 +68,9 @@ public class LoreGenerator {
             if (string.contains("$potionEffect")) {
                 //TODO: Add potion effects to dynamic items
             } else if (string.contains("$enchantments")) {
-                if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
+                if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
                     lore.addAll(enchantmentLore(enchantmentMap));
+                }
             } else if (string.contains("$itemValue"))
                 lore.add(itemWorth(material, enchantmentMap));
             else if (string.contains("$tier"))

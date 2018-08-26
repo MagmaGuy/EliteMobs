@@ -4,8 +4,8 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevel;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import org.bukkit.Bukkit;
@@ -69,7 +69,7 @@ public class Kraken implements Listener {
         kraken.setCustomNameVisible(true);
 
         MetadataHandler.registerMetadata(kraken, MetadataHandler.KRAKEN, true);
-        MetadataHandler.registerMetadata(kraken, MetadataHandler.ELITE_MOB_MD, DynamicBossLevel.determineDynamicBossLevel(kraken));
+        MetadataHandler.registerMetadata(kraken, MetadataHandler.ELITE_MOB_MD, ActionDynamicBossLevelConstructor.determineDynamicBossLevel(kraken));
         MetadataHandler.registerMetadata(kraken, MetadataHandler.EVENT_CREATURE, true);
         MetadataHandler.registerMetadata(kraken, MetadataHandler.PERSISTENT_ENTITY, true);
 

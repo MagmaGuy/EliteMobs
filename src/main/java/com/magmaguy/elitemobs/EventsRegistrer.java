@@ -272,7 +272,7 @@ public class EventsRegistrer {
         Bukkit.getServer().getPluginManager().registerEvents(new AdventurersGuildGUI(), MetadataHandler.PLUGIN);
 
         //Combat tag
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_COMBAT_TAG))
+        if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
             Bukkit.getServer().getPluginManager().registerEvents(new CombatTag(), MetadataHandler.PLUGIN);
 
         //Prevent elitemob on elitemob aggro

@@ -308,7 +308,7 @@ public class EconomySettingsConfig {
         configuration.addDefault(WITHER, (diamondLevel / 2) * 10);
 
         configuration.options().copyDefaults(true);
-        configuration = UnusedNodeHandler.clearNodes(configuration);
+        UnusedNodeHandler.clearNodes(configuration);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);
 

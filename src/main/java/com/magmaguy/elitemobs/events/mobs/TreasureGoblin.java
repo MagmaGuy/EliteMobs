@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.ItemDropper;
 import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
@@ -52,8 +53,10 @@ public class TreasureGoblin implements Listener {
 
     public static void createGoblin(Entity treasureGoblin) {
 
+        int mobLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
+
         //Give custom setup to entity
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.ELITE_MOB_MD, 600);
+        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.ELITE_MOB_MD, mobLevel);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_POWERS_MD, true);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_NAME, true);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_ARMOR, true);
@@ -66,7 +69,7 @@ public class TreasureGoblin implements Listener {
         ((Zombie) treasureGoblin).setBaby(true);
         ((Zombie) treasureGoblin).setRemoveWhenFarAway(false);
 
-        treasureGoblin.setCustomName("Treasure Goblin");
+        treasureGoblin.setCustomName(ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME)));
         treasureGoblin.setCustomNameVisible(true);
 
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.TREASURE_GOBLIN, true);

@@ -496,7 +496,7 @@ public class TranslationConfig {
         ));
 
         configuration.options().copyDefaults(true);
-        configuration = UnusedNodeHandler.clearNodes(configuration);
+        UnusedNodeHandler.clearNodes(configuration);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);
 
