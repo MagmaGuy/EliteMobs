@@ -64,7 +64,7 @@ public class DefaultConfig {
 
         configuration.options().copyDefaults(true);
 
-        configuration = UnusedNodeHandler.clearNodes(configuration);
+        UnusedNodeHandler.clearNodes(configuration);
 
         //save the config when changed
         Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).saveConfig();

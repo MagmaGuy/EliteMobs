@@ -44,9 +44,11 @@ public class LootGUI implements Listener {
     private List<Integer> lootSlots = new ArrayList<>(Arrays.asList(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31,
             32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52));
 
+    private String shopName = "EliteMobs Custom Loot";
+
     public void lootGUI(Player player) {
 
-        Inventory fakeChestInventory = Bukkit.createInventory(null, 54, "EliteMobs ItemsCustomLootList.yml");
+        Inventory fakeChestInventory = Bukkit.createInventory(null, 54, shopName);
         tierConstructor(fakeChestInventory);
         headerConstructor(fakeChestInventory);
         lootNavigationConstructor(fakeChestInventory);
@@ -182,7 +184,7 @@ public class LootGUI implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (event.getInventory().getName().equalsIgnoreCase("EliteMobs ItemsCustomLootList.yml")) {
+        if (event.getInventory().getName().equalsIgnoreCase(shopName)) {
 
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
 

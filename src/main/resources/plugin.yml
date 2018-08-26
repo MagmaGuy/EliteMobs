@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.5.9
+version: 6.5.10
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -122,7 +122,6 @@ permissions:
     default: op
   elitemobs.currency.cointop:
     description: Allows players to run /elitemobs highscore
-    default: op
     default: op
   elitemobs.events.*:
     description: Allows players to launch all events

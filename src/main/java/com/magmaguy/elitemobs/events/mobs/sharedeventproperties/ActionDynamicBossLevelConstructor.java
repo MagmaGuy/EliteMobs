@@ -5,7 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class DynamicBossLevel {
+public class ActionDynamicBossLevelConstructor {
 
     public static int determineDynamicBossLevel(LivingEntity boss) {
 

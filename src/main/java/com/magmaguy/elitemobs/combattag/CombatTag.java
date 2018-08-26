@@ -2,11 +2,12 @@ package com.magmaguy.elitemobs.combattag;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.CombatTagConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -29,16 +30,29 @@ public class CombatTag implements Listener {
         if (player.isFlying()) {
             player.setFlying(false);
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    TextComponent.fromLegacyText(ChatColorConverter.chatColorConverter(ConfigValues.mobCombatSettingsConfig.getString(MobCombatSettingsConfig.COMBAT_TAG_TRIGGER_MESSAGE))));
+                    TextComponent.fromLegacyText(ChatColorConverter.chatColorConverter(ConfigValues.combatTagConfig.getString(CombatTagConfig.COMBAT_TAG_MESSAGE))));
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    //TODO: introduce the featherfall potion effect for versions above 1.12.2
+//                    if (NameHandler.currentVersionUnder(13, 0)) {
                     if (!player.isOnline() || player.isDead())
                         cancel();
                     if (player.isOnGround()) {
                         player.setFallDistance(0F);
                         cancel();
                     }
+//                    } else {
+////TODO: introduce the featherfall potion effect for versions above 1.12.2
+//                        if (!player.isOnline() || player.isDead())
+//                            player.removePotionEffect(PotionEffectType.SLOW);
+//                            cancel();
+//                        if (player.isOnGround()) {
+//                            player.setFallDistance(0F);
+//                            cancel();
+//                        }
+//
+//                    }
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
         }
@@ -46,10 +60,14 @@ public class CombatTag implements Listener {
 
     private static Player playerFinder(EntityDamageByEntityEvent event) {
 
-        if (event.getDamager() instanceof Player) return (Player) event.getDamager();
-        if (event.getEntity() instanceof Player) return (Player) event.getEntity();
-        if (event.getDamager() instanceof Projectile && event.getDamager() instanceof Projectile
-                && ((Projectile) event.getDamager()).getShooter() instanceof Player)
+        if (event.getDamager() instanceof Player && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD))
+            return (Player) event.getDamager();
+        if (event.getEntity() instanceof Player && (event.getDamager().hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
+                event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
+                        ((LivingEntity) ((Projectile) event.getDamager()).getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD)))
+            return (Player) event.getEntity();
+        if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player &&
+                event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD))
             return (Player) ((Projectile) event.getDamager()).getShooter();
 
         return null;

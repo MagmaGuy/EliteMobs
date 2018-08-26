@@ -33,7 +33,7 @@ public class ItemWorthCalculator {
 
     public static double determineItemWorth(ItemStack itemStack) {
 
-        double itemWorth = Math.round((itemTypeWorth(itemStack.getType()) + getAllEnchantmentsValue(itemStack) + potionEffectValue(itemStack)) * 100.0) / 100.0;
+        double itemWorth = 1 + Math.round((itemTypeWorth(itemStack.getType()) + getAllEnchantmentsValue(itemStack) + potionEffectValue(itemStack)) * 100.0) / 100.0;
 
         return itemWorth;
 
@@ -41,7 +41,7 @@ public class ItemWorthCalculator {
 
     public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap) {
 
-        double itemWorth = Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap)) * 100.0) / 100.0;
+        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap)) * 100.0) / 100.0;
 
         return itemWorth;
 
@@ -49,7 +49,7 @@ public class ItemWorthCalculator {
 
     public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap, List<String> potionsMap) {
 
-        double itemWorth = Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap) + potionEffectValue(potionsMap)) * 100.0) / 100.0;
+        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap) + potionEffectValue(potionsMap)) * 100.0) / 100.0;
 
         return itemWorth;
 

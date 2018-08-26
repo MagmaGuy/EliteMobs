@@ -3,8 +3,8 @@ package com.magmaguy.elitemobs.events.mobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevel;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
@@ -62,7 +62,7 @@ public class Balrog implements Listener {
     private static void intializeBalrog(Location location) {
 
         Silverfish balrog = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
-        MetadataHandler.registerMetadata(balrog, MetadataHandler.ELITE_MOB_MD, DynamicBossLevel.determineDynamicBossLevel(balrog));
+        MetadataHandler.registerMetadata(balrog, MetadataHandler.ELITE_MOB_MD, ActionDynamicBossLevelConstructor.determineDynamicBossLevel(balrog));
         MetadataHandler.registerMetadata(balrog, MetadataHandler.BALROG, true);
         MetadataHandler.registerMetadata(balrog, MetadataHandler.EVENT_CREATURE, true);
         MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_ARMOR, true);

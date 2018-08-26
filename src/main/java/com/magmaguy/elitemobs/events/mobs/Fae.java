@@ -3,11 +3,12 @@ package com.magmaguy.elitemobs.events.mobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevel;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -20,6 +21,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Fae implements Listener {
@@ -82,7 +84,7 @@ public class Fae implements Listener {
 
     private static void faeConstructor(Vex fae) {
 
-        MetadataHandler.registerMetadata(fae, MetadataHandler.ELITE_MOB_MD, DynamicBossLevel.determineDynamicBossLevel(fae)/3);
+        MetadataHandler.registerMetadata(fae, MetadataHandler.ELITE_MOB_MD, ActionDynamicBossLevelConstructor.determineDynamicBossLevel(fae)/3);
         MetadataHandler.registerMetadata(fae, MetadataHandler.FAE, true);
         MetadataHandler.registerMetadata(fae, MetadataHandler.EVENT_CREATURE, true);
         MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_ARMOR, true);
@@ -107,7 +109,7 @@ public class Fae implements Listener {
 
     }
 
-    private static void faeVisualEffect(Vex vex, faeType faeType) {
+    private static void faeVisualEffect(Vex fae, faeType faeType) {
 
         Particle particle = Particle.SMOKE_LARGE;
 
@@ -129,10 +131,18 @@ public class Fae implements Listener {
 
         new BukkitRunnable() {
 
+            UUID uuid = fae.getUniqueId();
+
             @Override
             public void run() {
 
-                if (vex.isDead()) {
+                Vex localFae = fae;
+
+                if (!localFae.isValid())
+                    if (Bukkit.getEntity(uuid) != null && Bukkit.getEntity(uuid).isValid())
+                        localFae = (Vex) Bukkit.getEntity(uuid);
+
+                if (localFae.isDead()) {
 
                     cancel();
                     return;
@@ -142,13 +152,13 @@ public class Fae implements Listener {
                 switch (finalParticle) {
 
                     case SPELL:
-                        vex.getWorld().spawnParticle(finalParticle, vex.getLocation().add(new Vector(0, 0.25, 0)), 3, 0.1, 0.1, 0.1, 0.02);
+                        localFae.getWorld().spawnParticle(finalParticle, fae.getLocation().add(new Vector(0, 0.25, 0)), 3, 0.1, 0.1, 0.1, 0.02);
                         break;
                     case FLAME:
-                        vex.getWorld().spawnParticle(finalParticle, vex.getLocation().add(new Vector(0, 0.25, 0)), 3, 0.1, 0.1, 0.1, 0.01);
+                        localFae.getWorld().spawnParticle(finalParticle, fae.getLocation().add(new Vector(0, 0.25, 0)), 3, 0.1, 0.1, 0.1, 0.01);
                         break;
                     case WATER_DROP:
-                        vex.getWorld().spawnParticle(finalParticle, vex.getLocation().add(new Vector(0, 0.25, 0)), 5, 0.1, 0.1, 0.1, 1);
+                        localFae.getWorld().spawnParticle(finalParticle, fae.getLocation().add(new Vector(0, 0.25, 0)), 5, 0.1, 0.1, 0.1, 1);
                         break;
 
                 }
@@ -164,17 +174,25 @@ public class Fae implements Listener {
 
         new BukkitRunnable() {
 
+            UUID uuid = lightingFae.getUniqueId();
+
             @Override
             public void run() {
 
-                if (lightingFae.isDead()) {
+                Vex localFae = lightingFae;
+
+                if (!lightingFae.isValid())
+                    if (Bukkit.getEntity(uuid) != null && Bukkit.getEntity(uuid).isValid())
+                        localFae = (Vex) Bukkit.getEntity(uuid);
+
+                if (localFae.isDead()) {
 
                     cancel();
                     return;
 
                 }
 
-                for (Entity entity : lightingFae.getNearbyEntities(16, 16, 16)) {
+                for (Entity entity : localFae.getNearbyEntities(16, 16, 16)) {
 
                     if (entity instanceof Player) {
 

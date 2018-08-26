@@ -47,6 +47,7 @@ public class DeadMoon implements Listener {
 
         if (event.isCancelled()) return;
 
+        if (!event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL)) return;
         if (!(event.getEntity() instanceof Zombie)) return;
         if (!EventLauncher.verifyPlayerCount()) return;
 
@@ -74,8 +75,7 @@ public class DeadMoon implements Listener {
 
         if (!event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-            NaturalSpawning naturalSpawning = new NaturalSpawning();
-            naturalSpawning.naturalMobProcessor(event.getEntity());
+            NaturalSpawning.naturalMobProcessor(event.getEntity());
 
         }
 

@@ -80,7 +80,7 @@ public class ValidMobsConfig {
 
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
-        configuration = UnusedNodeHandler.clearNodes(configuration);
+        UnusedNodeHandler.clearNodes(configuration);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);
 

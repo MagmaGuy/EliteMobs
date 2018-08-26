@@ -31,6 +31,7 @@ public class EventsConfig {
     public static final String KRAKEN_ENABLED = ENABLED_EVENTS + "Kraken";
     public static final String BALROG_ENABLED = ENABLED_EVENTS + "Balrog";
     public static final String FAE_ENABLED = ENABLED_EVENTS + "Fae";
+    public static final String TREASURE_GOBLIN_NAME = "Name of mob in Treasure Goblin events";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT = "Small treasure goblin event announcement text";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT = "Small treasure goblin killed by players message";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT = "Small treasure goblin nondescript death message";
@@ -72,6 +73,7 @@ public class EventsConfig {
         configuration.addDefault(MAXIMUM_EVENT_FREQUENCY, 10);
         configuration.addDefault(TREASURE_GOBLIN_SMALL_ENABLED, true);
         configuration.addDefault(DEAD_MOON_ENABLED, true);
+        configuration.addDefault(TREASURE_GOBLIN_NAME, "&eTreasure Goblin");
         configuration.addDefault(SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT, "&7&m-----------------------------------------------------\n&7[&aEvent&7] &fA &ctreasure goblin &fhas appeared in&c $world &fat&c $location \n &fMake sure to take a hunting party with you!\n&7&m-----------------------------------------------------");
         configuration.addDefault(SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT, "A Treasure Goblin has been slain by $player!");
         configuration.addDefault(SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT, "A Treasure Goblin has been slain!");
@@ -103,7 +105,7 @@ public class EventsConfig {
         configuration.addDefault(FAE_CHANCE_ON_CHOP, 0.001);
 
         configuration.options().copyDefaults(true);
-        configuration = UnusedNodeHandler.clearNodes(configuration);
+        UnusedNodeHandler.clearNodes(configuration);
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);
 

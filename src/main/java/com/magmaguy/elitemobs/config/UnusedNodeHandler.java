@@ -15,6 +15,9 @@ public class UnusedNodeHandler {
 
                 if (actual.equals(defaults)) {
 
+                    if (actual.equals("test"))
+                        Bukkit.getLogger().warning("Oh shit");
+
                     keyExists = true;
 
                 }

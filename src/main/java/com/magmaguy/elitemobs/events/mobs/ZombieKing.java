@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
@@ -50,7 +51,7 @@ public class ZombieKing implements Listener {
 
         DeadMoon.entityQueued = false;
 
-        int kingLevel = 1000;
+        int kingLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
         Location location = zombie.getLocation();
 
         Zombie zombieKing = (Zombie) location.getWorld().spawnEntity(location, EntityType.ZOMBIE);

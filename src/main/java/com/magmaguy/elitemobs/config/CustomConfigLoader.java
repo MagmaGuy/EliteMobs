@@ -83,7 +83,11 @@ public class CustomConfigLoader {
         if (defConfigStream != null) {
 
             YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(customConfigFile);
-            customConfig.setDefaults(defConfig);
+
+            for (String key : defConfig.getKeys(true))
+                customConfig.set(key, defConfig.get(key));
+
+//            customConfig.setDefaults(defConfig);
 
         }
 
