@@ -95,6 +95,8 @@ public class ZombieParents extends MajorPowers implements Listener {
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
+        if (event.isCancelled()) return;
+
         if (event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Zombie &&
                 !event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_PARENTS_ACTIVATED) && random.nextDouble() < 0.5) {
 

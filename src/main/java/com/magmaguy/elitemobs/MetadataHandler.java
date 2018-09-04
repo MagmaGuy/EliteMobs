@@ -162,6 +162,7 @@ public class MetadataHandler implements Listener {
 
     //displays
     public final static String ARMOR_STAND_DISPLAY = "ArmorStandDisplay";
+    public final static String LIVINGENTITY_DISPLAY = "LivingEntityDisplay";
 
     //third party compatibility
     public final static String BETTERDROPS_COMPATIBILITY_MD = "betterdrops_ignore";
@@ -263,6 +264,7 @@ public class MetadataHandler implements Listener {
             SHOOTING_FIREBALLS,
             TRACKING_ARROWS_ACTIVE,
             ARMOR_STAND_DISPLAY,
+            LIVINGENTITY_DISPLAY,
             KILLED_BY_ELITE_MOB,
             USING_ZOMBIE_KING_AXE,
             SAFE_FALL,
@@ -477,7 +479,16 @@ public class MetadataHandler implements Listener {
 
     public static void runtimeMetadataFlush(Entity entity) {
 
-        if (entity.hasMetadata(PERSISTENT_ENTITY)) return;
+        if (entity.hasMetadata(PERSISTENT_ENTITY)) {
+
+            if (entity.hasMetadata(LIVINGENTITY_DISPLAY)) {
+                entity.removeMetadata(VISUAL_EFFECT_MD, PLUGIN);
+                entity.removeMetadata(MAJOR_POWER_AMOUNT_MD, PLUGIN);
+            }
+
+            return;
+        }
+
         fullMetadataFlush(entity);
 
     }

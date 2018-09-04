@@ -101,6 +101,8 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
     @EventHandler
     public void onPlayerDetect(EntityTargetEvent event) {
 
+        if (event.isCancelled()) return;
+
         Entity targetter = event.getEntity();
         Entity targetted = event.getTarget();
 

@@ -61,6 +61,8 @@ public class DefaultDropsHandler implements Listener {
 
             for (ItemStack itemStack : droppedItems) {
 
+//                ItemStack can be null for some reason, probably due to other plugins
+                if (itemStack == null) continue;
                 boolean itemIsWorn = false;
 
                 for (ItemStack wornItem : wornItems) {

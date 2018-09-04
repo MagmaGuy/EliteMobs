@@ -104,6 +104,8 @@ public class ZombieTeamRocket extends MajorPowers implements Listener {
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
+        if (event.isCancelled()) return;
+
         if (event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Zombie &&
                 !event.getEntity().hasMetadata(MetadataHandler.TEAM_ROCKET_ACTIVATED) && random.nextDouble() < 0.5) {
 

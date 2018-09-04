@@ -22,7 +22,6 @@ public class CombatTagConfig {
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);
 
-
     }
 
 }
