@@ -20,7 +20,7 @@ import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 
-import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.currentVersionUnder;
+import static com.magmaguy.elitemobs.utils.VersionChecker.currentVersionIsUnder;
 
 /**
  * Created by MagmaGuy on 10/10/2016.
@@ -58,13 +58,13 @@ public class ValidAgressiveMobFilter {
                 return config.getBoolean(ValidMobsConfig.ZOMBIE);
         }
 
-        if (currentVersionUnder(1, 8))
+        if (currentVersionIsUnder(1, 8))
             switch (entity.getType()) {
                 case ENDERMITE:
                     return config.getBoolean(ValidMobsConfig.ENDERMITE);
             }
 
-        if (!currentVersionUnder(1, 11))
+        if (!currentVersionIsUnder(1, 11))
             switch (entity.getType()) {
                 case STRAY:
                     return config.getBoolean(ValidMobsConfig.STRAY);

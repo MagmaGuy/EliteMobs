@@ -35,7 +35,7 @@ public class CombatTag implements Listener {
                 @Override
                 public void run() {
                     //TODO: introduce the featherfall potion effect for versions above 1.12.2
-//                    if (NameHandler.currentVersionUnder(13, 0)) {
+//                    if (NameHandler.currentVersionIsUnder(13, 0)) {
                     if (!player.isOnline() || player.isDead())
                         cancel();
                     if (player.isOnGround()) {

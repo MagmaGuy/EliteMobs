@@ -25,6 +25,7 @@ import com.magmaguy.elitemobs.items.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
+import com.magmaguy.elitemobs.mobcustomizer.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobcustomizer.displays.HealthDisplay;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
 import com.magmaguy.elitemobs.mobpowers.AggroPrevention;
@@ -277,6 +278,9 @@ public class EventsRegistrer {
 
         //Prevent elitemob on elitemob aggro
         Bukkit.getServer().getPluginManager().registerEvents(new AggroPrevention(), MetadataHandler.PLUGIN);
+
+        //Refresh display case Elite Mobs
+        Bukkit.getServer().getPluginManager().registerEvents(new DisplayMob(), MetadataHandler.PLUGIN);
 
     }
 

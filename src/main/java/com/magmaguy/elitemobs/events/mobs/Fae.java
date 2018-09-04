@@ -152,13 +152,13 @@ public class Fae implements Listener {
                 switch (finalParticle) {
 
                     case SPELL:
-                        localFae.getWorld().spawnParticle(finalParticle, fae.getLocation().add(new Vector(0, 0.25, 0)), 3, 0.1, 0.1, 0.1, 0.02);
+                        localFae.getWorld().spawnParticle(finalParticle, localFae.getLocation().add(new Vector(0, 0.25, 0)), 3, 0.1, 0.1, 0.1, 0.02);
                         break;
                     case FLAME:
-                        localFae.getWorld().spawnParticle(finalParticle, fae.getLocation().add(new Vector(0, 0.25, 0)), 3, 0.1, 0.1, 0.1, 0.01);
+                        localFae.getWorld().spawnParticle(finalParticle, localFae.getLocation().add(new Vector(0, 0.25, 0)), 3, 0.1, 0.1, 0.1, 0.01);
                         break;
                     case WATER_DROP:
-                        localFae.getWorld().spawnParticle(finalParticle, fae.getLocation().add(new Vector(0, 0.25, 0)), 5, 0.1, 0.1, 0.1, 1);
+                        localFae.getWorld().spawnParticle(finalParticle, localFae.getLocation().add(new Vector(0, 0.25, 0)), 5, 0.1, 0.1, 0.1, 1);
                         break;
 
                 }

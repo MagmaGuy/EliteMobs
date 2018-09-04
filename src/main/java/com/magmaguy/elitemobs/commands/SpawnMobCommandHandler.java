@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.mobcustomizer.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
@@ -513,6 +514,9 @@ public class SpawnMobCommandHandler {
                         break;
                     case "display":
                         entity.setAI(false);
+                        entity.setRemoveWhenFarAway(false);
+                        DisplayMob.nameEncoder(entity);
+                        break;
                     default:
                         commandSender.sendMessage(string + " is not a valid power.");
                         commandSender.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList + " custom");

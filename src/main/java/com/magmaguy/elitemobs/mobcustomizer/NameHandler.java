@@ -19,12 +19,12 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+import static com.magmaguy.elitemobs.utils.VersionChecker.currentVersionIsUnder;
 import static org.bukkit.Bukkit.getLogger;
 
 /**
@@ -118,7 +118,7 @@ public class NameHandler {
         /*
         Post-1.8
          */
-        if (!currentVersionUnder(1, 8))
+        if (!currentVersionIsUnder(1, 8))
             switch (entity.getType()) {
                 case ENDERMITE:
                     entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Endermite").get(0)) + mobLevel
@@ -129,7 +129,7 @@ public class NameHandler {
         /*
         Post-1.11
          */
-        if (!currentVersionUnder(1, 11))
+        if (!currentVersionIsUnder(1, 11))
             switch (entity.getType()) {
                 case STRAY:
                     entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Stray").get(0)) + mobLevel
@@ -153,7 +153,7 @@ public class NameHandler {
                     break;
             }
 
-//        if (currentVersionUnder(1, 13))
+//        if (currentVersionIsUnder(1, 13))
 //                switch (entity.getType()){
 //                    case DROWNED:
 //                        entity.setCustomName(chatColorConverter(TRANSLATION_CONFIG.getStringList("Elite Mob Names.Drowned").get(0)) + mobLevel
@@ -163,20 +163,6 @@ public class NameHandler {
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
             entity.setCustomNameVisible(true);
         return entity.getCustomName();
-
-    }
-
-    /*
-    Don't compare to mobs that aren't in that mc version
-     */
-    public static boolean currentVersionUnder(int version, int subVersion) {
-
-        if (Bukkit.getBukkitVersion().split("[.]").length < 4)
-            return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 2)) < version;
-
-        return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) < version ||
-                Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) == version &&
-                        Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[2].replace(")", "")) < subVersion;
 
     }
 
