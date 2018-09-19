@@ -238,6 +238,8 @@ public class ItemWorthCalculator {
 
     public static double enchantmentWorthGetter(Enchantment enchantment) {
 
+        if (enchantment == null) return 0;
+
         String enchantmentName = enchantment.getName();
 
         switch (enchantmentName) {

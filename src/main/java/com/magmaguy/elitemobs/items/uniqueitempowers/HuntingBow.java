@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -33,6 +34,8 @@ public class HuntingBow {
     public static ArrayList<LivingEntity> aliveBossMobList = new ArrayList();
 
     public static void scanForBossMobs() {
+
+        if (VersionChecker.currentVersionIsUnder(11, 0)) return;
 
         if (!ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_UNIQUE_ITEMS) || !ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_HUNTING_SET))
             return;

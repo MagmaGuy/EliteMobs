@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -50,6 +51,8 @@ public class UniqueItemConstructor {
 
 
     public void intializeUniqueItems() {
+
+        if (VersionChecker.currentVersionIsUnder(12, 2)) return;
 
         if (!ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_UNIQUE_ITEMS)) return;
 

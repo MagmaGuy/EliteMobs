@@ -36,6 +36,7 @@ import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
@@ -166,6 +167,9 @@ public class EventsRegistrer {
 
         for (String string : MetadataHandler.majorPowerList) {
 
+            if ((string.equalsIgnoreCase("ZombieBloat") || string.equalsIgnoreCase("ZombieNecronomicon"))
+                    && (VersionChecker.currentVersionIsUnder(10, 0))) continue;
+
             //don't load powers that require no event listeners
             if (!(string.equalsIgnoreCase("SkeletonTrackingArrow")))
                 try {
@@ -240,25 +244,30 @@ public class EventsRegistrer {
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_TOWER_EXPLOIT))
             Bukkit.getServer().getPluginManager().registerEvents(new PreventTowerExploit(), MetadataHandler.PLUGIN);
 
-        //Initialize custom events
-        Bukkit.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new TreasureGoblin(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new DeadMoon(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new TheReturned(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new ZombieKing(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new SpiritWalk(), MetadataHandler.PLUGIN);
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
-            Bukkit.getServer().getPluginManager().registerEvents(new Kraken(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new KrakenEvent(), MetadataHandler.PLUGIN);
+
+        if (!VersionChecker.currentVersionIsUnder(11, 0)){
+            //Initialize custom events
+            Bukkit.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), MetadataHandler.PLUGIN);
+            Bukkit.getServer().getPluginManager().registerEvents(new TreasureGoblin(), MetadataHandler.PLUGIN);
+            Bukkit.getServer().getPluginManager().registerEvents(new DeadMoon(), MetadataHandler.PLUGIN);
+            Bukkit.getServer().getPluginManager().registerEvents(new TheReturned(), MetadataHandler.PLUGIN);
+            Bukkit.getServer().getPluginManager().registerEvents(new ZombieKing(), MetadataHandler.PLUGIN);
+            Bukkit.getServer().getPluginManager().registerEvents(new SpiritWalk(), MetadataHandler.PLUGIN);
+
+            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
+                Bukkit.getServer().getPluginManager().registerEvents(new Kraken(), MetadataHandler.PLUGIN);
+                Bukkit.getServer().getPluginManager().registerEvents(new KrakenEvent(), MetadataHandler.PLUGIN);
+            }
+            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
+                Bukkit.getServer().getPluginManager().registerEvents(new Balrog(), MetadataHandler.PLUGIN);
+                Bukkit.getServer().getPluginManager().registerEvents(new BalrogEvent(), MetadataHandler.PLUGIN);
+            }
+            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
+                Bukkit.getServer().getPluginManager().registerEvents(new FaeEvent(), MetadataHandler.PLUGIN);
+                Bukkit.getServer().getPluginManager().registerEvents(new Fae(), MetadataHandler.PLUGIN);
+            }
         }
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
-            Bukkit.getServer().getPluginManager().registerEvents(new Balrog(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new BalrogEvent(), MetadataHandler.PLUGIN);
-        }
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
-            Bukkit.getServer().getPluginManager().registerEvents(new FaeEvent(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new Fae(), MetadataHandler.PLUGIN);
-        }
+
 
         //Set up health and damage displays
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT))

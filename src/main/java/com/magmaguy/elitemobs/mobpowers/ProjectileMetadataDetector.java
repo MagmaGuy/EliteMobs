@@ -29,8 +29,7 @@ public class ProjectileMetadataDetector {
 
         if (trueDamager == null) return false;
 
-        if (trueDamager instanceof Blaze || trueDamager instanceof Skeleton || trueDamager instanceof Witch ||
-                trueDamager instanceof Stray) {
+        if (trueDamager instanceof Blaze || trueDamager instanceof Skeleton || trueDamager instanceof Witch) {
 
             Entity trueDamagerEntity = (Entity) trueDamager;
 

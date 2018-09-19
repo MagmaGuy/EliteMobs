@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.mobcustomizer;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +29,8 @@ import org.bukkit.inventory.ItemStack;
 public class ArmorHandler {
 
     public static void ArmorHandler(Entity entity) {
+
+        if (VersionChecker.currentVersionIsUnder(12, 2)) return;
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_ARMOR)) return;
 

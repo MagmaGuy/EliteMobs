@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -337,15 +337,7 @@ public class EnchantmentGenerator {
     //Version and subVersion should be set to the update at which the enchantment was introduced
     private static boolean enchantmentBackwardsCompatibility(int version, int subVersion, String actualEnchantement, String enchantmentToAvoid) {
 
-        //Version is always randomWords(MC: 1.xx.yy) xx is mandatory yy is optional
-        //For versions with only an xx
-        if (Bukkit.getBukkitVersion().split("[.]").length < 4) {
-            return actualEnchantement.equalsIgnoreCase(enchantmentToAvoid) && Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 2)) < version;
-        }
-        //For other versions with yy
-        return actualEnchantement.equalsIgnoreCase(enchantmentToAvoid) && Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) < version ||
-                actualEnchantement.equalsIgnoreCase(enchantmentToAvoid) && Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) == version &&
-                        Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[2].replace(")", "")) < subVersion;
+        return !VersionChecker.currentVersionIsUnder(version, subVersion) && actualEnchantement.equalsIgnoreCase(enchantmentToAvoid);
 
     }
 
