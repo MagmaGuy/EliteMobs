@@ -19,6 +19,7 @@ package com.magmaguy.elitemobs.powerstances;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -243,17 +244,18 @@ public class MinorPowerPowerStance implements Listener {
 
                 }
 
-                if (entity.hasMetadata(MetadataHandler.ATTACK_WEAKNESS_MD)) {
+                if (!VersionChecker.currentVersionIsUnder(11, 0))
+                    if (entity.hasMetadata(MetadataHandler.ATTACK_WEAKNESS_MD)) {
 
-                    ItemStack itemStack = new ItemStack(Material.TOTEM, 1);
+                        ItemStack itemStack = new ItemStack(Material.TOTEM, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
                 if (entity.hasMetadata(MetadataHandler.ATTACK_WEB_MD)) {
 

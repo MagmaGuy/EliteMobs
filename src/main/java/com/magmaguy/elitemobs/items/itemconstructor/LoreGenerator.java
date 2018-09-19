@@ -29,7 +29,8 @@ public class LoreGenerator {
 
             if (string.contains("$enchantments")) {
                 if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
-                    lore.addAll(enchantmentLore(enchantmentMap));
+                    if (!enchantmentMap.isEmpty())
+                        lore.addAll(enchantmentLore(enchantmentMap));
                 }
             } else if (string.contains("$potionEffect"))
                 lore.addAll(potionsLore(potionList));
@@ -126,7 +127,8 @@ public class LoreGenerator {
         if (!enchantmentMap.isEmpty()) {
             obfuscatedString.append(OBFUSCATED_ENCHANTMENTS).append(",");
             for (Enchantment enchantment : enchantmentMap.keySet())
-                obfuscatedString.append(enchantment.getName()).append(":").append(enchantmentMap.get(enchantment)).append(",");
+                if (enchantment != null)
+                    obfuscatedString.append(enchantment.getName()).append(":").append(enchantmentMap.get(enchantment)).append(",");
         }
 
         if (potionList != null && !potionList.isEmpty()) {

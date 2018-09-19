@@ -134,10 +134,9 @@ public class ZombieBloat extends MajorPowers implements Listener {
                 }
 
                 if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS)) {
-
-                    eventZombie.getWorld().spawnParticle(Particle.TOTEM, new Location(eventZombie.getWorld(),
-                                    eventZombie.getLocation().getX(), eventZombie.getLocation().getY() + eventZombie.getHeight(), eventZombie.getLocation().getZ()),
-                            20, timer / 24, timer / 9, timer / 24, 0.1);
+                        eventZombie.getWorld().spawnParticle(Particle.TOTEM, new Location(eventZombie.getWorld(),
+                                        eventZombie.getLocation().getX(), eventZombie.getLocation().getY() + eventZombie.getHeight(), eventZombie.getLocation().getZ()),
+                                20, timer / 24, timer / 9, timer / 24, 0.1);
 
                 }
 

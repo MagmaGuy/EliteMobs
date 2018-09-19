@@ -36,7 +36,7 @@ public class CommandHandler implements CommandExecutor {
     private final static String STATS = "elitemobs.stats";
     private final static String GETLOOT = "elitemobs.getloot";
     private final static String SIMLOOT = "elitemobs.simloot";
-    public final static String RELOAD_CONFIGS = "elitemobs.reload.configs";
+    public final static String RELOAD_CONFIGS = "elitemobs.reload";
     private final static String RELOAD_LOOT = "elitemobs.reload.loot";
     private final static String GIVELOOT = "elitemobs.giveloot";
     private final static String SPAWNMOB = "elitemobs.spawnmob";

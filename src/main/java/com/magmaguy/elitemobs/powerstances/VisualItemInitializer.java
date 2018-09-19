@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +14,8 @@ public class VisualItemInitializer {
         item.setPickupDelay(Integer.MAX_VALUE);
         MetadataHandler.registerMetadata(item, MetadataHandler.VISUAL_EFFECT_MD, 0);
         MetadataHandler.registerMetadata(item, MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, true);
-        item.setGravity(false);
+        if (!VersionChecker.currentVersionIsUnder(1, 11))
+            item.setGravity(false);
         item.setInvulnerable(true);
 
         return item;

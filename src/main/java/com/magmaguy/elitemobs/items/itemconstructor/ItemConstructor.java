@@ -40,7 +40,8 @@ public class ItemConstructor {
         Note: This only applies enchantments up to a certain level, above that threshold item enchantments only exist
         in the item lore and get interpreted by the combat system
          */
-        itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantmentMap);
+        if (!enchantmentMap.isEmpty())
+            itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantmentMap);
 
         /*
         Generate item lore

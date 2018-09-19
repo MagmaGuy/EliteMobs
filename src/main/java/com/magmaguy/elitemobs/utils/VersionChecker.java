@@ -6,8 +6,15 @@ public class VersionChecker {
 
     public static boolean currentVersionIsUnder(int version, int subVersion) {
 
-        if (Bukkit.getBukkitVersion().split("[.]").length < 4)
-            return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 2)) < version;
+        if (Bukkit.getBukkitVersion().split("[.]").length < 4) {
+
+            try {
+                return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 2)) < version;
+            } catch (Exception ex) {
+                return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 1)) < version;
+            }
+
+        }
 
         if (Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) < version) return true;
 

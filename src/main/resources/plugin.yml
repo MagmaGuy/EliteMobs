@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.6.0
+version: 6.6.1
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -69,11 +69,8 @@ permissions:
   elitemobs.simloot:
     description: Allow players to run /elitemobs simloot
     default: op
-  elitemobs.reload.configs:
+  elitemobs.reload:
     decription: Allow players to run /elitemobs reload config
-    default: op
-  elitemobs.reload.loot:
-    decription: Allow players to run /elitemobs reload loot
     default: op
   elitemobs.giveloot:
     description: Allow players to run /elitemobs giveloot [playername] random/[loot name]

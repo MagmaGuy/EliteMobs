@@ -214,19 +214,10 @@ public class ItemTierFinder {
 
         int enchantments = 0;
 
-        if (!enchantmentMap.isEmpty()) {
-
-            for (Enchantment currentEnchantment : enchantmentMap.keySet()) {
-
-                if (currentEnchantment.equals(enchantment)) {
-
+        if (!enchantmentMap.isEmpty())
+            for (Enchantment currentEnchantment : enchantmentMap.keySet())
+                if (currentEnchantment.equals(enchantment))
                     enchantments += enchantmentMap.get(currentEnchantment);
-
-                }
-
-            }
-
-        }
 
         return enchantments;
 

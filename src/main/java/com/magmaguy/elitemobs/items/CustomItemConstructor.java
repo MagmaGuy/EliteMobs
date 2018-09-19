@@ -53,11 +53,8 @@ public class CustomItemConstructor implements Listener {
             Bukkit.getLogger().info("Adding: " + previousPath);
             String itemName = getName(previousPath);
 
-            if (itemType == null) {
-
+            if (itemType == null)
                 continue;
-
-            }
 
             HashMap<Enchantment, Integer> itemEnchantments = getEnchantments(previousPath);
             List potionList = itemPotionEffectHandler(previousPath);
@@ -193,7 +190,13 @@ public class CustomItemConstructor implements Listener {
             for (Object object : enchantments) {
 
                 String string = (String) object;
-                enchantmentMap.put(Enchantment.getByName(string.split(",")[0]), Integer.parseInt(string.split(",")[1]));
+                Enchantment enchantment = Enchantment.getByName(string.split(",")[0]);
+                if (enchantment != null) {
+                    enchantmentMap.put(Enchantment.getByName(string.split(",")[0]), Integer.parseInt(string.split(",")[1]));
+                } else {
+                    //This happens when the version doesn't contain this enchantment
+                }
+
             }
 
         } catch (Exception e) {

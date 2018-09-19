@@ -33,6 +33,7 @@ package com.magmaguy.elitemobs.mobpowers.majorpowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackArrow;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -51,6 +52,8 @@ public class SkeletonTrackingArrow extends MajorPowers implements Listener {
 
     @Override
     public void applyPowers(Entity entity) {
+
+        if (VersionChecker.currentVersionIsUnder(10, 0)) return;
 
         MetadataHandler.registerMetadata(entity, powerMetadata, true);
         MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
