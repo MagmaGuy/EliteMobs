@@ -92,8 +92,6 @@ public class Fae implements Listener {
         MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_STACK, true);
         MetadataHandler.registerMetadata(fae, MetadataHandler.PERSISTENT_ENTITY, true);
 
-        fae.setRemoveWhenFarAway(false);
-
         NameHandler.customUniqueNameAssigner(fae, ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME));
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(fae);
 

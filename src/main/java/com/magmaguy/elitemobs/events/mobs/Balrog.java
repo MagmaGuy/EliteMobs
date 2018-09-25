@@ -70,8 +70,6 @@ public class Balrog implements Listener {
         MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_STACK, true);
         MetadataHandler.registerMetadata(balrog, MetadataHandler.PERSISTENT_ENTITY, true);
 
-        balrog.setRemoveWhenFarAway(false);
-
         NameHandler.customUniqueNameAssigner(balrog, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME));
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(balrog);
 
