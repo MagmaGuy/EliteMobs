@@ -53,8 +53,12 @@ public class UniqueItemConstructor {
     public void intializeUniqueItems() {
 
         if (VersionChecker.currentVersionIsUnder(12, 2)) return;
-
         if (!ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_UNIQUE_ITEMS)) return;
+
+        for (String string : ConfigValues.itemsUniqueConfig.getKeys(true))
+            if (string.contains(ItemsUniqueConfig.ITEM_KEY)) {
+
+            }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_HUNTING_SET)) {
 
