@@ -45,8 +45,8 @@ public class EventsConfig {
     private static final String EVENT_WEIGHT = "Event weight.";
     public static final String SMALL_TREASURE_GOBLIN_EVENT_WEIGHT = EVENT_WEIGHT + "Small treasure goblin";
     public static final String DEAD_MOON_EVENT_WEIGHT = EVENT_WEIGHT + "Blood moon";
-    public static final String EVENT_TIMEOUT_TIME = "Time before boss mob gets culled";
-    public static final String EVENT_TIMEOUT_MESSAGE = "Message for when boss mobs despawn if they are not killed withing 30 minutes";
+    public static final String EVENT_TIMEOUT_TIME = "Time before boss mob escapes the map";
+    public static final String EVENT_TIMEOUT_MESSAGE = "Message for when boss mobs gets culled";
     public static final String SPIRIT_WALK_HIT_INTERVAL = "Number of hits before spirit walk gets activated";
     public static final String ZOMBIE_KING_FLAMETHROWER_INTERVAL = "Time interval between zombie king flamethrower attacks";
     public static final String ZOMBIE_KING_UNHOLY_SMITE_INTERVAL = "Time interval between zombie king unholy smite attacks";
