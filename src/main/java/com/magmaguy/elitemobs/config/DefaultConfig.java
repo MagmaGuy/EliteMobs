@@ -24,7 +24,7 @@ import org.bukkit.configuration.Configuration;
  */
 public class DefaultConfig {
 
-    public static final String ALWAYS_SHOW_NAMETAGS = "Dangerous! Always show Elite Mob nametags";
+    public static final String ALWAYS_SHOW_NAMETAGS = "Always show Elite Mob nametags";
     public static final String SUPERMOB_STACK_AMOUNT = "SuperMob (passive EliteMobs) stack amount";
     public static final String MMORPG_COLORS = "Use MMORPG colors for item ranks";
     public static final String CREEPER_PASSIVE_DAMAGE_PREVENTER = "Prevent creepers from killing passive mobs";
