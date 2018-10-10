@@ -88,7 +88,7 @@ public class DeadMoon implements Listener {
             eventOngoing = true;
             entityQueued = false;
 
-            EventMessage.sendEventMessage("A dead moon rises, and the undead with it...");
+            EventMessage.sendEventMessage("A dead moon rises, and the undead with it...", event.getEntity().getWorld());
 
             ZombieKing.spawnZombieKing((Zombie) event.getEntity());
             terminateEvent(event.getEntity().getWorld());
@@ -108,7 +108,7 @@ public class DeadMoon implements Listener {
 
                     eventOngoing = false;
 
-                    EventMessage.sendEventMessage("Dawn rises, the Dead Moon wanes for those still alive...");
+                    EventMessage.sendEventMessage("Dawn rises, the Dead Moon wanes for those still alive...", world);
 
                     cancel();
 

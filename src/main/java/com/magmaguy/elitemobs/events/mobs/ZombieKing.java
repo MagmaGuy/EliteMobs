@@ -99,7 +99,7 @@ public class ZombieKing implements Listener {
 
         sendString = ChatColorConverter.chatColorConverter(sendString);
 
-        EventMessage.sendEventMessage(sendString);
+        EventMessage.sendEventMessage(sendString, zombieKing.getWorld());
         BossMobDeathCountdown.startDeathCountdown(zombieKing);
         HuntingBow.aliveBossMobList.add(zombieKing);
 
@@ -570,11 +570,11 @@ public class ZombieKing implements Listener {
 
                 String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_PLAYER_END_TEXT).replace("$player", event.getEntity().getKiller().getDisplayName());
 
-                EventMessage.sendEventMessage(newMessage);
+                EventMessage.sendEventMessage(newMessage, zombieKing.getWorld());
 
             } else {
 
-                EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.chatColorConverter(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)));
+                EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.chatColorConverter(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)), zombieKing.getWorld());
 
             }
 

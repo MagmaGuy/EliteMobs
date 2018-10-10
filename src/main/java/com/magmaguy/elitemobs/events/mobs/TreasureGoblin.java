@@ -97,7 +97,7 @@ public class TreasureGoblin implements Listener {
 
         sendString = ChatColorConverter.chatColorConverter(sendString);
 
-        EventMessage.sendEventMessage(sendString);
+        EventMessage.sendEventMessage(sendString, treasureGoblin.getWorld());
 
         BossMobDeathCountdown.startDeathCountdown((LivingEntity) treasureGoblin);
 

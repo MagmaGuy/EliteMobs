@@ -19,6 +19,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -69,7 +71,7 @@ public class CommandHandler implements CommandExecutor {
             case "ag":
             case "adventurersguild":
             case "adventurerguild":
-                if (userPermCheck(ADVENTURERS_GUILD, commandSender))
+                if (userPermCheck(ADVENTURERS_GUILD, commandSender) && ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ENABLE_ADVENTURERS_GUILD))
                     AdventurersGuildGUI.mainMenu((Player) commandSender);
                 return true;
         }

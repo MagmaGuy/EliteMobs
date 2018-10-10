@@ -84,11 +84,8 @@ public class ShopHandler implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (!SharedShopElements.inventoryNullPointerPreventer(event)) {
-
+        if (!SharedShopElements.inventoryNullPointerPreventer(event))
             return;
-
-        }
 
         if (!event.getInventory().getName().equals(SHOP_NAME)) return;
 
