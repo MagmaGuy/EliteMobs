@@ -15,18 +15,22 @@
 
 package com.magmaguy.elitemobs.events;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EventsConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class EventMessage {
 
-    public static void sendEventMessage(String message) {
+    public static void sendEventMessage(String message, World world) {
 
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-
-            player.sendMessage(message);
-
-        }
+        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY))
+            Bukkit.getServer().broadcastMessage(message);
+        else
+            for (Player player : Bukkit.getServer().getOnlinePlayers())
+                if (player.getWorld().equals(world))
+                    player.sendMessage(message);
 
     }
 

@@ -36,7 +36,7 @@ public class BossMobDeathCountdown {
 
                     entity.remove();
                     String eventMessage = ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.EVENT_TIMEOUT_MESSAGE).replace("$bossmob", entity.getCustomName()));
-                    EventMessage.sendEventMessage(eventMessage);
+                    EventMessage.sendEventMessage(eventMessage, entity.getWorld());
 
                 }
 

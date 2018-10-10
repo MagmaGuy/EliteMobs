@@ -110,7 +110,7 @@ public class CustomItemConstructor implements Listener {
 
     }
 
-    private String automatedStringBuilder(String previousPath, String append) {
+    private static String automatedStringBuilder(String previousPath, String append) {
 
         StringBuilder automatedStringBuilder = new StringBuilder();
 
@@ -179,9 +179,11 @@ public class CustomItemConstructor implements Listener {
 
     }
 
-    private HashMap<Enchantment, Integer> getEnchantments(String previousPath) {
+    public static HashMap<Enchantment, Integer> getEnchantments(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
+
+        Bukkit.getLogger().warning(path);
 
         List enchantments = ConfigValues.itemsCustomLootListConfig.getList(path);
 
@@ -208,7 +210,7 @@ public class CustomItemConstructor implements Listener {
 
     }
 
-    private List<String> itemPotionEffectHandler(String previousPath) {
+    public static List<String> itemPotionEffectHandler(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Potion Effects");
 

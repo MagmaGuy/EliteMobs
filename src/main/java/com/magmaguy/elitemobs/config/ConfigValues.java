@@ -26,7 +26,7 @@ public class ConfigValues {
 
     public static Configuration defaultConfig, itemsCustomLootListConfig, mobPowerConfig, translationConfig, itemsProceduralSettingsConfig,
             economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, validMobsConfig, validWorldsConfig, itemsUniqueConfig,
-            mobCombatSettingsConfig, itemsDropSettingsConfig, playerMoneyData, playerRankData, playerMaxRankData, combatTagConfig;
+            mobCombatSettingsConfig, itemsDropSettingsConfig, playerMoneyData, playerRankData, playerMaxRankData, combatTagConfig, adventurersGuildConfig;
 
     public static void initializeConfigValues() {
 
@@ -85,6 +85,9 @@ public class ConfigValues {
         customConfigLoader = new CustomConfigLoader();
         combatTagConfig = customConfigLoader.getCustomConfig(CombatTagConfig.CONFIG_NAME);
 
+        customConfigLoader = new CustomConfigLoader();
+        adventurersGuildConfig = customConfigLoader.getCustomConfig(AdventurersGuildConfig.CONFIG_NAME);
+
     }
 
     public static void intializeConfigurations() {
@@ -142,6 +145,9 @@ public class ConfigValues {
 
         CombatTagConfig combatTagConfig = new CombatTagConfig();
         combatTagConfig.initializeConfig();
+
+        AdventurersGuildConfig adventurersGuildConfig = new AdventurersGuildConfig();
+        adventurersGuildConfig.initializeConfig();
 
     }
 

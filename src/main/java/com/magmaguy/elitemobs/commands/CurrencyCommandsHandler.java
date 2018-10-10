@@ -51,7 +51,7 @@ public class CurrencyCommandsHandler {
                 payCommand(args[1], Integer.parseInt(args[2]));
                 subtractCommand(commandSender.getName(), Integer.parseInt(args[2]));
 
-                commandSender.sendMessage("You have paid " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " to " + args[1]);
+                commandSender.sendMessage("You have paisd " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " to " + args[1]);
                 commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())) + " " + ConfigValues.economyConfig.get("Currency name"));
 
                 Player recipient = getServer().getPlayer(args[1]);

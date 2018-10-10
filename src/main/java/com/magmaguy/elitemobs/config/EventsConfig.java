@@ -60,6 +60,7 @@ public class EventsConfig {
     public static final String BALROG_TRASH_MOB_NAME = "Name of trash mobs in Balrog event";
     public static final String FAE_NAME = "Name of mob in Fae event";
     public static final String FAE_CHANCE_ON_CHOP = "Fae chance on chop";
+    public static final String ANNOUNCEMENT_BROADCAST_WORLD_ONLY = "Only broadcast event message in event world";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -103,6 +104,7 @@ public class EventsConfig {
         configuration.addDefault(FAE_ENABLED, true);
         configuration.addDefault(FAE_NAME, "&aFae");
         configuration.addDefault(FAE_CHANCE_ON_CHOP, 0.001);
+        configuration.addDefault(ANNOUNCEMENT_BROADCAST_WORLD_ONLY, false);
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

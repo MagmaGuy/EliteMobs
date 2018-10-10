@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.items.uniqueitems.HuntingHelmet;
 import org.bukkit.configuration.Configuration;
 
 public class ItemsUniqueConfig {
@@ -23,13 +24,13 @@ public class ItemsUniqueConfig {
     public static final String ENABLE_UNIQUE_ITEMS = "Enable unique items";
     public static final String ENABLE_HUNTING_SET = "Enable Mob Hunting set";
     public static final String HUNTING_SET_CHANCE_INCREASER = "EliteMob percentual spawn chance increase per hunting set item";
-    public  static final String ITEM_KEY = "Item.";
+    public  static final String ITEM_KEY = "Items.";
     public static final String HUNTING_SET_HELMET = ITEM_KEY + "Hunting Helmet";
     public static final String HUNTING_SET_CHESTPLATE = ITEM_KEY + "Hunting Chestplate";
     public static final String HUNTING_SET_LEGGINGS = ITEM_KEY + "Hunting Leggings";
     public static final String HUNTING_SET_BOOTS = ITEM_KEY + "Hunting Boots";
     public static final String HUNTING_SET_BOW = ITEM_KEY + "Hunting Bow";
-    public static final String ENABLE_ZOMBIE_KING_AXE = ITEM_KEY + "Enable Zombie King Axe";
+    public static final String ENABLE_ZOMBIE_KING_AXE = "Enable Zombie King Axe";
     public static final String ZOMBIE_KING_AXE = ITEM_KEY + "Zombie King Axe";
     public static final String SHOW_ITEM_WORTH = "Show item worth";
     public static final String ENABLE_KRAKEN_FISHING_ROD = "Enable Depths Seeker Fishing Rod";
@@ -47,19 +48,6 @@ public class ItemsUniqueConfig {
         configuration.addDefault(SHOW_ITEM_WORTH, true);
         configuration.addDefault(ENABLE_HUNTING_SET, true);
         configuration.addDefault(HUNTING_SET_CHANCE_INCREASER, 10);
-        configuration.addDefault(HUNTING_SET_HELMET, "\n" +
-                "    Item Type: IRON_HELMET\n" +
-                "    Item Name: &4Elite Mob Hunting Helmet\n" +
-                "    Item Lore:\n" +
-                "    - Wearing this helmet will\n" +
-                "    - increase the number of\n" +
-                "    - high level Elite Mobs\n" +
-                "    - that spawn around you!\n" +
-                "    Enchantments:\n" +
-                "    - VANISHING_CURSE,1\n" +
-                "    Potion Effects:\n" +
-                "    - NIGHT_VISION,1,self,continuous\n" +
-                "    Drop Weight: 1");
         configuration.addDefault(HUNTING_SET_CHESTPLATE, "\n" +
                 "    Item Type: IRON_CHESTPLATE\n" +
                 "    Item Name: &4Elite Mob Hunting Chestplate\n" +
@@ -197,6 +185,10 @@ public class ItemsUniqueConfig {
                 "    - FAST_DIGGING,2,self,continuous\n" +
                 "    - NIGHT_VISION,1,self,continuous\n" +
                 "    Drop Weight: 1");
+
+//        Non-static item assembly to avoid issues with making the configuration static (messes up reloads and changes)
+        HuntingHelmet huntingHelmet = new HuntingHelmet();
+        huntingHelmet.assembleConfigItem(configuration);
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);
