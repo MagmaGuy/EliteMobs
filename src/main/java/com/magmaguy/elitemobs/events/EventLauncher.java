@@ -111,6 +111,8 @@ public class EventLauncher {
 
         }
 
+        if (weighedConfigValues.isEmpty()) return;
+
         switch (pickWeighedEvent(weighedConfigValues)) {
 
             case EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT:
