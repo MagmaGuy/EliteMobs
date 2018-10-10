@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -40,9 +41,10 @@ public class SmallTreasureGoblin implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
 
+        if (event.isCancelled()) return;
         if (!EventLauncher.verifyPlayerCount()) return;
 
         if (EliteMobs.validWorldList.contains(event.getEntity().getWorld())) {
