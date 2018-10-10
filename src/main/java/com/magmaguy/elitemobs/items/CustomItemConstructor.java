@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -56,8 +57,8 @@ public class CustomItemConstructor implements Listener {
             if (itemType == null)
                 continue;
 
-            HashMap<Enchantment, Integer> itemEnchantments = getEnchantments(previousPath);
-            List potionList = itemPotionEffectHandler(previousPath);
+            HashMap<Enchantment, Integer> itemEnchantments = getEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
+            List potionList = itemPotionEffectHandler(ConfigValues.itemsCustomLootListConfig, previousPath);
             List<String> loreList = getCustomLore(previousPath);
 
             ItemStack itemStack = ItemConstructor.constructItem(itemName, itemType, itemEnchantments, potionList, loreList);
@@ -170,22 +171,20 @@ public class CustomItemConstructor implements Listener {
                 if (string != null && !string.isEmpty())
                     newList.add(chatColorConverter(string));
 
-
         if (newList.isEmpty())
             return itemLore;
-
 
         return newList;
 
     }
 
-    public static HashMap<Enchantment, Integer> getEnchantments(String previousPath) {
+    public static HashMap<Enchantment, Integer> getEnchantments(Configuration configuration, String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
 
         Bukkit.getLogger().warning(path);
 
-        List enchantments = ConfigValues.itemsCustomLootListConfig.getList(path);
+        List enchantments = configuration.getList(path);
 
         HashMap enchantmentMap = new HashMap();
         try {
@@ -210,11 +209,11 @@ public class CustomItemConstructor implements Listener {
 
     }
 
-    public static List<String> itemPotionEffectHandler(String previousPath) {
+    public static List<String> itemPotionEffectHandler(Configuration configuration, String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Potion Effects");
 
-        List potionEffects = ConfigValues.itemsCustomLootListConfig.getList(path);
+        List potionEffects = configuration.getList(path);
 
         return potionEffects;
 
