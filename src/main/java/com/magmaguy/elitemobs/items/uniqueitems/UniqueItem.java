@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items.uniqueitems;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.Bukkit;
@@ -11,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class UniqueItems {
+public abstract class UniqueItem {
 
     public abstract String definePath();
     public abstract String defineType();
@@ -23,13 +24,15 @@ public abstract class UniqueItems {
     public void assembleConfigItem(Configuration configuration){
         ConfigAssembler.assemble(configuration, definePath(), defineType(), defineName(), defineLore(),
                 defineEnchantments(), definePotionEffects(), defineDropWeight());
-        constructItemStack();
     }
     public ItemStack itemStack;
     public void constructItemStack(){
-        HashMap<Enchantment, Integer> enchantments = CustomItemConstructor.getEnchantments("Items." + definePath());
-        List<String> potionEffects = CustomItemConstructor.itemPotionEffectHandler("Items." + definePath());
-        itemStack = ItemConstructor.constructItem(defineName(), Material.getMaterial(defineType()), enchantments, potionEffects, defineLore());
+        HashMap<Enchantment, Integer> enchantments = CustomItemConstructor.getEnchantments(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        List<String> potionEffects = CustomItemConstructor.itemPotionEffectHandler(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        itemStack = ItemConstructor.constructItem(defineName(), Material.getMaterial(defineType()), enchantments,
+                potionEffects, defineLore());
         Bukkit.getLogger().info("EliteMobs - Added item " + itemStack.toString());
     }
     public ItemStack getItemStack(){

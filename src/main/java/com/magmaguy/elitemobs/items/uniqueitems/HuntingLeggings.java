@@ -7,28 +7,28 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.List;
 
-public class HuntingHelmet extends UniqueItem {
+public class HuntingLeggings extends UniqueItem{
 
     @Override
     public String definePath() {
-        return "Hunting Helmet";
+        return "Hunting Leggings";
     }
 
     @Override
     public String defineType() {
-        return Material.DIAMOND_HELMET.toString();
+        return Material.DIAMOND_LEGGINGS.toString();
     }
 
     @Override
     public String defineName() {
-        return "&4Elite Mob Hunting Helmet";
+        return "&4Elite Mob Hunting Leggings";
     }
 
 
     @Override
     public List<String> defineLore() {
         return Arrays.asList(
-                "Wearing this helmet will",
+                "Wearing these leggings will",
                 "increase the number of",
                 "high level Elite Mobs",
                 "that spawn around you!");
@@ -41,7 +41,7 @@ public class HuntingHelmet extends UniqueItem {
 
     @Override
     public List<String> definePotionEffects() {
-        return Arrays.asList("NIGHT_VISION,1,self,continuous");
+        return Arrays.asList("JUMP,2,self,continuous");
     }
 
     @Override
