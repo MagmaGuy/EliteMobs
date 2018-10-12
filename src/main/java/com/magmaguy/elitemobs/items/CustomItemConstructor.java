@@ -182,8 +182,6 @@ public class CustomItemConstructor implements Listener {
 
         String path = automatedStringBuilder(previousPath, "Enchantments");
 
-        Bukkit.getLogger().warning(path);
-
         List enchantments = configuration.getList(path);
 
         HashMap enchantmentMap = new HashMap();

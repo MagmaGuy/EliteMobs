@@ -1,12 +1,10 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
-public class Flamethrower extends CustomEnchantments{
-
-    private static final String key = "FlamethrowerEnchantment";
-
+public class Flamethrower extends CustomEnchantment {
 
     @Override
-    public String getKey() {
-        return key;
+    public String setName() {
+        return null;
     }
+
 }

@@ -66,8 +66,8 @@ public class EliteMobs extends JavaPlugin {
         CustomItemConstructor superDrops = new CustomItemConstructor();
         superDrops.superDropParser();
 
-        UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
-        uniqueItemConstructor.intializeUniqueItems();
+//        UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
+//        uniqueItemConstructor.intializeUniqueItems();
 
         UniqueItemInitializer.initialize();
 
