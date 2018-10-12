@@ -5,8 +5,11 @@ import com.magmaguy.elitemobs.config.CustomEnchantmentsConfig;
 
 public class Hunter extends CustomEnchantment {
 
-    @Override
-    public String setName() {
+    public static String setKey(){
+        return "HUNTER";
+    }
+
+    public static String setName() {
         return ConfigValues.customEnchantmentsConfig.getString(CustomEnchantmentsConfig.HUNTER_NAME);
     }
 
