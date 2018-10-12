@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
 import org.bukkit.command.CommandSender;
 
 public class ReloadHandler {
@@ -16,8 +17,9 @@ public class ReloadHandler {
         UniqueItemConstructor.uniqueItems.clear();
         CustomItemConstructor customItemConstructor = new CustomItemConstructor();
         customItemConstructor.superDropParser();
-        UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
-        uniqueItemConstructor.intializeUniqueItems();
+//        UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
+//        uniqueItemConstructor.intializeUniqueItems();
+        UniqueItemInitializer.initialize();
         commandSender.sendMessage("EliteMobs reloaded!");
 
     }

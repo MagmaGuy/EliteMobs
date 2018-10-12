@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.items.uniqueitems;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,11 +26,7 @@ public class HuntingHelmet extends UniqueItem {
 
     @Override
     public List<String> defineLore() {
-        return Arrays.asList(
-                "Wearing this helmet will",
-                "increase the number of",
-                "high level Elite Mobs",
-                "that spawn around you!");
+        return Arrays.asList("Only for the sharpest of eyes.");
     }
 
     @Override
@@ -52,16 +47,6 @@ public class HuntingHelmet extends UniqueItem {
     @Override
     public void assembleConfigItem(Configuration configuration) {
         super.assembleConfigItem(configuration);
-    }
-
-    @Override
-    public void constructItemStack() {
-        super.constructItemStack();
-    }
-
-    @Override
-    public ItemStack getItemStack() {
-        return super.getItemStack();
     }
 
 }

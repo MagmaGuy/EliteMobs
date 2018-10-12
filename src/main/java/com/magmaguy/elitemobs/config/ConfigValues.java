@@ -24,9 +24,11 @@ import org.bukkit.configuration.Configuration;
  */
 public class ConfigValues {
 
-    public static Configuration defaultConfig, itemsCustomLootListConfig, mobPowerConfig, translationConfig, itemsProceduralSettingsConfig,
-            economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, validMobsConfig, validWorldsConfig, itemsUniqueConfig,
-            mobCombatSettingsConfig, itemsDropSettingsConfig, playerMoneyData, playerRankData, playerMaxRankData, combatTagConfig, adventurersGuildConfig;
+    public static Configuration defaultConfig, itemsCustomLootListConfig, mobPowerConfig, translationConfig,
+            itemsProceduralSettingsConfig, economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig,
+            validMobsConfig, validWorldsConfig, itemsUniqueConfig, mobCombatSettingsConfig, itemsDropSettingsConfig,
+            playerMoneyData, playerRankData, playerMaxRankData, combatTagConfig, adventurersGuildConfig,
+            customEnchantmentsConfig;
 
     public static void initializeConfigValues() {
 
@@ -88,6 +90,9 @@ public class ConfigValues {
         customConfigLoader = new CustomConfigLoader();
         adventurersGuildConfig = customConfigLoader.getCustomConfig(AdventurersGuildConfig.CONFIG_NAME);
 
+        customConfigLoader = new CustomConfigLoader();
+        customEnchantmentsConfig = customConfigLoader.getCustomConfig(CustomEnchantmentsConfig.CONFIG_NAME);
+
     }
 
     public static void intializeConfigurations() {
@@ -148,6 +153,9 @@ public class ConfigValues {
 
         AdventurersGuildConfig adventurersGuildConfig = new AdventurersGuildConfig();
         adventurersGuildConfig.initializeConfig();
+
+        CustomEnchantmentsConfig customEnchantmentsConfig = new CustomEnchantmentsConfig();
+        customEnchantmentsConfig.initializeConfig();
 
     }
 

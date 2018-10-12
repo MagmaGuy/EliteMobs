@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
+import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -151,15 +152,18 @@ public class LootGUI implements Listener {
 
     private void lootConstructor(Inventory inventory) {
 
+        List<ItemStack> getLootList = (List<ItemStack>) CustomItemConstructor.customItemList.clone();
+        getLootList.addAll(UniqueItemInitializer.uniqueItemsList);
+
         int counter = 1;
 
         for (int number : lootSlots) {
 
             if (!filter) {
 
-                if (CustomItemConstructor.customItemList.size() >= counter + ((currentLootPage - 1) * 35)) {
+                if (getLootList.size() >= counter + ((currentLootPage - 1) * 35)) {
 
-                    inventory.setItem(number, CustomItemConstructor.customItemList.get(counter - 1 + ((currentLootPage - 1) * 35)));
+                    inventory.setItem(number, getLootList.get(counter - 1 + ((currentLootPage - 1) * 35)));
 
                 }
 

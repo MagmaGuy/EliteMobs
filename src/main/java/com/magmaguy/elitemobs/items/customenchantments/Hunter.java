@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
-public class Hunter extends CustomEnchantments {
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.CustomEnchantmentsConfig;
 
-    private static final String key = "HunterEnchantment";
+public class Hunter extends CustomEnchantment {
 
     @Override
-    public String getKey() {
-        return key;
+    public String setName() {
+        return ConfigValues.customEnchantmentsConfig.getString(CustomEnchantmentsConfig.HUNTER_NAME);
     }
+
 }

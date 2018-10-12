@@ -6,27 +6,27 @@ import org.bukkit.configuration.Configuration;
 import java.util.Arrays;
 import java.util.List;
 
-public class HuntingLeggings extends UniqueItem {
+public class HuntingBow extends UniqueItem {
 
     @Override
     public String definePath() {
-        return "Hunting Leggings";
+        return "Hunting Bow";
     }
 
     @Override
     public String defineType() {
-        return Material.DIAMOND_LEGGINGS.toString();
+        return Material.BOW.toString();
     }
 
     @Override
     public String defineName() {
-        return "&4Elite Mob Hunting Leggings";
+        return "&4Elite Mob Hunting Bow";
     }
 
 
     @Override
     public List<String> defineLore() {
-        return Arrays.asList("Only for those who aim the highest.");
+        return Arrays.asList("Only for natural-born hunters.");
     }
 
     @Override
@@ -36,7 +36,7 @@ public class HuntingLeggings extends UniqueItem {
 
     @Override
     public List<String> definePotionEffects() {
-        return Arrays.asList("JUMP,2,self,continuous");
+        return Arrays.asList("SATURATION,1,self,continuous");
     }
 
     @Override
