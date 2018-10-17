@@ -188,7 +188,7 @@ public class AdventurersGuildGUI implements Listener {
         if (rank == 15) name = "&2Raider";
         if (rank == 16) name = "&1Slayer";
         if (rank == 17) name = "&1Exterminator";
-        if (rank == 18) name = "&5&lElite Hunter";
+        if (rank == 18) name = "&5&lElite HunterEnchantment";
         if (rank == 19) name = "&5Hero";
         if (rank == 20) name = "&6&l&oLegend";
 

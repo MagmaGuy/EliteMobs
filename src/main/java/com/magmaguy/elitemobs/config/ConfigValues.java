@@ -30,7 +30,7 @@ public class ConfigValues {
             playerMoneyData, playerRankData, playerMaxRankData, combatTagConfig, adventurersGuildConfig,
             customEnchantmentsConfig;
 
-    public static void initializeConfigValues() {
+    public static void initializeCachedConfigurations() {
 
         CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 

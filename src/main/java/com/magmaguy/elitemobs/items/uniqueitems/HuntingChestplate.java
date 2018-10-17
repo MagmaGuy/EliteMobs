@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.items.uniqueitems;
 
-import com.magmaguy.elitemobs.items.customenchantments.Hunter;
+import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 
@@ -32,7 +32,7 @@ public class HuntingChestplate extends UniqueItem {
 
     @Override
     public List<String> defineEnchantments() {
-        return Arrays.asList("VANISHING_CURSE,1", Hunter.assembleConfigString(1));
+        return Arrays.asList("VANISHING_CURSE,1", HunterEnchantment.assembleConfigString(1));
     }
 
     @Override
