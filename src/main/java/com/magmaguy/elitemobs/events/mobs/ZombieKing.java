@@ -24,7 +24,7 @@ import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.items.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.uniqueitems.ZombieKingsAxe;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
@@ -100,7 +100,6 @@ public class ZombieKing implements Listener {
 
         EventMessage.sendEventMessage(sendString, zombieKing.getWorld());
         BossMobDeathCountdown.startDeathCountdown(zombieKing);
-        HuntingBow.aliveBossMobList.add(zombieKing);
 
     }
 
@@ -534,11 +533,8 @@ public class ZombieKing implements Listener {
 
                     int amountOfSummonedMobs = 10;
 
-                    for (int i = 0; i < amountOfSummonedMobs; i++) {
-
+                    for (int i = 0; i < amountOfSummonedMobs; i++)
                         TheReturned.theReturnedConstructor(50, (Zombie) zombieKing);
-
-                    }
 
                     zombieKing.setAI(true);
                     cancel();
@@ -562,8 +558,10 @@ public class ZombieKing implements Listener {
 
             Zombie zombieKing = (Zombie) event.getEntity();
 
-            ItemStack zombieKingAxe = UniqueItemConstructor.uniqueItems.get(UniqueItemConstructor.ZOMBIE_KING_AXE);
-            zombieKing.getWorld().dropItem(zombieKing.getLocation(), zombieKingAxe);
+            ZombieKingsAxe zombieKingAxe = new ZombieKingsAxe();
+            ItemStack zombieKingAxeItemStack = zombieKingAxe.constructItemStack();
+
+            zombieKing.getWorld().dropItem(zombieKing.getLocation(), zombieKingAxeItemStack);
 
             if (event.getEntity().getKiller() != null) {
 
@@ -571,13 +569,8 @@ public class ZombieKing implements Listener {
 
                 EventMessage.sendEventMessage(newMessage, zombieKing.getWorld());
 
-            } else {
-
+            } else
                 EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.chatColorConverter(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)), zombieKing.getWorld());
-
-            }
-
-            HuntingBow.aliveBossMobList.remove(zombieKing);
 
         }
 

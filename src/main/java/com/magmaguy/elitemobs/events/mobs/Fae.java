@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
-import com.magmaguy.elitemobs.items.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.uniqueitems.TheFeller;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import org.bukkit.Bukkit;
@@ -18,6 +18,7 @@ import org.bukkit.entity.Vex;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -84,7 +85,7 @@ public class Fae implements Listener {
 
     private static void faeConstructor(Vex fae) {
 
-        MetadataHandler.registerMetadata(fae, MetadataHandler.ELITE_MOB_MD, ActionDynamicBossLevelConstructor.determineDynamicBossLevel(fae)/3);
+        MetadataHandler.registerMetadata(fae, MetadataHandler.ELITE_MOB_MD, ActionDynamicBossLevelConstructor.determineDynamicBossLevel(fae) / 3);
         MetadataHandler.registerMetadata(fae, MetadataHandler.FAE, true);
         MetadataHandler.registerMetadata(fae, MetadataHandler.EVENT_CREATURE, true);
         MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_ARMOR, true);
@@ -212,8 +213,10 @@ public class Fae implements Listener {
         if (!event.getEntity().hasMetadata(MetadataHandler.FAE)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.33) return;
 
-        event.getEntity().getWorld().dropItem(event.getEntity().getLocation(),
-                UniqueItemConstructor.uniqueItems.get(UniqueItemConstructor.THE_FELLER));
+        TheFeller theFeller = new TheFeller();
+        ItemStack theFellerItemStack = theFeller.constructItemStack();
+
+        event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), theFellerItemStack);
 
     }
 

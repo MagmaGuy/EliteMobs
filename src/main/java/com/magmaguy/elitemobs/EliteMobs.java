@@ -25,7 +25,6 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
-import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentInitializer;
 import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
@@ -133,7 +132,7 @@ public class EliteMobs extends JavaPlugin {
         CustomItemConstructor.customItemList.clear();
         CustomItemConstructor.staticCustomItemHashMap.clear();
         CustomItemConstructor.dynamicRankedItemStacks.clear();
-        UniqueItemConstructor.uniqueItems.clear();
+        UniqueItemInitializer.uniqueItemsList.clear();
         validWorldList.clear();
 
         //save cached data

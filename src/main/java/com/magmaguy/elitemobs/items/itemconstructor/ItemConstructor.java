@@ -16,10 +16,11 @@ import java.util.List;
 public class ItemConstructor {
 
     /*
-    For custom items
+    For custom and unique items
      */
-    public static ItemStack constructItem(String rawItemName, Material material, HashMap<Enchantment,
-            Integer> enchantmentMap, List<String> potionList, List<String> loreList) {
+    public static ItemStack constructItem(String rawName, Material material, HashMap<Enchantment,
+            Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
+                                          List<String> lore) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;
@@ -40,13 +41,13 @@ public class ItemConstructor {
         Note: This only applies enchantments up to a certain level, above that threshold item enchantments only exist
         in the item lore and get interpreted by the combat system
          */
-        if (!enchantmentMap.isEmpty())
-            itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantmentMap);
+        if (!enchantments.isEmpty())
+            itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantments);
 
         /*
         Generate item lore
          */
-        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantmentMap, potionList, loreList);
+        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, potionEffects, lore);
 
         /*
         Remove vanilla enchantments
@@ -57,7 +58,7 @@ public class ItemConstructor {
         /*
         Generate item name last as it relies on material type and quality
          */
-        itemMeta.setDisplayName(NameGenerator.generateName(rawItemName));
+        itemMeta.setDisplayName(NameGenerator.generateName(rawName));
 
         /*
         Colorize with MMO colors

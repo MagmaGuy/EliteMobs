@@ -17,7 +17,6 @@ package com.magmaguy.elitemobs.events.eventitems;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
-import com.magmaguy.elitemobs.items.UniqueItemConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

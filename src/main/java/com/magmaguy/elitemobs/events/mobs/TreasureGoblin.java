@@ -100,8 +100,6 @@ public class TreasureGoblin implements Listener {
 
         BossMobDeathCountdown.startDeathCountdown((LivingEntity) treasureGoblin);
 
-        HuntingBow.aliveBossMobList.add((LivingEntity) treasureGoblin);
-
     }
 
     @EventHandler
@@ -134,8 +132,6 @@ public class TreasureGoblin implements Listener {
                 }
 
             }
-
-            HuntingBow.aliveBossMobList.remove(entity);
 
         }
 

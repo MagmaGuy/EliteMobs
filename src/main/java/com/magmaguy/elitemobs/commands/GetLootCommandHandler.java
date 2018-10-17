@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.items.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -37,7 +37,7 @@ public class GetLootCommandHandler {
 
         if (itemExists) return true;
 
-        for (ItemStack itemStack : UniqueItemConstructor.uniqueItemsList)
+        for (ItemStack itemStack : UniqueItemInitializer.uniqueItemsList)
             itemExists = getItem(itemStack, args1, player);
 
         if (itemExists) return true;
