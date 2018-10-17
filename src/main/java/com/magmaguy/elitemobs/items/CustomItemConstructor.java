@@ -53,19 +53,20 @@ public class CustomItemConstructor implements Listener {
 
             String previousPath = path.toString();
 
-            Material itemType = getMaterial(previousPath);
+            Material material = getMaterial(previousPath);
             Bukkit.getLogger().info("Adding: " + previousPath);
-            String itemName = getName(previousPath);
+            String rawName = getName(previousPath);
 
-            if (itemType == null)
+            if (material == null)
                 continue;
 
-            HashMap<Enchantment, Integer> itemEnchantments = parseEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
-            HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments();
-            List potionList = itemPotionEffectHandler(ConfigValues.itemsCustomLootListConfig, previousPath);
-            List<String> loreList = getCustomLore(previousPath);
+            HashMap<Enchantment, Integer> enchantments = parseEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
+            HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
+            List potionEffects = itemPotionEffectHandler(ConfigValues.itemsCustomLootListConfig, previousPath);
+            List<String> lore = getCustomLore(previousPath);
 
-            ItemStack itemStack = ItemConstructor.constructItem(itemName, itemType, itemEnchantments, potionList, loreList);
+            ItemStack itemStack = ItemConstructor.constructItem(rawName, material, enchantments, customEnchantments,
+                    potionEffects, lore);
 
             if (!loreAddDropFrequency(previousPath, itemStack)) {
 

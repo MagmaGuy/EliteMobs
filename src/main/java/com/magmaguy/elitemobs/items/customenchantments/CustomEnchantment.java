@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
+import org.bukkit.inventory.ItemStack;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,7 @@ public abstract class CustomEnchantment {
     setKey() and setName() need to be rewritten in every class
      */
 
-    public static void initialize(){
+    public static void initialize() {
 
         setKey();
         setName();
@@ -53,8 +55,40 @@ public abstract class CustomEnchantment {
     /*
     Get the enchantment string for assembling configurations
      */
-    public static String assembleConfigString(int enchantmentLevel){
+    public static String assembleConfigString(int enchantmentLevel) {
         return key + "," + enchantmentLevel;
+    }
+
+    /*
+    Check an itemstack has this enchantment
+     */
+    public static boolean hasCustomEnchantment(ItemStack itemStack) {
+        if (!itemStack.hasItemMeta()) return false;
+        if (!itemStack.getItemMeta().hasLore()) return false;
+        return hasCustomEnchantment(itemStack.getItemMeta().getLore());
+    }
+
+    public static boolean hasCustomEnchantment(List<String> lore) {
+        return (lore.get(1).replace("§", "").contains(key));
+    }
+
+    /*
+    Get a custom enchantment's level
+     */
+    public static int getCustomEnchantmentLevel(ItemStack itemStack) {
+        if (!itemStack.hasItemMeta()) return 0;
+        if (!itemStack.getItemMeta().hasLore()) return 0;
+        return getCustomEnchantmentLevel(itemStack.getItemMeta().getLore());
+    }
+
+    public static int getCustomEnchantmentLevel(List<String> lore) {
+
+        for (String string : lore.get(1).replace("§", "").split(","))
+            if (string.equals(key))
+                return Integer.parseInt(string.split(";")[1]);
+
+        return 0;
+
     }
 
 }

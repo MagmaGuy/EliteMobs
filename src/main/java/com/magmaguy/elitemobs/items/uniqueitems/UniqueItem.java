@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.items.uniqueitems;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.items.parserutil.CustomEnchantmentConfigParser;
+import com.magmaguy.elitemobs.items.parserutil.EnchantmentConfigParser;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.enchantments.Enchantment;
@@ -21,6 +23,9 @@ public abstract class UniqueItem {
 
     public abstract List<String> defineLore();
 
+    /*
+    #defineEnchantments() also defines custom enchantments as they are written the same way into config files
+    */
     public abstract List<String> defineEnchantments();
 
     public abstract List<String> definePotionEffects();
@@ -33,11 +38,13 @@ public abstract class UniqueItem {
     }
 
     public ItemStack constructItemStack() {
-        HashMap<Enchantment, Integer> enchantments = CustomItemConstructor.getEnchantments(ConfigValues.itemsUniqueConfig,
+        HashMap<Enchantment, Integer> enchantments = EnchantmentConfigParser.parseEnchantments(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsUniqueConfig,
                 "Items." + definePath());
         List<String> potionEffects = CustomItemConstructor.itemPotionEffectHandler(ConfigValues.itemsUniqueConfig,
                 "Items." + definePath());
-        return ItemConstructor.constructItem(defineName(), Material.getMaterial(defineType()), enchantments,
+        return ItemConstructor.constructItem(defineName(), Material.getMaterial(defineType()), enchantments, customEnchantments,
                 potionEffects, defineLore());
     }
 

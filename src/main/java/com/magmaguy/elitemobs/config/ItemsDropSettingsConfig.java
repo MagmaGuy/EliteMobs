@@ -15,6 +15,8 @@
 
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import org.bukkit.configuration.Configuration;
 
 public class ItemsDropSettingsConfig {
@@ -103,6 +105,12 @@ public class ItemsDropSettingsConfig {
     public static final String WEAKNESS_NAME = POTION_EFFECT_NAME + "WEAKNESS";
     public static final String WITHER_NAME = POTION_EFFECT_NAME + "WITHER";
 
+    /*
+    Custom enchantments
+     */
+    public static final String FLAMETHROWER_NAME = ENCHANTMENT_NAME + FlamethrowerEnchantment.getKey();
+    public static final String HUNTER_NAME = ENCHANTMENT_NAME + HunterEnchantment.getKey();
+
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
@@ -187,6 +195,8 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(WATER_BREATHING_NAME, "Water Breathing");
         configuration.addDefault(WEAKNESS_NAME, "Weakness");
         configuration.addDefault(WITHER_NAME, "Wither");
+        configuration.addDefault(FLAMETHROWER_NAME, FlamethrowerEnchantment.getName());
+        configuration.addDefault(HUNTER_NAME, HunterEnchantment.getName());
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

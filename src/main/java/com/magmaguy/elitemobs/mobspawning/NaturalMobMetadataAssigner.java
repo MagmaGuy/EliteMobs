@@ -17,7 +17,9 @@ package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
-import com.magmaguy.elitemobs.items.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
+import com.magmaguy.elitemobs.items.uniqueitems.HuntingHelmet;
+import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -92,22 +94,24 @@ public class NaturalMobMetadataAssigner implements Listener {
                 if (player.getLocation().distance(entity.getLocation()) < range) {
 
                     ItemStack helmet = player.getInventory().getHelmet();
-
                     ItemStack chestplate = player.getInventory().getChestplate();
-
                     ItemStack leggings = player.getInventory().getLeggings();
-
                     ItemStack boots = player.getInventory().getBoots();
-
                     ItemStack heldItem = player.getInventory().getItemInMainHand();
+                    ItemStack offHandItem = player.getInventory().getItemInOffHand();
 
-                    UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
-
-                    if (uniqueItemConstructor.huntingSetItemDetector(helmet)) huntingGearChanceAdder++;
-                    if (uniqueItemConstructor.huntingSetItemDetector(chestplate)) huntingGearChanceAdder++;
-                    if (uniqueItemConstructor.huntingSetItemDetector(leggings)) huntingGearChanceAdder++;
-                    if (uniqueItemConstructor.huntingSetItemDetector(boots)) huntingGearChanceAdder++;
-                    if (uniqueItemConstructor.huntingSetItemDetector(heldItem)) huntingGearChanceAdder++;
+                    if (HunterEnchantment.hasCustomEnchantment(helmet))
+                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(helmet);
+                    if (HunterEnchantment.hasCustomEnchantment(chestplate))
+                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(chestplate);
+                    if (HunterEnchantment.hasCustomEnchantment(leggings))
+                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(leggings);
+                    if (HunterEnchantment.hasCustomEnchantment(boots))
+                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(boots);
+                    if (HunterEnchantment.hasCustomEnchantment(heldItem))
+                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(heldItem);
+                    if (HunterEnchantment.hasCustomEnchantment(offHandItem))
+                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(offHandItem);
 
                 }
 

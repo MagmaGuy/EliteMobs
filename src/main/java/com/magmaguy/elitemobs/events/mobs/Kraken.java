@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
-import com.magmaguy.elitemobs.items.UniqueItemConstructor;
+import com.magmaguy.elitemobs.items.uniqueitems.DepthsSeeker;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -207,7 +208,9 @@ public class Kraken implements Listener {
 
         if (event.getEntity().hasMetadata(MetadataHandler.KRAKEN)) {
 
-            event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), UniqueItemConstructor.uniqueItems.get(UniqueItemConstructor.DEPTHS_SEEKER));
+            DepthsSeeker depthsSeeker = new DepthsSeeker();
+            ItemStack depthSeekerItemStack = depthsSeeker.constructItemStack();
+            event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), depthSeekerItemStack);
 
         }
 

@@ -32,7 +32,7 @@ public class HuntingBoots extends UniqueItem {
 
     @Override
     public List<String> defineEnchantments() {
-        return Arrays.asList("VANISHING_CURSE,1", HunterEnchantment.assembleConfigString(1));
+        return Arrays.asList("VANISHING_CURSE,1", HunterEnchantment.assembleConfigString(2));
     }
 
     @Override
