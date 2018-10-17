@@ -27,7 +27,7 @@ public class ReloadConfigCommandHandler {
     public void reloadConfiguration() {
 
         //Reload all configs
-        ConfigValues.initializeConfigValues();
+        ConfigValues.initializeCachedConfigurations();
 
         //reload config-based initialized data
         CustomItemConstructor customItemConstructor = new CustomItemConstructor();

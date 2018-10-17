@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.items.parserutil.CustomEnchantmentConfigParser;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+import static com.magmaguy.elitemobs.items.parserutil.ConfigPathBuilder.automatedStringBuilder;
+import static com.magmaguy.elitemobs.items.parserutil.EnchantmentConfigParser.parseEnchantments;
 
 /**
  * Created by MagmaGuy on 29/11/2016.
@@ -57,7 +60,8 @@ public class CustomItemConstructor implements Listener {
             if (itemType == null)
                 continue;
 
-            HashMap<Enchantment, Integer> itemEnchantments = getEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
+            HashMap<Enchantment, Integer> itemEnchantments = parseEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
+            HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments();
             List potionList = itemPotionEffectHandler(ConfigValues.itemsCustomLootListConfig, previousPath);
             List<String> loreList = getCustomLore(previousPath);
 
@@ -111,20 +115,6 @@ public class CustomItemConstructor implements Listener {
 
     }
 
-    private static String automatedStringBuilder(String previousPath, String append) {
-
-        StringBuilder automatedStringBuilder = new StringBuilder();
-
-        automatedStringBuilder.append(previousPath);
-        automatedStringBuilder.append(".");
-        automatedStringBuilder.append(append);
-
-        String path = automatedStringBuilder.toString();
-
-        return path;
-
-    }
-
     private Material getMaterial(String previousPath) {
 
         String path = automatedStringBuilder(previousPath, "Item Type");
@@ -175,35 +165,6 @@ public class CustomItemConstructor implements Listener {
             return itemLore;
 
         return newList;
-
-    }
-
-    public static HashMap<Enchantment, Integer> getEnchantments(Configuration configuration, String previousPath) {
-
-        String path = automatedStringBuilder(previousPath, "Enchantments");
-
-        List enchantments = configuration.getList(path);
-
-        HashMap enchantmentMap = new HashMap();
-        try {
-            for (Object object : enchantments) {
-
-                String string = (String) object;
-                Enchantment enchantment = Enchantment.getByName(string.split(",")[0]);
-                if (enchantment != null) {
-                    enchantmentMap.put(Enchantment.getByName(string.split(",")[0]), Integer.parseInt(string.split(",")[1]));
-                } else {
-                    //This happens when the version doesn't contain this enchantment
-                }
-
-            }
-
-        } catch (Exception e) {
-            Bukkit.getLogger().warning("Warning: something on ItemsCustomLootList.yml is invalid.");
-            Bukkit.getLogger().warning("Make sure you add a valid enchantment type and a valid level for it!");
-        }
-
-        return enchantmentMap;
 
     }
 

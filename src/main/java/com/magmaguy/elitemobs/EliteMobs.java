@@ -26,7 +26,7 @@ import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.UniqueItemConstructor;
-import com.magmaguy.elitemobs.items.uniqueitempowers.HuntingBow;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentInitializer;
 import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
@@ -57,10 +57,13 @@ public class EliteMobs extends JavaPlugin {
 
         //Load loot from config
         ConfigValues.intializeConfigurations();
-        ConfigValues.initializeConfigValues();
+        ConfigValues.initializeCachedConfigurations();
 
         //Hook up all listeners, some depend on config
         EventsRegistrer.registerEvents();
+
+        //Initialize custom enchantments
+        CustomEnchantmentInitializer.initialize();
 
         //Parse loot
         CustomItemConstructor superDrops = new CustomItemConstructor();
@@ -169,7 +172,7 @@ public class EliteMobs extends JavaPlugin {
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         new DynamicLoreUpdater().runTaskTimer(this, 20, 20 * 2);
-        HuntingBow.scanForBossMobs();
+//        HuntingBow.scanForBossMobs();
         new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
 
     }

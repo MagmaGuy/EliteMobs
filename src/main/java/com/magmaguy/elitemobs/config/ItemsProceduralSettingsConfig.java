@@ -476,7 +476,7 @@ public class ItemsProceduralSettingsConfig {
                 "Monk",
                 "Sorcerer",
                 "Warlock",
-                "Demon Hunter",
+                "Demon HunterEnchantment",
                 "Death Knight",
                 "Priest",
                 "Shaman",
@@ -553,7 +553,7 @@ public class ItemsProceduralSettingsConfig {
                 "Thrall",
                 "Felhound",
                 "Huntress",
-                "Hunter"
+                "HunterEnchantment"
         ));
 
         configuration.addDefault("Valid verb-er (noun)", Arrays.asList(
@@ -634,7 +634,7 @@ public class ItemsProceduralSettingsConfig {
                 "Alterer",
                 "Adapter",
                 "Evolver",
-                "Hunter",
+                "HunterEnchantment",
                 "Trailer",
                 "Follower",
                 "Stalker",

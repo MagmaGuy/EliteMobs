@@ -10,7 +10,7 @@ public class ReloadHandler {
 
     public static void reloadCommand(CommandSender commandSender, String[] args) {
 
-        ConfigValues.initializeConfigValues();
+        ConfigValues.initializeCachedConfigurations();
         CustomItemConstructor.customItemList.clear();
         CustomItemConstructor.staticCustomItemHashMap.clear();
         CustomItemConstructor.dynamicRankedItemStacks.clear();
