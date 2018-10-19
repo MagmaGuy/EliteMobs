@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.items.parserutil.CustomEnchantmentConfigParser;
 import com.magmaguy.elitemobs.items.parserutil.DropWeightConfigParser;
 import com.magmaguy.elitemobs.items.parserutil.EnchantmentConfigParser;
+import com.magmaguy.elitemobs.items.parserutil.PotionEffectConfigParser;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.enchantments.Enchantment;
@@ -43,7 +44,7 @@ public abstract class UniqueItem {
                 "Items." + definePath());
         HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsUniqueConfig,
                 "Items." + definePath());
-        List<String> potionEffects = CustomItemConstructor.itemPotionEffectHandler(ConfigValues.itemsUniqueConfig,
+        List<String> potionEffects = PotionEffectConfigParser.itemPotionEffectHandler(ConfigValues.itemsUniqueConfig,
                 "Items." + definePath());
         String dropType = DropWeightConfigParser.getDropType(ConfigValues.itemsUniqueConfig, "Items." + definePath());
         return ItemConstructor.constructItem(defineName(), Material.getMaterial(defineType()), enchantments, customEnchantments,
