@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.items.uniqueitems;
 
-import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import org.bukkit.Material;
 
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class ZombieKingsAxe extends UniqueItem {
                 "FIRE_ASPECT,4",
                 "LOOT_BONUS_MOBS,5",
                 "WATER_WORKER,5",
-                FlamethrowerEnchantment.assembleConfigString(1)
+                CustomEnchantmentCache.flamethrowerEnchantment.assembleConfigString(1)
         );
     }
 

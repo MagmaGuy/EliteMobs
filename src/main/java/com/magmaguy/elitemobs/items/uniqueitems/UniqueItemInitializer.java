@@ -9,6 +9,9 @@ import java.util.List;
 
 public class UniqueItemInitializer {
 
+    /*
+    Elements are added to the list during the construction process
+     */
     public static List<ItemStack> uniqueItemsList = new ArrayList();
 
     public static void initialize() {
@@ -18,56 +21,47 @@ public class UniqueItemInitializer {
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_HUNTING_SET)) {
 
             HuntingHelmet huntingHelmet = new HuntingHelmet();
-            ItemStack huntingHelmetItem = huntingHelmet.constructItemStack();
-            uniqueItemsList.add(huntingHelmetItem);
+            huntingHelmet.constructItemStack();
 
             HuntingChestplate huntingChestplate = new HuntingChestplate();
-            ItemStack huntingChestplateItem = huntingChestplate.constructItemStack();
-            uniqueItemsList.add(huntingChestplateItem);
+            huntingChestplate.constructItemStack();
 
             HuntingLeggings huntingLeggings = new HuntingLeggings();
-            ItemStack huntingLeggingsItem = huntingLeggings.constructItemStack();
-            uniqueItemsList.add(huntingLeggingsItem);
+            huntingLeggings.constructItemStack();
 
             HuntingBoots huntingBoots = new HuntingBoots();
-            ItemStack huntingBootsItem = huntingBoots.constructItemStack();
-            uniqueItemsList.add(huntingBootsItem);
+            huntingBoots.constructItemStack();
 
             HuntingBow huntingBow = new HuntingBow();
-            ItemStack huntingBowItem = huntingBow.constructItemStack();
-            uniqueItemsList.add(huntingBowItem);
+            huntingBow.constructItemStack();
 
         }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_ZOMBIE_KING_AXE)) {
 
             ZombieKingsAxe zombieKingsAxe = new ZombieKingsAxe();
-            ItemStack zombieKingsAxeItem = zombieKingsAxe.constructItemStack();
-            uniqueItemsList.add(zombieKingsAxeItem);
+            zombieKingsAxe.constructItemStack();
 
         }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_KRAKEN_FISHING_ROD)) {
 
             DepthsSeeker depthsSeeker = new DepthsSeeker();
-            ItemStack depthsSeekerItem = depthsSeeker.constructItemStack();
-            uniqueItemsList.add(depthsSeekerItem);
+            depthsSeeker.constructItemStack();
 
         }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_GREED)) {
 
             DwarvenGreed dwarvenGreed = new DwarvenGreed();
-            ItemStack dwarvenGreedItem = dwarvenGreed.constructItemStack();
-            uniqueItemsList.add(dwarvenGreedItem);
+            dwarvenGreed.constructItemStack();
 
         }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_THE_FELLER)) {
 
             TheFeller theFeller = new TheFeller();
-            ItemStack theFellerItem = theFeller.constructItemStack();
-            uniqueItemsList.add(theFellerItem);
+            theFeller.constructItemStack();
 
         }
 

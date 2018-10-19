@@ -25,7 +25,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentInitializer;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
@@ -54,15 +54,13 @@ public class EliteMobs extends JavaPlugin {
         //Enable stats
         Metrics metrics = new Metrics(this);
 
+
+        //Initialize custom enchantments
+        CustomEnchantmentCache.initialize();
+
         //Load loot from config
         ConfigValues.intializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
-
-        //Hook up all listeners, some depend on config
-        EventsRegistrer.registerEvents();
-
-        //Initialize custom enchantments
-        CustomEnchantmentInitializer.initialize();
 
         //Parse loot
         CustomItemConstructor superDrops = new CustomItemConstructor();
@@ -72,6 +70,9 @@ public class EliteMobs extends JavaPlugin {
 //        uniqueItemConstructor.intializeUniqueItems();
 
         UniqueItemInitializer.initialize();
+
+        //Hook up all listeners, some depend on config
+        EventsRegistrer.registerEvents();
 
         //Launch the local data cache
         PlayerData.initializePlayerData();

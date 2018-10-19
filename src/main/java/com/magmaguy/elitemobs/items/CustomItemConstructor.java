@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.items.parserutil.CustomEnchantmentConfigParser;
+import com.magmaguy.elitemobs.items.parserutil.DropWeightConfigParser;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -64,16 +65,10 @@ public class CustomItemConstructor implements Listener {
             HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
             List potionEffects = itemPotionEffectHandler(ConfigValues.itemsCustomLootListConfig, previousPath);
             List<String> lore = getCustomLore(previousPath);
+            String dropType = DropWeightConfigParser.getDropType(ConfigValues.itemsCustomLootListConfig, previousPath);
 
             ItemStack itemStack = ItemConstructor.constructItem(rawName, material, enchantments, customEnchantments,
-                    potionEffects, lore);
-
-            if (!loreAddDropFrequency(previousPath, itemStack)) {
-
-                //Add item to ranked item list for drop math
-                rankedItemMapCreator(itemStack);
-
-            }
+                    potionEffects, lore, dropType);
 
             customItemList.add(itemStack);
 
@@ -142,7 +137,7 @@ public class CustomItemConstructor implements Listener {
 
         String name = automatedStringBuilder(previousPath, "Item Name");
 
-        if (name.isEmpty())
+        if (ConfigValues.itemsCustomLootListConfig.getString(name) == null || ConfigValues.itemsCustomLootListConfig.getString(name).isEmpty())
             Bukkit.getLogger().warning("[EliteMobs] Invalid name!");
 
         return chatColorConverter(ConfigValues.itemsCustomLootListConfig.getString(name));
@@ -176,61 +171,6 @@ public class CustomItemConstructor implements Listener {
         List potionEffects = configuration.getList(path);
 
         return potionEffects;
-
-    }
-
-    private void rankedItemMapCreator(ItemStack itemStack) {
-
-        int itemTier = (int) ItemTierFinder.findBattleTier(itemStack);
-
-        if (dynamicRankedItemStacks.get(itemTier) == null) {
-
-            List<ItemStack> list = new ArrayList<>();
-
-            list.add(itemStack);
-
-            dynamicRankedItemStacks.put(itemTier, list);
-
-        } else {
-
-            List<ItemStack> list = dynamicRankedItemStacks.get(itemTier);
-
-            list.add(itemStack);
-
-            dynamicRankedItemStacks.put(itemTier, list);
-
-        }
-
-    }
-
-    private boolean loreAddDropFrequency(String previousPath, ItemStack itemStack) {
-
-        String path = automatedStringBuilder(previousPath, "Drop Weight");
-
-        //Only tag the item if it contains a value other than dynamic
-        if (ConfigValues.itemsCustomLootListConfig.contains(path)) {
-
-            if (!ConfigValues.itemsCustomLootListConfig.getString(path).equalsIgnoreCase("dynamic")) {
-
-                try {
-
-                    Double dropWeight = Double.valueOf(ConfigValues.itemsCustomLootListConfig.getString(path));
-                    staticCustomItemHashMap.put(itemStack, dropWeight);
-                    return true;
-
-                } catch (NumberFormatException e) {
-
-                    Bukkit.getLogger().info("[EliteMobs] Your item " + path + " contains an invalid drop weight value ("
-                            + ConfigValues.itemsCustomLootListConfig.getString(path) + ")");
-
-                }
-
-
-            }
-
-        }
-
-        return false;
 
     }
 

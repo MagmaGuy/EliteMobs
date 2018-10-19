@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
-import org.bukkit.ChatColor;
+import com.magmaguy.elitemobs.items.parserutil.DropWeightHandler;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
@@ -20,7 +20,7 @@ public class ItemConstructor {
      */
     public static ItemStack constructItem(String rawName, Material material, HashMap<Enchantment,
             Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
-                                          List<String> lore) {
+                                          List<String> lore, String dropType) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;
@@ -47,7 +47,7 @@ public class ItemConstructor {
         /*
         Generate item lore
          */
-        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, potionEffects, lore);
+        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore);
 
         /*
         Remove vanilla enchantments
@@ -64,8 +64,12 @@ public class ItemConstructor {
         Colorize with MMO colors
          */
         itemStack.setItemMeta(itemMeta);
-        if (itemMeta.getDisplayName().equals(ChatColor.stripColor(itemMeta.getDisplayName())))
-            ItemQualityColorizer.dropQualityColorizer(itemStack);
+        ItemQualityColorizer.dropQualityColorizer(itemStack);
+
+        /*
+        Add item to relevant lists
+         */
+        DropWeightHandler.process(dropType, itemStack);
 
         return itemStack;
 

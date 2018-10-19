@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CustomEnchantment {
@@ -12,10 +12,9 @@ public abstract class CustomEnchantment {
     setKey() and setName() need to be rewritten in every class
      */
 
-    public static void initialize() {
+    public void initialize() {
 
         setKey();
-        setName();
 
     }
 
@@ -24,68 +23,51 @@ public abstract class CustomEnchantment {
     config changes invalidating old enchantment names
     It's also used as the value to write in for the configuration file
      */
-    public static String key = setKey();
-    public static List<String> keyList = new ArrayList<>();
+    public String key = setKey();
 
-    public static String setKey() {
+    public String setKey() {
         return "placeholder key";
     }
 
-    public static String getKey() {
+    public String getKey() {
         return key;
-    }
-
-    public static void addKey(String key) {
-        keyList.add(key);
-    }
-
-    /*
-    Name is taken from config settings
-     */
-    public static String name = setName();
-
-    public static String setName() {
-        return "placeholder name";
-    }
-
-    public static String getName() {
-        return name;
     }
 
     /*
     Get the enchantment string for assembling configurations
      */
-    public static String assembleConfigString(int enchantmentLevel) {
+    public String assembleConfigString(int enchantmentLevel) {
         return key + "," + enchantmentLevel;
     }
 
     /*
     Check an itemstack has this enchantment
      */
-    public static boolean hasCustomEnchantment(ItemStack itemStack) {
+    public boolean hasCustomEnchantment(ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType().equals(Material.AIR)) return false;
         if (!itemStack.hasItemMeta()) return false;
         if (!itemStack.getItemMeta().hasLore()) return false;
         return hasCustomEnchantment(itemStack.getItemMeta().getLore());
     }
 
-    public static boolean hasCustomEnchantment(List<String> lore) {
-        return (lore.get(1).replace("§", "").contains(key));
+    public boolean hasCustomEnchantment(List<String> lore) {
+        return (lore.get(0).replace("§", "").contains(key));
     }
 
     /*
     Get a custom enchantment's level
      */
-    public static int getCustomEnchantmentLevel(ItemStack itemStack) {
+    public int getCustomEnchantmentLevel(ItemStack itemStack) {
         if (!itemStack.hasItemMeta()) return 0;
         if (!itemStack.getItemMeta().hasLore()) return 0;
         return getCustomEnchantmentLevel(itemStack.getItemMeta().getLore());
     }
 
-    public static int getCustomEnchantmentLevel(List<String> lore) {
+    public int getCustomEnchantmentLevel(List<String> lore) {
 
-        for (String string : lore.get(1).replace("§", "").split(","))
-            if (string.equals(key))
-                return Integer.parseInt(string.split(";")[1]);
+        for (String string : lore.get(0).replace("§", "").split(","))
+            if (string.contains(key))
+                return Integer.parseInt(string.split(":")[1]);
 
         return 0;
 
