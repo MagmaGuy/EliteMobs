@@ -16,12 +16,12 @@ import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
 import com.magmaguy.elitemobs.events.actionevents.BalrogEvent;
 import com.magmaguy.elitemobs.events.actionevents.FaeEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
-import com.magmaguy.elitemobs.events.eventitems.ZombieKingAxe;
 import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.events.mobs.sharedeventpowers.SpiritWalk;
 import com.magmaguy.elitemobs.items.ItemDropper;
 import com.magmaguy.elitemobs.items.PlaceEventPrevent;
 import com.magmaguy.elitemobs.items.PotionEffectApplier;
+import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
 import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
@@ -245,7 +245,7 @@ public class EventsRegistrer {
             Bukkit.getServer().getPluginManager().registerEvents(new PreventTowerExploit(), MetadataHandler.PLUGIN);
 
 
-        if (!VersionChecker.currentVersionIsUnder(11, 0)){
+        if (!VersionChecker.currentVersionIsUnder(11, 0)) {
             //Initialize custom events
             Bukkit.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), MetadataHandler.PLUGIN);
             Bukkit.getServer().getPluginManager().registerEvents(new TreasureGoblin(), MetadataHandler.PLUGIN);
@@ -276,7 +276,7 @@ public class EventsRegistrer {
             Bukkit.getServer().getPluginManager().registerEvents(new DamageDisplay(), MetadataHandler.PLUGIN);
 
         //Initialize items from custom events
-        Bukkit.getServer().getPluginManager().registerEvents(new ZombieKingAxe(), MetadataHandler.PLUGIN);
+        Bukkit.getServer().getPluginManager().registerEvents(new FlamethrowerEnchantment(), MetadataHandler.PLUGIN);
 
         //Initialize adventurer's guild
         Bukkit.getServer().getPluginManager().registerEvents(new AdventurersGuildGUI(), MetadataHandler.PLUGIN);

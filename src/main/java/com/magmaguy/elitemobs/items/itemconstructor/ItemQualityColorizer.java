@@ -157,7 +157,11 @@ public class ItemQualityColorizer {
 
     private static ItemMeta colorizeBoldNameAndLore(ChatColor chatColor, ItemMeta itemMeta) {
 
-        itemMeta.setDisplayName(chatColor + "" + ChatColor.BOLD + "" + itemMeta.getDisplayName());
+        /*
+        Cancel colorization in case item already has a color (for custom and unique items)
+         */
+        if (itemMeta.getDisplayName().equals(ChatColor.stripColor(itemMeta.getDisplayName())))
+            itemMeta.setDisplayName(chatColor + "" + ChatColor.BOLD + "" + itemMeta.getDisplayName());
 
         List list = new ArrayList();
 

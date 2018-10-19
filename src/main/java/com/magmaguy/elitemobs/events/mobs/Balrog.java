@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
+import com.magmaguy.elitemobs.items.uniqueitems.DwarvenGreed;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
 import org.bukkit.Bukkit;
@@ -17,6 +18,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -114,7 +116,10 @@ public class Balrog implements Listener {
 
         if (!event.getEntity().hasMetadata(MetadataHandler.BALROG)) return;
 
-        event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), UniqueItemConstructor.uniqueItems.get(UniqueItemConstructor.GREED));
+        DwarvenGreed dwarvenGreed = new DwarvenGreed();
+        ItemStack dwarvenGreedItemStack = dwarvenGreed.constructItemStack();
+
+        event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), dwarvenGreedItemStack);
 
     }
 

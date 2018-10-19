@@ -26,7 +26,7 @@ public class MobCombatSettingsConfig {
     public static final String AGGRESSIVE_MOB_CONVERSION_PERCENTAGE = "Percentage of aggressive mobs that get converted to EliteMobs when they spawn";
     public static final String AGGRESSIVE_MOB_STACKING = "Aggressive mob stacking";
     public static final String ELITEMOB_STACKING_CAP = "Elite mob stacking cap";
-    public static final String PER_TIER_LEVEL_INCREASE = "Elite mob per level tier increase";
+    public static final String PER_TIER_LEVEL_INCREASE = "Levels between elite mob tiers";
     public static final String STACK_AGGRESSIVE_SPAWNER_MOBS = "Stack aggressive spawner mobs";
     public static final String STACK_AGGRESSIVE_NATURAL_MOBS = "Stack aggressive natural mobs";
     public static final String AGGRESSIVE_STACK_RANGE = "Range to stack aggressive mobs";
@@ -89,7 +89,7 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS, true);
         configuration.addDefault(DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS, true);
         configuration.addDefault(ENABLE_WARNING_VISUAL_EFFECTS, true);
-        configuration.addDefault(PER_TIER_LEVEL_INCREASE, 50);
+        configuration.addDefault(PER_TIER_LEVEL_INCREASE, 10);
         configuration.addDefault(ENABLE_DEATH_MESSAGES, true);
         configuration.addDefault(BLAZE_DEATH_MESSAGE, "$player was lit ablaze by $entity!");
         configuration.addDefault(CREEPER_DEATH_MESSAGE, "$player was blasted away by $entity!");

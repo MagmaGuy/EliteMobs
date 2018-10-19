@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items.parserutil;
 
-import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import org.bukkit.configuration.Configuration;
 
 import java.util.HashMap;
@@ -41,8 +40,8 @@ public class CustomEnchantmentConfigParser {
 
     public static boolean isCustomEnchantment(String string) {
 
-        if (string.contains(HunterEnchantment.getKey())) return true;
-        if (string.contains(FlamethrowerEnchantment.getKey())) return true;
+        if (string.contains(CustomEnchantmentCache.hunterEnchantment.getKey())) return true;
+        if (string.contains(CustomEnchantmentCache.flamethrowerEnchantment.getKey())) return true;
 
         return false;
 

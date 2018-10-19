@@ -17,9 +17,7 @@ package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
-import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
-import com.magmaguy.elitemobs.items.uniqueitems.HuntingHelmet;
-import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -72,7 +70,7 @@ public class NaturalMobMetadataAssigner implements Listener {
         int huntingGearChanceAdder = getHuntingGearBonus(entity);
 
         Double validChance = (ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
-                (huntingGearChanceAdder * ConfigValues.itemsUniqueConfig.getInt(ItemsUniqueConfig.HUNTING_SET_CHANCE_INCREASER))) / 100;
+                huntingGearChanceAdder) / 100;
 
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;
@@ -100,24 +98,26 @@ public class NaturalMobMetadataAssigner implements Listener {
                     ItemStack heldItem = player.getInventory().getItemInMainHand();
                     ItemStack offHandItem = player.getInventory().getItemInOffHand();
 
-                    if (HunterEnchantment.hasCustomEnchantment(helmet))
-                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(helmet);
-                    if (HunterEnchantment.hasCustomEnchantment(chestplate))
-                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(chestplate);
-                    if (HunterEnchantment.hasCustomEnchantment(leggings))
-                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(leggings);
-                    if (HunterEnchantment.hasCustomEnchantment(boots))
-                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(boots);
-                    if (HunterEnchantment.hasCustomEnchantment(heldItem))
-                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(heldItem);
-                    if (HunterEnchantment.hasCustomEnchantment(offHandItem))
-                        huntingGearChanceAdder += HunterEnchantment.getCustomEnchantmentLevel(offHandItem);
+                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(helmet))
+                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(helmet);
+                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(chestplate))
+                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(chestplate);
+                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(leggings))
+                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(leggings);
+                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(boots))
+                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(boots);
+                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(heldItem))
+                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(heldItem);
+                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(offHandItem))
+                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(offHandItem);
 
                 }
 
             }
 
         }
+
+        huntingGearChanceAdder = huntingGearChanceAdder * ConfigValues.customEnchantmentsConfig.getInt(CustomEnchantmentsConfig.HUNTER_SPAWN_BONUS);
 
         return huntingGearChanceAdder;
 

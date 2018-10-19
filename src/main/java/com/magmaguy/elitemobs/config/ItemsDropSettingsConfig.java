@@ -15,8 +15,7 @@
 
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import org.bukkit.configuration.Configuration;
 
 public class ItemsDropSettingsConfig {
@@ -108,8 +107,8 @@ public class ItemsDropSettingsConfig {
     /*
     Custom enchantments
      */
-    public static final String FLAMETHROWER_NAME = ENCHANTMENT_NAME + FlamethrowerEnchantment.getKey();
-    public static final String HUNTER_NAME = ENCHANTMENT_NAME + HunterEnchantment.getKey();
+    public static final String FLAMETHROWER_NAME = ENCHANTMENT_NAME + CustomEnchantmentCache.flamethrowerEnchantment.getKey();
+    public static final String HUNTER_NAME = ENCHANTMENT_NAME + CustomEnchantmentCache.hunterEnchantment.getKey();
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -195,8 +194,8 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(WATER_BREATHING_NAME, "Water Breathing");
         configuration.addDefault(WEAKNESS_NAME, "Weakness");
         configuration.addDefault(WITHER_NAME, "Wither");
-        configuration.addDefault(FLAMETHROWER_NAME, FlamethrowerEnchantment.getName());
-        configuration.addDefault(HUNTER_NAME, HunterEnchantment.getName());
+        configuration.addDefault(FLAMETHROWER_NAME, "Flamethrower");
+        configuration.addDefault(HUNTER_NAME, "Hunter");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

@@ -152,7 +152,11 @@ public class LootGUI implements Listener {
 
     private void lootConstructor(Inventory inventory) {
 
-        List<ItemStack> getLootList = (List<ItemStack>) CustomItemConstructor.customItemList.clone();
+        List<ItemStack> getLootList = new ArrayList<>();
+        for (List<ItemStack> list : CustomItemConstructor.dynamicRankedItemStacks.values())
+            getLootList.addAll(list);
+
+        getLootList.addAll(CustomItemConstructor.staticCustomItemHashMap.keySet());
         getLootList.addAll(UniqueItemInitializer.uniqueItemsList);
 
         int counter = 1;
