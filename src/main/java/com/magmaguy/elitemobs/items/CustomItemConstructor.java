@@ -19,9 +19,9 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.items.parserutil.CustomEnchantmentConfigParser;
 import com.magmaguy.elitemobs.items.parserutil.DropWeightConfigParser;
+import com.magmaguy.elitemobs.items.parserutil.PotionEffectConfigParser;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -63,7 +63,7 @@ public class CustomItemConstructor implements Listener {
 
             HashMap<Enchantment, Integer> enchantments = parseEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
             HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
-            List potionEffects = itemPotionEffectHandler(ConfigValues.itemsCustomLootListConfig, previousPath);
+            List potionEffects = PotionEffectConfigParser.itemPotionEffectHandler(ConfigValues.itemsCustomLootListConfig, previousPath);
             List<String> lore = getCustomLore(previousPath);
             String dropType = DropWeightConfigParser.getDropType(ConfigValues.itemsCustomLootListConfig, previousPath);
 
@@ -86,22 +86,12 @@ public class CustomItemConstructor implements Listener {
 
             if (configIterator.contains("Loot.")) {
 
-                for (int i = 0; i < configIterator.length(); i++) {
-
-                    if (configIterator.charAt(i) == '.') {
-
+                for (int i = 0; i < configIterator.length(); i++)
+                    if (configIterator.charAt(i) == '.')
                         dotCount++;
 
-                    }
-
-                }
-
-                if (dotCount == 1) {
-
+                if (dotCount == 1)
                     lootCount.add(configIterator);
-
-
-                }
 
             }
 
@@ -161,16 +151,6 @@ public class CustomItemConstructor implements Listener {
             return itemLore;
 
         return newList;
-
-    }
-
-    public static List<String> itemPotionEffectHandler(Configuration configuration, String previousPath) {
-
-        String path = automatedStringBuilder(previousPath, "Potion Effects");
-
-        List potionEffects = configuration.getList(path);
-
-        return potionEffects;
 
     }
 

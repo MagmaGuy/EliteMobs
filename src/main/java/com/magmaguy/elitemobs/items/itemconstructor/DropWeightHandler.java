@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.items.parserutil;
+package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.ItemTierFinder;

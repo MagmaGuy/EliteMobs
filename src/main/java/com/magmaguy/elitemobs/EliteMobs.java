@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs;
 
-/**
+/*
  * Created by MagmaGuy on 07/10/2016.
  */
 
@@ -147,15 +147,9 @@ public class EliteMobs extends JavaPlugin {
 
     public void worldScanner() {
 
-        for (World world : Bukkit.getWorlds()) {
-
-            if (ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + world.getName())) {
-
+        for (World world : Bukkit.getWorlds())
+            if (ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + world.getName()))
                 validWorldList.add(world);
-
-            }
-
-        }
 
     }
 
