@@ -14,6 +14,9 @@ public class DropWeightHandler {
 
     public static void process(String dropType, ItemStack itemStack) {
 
+        /*
+        This field is not mandatory, all parent keys missing this key will be considered dynamic
+         */
         if (dropType == null || dropType.isEmpty()) {
 
             rankedItemMapCreator(itemStack);
@@ -80,6 +83,30 @@ public class DropWeightHandler {
             CustomItemConstructor.dynamicRankedItemStacks.put(itemTier, list);
 
         }
+
+    }
+
+    public static boolean isDynamic(String dropType){
+
+        /*
+        This field is not mandatory, all parent keys missing this key will be considered dynamic
+         */
+        if (dropType == null || dropType.isEmpty()) {
+
+            return true;
+
+        }
+
+        /*
+        Code doesn't check for "dynamic" as it's the same behavior as nothing being in this key
+         */
+        if (dropType.equalsIgnoreCase("dynamic")) {
+
+            return true;
+
+        }
+
+        return false;
 
     }
 
