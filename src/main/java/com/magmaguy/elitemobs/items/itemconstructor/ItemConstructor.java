@@ -19,7 +19,7 @@ public class ItemConstructor {
      */
     public static ItemStack constructItem(String rawName, Material material, HashMap<Enchantment,
             Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
-                                          List<String> lore, String dropType) {
+                                          List<String> lore, String dropType, String scalabilityType) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;
@@ -66,9 +66,15 @@ public class ItemConstructor {
         ItemQualityColorizer.dropQualityColorizer(itemStack);
 
         /*
-        Add item to relevant lists
+        Add item to relevant loot lists
          */
         DropWeightHandler.process(dropType, itemStack);
+
+        /*
+        Handle item scalability
+         */
+        ScalabilityAssigner.assign(itemStack, rawName, material, enchantments, customEnchantments, potionEffects, lore,
+                dropType, scalabilityType);
 
         return itemStack;
 

@@ -1,12 +1,21 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
+import com.magmaguy.elitemobs.items.ItemScalabilityConstructor;
+import com.magmaguy.elitemobs.items.ItemTierFinder;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class ScalabilityAssigner {
 
-    public static void assign(String scalabilityType, HashMap<Enchantment, Integer> enchantments, HashMap<String, Integer> customEnchantments, String dropType){
+    public static void assign(ItemStack itemStack, String rawName, Material material, HashMap<Enchantment,
+            Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
+                              List<String> lore, String dropType, String scalabilityType) {
 
         /*
         For the sake of clarity for the users and just overall reliability scalability will only be assigned to dynamic
@@ -15,15 +24,30 @@ public class ScalabilityAssigner {
         if (!DropWeightHandler.isDynamic(dropType)) return;
         if (!isScalable(scalabilityType)) return;
 
-        if (scalabilityType == null || scalabilityType.equalsIgnoreCase("dynamic")){
+        ScallableItemObject scalableItemObject = new ScallableItemObject();
+        scalableItemObject.initializeItemObject(rawName, material, enchantments, customEnchantments, potionEffects,
+                lore);
 
+        if (scalabilityType == null || scalabilityType.equalsIgnoreCase("dynamic"))
+            ItemScalabilityConstructor.dynamicallyScalableItems.add(scalableItemObject);
 
+        if (scalabilityType.equalsIgnoreCase("limited")) {
+
+            int itemTier = (int) ItemTierFinder.findBattleTier(itemStack);
+
+            if (!ItemScalabilityConstructor.limitedScalableItems.containsKey(itemTier))
+                ItemScalabilityConstructor.limitedScalableItems.put((int) ItemTierFinder.findBattleTier(itemStack), new ArrayList<>(Arrays.asList(scalableItemObject)));
+            else {
+                List<ScallableItemObject> existingList = ItemScalabilityConstructor.limitedScalableItems.get(itemTier);
+                existingList.add(scalableItemObject);
+                ItemScalabilityConstructor.limitedScalableItems.put((int) ItemTierFinder.findBattleTier(itemStack), existingList);
+            }
 
         }
 
     }
 
-    public static boolean isScalable (String scalabilityType) {
+    public static boolean isScalable(String scalabilityType) {
 
         return scalabilityType == null || scalabilityType.equalsIgnoreCase("dynamic") || scalabilityType.equalsIgnoreCase("dynamic_full");
 
