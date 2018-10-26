@@ -18,9 +18,10 @@ import com.magmaguy.elitemobs.events.actionevents.FaeEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.events.mobs.sharedeventpowers.SpiritWalk;
-import com.magmaguy.elitemobs.items.ItemDropper;
+import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.PlaceEventPrevent;
 import com.magmaguy.elitemobs.items.PotionEffectApplier;
+import com.magmaguy.elitemobs.items.RareDropEffect;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
 import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
 import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
@@ -216,7 +217,7 @@ public class EventsRegistrer {
 
         //Loot
         if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_PLUGIN_LOOT)) {
-            Bukkit.getServer().getPluginManager().registerEvents(new ItemDropper(), MetadataHandler.PLUGIN);
+            Bukkit.getServer().getPluginManager().registerEvents(new LootTables(), MetadataHandler.PLUGIN);
             Bukkit.getServer().getPluginManager().registerEvents(new PlaceEventPrevent(), MetadataHandler.PLUGIN);
         }
 
@@ -290,6 +291,10 @@ public class EventsRegistrer {
 
         //Refresh display case Elite Mobs
         Bukkit.getServer().getPluginManager().registerEvents(new DisplayMob(), MetadataHandler.PLUGIN);
+
+        //Player effect when a rare item is on the ground
+        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_RARE_DROP_EFFECT))
+            Bukkit.getServer().getPluginManager().registerEvents(new RareDropEffect(), MetadataHandler.PLUGIN);
 
     }
 

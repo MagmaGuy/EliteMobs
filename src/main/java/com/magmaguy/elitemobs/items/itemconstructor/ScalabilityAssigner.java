@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.items.ItemScalabilityConstructor;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -28,19 +28,35 @@ public class ScalabilityAssigner {
         scalableItemObject.initializeItemObject(rawName, material, enchantments, customEnchantments, potionEffects,
                 lore);
 
-        if (scalabilityType == null || scalabilityType.equalsIgnoreCase("dynamic"))
-            ItemScalabilityConstructor.dynamicallyScalableItems.add(scalableItemObject);
+        if (scalabilityType == null || scalabilityType.equalsIgnoreCase("dynamic")) {
+            ScalableItemConstructor.dynamicallyScalableItems.add(scalableItemObject);
+            return;
+        }
 
         if (scalabilityType.equalsIgnoreCase("limited")) {
 
             int itemTier = (int) ItemTierFinder.findBattleTier(itemStack);
 
-            if (!ItemScalabilityConstructor.limitedScalableItems.containsKey(itemTier))
-                ItemScalabilityConstructor.limitedScalableItems.put((int) ItemTierFinder.findBattleTier(itemStack), new ArrayList<>(Arrays.asList(scalableItemObject)));
+            if (!ScalableItemConstructor.limitedScalableItems.containsKey(itemTier))
+                ScalableItemConstructor.limitedScalableItems.put((int) ItemTierFinder.findBattleTier(itemStack), new ArrayList<>(Arrays.asList(scalableItemObject)));
             else {
-                List<ScallableItemObject> existingList = ItemScalabilityConstructor.limitedScalableItems.get(itemTier);
+                List<ScallableItemObject> existingList = ScalableItemConstructor.limitedScalableItems.get(itemTier);
                 existingList.add(scalableItemObject);
-                ItemScalabilityConstructor.limitedScalableItems.put((int) ItemTierFinder.findBattleTier(itemStack), existingList);
+                ScalableItemConstructor.limitedScalableItems.put((int) ItemTierFinder.findBattleTier(itemStack), existingList);
+            }
+
+        }
+
+        if (scalabilityType.equalsIgnoreCase("static")) {
+
+            int itemTier = (int) ItemTierFinder.findBattleTier(itemStack);
+
+            if (!ScalableItemConstructor.staticItems.containsKey(itemTier))
+                ScalableItemConstructor.staticItems.put((int) ItemTierFinder.findBattleTier(itemStack), new ArrayList<>(Arrays.asList(itemStack)));
+            else {
+                List<ItemStack> existingList = ScalableItemConstructor.staticItems.get(itemTier);
+                existingList.add(itemStack);
+                ScalableItemConstructor.staticItems.put((int) ItemTierFinder.findBattleTier(itemStack), existingList);
             }
 
         }

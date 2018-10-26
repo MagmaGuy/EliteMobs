@@ -58,7 +58,8 @@ public class LoreGenerator {
 
     }
 
-    public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap, LivingEntity livingEntity) {
+    public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
+                                        HashMap<String, Integer> customEnchantments, LivingEntity livingEntity) {
 
         List<String> lore = new ArrayList<>();
 
@@ -73,7 +74,7 @@ public class LoreGenerator {
             } else if (string.contains("$enchantments")) {
                 if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
                     lore.addAll(enchantmentLore(enchantmentMap));
-//                    lore.addAll(customEnchantmentLore(customEnchantments));
+                    lore.addAll(customEnchantmentLore(customEnchantments));
                 }
             } else if (string.contains("$itemValue"))
                 lore.add(itemWorth(material, enchantmentMap));
@@ -89,7 +90,7 @@ public class LoreGenerator {
         /*
         Obfuscate potion and enchantment info
          */
-        lore = generateObfuscatedLore(lore, getObfuscatedLoreString(enchantmentMap));
+        lore = generateObfuscatedLore(lore, getObfuscatedLoreString(enchantmentMap, customEnchantments));
         itemMeta.setLore(lore);
 
         return itemMeta;
@@ -153,7 +154,7 @@ public class LoreGenerator {
 
     }
 
-    private static String getObfuscatedLoreString(HashMap<Enchantment, Integer> enchantmentMap) {
+    private static String getObfuscatedLoreString(HashMap<Enchantment, Integer> enchantmentMap, HashMap<String, Integer> customEnchantments) {
 
         StringBuilder obfuscatedString = new StringBuilder();
 
@@ -163,6 +164,12 @@ public class LoreGenerator {
             obfuscatedString.append(OBFUSCATED_ENCHANTMENTS).append(",");
             for (Enchantment enchantment : enchantmentMap.keySet())
                 obfuscatedString.append(enchantment.getName()).append(":").append(enchantmentMap.get(enchantment)).append(",");
+        }
+
+        if (!customEnchantments.isEmpty()){
+            obfuscatedString.append(OBFUSCATED_CUSTOM_ENCHANTMENTS).append(",");
+            for (String string: customEnchantments.keySet())
+                obfuscatedString.append(string).append(":").append(customEnchantments.get(string)).append(",");
         }
 
         String finalString = stringObfuscator(obfuscatedString);

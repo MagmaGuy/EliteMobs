@@ -55,4 +55,9 @@ public class TheFeller extends UniqueItem {
         return "unique";
     }
 
+    @Override
+    public String defineScalability() {
+        return "dynamic";
+    }
+
 }

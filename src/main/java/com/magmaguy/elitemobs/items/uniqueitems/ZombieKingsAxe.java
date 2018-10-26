@@ -59,4 +59,9 @@ public class ZombieKingsAxe extends UniqueItem {
         return "unique";
     }
 
+    @Override
+    public String defineScalability() {
+        return "dynamic";
+    }
+
 }

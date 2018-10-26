@@ -24,7 +24,7 @@ import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.items.ItemDropper;
+import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
@@ -107,13 +107,11 @@ public class TreasureGoblin implements Listener {
 
         if (event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN)) {
 
-            ItemDropper itemDropper = new ItemDropper();
-
             Entity entity = event.getEntity();
 
             for (int i = 0; i < ConfigValues.eventsConfig.getInt(EventsConfig.SMALL_TREASURE_GOBLIN_REWARD); i++) {
 
-                itemDropper.determineItemTier((LivingEntity) entity);
+                LootTables.generateLoot((LivingEntity) entity);
 
             }
 

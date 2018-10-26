@@ -55,4 +55,9 @@ public class DwarvenGreed extends UniqueItem {
         return "unique";
     }
 
+    @Override
+    public String defineScalability() {
+        return "dynamic";
+    }
+
 }

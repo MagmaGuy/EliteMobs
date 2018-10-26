@@ -139,7 +139,7 @@ public class MobSpawningAndLoot implements Listener {
 //                "Sets the additional percentual chance",
 //                "Elite Mobs have of dropping special items",
 //                "with each additional level"));
-//        ItemStack levelDropRateItem = percentageDoubleItemStackConstructor(DefaultConfig.ELITE_ITEM_LEVEL_DROP_RATE,
+//        ItemStack levelDropRateItem = percentageDoubleItemStackConstructor(DefaultConfig.ELITE_ITEM_TIER_DROP_RATE,
 //                levelDropRateLore, levelDropRate);
 //        optionsList.add(levelDropRateItem);
 //

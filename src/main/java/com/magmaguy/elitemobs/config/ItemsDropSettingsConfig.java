@@ -27,8 +27,9 @@ public class ItemsDropSettingsConfig {
     public static final String LORE_WORTH = "Item worth";
     public static final String LORE_RESALE_WORTH = "Item resale worth";
     public static final String ELITE_ITEM_FLAT_DROP_RATE = "EliteMob base percentual plugin item drop chance";
-    public static final String ELITE_ITEM_LEVEL_DROP_RATE = "EliteMob plugin item percentual drop chance increase per level";
+    public static final String ELITE_ITEM_TIER_DROP_RATE = "EliteMob plugin item percentual drop chance increase per tier";
     public static final String PROCEDURAL_ITEM_WEIGHT = "Procedurally generated item weight";
+    public static final String CUSTOM_ITEM_WEIGHT = "Custom item weight";
     public static final String CUSTOM_DYNAMIC_ITEM_WEIGHT = "Custom dynamic item weight";
     public static final String CUSTOM_STATIC_ITEM_WEIGHT = "Custom static item weight";
     public static final String SPAWNER_DEFAULT_LOOT_MULTIPLIER = "Drop multiplied default loot from elite mobs spawned in spawners";
@@ -103,6 +104,7 @@ public class ItemsDropSettingsConfig {
     public static final String WATER_BREATHING_NAME = POTION_EFFECT_NAME + "WATER_BREATHING";
     public static final String WEAKNESS_NAME = POTION_EFFECT_NAME + "WEAKNESS";
     public static final String WITHER_NAME = POTION_EFFECT_NAME + "WITHER";
+    public static final String ENABLE_RARE_DROP_EFFECT = "Enable rare drop visual effect";
 
     /*
     Custom enchantments
@@ -120,13 +122,14 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(LORE_WORTH, "Worth $worth $currencyName");
         configuration.addDefault(LORE_RESALE_WORTH, "$resale $currencyName resale value");
         configuration.addDefault(ELITE_ITEM_FLAT_DROP_RATE, 025.00);
-        configuration.addDefault(ELITE_ITEM_LEVEL_DROP_RATE, 001.00);
+        configuration.addDefault(ELITE_ITEM_TIER_DROP_RATE, 005.00);
         configuration.addDefault(PROCEDURAL_ITEM_WEIGHT, 90);
+        configuration.addDefault(CUSTOM_ITEM_WEIGHT, 10);
         configuration.addDefault(CUSTOM_DYNAMIC_ITEM_WEIGHT, 9);
         configuration.addDefault(CUSTOM_STATIC_ITEM_WEIGHT, 1);
         configuration.addDefault(SPAWNER_DEFAULT_LOOT_MULTIPLIER, true);
         configuration.addDefault(DEFAULT_LOOT_MULTIPLIER, 1.0);
-        configuration.addDefault(MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER, 1000);
+        configuration.addDefault(MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER, 200);
         configuration.addDefault(EXPERIENCE_LOOT_MULTIPLIER, 1.0);
         configuration.addDefault(MAXIMUM_LOOT_TIER, 5);
         configuration.addDefault(ENABLE_CUSTOM_ENCHANTMENT_SYSTEM, true);
@@ -196,6 +199,7 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(WITHER_NAME, "Wither");
         configuration.addDefault(FLAMETHROWER_NAME, "Flamethrower");
         configuration.addDefault(HUNTER_NAME, "Hunter");
+        configuration.addDefault(ENABLE_RARE_DROP_EFFECT, true);
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

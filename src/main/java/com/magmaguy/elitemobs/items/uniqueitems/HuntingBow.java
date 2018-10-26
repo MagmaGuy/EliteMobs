@@ -31,7 +31,7 @@ public class HuntingBow extends UniqueItem {
 
     @Override
     public List<String> defineEnchantments() {
-        return Arrays.asList("VANISHING_CURSE,1");
+        return Arrays.asList("VANISHING_CURSE,1", "DAMAGE_ARROW,1");
     }
 
     @Override
@@ -41,7 +41,12 @@ public class HuntingBow extends UniqueItem {
 
     @Override
     public String defineDropWeight() {
-        return "1";
+        return "dynamic";
+    }
+
+    @Override
+    public String defineScalability() {
+        return "dynamic";
     }
 
     @Override

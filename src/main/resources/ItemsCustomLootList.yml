@@ -7,6 +7,8 @@ Loot:
     Enchantments:
     - DAMAGE_ALL,1
     Potion Effects:
+    Drop Weight: dynamic
+    Scalability: dynamic
   Rabbit Charm:
     Item Type: RABBIT_FOOT
     Item Name: "Rabbit Charm"

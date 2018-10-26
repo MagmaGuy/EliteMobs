@@ -17,15 +17,13 @@ package com.magmaguy.elitemobs.mobcustomizer;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobPowersConfig;
+import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Zombie;
-import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,14 +34,12 @@ import java.util.Random;
  */
 public class PowerHandler {
 
-    private static Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     private static ArrayList<MinorPowers> defensivePowerArray = new ArrayList();
     private static ArrayList<MinorPowers> offensivePowerArray = new ArrayList();
     private static ArrayList<MinorPowers> miscellaneousPowerArray = new ArrayList();
 
     private static Random random = new Random();
 
-    private static MobPowersConfig mobPowersConfig = new MobPowersConfig();
     private static ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
     private static ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
     private static ZombieParents zombieParents = new ZombieParents();
@@ -73,16 +69,16 @@ public class PowerHandler {
 
             if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= 10) {
 
-                int eliteMobLevel = entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+                int eliteMobTier = (int) MobTierFinder.findMobTier(entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
 
-                if (eliteMobLevel >= 50) availableDefensivePowers = 1;
-                if (eliteMobLevel >= 100) availableOffensivePowers = 1;
-                if (eliteMobLevel >= 150) availableMiscellaneousPowers = 1;
-                if (eliteMobLevel >= 200) availableMajorPowers = 1;
-                if (eliteMobLevel >= 250) availableDefensivePowers = 2;
-                if (eliteMobLevel >= 300) availableOffensivePowers = 2;
-                if (eliteMobLevel >= 350) availableMiscellaneousPowers = 2;
-                if (eliteMobLevel >= 400) availableMajorPowers = 2;
+                if (eliteMobTier >= 1) availableDefensivePowers = 1;
+                if (eliteMobTier >= 2) availableOffensivePowers = 1;
+                if (eliteMobTier >= 3) availableMiscellaneousPowers = 1;
+                if (eliteMobTier >= 4) availableMajorPowers = 1;
+                if (eliteMobTier >= 5) availableDefensivePowers = 2;
+                if (eliteMobTier >= 6) availableOffensivePowers = 2;
+                if (eliteMobTier >= 7) availableMiscellaneousPowers = 2;
+                if (eliteMobTier >= 8) availableMajorPowers = 2;
 
             }
 

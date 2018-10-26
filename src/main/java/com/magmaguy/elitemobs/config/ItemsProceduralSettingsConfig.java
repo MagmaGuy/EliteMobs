@@ -62,6 +62,7 @@ public class ItemsProceduralSettingsConfig {
             THORNS_BOOL, THORNS_MAX_LEVEL,
             VANISHING_CURSE_BOOL,
             WATER_WORKER_BOOL, WATER_WORKER_MAX_LEVEL;
+    public static String HUNTER_BOOL, HUNTER_MAX_LEVEL;
     public static final String ITEM_NAME_FORMAT = "Procedurally generated item name format";
     private static final String MATERIAL_NAME = "Material name.";
     public static final String SWORD_MATERIAL_NAME = MATERIAL_NAME + "Sword";
@@ -77,6 +78,7 @@ public class ItemsProceduralSettingsConfig {
     public static final String SHEARS_MATERIAL_NAME = MATERIAL_NAME + "Shears";
     public static final String FISHING_ROD_MATERIAL_NAME = MATERIAL_NAME + "Fishing Rod";
     public static final String SHIELD_MATERIAL_NAME = MATERIAL_NAME + "Shield";
+    public static final String CUSTOM_ENCHANTMENT_CHANCE = "Chance of getting a custom enchantment";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -234,6 +236,12 @@ public class ItemsProceduralSettingsConfig {
         WATER_WORKER_BOOL = boolValidEnchantmentConstructor("WATER_WORKER");
         WATER_WORKER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("WATER_WORKER");
 
+        /*
+        Custom enchantments
+         */
+        HUNTER_BOOL = boolValidEnchantmentConstructor("HUNTER");
+        HUNTER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("HUNTER");
+
 
         configuration.addDefault(ARROW_DAMAGE_BOOL, true);
         configuration.addDefault(ARROW_DAMAGE_MAX_LEVEL, 5);
@@ -320,6 +328,9 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(WATER_WORKER_BOOL, true);
         configuration.addDefault(WATER_WORKER_MAX_LEVEL, 1);
 
+        configuration.addDefault(HUNTER_BOOL, true);
+        configuration.addDefault(HUNTER_MAX_LEVEL, 3);
+
         configuration.addDefault(SWORD_MATERIAL_NAME, "Sword");
         configuration.addDefault(BOW_MATERIAL_NAME, "Bow");
         configuration.addDefault(PICKAXE_MATERIAL_NAME, "Pickaxe");
@@ -333,6 +344,7 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(CHESTPLATE_MATERIAL_NAME, "Chestplate");
         configuration.addDefault(LEGGINGS_MATERIAL_NAME, "Leggings");
         configuration.addDefault(BOOTS_MATERIAL_NAME, "Boots");
+        configuration.addDefault(CUSTOM_ENCHANTMENT_CHANCE, 0.1);
 
         configuration.addDefault(ITEM_NAME_FORMAT, Arrays.asList(
                 "$verb $itemType of the $adjective $noun",

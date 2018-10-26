@@ -16,23 +16,20 @@
 package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.items.ItemDropper;
+import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
 public class BonusLoot extends MinorPowers implements Listener {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.BONUS_LOOT_MD;
 
     @Override
@@ -58,10 +55,9 @@ public class BonusLoot extends MinorPowers implements Listener {
 
             Entity entity = event.getEntity();
 
-            ItemDropper itemDropper = new ItemDropper();
 
             //drops item
-            itemDropper.determineItemTier((LivingEntity) entity);
+            LootTables.generateLoot((LivingEntity) entity);
 
         }
 

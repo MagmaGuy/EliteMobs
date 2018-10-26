@@ -16,7 +16,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.items.ItemDropper;
+import com.magmaguy.elitemobs.items.LootTables;
 import org.bukkit.entity.Player;
 
 /**
@@ -32,10 +32,8 @@ public class SimLootHandler {
 
         }
 
-        ItemDropper proceduralItemGenerator = new ItemDropper();
-
         MetadataHandler.registerMetadata(player, MetadataHandler.ELITE_MOB_MD, level);
-        proceduralItemGenerator.determineItemTier(player);
+        LootTables.generateLoot(player);
         player.removeMetadata(MetadataHandler.ELITE_MOB_MD, MetadataHandler.PLUGIN);
 
     }
