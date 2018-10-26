@@ -166,7 +166,6 @@ public class EliteMobs extends JavaPlugin {
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         new DynamicLoreUpdater().runTaskTimer(this, 20, 20 * 2);
-//        HuntingBow.scanForBossMobs();
         new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
 
     }
