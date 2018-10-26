@@ -188,7 +188,6 @@ public class ItemConstructor {
         itemStack.setItemMeta(itemMeta);
         ItemQualityColorizer.dropQualityColorizer(itemStack);
 
-
         return itemStack;
 
     }
