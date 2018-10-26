@@ -32,7 +32,7 @@ public class HuntingChestplate extends UniqueItem {
 
     @Override
     public List<String> defineEnchantments() {
-        return Arrays.asList("VANISHING_CURSE,1", CustomEnchantmentCache.hunterEnchantment.assembleConfigString(2));
+        return Arrays.asList("VANISHING_CURSE,1", "PROTECTION_ENVIRONMENTAL,1", CustomEnchantmentCache.hunterEnchantment.assembleConfigString(2));
     }
 
     @Override
@@ -42,12 +42,17 @@ public class HuntingChestplate extends UniqueItem {
 
     @Override
     public String defineDropWeight() {
-        return "1";
+        return "dynamic";
     }
 
     @Override
     public void assembleConfigItem(Configuration configuration) {
         super.assembleConfigItem(configuration);
+    }
+
+    @Override
+    public String defineScalability() {
+        return "dynamic";
     }
 
 }

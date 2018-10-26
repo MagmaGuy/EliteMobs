@@ -1,12 +1,8 @@
 package com.magmaguy.elitemobs.items.uniqueitems;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
-import com.magmaguy.elitemobs.items.parserutil.CustomEnchantmentConfigParser;
-import com.magmaguy.elitemobs.items.parserutil.DropWeightConfigParser;
-import com.magmaguy.elitemobs.items.parserutil.EnchantmentConfigParser;
-import com.magmaguy.elitemobs.items.parserutil.PotionEffectConfigParser;
+import com.magmaguy.elitemobs.items.parserutil.*;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.enchantments.Enchantment;
@@ -34,9 +30,11 @@ public abstract class UniqueItem {
 
     public abstract String defineDropWeight();
 
+    public abstract String defineScalability();
+
     public void assembleConfigItem(Configuration configuration) {
         ConfigAssembler.assemble(configuration, definePath(), defineType(), defineName(), defineLore(),
-                defineEnchantments(), definePotionEffects(), defineDropWeight());
+                defineEnchantments(), definePotionEffects(), defineDropWeight(), defineScalability());
     }
 
     public ItemStack constructItemStack() {
@@ -47,8 +45,10 @@ public abstract class UniqueItem {
         List<String> potionEffects = PotionEffectConfigParser.itemPotionEffectHandler(ConfigValues.itemsUniqueConfig,
                 "Items." + definePath());
         String dropType = DropWeightConfigParser.getDropType(ConfigValues.itemsUniqueConfig, "Items." + definePath());
+        String scalability = ScalabilityConfigParser.parseItemScalability(ConfigValues.itemsUniqueConfig, "Items." + definePath());
+
         return ItemConstructor.constructItem(defineName(), Material.getMaterial(defineType()), enchantments, customEnchantments,
-                potionEffects, defineLore(), dropType);
+                potionEffects, defineLore(), dropType, scalability);
     }
 
 }

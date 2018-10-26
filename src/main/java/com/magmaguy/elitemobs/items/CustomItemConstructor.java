@@ -20,8 +20,10 @@ import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.items.parserutil.CustomEnchantmentConfigParser;
 import com.magmaguy.elitemobs.items.parserutil.DropWeightConfigParser;
 import com.magmaguy.elitemobs.items.parserutil.PotionEffectConfigParser;
+import com.magmaguy.elitemobs.items.parserutil.ScalabilityConfigParser;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -61,14 +63,17 @@ public class CustomItemConstructor implements Listener {
             if (material == null)
                 continue;
 
-            HashMap<Enchantment, Integer> enchantments = parseEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
-            HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsCustomLootListConfig, previousPath);
-            List potionEffects = PotionEffectConfigParser.itemPotionEffectHandler(ConfigValues.itemsCustomLootListConfig, previousPath);
+            Configuration configuration = ConfigValues.itemsCustomLootListConfig;
+
+            HashMap<Enchantment, Integer> enchantments = parseEnchantments(configuration, previousPath);
+            HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(configuration, previousPath);
+            List potionEffects = PotionEffectConfigParser.itemPotionEffectHandler(configuration, previousPath);
             List<String> lore = getCustomLore(previousPath);
-            String dropType = DropWeightConfigParser.getDropType(ConfigValues.itemsCustomLootListConfig, previousPath);
+            String dropType = DropWeightConfigParser.getDropType(configuration, previousPath);
+            String scalability = ScalabilityConfigParser.parseItemScalability(configuration, previousPath);
 
             ItemStack itemStack = ItemConstructor.constructItem(rawName, material, enchantments, customEnchantments,
-                    potionEffects, lore, dropType);
+                    potionEffects, lore, dropType, scalability);
 
             customItemList.add(itemStack);
 

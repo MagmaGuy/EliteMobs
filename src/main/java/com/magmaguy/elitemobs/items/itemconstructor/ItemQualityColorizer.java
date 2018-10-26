@@ -30,10 +30,19 @@ import java.util.List;
 
 public class ItemQualityColorizer {
 
+    public enum ItemQuality {
+        LIGHT_BLUE,
+        GOLD,
+        PURPLE,
+        BLUE,
+        GREEN,
+        WHITE,
+        GRAY
+    }
+
     /*
     item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
      */
-
     private static final int ARROW_DAMAGE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_DAMAGE_BOOL, ItemsProceduralSettingsConfig.ARROW_DAMAGE_MAX_LEVEL);
     private static final int ARROW_FIRE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_FIRE_BOOL, ItemsProceduralSettingsConfig.ARROW_FIRE_MAX_LEVEL);
     private static final int ARROW_INFINITE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_INFINITE_BOOL);
@@ -64,6 +73,48 @@ public class ItemQualityColorizer {
     private static final int THORNS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.THORNS_BOOL, ItemsProceduralSettingsConfig.THORNS_MAX_LEVEL);
     private static final int VANISHING_CURSE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.VANISHING_CURSE_BOOL);
     private static final int WATER_WORKER = enchantMaxValueGetter(ItemsProceduralSettingsConfig.WATER_WORKER_BOOL, ItemsProceduralSettingsConfig.WATER_WORKER_MAX_LEVEL);
+
+    public static ItemQuality getItemQuality(ItemStack itemStack) {
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        int enchantmentCount = 0;
+
+        if (!itemMeta.getEnchants().isEmpty()) {
+
+            for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
+
+                enchantmentCount += itemMeta.getEnchantLevel(enchantment);
+
+            }
+
+        }
+
+        double enchantPercentage = 0;
+
+        //get percentage of max enchants it could have
+        if (maxRankCalculator(itemStack) > 0) {
+
+            enchantPercentage = enchantmentCount * 100 / maxRankCalculator(itemStack);
+
+        }
+
+        if (enchantPercentage > 100)
+            return ItemQuality.LIGHT_BLUE;
+        else if (enchantPercentage > 100 / 6 * 5)
+            return ItemQuality.GOLD;
+        else if (enchantPercentage > 100 / 6 * 4)
+            return ItemQuality.PURPLE;
+        else if (enchantPercentage > 100 / 6 * 3)
+            return ItemQuality.BLUE;
+        else if (enchantPercentage > 100 / 6 * 2)
+            return ItemQuality.GREEN;
+        else if (enchantPercentage > 100 / 6 * 1)
+            return ItemQuality.WHITE;
+        else
+            return ItemQuality.GRAY;
+
+    }
 
     public static void dropQualityColorizer(ItemStack itemStack) {
 

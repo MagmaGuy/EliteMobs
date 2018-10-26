@@ -24,6 +24,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
+import static com.magmaguy.elitemobs.utils.WeightedProbablity.pickWeighedProbability;
+
 public class EventLauncher {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
@@ -113,7 +115,7 @@ public class EventLauncher {
 
         if (weighedConfigValues.isEmpty()) return;
 
-        switch (pickWeighedEvent(weighedConfigValues)) {
+        switch (pickWeighedProbability(weighedConfigValues)) {
 
             case EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT:
                 SmallTreasureGoblin.initializeEvent();
@@ -123,38 +125,6 @@ public class EventLauncher {
                 return;
 
         }
-
-    }
-
-    private String pickWeighedEvent(HashMap<String, Double> weighedConfigValues) {
-
-        double totalWeight = 0;
-
-        for (String string : weighedConfigValues.keySet()) {
-
-            totalWeight += weighedConfigValues.get(string);
-
-        }
-
-        String selectedLootSystem = null;
-        double random = Math.random() * totalWeight;
-
-        for (String string : weighedConfigValues.keySet()) {
-
-            random -= weighedConfigValues.get(string);
-
-
-            if (random <= 0) {
-
-                selectedLootSystem = string;
-
-                break;
-
-            }
-
-        }
-
-        return selectedLootSystem;
 
     }
 

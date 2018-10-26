@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -254,6 +255,107 @@ public class EnchantmentGenerator {
 
     }
 
+    public static HashMap<String, Integer> generateCustomEnchantments(double itemTier, Material material){
+
+        HashMap<String, Integer> enchantmentMap = new HashMap<>();
+
+        /*
+        No enchantments for items too low tier to have one
+         */
+        if (itemTier < 1) return enchantmentMap;
+
+        HashMap<String, Integer> validSecondaryEnchantments = new HashMap();
+
+        /*
+        Primary enchantments get instantly validated and applies since there is only one per item type
+        Secondary enchantments get added to a common pool to be randomized later
+         */
+        switch (material) {
+            case DIAMOND_SWORD:
+            case GOLD_SWORD:
+            case IRON_SWORD:
+            case STONE_SWORD:
+            case WOOD_SWORD:
+                break;
+            case BOW:
+                break;
+            case DIAMOND_PICKAXE:
+            case GOLD_PICKAXE:
+            case IRON_PICKAXE:
+            case STONE_PICKAXE:
+            case WOOD_PICKAXE:
+                break;
+            case DIAMOND_SPADE:
+            case GOLD_SPADE:
+            case IRON_SPADE:
+            case STONE_SPADE:
+            case WOOD_SPADE:
+                break;
+            case DIAMOND_HOE:
+            case GOLD_HOE:
+            case IRON_HOE:
+            case STONE_HOE:
+            case WOOD_HOE:
+            case SHIELD:
+                break;
+            case DIAMOND_AXE:
+            case GOLD_AXE:
+            case IRON_AXE:
+            case STONE_AXE:
+            case WOOD_AXE:
+                break;
+            case CHAINMAIL_HELMET:
+            case DIAMOND_HELMET:
+            case GOLD_HELMET:
+            case IRON_HELMET:
+            case LEATHER_HELMET:
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("HUNTER"));
+                break;
+            case CHAINMAIL_CHESTPLATE:
+            case DIAMOND_CHESTPLATE:
+            case GOLD_CHESTPLATE:
+            case IRON_CHESTPLATE:
+            case LEATHER_CHESTPLATE:
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("HUNTER"));
+                break;
+            case CHAINMAIL_LEGGINGS:
+            case DIAMOND_LEGGINGS:
+            case GOLD_LEGGINGS:
+            case IRON_LEGGINGS:
+            case LEATHER_LEGGINGS:
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("HUNTER"));
+                break;
+            case CHAINMAIL_BOOTS:
+            case DIAMOND_BOOTS:
+            case GOLD_BOOTS:
+            case IRON_BOOTS:
+            case LEATHER_BOOTS:
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("HUNTER"));
+                break;
+            case FISHING_ROD:
+                break;
+            case SHEARS:
+                break;
+        }
+
+        /*
+        Now that the primary enchantments are applied and the secondary enchantments are parsed, apply secondary enchants
+         */
+        int secondaryEnchantmentTotalParsedLevel = totalSecondaryCustomEnchantmentCount(validSecondaryEnchantments);
+
+        if (itemTier < 2 || secondaryEnchantmentTotalParsedLevel < 1 || validSecondaryEnchantments.size() == 0)
+            return enchantmentMap;
+
+        if (ThreadLocalRandom.current().nextDouble() > ConfigValues.itemsProceduralSettingsConfig.getDouble(ItemsProceduralSettingsConfig.CUSTOM_ENCHANTMENT_CHANCE))
+            return enchantmentMap;
+
+        /*
+        Right now there is only one enchantment per material, so it doesn't further randomize picking enchants
+         */
+        return validSecondaryEnchantments;
+
+    }
+
     private static HashMap<Enchantment, Integer> validateAndApplyPrimaryEnchantment(String string, double itemTier) {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
@@ -323,11 +425,51 @@ public class EnchantmentGenerator {
 
     }
 
+    private static HashMap<String, Integer> validateSecondaryCustomEnchantments(String string) {
+
+        HashMap<String, Integer> hashMap = new HashMap();
+
+        String mainString = "Valid Enchantments." + string;
+
+        if (ConfigValues.itemsProceduralSettingsConfig.getBoolean(mainString + ".Allow")) {
+
+            int enchantmentLevel;
+
+            if (ConfigValues.itemsProceduralSettingsConfig.contains(mainString + ".Max Level")) {
+
+                //TODO: actually implement this properly
+                enchantmentLevel = ThreadLocalRandom.current().nextInt(ConfigValues.itemsProceduralSettingsConfig.getInt(mainString + ".Max Level")) + 1;
+
+            } else {
+
+                enchantmentLevel = 1;
+
+            }
+
+            hashMap.put(string, enchantmentLevel);
+
+        }
+
+        return hashMap;
+
+    }
+
     private static int totalSecondaryEnchantmentCount(HashMap<Enchantment, Integer> validSecondaryEnchantments) {
 
         int totalCount = 0;
 
         for (Enchantment enchantment : validSecondaryEnchantments.keySet())
+            totalCount += validSecondaryEnchantments.get(enchantment);
+
+        return totalCount;
+
+    }
+
+    private static int totalSecondaryCustomEnchantmentCount(HashMap<String, Integer> validSecondaryEnchantments) {
+
+        int totalCount = 0;
+
+        for (String enchantment : validSecondaryEnchantments.keySet())
             totalCount += validSecondaryEnchantments.get(enchantment);
 
         return totalCount;
