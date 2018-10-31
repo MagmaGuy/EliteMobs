@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPowers;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ public class EliteMobEntity {
     /*
     Note that a lot of values here are defined by EliteMobProperties.java
      */
-
     private LivingEntity eliteMob;
     private int eliteMobLevel;
     private double maxHealth;
@@ -26,8 +26,10 @@ public class EliteMobEntity {
     /*
     This just defines default behavior
      */
+    private boolean isUnalterable = false;
     private boolean canStack = true;
     private boolean hasCustomArmor = false;
+    private boolean hasCustomName = false;
 
     public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel) {
 
@@ -39,8 +41,10 @@ public class EliteMobEntity {
         Register level, this is variable as per stacking rules
          */
         this.eliteMobLevel = eliteMobLevel;
+        if (eliteMobLevel < 1)
+            eliteMobLevel = 1;
         /*
-        Get correct instance of plugin date, necessary for settings names and health among other things
+        Get correct instance of plugin data, necessary for settings names and health among other things
          */
         EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
         /*
@@ -54,10 +58,28 @@ public class EliteMobEntity {
             livingEntity.setCustomNameVisible(true);
         /*
         Handle health, max is variable as per stacking rules
+        Currently #setHealth() resets the health back to maximum
          */
-        this.maxHealth = maxHealth;
-        this.currentHealth = currentHealth;
+        setMaxHealth(eliteMobProperties);
+        setHealth();
 
+    }
+
+    public void setEliteMobLevel(int newLevel) {
+        if (newLevel < 1)
+            newLevel = 1;
+        this.eliteMobLevel = newLevel;
+    }
+
+    private void setMaxHealth(EliteMobProperties eliteMobProperties) {
+        double defaultMaxHealth = eliteMobProperties.getDefaultMaxHealth();
+        this.maxHealth = (eliteMobLevel * DamageAdjuster.PER_LEVEL_POWER_INCREASE * defaultMaxHealth + defaultMaxHealth);
+        eliteMob.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+    }
+
+    private void setHealth() {
+        this.currentHealth = eliteMob.getHealth();
+        this.setHealth(maxHealth);
     }
 
     public boolean isThisEliteMob(LivingEntity livingEntity) {
@@ -72,9 +94,6 @@ public class EliteMobEntity {
         return eliteMobLevel;
     }
 
-    public void setEliteMobLevel(int newLevel) {
-        this.eliteMobLevel = newLevel;
-    }
 
     public boolean hasPower(MinorPowers minorPower) {
         return minorPowersList.contains(minorPower);
@@ -102,10 +121,6 @@ public class EliteMobEntity {
 
     public double getMaxHealth() {
         return maxHealth;
-    }
-
-    public void setMaxHealth(double newMaxHealth) {
-        this.maxHealth = newMaxHealth;
     }
 
     public void setCanStack(boolean bool) {
