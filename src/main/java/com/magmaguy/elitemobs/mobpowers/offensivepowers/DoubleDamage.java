@@ -28,7 +28,6 @@ import org.bukkit.plugin.Plugin;
  */
 public class DoubleDamage extends MinorPowers {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.DOUBLE_DAMAGE_MD;
 
     @Override

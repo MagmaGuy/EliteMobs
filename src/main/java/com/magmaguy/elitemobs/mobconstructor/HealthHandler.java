@@ -38,11 +38,8 @@ public class HealthHandler {
 
             newEliteMobLevel = (int) Math.floor(newEliteMobLevel / 2);
 
-            if (newEliteMobLevel < 1) {
-
+            if (newEliteMobLevel < 1)
                 newEliteMobLevel = 1;
-
-            }
 
         }
 

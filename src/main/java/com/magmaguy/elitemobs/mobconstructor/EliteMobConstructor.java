@@ -13,11 +13,11 @@ public class EliteMobConstructor {
     public static LivingEntity constructEliteMob(LivingEntity livingEntity, int mobLevel) {
 
         if (!EliteMobProperties.isValidEliteMobType(livingEntity)) {
-            Bukkit.getLogger().warning("[EliteMobs] Attempted to construct an invalid supermob. Report this to the dev!");
+            Bukkit.getLogger().warning("[EliteMobs] Attempted to construct an invalid Elite Mob. Report this to the dev!");
+            Bukkit.getLogger().warning("[EliteMobs] Elite Mob type: " + livingEntity.getType());
             return null;
         }
-        
-        String name = EliteMobProperties.getPluginData(livingEntity).getName().replace("$level", mobLevel+"");
+
         EntityTracker.registerEliteMob(new EliteMobEntity(livingEntity, mobLevel));
 
         return livingEntity;
