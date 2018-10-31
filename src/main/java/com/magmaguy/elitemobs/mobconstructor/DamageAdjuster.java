@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobcustomizer;
+package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
@@ -49,9 +49,9 @@ public class DamageAdjuster implements Listener {
     public static final double TO_PLAYER_DAMAGE_TIER_HANDICAP = 0.75;
     public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.33;
 
-    public static final double DIAMOND_TIER_LEVEL = 1;
-    public static final double IRON_TIER_LEVEL = 0.66;
-    public static final double STONE_CHAIN_TIER_LEVEL = 0.25;
+    public static final double DIAMOND_TIER_LEVEL = 3;
+    public static final double IRON_TIER_LEVEL = 2;
+    public static final double STONE_CHAIN_TIER_LEVEL = 1;
     public static final double GOLD_WOOD_LEATHER_TIER_LEVEL = 0;
 
     //TODO: Handle thorns damage and potion effects

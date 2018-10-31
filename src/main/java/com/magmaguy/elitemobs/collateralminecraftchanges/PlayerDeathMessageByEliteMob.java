@@ -19,7 +19,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -117,7 +117,7 @@ public class PlayerDeathMessageByEliteMob implements Listener {
 
         deathMessage = deathMessage.replace("$player", player.getDisplayName());
         deathMessage = deathMessage.replace("$entity", livingEntityName);
-        deathMessage = ChatColorConverter.chatColorConverter(deathMessage);
+        deathMessage = ChatColorConverter.convert(deathMessage);
 
         return deathMessage;
 

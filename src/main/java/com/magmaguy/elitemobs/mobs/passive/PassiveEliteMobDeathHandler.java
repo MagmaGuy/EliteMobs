@@ -15,30 +15,24 @@
 
 package com.magmaguy.elitemobs.mobs.passive;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.EntityTracker;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Created by MagmaGuy on 03/05/2017.
  */
 public class PassiveEliteMobDeathHandler implements Listener {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+        if (EntityTracker.isPassiveMob(event.getEntity())) {
 
             event.getEntity().getLocation().getWorld().spawnEntity(event.getEntity().getLocation(), event.getEntityType());
             event.getEntity().getLocation().getWorld().spawnEntity(event.getEntity().getLocation(), event.getEntityType());
-
-            event.getEntity().removeMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD, plugin);
 
         }
 

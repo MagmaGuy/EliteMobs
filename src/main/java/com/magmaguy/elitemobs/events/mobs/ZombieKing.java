@@ -25,8 +25,8 @@ import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.uniqueitems.ZombieKingsAxe;
-import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -62,7 +62,7 @@ public class ZombieKing implements Listener {
         MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_STACK, true);
         MetadataHandler.registerMetadata(zombieKing, MetadataHandler.EVENT_CREATURE, true);
         MetadataHandler.registerMetadata(zombieKing, MetadataHandler.PERSISTENT_ENTITY, true);
-        NameHandler.customUniqueNameAssigner(zombieKing, ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME)));
+        NameHandler.customUniqueNameAssigner(zombieKing, ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME)));
 
         zombieKing.setRemoveWhenFarAway(false);
         zombieKing.setBaby(false);
@@ -96,7 +96,7 @@ public class ZombieKing implements Listener {
 
         sendString = sendString.replace("$world", worldName);
 
-        sendString = ChatColorConverter.chatColorConverter(sendString);
+        sendString = ChatColorConverter.convert(sendString);
 
         EventMessage.sendEventMessage(sendString, zombieKing.getWorld());
         BossMobDeathCountdown.startDeathCountdown(zombieKing);
@@ -570,7 +570,7 @@ public class ZombieKing implements Listener {
                 EventMessage.sendEventMessage(newMessage, zombieKing.getWorld());
 
             } else
-                EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.chatColorConverter(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)), zombieKing.getWorld());
+                EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.convert(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)), zombieKing.getWorld());
 
         }
 

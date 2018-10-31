@@ -47,8 +47,8 @@ package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
@@ -62,7 +62,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Random;
 
-import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
 /**
  * Created by MagmaGuy on 18/05/2017.
@@ -120,8 +120,8 @@ public class ZombieFriends extends MajorPowers implements Listener {
             MetadataHandler.registerMetadata(friend2, MetadataHandler.CUSTOM_STACK, true);
             MetadataHandler.registerMetadata(friend1, MetadataHandler.CUSTOM_POWERS_MD, true);
             MetadataHandler.registerMetadata(friend2, MetadataHandler.CUSTOM_POWERS_MD, true);
-            friend1.setCustomName(chatColorConverter(configuration.getString("ZombieFriends.Friend 1")));
-            friend2.setCustomName(chatColorConverter(configuration.getString("ZombieFriends.Friend 2")));
+            friend1.setCustomName(convert(configuration.getString("ZombieFriends.Friend 1")));
+            friend2.setCustomName(convert(configuration.getString("ZombieFriends.Friend 2")));
             friend1.setCustomNameVisible(true);
             friend2.setCustomNameVisible(true);
             AggressiveEliteMobConstructor.constructAggressiveEliteMob(friend1);
@@ -138,7 +138,7 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
                             nameClearer(friend1);
 
-                            friend1.setCustomName(chatColorConverter(configuration.getStringList("ZombieFriends.DeathMessage").
+                            friend1.setCustomName(convert(configuration.getStringList("ZombieFriends.DeathMessage").
                                     get(random.nextInt(configuration.getStringList("ZombieFriends.DeathMessage")
                                             .size()))));
 
@@ -149,7 +149,7 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
                             nameClearer(friend1);
 
-                            friend2.setCustomName(chatColorConverter(configuration.getStringList("ZombieFriends.DeathMessage").
+                            friend2.setCustomName(convert(configuration.getStringList("ZombieFriends.DeathMessage").
                                     get(random.nextInt(configuration.getStringList("ZombieFriends.DeathMessage")
                                             .size()))));
 
@@ -164,7 +164,7 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
                             nameClearer(entity);
 
-                            entity.setCustomName(chatColorConverter(configuration.getStringList("ZombieFriends.ZombieDialog").
+                            entity.setCustomName(convert(configuration.getStringList("ZombieFriends.ZombieDialog").
                                     get(random.nextInt(configuration.getStringList("ZombieFriends.ZombieDialog")
                                             .size()))));
 
@@ -174,7 +174,7 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
                             nameClearer(friend1);
 
-                            friend1.setCustomName(chatColorConverter(configuration.getStringList("ZombieFriends.FriendDialog").
+                            friend1.setCustomName(convert(configuration.getStringList("ZombieFriends.FriendDialog").
                                     get(random.nextInt(configuration.getStringList("ZombieFriends.FriendDialog")
                                             .size()))));
 
@@ -184,7 +184,7 @@ public class ZombieFriends extends MajorPowers implements Listener {
 
                             nameClearer(friend2);
 
-                            friend2.setCustomName(chatColorConverter(configuration.getStringList("ZombieFriends.FriendDialog").
+                            friend2.setCustomName(convert(configuration.getStringList("ZombieFriends.FriendDialog").
                                     get(random.nextInt(configuration.getStringList("ZombieFriends.FriendDialog")
                                             .size()))));
 

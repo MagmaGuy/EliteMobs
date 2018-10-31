@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobcustomizer;
+package com.magmaguy.elitemobs.mobconstructor;
 
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -23,9 +23,18 @@ import org.bukkit.entity.LivingEntity;
  */
 public class DefaultMaxHealthGuesser {
 
+    /*
+    Todo: find a better solution for this
+    It's really not a great solution but it will do for now
+     */
+
     public static double defaultMaxHealthGuesser(LivingEntity livingEntity) {
 
-        return livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        LivingEntity livingEntity1 = (LivingEntity) livingEntity.getWorld().spawnEntity(livingEntity.getLocation(), livingEntity.getType());
+        double maxHealth = livingEntity1.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        livingEntity1.remove();
+
+        return maxHealth;
 
     }
 

@@ -92,14 +92,14 @@ public class AdventurersGuildGUI implements Listener {
                 itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
                 ItemMeta unlockedMeta = itemStack.getItemMeta();
                 String lowTierWarning = "";
-                if (rank < 10) lowTierWarning = ChatColorConverter.chatColorConverter("&cElites can't drop better loot!");
-                else lowTierWarning = ChatColorConverter.chatColorConverter("&aElites can drop better loot!");
+                if (rank < 10) lowTierWarning = ChatColorConverter.convert("&cElites can't drop better loot!");
+                else lowTierWarning = ChatColorConverter.convert("&aElites can drop better loot!");
                 unlockedMeta.setLore(Arrays.asList(
-                        ChatColorConverter.chatColorConverter("&f&m-------------------------------"),
-                       ChatColorConverter.chatColorConverter( "&aThis rank is unlocked!"),
-                        ChatColorConverter.chatColorConverter("&fYou can select it."),
+                        ChatColorConverter.convert("&f&m-------------------------------"),
+                       ChatColorConverter.convert( "&aThis rank is unlocked!"),
+                        ChatColorConverter.convert("&fYou can select it."),
                         lowTierWarning,
-                        ChatColorConverter.chatColorConverter("&f&m-------------------------------"),
+                        ChatColorConverter.convert("&f&m-------------------------------"),
                         lootBonus(rank),
                         mobSpawning(rank),
                         difficultyBonus(rank)));
@@ -109,10 +109,10 @@ public class AdventurersGuildGUI implements Listener {
                 itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
                 ItemMeta lockedMeta = itemStack.getItemMeta();
                 lockedMeta.setLore(Arrays.asList(
-                        ChatColorConverter.chatColorConverter("&f&m-------------------------------"),
-                        ChatColorConverter.chatColorConverter("&cThis rank is locked!"),
-                        ChatColorConverter.chatColorConverter("&cYou need rank " + (PlayerData.playerMaxGuildRank.get(player.getUniqueId()) + 1) + " first!"),
-                        ChatColorConverter.chatColorConverter("&f&m-------------------------------"),
+                        ChatColorConverter.convert("&f&m-------------------------------"),
+                        ChatColorConverter.convert("&cThis rank is locked!"),
+                        ChatColorConverter.convert("&cYou need rank " + (PlayerData.playerMaxGuildRank.get(player.getUniqueId()) + 1) + " first!"),
+                        ChatColorConverter.convert("&f&m-------------------------------"),
                         lootBonus(rank),
                         mobSpawning(rank),
                         difficultyBonus(rank)));
@@ -122,13 +122,13 @@ public class AdventurersGuildGUI implements Listener {
                 itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
                 ItemMeta selectedMeta = itemStack.getItemMeta();
                 String tierWarning = "";
-                if (rank < 10) tierWarning = ChatColorConverter.chatColorConverter("&cElites can't drop better loot!");
-                else tierWarning = ChatColorConverter.chatColorConverter("&aElites can drop better loot!");
+                if (rank < 10) tierWarning = ChatColorConverter.convert("&cElites can't drop better loot!");
+                else tierWarning = ChatColorConverter.convert("&aElites can drop better loot!");
                 selectedMeta.setLore(Arrays.asList(
-                        ChatColorConverter.chatColorConverter("&f&m-------------------------------"),
-                        ChatColorConverter.chatColorConverter("&aThis is your current rank!"),
+                        ChatColorConverter.convert("&f&m-------------------------------"),
+                        ChatColorConverter.convert("&aThis is your current rank!"),
                         tierWarning,
-                        ChatColorConverter.chatColorConverter("&f&m-------------------------------"),
+                        ChatColorConverter.convert("&f&m-------------------------------"),
                         lootBonus(rank),
                         mobSpawning(rank),
                         difficultyBonus(rank)));
@@ -145,12 +145,12 @@ public class AdventurersGuildGUI implements Listener {
                 else
                     priceString = "&a" + tierPriceCalculator(rank);
                 nextMeta.setLore(Arrays.asList(
-                        ChatColorConverter.chatColorConverter("&f&m-------------------------------"),
-                        ChatColorConverter.chatColorConverter("&6This is the next rank you can unlock"),
-                        ChatColorConverter.chatColorConverter("&aSelect it when you're ready!"),
-                        ChatColorConverter.chatColorConverter("&6Costs " + priceString + " &6" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
-                        ChatColorConverter.chatColorConverter("&fYou have &a" + PlayerData.playerCurrency.get(player.getUniqueId()) + " &f" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
-                        ChatColorConverter.chatColorConverter("&f&m-------------------------------"),
+                        ChatColorConverter.convert("&f&m-------------------------------"),
+                        ChatColorConverter.convert("&6This is the next rank you can unlock"),
+                        ChatColorConverter.convert("&aSelect it when you're ready!"),
+                        ChatColorConverter.convert("&6Costs " + priceString + " &6" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
+                        ChatColorConverter.convert("&fYou have &a" + PlayerData.playerCurrency.get(player.getUniqueId()) + " &f" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
+                        ChatColorConverter.convert("&f&m-------------------------------"),
                         lootBonus(rank),
                         mobSpawning(rank),
                         difficultyBonus(rank)));
@@ -192,7 +192,7 @@ public class AdventurersGuildGUI implements Listener {
         if (rank == 19) name = "&5Hero";
         if (rank == 20) name = "&6&l&oLegend";
 
-        return ChatColorConverter.chatColorConverter(name);
+        return ChatColorConverter.convert(name);
 
     }
 
@@ -221,7 +221,7 @@ public class AdventurersGuildGUI implements Listener {
         if (rank == 19) mobSpawning = 280;
         if (rank == 20) mobSpawning = 300;
 
-        return ChatColorConverter.chatColorConverter("&fElite Mob spawn rate modifier: &c" + mobSpawning + "%");
+        return ChatColorConverter.convert("&fElite Mob spawn rate modifier: &c" + mobSpawning + "%");
 
     }
 
@@ -250,7 +250,7 @@ public class AdventurersGuildGUI implements Listener {
         if (rank == 19) lootBonus = 280;
         if (rank == 20) lootBonus = 300;
 
-        return ChatColorConverter.chatColorConverter("&fElite Mob loot modifier: &a" + lootBonus + "%");
+        return ChatColorConverter.convert("&fElite Mob loot modifier: &a" + lootBonus + "%");
 
     }
 
@@ -279,7 +279,7 @@ public class AdventurersGuildGUI implements Listener {
         if (rank == 19) difficultyBonus = 190;
         if (rank == 20) difficultyBonus = 200;
 
-        return ChatColorConverter.chatColorConverter("&fElite Mob difficulty modifier: &4" + difficultyBonus + "%");
+        return ChatColorConverter.convert("&fElite Mob difficulty modifier: &4" + difficultyBonus + "%");
 
     }
 
@@ -363,10 +363,10 @@ public class AdventurersGuildGUI implements Listener {
             else {
                 EconomyHandler.subtractCurrency(event.getWhoClicked().getUniqueId(), tierPriceCalculator(selectedTier));
                 PlayerData.playerMaxGuildRank.put(event.getWhoClicked().getUniqueId(), selectedTier);
-                event.getWhoClicked().sendMessage(ChatColorConverter.chatColorConverter("&aYou have unlocked the " + rankNamer(selectedTier) + " &arank for " +
+                event.getWhoClicked().sendMessage(ChatColorConverter.convert("&aYou have unlocked the " + rankNamer(selectedTier) + " &arank for " +
                         tierPriceCalculator(selectedTier) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + ". \n&6Happy hunting!"));
                 difficultyMenu((Player) event.getWhoClicked());
-                Bukkit.broadcastMessage(ChatColorConverter.chatColorConverter(
+                Bukkit.broadcastMessage(ChatColorConverter.convert(
                         ((Player) event.getWhoClicked()).getDisplayName() + " has reached the " + rankNamer(selectedTier) + " &fguild rank!"));
             }
         }

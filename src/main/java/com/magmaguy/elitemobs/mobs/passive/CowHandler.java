@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.mobs.passive;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.ExperienceOrb;
@@ -50,7 +50,7 @@ public class CowHandler implements Listener {
 
         }
 
-        if (event.getEntity() instanceof Cow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof Cow && EntityTracker.isPassiveMob(event.getEntity())) {
 
             Random random = new Random();
 

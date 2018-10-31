@@ -23,11 +23,11 @@ import com.magmaguy.elitemobs.items.PlaceEventPrevent;
 import com.magmaguy.elitemobs.items.PotionEffectApplier;
 import com.magmaguy.elitemobs.items.RareDropEffect;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
-import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
-import com.magmaguy.elitemobs.mobcustomizer.DefaultDropsHandler;
-import com.magmaguy.elitemobs.mobcustomizer.displays.DamageDisplay;
-import com.magmaguy.elitemobs.mobcustomizer.displays.DisplayMob;
-import com.magmaguy.elitemobs.mobcustomizer.displays.HealthDisplay;
+import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.DefaultDropsHandler;
+import com.magmaguy.elitemobs.mobconstructor.displays.DamageDisplay;
+import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
+import com.magmaguy.elitemobs.mobconstructor.displays.HealthDisplay;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
 import com.magmaguy.elitemobs.mobpowers.AggroPrevention;
 import com.magmaguy.elitemobs.mobs.passive.*;
@@ -52,6 +52,7 @@ public class EventsRegistrer {
         Bukkit.getServer().getPluginManager().registerEvents(new PassiveEliteMobDeathHandler(), MetadataHandler.PLUGIN);
         Bukkit.getServer().getPluginManager().registerEvents(new PigHandler(), MetadataHandler.PLUGIN);
         Bukkit.getServer().getPluginManager().registerEvents(new SheepHandler(), MetadataHandler.PLUGIN);
+        Bukkit.getServer().getPluginManager().registerEvents(new FindSuperMobs(), MetadataHandler.PLUGIN);
 
         //Mob damage
         Bukkit.getServer().getPluginManager().registerEvents(new DamageAdjuster(), MetadataHandler.PLUGIN);
@@ -204,8 +205,10 @@ public class EventsRegistrer {
         Bukkit.getServer().getPluginManager().registerEvents(new MergeHandler(), MetadataHandler.PLUGIN);
 
         //Natural EliteMobs Spawning
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING))
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING)) {
             Bukkit.getServer().getPluginManager().registerEvents(new NaturalSpawning(), MetadataHandler.PLUGIN);
+            Bukkit.getServer().getPluginManager().registerEvents(new EntityTracker(), MetadataHandler.PLUGIN);
+        }
 
         //Natural Mob Metadata Assigner
         Bukkit.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(), MetadataHandler.PLUGIN);
@@ -227,7 +230,6 @@ public class EventsRegistrer {
         Bukkit.getServer().getPluginManager().registerEvents(new ItemSaleEvent(), MetadataHandler.PLUGIN);
 
         //Minecraft behavior canceller
-
         Bukkit.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(), MetadataHandler.PLUGIN);
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDeathMetadataFlusher(), MetadataHandler.PLUGIN);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))

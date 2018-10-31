@@ -25,7 +25,7 @@ import static com.magmaguy.elitemobs.utils.VersionChecker.currentVersionIsUnder;
 /**
  * Created by MagmaGuy on 10/10/2016.
  */
-public class ValidAgressiveMobFilter {
+public class ValidAggressiveMobFilter {
 
     public static boolean checkValidAggressiveMob(Entity entity) {
 

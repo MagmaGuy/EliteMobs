@@ -33,17 +33,17 @@ public class SetMaxItemTierCommand {
 
         ConfigValues.initializeCachedConfigurations();
 
-        commandSender.sendMessage(ChatColorConverter.chatColorConverter(
+        commandSender.sendMessage(ChatColorConverter.convert(
                 "Warning: You have set the max tier to " + tier + "!"));
-        commandSender.sendMessage(ChatColorConverter.chatColorConverter(
+        commandSender.sendMessage(ChatColorConverter.convert(
                 "The max protection enchantment has been increased to " + (tier - 1)));
-        commandSender.sendMessage(ChatColorConverter.chatColorConverter(
+        commandSender.sendMessage(ChatColorConverter.convert(
                 "The max sharpness enchantment has been increased to " + (tier- 1)));
-        commandSender.sendMessage(ChatColorConverter.chatColorConverter(
+        commandSender.sendMessage(ChatColorConverter.convert(
                 "The max power enchantment has been increased to " + (tier - 1)));
-        commandSender.sendMessage(ChatColorConverter.chatColorConverter(
+        commandSender.sendMessage(ChatColorConverter.convert(
                 "The max mob level has been increased to " + maxMobLevel));
-        commandSender.sendMessage(ChatColorConverter.chatColorConverter(
+        commandSender.sendMessage(ChatColorConverter.convert(
                 "You can run this command again to tweak the values or change them in the ItemProceduralSettings.yml file," +
                         " as well as the ItemsDropSettings and the MobCombatSettings"));
 

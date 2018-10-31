@@ -22,7 +22,7 @@ import org.bukkit.ChatColor;
  */
 public class ChatColorConverter {
 
-    public static String chatColorConverter(String string) {
+    public static String convert(String string) {
 
         return ChatColor.translateAlternateColorCodes('&', string);
 

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
-import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -20,74 +20,74 @@ public class MaterialGenerator {
 
     }
 
-    private static List<Material> validMaterials = new ArrayList<>();
-
     public static Material generateMaterial(double itemTier){
 
-        if (validMaterials.isEmpty()) intializeValidProceduralMaterials();
+        List<Material> localValidMaterials = intializeValidProceduralMaterials();
+
+        if (localValidMaterials.isEmpty()) intializeValidProceduralMaterials();
 
         if (itemTier < DamageAdjuster.DIAMOND_TIER_LEVEL) {
 
-            validMaterials.remove(DIAMOND);
-            validMaterials.remove(DIAMOND_AXE);
-            validMaterials.remove(DIAMOND_BARDING);
-            validMaterials.remove(DIAMOND_BLOCK);
-            validMaterials.remove(DIAMOND_CHESTPLATE);
-            validMaterials.remove(DIAMOND_HELMET);
-            validMaterials.remove(DIAMOND_HOE);
-            validMaterials.remove(DIAMOND_LEGGINGS);
-            validMaterials.remove(DIAMOND_ORE);
-            validMaterials.remove(DIAMOND_PICKAXE);
-            validMaterials.remove(DIAMOND_SPADE);
-            validMaterials.remove(DIAMOND_SWORD);
+            localValidMaterials.remove(DIAMOND);
+            localValidMaterials.remove(DIAMOND_AXE);
+            localValidMaterials.remove(DIAMOND_BARDING);
+            localValidMaterials.remove(DIAMOND_BLOCK);
+            localValidMaterials.remove(DIAMOND_CHESTPLATE);
+            localValidMaterials.remove(DIAMOND_HELMET);
+            localValidMaterials.remove(DIAMOND_HOE);
+            localValidMaterials.remove(DIAMOND_LEGGINGS);
+            localValidMaterials.remove(DIAMOND_ORE);
+            localValidMaterials.remove(DIAMOND_PICKAXE);
+            localValidMaterials.remove(DIAMOND_SPADE);
+            localValidMaterials.remove(DIAMOND_SWORD);
+            localValidMaterials.remove(DIAMOND_BOOTS);
 
         }
 
         if (itemTier < DamageAdjuster.IRON_TIER_LEVEL) {
 
-            validMaterials.remove(IRON_AXE);
-            validMaterials.remove(IRON_BARDING);
-            validMaterials.remove(IRON_BLOCK);
-            validMaterials.remove(IRON_BOOTS);
-            validMaterials.remove(IRON_CHESTPLATE);
-            validMaterials.remove(IRON_HELMET);
-            validMaterials.remove(IRON_HOE);
-            validMaterials.remove(IRON_INGOT);
-            validMaterials.remove(IRON_LEGGINGS);
-            validMaterials.remove(IRON_NUGGET);
-            validMaterials.remove(IRON_ORE);
-            validMaterials.remove(IRON_PICKAXE);
-            validMaterials.remove(IRON_SPADE);
-            validMaterials.remove(IRON_SWORD);
-            validMaterials.remove(IRON_BOOTS);
+            localValidMaterials.remove(IRON_AXE);
+            localValidMaterials.remove(IRON_BARDING);
+            localValidMaterials.remove(IRON_BLOCK);
+            localValidMaterials.remove(IRON_BOOTS);
+            localValidMaterials.remove(IRON_CHESTPLATE);
+            localValidMaterials.remove(IRON_HELMET);
+            localValidMaterials.remove(IRON_HOE);
+            localValidMaterials.remove(IRON_INGOT);
+            localValidMaterials.remove(IRON_LEGGINGS);
+            localValidMaterials.remove(IRON_NUGGET);
+            localValidMaterials.remove(IRON_ORE);
+            localValidMaterials.remove(IRON_PICKAXE);
+            localValidMaterials.remove(IRON_SPADE);
+            localValidMaterials.remove(IRON_SWORD);
 
         }
 
         if (itemTier < DamageAdjuster.STONE_CHAIN_TIER_LEVEL) {
 
-            validMaterials.remove(CHAINMAIL_BOOTS);
-            validMaterials.remove(CHAINMAIL_CHESTPLATE);
-            validMaterials.remove(CHAINMAIL_HELMET);
-            validMaterials.remove(CHAINMAIL_LEGGINGS);
-            validMaterials.remove(STONE_SWORD);
-            validMaterials.remove(STONE_HOE);
-            validMaterials.remove(STONE_SPADE);
-            validMaterials.remove(STONE_PICKAXE);
-            validMaterials.remove(STONE_AXE);
+            localValidMaterials.remove(CHAINMAIL_BOOTS);
+            localValidMaterials.remove(CHAINMAIL_CHESTPLATE);
+            localValidMaterials.remove(CHAINMAIL_HELMET);
+            localValidMaterials.remove(CHAINMAIL_LEGGINGS);
+            localValidMaterials.remove(STONE_SWORD);
+            localValidMaterials.remove(STONE_HOE);
+            localValidMaterials.remove(STONE_SPADE);
+            localValidMaterials.remove(STONE_PICKAXE);
+            localValidMaterials.remove(STONE_AXE);
 
         }
 
-        int index = ThreadLocalRandom.current().nextInt(validMaterials.size());
+        int index = ThreadLocalRandom.current().nextInt(localValidMaterials.size());
 
-        Material material = validMaterials.get(index);
+        Material material = localValidMaterials.get(index);
 
         return material;
 
     }
 
-    private static void intializeValidProceduralMaterials(){
+    private static List<Material> intializeValidProceduralMaterials(){
 
-        validMaterials = new ArrayList<>();
+        List<Material> validMaterials = new ArrayList<>();
 
         for (Object object : ConfigValues.itemsProceduralSettingsConfig.getList(ItemsProceduralSettingsConfig.PROCEDURAL_ITEM_VALID_MATERIALS)) {
 
@@ -104,6 +104,8 @@ public class MaterialGenerator {
 
 
         }
+
+        return validMaterials;
 
     }
 

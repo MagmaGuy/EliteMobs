@@ -64,13 +64,13 @@ public class ItemsCustomLootSettingsConfig {
         configuration.addDefault(SHOW_ITEM_TIER, true);
         configuration.addDefault(PREVENT_CUSTOM_ITEM_PLACING, true);
         configuration.addDefault(LORE_STRUCTURE, Arrays.asList(
-                ChatColorConverter.chatColorConverter("$enchantments"),
-                ChatColorConverter.chatColorConverter("$potionEffect"),
-                ChatColorConverter.chatColorConverter("&m----------------------"),
-                ChatColorConverter.chatColorConverter(" $customLore "),
-                ChatColorConverter.chatColorConverter(" $itemValue "),
-                ChatColorConverter.chatColorConverter("&m----------------------"),
-                ChatColorConverter.chatColorConverter(" Tier $tier ")
+                ChatColorConverter.convert("$enchantments"),
+                ChatColorConverter.convert("$potionEffect"),
+                ChatColorConverter.convert("&m----------------------"),
+                ChatColorConverter.convert(" $customLore "),
+                ChatColorConverter.convert(" $itemValue "),
+                ChatColorConverter.convert("&m----------------------"),
+                ChatColorConverter.convert(" Tier $tier ")
         ));
         configuration.addDefault(ABSORPTION, 2);
         configuration.addDefault(BLINDNESS, 5);

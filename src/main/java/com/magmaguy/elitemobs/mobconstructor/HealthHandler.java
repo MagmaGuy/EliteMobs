@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobcustomizer;
+package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.entity.Damageable;
@@ -78,34 +78,15 @@ public class HealthHandler {
     public static void passiveHealthHandler(Entity entity, int passiveStacking) {
 
         ((Damageable) entity).setMaxHealth(((LivingEntity) entity).getMaxHealth() * passiveStacking);
-
         ((Damageable) entity).setHealth(((LivingEntity) entity).getMaxHealth());
 
     }
 
-    public static void naturalAgressiveHealthHandler(Entity entity, int eliteMobLevel) {
+    public static void naturalAggressiveHealthHandler(Entity entity, int eliteMobLevel) {
 
         Damageable damageable = (Damageable) entity;
         double defaultMaxHealth = DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity);
         int newEliteMobLevel = eliteMobLevel;
-
-        if (entity.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
-
-            newEliteMobLevel = (int) Math.floor(newEliteMobLevel / 2);
-
-            if (newEliteMobLevel < 1) {
-
-                newEliteMobLevel = 1;
-
-            }
-
-        }
-
-        if (entity.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
-
-            newEliteMobLevel = (int) Math.floor(newEliteMobLevel * 2);
-
-        }
 
         damageable.setMaxHealth(maxHealthFormula(newEliteMobLevel, defaultMaxHealth));
         damageable.setHealth(damageable.getMaxHealth());

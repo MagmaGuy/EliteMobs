@@ -90,14 +90,14 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from a level $level Elite $mob");
         configuration.addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
         configuration.addDefault(LORE_STRUCTURE, Arrays.asList(
-                ChatColorConverter.chatColorConverter("$enchantments"),
-                ChatColorConverter.chatColorConverter("$potionEffects"),
-                ChatColorConverter.chatColorConverter("&m----------------------"),
-                ChatColorConverter.chatColorConverter("$itemSource"),
-                ChatColorConverter.chatColorConverter( "$itemValue"),
-                ChatColorConverter.chatColorConverter("Elite Mobs drop"),
-                ChatColorConverter.chatColorConverter("&m----------------------"),
-                ChatColorConverter.chatColorConverter("Tier $tier")
+                ChatColorConverter.convert("$enchantments"),
+                ChatColorConverter.convert("$potionEffects"),
+                ChatColorConverter.convert("&m----------------------"),
+                ChatColorConverter.convert("$itemSource"),
+                ChatColorConverter.convert( "$itemValue"),
+                ChatColorConverter.convert("Elite Mobs drop"),
+                ChatColorConverter.convert("&m----------------------"),
+                ChatColorConverter.convert("Tier $tier")
         ));
         configuration.addDefault(PROCEDURAL_ITEM_VALID_MATERIALS, Arrays.asList(
                 "DIAMOND_SWORD",

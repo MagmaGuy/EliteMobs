@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.mobs.passive;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.Material;
@@ -65,7 +66,7 @@ public class ChickenHandler implements Listener {
 
         }
 
-        if (event.getEntity() instanceof Chicken && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof Chicken && EntityTracker.isPassiveMob(event.getEntity())) {
 
             Random random = new Random();
 
@@ -112,7 +113,7 @@ public class ChickenHandler implements Listener {
 
             Chicken chicken = (Chicken) event.getEntity();
 
-            if (chicken.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+            if (EntityTracker.isPassiveMob(chicken)) {
 
                 if (!activeChickenList.contains(chicken)) {
 
@@ -150,7 +151,7 @@ public class ChickenHandler implements Listener {
 
         for (Entity entity : entityList) {
 
-            if (entity instanceof Chicken && entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+            if (entity instanceof Chicken && EntityTracker.isPassiveMob(entity)) {
 
                 activeChickenList.remove(entity);
 

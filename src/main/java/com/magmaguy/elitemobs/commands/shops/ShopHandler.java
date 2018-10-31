@@ -18,7 +18,6 @@ package com.magmaguy.elitemobs.commands.shops;
 import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
@@ -71,11 +70,9 @@ public class ShopHandler implements Listener {
                     - ConfigValues.economyConfig.getInt(EconomySettingsConfig.LOWEST_PROCEDURALLY_SIMULATED_LOOT);
             int balancedMin = ConfigValues.economyConfig.getInt(EconomySettingsConfig.LOWEST_PROCEDURALLY_SIMULATED_LOOT);
 
-            int randomLevel = random.nextInt(balancedMax + 1) + balancedMin;
+            int randomTier = random.nextInt(balancedMax) + balancedMin;
 
-            int itemTier = (int) (randomLevel / ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.PER_TIER_LEVEL_INCREASE));
-
-            shopInventory.setItem(i, ItemConstructor.constructItem(itemTier, null));
+            shopInventory.setItem(i, ItemConstructor.constructItem(randomTier, null));
 
         }
 

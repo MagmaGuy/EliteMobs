@@ -66,7 +66,7 @@ public class Kraken implements Listener {
         kraken.setMaxHealth(200);
         kraken.setHealth(200);
 
-        kraken.setCustomName(ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.KRAKEN_NAME)));
+        kraken.setCustomName(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.KRAKEN_NAME)));
         kraken.setCustomNameVisible(true);
 
         MetadataHandler.registerMetadata(kraken, MetadataHandler.KRAKEN, true);

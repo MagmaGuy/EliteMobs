@@ -48,8 +48,8 @@ package com.magmaguy.elitemobs.mobpowers.majorpowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import org.bukkit.Bukkit;
@@ -68,7 +68,7 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
 /**
  * Created by MagmaGuy on 18/05/2017.
@@ -181,7 +181,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_NAME, true);
                             MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_HEALTH, true);
                             zombie.setMaxHealth(zombie.getMaxHealth() / 2);
-                            zombie.setCustomName(chatColorConverter(configuration.getString("ZombieNecronomicon.Summoned zombie")));
+                            zombie.setCustomName(convert(configuration.getString("ZombieNecronomicon.Summoned zombie")));
                             zombie.setCustomNameVisible(true);
                             AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombie);
 
@@ -198,7 +198,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_NAME, true);
                             MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_HEALTH, true);
                             skeleton.setMaxHealth(skeleton.getMaxHealth() / 2);
-                            skeleton.setCustomName(chatColorConverter(configuration.getString("ZombieNecronomicon.Summoned skeleton")));
+                            skeleton.setCustomName(convert(configuration.getString("ZombieNecronomicon.Summoned skeleton")));
                             skeleton.setCustomNameVisible(true);
                             AggressiveEliteMobConstructor.constructAggressiveEliteMob(skeleton);
 
@@ -354,7 +354,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
         new BukkitRunnable() {
 
-            String fullChant = chatColorConverter(configuration.getString("ZombieNecronomicon.Summoning chant"));
+            String fullChant = convert(configuration.getString("ZombieNecronomicon.Summoning chant"));
 
             @Override
             public void run() {

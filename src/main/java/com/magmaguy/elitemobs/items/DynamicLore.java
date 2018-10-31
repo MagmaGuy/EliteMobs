@@ -163,7 +163,7 @@ public class DynamicLore {
         String worthLore = ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LORE_WORTH);
         worthLore = worthLore.replace("$worth", worthOrResale + "");
         worthLore = worthLore.replace("$currencyName", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-        worthLore = ChatColorConverter.chatColorConverter(worthLore);
+        worthLore = ChatColorConverter.convert(worthLore);
 
         return worthLore;
 
@@ -174,7 +174,7 @@ public class DynamicLore {
         String resaleLore = ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LORE_RESALE_WORTH);
         resaleLore = resaleLore.replace("$resale", resale + "");
         resaleLore = resaleLore.replace("$currencyName", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-        resaleLore = ChatColorConverter.chatColorConverter(resaleLore);
+        resaleLore = ChatColorConverter.convert(resaleLore);
 
         return resaleLore;
 

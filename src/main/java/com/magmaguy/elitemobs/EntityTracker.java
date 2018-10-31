@@ -1,50 +1,247 @@
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 public class EntityTracker implements Listener {
 
-    public static HashMap<World, LivingEntity> passiveMobs = new HashMap<>();
-    public static HashMap<World, LivingEntity> eliteMobs = new HashMap<>();
-    public static HashMap<World, LivingEntity> bossMobs = new HashMap<>();
-    public static List<Entity> allPluginEntities = new ArrayList<>();
-    public static HashMap<World, LivingEntity> naturalEntity = new HashMap<>();
+    public static HashMap<World, List<LivingEntity>> passiveMobs = new HashMap<>();
+    public static HashMap<World, List<EliteMobEntity>> eliteMobs = new HashMap<>();
+    public static HashMap<World, List<EliteMobEntity>> bossMobs = new HashMap<>();
+    public static List<Entity> allCullableEliteMobEntities = new ArrayList<>();
+    public static HashMap<World, List<LivingEntity>> naturalEntities = new HashMap<>();
 
-    public static void registerEliteMob(LivingEntity livingEntity) {
-        eliteMobs.put(livingEntity.getWorld(), livingEntity);
-        allPluginEntities.add(livingEntity);
+    /*
+    Starts tracking elite mob
+     */
+    public static void registerEliteMob(EliteMobEntity eliteMobEntity) {
+        eliteMobs = eliteMobAdder(eliteMobs, eliteMobEntity);
+        registerEntity(eliteMobEntity.getLivingEntity());
     }
 
+    /*
+    Starts tracking boss mob
+     */
+    public static void registerBossMob(EliteMobEntity eliteMobEntity) {
+        bossMobs = eliteMobAdder(bossMobs, eliteMobEntity);
+        registerEntity(eliteMobEntity.getLivingEntity());
+    }
+
+    private static HashMap<World, List<EliteMobEntity>> eliteMobAdder(HashMap<World, List<EliteMobEntity>> currentHashMap, EliteMobEntity eliteMob) {
+
+        HashMap<World, List<EliteMobEntity>> newHashMap = (HashMap<World, List<EliteMobEntity>>) currentHashMap.clone();
+
+        if (currentHashMap.containsKey(eliteMob.getLivingEntity().getWorld())) {
+            List<EliteMobEntity> eliteMobEntityList = newHashMap.get(eliteMob.getLivingEntity().getWorld());
+            /*
+            Check if the entity is already in the list
+             */
+            if (eliteMobEntityList.contains(eliteMob))
+                return newHashMap;
+
+            eliteMobEntityList.add(eliteMob);
+            newHashMap.put(eliteMob.getLivingEntity().getWorld(), eliteMobEntityList);
+        } else
+            newHashMap.put(eliteMob.getLivingEntity().getWorld(), new ArrayList(Collections.singletonList(eliteMob)));
+
+        return newHashMap;
+
+    }
+
+    /*
+    Starts tracking super mob
+     */
     public static void registerPassiveMob(LivingEntity livingEntity) {
-        passiveMobs.put(livingEntity.getWorld(), livingEntity);
-        allPluginEntities.add(livingEntity);
+        passiveMobs = livingEntityAdder(passiveMobs, livingEntity);
     }
 
-    public static void registerBossMob(LivingEntity livingEntity) {
-        bossMobs.put(livingEntity.getWorld(), livingEntity);
-        allPluginEntities.add(livingEntity);
+    private static HashMap<World, List<LivingEntity>> livingEntityAdder(HashMap<World, List<LivingEntity>> currentHashMap, LivingEntity livingEntity) {
+
+        HashMap<World, List<LivingEntity>> newHashMap = currentHashMap;
+
+        if (currentHashMap.containsKey(livingEntity.getWorld())) {
+            List<LivingEntity> currentLivingEntities = currentHashMap.get(livingEntity.getWorld());
+            /*
+            Check if the entity is already in the list
+             */
+            if (currentLivingEntities.contains(livingEntity))
+                return newHashMap;
+            currentLivingEntities.add(livingEntity);
+            newHashMap.put(livingEntity.getWorld(), currentLivingEntities);
+        } else
+            newHashMap.put(livingEntity.getWorld(), new ArrayList<>(Collections.singletonList(livingEntity)));
+
+        return newHashMap;
+
     }
 
+    /*
+    Starts tracking any entity generated or managed by EliteMobs, useful for when they need to be culled
+    Does not include passive mobs to avoid culling them by mistake
+     */
     public static void registerEntity(Entity entity) {
-        allPluginEntities.add(entity);
+        allCullableEliteMobEntities.add(entity);
     }
 
-    public static void registerNaturalEntity(LivingEntity livingEntity) {
-        naturalEntity.put(livingEntity.getWorld(), livingEntity);
+    /*
+    Registers mobs that spawn naturally, necessary for elite mob rewards
+     */
+    public static void registerNaturalEntity(LivingEntity entity) {
+        naturalEntities = livingEntityAdder(passiveMobs, entity);
     }
 
+    public static void checkEntityState() {
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                passiveMobs = updateValidEntities(passiveMobs);
+                eliteMobs = updateValidEliteMobs(eliteMobs);
+                bossMobs = updateValidEliteMobs(bossMobs);
+                naturalEntities = updateValidEntities(naturalEntities);
+                allCullableEliteMobEntities = checkEntityList(allCullableEliteMobEntities);
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+
+    }
+
+    private static HashMap<World, List<LivingEntity>> updateValidEntities(HashMap<World, List<LivingEntity>> livingEntityHashMap) {
+
+        HashMap<World, List<LivingEntity>> hashMap = (HashMap<World, List<LivingEntity>>) livingEntityHashMap.clone();
+
+        for (World world : hashMap.keySet()) {
+            List<LivingEntity> livingEntityList = new ArrayList<>();
+            livingEntityList.addAll(hashMap.get(world));
+            for (LivingEntity livingEntity : livingEntityList)
+                if (!livingEntity.isValid())
+                    hashMap = livingEntitySubtractor(livingEntityHashMap, livingEntity);
+        }
+
+        return hashMap;
+
+    }
+
+    private static HashMap<World, List<EliteMobEntity>> updateValidEliteMobs(HashMap<World, List<EliteMobEntity>> livingEntityHashMap) {
+
+        HashMap<World, List<EliteMobEntity>> hashMap = (HashMap<World, List<EliteMobEntity>>) livingEntityHashMap.clone();
+
+        for (World world : livingEntityHashMap.keySet()) {
+            List<EliteMobEntity> livingEntityList = new ArrayList<>();
+            livingEntityList.addAll(hashMap.get(world));
+            for (EliteMobEntity livingEntity : livingEntityList)
+                if (!livingEntity.getLivingEntity().isValid())
+                    hashMap = eliteMobsSubtractor(hashMap, livingEntity.getLivingEntity());
+        }
+
+        return hashMap;
+
+    }
+
+    private static HashMap<World, List<LivingEntity>> livingEntitySubtractor(HashMap<World, List<LivingEntity>> currentHashMap, LivingEntity livingEntity) {
+
+        HashMap<World, List<LivingEntity>> newHashMap = currentHashMap;
+
+        List<LivingEntity> currentLivingEntities = currentHashMap.get(livingEntity.getWorld());
+        currentLivingEntities.remove(livingEntity);
+        newHashMap.put(livingEntity.getWorld(), currentLivingEntities);
+
+        return newHashMap;
+
+    }
+
+    private static HashMap<World, List<EliteMobEntity>> eliteMobsSubtractor(HashMap<World, List<EliteMobEntity>> currentHashMap, LivingEntity livingEntity) {
+
+        HashMap<World, List<EliteMobEntity>> newHashMap = currentHashMap;
+
+        List<EliteMobEntity> currentLivingEntities = currentHashMap.get(livingEntity.getWorld());
+        currentLivingEntities.remove(livingEntity);
+        newHashMap.put(livingEntity.getWorld(), currentLivingEntities);
+
+        return newHashMap;
+
+    }
+
+    private static List<Entity> checkEntityList(List<Entity> entityList) {
+
+        List<Entity> newArrayList = entityList;
+
+        for (Entity entity : entityList)
+            if (!entity.isValid())
+                newArrayList.remove(entity);
+
+        return newArrayList;
+
+    }
+
+    public static boolean isPassiveMob(Entity entity) {
+        if (!(entity instanceof LivingEntity)) return false;
+        return checkLivingEntityMap(passiveMobs, (LivingEntity) entity);
+    }
+
+    public static boolean isEliteMob(LivingEntity livingEntity) {
+        return checkEliteMobMap(eliteMobs, livingEntity);
+    }
+
+    public static boolean isBossMob(LivingEntity livingEntity) {
+        return checkEliteMobMap(bossMobs, livingEntity);
+    }
+
+    public static boolean isPluginEntity(Entity entity) {
+        return allCullableEliteMobEntities.contains(entity);
+    }
+
+    public static boolean isNaturalEntity(Entity entity) {
+        if (!(entity instanceof LivingEntity)) return false;
+        return checkLivingEntityMap(naturalEntities, (LivingEntity) entity);
+    }
+
+    public static boolean isCullablePluginEntity(Entity entity) {
+        return allCullableEliteMobEntities.contains(entity);
+    }
+
+    private static boolean checkLivingEntityMap(HashMap<World, List<LivingEntity>> hashMap, LivingEntity livingEntity) {
+
+        if (hashMap.containsKey(livingEntity.getWorld()))
+            return hashMap.get(livingEntity.getWorld()).contains(livingEntity);
+        return false;
+
+    }
+
+    private static boolean checkEliteMobMap(HashMap<World, List<EliteMobEntity>> hashMap, LivingEntity livingEntity) {
+
+        if (hashMap.containsKey(livingEntity.getWorld()))
+            return hashMap.get(livingEntity.getWorld()).contains(livingEntity);
+        return false;
+
+    }
+
+    /*
+    Custom spawn reasons can be considered as natural spawns under specific config options
+     */
     @EventHandler
-    public void registerNaturalEntity(EntitySpawnEvent event) {
-        if (event instanceof LivingEntity)
+    public void registerNaturalEntity(CreatureSpawnEvent event) {
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL))
+            registerNaturalEntity(event.getEntity());
+    }
+
+    /*
+    Natural entities get unregistered from being natural when exploit abuse is detected from the players
+     */
+    public static void unregisterNaturalEntity(Entity livingEntity) {
+        List<LivingEntity> entityList = naturalEntities.get(livingEntity.getWorld());
+        entityList.remove(livingEntity);
+        naturalEntities.put(livingEntity.getWorld(), entityList);
     }
 
 }

@@ -15,14 +15,15 @@
 
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.events.mobs.*;
-import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobcustomizer.HealthHandler;
-import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
-import com.magmaguy.elitemobs.mobcustomizer.displays.DisplayMob;
+import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.HealthHandler;
+import com.magmaguy.elitemobs.mobconstructor.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
@@ -343,7 +344,7 @@ public class SpawnMobCommandHandler {
                 mobType == EntityType.PIG || mobType == EntityType.SHEEP) {
 
             HealthHandler.passiveHealthHandler(entity, ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT));
-            NameHandler.customPassiveName(entity, MetadataHandler.PLUGIN);
+            NameHandler.customPassiveName(entity);
 
             return entity;
 
@@ -363,6 +364,8 @@ public class SpawnMobCommandHandler {
             }
 
         }
+
+        EntityTracker.registerNaturalEntity(entity);
 
         return entity;
 

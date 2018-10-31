@@ -20,8 +20,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.DeadMoon;
-import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -77,7 +77,7 @@ public class TheReturned implements Listener {
         MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_ARMOR, true);
         MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_POWERS_MD, true);
         MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_STACK, true);
-        NameHandler.customUniqueNameAssigner(theReturned, ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME)));
+        NameHandler.customUniqueNameAssigner(theReturned, ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME)));
 
         double x = random.nextDouble() - 0.5;
         double z = random.nextDouble() - 0.5;

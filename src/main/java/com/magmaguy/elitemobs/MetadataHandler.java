@@ -47,8 +47,8 @@ public class MetadataHandler implements Listener {
 
     //plugin metadata
     public final static String ELITE_MOB_MD = "EliteMob";
-    public final static String PASSIVE_ELITE_MOB_MD = "PassiveEliteMob";
-    public final static String NATURAL_MOB_MD = "NaturalMob";
+//    public final static String PASSIVE_ELITE_MOB_MD = "PassiveEliteMob";
+//    public final static String NATURAL_MOB_MD = "NaturalMob";
     public final static String MAJOR_POWER_AMOUNT_MD = "MajorPowerAmount";
     public final static String DEFENSIVE_POWER_AMOUNT_MD = "DefensivePowerAmount";
     public final static String OFFENSIVE_POWER_AMOUNT_MD = "OffensivePowerAmount";
@@ -225,8 +225,6 @@ public class MetadataHandler implements Listener {
     ));
     private static List<String> forMetadataList = new ArrayList<>(Arrays.asList( //add major and minor power lists
             ELITE_MOB_MD,
-            PASSIVE_ELITE_MOB_MD,
-            NATURAL_MOB_MD,
             MAJOR_POWER_AMOUNT_MD,
             DEFENSIVE_POWER_AMOUNT_MD,
             OFFENSIVE_POWER_AMOUNT_MD,

@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
+import com.magmaguy.elitemobs.mobscanner.ValidAggressiveMobFilter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +27,7 @@ public class PreventMobItemPickup implements Listener {
     public void onPickup(EntityPickupItemEvent event) {
 
         if (event.getEntity() instanceof Player) return;
-        if (ValidAgressiveMobFilter.checkValidAggressiveMob(event.getEntity())) {
+        if (ValidAggressiveMobFilter.checkValidAggressiveMob(event.getEntity())) {
 
             event.setCancelled(true);
 
