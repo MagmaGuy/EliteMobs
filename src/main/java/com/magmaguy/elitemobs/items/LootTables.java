@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
@@ -42,15 +43,15 @@ public class LootTables implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
-        Entity entity = event.getEntity();
+        if (event.getEntity() == null) return;
+        LivingEntity livingEntity = event.getEntity();
 
-        if (entity == null) return;
-        if (!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) ||
-                !entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+        if (!EntityTracker.isNaturalEntity(livingEntity) ||
+                !livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
 
-        if (entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) return;
+        if (livingEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) return;
 
-        Item item = generateLoot((LivingEntity) entity);
+        Item item = generateLoot((LivingEntity) livingEntity);
 
         if (item == null) return;
 
@@ -79,7 +80,7 @@ public class LootTables implements Listener {
         double baseChance = ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.ELITE_ITEM_FLAT_DROP_RATE) / 100;
         double dropChanceBonus = ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.ELITE_ITEM_TIER_DROP_RATE) / 100 * itemTier;
 
-        if (ThreadLocalRandom.current().nextDouble() < baseChance + dropChanceBonus)
+        if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus)
             return null;
 
         /*

@@ -13,7 +13,7 @@ public class NameGenerator {
 
     public static String generateName(String rawName) {
 
-        return ChatColorConverter.chatColorConverter(rawName);
+        return ChatColorConverter.convert(rawName);
 
     }
 

@@ -25,12 +25,12 @@ public class EventMessage {
 
     public static void sendEventMessage(String message, World world) {
 
-        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY))
-            Bukkit.getServer().broadcastMessage(message);
-        else
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY)) {
             for (Player player : Bukkit.getServer().getOnlinePlayers())
                 if (player.getWorld().equals(world))
                     player.sendMessage(message);
+        } else
+            Bukkit.getServer().broadcastMessage(message);
 
     }
 

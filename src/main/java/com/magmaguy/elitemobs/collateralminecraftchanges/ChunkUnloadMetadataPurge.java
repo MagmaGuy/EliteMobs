@@ -33,9 +33,6 @@ public class ChunkUnloadMetadataPurge implements Listener {
 
         for (Entity entity : event.getChunk().getEntities()) {
 
-            if (entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD))
-                continue;
-
             if (!(entity instanceof LivingEntity) ||
                     entity instanceof LivingEntity && ((LivingEntity) entity).getRemoveWhenFarAway())
                 MetadataHandler.runtimeMetadataFlush(entity);

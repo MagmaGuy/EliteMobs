@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.mobs.passive;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.MushroomCow;
@@ -44,7 +44,7 @@ public class MushroomCowHandler implements Listener {
 
         }
 
-        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof MushroomCow && EntityTracker.isPassiveMob(event.getEntity())) {
 
             Random random = new Random();
 
@@ -100,7 +100,7 @@ public class MushroomCowHandler implements Listener {
     @EventHandler
     public void onShear(PlayerShearEntityEvent event) {
 
-        if (event.getEntity() instanceof MushroomCow && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof MushroomCow && EntityTracker.isPassiveMob(event.getEntity())) {
 
             MushroomCow mushroomCow = (MushroomCow) event.getEntity();
 

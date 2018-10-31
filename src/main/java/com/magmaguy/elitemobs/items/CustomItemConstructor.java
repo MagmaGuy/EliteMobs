@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 import static com.magmaguy.elitemobs.items.parserutil.ConfigPathBuilder.automatedStringBuilder;
 import static com.magmaguy.elitemobs.items.parserutil.EnchantmentConfigParser.parseEnchantments;
 
@@ -135,7 +135,7 @@ public class CustomItemConstructor implements Listener {
         if (ConfigValues.itemsCustomLootListConfig.getString(name) == null || ConfigValues.itemsCustomLootListConfig.getString(name).isEmpty())
             Bukkit.getLogger().warning("[EliteMobs] Invalid name!");
 
-        return chatColorConverter(ConfigValues.itemsCustomLootListConfig.getString(name));
+        return convert(ConfigValues.itemsCustomLootListConfig.getString(name));
 
     }
 
@@ -150,7 +150,7 @@ public class CustomItemConstructor implements Listener {
         if (itemLore != null && !itemLore.isEmpty())
             for (String string : itemLore)
                 if (string != null && !string.isEmpty())
-                    newList.add(chatColorConverter(string));
+                    newList.add(convert(string));
 
         if (newList.isEmpty())
             return itemLore;

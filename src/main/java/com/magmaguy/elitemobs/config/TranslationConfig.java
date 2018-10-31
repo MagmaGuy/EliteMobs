@@ -24,6 +24,33 @@ import java.util.Arrays;
  */
 public class TranslationConfig {
 
+    private static final String ELITE_MOB_NAME = "Elite Mob Names.";
+    public static final String NAME_BLAZE = ELITE_MOB_NAME + "Blaze";
+    public static final String NAME_CAVE_SPIDER = ELITE_MOB_NAME + "CaveSpider";
+    public static final String NAME_CREEPER = ELITE_MOB_NAME + "Creeper";
+    public static final String NAME_ENDERMAN = ELITE_MOB_NAME + "Enderman";
+    public static final String NAME_ENDERMITE = ELITE_MOB_NAME + "Endermite";
+    public static final String NAME_HUSK = ELITE_MOB_NAME + "Husk";
+    public static final String NAME_IRON_GOLEM = ELITE_MOB_NAME + "IronGolem";
+    public static final String NAME_PIG_ZOMBIE = ELITE_MOB_NAME + "PigZombie";
+    public static final String NAME_POLAR_BEAR = ELITE_MOB_NAME + "PolarBear";
+    public static final String NAME_SILVERFISH = ELITE_MOB_NAME + "Silverfish";
+    public static final String NAME_SKELETON = ELITE_MOB_NAME + "Skeleton";
+    public static final String NAME_SPIDER = ELITE_MOB_NAME + "Spider";
+    public static final String NAME_STRAY = ELITE_MOB_NAME + "Stray";
+    public static final String NAME_WITCH = ELITE_MOB_NAME + "Witch";
+    public static final String NAME_WITHER_SKELETON = ELITE_MOB_NAME + "WitherSkeleton";
+    public static final String NAME_ZOMBIE = ELITE_MOB_NAME + "Zombie";
+    public static final String NAME_VEX = ELITE_MOB_NAME + "Vex";
+    public static final String NAME_VINDICATOR = ELITE_MOB_NAME + "Vindicator";
+    public static final String NAME_DROWNED = ELITE_MOB_NAME + "Drowned";
+
+    public static final String NAME_CHICKEN = ELITE_MOB_NAME + "Chicken";
+    public static final String NAME_COW = ELITE_MOB_NAME + "Cow";
+    public static final String NAME_MUSHROOM_COW = ELITE_MOB_NAME + "MushroomCow";
+    public static final String NAME_PIG = ELITE_MOB_NAME + "Pig";
+    public static final String NAME_SHEEP = ELITE_MOB_NAME + "Sheep";
+
     public static final String CONFIG_NAME = "translation.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -31,31 +58,31 @@ public class TranslationConfig {
     public void initializeConfig() {
 
 
-        configuration.addDefault("Elite Mob Names.Blaze", Arrays.asList("Level ", " Elite Blaze"));
-        configuration.addDefault("Elite Mob Names.CaveSpider", Arrays.asList("Level ", " Elite Cave Spider"));
-        configuration.addDefault("Elite Mob Names.Creeper", Arrays.asList("Level ", " Elite Creeper"));
-        configuration.addDefault("Elite Mob Names.Enderman", Arrays.asList("Level ", " Elite Enderman"));
-        configuration.addDefault("Elite Mob Names.Endermite", Arrays.asList("Level ", " Elite Endermite"));
-        configuration.addDefault("Elite Mob Names.Husk", Arrays.asList("Level ", " Elite Husk"));
-        configuration.addDefault("Elite Mob Names.IronGolem", Arrays.asList("Level ", " Elite Iron Golem"));
-        configuration.addDefault("Elite Mob Names.PigZombie", Arrays.asList("Level ", " Elite Zombie Pigman"));
-        configuration.addDefault("Elite Mob Names.PolarBear", Arrays.asList("Level ", " Elite Polar Bear"));
-        configuration.addDefault("Elite Mob Names.Silverfish", Arrays.asList("Level ", " Elite Silverfish"));
-        configuration.addDefault("Elite Mob Names.Skeleton", Arrays.asList("Level ", " Elite Skeleton"));
-        configuration.addDefault("Elite Mob Names.Spider", Arrays.asList("Level ", " Elite Spider"));
-        configuration.addDefault("Elite Mob Names.Stray", Arrays.asList("Level ", " Elite Stray"));
-        configuration.addDefault("Elite Mob Names.Witch", Arrays.asList("Level ", " Elite Witch"));
-        configuration.addDefault("Elite Mob Names.WitherSkeleton", Arrays.asList("Level ", " Elite Wither Skeleton"));
-        configuration.addDefault("Elite Mob Names.Zombie", Arrays.asList("Level ", " Elite Zombie"));
-        configuration.addDefault("Elite Mob Names.Vex", Arrays.asList("Level ", " Elite Vex"));
-        configuration.addDefault("Elite Mob Names.Vindicator", Arrays.asList("Level ", " Elite Vindicator"));
-        configuration.addDefault("Elite Mob Names.Drowned", Arrays.asList("Level ", " Elite Drowned"));
+        configuration.addDefault(NAME_BLAZE, Arrays.asList("Level ", " Elite Blaze"));
+        configuration.addDefault(NAME_CAVE_SPIDER, Arrays.asList("Level ", " Elite Cave Spider"));
+        configuration.addDefault(NAME_CREEPER, Arrays.asList("Level ", " Elite Creeper"));
+        configuration.addDefault(NAME_ENDERMAN, Arrays.asList("Level ", " Elite Enderman"));
+        configuration.addDefault(NAME_ENDERMITE, Arrays.asList("Level ", " Elite Endermite"));
+        configuration.addDefault(NAME_HUSK, Arrays.asList("Level ", " Elite Husk"));
+        configuration.addDefault(NAME_IRON_GOLEM, Arrays.asList("Level ", " Elite Iron Golem"));
+        configuration.addDefault(NAME_PIG_ZOMBIE, Arrays.asList("Level ", " Elite Zombie Pigman"));
+        configuration.addDefault(NAME_POLAR_BEAR, Arrays.asList("Level ", " Elite Polar Bear"));
+        configuration.addDefault(NAME_SILVERFISH, Arrays.asList("Level ", " Elite Silverfish"));
+        configuration.addDefault(NAME_SKELETON, Arrays.asList("Level ", " Elite Skeleton"));
+        configuration.addDefault(NAME_SPIDER, Arrays.asList("Level ", " Elite Spider"));
+        configuration.addDefault(NAME_STRAY, Arrays.asList("Level ", " Elite Stray"));
+        configuration.addDefault(NAME_WITCH, Arrays.asList("Level ", " Elite Witch"));
+        configuration.addDefault(NAME_WITHER_SKELETON, Arrays.asList("Level ", " Elite Wither Skeleton"));
+        configuration.addDefault(NAME_ZOMBIE, Arrays.asList("Level ", " Elite Zombie"));
+        configuration.addDefault(NAME_VEX, Arrays.asList("Level ", " Elite Vex"));
+        configuration.addDefault(NAME_VINDICATOR, Arrays.asList("Level ", " Elite Vindicator"));
+        configuration.addDefault(NAME_DROWNED, Arrays.asList("Level ", " Elite Drowned"));
 
-        configuration.addDefault("Elite Mob Names.Chicken", "Super Chicken");
-        configuration.addDefault("Elite Mob Names.Cow", "Super Cow");
-        configuration.addDefault("Elite Mob Names.MushroomCow", "Super Mooshroom");
-        configuration.addDefault("Elite Mob Names.Pig", "Super Pig");
-        configuration.addDefault("Elite Mob Names.Sheep", "Super Sheep");
+        configuration.addDefault(NAME_CHICKEN, "Super Chicken");
+        configuration.addDefault(NAME_COW, "Super Cow");
+        configuration.addDefault(NAME_MUSHROOM_COW, "Super Mooshroom");
+        configuration.addDefault(NAME_PIG, "Super Pig");
+        configuration.addDefault(NAME_SHEEP, "Super Sheep");
 
         configuration.addDefault("ScoreBoard.Health", "Health: ");
 

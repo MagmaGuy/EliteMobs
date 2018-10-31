@@ -261,11 +261,11 @@ public class MobSpawningAndLoot implements Listener {
 //
 //        Material itemMaterial = currentSetting ? Material.PAPER : Material.BARRIER;
 //
-//        title += currentSetting ? ChatColorConverter.chatColorConverter(": &2true") :
-//                ChatColorConverter.chatColorConverter(": &4false");
+//        title += currentSetting ? ChatColorConverter.convert(": &2true") :
+//                ChatColorConverter.convert(": &4false");
 //
-//        String loteInstructions = currentSetting ? ChatColorConverter.chatColorConverter("&4Click to disable!") :
-//                ChatColorConverter.chatColorConverter("&aClick to enable!");
+//        String loteInstructions = currentSetting ? ChatColorConverter.convert("&4Click to disable!") :
+//                ChatColorConverter.convert("&aClick to enable!");
 //
 //        lore.add(loteInstructions);
 //

@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.mobcustomizer.displays;
+package com.magmaguy.elitemobs.mobconstructor.displays;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -19,14 +19,14 @@ import java.util.List;
 public class DisplayMob implements Listener {
 
     public static List<LivingEntity> livingEntityList = new ArrayList<>();
-    private static String encodedKey = ChatColorConverter.chatColorConverter("&D&d&d&d&D&d&d&f");
+    private static String encodedKey = ChatColorConverter.convert("&D&d&d&d&D&d&d&f");
 
     public static void nameEncoder(LivingEntity livingEntity) {
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                livingEntity.setCustomName(ChatColorConverter.chatColorConverter(encodedKey + livingEntity.getCustomName()));
+                livingEntity.setCustomName(ChatColorConverter.convert(encodedKey + livingEntity.getCustomName()));
                 MetadataHandler.registerMetadata(livingEntity, MetadataHandler.CUSTOM_NAME, true);
                 MetadataHandler.registerMetadata(livingEntity, MetadataHandler.LIVINGENTITY_DISPLAY, true);
                 MetadataHandler.registerMetadata(livingEntity, MetadataHandler.PERSISTENT_ENTITY, true);

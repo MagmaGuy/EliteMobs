@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.powerstances;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -41,7 +42,7 @@ public class MajorPowerPowerStance implements Listener {
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS))
             return;
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS)
-                && !entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD))
+                && !EntityTracker.isNaturalEntity(entity))
             return;
         if (entity.hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD))
             return;
@@ -178,7 +179,7 @@ public class MajorPowerPowerStance implements Listener {
                 globalPositionCounter++;
 
                 if (!entity.isValid() || entity.isDead() ||
-                        (!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) && ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS))) {
+                        (!EntityTracker.isNaturalEntity(entity) && ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS))) {
 
                     VisualItemRemover.removeItems(powerItemLocationTracker, trackAmount, itemsPerTrack);
                     cancel();

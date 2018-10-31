@@ -13,8 +13,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobcustomizer;
+package com.magmaguy.elitemobs.mobconstructor;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
@@ -43,7 +44,7 @@ public class DefaultDropsHandler implements Listener {
 
         if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
-            if (!event.getEntity().hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
+            if (!EntityTracker.isNaturalEntity(event.getEntity()) &&
                     !ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.SPAWNER_DEFAULT_LOOT_MULTIPLIER)) {
 
                 return;

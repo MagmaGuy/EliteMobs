@@ -19,7 +19,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.MobTierFinder;
-import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;

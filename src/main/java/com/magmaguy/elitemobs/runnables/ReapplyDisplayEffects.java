@@ -7,7 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Iterator;
 
-import static com.magmaguy.elitemobs.mobcustomizer.displays.DisplayMob.livingEntityList;
+import static com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob.livingEntityList;
 
 public class ReapplyDisplayEffects extends BukkitRunnable {
 

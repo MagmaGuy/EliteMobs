@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.mobcustomizer.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import com.magmaguy.elitemobs.mobpowers.ProjectileMetadataDetector;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
@@ -38,7 +38,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
 import java.util.Random;
 
-import static com.magmaguy.elitemobs.ChatColorConverter.chatColorConverter;
+import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
 /**
  * Created by MagmaGuy on 06/05/2017.
@@ -170,7 +170,7 @@ public class Taunt extends MinorPowers implements Listener {
         int randomizedKey = random.nextInt(list.size());
         String tempName = list.get(randomizedKey);
 
-        entity.setCustomName(chatColorConverter(tempName));
+        entity.setCustomName(convert(tempName));
 
         new BukkitRunnable() {
 

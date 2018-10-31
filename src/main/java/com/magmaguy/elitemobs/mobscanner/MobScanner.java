@@ -15,12 +15,13 @@
 
 package com.magmaguy.elitemobs.mobscanner;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
-import com.magmaguy.elitemobs.mobcustomizer.*;
+import com.magmaguy.elitemobs.mobconstructor.*;
 import com.magmaguy.elitemobs.mobs.passive.ChickenHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -33,8 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
-import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customAggressiveName;
-import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customPassiveName;
+import static com.magmaguy.elitemobs.mobconstructor.NameHandler.customAggressiveName;
+import static com.magmaguy.elitemobs.mobconstructor.NameHandler.customPassiveName;
 
 /**
  * Created by MagmaGuy on 07/10/2016.
@@ -53,9 +54,9 @@ public class MobScanner implements Listener {
 
             while (iterator.hasNext()) {
 
-                Entity entity = iterator.next();
+                LivingEntity entity = iterator.next();
 
-                if (ValidAgressiveMobFilter.checkValidAggressiveMob(entity)) {
+                if (ValidAggressiveMobFilter.checkValidAggressiveMob(entity)) {
 
                     //scan for stacked EliteMobs
                     if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS) &&
@@ -65,14 +66,14 @@ public class MobScanner implements Listener {
                         if (!(entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
                                 entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.ELITEMOB_STACKING_CAP))) {
 
-                            if (!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
+                            if (!EntityTracker.isNaturalEntity(entity) &&
                                     ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_SPAWNER_MOBS)) {
 
                                 scanValidAggressiveLivingEntity(entity);
 
                             }
 
-                            if (entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) &&
+                            if (EntityTracker.isNaturalEntity(entity) &&
                                     ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_NATURAL_MOBS)) {
 
                                 scanValidAggressiveLivingEntity(entity);
@@ -97,21 +98,21 @@ public class MobScanner implements Listener {
                 if (ValidPassiveMobFilter.ValidPassiveMobFilter(entity) && ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS)) {
 
                     //scan for passive mobs that might have lost their metadata
-                    if (((LivingEntity) entity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity) * ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT)) {
+                    if (entity.getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity) * ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT)) {
 
-                        customPassiveName(entity, plugin);
+                        customPassiveName(entity);
 
                     }
 
                     //scan for new passive supermobs
-                    if (!entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+                    if (!EntityTracker.isPassiveMob(entity)) {
 
                         scanValidPassiveLivingEntity(entity);
 
                     }
 
                     //spawn chicken eggs, really wish there were an event for this
-                    if (entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && entity instanceof Chicken) {
+                    if (EntityTracker.isPassiveMob(entity) && entity instanceof Chicken) {
 
                         if (!ChickenHandler.activeChickenList.contains(entity)) {
 
@@ -125,10 +126,10 @@ public class MobScanner implements Listener {
 
                 //scan for iron golems with missing metadata
                 if (entity instanceof IronGolem && !entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                        ((IronGolem) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity)) {
+                        (entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)) {
 
-                    MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, HealthHandler.reversePowerFormula(((IronGolem) entity).getMaxHealth(),
-                            DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity)));
+                    MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, HealthHandler.reversePowerFormula(entity.getMaxHealth(),
+                            DefaultMaxHealthGuesser.defaultMaxHealthGuesser(entity)));
                     customAggressiveName(entity);
 
                 }
@@ -139,21 +140,19 @@ public class MobScanner implements Listener {
 
     }
 
-    public void scanValidAggressiveLivingEntity(Entity entity) {
+    public void scanValidAggressiveLivingEntity(LivingEntity entity) {
 
         for (Entity secondEntity : entity.getNearbyEntities(aggressiveRange, aggressiveRange, aggressiveRange)) {
+
+            if (!(secondEntity instanceof LivingEntity)) continue;
 
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
                     && !entity.hasMetadata(MetadataHandler.CUSTOM_STACK) && !secondEntity.hasMetadata(MetadataHandler.CUSTOM_STACK)) {
 
-                //If the sum of both entities is above level 50, don't add both entities together
                 if (levelCap(entity, secondEntity)) {
 
-                    if (!entity.hasMetadata(MetadataHandler.NATURAL_MOB_MD) || !secondEntity.hasMetadata(MetadataHandler.NATURAL_MOB_MD)) {
-
-                        entity.removeMetadata(MetadataHandler.NATURAL_MOB_MD, plugin);
-
-                    }
+                    if (!EntityTracker.isNaturalEntity(entity) || !EntityTracker.isNaturalEntity(secondEntity))
+                        EntityTracker.isNaturalEntity(entity);
 
                     //setup new EliteMob
                     LevelHandler.LevelHandler(entity, secondEntity, plugin);
@@ -180,21 +179,17 @@ public class MobScanner implements Listener {
 
         List<LivingEntity> animalContainer = new ArrayList<>();
 
-        if (((LivingEntity) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity)) {
-
+        if (((LivingEntity) entity).getMaxHealth() != DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity))
             return;
 
-        }
-
-        for (Entity secondEntity : entity.getNearbyEntities(passiveRange, passiveRange, passiveRange)) {
-
+        for (Entity secondEntity : entity.getNearbyEntities(passiveRange, passiveRange, passiveRange))
             if (entity.getType() == secondEntity.getType() && entity.isValid() && secondEntity.isValid()
-                    && !secondEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) &&
+                    && !EntityTracker.isPassiveMob(secondEntity) &&
                     ((LivingEntity) secondEntity).getMaxHealth() == DefaultMaxHealthGuesser.defaultMaxHealthGuesser((LivingEntity) entity)) {
 
                 animalContainer.add((LivingEntity) secondEntity);
 
-                if (animalContainer.size() == passiveStacking && !entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+                if (animalContainer.size() == passiveStacking && !EntityTracker.isPassiveMob(entity)) {
 
                     for (LivingEntity livingEntity : animalContainer) {
 
@@ -204,16 +199,12 @@ public class MobScanner implements Listener {
                     }
 
                     HealthHandler.passiveHealthHandler(entity, passiveStacking);
-
-                    customPassiveName(entity, plugin);
-
+                    customPassiveName(entity);
                     return;
 
                 }
 
             }
-
-        }
 
     }
 
@@ -224,11 +215,10 @@ public class MobScanner implements Listener {
         Damageable damageable2 = (Damageable) entity2;
 
         if (damageable1.hasMetadata(MetadataHandler.ELITE_MOB_MD) &&
-                damageable1.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.ELITEMOB_STACKING_CAP)) {
-
+                damageable1.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() >= ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.ELITEMOB_STACKING_CAP))
             return false;
 
-        } else return !damageable2.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
+        else return !damageable2.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
                 damageable2.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.ELITEMOB_STACKING_CAP);
 
     }

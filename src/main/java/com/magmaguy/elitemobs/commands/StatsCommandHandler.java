@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
@@ -73,7 +74,7 @@ public class StatsCommandHandler {
             for (LivingEntity livingEntity : world.getLivingEntities()) {
 
                 if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
-                        livingEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+                        EntityTracker.isPassiveMob(livingEntity)) {
 
                     totalMobCount++;
 
@@ -142,7 +143,7 @@ public class StatsCommandHandler {
                         }
 
 
-                    } else if (livingEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+                    } else if (EntityTracker.isPassiveMob(livingEntity)) {
 
                         //passive EliteMobs only stack at 50 right now
                         //TODO: redo this count at some other stage of this plugin's development

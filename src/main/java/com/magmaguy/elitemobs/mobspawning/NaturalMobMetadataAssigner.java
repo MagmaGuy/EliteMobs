@@ -18,9 +18,10 @@ package com.magmaguy.elitemobs.mobspawning;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
-import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
+import com.magmaguy.elitemobs.mobscanner.ValidAggressiveMobFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -61,13 +62,14 @@ public class NaturalMobMetadataAssigner implements Listener {
             return;
         if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES)))
             return;
-        if (!ValidAgressiveMobFilter.checkValidAggressiveMob(event.getEntity()))
+        if (!ValidAggressiveMobFilter.checkValidAggressiveMob(event.getEntity()))
             return;
 
-        Entity entity = event.getEntity();
-        MetadataHandler.registerMetadata(entity, MetadataHandler.NATURAL_MOB_MD, true);
+        LivingEntity livingEntity = event.getEntity();
+//        MetadataHandler.registerMetadata(livingEntity, MetadataHandler.NATURAL_MOB_MD, true); //todo: remove this metadata
+//        EntityTracker.registerNaturalEntity(livingEntity);
 
-        int huntingGearChanceAdder = getHuntingGearBonus(entity);
+        int huntingGearChanceAdder = getHuntingGearBonus(livingEntity);
 
         Double validChance = (ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
                 huntingGearChanceAdder) / 100;
@@ -75,7 +77,7 @@ public class NaturalMobMetadataAssigner implements Listener {
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;
 
-        NaturalSpawning.naturalMobProcessor(entity);
+        NaturalSpawning.naturalMobProcessor(livingEntity);
 
     }
 

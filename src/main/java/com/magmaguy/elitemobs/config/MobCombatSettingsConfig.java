@@ -65,6 +65,7 @@ public class MobCombatSettingsConfig {
     public static final String INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE = "Increase level of mobs spawned based on distance from world spawn";
     public static final String DISTANCE_TO_INCREMENT = "Distance between increments";
     public static final String LEVEL_TO_INCREMENT = "Amount of levels incremented per distance";
+    public static final String ANTI_EXPLOIT_MESSAGE = "Anti exploit message";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -114,6 +115,7 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE, false);
         configuration.addDefault(DISTANCE_TO_INCREMENT, 100);
         configuration.addDefault(LEVEL_TO_INCREMENT, 1);
+        configuration.addDefault(ANTI_EXPLOIT_MESSAGE, "&c[EM AntiExploit] &7Nearby elite won't drop special loot.");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

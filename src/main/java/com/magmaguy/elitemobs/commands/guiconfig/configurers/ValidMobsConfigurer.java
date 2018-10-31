@@ -48,11 +48,11 @@ public class ValidMobsConfigurer implements Listener {
 //        witch = aggressiveBooleanConfigGrabber("Witch");
 //        zombie = aggressiveBooleanConfigGrabber("Zombie");
 //
-//        chicken = passiveBooleanConfigGrabber("Chicken");
+//        chicken = passiveBooleanConfigGrabber("SuperChicken");
 //        cow = passiveBooleanConfigGrabber("Cow");
-//        mushroomCow = passiveBooleanConfigGrabber("MushroomCow");
-//        pig = passiveBooleanConfigGrabber("Pig");
-//        sheep = passiveBooleanConfigGrabber("Sheep");
+//        mushroomCow = passiveBooleanConfigGrabber("SuperMushroomCow");
+//        pig = passiveBooleanConfigGrabber("SuperPig");
+//        sheep = passiveBooleanConfigGrabber("SuperSheep");
 //
 //        aggressive = ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs");
 //
@@ -147,19 +147,19 @@ public class ValidMobsConfigurer implements Listener {
 //        inventory.setItem(aggressiveMobSlots.get(19), aggressiveSkull);
 //
 //        //populate passive mobs
-//        ItemStack chickenSkull = validMobConfigSkullGenerator("Chicken", chicken);
+//        ItemStack chickenSkull = validMobConfigSkullGenerator("SuperChicken", chicken);
 //        inventory.setItem(passiveMobSlots.get(0), chickenSkull);
 //
 //        ItemStack cowSkull = validMobConfigSkullGenerator("Cow", cow);
 //        inventory.setItem(passiveMobSlots.get(1), cowSkull);
 //
-//        ItemStack mushroomCowSkull = validMobConfigSkullGenerator("MushroomCow", mushroomCow);
+//        ItemStack mushroomCowSkull = validMobConfigSkullGenerator("SuperMushroomCow", mushroomCow);
 //        inventory.setItem(passiveMobSlots.get(2), mushroomCowSkull);
 //
-//        ItemStack pigSkull = validMobConfigSkullGenerator("Pig", pig);
+//        ItemStack pigSkull = validMobConfigSkullGenerator("SuperPig", pig);
 //        inventory.setItem(passiveMobSlots.get(3), pigSkull);
 //
-//        ItemStack sheepSkull = validMobConfigSkullGenerator("Sheep", sheep);
+//        ItemStack sheepSkull = validMobConfigSkullGenerator("SuperSheep", sheep);
 //        inventory.setItem(passiveMobSlots.get(4), sheepSkull);
 //
 //        //enable or disable all passive mobs
@@ -348,17 +348,17 @@ public class ValidMobsConfigurer implements Listener {
 //
 //                }
 //
-//                if (name.contains("Chicken")) {
+//                if (name.contains("SuperChicken")) {
 //
-//                    passiveMobConfigSetter("Chicken", inventory);
+//                    passiveMobConfigSetter("SuperChicken", inventory);
 //
 //                    return;
 //
 //                }
 //
-//                if (name.contains("MushroomCow")) {
+//                if (name.contains("SuperMushroomCow")) {
 //
-//                    passiveMobConfigSetter("MushroomCow", inventory);
+//                    passiveMobConfigSetter("SuperMushroomCow", inventory);
 //
 //                    return;
 //
@@ -372,17 +372,17 @@ public class ValidMobsConfigurer implements Listener {
 //
 //                }
 //
-//                if (name.contains("Pig")) {
+//                if (name.contains("SuperPig")) {
 //
-//                    passiveMobConfigSetter("Pig", inventory);
+//                    passiveMobConfigSetter("SuperPig", inventory);
 //
 //                    return;
 //
 //                }
 //
-//                if (name.contains("Sheep")) {
+//                if (name.contains("SuperSheep")) {
 //
-//                    passiveMobConfigSetter("Sheep", inventory);
+//                    passiveMobConfigSetter("SuperSheep", inventory);
 //
 //                    return;
 //

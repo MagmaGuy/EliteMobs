@@ -27,7 +27,8 @@ import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
-import com.magmaguy.elitemobs.mobcustomizer.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.runnables.*;
@@ -54,7 +55,6 @@ public class EliteMobs extends JavaPlugin {
         //Enable stats
         Metrics metrics = new Metrics(this);
 
-
         //Initialize custom enchantments
         CustomEnchantmentCache.initialize();
 
@@ -65,9 +65,6 @@ public class EliteMobs extends JavaPlugin {
         //Parse loot
         CustomItemConstructor superDrops = new CustomItemConstructor();
         superDrops.superDropParser();
-
-//        UniqueItemConstructor uniqueItemConstructor = new UniqueItemConstructor();
-//        uniqueItemConstructor.intializeUniqueItems();
 
         UniqueItemInitializer.initialize();
 
@@ -93,6 +90,11 @@ public class EliteMobs extends JavaPlugin {
 
         //launch internal clock for attack cooldown
         DamageAdjuster.launchInternalClock();
+
+        /*
+        Initialize mob values
+         */
+        PluginMobProperties.initializePluginMobValues();
 
         /*
         Check for new plugin version
@@ -153,6 +155,9 @@ public class EliteMobs extends JavaPlugin {
 
     }
 
+    /*
+    Repeating tasks that run as long as the server is on
+     */
     public void launchRunnables() {
 
         int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
@@ -167,6 +172,7 @@ public class EliteMobs extends JavaPlugin {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         new DynamicLoreUpdater().runTaskTimer(this, 20, 20 * 2);
         new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
+        EntityListUpdater.startUpdating();
 
     }
 

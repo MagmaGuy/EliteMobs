@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.scoreboard;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import org.bukkit.Bukkit;
@@ -58,7 +59,7 @@ public class ScoreboardHandler implements Listener {
                         aggressiveEliteMobScoreboard(entity, player);
                         return;
 
-                    } else if (entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+                    } else if (EntityTracker.isPassiveMob(entity)) {
 
                         aggressiveEliteMobScoreboard(entity, player);
                         return;

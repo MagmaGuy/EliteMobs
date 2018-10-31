@@ -13,13 +13,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobcustomizer;
+package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
-import static com.magmaguy.elitemobs.mobcustomizer.NameHandler.customAggressiveName;
+import static com.magmaguy.elitemobs.mobconstructor.NameHandler.customAggressiveName;
 
 /**
  * Created by MagmaGuy on 15/07/2017.
@@ -35,7 +35,7 @@ public class AggressiveEliteMobConstructor {
 
         }
 
-        HealthHandler.naturalAgressiveHealthHandler(entity, entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
+        HealthHandler.naturalAggressiveHealthHandler(entity, entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt());
         customAggressiveName(entity);
         PowerHandler.powerHandler(entity);
         ArmorHandler.ArmorHandler(entity);

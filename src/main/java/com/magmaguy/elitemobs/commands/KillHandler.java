@@ -1,8 +1,9 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobscanner.ValidAgressiveMobFilter;
+import com.magmaguy.elitemobs.mobscanner.ValidAggressiveMobFilter;
 import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -53,7 +54,7 @@ public class KillHandler {
             int counter = 0;
             for (World world : EliteMobs.validWorldList)
                 for (LivingEntity livingEntity : world.getLivingEntities())
-                    if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.checkValidAggressiveMob(livingEntity)) {
+                    if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAggressiveMobFilter.checkValidAggressiveMob(livingEntity)) {
                         livingEntity.remove();
                         counter++;
                     }
@@ -70,7 +71,7 @@ public class KillHandler {
             int counter = 0;
             for (World world : EliteMobs.validWorldList)
                 for (LivingEntity livingEntity : world.getLivingEntities())
-                    if (livingEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && ValidPassiveMobFilter.ValidPassiveMobFilter(livingEntity)) {
+                    if (EntityTracker.isPassiveMob(livingEntity) && ValidPassiveMobFilter.ValidPassiveMobFilter(livingEntity)) {
                         livingEntity.remove();
                         counter++;
                     }
@@ -91,7 +92,7 @@ public class KillHandler {
                     for (LivingEntity livingEntity : world.getLivingEntities())
                         if (livingEntity.getType().equals(entityType) &&
                                 (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
-                                        livingEntity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD))) {
+                                        EntityTracker.isPassiveMob(livingEntity))) {
                             livingEntity.remove();
                             counter++;
                         }
@@ -115,7 +116,7 @@ public class KillHandler {
 
             int counter = 0;
             for (Entity entity : ((Player) commandSender).getNearbyEntities(Integer.parseInt(args[2]), Integer.parseInt(args[2]), Integer.parseInt(args[2])))
-                if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAgressiveMobFilter.checkValidAggressiveMob(entity)) {
+                if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAggressiveMobFilter.checkValidAggressiveMob(entity)) {
                     entity.remove();
                     counter++;
                 }
@@ -136,7 +137,7 @@ public class KillHandler {
         try {
             int counter = 0;
             for (Entity entity : ((Player) commandSender).getNearbyEntities(Integer.parseInt(args[2]), Integer.parseInt(args[2]), Integer.parseInt(args[2])))
-                if (entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && ValidPassiveMobFilter.ValidPassiveMobFilter(entity)) {
+                if (EntityTracker.isPassiveMob(entity) && ValidPassiveMobFilter.ValidPassiveMobFilter(entity)) {
                     entity.remove();
                     counter++;
                 }
@@ -161,7 +162,7 @@ public class KillHandler {
             for (Entity entity : ((Player) commandSender).getNearbyEntities(Integer.parseInt(args[2]), Integer.parseInt(args[2]), Integer.parseInt(args[2])))
                 if (entity.getType().equals(entityType) &&
                         (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
-                                entity.hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD))) {
+                                EntityTracker.isPassiveMob(entity))) {
                     entity.remove();
                     counter++;
                 }

@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.mobs.passive;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
@@ -51,7 +51,7 @@ public class SheepHandler implements Listener {
 
         }
 
-        if (event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD) && event.getEntity() instanceof Sheep) {
+        if (EntityTracker.isPassiveMob(event.getEntity()) && event.getEntity() instanceof Sheep) {
 
             Random random = new Random();
 
@@ -143,7 +143,7 @@ public class SheepHandler implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity() instanceof Sheep && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof Sheep && EntityTracker.isPassiveMob(event.getEntity())) {
 
             Sheep sheep = (Sheep) event.getEntity();
 
@@ -157,7 +157,7 @@ public class SheepHandler implements Listener {
     @EventHandler
     public void onShear(PlayerShearEntityEvent event) {
 
-        if (event.getEntity() instanceof Sheep && event.getEntity().hasMetadata(MetadataHandler.PASSIVE_ELITE_MOB_MD)) {
+        if (event.getEntity() instanceof Sheep && EntityTracker.isPassiveMob(event.getEntity())) {
 
             Sheep sheep = (Sheep) event.getEntity();
 

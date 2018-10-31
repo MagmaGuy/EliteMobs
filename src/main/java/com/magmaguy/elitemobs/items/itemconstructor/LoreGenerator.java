@@ -212,9 +212,9 @@ public class LoreGenerator {
         for (Enchantment enchantment : enchantmentMap.keySet()) {
             String loreLine;
             if (enchantment.getName().contains("CURSE"))
-                loreLine = ChatColorConverter.chatColorConverter("&c" + getEnchantmentName(enchantment) + " " + enchantmentMap.get(enchantment));
+                loreLine = ChatColorConverter.convert("&c" + getEnchantmentName(enchantment) + " " + enchantmentMap.get(enchantment));
             else
-                loreLine = ChatColorConverter.chatColorConverter("&7" + getEnchantmentName(enchantment) + " " + enchantmentMap.get(enchantment));
+                loreLine = ChatColorConverter.convert("&7" + getEnchantmentName(enchantment) + " " + enchantmentMap.get(enchantment));
             enchantmentsLore.add(loreLine);
         }
 
@@ -241,7 +241,7 @@ public class LoreGenerator {
         for (String string : customEnchantments.keySet()) {
 
             String loreLine;
-            loreLine = ChatColorConverter.chatColorConverter("&6" + getCustomEnchantmentName(string) + " " + customEnchantments.get(string));
+            loreLine = ChatColorConverter.convert("&6" + getCustomEnchantmentName(string) + " " + customEnchantments.get(string));
             customEnchantmentLore.add(loreLine);
 
         }
@@ -285,7 +285,7 @@ public class LoreGenerator {
         if (potionList == null || potionList.isEmpty()) return potionsLore;
 
         for (String string : potionList) {
-            String loreLine = ChatColorConverter.chatColorConverter("&2" + getPotionName(string.split(",")[0]) + " " + string.split(",")[1]);
+            String loreLine = ChatColorConverter.convert("&2" + getPotionName(string.split(",")[0]) + " " + string.split(",")[1]);
             potionsLore.add(loreLine);
         }
 
@@ -363,7 +363,7 @@ public class LoreGenerator {
         List<String> colorizedLore = new ArrayList<>();
 
         for (String string : rawLore)
-            colorizedLore.add(ChatColorConverter.chatColorConverter(string));
+            colorizedLore.add(ChatColorConverter.convert(string));
 
         return colorizedLore;
 

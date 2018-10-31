@@ -16,6 +16,7 @@
 package com.magmaguy.elitemobs.events.mobs;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
@@ -25,7 +26,7 @@ import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.mobcustomizer.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -50,7 +51,7 @@ public class TreasureGoblin implements Listener {
 
     private static Random random = new Random();
 
-    public static void createGoblin(Entity treasureGoblin) {
+    public static void createGoblin(LivingEntity treasureGoblin) {
 
         int mobLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
 
@@ -60,7 +61,7 @@ public class TreasureGoblin implements Listener {
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_NAME, true);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_ARMOR, true);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_STACK, true);
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.NATURAL_MOB_MD, true);
+        EntityTracker.registerNaturalEntity(treasureGoblin);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_STACK, true);
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.PERSISTENT_ENTITY, true);
         AggressiveEliteMobConstructor.constructAggressiveEliteMob(treasureGoblin);
@@ -68,7 +69,7 @@ public class TreasureGoblin implements Listener {
         ((Zombie) treasureGoblin).setBaby(true);
         ((Zombie) treasureGoblin).setRemoveWhenFarAway(false);
 
-        treasureGoblin.setCustomName(ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME)));
+        treasureGoblin.setCustomName(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME)));
         treasureGoblin.setCustomNameVisible(true);
 
         MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.TREASURE_GOBLIN, true);
@@ -94,7 +95,7 @@ public class TreasureGoblin implements Listener {
 
         sendString = sendString.replace("$world", worldName);
 
-        sendString = ChatColorConverter.chatColorConverter(sendString);
+        sendString = ChatColorConverter.convert(sendString);
 
         EventMessage.sendEventMessage(sendString, treasureGoblin.getWorld());
 
@@ -121,11 +122,11 @@ public class TreasureGoblin implements Listener {
 
                     String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT).replace("$player", ((LivingEntity) entity).getKiller().getDisplayName());
 
-                    player.sendMessage(ChatColorConverter.chatColorConverter(newMessage));
+                    player.sendMessage(ChatColorConverter.convert(newMessage));
 
                 } else {
 
-                    player.sendMessage(ChatColorConverter.chatColorConverter(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
+                    player.sendMessage(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
 
                 }
 

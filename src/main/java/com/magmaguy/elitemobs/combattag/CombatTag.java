@@ -30,7 +30,7 @@ public class CombatTag implements Listener {
         if (player.isFlying()) {
             player.setFlying(false);
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    TextComponent.fromLegacyText(ChatColorConverter.chatColorConverter(ConfigValues.combatTagConfig.getString(CombatTagConfig.COMBAT_TAG_MESSAGE))));
+                    TextComponent.fromLegacyText(ChatColorConverter.convert(ConfigValues.combatTagConfig.getString(CombatTagConfig.COMBAT_TAG_MESSAGE))));
             new BukkitRunnable() {
                 @Override
                 public void run() {
