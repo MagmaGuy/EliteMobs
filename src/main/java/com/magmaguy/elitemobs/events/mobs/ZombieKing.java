@@ -26,7 +26,6 @@ import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCoun
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.uniqueitems.ZombieKingsAxe;
 import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

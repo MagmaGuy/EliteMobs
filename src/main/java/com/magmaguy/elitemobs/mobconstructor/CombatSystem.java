@@ -41,7 +41,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
-public class DamageAdjuster implements Listener {
+public class CombatSystem implements Listener {
 
     public static final double PER_LEVEL_POWER_INCREASE = 0.1;
     public static final double TARGET_HITS_TO_KILL = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.TARGET_HITS_TO_KILL);
@@ -99,17 +99,12 @@ public class DamageAdjuster implements Listener {
         if (newDamage < 1) newDamage = 1;
         if (newDamage > 19) newDamage = 19;
 
-
         //Set the final damage value
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
         //Deal with the player getting killed
-        if (player.getHealth() - event.getDamage() <= 0) {
-
+        if (player.getHealth() - event.getDamage() <= 0)
             MetadataHandler.registerMetadata(player, MetadataHandler.KILLED_BY_ELITE_MOB, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity));
-//            PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity);
-
-        }
 
     }
 
@@ -138,17 +133,13 @@ public class DamageAdjuster implements Listener {
 
             for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
 
-                if (enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()) && event.getDamager() instanceof Projectile) {
-
+                if (enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()) && event.getDamager() instanceof Projectile)
                     totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
 
-                }
 
-                if (enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) && event.getCause().equals(EntityDamageByEntityEvent.DamageCause.ENTITY_EXPLOSION)) {
-
+                if (enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) && event.getCause().equals(EntityDamageByEntityEvent.DamageCause.ENTITY_EXPLOSION))
                     totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
 
-                }
 
             }
 
@@ -184,11 +175,9 @@ public class DamageAdjuster implements Listener {
 
         float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.01 * mobLevel * event.getRadius() * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
 
-        if (newExplosionRange > Integer.MAX_VALUE) {
-
+        if (newExplosionRange > Integer.MAX_VALUE)
             newExplosionRange = Integer.MAX_VALUE;
 
-        }
 
         event.setRadius(newExplosionRange);
 
@@ -209,11 +198,8 @@ public class DamageAdjuster implements Listener {
         if (!(event.getEntity() instanceof LivingEntity)) return;
         if (!event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
         if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
-        if (!event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
-
+        if (!event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM))
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
-
-        }
 
     }
 
@@ -323,9 +309,7 @@ public class DamageAdjuster implements Listener {
     This part is pretty much a copy of how Minecraft does the cooldown check
      */
     private float getCooldownPeriod(Player player) {
-
         return (float) (1.0D / player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue() * 20.0D);
-
     }
 
     private static int clock = 0;
@@ -338,7 +322,6 @@ public class DamageAdjuster implements Listener {
             public void run() {
 
                 if (clock == Integer.MAX_VALUE) clock = 0;
-
                 clock++;
 
             }
@@ -406,9 +389,7 @@ public class DamageAdjuster implements Listener {
     }
 
     private int getMaxEnchantmentLevel(Enchantment enchantment) {
-
         return ConfigValues.itemsProceduralSettingsConfig.getInt("Valid Enchantments." + enchantment.getName() + ".Max Level");
-
     }
 
     private HashMap<Player, Integer> playerHitCooldownHashMap = new HashMap<>();

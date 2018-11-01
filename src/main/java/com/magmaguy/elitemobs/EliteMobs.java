@@ -27,7 +27,7 @@ import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
-import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
@@ -89,7 +89,7 @@ public class EliteMobs extends JavaPlugin {
         eventLauncher.eventRepeatingTask();
 
         //launch internal clock for attack cooldown
-        DamageAdjuster.launchInternalClock();
+        CombatSystem.launchInternalClock();
 
         /*
         Initialize mob values

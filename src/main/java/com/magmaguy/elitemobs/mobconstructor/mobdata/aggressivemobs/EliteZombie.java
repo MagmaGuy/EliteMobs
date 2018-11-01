@@ -31,6 +31,10 @@ public class EliteZombie extends EliteMobProperties {
 
         if (!isEnabled) return;
 
+        this.validDefensivePowers.addAll(super.getValidDefensivePowers());
+        this.validOffensivePowers.addAll(super.getValidOffensivePowers());
+        this.validMiscellaneousPowers.addAll(super.getValidMiscellaneousPowers());
+
         eliteMobData.add(this);
 
     }

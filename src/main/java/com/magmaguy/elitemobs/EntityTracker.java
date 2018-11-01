@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -16,11 +18,14 @@ import java.util.List;
 
 public class EntityTracker implements Listener {
 
-    public static HashMap<World, List<LivingEntity>> passiveMobs = new HashMap<>();
-    public static HashMap<World, List<EliteMobEntity>> eliteMobs = new HashMap<>();
-    public static HashMap<World, List<EliteMobEntity>> bossMobs = new HashMap<>();
-    public static List<Entity> allCullableEliteMobEntities = new ArrayList<>();
-    public static HashMap<World, List<LivingEntity>> naturalEntities = new HashMap<>();
+    /*
+    These lists track basically everything for live plugin entities
+     */
+    private static HashMap<World, List<LivingEntity>> passiveMobs = new HashMap<>();
+    private static HashMap<World, List<EliteMobEntity>> eliteMobs = new HashMap<>();
+    private static HashMap<World, List<EliteMobEntity>> bossMobs = new HashMap<>();
+    private static List<Entity> allCullableEliteMobEntities = new ArrayList<>();
+    private static HashMap<World, List<LivingEntity>> naturalEntities = new HashMap<>();
 
     /*
     Starts tracking elite mob
@@ -190,11 +195,20 @@ public class EntityTracker implements Listener {
     }
 
     public static boolean isEliteMob(LivingEntity livingEntity) {
-        return checkEliteMobMap(eliteMobs, livingEntity);
+        return checkMap(eliteMobs, livingEntity);
+    }
+
+    public static boolean isEliteMob(Entity entity) {
+        if (!(entity instanceof LivingEntity)) return false;
+        return isEliteMob((LivingEntity) entity);
+    }
+
+    public static EliteMobEntity getEliteMobEntity(LivingEntity livingEntity) {
+        return getMap(eliteMobs, livingEntity);
     }
 
     public static boolean isBossMob(LivingEntity livingEntity) {
-        return checkEliteMobMap(bossMobs, livingEntity);
+        return checkMap(bossMobs, livingEntity); //todo: this returns isEliteMob
     }
 
     public static boolean isPluginEntity(Entity entity) {
@@ -218,12 +232,42 @@ public class EntityTracker implements Listener {
 
     }
 
-    private static boolean checkEliteMobMap(HashMap<World, List<EliteMobEntity>> hashMap, LivingEntity livingEntity) {
+    private static boolean checkMap(HashMap<World, List<EliteMobEntity>> hashMap, LivingEntity livingEntity) {
 
         if (hashMap.containsKey(livingEntity.getWorld()))
-            return hashMap.get(livingEntity.getWorld()).contains(livingEntity);
+            for (EliteMobEntity eliteMobEntity : hashMap.get(livingEntity.getWorld()))
+                if (eliteMobEntity.getLivingEntity().equals(livingEntity))
+                    return true;
         return false;
 
+    }
+
+    private static EliteMobEntity getMap(HashMap<World, List<EliteMobEntity>> hashMap, LivingEntity livingEntity) {
+        if (hashMap.containsKey(livingEntity.getWorld()))
+            for (EliteMobEntity eliteMobEntity : hashMap.get(livingEntity.getWorld()))
+                if (eliteMobEntity.getLivingEntity().equals(livingEntity))
+                    return eliteMobEntity;
+        return null;
+    }
+
+    public static boolean hasPower(MajorPowers majorPowers, LivingEntity livingEntity) {
+        if (!isEliteMob(livingEntity)) return false;
+        return getEliteMobEntity(livingEntity).hasPower(majorPowers);
+    }
+
+    public static boolean hasPower(MajorPowers majorPowers, Entity entity) {
+        if (!(entity instanceof LivingEntity)) return false;
+        return hasPower(majorPowers, (LivingEntity) entity);
+    }
+
+    public static boolean hasPower(MinorPowers minorPowers, LivingEntity livingEntity) {
+        if (!isEliteMob(livingEntity)) return false;
+        return getEliteMobEntity(livingEntity).hasPower(minorPowers);
+    }
+
+    public static boolean hasPower(MinorPowers minorPowers, Entity entity) {
+        if (!(entity instanceof LivingEntity)) return false;
+        return hasPower(minorPowers, (LivingEntity) entity);
     }
 
     /*

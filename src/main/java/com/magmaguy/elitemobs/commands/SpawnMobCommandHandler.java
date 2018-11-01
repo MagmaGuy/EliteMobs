@@ -21,8 +21,6 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobconstructor.HealthHandler;
-import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
@@ -471,18 +469,6 @@ public class SpawnMobCommandHandler {
                     case MetadataHandler.BONUS_LOOT_H:
                         BonusLoot bonusLoot = new BonusLoot();
                         bonusLoot.applyPowers(entity);
-                        break;
-                    case MetadataHandler.DOUBLE_DAMAGE_H:
-                        if (!(entity instanceof IronGolem)) {
-                            DoubleDamage doubleDamage = new DoubleDamage();
-                            doubleDamage.applyPowers(entity);
-                        }
-                        break;
-                    case MetadataHandler.DOUBLE_HEALTH_H:
-                        if (!(entity instanceof IronGolem)) {
-                            DoubleHealth doubleHealth = new DoubleHealth();
-                            doubleHealth.applyPowers(entity);
-                        }
                         break;
                     case MetadataHandler.INVISIBILITY_H:
                         Invisibility invisibility = new Invisibility();
