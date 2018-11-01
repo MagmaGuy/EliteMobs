@@ -27,6 +27,8 @@ public class MobPowersConfig {
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
+    public static String FROZEN_MESSAGE = "Freeze power message";
+
     public void initializeConfig() {
 
         for (String string : MetadataHandler.defensivePowerList) {
@@ -52,6 +54,8 @@ public class MobPowersConfig {
             configuration.addDefault("Powers.Major Powers." + string, true);
 
         }
+
+        configuration.addDefault(FROZEN_MESSAGE, "&9You've been frozen!");
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobconstructor;
+package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -45,11 +45,8 @@ public class DefaultDropsHandler implements Listener {
         if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
 
             if (!EntityTracker.isNaturalEntity(event.getEntity()) &&
-                    !ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.SPAWNER_DEFAULT_LOOT_MULTIPLIER)) {
-
+                    !ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.SPAWNER_DEFAULT_LOOT_MULTIPLIER))
                 return;
-
-            }
 
             List<ItemStack> droppedItems = event.getDrops();
             int mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
@@ -66,25 +63,13 @@ public class DefaultDropsHandler implements Listener {
                 if (itemStack == null) continue;
                 boolean itemIsWorn = false;
 
-                for (ItemStack wornItem : wornItems) {
-
-                    if (wornItem.isSimilar(itemStack)) {
-
+                for (ItemStack wornItem : wornItems)
+                    if (wornItem.isSimilar(itemStack))
                         itemIsWorn = true;
 
-                    }
-
-                }
-
-                if (!itemIsWorn) {
-
-                    for (int i = 0; i < mobLevel * 0.1; i++) {
-
+                if (!itemIsWorn)
+                    for (int i = 0; i < mobLevel * 0.1; i++)
                         event.getEntity().getLocation().getWorld().dropItem(event.getEntity().getLocation(), itemStack);
-
-                    }
-
-                }
 
             }
 
@@ -103,34 +88,20 @@ public class DefaultDropsHandler implements Listener {
 
         EntityEquipment equipment = entity.getEquipment();
 
-        if (equipment.getItemInMainHand() != null && !equipment.getItemInMainHand().getType().equals(Material.AIR)) {
-
+        if (equipment.getItemInMainHand() != null && !equipment.getItemInMainHand().getType().equals(Material.AIR))
             wornItems.add(equipment.getItemInMainHand());
 
-        }
-
-        if (equipment.getHelmet() != null) {
-
+        if (equipment.getHelmet() != null)
             wornItems.add(equipment.getHelmet());
-        }
 
-        if (equipment.getChestplate() != null) {
-
+        if (equipment.getChestplate() != null)
             wornItems.add(equipment.getChestplate());
 
-        }
-
-        if (equipment.getLeggings() != null) {
-
+        if (equipment.getLeggings() != null)
             wornItems.add(equipment.getLeggings());
 
-        }
-
-        if (equipment.getBoots() != null) {
-
+        if (equipment.getBoots() != null)
             wornItems.add(equipment.getBoots());
-
-        }
 
         return wornItems;
 

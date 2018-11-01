@@ -15,22 +15,27 @@
 
 package com.magmaguy.elitemobs.mobpowers.minorpowers;
 
+import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
 
 public class EventValidator {
 
-    public static boolean eventIsValid(Player player, LivingEntity livingEntity, String powerMetadata, EntityDamageByEntityEvent event) {
+    public static boolean eventIsValid(MinorPowers minorPowers, EntityDamageByEntityEvent event) {
 
-        return (player != null && livingEntity != null && livingEntity.hasMetadata(powerMetadata) && !event.isCancelled());
+        if (event.isCancelled()) return false;
 
-    }
+        Player player = EntityFinder.findPlayer(event);
 
-    public static boolean eventIsValid(Player player, LivingEntity livingEntity, String powerMetadata, EntityTargetEvent event) {
+        if (player == null) return false;
 
-        return (player != null && livingEntity != null && livingEntity.hasMetadata(powerMetadata) && !event.isCancelled());
+        LivingEntity eliteMob = EntityFinder.getRealDamager(event);
+
+        if (eliteMob == null) return false;
+
+        return (EntityTracker.hasPower(minorPowers, eliteMob));
 
     }
 

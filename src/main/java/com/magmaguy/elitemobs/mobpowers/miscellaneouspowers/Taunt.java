@@ -15,28 +15,25 @@
 
 package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.mobconstructor.NameHandler;
-import com.magmaguy.elitemobs.mobpowers.ProjectileMetadataDetector;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
@@ -50,40 +47,19 @@ public class Taunt extends MinorPowers implements Listener {
     private final static List<String> DAMAGED_BY_BOW_LIST = ConfigValues.translationConfig.getStringList("Taunts.BowDamaged");
     private final static List<String> HIT_LIST = ConfigValues.translationConfig.getStringList("Taunts.Hit");
     private final static List<String> DEATH_LIST = ConfigValues.translationConfig.getStringList("Taunts.Death");
-    private static Random random = new Random();
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.TAUNT_MD;
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
-    public void onTarget(EntityTargetEvent event) {
+    public void onTarget(EntityTargetLivingEntityEvent event) {
 
-        if (event.getEntity().hasMetadata(powerMetadata)) {
-
+        if (EntityTracker.hasPower(this, event.getEntity()))
             if (event.getTarget() instanceof Player) {
-
                 Entity targetter = event.getEntity();
-
                 nametagProcessor(targetter, TARGET_TAUNT_LIST);
-
             }
-
-        }
 
     }
 
@@ -92,25 +68,18 @@ public class Taunt extends MinorPowers implements Listener {
 
         if (!(event.getEntity() instanceof LivingEntity) ||
                 ((LivingEntity) event.getEntity()).getHealth() - event.getFinalDamage() <= 0 ||
-                !event.getEntity().isValid()) {
-
+                !event.getEntity().isValid())
             return;
 
-        }
 
-        if (event.getEntity().hasMetadata(powerMetadata)) {
+        if (EntityTracker.hasPower(this, event.getEntity())) {
 
             Entity entity = event.getEntity();
 
-            if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)) {
-
+            if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
                 nametagProcessor(entity, DAMAGED_BY_BOW_LIST);
-
-            } else {
-
+            else
                 nametagProcessor(entity, GENERIC_DAMAGED_LIST);
-
-            }
 
         }
 
@@ -119,55 +88,24 @@ public class Taunt extends MinorPowers implements Listener {
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
 
-        if (event.getDamager() == null) return;
+        if (!EventValidator.eventIsValid(this, event)) return;
+        LivingEntity eliteMob = EntityFinder.getRealDamager(event);
 
-        if (event.getDamager().hasMetadata(powerMetadata) || event.getDamager() instanceof Projectile &&
-                ProjectileMetadataDetector.projectileMetadataDetector((Projectile) event.getDamager(), powerMetadata)) {
-
-            if (event.getDamager().hasMetadata(powerMetadata)) {
-
-                nametagProcessor(event.getDamager(), HIT_LIST);
-
-            } else if (event.getDamager() instanceof Projectile &&
-                    ProjectileMetadataDetector.projectileMetadataDetector((Projectile) event.getDamager(), powerMetadata)) {
-
-                Entity entity = (Entity) ((Projectile) event.getDamager()).getShooter();
-
-                nametagProcessor(entity, HIT_LIST);
-
-            }
-
-        }
-
+        nametagProcessor(eliteMob, HIT_LIST);
 
     }
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(powerMetadata)) {
-
-            Entity entity = event.getEntity();
-
-            nametagProcessor(entity, DEATH_LIST);
-
-        }
+        if (EntityTracker.hasPower(this, event.getEntity()))
+            nametagProcessor(event.getEntity(), DEATH_LIST);
 
     }
 
     private void nametagProcessor(Entity entity, List<String> list) {
 
-        if (entity.hasMetadata(MetadataHandler.TAUNT_NAME)) {
-
-            return;
-
-        }
-
-        MetadataHandler.registerMetadata(entity, MetadataHandler.TAUNT_NAME, true);
-
-        String originalName = entity.getCustomName();
-
-        int randomizedKey = random.nextInt(list.size());
+        int randomizedKey = ThreadLocalRandom.current().nextInt(list.size());
         String tempName = list.get(randomizedKey);
 
         entity.setCustomName(convert(tempName));
@@ -177,22 +115,15 @@ public class Taunt extends MinorPowers implements Listener {
             @Override
             public void run() {
 
-                if (!entity.isValid()) {
+                if (!entity.isValid())
                     return;
-                }
 
-                if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
-                    entity.setCustomName(originalName);
-                } else {
-                    entity.setCustomName(NameHandler.customAggressiveName(entity));
-                }
-
-                entity.removeMetadata(MetadataHandler.TAUNT_NAME, plugin);
+                entity.setCustomName(EntityTracker.getEliteMobEntity((LivingEntity) entity).getName());
 
             }
 
 
-        }.runTaskLater(plugin, 4 * 20);
+        }.runTaskLater(MetadataHandler.PLUGIN, 4 * 20);
 
     }
 

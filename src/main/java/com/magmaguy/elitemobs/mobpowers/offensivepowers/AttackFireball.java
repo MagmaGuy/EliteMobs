@@ -15,61 +15,58 @@
 
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.GameMode;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.EventListener;
+
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackFireball extends MinorPowers {
+public class AttackFireball extends MinorPowers implements EventListener {
 
-    String powerMetadata = MetadataHandler.ATTACK_FIREBALL_MD;
+    ArrayList<LivingEntity> currentlyFiringEntities = new ArrayList<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-        repeatingFireballTask(entity);
-
     }
 
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
+    @EventHandler
+    public void targetEvent(EntityTargetLivingEntityEvent event) {
+        if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof Monster)) return;
+        if (currentlyFiringEntities.contains(event.getEntity())) return;
+        if (!EntityTracker.hasPower(this, (LivingEntity) event.getEntity())) return;
+        repeatingFireballTask((Monster) event.getEntity());
+        currentlyFiringEntities.add((LivingEntity) event.getEntity());
     }
 
-    private void repeatingFireballTask(Entity entity) {
+    private void repeatingFireballTask(Monster monster) {
 
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                if (!entity.isValid() || entity.isDead()) {
-
+                if (!monster.isValid() || monster.getTarget() == null) {
                     cancel();
                     return;
-
                 }
 
-                for (Entity nearbyEntity : entity.getNearbyEntities(20, 20, 20))
+                for (Entity nearbyEntity : monster.getNearbyEntities(20, 20, 20))
                     if (nearbyEntity instanceof Player)
                         if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
                                 ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL))
-                            shootFireball(entity, (Player) nearbyEntity);
+                            shootFireball(monster, (Player) nearbyEntity);
 
             }
 

@@ -24,6 +24,4 @@ public abstract class MinorPowers {
 
     public abstract void applyPowers(Entity entity);
 
-    public abstract boolean existingPowers(Entity entity);
-
 }

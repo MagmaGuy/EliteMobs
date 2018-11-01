@@ -18,13 +18,9 @@ import com.magmaguy.elitemobs.events.actionevents.FaeEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.events.mobs.sharedeventpowers.SpiritWalk;
-import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.items.PlaceEventPrevent;
-import com.magmaguy.elitemobs.items.PotionEffectApplier;
-import com.magmaguy.elitemobs.items.RareDropEffect;
+import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
-import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
-import com.magmaguy.elitemobs.mobconstructor.DefaultDropsHandler;
+import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.displays.DamageDisplay;
 import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobconstructor.displays.HealthDisplay;
@@ -55,7 +51,7 @@ public class EventsRegistrer {
         Bukkit.getServer().getPluginManager().registerEvents(new FindSuperMobs(), MetadataHandler.PLUGIN);
 
         //Mob damage
-        Bukkit.getServer().getPluginManager().registerEvents(new DamageAdjuster(), MetadataHandler.PLUGIN);
+        Bukkit.getServer().getPluginManager().registerEvents(new CombatSystem(), MetadataHandler.PLUGIN);
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_DEATH_MESSAGES))
             Bukkit.getServer().getPluginManager().registerEvents(new PlayerDeathMessageByEliteMob(), MetadataHandler.PLUGIN);
 

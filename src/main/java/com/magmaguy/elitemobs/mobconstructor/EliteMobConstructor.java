@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -18,7 +17,7 @@ public class EliteMobConstructor {
             return null;
         }
 
-        EntityTracker.registerEliteMob(new EliteMobEntity(livingEntity, mobLevel));
+        new EliteMobEntity(livingEntity, mobLevel);
 
         return livingEntity;
 

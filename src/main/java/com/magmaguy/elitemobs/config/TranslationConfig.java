@@ -58,25 +58,25 @@ public class TranslationConfig {
     public void initializeConfig() {
 
 
-        configuration.addDefault(NAME_BLAZE, Arrays.asList("Level ", " Elite Blaze"));
-        configuration.addDefault(NAME_CAVE_SPIDER, Arrays.asList("Level ", " Elite Cave Spider"));
-        configuration.addDefault(NAME_CREEPER, Arrays.asList("Level ", " Elite Creeper"));
-        configuration.addDefault(NAME_ENDERMAN, Arrays.asList("Level ", " Elite Enderman"));
-        configuration.addDefault(NAME_ENDERMITE, Arrays.asList("Level ", " Elite Endermite"));
-        configuration.addDefault(NAME_HUSK, Arrays.asList("Level ", " Elite Husk"));
-        configuration.addDefault(NAME_IRON_GOLEM, Arrays.asList("Level ", " Elite Iron Golem"));
-        configuration.addDefault(NAME_PIG_ZOMBIE, Arrays.asList("Level ", " Elite Zombie Pigman"));
-        configuration.addDefault(NAME_POLAR_BEAR, Arrays.asList("Level ", " Elite Polar Bear"));
-        configuration.addDefault(NAME_SILVERFISH, Arrays.asList("Level ", " Elite Silverfish"));
-        configuration.addDefault(NAME_SKELETON, Arrays.asList("Level ", " Elite Skeleton"));
-        configuration.addDefault(NAME_SPIDER, Arrays.asList("Level ", " Elite Spider"));
-        configuration.addDefault(NAME_STRAY, Arrays.asList("Level ", " Elite Stray"));
-        configuration.addDefault(NAME_WITCH, Arrays.asList("Level ", " Elite Witch"));
-        configuration.addDefault(NAME_WITHER_SKELETON, Arrays.asList("Level ", " Elite Wither Skeleton"));
-        configuration.addDefault(NAME_ZOMBIE, Arrays.asList("Level ", " Elite Zombie"));
-        configuration.addDefault(NAME_VEX, Arrays.asList("Level ", " Elite Vex"));
-        configuration.addDefault(NAME_VINDICATOR, Arrays.asList("Level ", " Elite Vindicator"));
-        configuration.addDefault(NAME_DROWNED, Arrays.asList("Level ", " Elite Drowned"));
+        configuration.addDefault(NAME_BLAZE, "Level $level Elite Blaze");
+        configuration.addDefault(NAME_CAVE_SPIDER, "Level $level Elite Cave Spider");
+        configuration.addDefault(NAME_CREEPER, "Level $level Elite Creeper");
+        configuration.addDefault(NAME_ENDERMAN, "Level $levelElite Enderman");
+        configuration.addDefault(NAME_ENDERMITE, "Level $level Elite Endermite");
+        configuration.addDefault(NAME_HUSK, "Level $level Elite Husk");
+        configuration.addDefault(NAME_IRON_GOLEM, "Level $level Elite Iron Golem");
+        configuration.addDefault(NAME_PIG_ZOMBIE, "Level $level Elite Zombie Pigman");
+        configuration.addDefault(NAME_POLAR_BEAR, "Level $level Elite Polar Bear");
+        configuration.addDefault(NAME_SILVERFISH, "Level $level Elite Silverfish");
+        configuration.addDefault(NAME_SKELETON, "Level $level Elite Skeleton");
+        configuration.addDefault(NAME_SPIDER, "Level $level Elite Spider");
+        configuration.addDefault(NAME_STRAY, "Level $level Elite Stray");
+        configuration.addDefault(NAME_WITCH, "Level $level Elite Witch");
+        configuration.addDefault(NAME_WITHER_SKELETON, "Level $level Elite Wither Skeleton");
+        configuration.addDefault(NAME_ZOMBIE, "Level $level Elite Zombie");
+        configuration.addDefault(NAME_VEX, "Level $level Elite Vex");
+        configuration.addDefault(NAME_VINDICATOR, "Level $level Elite Vindicator");
+        configuration.addDefault(NAME_DROWNED, "Level $level Elite Drowned");
 
         configuration.addDefault(NAME_CHICKEN, "Super Chicken");
         configuration.addDefault(NAME_COW, "Super Cow");

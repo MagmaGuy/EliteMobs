@@ -15,12 +15,10 @@
 
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.LivingEntityFinder;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,42 +28,30 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
+
 /**
  * Created by MagmaGuy on 12/12/2016.
  */
 public class AttackWither extends MinorPowers implements Listener {
 
-    String powerMetadata = MetadataHandler.ATTACK_WITHER_MD;
-    String cooldownMetadata = MetadataHandler.ATTACK_WITHER_COOLDOWN;
+    private ArrayList<LivingEntity> cooldownList = new ArrayList<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
 
-        Player player = LivingEntityFinder.findPlayer(event);
-        LivingEntity eliteMob = LivingEntityFinder.findEliteMob(event);
-
-        if (!EventValidator.eventIsValid(player, eliteMob, powerMetadata, event)) return;
-        if (PowerCooldown.cooldownChecker(player, eliteMob, cooldownMetadata)) return;
+        if (!EventValidator.eventIsValid(this, event)) return;
+        Player player = EntityFinder.findPlayer(event);
+        LivingEntity eliteMob = EntityFinder.getRealDamager(event);
+        if (PowerCooldown.cooldownChecker(eliteMob, cooldownList)) return;
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 50, 1));
 
-        PowerCooldown.startCooldownTimer(eliteMob, cooldownMetadata, 10 * 20);
+        PowerCooldown.startCooldownTimer(eliteMob, cooldownList, 10 * 20);
 
     }
 

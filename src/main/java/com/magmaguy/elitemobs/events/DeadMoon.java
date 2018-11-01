@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.events;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
@@ -88,7 +89,7 @@ public class DeadMoon implements Listener {
             eventOngoing = true;
             entityQueued = false;
 
-            EventMessage.sendEventMessage("A dead moon rises, and the undead with it...", event.getEntity().getWorld());
+            EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_ANNOUNCEMENT_MESSAGE), event.getEntity().getWorld());
 
             ZombieKing.spawnZombieKing((Zombie) event.getEntity());
             terminateEvent(event.getEntity().getWorld());
@@ -108,7 +109,7 @@ public class DeadMoon implements Listener {
 
                     eventOngoing = false;
 
-                    EventMessage.sendEventMessage("Dawn rises, the Dead Moon wanes for those still alive...", world);
+                    EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_END_MESSAGE), world);
 
                     cancel();
 

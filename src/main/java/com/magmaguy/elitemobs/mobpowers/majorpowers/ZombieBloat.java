@@ -50,15 +50,12 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -69,9 +66,7 @@ import java.util.Random;
 public class ZombieBloat extends MajorPowers implements Listener {
 
     private static Random random = new Random();
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
     String powerMetadata = MetadataHandler.ZOMBIE_BLOAT_MD;
-    Configuration configuration = ConfigValues.translationConfig;
 
     @Override
     public void applyPowers(Entity entity) {

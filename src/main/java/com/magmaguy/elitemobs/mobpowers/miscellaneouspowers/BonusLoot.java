@@ -15,12 +15,10 @@
 
 package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -30,36 +28,15 @@ import org.bukkit.event.entity.EntityDeathEvent;
  */
 public class BonusLoot extends MinorPowers implements Listener {
 
-    String powerMetadata = MetadataHandler.BONUS_LOOT_MD;
-
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(powerMetadata)) {
-
-            Entity entity = event.getEntity();
-
-
-            //drops item
-            LootTables.generateLoot((LivingEntity) entity);
-
-        }
+        if (EntityTracker.hasPower(this, event.getEntity()))
+            LootTables.generateLoot(event.getEntity());
 
     }
 
