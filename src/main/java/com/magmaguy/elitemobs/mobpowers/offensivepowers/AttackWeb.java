@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class AttackWeb extends MinorPowers implements Listener {
+public class AttackWeb extends MinorPower implements Listener {
 
     private ArrayList<LivingEntity> cooldownList = new ArrayList<>();
 

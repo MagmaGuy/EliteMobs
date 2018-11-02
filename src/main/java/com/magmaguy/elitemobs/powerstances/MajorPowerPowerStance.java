@@ -19,9 +19,12 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -44,10 +47,13 @@ public class MajorPowerPowerStance implements Listener {
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS)
                 && !EntityTracker.isNaturalEntity(entity))
             return;
-        if (entity.hasMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD))
-            return;
+        if (!EntityTracker.isEliteMob(entity)) return;
 
-        MetadataHandler.registerMetadata(entity, MetadataHandler.MAJOR_VISUAL_EFFECT_MD, 0);
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity((LivingEntity) entity);
+
+        if (eliteMobEntity.hasMajorVisualEffect()) return;
+
+        eliteMobEntity.setHasMajorVisualEffect(true);
 
         //First integer counts the visual effects it's in, hashmap is from MajorPowerStance's trackHashMap
         HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker = new HashMap<>();
@@ -55,7 +61,7 @@ public class MajorPowerPowerStance implements Listener {
         new BukkitRunnable() {
 
             int globalPositionCounter = 1;
-            int effectQuantity = 0;
+            int effectQuantity = eliteMobEntity.getMajorPowers().size();
 
             public void run() {
 
@@ -63,131 +69,118 @@ public class MajorPowerPowerStance implements Listener {
                 int individualPositionCounter = 0;
                 int effectQuantityChecksum = 0;
 
-                for (String string : MetadataHandler.majorPowerList) {
+                if (!entity.isValid() ||
+                        (!eliteMobEntity.isNaturalEntity() &&
+                                ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS))) {
 
-                    if (entity.hasMetadata(string)) {
-
-                        effectQuantityChecksum++;
-
-                    }
+                    VisualItemRemover.removeItems(powerItemLocationTracker, trackAmount, itemsPerTrack);
+                    cancel();
+                    return;
 
                 }
 
-                if (effectQuantity == 0) {
+                effectQuantityChecksum = eliteMobEntity.getMajorPowers().size();
 
-                    effectQuantity = effectQuantityChecksum;
-
-                } else if (effectQuantity != effectQuantityChecksum) {
-
+                if (effectQuantity != effectQuantityChecksum) {
                     VisualItemRemover.removeItems(powerItemLocationTracker, trackAmount, itemsPerTrack);
-
                     powerItemLocationTracker.clear();
-
                     effectQuantity = effectQuantityChecksum;
-
                 }
 
                 if (globalPositionCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION)
                     globalPositionCounter = 0;
 
+                for (MajorPowers majorPower : eliteMobEntity.getMajorPowers()) {
 
-                if (entity.hasMetadata(MetadataHandler.ZOMBIE_FRIENDS_MD)) {
+                    if (majorPower instanceof ZombieFriends) {
 
-                    ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 2);
+                        ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 2);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.ZOMBIE_NECRONOMICON_MD)) {
+                    if (majorPower instanceof ZombieNecronomicon) {
 
+                        ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
 
-                    ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                    }
 
-                }
+                    if (majorPower instanceof ZombieTeamRocket) {
 
-                if (entity.hasMetadata(MetadataHandler.ZOMBIE_TEAM_ROCKET_MD)) {
+                        ItemStack itemStack = new ItemStack(Material.FIREWORK, 1);
 
-                    ItemStack itemStack = new ItemStack(Material.FIREWORK, 1);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                    }
 
-                }
+                    if (majorPower instanceof ZombieParents) {
 
-                if (entity.hasMetadata(MetadataHandler.ZOMBIE_PARENTS_MD)) {
+                        ItemStack itemStack = new ItemStack(Material.MONSTER_EGG, 1, (short) 0, (byte) 54);
 
-                    ItemStack itemStack = new ItemStack(Material.MONSTER_EGG, 1, (short) 0, (byte) 54);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                    }
 
-                }
+                    if (majorPower instanceof ZombieBloat) {
 
-                if (entity.hasMetadata(MetadataHandler.ZOMBIE_BLOAT_MD)) {
+                        ItemStack itemStack = new ItemStack(Material.RED_MUSHROOM, 1);
 
-                    ItemStack itemStack = new ItemStack(Material.RED_MUSHROOM, 1);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                    }
 
-                }
+                    if (majorPower instanceof SkeletonTrackingArrow) {
 
-                if (entity.hasMetadata(MetadataHandler.SKELETON_TRACKING_ARROW_MD)) {
+                        ItemStack itemStack = new ItemStack(Material.TIPPED_ARROW, 1);
 
-                    ItemStack itemStack = new ItemStack(Material.TIPPED_ARROW, 1);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                    }
 
-                }
+                    if (majorPower instanceof SkeletonPillar) {
 
-                if (entity.hasMetadata(MetadataHandler.SKELETON_PILLAR_MD)) {
+                        ItemStack itemStack = new ItemStack(Material.BONE, 1);
 
-                    ItemStack itemStack = new ItemStack(Material.BONE, 1);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                    }
 
                 }
 
                 globalPositionCounter++;
 
-                if (!entity.isValid() || entity.isDead() ||
-                        (!EntityTracker.isNaturalEntity(entity) && ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS))) {
-
-                    VisualItemRemover.removeItems(powerItemLocationTracker, trackAmount, itemsPerTrack);
-                    cancel();
-
-                }
-
             }
-
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
 
@@ -197,8 +190,11 @@ public class MajorPowerPowerStance implements Listener {
                                Entity entity, int effectQuantity, int globalPositionCounter,
                                int individualPositionCounter, int itemStackHashMapPosition) {
 
-        int counter = VisualItemProcessor.adjustTrackPosition(effectQuantity, globalPositionCounter, individualPositionCounter, MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, itemsPerTrack);
-        VisualItemProcessor.itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity, MajorPowerStanceMath.majorPowerLocationConstructor(trackAmount, itemsPerTrack, counter), trackAmount, itemsPerTrack);
+        int counter = VisualItemProcessor.adjustTrackPosition(effectQuantity, globalPositionCounter,
+                individualPositionCounter, MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, itemsPerTrack);
+        VisualItemProcessor.itemProcessor(powerItemLocationTracker, itemStack, itemStackHashMapPosition, entity,
+                MajorPowerStanceMath.majorPowerLocationConstructor(trackAmount, itemsPerTrack, counter), trackAmount,
+                itemsPerTrack);
 
     }
 

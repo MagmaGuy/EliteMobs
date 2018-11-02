@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.mobpowers.defensivepowers;
 
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -24,7 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class Invisibility extends MinorPowers {
+public class Invisibility extends MinorPower {
 
     @Override
     public void applyPowers(Entity entity) {

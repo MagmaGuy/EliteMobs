@@ -21,7 +21,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobPowersConfig;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class AttackFreeze extends MinorPowers {
+public class AttackFreeze extends MinorPower {
 
     private ArrayList<LivingEntity> cooldownList = new ArrayList<>();
 

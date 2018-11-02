@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.GameMode;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -32,7 +32,7 @@ import java.util.EventListener;
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackFireball extends MinorPowers implements EventListener {
+public class AttackFireball extends MinorPower implements EventListener {
 
     ArrayList<LivingEntity> currentlyFiringEntities = new ArrayList<>();
 

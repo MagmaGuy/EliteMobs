@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -24,7 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Created by MagmaGuy on 05/11/2016.
  */
-public class MovementSpeed extends MinorPowers {
+public class MovementSpeed extends MinorPower {
 
     @Override
     public void applyPowers(Entity entity) {
