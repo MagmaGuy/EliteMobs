@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPowers;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -31,10 +31,13 @@ public class EliteMobEntity {
     private double eliteMobTier;
     private double maxHealth;
     private String name;
-    private ArrayList<MinorPowers> offensivePowers = new ArrayList<>();
-    private ArrayList<MinorPowers> defensivePowers = new ArrayList<>();
-    private ArrayList<MinorPowers> miscelleaneousPowers = new ArrayList<>();
+    private ArrayList<MinorPower> offensivePowers = new ArrayList<>();
+    private ArrayList<MinorPower> defensivePowers = new ArrayList<>();
+    private ArrayList<MinorPower> miscelleaneousPowers = new ArrayList<>();
     private ArrayList<MajorPowers> majorPowers = new ArrayList<>();
+    private boolean hasMinorVisualEffect = false;
+    private boolean hasMajorVisualEffect = false;
+    private boolean isNaturalEntity;
     /*
     This just defines default behavior
      */
@@ -81,6 +84,10 @@ public class EliteMobEntity {
          */
         setPowers(eliteMobProperties);
         /*
+        Register whether or not the elite mob is natural
+         */
+        this.isNaturalEntity = EntityTracker.isNaturalEntity(livingEntity);
+        /*
         Start tracking the entity
          */
         EntityTracker.registerEliteMob(this);
@@ -88,10 +95,10 @@ public class EliteMobEntity {
     }
 
     /*
-    This is the generic constructor used in most instances of natural elite mob generation
+    This is the generic constructor for elite mobs spawned via commands
      */
     public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, List<MajorPowers> majorPowers,
-                          List<MinorPowers> minorPowers, boolean isUnalterable) {
+                          List<MinorPower> minorPowers, boolean isUnalterable) {
 
         /*
         Register living entity to keep track of which entity this object is tied to
@@ -128,6 +135,11 @@ public class EliteMobEntity {
         Set whether or not the entity should be altered
          */
         this.isUnalterable = isUnalterable;
+        /*
+        Register whether or not the elite mob is natural
+        All mobs spawned via commands are considered natural
+         */
+        this.isNaturalEntity = true;
         /*
         Start tracking the entity
          */
@@ -257,13 +269,13 @@ public class EliteMobEntity {
 
 
         //apply defensive powers
-        applyMinorPowers((ArrayList<MinorPowers>) eliteMobProperties.validDefensivePowers.clone(), defensivePowers, availableDefensivePowers);
+        applyMinorPowers((ArrayList<MinorPower>) eliteMobProperties.validDefensivePowers.clone(), defensivePowers, availableDefensivePowers);
 
         //apply offensive powers
-        applyMinorPowers((ArrayList<MinorPowers>) eliteMobProperties.validOffensivePowers.clone(), offensivePowers, availableOffensivePowers);
+        applyMinorPowers((ArrayList<MinorPower>) eliteMobProperties.validOffensivePowers.clone(), offensivePowers, availableOffensivePowers);
 
         //apply miscellaneous powers
-        applyMinorPowers((ArrayList<MinorPowers>) eliteMobProperties.validMiscellaneousPowers.clone(), miscelleaneousPowers, availableMiscellaneousPowers);
+        applyMinorPowers((ArrayList<MinorPower>) eliteMobProperties.validMiscellaneousPowers.clone(), miscelleaneousPowers, availableMiscellaneousPowers);
 
         //apply major powers
         applyMajorPowers((ArrayList<MajorPowers>) eliteMobProperties.validMajorPowers.clone(), majorPowers, availableMajorPowers);
@@ -278,22 +290,22 @@ public class EliteMobEntity {
 
     }
 
-    private static void applyMinorPowers(ArrayList<MinorPowers> configMinorPowers, ArrayList<MinorPowers> existingMinorPowers, int availablePowerAmount) {
+    private static void applyMinorPowers(ArrayList<MinorPower> configMinorPowers, ArrayList<MinorPower> existingMinorPowers, int availablePowerAmount) {
 
         availablePowerAmount = availablePowerAmount - existingMinorPowers.size();
 
         if (availablePowerAmount < 1) return;
 
-        ArrayList<MinorPowers> localMinorPowers = (ArrayList<MinorPowers>) configMinorPowers.clone();
+        ArrayList<MinorPower> localMinorPowers = (ArrayList<MinorPower>) configMinorPowers.clone();
 
-        for (MinorPowers minorPower : existingMinorPowers)
+        for (MinorPower minorPower : existingMinorPowers)
             localMinorPowers.remove(minorPower);
 
         for (int i = 0; i < availablePowerAmount; i++)
             if (localMinorPowers.size() < 1)
                 break;
             else {
-                MinorPowers selectedMinorPower = localMinorPowers.get(ThreadLocalRandom.current().nextInt(localMinorPowers.size()));
+                MinorPower selectedMinorPower = localMinorPowers.get(ThreadLocalRandom.current().nextInt(localMinorPowers.size()));
                 existingMinorPowers.add(selectedMinorPower);
                 localMinorPowers.remove(selectedMinorPower);
             }
@@ -334,12 +346,36 @@ public class EliteMobEntity {
         return eliteMobLevel;
     }
 
-    public boolean hasPower(MinorPowers minorPower) {
+    public boolean hasPower(MinorPower minorPower) {
         return offensivePowers.contains(minorPower) || defensivePowers.contains(minorPower) || miscelleaneousPowers.contains(minorPower);
+    }
+
+    public ArrayList<MinorPower> getOffensivePowers(){
+        return this.offensivePowers;
+    }
+
+    public ArrayList<MinorPower> getDefensivePowers(){
+        return this.defensivePowers;
+    }
+
+    public ArrayList<MinorPower> getMiscelleaneousPowers(){
+        return this.miscelleaneousPowers;
+    }
+
+    public ArrayList<MinorPower> getMinorPowers(){
+        ArrayList<MinorPower> arrayList = new ArrayList();
+        arrayList.addAll(getOffensivePowers());
+        arrayList.addAll(getDefensivePowers());
+        arrayList.addAll(getMiscelleaneousPowers());
+        return arrayList;
     }
 
     public boolean hasPower(MajorPowers majorPower) {
         return majorPowers.contains(majorPower);
+    }
+
+    public ArrayList<MajorPowers> getMajorPowers(){
+        return this.majorPowers;
     }
 
     public double getMaxHealth() {
@@ -369,5 +405,26 @@ public class EliteMobEntity {
     public String getName() {
         return this.name;
     }
+
+    public boolean hasMinorVisualEffect(){
+        return this.hasMinorVisualEffect;
+    }
+
+    public void setHasMinorVisualEffect(boolean bool){
+        this.hasMinorVisualEffect = bool;
+    }
+
+    public boolean hasMajorVisualEffect(){
+        return this.hasMajorVisualEffect;
+    }
+
+    public void setHasMajorVisualEffect(boolean bool){
+        this.hasMajorVisualEffect = bool;
+    }
+
+    public boolean isNaturalEntity(){
+        return this.isNaturalEntity;
+    }
+
 
 }

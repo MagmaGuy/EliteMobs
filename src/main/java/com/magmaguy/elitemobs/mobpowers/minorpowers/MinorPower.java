@@ -20,7 +20,7 @@ import org.bukkit.entity.Entity;
 /**
  * Created by MagmaGuy on 05/11/2016.
  */
-public abstract class MinorPowers {
+public abstract class MinorPower {
 
     public abstract void applyPowers(Entity entity);
 

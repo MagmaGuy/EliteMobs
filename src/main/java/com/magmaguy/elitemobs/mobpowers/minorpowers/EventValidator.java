@@ -23,7 +23,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class EventValidator {
 
-    public static boolean eventIsValid(MinorPowers minorPowers, EntityDamageByEntityEvent event) {
+    public static boolean eventIsValid(MinorPower minorPower, EntityDamageByEntityEvent event) {
 
         if (event.isCancelled()) return false;
 
@@ -35,7 +35,7 @@ public class EventValidator {
 
         if (eliteMob == null) return false;
 
-        return (EntityTracker.hasPower(minorPowers, eliteMob));
+        return (EntityTracker.hasPower(minorPower, eliteMob));
 
     }
 

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPowers;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
@@ -27,27 +27,27 @@ public abstract class EliteMobProperties extends PluginMobProperties {
 
     public static List<EliteMobProperties> eliteMobData = new ArrayList<>();
     public ArrayList<MajorPowers> validMajorPowers = new ArrayList<>();
-    public ArrayList<MinorPowers> validDefensivePowers = new ArrayList<>();
-    public ArrayList<MinorPowers> validOffensivePowers = new ArrayList<>();
-    public ArrayList<MinorPowers> validMiscellaneousPowers = new ArrayList<>();
+    public ArrayList<MinorPower> validDefensivePowers = new ArrayList<>();
+    public ArrayList<MinorPower> validOffensivePowers = new ArrayList<>();
+    public ArrayList<MinorPower> validMiscellaneousPowers = new ArrayList<>();
 
     public ArrayList<MajorPowers> getValidMajorPowers() {
         return validMajorPowers;
     }
 
-    public ArrayList<MinorPowers> getValidDefensivePowers() {
+    public ArrayList<MinorPower> getValidDefensivePowers() {
         return validDefensivePowers;
     }
 
-    public ArrayList<MinorPowers> getValidOffensivePowers() {
+    public ArrayList<MinorPower> getValidOffensivePowers() {
         return validOffensivePowers;
     }
 
-    public ArrayList<MinorPowers> getValidMiscellaneousPowers() {
+    public ArrayList<MinorPower> getValidMiscellaneousPowers() {
         return validMiscellaneousPowers;
     }
 
-    public static ArrayList<MinorPowers> getAllDefensivePowers() {
+    public static ArrayList<MinorPower> getAllDefensivePowers() {
         return new ArrayList<>(Arrays.asList(
                 new Invisibility(),
                 new InvulnerabilityArrow(),
@@ -57,7 +57,7 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         ));
     }
 
-    public static ArrayList<MinorPowers> getAllOffensivePowers() {
+    public static ArrayList<MinorPower> getAllOffensivePowers() {
         return new ArrayList<>(Arrays.asList(
                 new AttackArrow(),
                 new AttackBlinding(),
@@ -74,7 +74,7 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         ));
     }
 
-    public static ArrayList<MinorPowers> getAllMiscellaneousPowers() {
+    public static ArrayList<MinorPower> getAllMiscellaneousPowers() {
         return new ArrayList<>(Arrays.asList(
                 new BonusLoot(),
                 new MovementSpeed(),

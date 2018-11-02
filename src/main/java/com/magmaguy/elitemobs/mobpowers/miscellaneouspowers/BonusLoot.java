@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,7 +26,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class BonusLoot extends MinorPowers implements Listener {
+public class BonusLoot extends MinorPower implements Listener {
 
     @Override
     public void applyPowers(Entity entity) {

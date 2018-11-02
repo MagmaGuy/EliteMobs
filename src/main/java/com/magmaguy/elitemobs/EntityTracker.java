@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPowers;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -260,14 +260,14 @@ public class EntityTracker implements Listener {
         return hasPower(majorPowers, (LivingEntity) entity);
     }
 
-    public static boolean hasPower(MinorPowers minorPowers, LivingEntity livingEntity) {
+    public static boolean hasPower(MinorPower minorPower, LivingEntity livingEntity) {
         if (!isEliteMob(livingEntity)) return false;
-        return getEliteMobEntity(livingEntity).hasPower(minorPowers);
+        return getEliteMobEntity(livingEntity).hasPower(minorPower);
     }
 
-    public static boolean hasPower(MinorPowers minorPowers, Entity entity) {
+    public static boolean hasPower(MinorPower minorPower, Entity entity) {
         if (!(entity instanceof LivingEntity)) return false;
-        return hasPower(minorPowers, (LivingEntity) entity);
+        return hasPower(minorPower, (LivingEntity) entity);
     }
 
     /*

@@ -20,10 +20,21 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.Invisibility;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityArrow;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFallDamage;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityKnockback;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -101,10 +112,13 @@ public class MinorPowerPowerStance implements Listener {
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS)
                 && !EntityTracker.isNaturalEntity(entity))
             return;
-        if (entity.hasMetadata(MetadataHandler.VISUAL_EFFECT_MD))
-            return;
+        if (!EntityTracker.isEliteMob(entity)) return;
 
-        MetadataHandler.registerMetadata(entity, MetadataHandler.VISUAL_EFFECT_MD, true);
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity((LivingEntity) entity);
+
+        if (eliteMobEntity.hasMinorVisualEffect()) return;
+
+        eliteMobEntity.setHasMinorVisualEffect(true);
 
         //contains all items around a given entity
         HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker = new HashMap<>();
@@ -120,135 +134,32 @@ public class MinorPowerPowerStance implements Listener {
                 int individualPositionCounter = 0;
                 int effectQuantityChecksum = 0;
 
-                //count amount of active effects
-                for (String string : MetadataHandler.defensivePowerList)
-                    if (entity.hasMetadata(string))
-                        effectQuantityChecksum++;
+                if (!entity.isValid() ||
+                        (!eliteMobEntity.isNaturalEntity() &&
+                                ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS))) {
 
-                for (String string : MetadataHandler.offensivePowerList)
-                    if (entity.hasMetadata(string))
-                        effectQuantityChecksum++;
+                    VisualItemRemover.removeItems(powerItemLocationTracker, trackAmount, itemsPerTrack);
+                    cancel();
+                    return;
 
-                for (String string : MetadataHandler.miscellaneousPowerList)
-                    if (entity.hasMetadata(string))
-                        effectQuantityChecksum++;
+                }
 
-                if (effectQuantity == 0) {
+                effectQuantityChecksum = eliteMobEntity.getMinorPowers().size();
 
-                    effectQuantity = effectQuantityChecksum;
-
-                } else if (effectQuantity != effectQuantityChecksum) {
-
+                if (effectQuantity != effectQuantityChecksum) {
                     VisualItemRemover.removeItems(powerItemLocationTracker, trackAmount, itemsPerTrack);
                     powerItemLocationTracker.clear();
                     effectQuantity = effectQuantityChecksum;
-
                 }
 
                 if (globalPositionCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION)
                     globalPositionCounter = 0;
 
-                //apply new positioning
-                if (entity.hasMetadata(MetadataHandler.ATTACK_ARROW_MD)) {
+                for (MinorPower minorPower : eliteMobEntity.getMinorPowers()) {
 
-                    ItemStack itemStack = new ItemStack(Material.ARROW, 1);
+                    if (minorPower instanceof AttackArrow) {
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
-
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-
-                }
-
-                if (entity.hasMetadata(MetadataHandler.ATTACK_BLINDING_MD)) {
-
-                    ItemStack itemStack = new ItemStack(Material.EYE_OF_ENDER, 1);
-
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
-
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-
-                }
-
-                if (entity.hasMetadata(MetadataHandler.ATTACK_FIRE_MD)) {
-
-                    ItemStack itemStack = new ItemStack(Material.LAVA_BUCKET, 1);
-
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
-
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-
-                }
-
-                if (entity.hasMetadata(MetadataHandler.ATTACK_FIREBALL_MD)) {
-
-                    ItemStack itemStack = new ItemStack(Material.FIREBALL, 1);
-
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
-
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-
-                }
-
-                if (entity.hasMetadata(MetadataHandler.ATTACK_FREEZE_MD)) {
-
-                    ItemStack itemStack = new ItemStack(Material.PACKED_ICE, 1);
-
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
-
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-
-                }
-
-                if (entity.hasMetadata(MetadataHandler.ATTACK_GRAVITY_MD)) {
-
-                    ItemStack itemStack = new ItemStack(Material.ELYTRA, 1);
-
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
-
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-
-                }
-
-                if (entity.hasMetadata(MetadataHandler.ATTACK_POISON_MD)) {
-
-                    ItemStack itemStack = new ItemStack(Material.EMERALD, 1);
-
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
-
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-
-                }
-
-                if (entity.hasMetadata(MetadataHandler.ATTACK_PUSH_MD)) {
-
-                    ItemStack itemStack = new ItemStack(Material.PISTON_BASE, 1);
-
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
-
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-
-                }
-
-                if (!VersionChecker.currentVersionIsUnder(11, 0))
-                    if (entity.hasMetadata(MetadataHandler.ATTACK_WEAKNESS_MD)) {
-
-                        ItemStack itemStack = new ItemStack(Material.TOTEM, 1);
+                        ItemStack itemStack = new ItemStack(Material.ARROW, 1);
 
                         applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
                                 individualPositionCounter, itemStackHashMapPosition);
@@ -258,144 +169,210 @@ public class MinorPowerPowerStance implements Listener {
 
                     }
 
-                if (entity.hasMetadata(MetadataHandler.ATTACK_WEB_MD)) {
+                    if (minorPower instanceof AttackBlinding) {
 
-                    ItemStack itemStack = new ItemStack(Material.WEB, 1);
+                        ItemStack itemStack = new ItemStack(Material.EYE_OF_ENDER, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.ATTACK_WITHER_MD)) {
+                    if (minorPower instanceof AttackFire) {
 
-                    ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
+                        ItemStack itemStack = new ItemStack(Material.LAVA_BUCKET, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.BONUS_LOOT_MD)) {
+                    if (minorPower instanceof AttackFireball) {
 
-                    ItemStack itemStack = new ItemStack(Material.CHEST, 1);
+                        ItemStack itemStack = new ItemStack(Material.FIREBALL, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.DOUBLE_DAMAGE_MD)) {
+                    if (minorPower instanceof AttackFreeze) {
 
-                    ItemStack itemStack = new ItemStack(Material.GOLD_SWORD, 1);
+                        ItemStack itemStack = new ItemStack(Material.PACKED_ICE, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.DOUBLE_HEALTH_MD)) {
+                    if (minorPower instanceof AttackGravity) {
 
-                    ItemStack itemStack = new ItemStack(Material.SHIELD, 1);
+                        ItemStack itemStack = new ItemStack(Material.ELYTRA, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.INVISIBILITY_MD)) {
+                    if (minorPower instanceof AttackPoison) {
 
-                    ItemStack itemStack = new ItemStack(Material.THIN_GLASS, 1);
+                        ItemStack itemStack = new ItemStack(Material.EMERALD, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.INVULNERABILITY_ARROW_MD)) {
+                    if (minorPower instanceof AttackPush) {
 
-                    ItemStack itemStack = new ItemStack(Material.SPECTRAL_ARROW, 1);
+                        ItemStack itemStack = new ItemStack(Material.PISTON_BASE, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.INVULNERABILITY_FALL_DAMAGE_MD)) {
+                    if (!VersionChecker.currentVersionIsUnder(11, 0))
+                        if (minorPower instanceof AttackWeakness) {
 
-                    ItemStack itemStack = new ItemStack(Material.FEATHER, 1);
+                            ItemStack itemStack = new ItemStack(Material.TOTEM, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                            applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                    individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                            individualPositionCounter++;
+                            itemStackHashMapPosition++;
 
-                }
+                        }
 
-                if (entity.hasMetadata(MetadataHandler.INVULNERABILITY_KNOCKBACK_MD)) {
+                    if (minorPower instanceof AttackWeb) {
 
-                    ItemStack itemStack = new ItemStack(Material.ANVIL, 1);
+                        ItemStack itemStack = new ItemStack(Material.WEB, 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                }
+                    }
 
-                if (entity.hasMetadata(MetadataHandler.MOVEMENT_SPEED_MD)) {
+                    if (minorPower instanceof AttackWither) {
 
-                    ItemStack itemStack = new ItemStack(Material.GOLD_BOOTS, 1);
+                        ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 1);
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
-                }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                if (entity.hasMetadata(MetadataHandler.TAUNT_MD)) {
+                    }
 
-                    ItemStack itemStack = new ItemStack(Material.JUKEBOX, 1);
+                    if (minorPower instanceof BonusLoot) {
 
-                    applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
-                            individualPositionCounter, itemStackHashMapPosition);
+                        ItemStack itemStack = new ItemStack(Material.CHEST, 1);
 
-                    individualPositionCounter++;
-                    itemStackHashMapPosition++;
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
 
-                }
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
 
-                globalPositionCounter++;
+                    }
 
-                if (!entity.isValid() || entity.isDead() ||
-                        (!EntityTracker.isNaturalEntity(entity) && ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS))) {
+                    if (minorPower instanceof Invisibility) {
 
-                    VisualItemRemover.removeItems(powerItemLocationTracker, trackAmount, itemsPerTrack);
-                    cancel();
+                        ItemStack itemStack = new ItemStack(Material.THIN_GLASS, 1);
+
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
+
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
+
+                    }
+
+                    if (minorPower instanceof InvulnerabilityArrow) {
+
+                        ItemStack itemStack = new ItemStack(Material.SPECTRAL_ARROW, 1);
+
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
+
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
+
+                    }
+
+                    if (minorPower instanceof InvulnerabilityFallDamage) {
+
+                        ItemStack itemStack = new ItemStack(Material.FEATHER, 1);
+
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
+
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
+
+                    }
+
+                    if (minorPower instanceof InvulnerabilityKnockback) {
+
+                        ItemStack itemStack = new ItemStack(Material.ANVIL, 1);
+
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
+
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
+
+                    }
+
+                    if (minorPower instanceof MovementSpeed) {
+
+                        ItemStack itemStack = new ItemStack(Material.GOLD_BOOTS, 1);
+
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
+
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
+
+                    }
+
+                    if (minorPower instanceof Taunt) {
+
+                        ItemStack itemStack = new ItemStack(Material.JUKEBOX, 1);
+
+                        applyRotation(powerItemLocationTracker, itemStack, entity, effectQuantity, globalPositionCounter,
+                                individualPositionCounter, itemStackHashMapPosition);
+
+                        individualPositionCounter++;
+                        itemStackHashMapPosition++;
+
+                    }
 
                 }
 

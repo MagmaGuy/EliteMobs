@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackArrow extends MinorPowers implements Listener {
+public class AttackArrow extends MinorPower implements Listener {
 
     ArrayList<LivingEntity> currentlyFiringEntities = new ArrayList<>();
 

@@ -17,7 +17,7 @@ package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 /**
  * Created by MagmaGuy on 12/12/2016.
  */
-public class AttackWither extends MinorPowers implements Listener {
+public class AttackWither extends MinorPower implements Listener {
 
     private ArrayList<LivingEntity> cooldownList = new ArrayList<>();
 
