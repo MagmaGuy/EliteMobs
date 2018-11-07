@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -73,14 +74,14 @@ public class StatsCommandHandler {
 
             for (LivingEntity livingEntity : world.getLivingEntities()) {
 
-                if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
+                if (EntityTracker.isEliteMob(livingEntity) ||
                         EntityTracker.isSuperMob(livingEntity)) {
 
                     totalMobCount++;
 
-                    if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+                    if (EntityTracker.isEliteMob(livingEntity)) {
 
-                        mobLevelSavingsCount += livingEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+                        mobLevelSavingsCount += EntityTracker.getEliteMobEntity(livingEntity).getLevel();
                         aggressiveCount++;
 
                         switch (livingEntity.getType()) {
