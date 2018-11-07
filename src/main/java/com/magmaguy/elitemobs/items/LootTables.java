@@ -16,11 +16,11 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -46,12 +46,15 @@ public class LootTables implements Listener {
         if (event.getEntity() == null) return;
         LivingEntity livingEntity = event.getEntity();
 
-        if (!EntityTracker.isNaturalEntity(livingEntity) ||
-                !livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+        if (!EntityTracker.isEliteMob(livingEntity)) return;
 
-        if (livingEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 2) return;
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(livingEntity);
 
-        Item item = generateLoot((LivingEntity) livingEntity);
+        if (!eliteMobEntity.isNaturalEntity()) return;
+
+        if (eliteMobEntity.getLevel() < 2) return;
+
+        Item item = generateLoot(livingEntity);
 
         if (item == null) return;
 

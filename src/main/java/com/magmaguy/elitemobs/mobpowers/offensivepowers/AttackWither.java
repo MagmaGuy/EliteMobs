@@ -47,7 +47,7 @@ public class AttackWither extends MinorPower implements Listener {
         if (!EventValidator.eventIsValid(this, event)) return;
         Player player = EntityFinder.findPlayer(event);
         LivingEntity eliteMob = EntityFinder.getRealDamager(event);
-        if (PowerCooldown.cooldownChecker(eliteMob, cooldownList)) return;
+        if (PowerCooldown.isInCooldown(eliteMob, cooldownList)) return;
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 50, 1));
 

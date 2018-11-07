@@ -15,13 +15,14 @@
 
 package com.magmaguy.elitemobs.mobmerger;
 
-import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.mobscanner.MobScanner;
-import com.magmaguy.elitemobs.mobscanner.ValidAggressiveMobFilter;
-import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
+import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
+import com.magmaguy.elitemobs.mobscanner.EliteMobScanner;
+import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -67,33 +68,22 @@ public class MergeHandler implements Listener {
 
     private void validateEntityType(Entity eventEntity) {
 
-        if (eventEntity == null || !(eventEntity instanceof LivingEntity)) return;
-        LivingEntity livingEntity = (LivingEntity) eventEntity;
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) &&
+                EliteMobProperties.isValidEliteMobType(eventEntity)) {
 
-        if (!EliteMobs.validWorldList.contains(eventEntity.getWorld()))
-            return;
+            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_NATURAL_MOBS) &&
+                    EntityTracker.isNaturalEntity(eventEntity))
+                EliteMobScanner.scanValidAggressiveLivingEntity((LivingEntity) eventEntity);
 
-        if (!EntityTracker.isNaturalEntity(livingEntity) && !ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_SPAWNER_MOBS))
-            return;
+            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_SPAWNER_MOBS) &&
+                    !EntityTracker.isNaturalEntity(eventEntity))
+                EliteMobScanner.scanValidAggressiveLivingEntity((LivingEntity) eventEntity);
 
-        MobScanner mobScanner = new MobScanner();
+        }
 
-        if (ValidAggressiveMobFilter.checkValidAggressiveMob(eventEntity) && ConfigValues.defaultConfig.getBoolean("Allow aggressive EliteMobs") &&
-                ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) && !EntityTracker.isNaturalEntity(livingEntity)) {
-
-            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) && !EntityTracker.isNaturalEntity(livingEntity)) {
-
-                mobScanner.scanValidAggressiveLivingEntity(livingEntity);
-
-            } else if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) && ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_NATURAL_MOBS) &&
-                    EntityTracker.isNaturalEntity(livingEntity)) {
-
-                mobScanner.scanValidAggressiveLivingEntity(livingEntity);
-
-            }
-
-        } else if (ValidPassiveMobFilter.ValidPassiveMobFilter(eventEntity) && ConfigValues.defaultConfig.getBoolean("Allow Passive EliteMobs"))
-            mobScanner.scanValidPassiveLivingEntity(eventEntity);
+        if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
+                SuperMobProperties.isValidSuperMobType(eventEntity))
+            SuperMobScanner.newSuperMobScan((LivingEntity) eventEntity);
 
     }
 

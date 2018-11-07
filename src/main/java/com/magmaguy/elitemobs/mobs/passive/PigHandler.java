@@ -49,7 +49,7 @@ public class PigHandler implements Listener {
 
         }
 
-        if (event.getEntity() instanceof Pig && EntityTracker.isPassiveMob(event.getEntity())) {
+        if (event.getEntity() instanceof Pig && EntityTracker.isSuperMob(event.getEntity())) {
 
             Random random = new Random();
 

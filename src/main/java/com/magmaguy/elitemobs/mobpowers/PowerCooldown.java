@@ -46,7 +46,7 @@ public class PowerCooldown {
     /*
     This method checks if the cooldown is active
      */
-    public static boolean cooldownChecker(LivingEntity eliteMob, ArrayList<LivingEntity> cooldownList) {
+    public static boolean isInCooldown(LivingEntity eliteMob, ArrayList<LivingEntity> cooldownList) {
         return cooldownList.contains(eliteMob);
     }
 

@@ -74,7 +74,7 @@ public class StatsCommandHandler {
             for (LivingEntity livingEntity : world.getLivingEntities()) {
 
                 if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
-                        EntityTracker.isPassiveMob(livingEntity)) {
+                        EntityTracker.isSuperMob(livingEntity)) {
 
                     totalMobCount++;
 
@@ -143,7 +143,7 @@ public class StatsCommandHandler {
                         }
 
 
-                    } else if (EntityTracker.isPassiveMob(livingEntity)) {
+                    } else if (EntityTracker.isSuperMob(livingEntity)) {
 
                         //passive EliteMobs only stack at 50 right now
                         //TODO: redo this count at some other stage of this plugin's development

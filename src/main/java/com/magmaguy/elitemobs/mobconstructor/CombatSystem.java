@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.mobconstructor;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.config.ConfigValues;
@@ -62,7 +63,7 @@ public class CombatSystem implements Listener {
 
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player)) return;
-        if (event.getDamager() instanceof LivingEntity && !event.getDamager().hasMetadata(MetadataHandler.ELITE_MOB_MD))
+        if (!EntityTracker.isEliteMob(event.getDamager()))
             return;
         if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
                 !((LivingEntity) ((Projectile) event.getDamager()).getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD))

@@ -66,7 +66,7 @@ public class ChickenHandler implements Listener {
 
         }
 
-        if (event.getEntity() instanceof Chicken && EntityTracker.isPassiveMob(event.getEntity())) {
+        if (event.getEntity() instanceof Chicken && EntityTracker.isSuperMob(event.getEntity())) {
 
             Random random = new Random();
 
@@ -113,7 +113,7 @@ public class ChickenHandler implements Listener {
 
             Chicken chicken = (Chicken) event.getEntity();
 
-            if (EntityTracker.isPassiveMob(chicken)) {
+            if (EntityTracker.isSuperMob(chicken)) {
 
                 if (!activeChickenList.contains(chicken)) {
 
@@ -134,11 +134,7 @@ public class ChickenHandler implements Listener {
 
             Chicken chicken = (Chicken) event.getEntity();
 
-            if (activeChickenList.contains(chicken)) {
-
-                activeChickenList.remove(chicken);
-
-            }
+            activeChickenList.remove(chicken);
 
         }
 
@@ -147,11 +143,11 @@ public class ChickenHandler implements Listener {
     @EventHandler
     public void superChickenChunkUnloadEvent(ChunkUnloadEvent event) {
 
-        List<Entity> entityList = Arrays.asList(event.getChunk().getEntities());
+        Entity[] entityList = event.getChunk().getEntities();
 
         for (Entity entity : entityList) {
 
-            if (entity instanceof Chicken && EntityTracker.isPassiveMob(entity)) {
+            if (entity instanceof Chicken && EntityTracker.isSuperMob(entity)) {
 
                 activeChickenList.remove(entity);
 

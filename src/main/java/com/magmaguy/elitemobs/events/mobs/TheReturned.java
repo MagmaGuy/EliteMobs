@@ -20,7 +20,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.DeadMoon;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;

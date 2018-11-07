@@ -9,7 +9,7 @@ public class EliteMobConstructor {
     /*
     This class assumes that the entity has already been filtered and validated before being invoked
      */
-    public static LivingEntity constructEliteMob(LivingEntity livingEntity, int mobLevel) {
+    public static EliteMobEntity constructEliteMob(LivingEntity livingEntity, int mobLevel) {
 
         if (!EliteMobProperties.isValidEliteMobType(livingEntity)) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to construct an invalid Elite Mob. Report this to the dev!");
@@ -17,9 +17,7 @@ public class EliteMobConstructor {
             return null;
         }
 
-        new EliteMobEntity(livingEntity, mobLevel);
-
-        return livingEntity;
+        return new EliteMobEntity(livingEntity, mobLevel);
 
     }
 

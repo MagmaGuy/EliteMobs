@@ -25,7 +25,7 @@ import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.uniqueitems.ZombieKingsAxe;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.BossMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,30 +40,38 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.Random;
+import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ZombieKing implements Listener {
+
+    private static ArrayList<BossMobEntity> zombieKingList = new ArrayList<>();
+
+    public static boolean isZombieKing(Entity entity) {
+        if (!(entity instanceof LivingEntity)) return false;
+        if (zombieKingList.isEmpty()) return false;
+        for (BossMobEntity bossMobEntity : zombieKingList)
+            if (bossMobEntity.getEliteMobEntity().getLivingEntity().equals(entity))
+                return true;
+        return false;
+    }
 
     public static void spawnZombieKing(Zombie zombie) {
 
         DeadMoon.entityQueued = false;
 
-        int kingLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
         Location location = zombie.getLocation();
-
         Zombie zombieKing = (Zombie) location.getWorld().spawnEntity(location, EntityType.ZOMBIE);
 
-        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.ZOMBIE_KING, true);
-        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.ELITE_MOB_MD, kingLevel);
-        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_ARMOR, true);
-        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_POWERS_MD, true);
-        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.CUSTOM_STACK, true);
-        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.EVENT_CREATURE, true);
-        MetadataHandler.registerMetadata(zombieKing, MetadataHandler.PERSISTENT_ENTITY, true);
-        NameHandler.customUniqueNameAssigner(zombieKing, ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME)));
 
-        zombieKing.setRemoveWhenFarAway(false);
+        int kingLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
+        BossMobEntity zombieKingPluginEntity = new BossMobEntity(zombieKing, kingLevel,
+                ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME)));
+
+        zombieKingList.add(zombieKingPluginEntity);
+        zombieKingFlair(zombieKing);
+
         zombieKing.setBaby(false);
 
         zombieKing.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
@@ -72,32 +80,7 @@ public class ZombieKing implements Listener {
         zombieKing.getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
         zombieKing.getEquipment().setItemInMainHand(new ItemStack(Material.GOLD_AXE));
 
-        AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombieKing);
-        zombieKingFlair(zombieKing);
-
-        String coordinates = zombieKing.getLocation().getBlockX() + ", " + zombieKing.getLocation().getBlockY() + ", " + zombieKing.getLocation().getBlockZ();
-        String sendString = ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_ANNOUNCEMENT_TEXT).replace("$location", coordinates);
-        String worldName = "";
-
-        if (zombieKing.getWorld().getName().contains("_")) {
-
-            for (String string : zombieKing.getWorld().getName().split("_")) {
-
-                worldName += string.substring(0, 1).toUpperCase() + string.toLowerCase() + " ";
-
-            }
-
-        } else {
-
-            worldName = zombieKing.getWorld().getName().substring(0, 1).toUpperCase() + zombieKing.getWorld().getName().substring(1).toLowerCase();
-
-        }
-
-        sendString = sendString.replace("$world", worldName);
-
-        sendString = ChatColorConverter.convert(sendString);
-
-        EventMessage.sendEventMessage(sendString, zombieKing.getWorld());
+        EventMessage.sendEventMessage(zombieKing, ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_ANNOUNCEMENT_TEXT));
         BossMobDeathCountdown.startDeathCountdown(zombieKing);
 
     }
@@ -132,12 +115,14 @@ public class ZombieKing implements Listener {
 
     }
 
-    private static Random random = new Random();
+    private static ArrayList<LivingEntity> flamethrowerCooldown = new ArrayList<>();
+    private static ArrayList<LivingEntity> unholySmiteCooldown = new ArrayList<>();
+    private static ArrayList<LivingEntity> minionsCooldown = new ArrayList<>();
 
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
 
-        if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING)) return;
+        if (!isZombieKing(event.getEntity())) return;
 
         LivingEntity livingEntity;
 
@@ -158,31 +143,34 @@ public class ZombieKing implements Listener {
 
         if (livingEntity == null) return;
 
-        if (random.nextDouble() < 0.20) {
+        if (ThreadLocalRandom.current().nextDouble() < 0.20) {
 
-            if (random.nextDouble() < 0.33) {
+            if (ThreadLocalRandom.current().nextDouble() < 0.33) {
 
-                if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_FLAMETHROWER_COOLDOWN)) {
+                if (!PowerCooldown.isInCooldown(livingEntity, flamethrowerCooldown)) {
 
-                    PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_FLAMETHROWER_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_FLAMETHROWER_INTERVAL));
+                    PowerCooldown.startCooldownTimer(livingEntity, flamethrowerCooldown,
+                            20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_FLAMETHROWER_INTERVAL));
                     initializeFlamethrower(event.getEntity().getLocation(), livingEntity.getLocation(), (LivingEntity) event.getEntity());
 
                 }
 
-            } else if (random.nextDouble() < 0.66) {
+            } else if (ThreadLocalRandom.current().nextDouble() < 0.66) {
 
-                if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN)) {
+                if (PowerCooldown.isInCooldown(livingEntity, unholySmiteCooldown)) {
 
-                    PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_UNHOLY_SMITE_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_UNHOLY_SMITE_INTERVAL));
+                    PowerCooldown.startCooldownTimer(livingEntity, unholySmiteCooldown,
+                            20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_UNHOLY_SMITE_INTERVAL));
                     initializeUnholySmite((LivingEntity) event.getEntity());
 
                 }
 
             } else {
 
-                if (!event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN)) {
+                if (PowerCooldown.isInCooldown(livingEntity, minionsCooldown)) {
 
-                    PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.ZOMBIE_KING_SUMMON_MINIONS_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_SUMMON_MINIONS_INTERVAL));
+                    PowerCooldown.startCooldownTimer(livingEntity, minionsCooldown,
+                            20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_SUMMON_MINIONS_INTERVAL));
                     initializeSummonMinions((LivingEntity) event.getEntity());
 
                 }
@@ -219,20 +207,12 @@ public class ZombieKing implements Listener {
             @Override
             public void run() {
 
-                if (counter > flamePoints) {
-
+                if (counter > flamePoints)
                     cancel();
-
-                }
 
                 Location armorStandLocation = sourceLocation.add(toTarget);
 
-                ArmorStand flamethrowerDamagePoint = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
-                MetadataHandler.registerMetadata(flamethrowerDamagePoint, MetadataHandler.ARMOR_STAND_DISPLAY, true);
-                flamethrowerDamagePoint.setVisible(false);
-                flamethrowerDamagePoint.setMarker(true);
-                flamethrowerDamagePoint.setGravity(false);
-                flamethrowerDamage(flamethrowerDamagePoint, shooter, toTarget, shotByPlayer);
+                flamethrowerDamage(armorStandLocation, shooter, toTarget, shotByPlayer);
 
                 counter++;
 
@@ -242,7 +222,7 @@ public class ZombieKing implements Listener {
 
     }
 
-    private static void flamethrowerDamage(ArmorStand armorStand, LivingEntity shooter, Vector directionVector, boolean shotByPlayer) {
+    private static void flamethrowerDamage(Location location, LivingEntity shooter, Vector directionVector, boolean shotByPlayer) {
 
         new BukkitRunnable() {
 
@@ -254,7 +234,6 @@ public class ZombieKing implements Listener {
                 if (counter > 3 * 20) {
 
                     if (!(shooter instanceof Player)) shooter.setAI(true);
-                    armorStand.remove();
                     cancel();
 
                 }
@@ -269,10 +248,10 @@ public class ZombieKing implements Listener {
 
                         for (int i = 0; i < 5; i++) {
 
-                            double offsetX = (random.nextDouble() - 0.5) * 0.1 + directionVector.getX();
-                            double offsetY = (random.nextDouble() - 0.5) * 0.1 + directionVector.getY();
-                            double offsetZ = (random.nextDouble() - 0.5) * 0.1 + directionVector.getZ();
-                            double offsetVelocity = random.nextDouble() + 0.05;
+                            double offsetX = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getX();
+                            double offsetY = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getY();
+                            double offsetZ = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getZ();
+                            double offsetVelocity = ThreadLocalRandom.current().nextDouble() + 0.05;
 
                             if (shooter instanceof Player)
                                 shooter.getLocation().getWorld().spawnParticle(Particle.FLAME, shooter.getEyeLocation().clone().add(directionVector), 0, offsetX, offsetY, offsetZ, offsetVelocity);
@@ -283,7 +262,7 @@ public class ZombieKing implements Listener {
 
                     }
 
-                    for (Entity entity : armorStand.getNearbyEntities(1, 1, 1)) {
+                    for (Entity entity : location.getWorld().getNearbyEntities(location, 1, 1, 1)) {
 
                         if (!entity.equals(shooter) && entity instanceof LivingEntity) {
 
@@ -307,10 +286,10 @@ public class ZombieKing implements Listener {
 
                     for (int i = 0; i < 5; i++) {
 
-                        double offsetX = (random.nextDouble() - 0.5) * 0.1 + directionVector.getX();
-                        double offsetY = (random.nextDouble() - 0.5) * 0.1 + directionVector.getY();
-                        double offsetZ = (random.nextDouble() - 0.5) * 0.1 + directionVector.getZ();
-                        double offsetVelocity = random.nextDouble() + 0.05;
+                        double offsetX = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getX();
+                        double offsetY = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getY();
+                        double offsetZ = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getZ();
+                        double offsetVelocity = ThreadLocalRandom.current().nextDouble() + 0.05;
 
                         if (shooter instanceof Player)
                             shooter.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, shooter.getEyeLocation().clone().add(directionVector), 0, offsetX, offsetY, offsetZ, offsetVelocity);
@@ -463,10 +442,10 @@ public class ZombieKing implements Listener {
 
         for (int i = 0; i < 10; i++) {
 
-            double offsetVelocity = random.nextDouble() * 2;
+            double offsetVelocity = ThreadLocalRandom.current().nextDouble() * 2;
 
-            double offsetLocationX = (random.nextDouble() - 0.5) * 0.5 + livingEntity.getLocation().getX();
-            double offsetLocationZ = (random.nextDouble() - 0.5) * 0.5 + livingEntity.getLocation().getZ();
+            double offsetLocationX = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.5 + livingEntity.getLocation().getX();
+            double offsetLocationZ = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.5 + livingEntity.getLocation().getZ();
 
             Location offsetLocation = new Location(livingEntity.getWorld(), offsetLocationX, livingEntity.getLocation().getY(), offsetLocationZ);
 
@@ -480,10 +459,10 @@ public class ZombieKing implements Listener {
 
         for (int i = 0; i < 10; i++) {
 
-            double offsetVelocity = random.nextDouble() * 2;
+            double offsetVelocity = ThreadLocalRandom.current().nextDouble() * 2;
 
-            double offsetLocationX = (random.nextDouble() - 0.5) * 3 + livingEntity.getLocation().getX();
-            double offsetLocationZ = (random.nextDouble() - 0.5) * 3 + livingEntity.getLocation().getZ();
+            double offsetLocationX = (ThreadLocalRandom.current().nextDouble() - 0.5) * 3 + livingEntity.getLocation().getX();
+            double offsetLocationZ = (ThreadLocalRandom.current().nextDouble() - 0.5) * 3 + livingEntity.getLocation().getZ();
 
             Location offsetLocation = new Location(livingEntity.getWorld(), offsetLocationX, livingEntity.getLocation().getY(), offsetLocationZ);
 
@@ -553,7 +532,7 @@ public class ZombieKing implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING) && event.getEntity() instanceof Zombie) {
+        if (isZombieKing(event.getEntity())) {
 
             Zombie zombieKing = (Zombie) event.getEntity();
 
@@ -564,12 +543,14 @@ public class ZombieKing implements Listener {
 
             if (event.getEntity().getKiller() != null) {
 
-                String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_PLAYER_END_TEXT).replace("$player", event.getEntity().getKiller().getDisplayName());
+                String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_PLAYER_END_TEXT)
+                        .replace("$player", event.getEntity().getKiller().getDisplayName());
 
-                EventMessage.sendEventMessage(newMessage, zombieKing.getWorld());
+                EventMessage.sendEventMessage(event.getEntity(), newMessage);
 
             } else
-                EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(ChatColorConverter.convert(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)), zombieKing.getWorld());
+                EventMessage.sendEventMessage(event.getEntity(), ConfigValues.eventsConfig.getString(
+                        ChatColorConverter.convert(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)));
 
         }
 

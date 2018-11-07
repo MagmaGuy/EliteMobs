@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.items.uniqueitems.DwarvenGreed;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;

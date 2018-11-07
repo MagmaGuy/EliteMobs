@@ -376,9 +376,9 @@ public class MinorPowerPowerStance implements Listener {
 
                 }
 
-            }
+                globalPositionCounter++;
 
-            //can only run every 5 ticks or it causes effect-breaking visual glitches client-side
+            }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
 

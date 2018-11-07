@@ -46,7 +46,7 @@ public class AttackPush extends MinorPower implements Listener {
         if (!EventValidator.eventIsValid(this, event)) return;
         Player player = EntityFinder.findPlayer(event);
         LivingEntity eliteMob = EntityFinder.getRealDamager(event);
-        if (PowerCooldown.cooldownChecker(eliteMob, cooldownList)) return;
+        if (PowerCooldown.isInCooldown(eliteMob, cooldownList)) return;
 
         Vector pushbackDirection = player.getLocation().subtract(eliteMob.getLocation()).toVector();
         Vector pushbackApplied = pushbackDirection.normalize().multiply(3);

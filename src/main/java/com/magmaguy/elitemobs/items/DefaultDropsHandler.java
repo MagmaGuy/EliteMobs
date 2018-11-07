@@ -16,7 +16,6 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import org.bukkit.Material;
@@ -42,47 +41,46 @@ public class DefaultDropsHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+        if (!EntityTracker.isEliteMob(event.getEntity())) return;
 
-            if (!EntityTracker.isNaturalEntity(event.getEntity()) &&
-                    !ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.SPAWNER_DEFAULT_LOOT_MULTIPLIER))
-                return;
+        if (!EntityTracker.isNaturalEntity(event.getEntity()) &&
+                !ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.SPAWNER_DEFAULT_LOOT_MULTIPLIER))
+            return;
 
-            List<ItemStack> droppedItems = event.getDrops();
-            int mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
-                    ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.DEFAULT_LOOT_MULTIPLIER));
+        List<ItemStack> droppedItems = event.getDrops();
+        int mobLevel = (int) (EntityTracker.getEliteMobEntity(event.getEntity()).getLevel() *
+                ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.DEFAULT_LOOT_MULTIPLIER));
 
-            if (mobLevel > ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER))
-                mobLevel = ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER);
+        if (mobLevel > ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER))
+            mobLevel = ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER);
 
-            inventoryItemsConstructor(event.getEntity());
+        inventoryItemsConstructor(event.getEntity());
 
-            for (ItemStack itemStack : droppedItems) {
+        for (ItemStack itemStack : droppedItems) {
 
 //                ItemStack can be null for some reason, probably due to other plugins
-                if (itemStack == null) continue;
-                boolean itemIsWorn = false;
+            if (itemStack == null) continue;
+            boolean itemIsWorn = false;
 
-                for (ItemStack wornItem : wornItems)
-                    if (wornItem.isSimilar(itemStack))
-                        itemIsWorn = true;
+            for (ItemStack wornItem : wornItems)
+                if (wornItem.isSimilar(itemStack))
+                    itemIsWorn = true;
 
-                if (!itemIsWorn)
-                    for (int i = 0; i < mobLevel * 0.1; i++)
-                        event.getEntity().getLocation().getWorld().dropItem(event.getEntity().getLocation(), itemStack);
-
-            }
-
-            mobLevel = (int) (event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() *
-                    ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.EXPERIENCE_LOOT_MULTIPLIER));
-
-            int droppedXP = (int) (event.getDroppedExp() + event.getDroppedExp() * 0.1 * mobLevel);
-            event.setDroppedExp(0);
-            event.getEntity().getWorld().spawn(event.getEntity().getLocation(), ExperienceOrb.class).setExperience(droppedXP);
+            if (!itemIsWorn)
+                for (int i = 0; i < mobLevel * 0.1; i++)
+                    event.getEntity().getLocation().getWorld().dropItem(event.getEntity().getLocation(), itemStack);
 
         }
 
+        mobLevel = (int) (EntityTracker.getEliteMobEntity(event.getEntity()).getLevel() *
+                ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.EXPERIENCE_LOOT_MULTIPLIER));
+
+        int droppedXP = (int) (event.getDroppedExp() + event.getDroppedExp() * 0.1 * mobLevel);
+        event.setDroppedExp(0);
+        event.getEntity().getWorld().spawn(event.getEntity().getLocation(), ExperienceOrb.class).setExperience(droppedXP);
+
     }
+
 
     private List<ItemStack> inventoryItemsConstructor(LivingEntity entity) {
 
