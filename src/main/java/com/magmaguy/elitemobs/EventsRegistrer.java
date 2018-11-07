@@ -26,8 +26,15 @@ import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobconstructor.displays.HealthDisplay;
 import com.magmaguy.elitemobs.mobmerger.MergeHandler;
 import com.magmaguy.elitemobs.mobpowers.AggroPrevention;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityArrow;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFallDamage;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFire;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityKnockback;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
-import com.magmaguy.elitemobs.mobscanner.MobScanner;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobMetadataAssigner;
 import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
@@ -35,264 +42,176 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 
 public class EventsRegistrer {
 
     public static void registerEvents() {
 
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        Plugin plugin = MetadataHandler.PLUGIN;
+
         //Load passive mobs TODO: find generic alternative to this
-        Bukkit.getServer().getPluginManager().registerEvents(new ChickenHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new CowHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new MushroomCowHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new PassiveEliteMobDeathHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new PigHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new SheepHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new FindSuperMobs(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new ChickenHandler(), plugin);
+        pluginManager.registerEvents(new CowHandler(), plugin);
+        pluginManager.registerEvents(new MushroomCowHandler(), plugin);
+        pluginManager.registerEvents(new PassiveEliteMobDeathHandler(), plugin);
+        pluginManager.registerEvents(new PigHandler(), plugin);
+        pluginManager.registerEvents(new SheepHandler(), plugin);
+        pluginManager.registerEvents(new FindSuperMobs(), plugin);
 
         //Mob damage
-        Bukkit.getServer().getPluginManager().registerEvents(new CombatSystem(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new CombatSystem(), plugin);
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_DEATH_MESSAGES))
-            Bukkit.getServer().getPluginManager().registerEvents(new PlayerDeathMessageByEliteMob(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
 
         //Mob loot
-        Bukkit.getServer().getPluginManager().registerEvents(new DefaultDropsHandler(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new DefaultDropsHandler(), plugin);
 
         //potion effects
-        Bukkit.getServer().getPluginManager().registerEvents(new PotionEffectApplier(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new PotionEffectApplier(), plugin);
 
         //getloot AdventurersGuildGUI
-        Bukkit.getServer().getPluginManager().registerEvents(new LootGUI(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new LootGUI(), plugin);
 
         //config AdventurersGuildGUI
-        Bukkit.getServer().getPluginManager().registerEvents(new GUIConfigHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new ValidMobsConfigurer(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new MobSpawningAndLoot(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new GUIConfigHandler(), plugin);
+        pluginManager.registerEvents(new ValidMobsConfigurer(), plugin);
+        pluginManager.registerEvents(new MobSpawningAndLoot(), plugin);
 
+
+        /*
+        While these powers could be registered in a more automated way, I realized that it's also a bad way of getting
+        silent errors without ever noticing, and ultimately the amount of manual input required is pretty minimal
+         */
         //Minor mob powers
-        for (String string : MetadataHandler.defensivePowerList) {
+        pluginManager.registerEvents(new InvulnerabilityArrow(), plugin);
+        pluginManager.registerEvents(new InvulnerabilityFallDamage(), plugin);
+        pluginManager.registerEvents(new InvulnerabilityFire(), plugin);
+        pluginManager.registerEvents(new InvulnerabilityKnockback(), plugin);
+        pluginManager.registerEvents(new BonusLoot(), plugin);
+        pluginManager.registerEvents(new Taunt(), plugin);
+        pluginManager.registerEvents(new AttackArrow(), plugin);
+        pluginManager.registerEvents(new AttackBlinding(), plugin);
+        pluginManager.registerEvents(new AttackFire(), plugin);
+        pluginManager.registerEvents(new AttackFireball(), plugin);
+        pluginManager.registerEvents(new AttackFreeze(), plugin);
+        pluginManager.registerEvents(new AttackGravity(), plugin);
+        pluginManager.registerEvents(new AttackPoison(), plugin);
+        pluginManager.registerEvents(new AttackPush(), plugin);
+        pluginManager.registerEvents(new AttackWeakness(), plugin);
+        pluginManager.registerEvents(new AttackWeb(), plugin);
+        pluginManager.registerEvents(new AttackWither(), plugin);
 
-            //don't load powers that require no event listeners
-            if (!(string.equalsIgnoreCase("MovementSpeed"))
-                    && !(string.equalsIgnoreCase("Invisibility"))
-                    && !(string.equalsIgnoreCase("DoubleHealth"))
-                    && !(string.equalsIgnoreCase("DoubleDamage"))) {
-
-                try {
-
-                    String earlypath = "com.magmaguy.elitemobs.mobpowers.defensivepowers.";
-                    String finalString = earlypath + string;
-
-                    Class<?> clazz = Class.forName(finalString);
-
-                    Object instance = clazz.newInstance();
-
-                    Bukkit.getServer().getPluginManager().registerEvents((Listener) instance, MetadataHandler.PLUGIN);
-
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-        }
-
-        for (String string : MetadataHandler.offensivePowerList) {
-
-            //don't load powers that require no event listeners
-            if (!(string.equalsIgnoreCase("MovementSpeed"))
-                    && !(string.equalsIgnoreCase("Invisibility"))
-                    && !(string.equalsIgnoreCase("DoubleHealth"))
-                    && !(string.equalsIgnoreCase("DoubleDamage"))
-                    && !(string.equalsIgnoreCase("AttackArrow"))
-                    && !(string.equalsIgnoreCase("AttackFireball"))) {
-
-                try {
-
-                    String earlypath = "com.magmaguy.elitemobs.mobpowers.offensivepowers.";
-                    String finalString = earlypath + string;
-
-                    Class<?> clazz = Class.forName(finalString);
-
-                    Object instance = clazz.newInstance();
-
-                    Bukkit.getServer().getPluginManager().registerEvents((Listener) instance, MetadataHandler.PLUGIN);
-
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-        }
-
-        for (String string : MetadataHandler.miscellaneousPowerList) {
-
-            //don't load powers that require no event listeners
-            if (!(string.equalsIgnoreCase("MovementSpeed"))
-                    && !(string.equalsIgnoreCase("Invisibility"))
-                    && !(string.equalsIgnoreCase("DoubleHealth"))
-                    && !(string.equalsIgnoreCase("DoubleDamage")))
-                try {
-
-                    String earlypath = "com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.";
-                    String finalString = earlypath + string;
-
-                    Class<?> clazz = Class.forName(finalString);
-
-                    Object instance = clazz.newInstance();
-
-                    Bukkit.getServer().getPluginManager().registerEvents((Listener) instance, MetadataHandler.PLUGIN);
-
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                }
-
-
-        }
-
-        for (String string : MetadataHandler.majorPowerList) {
-
-            if ((string.equalsIgnoreCase("ZombieBloat") || string.equalsIgnoreCase("ZombieNecronomicon"))
-                    && (VersionChecker.currentVersionIsUnder(10, 0))) continue;
-
-            //don't load powers that require no event listeners
-            if (!(string.equalsIgnoreCase("SkeletonTrackingArrow")))
-                try {
-
-                    String earlypath = "com.magmaguy.elitemobs.mobpowers.majorpowers.";
-                    String finalString = earlypath + string;
-
-                    Class<?> clazz = Class.forName(finalString);
-
-                    Object instance = clazz.newInstance();
-
-                    Bukkit.getServer().getPluginManager().registerEvents((Listener) instance, MetadataHandler.PLUGIN);
-
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                }
-
-        }
+        //Major mob powers
+        pluginManager.registerEvents(new SkeletonPillar(), plugin);
+        pluginManager.registerEvents(new SkeletonTrackingArrow(), plugin);
+        pluginManager.registerEvents(new ZombieBloat(), plugin);
+        pluginManager.registerEvents(new ZombieFriends(), plugin);
+        pluginManager.registerEvents(new ZombieNecronomicon(), plugin);
+        pluginManager.registerEvents(new ZombieParents(), plugin);
+        pluginManager.registerEvents(new ZombieTeamRocket(), plugin);
 
         //Metadata (player purger)
-        Bukkit.getServer().getPluginManager().registerEvents(new MetadataHandler(), MetadataHandler.PLUGIN);
-
-        //Mob scanner
-        Bukkit.getServer().getPluginManager().registerEvents(new MobScanner(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new MetadataHandler(), plugin);
 
         //Mob merger TODO: maybe add a config scan here?
-        Bukkit.getServer().getPluginManager().registerEvents(new MergeHandler(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new MergeHandler(), plugin);
 
         //Natural EliteMobs Spawning
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING)) {
-            Bukkit.getServer().getPluginManager().registerEvents(new NaturalSpawning(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new EntityTracker(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new NaturalSpawning(), plugin);
+            pluginManager.registerEvents(new EntityTracker(), plugin);
         }
 
         //Natural Mob Metadata Assigner
-        Bukkit.getServer().getPluginManager().registerEvents(new NaturalMobMetadataAssigner(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new NaturalMobMetadataAssigner(), plugin);
 
         //Visual effects
-        Bukkit.getServer().getPluginManager().registerEvents(new EffectEventHandlers(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new MinorPowerPowerStance(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new MajorPowerPowerStance(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new EffectEventHandlers(), plugin);
+        pluginManager.registerEvents(new MinorPowerPowerStance(), plugin);
+        pluginManager.registerEvents(new MajorPowerPowerStance(), plugin);
 
         //Loot
         if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_PLUGIN_LOOT)) {
-            Bukkit.getServer().getPluginManager().registerEvents(new LootTables(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new PlaceEventPrevent(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new LootTables(), plugin);
+            pluginManager.registerEvents(new PlaceEventPrevent(), plugin);
         }
 
         //Shops
-        Bukkit.getServer().getPluginManager().registerEvents(new ShopHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new CustomShopHandler(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new ItemSaleEvent(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new ShopHandler(), plugin);
+        pluginManager.registerEvents(new CustomShopHandler(), plugin);
+        pluginManager.registerEvents(new ItemSaleEvent(), plugin);
 
         //Minecraft behavior canceller
-        Bukkit.getServer().getPluginManager().registerEvents(new ChunkUnloadMetadataPurge(), MetadataHandler.PLUGIN);
-        Bukkit.getServer().getPluginManager().registerEvents(new EntityDeathMetadataFlusher(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new ChunkUnloadMetadataPurge(), plugin);
+        pluginManager.registerEvents(new EntityDeathMetadataFlusher(), plugin);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
-            Bukkit.getServer().getPluginManager().registerEvents(new PreventMobItemPickup(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new PreventMobItemPickup(), plugin);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
-            Bukkit.getServer().getPluginManager().registerEvents(new PreventCreeperPassiveEntityDamage(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
         //Prevent exploits
         //Prevent mount exploit
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_MOUNT_EXPLOIT))
-            Bukkit.getServer().getPluginManager().registerEvents(new PreventMountExploit(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new PreventMountExploit(), plugin);
         //Prevent darkroom exploit
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_DARKROOM_EXPLOIT))
-            Bukkit.getServer().getPluginManager().registerEvents(new PreventDarkroomExploit(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
         //Prevent tower exploit
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_TOWER_EXPLOIT))
-            Bukkit.getServer().getPluginManager().registerEvents(new PreventTowerExploit(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new PreventTowerExploit(), plugin);
 
 
         if (!VersionChecker.currentVersionIsUnder(11, 0)) {
             //Initialize custom events
-            Bukkit.getServer().getPluginManager().registerEvents(new SmallTreasureGoblin(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new TreasureGoblin(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new DeadMoon(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new TheReturned(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new ZombieKing(), MetadataHandler.PLUGIN);
-            Bukkit.getServer().getPluginManager().registerEvents(new SpiritWalk(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new SmallTreasureGoblin(), plugin);
+            pluginManager.registerEvents(new TreasureGoblin(), plugin);
+            pluginManager.registerEvents(new DeadMoon(), plugin);
+            pluginManager.registerEvents(new TheReturned(), plugin);
+            pluginManager.registerEvents(new ZombieKing(), plugin);
+            pluginManager.registerEvents(new SpiritWalk(), plugin);
 
             if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
-                Bukkit.getServer().getPluginManager().registerEvents(new Kraken(), MetadataHandler.PLUGIN);
-                Bukkit.getServer().getPluginManager().registerEvents(new KrakenEvent(), MetadataHandler.PLUGIN);
+                pluginManager.registerEvents(new Kraken(), plugin);
+                pluginManager.registerEvents(new KrakenEvent(), plugin);
             }
             if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
-                Bukkit.getServer().getPluginManager().registerEvents(new Balrog(), MetadataHandler.PLUGIN);
-                Bukkit.getServer().getPluginManager().registerEvents(new BalrogEvent(), MetadataHandler.PLUGIN);
+                pluginManager.registerEvents(new Balrog(), plugin);
+                pluginManager.registerEvents(new BalrogEvent(), plugin);
             }
             if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
-                Bukkit.getServer().getPluginManager().registerEvents(new FaeEvent(), MetadataHandler.PLUGIN);
-                Bukkit.getServer().getPluginManager().registerEvents(new Fae(), MetadataHandler.PLUGIN);
+                pluginManager.registerEvents(new FaeEvent(), plugin);
+                pluginManager.registerEvents(new Fae(), plugin);
             }
         }
 
 
         //Set up health and damage displays
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT))
-            Bukkit.getServer().getPluginManager().registerEvents(new HealthDisplay(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new HealthDisplay(), plugin);
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_DAMAGE_ON_HIT))
-            Bukkit.getServer().getPluginManager().registerEvents(new DamageDisplay(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new DamageDisplay(), plugin);
 
         //Initialize items from custom events
-        Bukkit.getServer().getPluginManager().registerEvents(new FlamethrowerEnchantment(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new FlamethrowerEnchantment(), plugin);
 
         //Initialize adventurer's guild
-        Bukkit.getServer().getPluginManager().registerEvents(new AdventurersGuildGUI(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new AdventurersGuildGUI(), plugin);
 
         //Combat tag
         if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
-            Bukkit.getServer().getPluginManager().registerEvents(new CombatTag(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new CombatTag(), plugin);
 
         //Prevent elitemob on elitemob aggro
-        Bukkit.getServer().getPluginManager().registerEvents(new AggroPrevention(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new AggroPrevention(), plugin);
 
         //Refresh display case Elite Mobs
-        Bukkit.getServer().getPluginManager().registerEvents(new DisplayMob(), MetadataHandler.PLUGIN);
+        pluginManager.registerEvents(new DisplayMob(), plugin);
 
         //Player effect when a rare item is on the ground
         if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_RARE_DROP_EFFECT))
-            Bukkit.getServer().getPluginManager().registerEvents(new RareDropEffect(), MetadataHandler.PLUGIN);
+            pluginManager.registerEvents(new RareDropEffect(), plugin);
 
     }
 

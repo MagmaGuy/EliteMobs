@@ -21,18 +21,18 @@ import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.GameMode;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackFireball extends MinorPower implements EventListener {
+public class AttackFireball extends MinorPower implements Listener {
 
     ArrayList<LivingEntity> currentlyFiringEntities = new ArrayList<>();
 

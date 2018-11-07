@@ -50,7 +50,7 @@ public class CowHandler implements Listener {
 
         }
 
-        if (event.getEntity() instanceof Cow && EntityTracker.isPassiveMob(event.getEntity())) {
+        if (event.getEntity() instanceof Cow && EntityTracker.isSuperMob(event.getEntity())) {
 
             Random random = new Random();
 

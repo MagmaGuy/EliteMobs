@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -31,13 +31,10 @@ public class ChunkUnloadMetadataPurge implements Listener {
     @EventHandler
     public void onUnload(ChunkUnloadEvent event) {
 
-        for (Entity entity : event.getChunk().getEntities()) {
-
-            if (!(entity instanceof LivingEntity) ||
-                    entity instanceof LivingEntity && ((LivingEntity) entity).getRemoveWhenFarAway())
-                MetadataHandler.runtimeMetadataFlush(entity);
-
-        }
+        for (Entity entity : event.getChunk().getEntities())
+            if (EliteMobProperties.isValidEliteMobType(entity) &&
+                    ((LivingEntity) entity).getRemoveWhenFarAway())
+                entity.remove();
 
     }
 

@@ -59,7 +59,7 @@ public class ScoreboardHandler implements Listener {
                         aggressiveEliteMobScoreboard(entity, player);
                         return;
 
-                    } else if (EntityTracker.isPassiveMob(entity)) {
+                    } else if (EntityTracker.isSuperMob(entity)) {
 
                         aggressiveEliteMobScoreboard(entity, player);
                         return;

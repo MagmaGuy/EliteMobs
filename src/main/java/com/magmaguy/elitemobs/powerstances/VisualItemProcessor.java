@@ -47,11 +47,8 @@ public class VisualItemProcessor {
 
                 List<Item> newItemList = new ArrayList<>();
 
-                for (int j = 0; j < itemsPerTrack; j++) {
-
+                for (int j = 0; j < itemsPerTrack; j++)
                     newItemList.add(VisualItemInitializer.intializeItem(itemStack, entity.getLocation()));
-
-                }
 
                 //same format as trackHashMap
                 tempMap.put(i, newItemList);

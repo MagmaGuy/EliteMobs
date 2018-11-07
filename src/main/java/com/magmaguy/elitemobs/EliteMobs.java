@@ -38,8 +38,6 @@ import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -103,27 +101,12 @@ public class EliteMobs extends JavaPlugin {
         if (!VersionChecker.pluginIsUpToDate)
             this.getServer().getPluginManager().registerEvents(new VersionWarner(), this);
 
-        /*
-        Metadata wiper repeating task
-         */
-        MetadataHandler.metadataWiper();
-
     }
 
     @Override
     public void onDisable() {
 
-        /*
-        Flush all elitemob entities
-        This deletes all metadata and all aggressive mobs
-         */
-        for (World world : validWorldList)
-            for (Entity entity : world.getEntities()) {
-                MetadataHandler.fullMetadataFlush(entity);
-                if (entity instanceof Player)
-                    ((Player) entity).setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-            }
-
+        EntityTracker.shutdownPurger();
 
         /*
         Flush lingering arrows from the arrow tracking power
@@ -171,7 +154,7 @@ public class EliteMobs extends JavaPlugin {
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         new DynamicLoreUpdater().runTaskTimer(this, 20, 20 * 2);
-        new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
+//        new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
         EntityListUpdater.startUpdating();
 
     }

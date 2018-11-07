@@ -49,7 +49,7 @@ public class AttackWeb extends MinorPower implements Listener {
         if (!EventValidator.eventIsValid(this, event)) return;
         Player player = EntityFinder.findPlayer(event);
         LivingEntity eliteMob = EntityFinder.getRealDamager(event);
-        if (PowerCooldown.cooldownChecker(eliteMob, cooldownList)) return;
+        if (PowerCooldown.isInCooldown(eliteMob, cooldownList)) return;
 
         Block block = player.getLocation().getBlock();
         Material originalMaterial = block.getType();

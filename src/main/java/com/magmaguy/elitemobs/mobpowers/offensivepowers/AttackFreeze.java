@@ -31,6 +31,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -41,7 +42,7 @@ import java.util.ArrayList;
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class AttackFreeze extends MinorPower {
+public class AttackFreeze extends MinorPower implements Listener {
 
     private ArrayList<LivingEntity> cooldownList = new ArrayList<>();
 
@@ -55,7 +56,7 @@ public class AttackFreeze extends MinorPower {
         if (!EventValidator.eventIsValid(this, event)) return;
         Player player = EntityFinder.findPlayer(event);
         LivingEntity eliteMob = EntityFinder.getRealDamager(event);
-        if (PowerCooldown.cooldownChecker(eliteMob, cooldownList)) return;
+        if (PowerCooldown.isInCooldown(eliteMob, cooldownList)) return;
 
         /*
         Slow player down

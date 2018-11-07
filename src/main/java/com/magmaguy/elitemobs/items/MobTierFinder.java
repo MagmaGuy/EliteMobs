@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.entity.LivingEntity;
@@ -11,9 +11,9 @@ public class MobTierFinder {
 
     public static double findMobTier(LivingEntity livingEntity) {
 
-        if (!livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) return 0;
+        if (!EntityTracker.isEliteMob(livingEntity)) return 0;
 
-        return livingEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / PER_TIER_LEVEL_INCREASE;
+        return EntityTracker.getEliteMobEntity(livingEntity).getLevel() / PER_TIER_LEVEL_INCREASE;
 
     }
 

@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.mobspawning;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
-import com.magmaguy.elitemobs.mobscanner.ValidAggressiveMobFilter;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -62,11 +62,10 @@ public class NaturalMobMetadataAssigner implements Listener {
             return;
         if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES)))
             return;
-        if (!ValidAggressiveMobFilter.checkValidAggressiveMob(event.getEntity()))
+        if (!EliteMobProperties.isValidEliteMobType(event.getEntityType()))
             return;
 
         LivingEntity livingEntity = event.getEntity();
-//        MetadataHandler.registerMetadata(livingEntity, MetadataHandler.NATURAL_MOB_MD, true); //todo: remove this metadata
 //        EntityTracker.registerNaturalEntity(livingEntity);
 
         int huntingGearChanceAdder = getHuntingGearBonus(livingEntity);

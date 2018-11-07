@@ -15,21 +15,7 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.events.mobs.*;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
-import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
@@ -336,34 +322,35 @@ public class SpawnMobCommandHandler {
 
     private static Entity spawnEliteMob(int mobLevel, EntityType mobType, Location location, ArrayList<String> mobPowers, CommandSender commandSender) {
 
+
         LivingEntity entity = (LivingEntity) location.getWorld().spawnEntity(location, mobType);
 
-        if (mobType == EntityType.CHICKEN || mobType == EntityType.COW || mobType == EntityType.MUSHROOM_COW ||
-                mobType == EntityType.PIG || mobType == EntityType.SHEEP) {
-
-            HealthHandler.passiveHealthHandler(entity, ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT));
-            NameHandler.customPassiveName(entity);
-
-            return entity;
-
-        } else {
-
-            if (mobLevel > 0) {
-
-                MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, mobLevel);
-                applyPowers(entity, mobPowers, commandSender);
-
-                AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
-
-            } else {
-
-                commandSender.sendMessage("[EliteMobs] Elite Mob level must be over 0!");
-
-            }
-
-        }
-
-        EntityTracker.registerNaturalEntity(entity);
+//        if (mobType == EntityType.CHICKEN || mobType == EntityType.COW || mobType == EntityType.MUSHROOM_COW ||
+//                mobType == EntityType.PIG || mobType == EntityType.SHEEP) {
+//
+//            HealthHandler.passiveHealthHandler(entity, ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT));
+//            NameHandler.customPassiveName(entity);
+//
+//            return entity;
+//
+//        } else {
+//
+//            if (mobLevel > 0) {
+//
+//                MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, mobLevel);
+//                applyPowers(entity, mobPowers, commandSender);
+//
+//                AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
+//
+//            } else {
+//
+//                commandSender.sendMessage("[EliteMobs] Elite Mob level must be over 0!");
+//
+//            }
+//
+//        }
+//
+//        EntityTracker.registerNaturalEntity(entity);
 
         return entity;
 
@@ -371,157 +358,157 @@ public class SpawnMobCommandHandler {
 
     private static void applyPowers(LivingEntity entity, ArrayList<String> mobPowers, CommandSender commandSender) {
 
-        if (mobPowers.size() > 0) {
-
-            for (String string : mobPowers) {
-
-                switch (string) {
-                    //major powers
-                    case MetadataHandler.ZOMBIE_FRIENDS_H:
-                        if (entity instanceof Zombie) {
-                            ZombieFriends zombieFriends = new ZombieFriends();
-                            zombieFriends.applyPowers(entity);
-                        }
-                        break;
-                    case MetadataHandler.ZOMBIE_NECRONOMICON_H:
-                        if (entity instanceof Zombie) {
-                            ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
-                            zombieNecronomicon.applyPowers(entity);
-                        }
-                        break;
-                    case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
-                        if (entity instanceof Zombie) {
-                            ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
-                            zombieTeamRocket.applyPowers(entity);
-                        }
-                        break;
-                    case MetadataHandler.ZOMBIE_PARENTS_H:
-                        if (entity instanceof Zombie) {
-                            ZombieParents zombieParents = new ZombieParents();
-                            zombieParents.applyPowers(entity);
-                        }
-                        break;
-                    case MetadataHandler.ZOMBIE_BLOAT_H:
-                        if (entity instanceof Zombie) {
-                            ZombieBloat zombieBloat = new ZombieBloat();
-                            zombieBloat.applyPowers(entity);
-                        }
-                        break;
-                    case MetadataHandler.SKELETON_TRACKING_ARROW_H:
-                        if (entity instanceof Skeleton) {
-                            SkeletonTrackingArrow skeletonTrackingArrow = new SkeletonTrackingArrow();
-                            skeletonTrackingArrow.applyPowers(entity);
-                        }
-                    case MetadataHandler.SKELETON_PILLAR_H:
-                        if (entity instanceof Skeleton) {
-                            SkeletonPillar skeletonPillar = new SkeletonPillar();
-                            skeletonPillar.applyPowers(entity);
-                        }
-                        //minor powers
-                    case MetadataHandler.ATTACK_ARROW_H:
-                        AttackArrow attackArrow = new AttackArrow();
-                        attackArrow.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_BLINDING_H:
-                        AttackBlinding attackBlinding = new AttackBlinding();
-                        attackBlinding.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_CONFUSING_H:
-                        AttackConfusing attackConfusing = new AttackConfusing();
-                        attackConfusing.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_FIRE_H:
-                        AttackFire attackFire = new AttackFire();
-                        attackFire.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_FIREBALL_H:
-                        AttackFireball attackFireball = new AttackFireball();
-                        attackFireball.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_FREEZE_H:
-                        AttackFreeze attackFreeze = new AttackFreeze();
-                        attackFreeze.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_GRAVITY_H:
-                        AttackGravity attackGravity = new AttackGravity();
-                        attackGravity.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_POISON_H:
-                        AttackPoison attackPoison = new AttackPoison();
-                        attackPoison.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_PUSH_H:
-                        AttackPush attackPush = new AttackPush();
-                        attackPush.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_WEAKNESS_H:
-                        AttackWeakness attackWeakness = new AttackWeakness();
-                        attackWeakness.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_WEB_H:
-                        AttackWeb attackWeb = new AttackWeb();
-                        attackWeb.applyPowers(entity);
-                        break;
-                    case MetadataHandler.ATTACK_WITHER_H:
-                        AttackWither attackWither = new AttackWither();
-                        attackWither.applyPowers(entity);
-                        break;
-                    case MetadataHandler.BONUS_LOOT_H:
-                        BonusLoot bonusLoot = new BonusLoot();
-                        bonusLoot.applyPowers(entity);
-                        break;
-                    case MetadataHandler.INVISIBILITY_H:
-                        Invisibility invisibility = new Invisibility();
-                        invisibility.applyPowers(entity);
-                        break;
-                    case MetadataHandler.INVULNERABILITY_ARROW_H:
-                        InvulnerabilityArrow invulnerabilityArrow = new InvulnerabilityArrow();
-                        invulnerabilityArrow.applyPowers(entity);
-                        break;
-                    case MetadataHandler.INVULNERABILITY_FALL_DAMAGE_H:
-                        InvulnerabilityFallDamage invulnerabilityFallDamage = new InvulnerabilityFallDamage();
-                        invulnerabilityFallDamage.applyPowers(entity);
-                        break;
-                    case MetadataHandler.INVULNERABILITY_FIRE_H:
-                        InvulnerabilityFire invulnerabilityFire = new InvulnerabilityFire();
-                        invulnerabilityFire.applyPowers(entity);
-                        break;
-                    case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:
-                        InvulnerabilityKnockback invulnerabilityKnockback = new InvulnerabilityKnockback();
-                        invulnerabilityKnockback.applyPowers(entity);
-                        break;
-                    case MetadataHandler.MOVEMENT_SPEED_H:
-                        MovementSpeed movementSpeed = new MovementSpeed();
-                        movementSpeed.applyPowers(entity);
-                        break;
-                    case MetadataHandler.TAUNT_H:
-                        Taunt taunt = new Taunt();
-                        taunt.applyPowers(entity);
-                        break;
-                    case "custom":
-                        MetadataHandler.registerMetadata(entity, MetadataHandler.CUSTOM_POWERS_MD, true);
-                        break;
-                    case "display":
-                        entity.setAI(false);
-                        entity.setRemoveWhenFarAway(false);
-                        DisplayMob.nameEncoder(entity);
-                        break;
-                    default:
-                        commandSender.sendMessage(string + " is not a valid power.");
-                        commandSender.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList + " custom");
-                        break;
-
-                }
-
-            }
-
-            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-            MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
-
-            minorPowerPowerStance.itemEffect(entity);
-            majorPowerPowerStance.itemEffect(entity);
-
-        }
+//        if (mobPowers.size() > 0) {
+//
+//            for (String string : mobPowers) {
+//
+//                switch (string) {
+//                    //major powers
+//                    case MetadataHandler.ZOMBIE_FRIENDS_H:
+//                        if (entity instanceof Zombie) {
+//                            ZombieFriends zombieFriends = new ZombieFriends();
+//                            zombieFriends.applyPowers(entity);
+//                        }
+//                        break;
+//                    case MetadataHandler.ZOMBIE_NECRONOMICON_H:
+//                        if (entity instanceof Zombie) {
+//                            ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
+//                            zombieNecronomicon.applyPowers(entity);
+//                        }
+//                        break;
+//                    case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
+//                        if (entity instanceof Zombie) {
+//                            ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
+//                            zombieTeamRocket.applyPowers(entity);
+//                        }
+//                        break;
+//                    case MetadataHandler.ZOMBIE_PARENTS_H:
+//                        if (entity instanceof Zombie) {
+//                            ZombieParents zombieParents = new ZombieParents();
+//                            zombieParents.applyPowers(entity);
+//                        }
+//                        break;
+//                    case MetadataHandler.ZOMBIE_BLOAT_H:
+//                        if (entity instanceof Zombie) {
+//                            ZombieBloat zombieBloat = new ZombieBloat();
+//                            zombieBloat.applyPowers(entity);
+//                        }
+//                        break;
+//                    case MetadataHandler.SKELETON_TRACKING_ARROW_H:
+//                        if (entity instanceof Skeleton) {
+//                            SkeletonTrackingArrow skeletonTrackingArrow = new SkeletonTrackingArrow();
+//                            skeletonTrackingArrow.applyPowers(entity);
+//                        }
+//                    case MetadataHandler.SKELETON_PILLAR_H:
+//                        if (entity instanceof Skeleton) {
+//                            SkeletonPillar skeletonPillar = new SkeletonPillar();
+//                            skeletonPillar.applyPowers(entity);
+//                        }
+//                        //minor powers
+//                    case MetadataHandler.ATTACK_ARROW_H:
+//                        AttackArrow attackArrow = new AttackArrow();
+//                        attackArrow.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_BLINDING_H:
+//                        AttackBlinding attackBlinding = new AttackBlinding();
+//                        attackBlinding.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_CONFUSING_H:
+//                        AttackConfusing attackConfusing = new AttackConfusing();
+//                        attackConfusing.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_FIRE_H:
+//                        AttackFire attackFire = new AttackFire();
+//                        attackFire.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_FIREBALL_H:
+//                        AttackFireball attackFireball = new AttackFireball();
+//                        attackFireball.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_FREEZE_H:
+//                        AttackFreeze attackFreeze = new AttackFreeze();
+//                        attackFreeze.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_GRAVITY_H:
+//                        AttackGravity attackGravity = new AttackGravity();
+//                        attackGravity.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_POISON_H:
+//                        AttackPoison attackPoison = new AttackPoison();
+//                        attackPoison.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_PUSH_H:
+//                        AttackPush attackPush = new AttackPush();
+//                        attackPush.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_WEAKNESS_H:
+//                        AttackWeakness attackWeakness = new AttackWeakness();
+//                        attackWeakness.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_WEB_H:
+//                        AttackWeb attackWeb = new AttackWeb();
+//                        attackWeb.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.ATTACK_WITHER_H:
+//                        AttackWither attackWither = new AttackWither();
+//                        attackWither.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.BONUS_LOOT_H:
+//                        BonusLoot bonusLoot = new BonusLoot();
+//                        bonusLoot.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.INVISIBILITY_H:
+//                        Invisibility invisibility = new Invisibility();
+//                        invisibility.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.INVULNERABILITY_ARROW_H:
+//                        InvulnerabilityArrow invulnerabilityArrow = new InvulnerabilityArrow();
+//                        invulnerabilityArrow.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.INVULNERABILITY_FALL_DAMAGE_H:
+//                        InvulnerabilityFallDamage invulnerabilityFallDamage = new InvulnerabilityFallDamage();
+//                        invulnerabilityFallDamage.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.INVULNERABILITY_FIRE_H:
+//                        InvulnerabilityFire invulnerabilityFire = new InvulnerabilityFire();
+//                        invulnerabilityFire.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:
+//                        InvulnerabilityKnockback invulnerabilityKnockback = new InvulnerabilityKnockback();
+//                        invulnerabilityKnockback.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.MOVEMENT_SPEED_H:
+//                        MovementSpeed movementSpeed = new MovementSpeed();
+//                        movementSpeed.applyPowers(entity);
+//                        break;
+//                    case MetadataHandler.TAUNT_H:
+//                        Taunt taunt = new Taunt();
+//                        taunt.applyPowers(entity);
+//                        break;
+//                    case "custom":
+//                        MetadataHandler.registerMetadata(entity, MetadataHandler.CUSTOM_POWERS_MD, true);
+//                        break;
+//                    case "display":
+//                        entity.setAI(false);
+//                        entity.setRemoveWhenFarAway(false);
+//                        DisplayMob.nameEncoder(entity);
+//                        break;
+//                    default:
+//                        commandSender.sendMessage(string + " is not a valid power.");
+//                        commandSender.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList + " custom");
+//                        break;
+//
+//                }
+//
+//            }
+//
+//            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
+//            MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
+//
+//            minorPowerPowerStance.itemEffect(entity);
+//            majorPowerPowerStance.itemEffect(entity);
+//
+//        }
 
     }
 

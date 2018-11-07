@@ -46,6 +46,7 @@ public class EliteMobEntity {
     private boolean hasCustomArmor = false;
     private boolean hasCustomName = false;
     private boolean hasCustomPowers = false;
+    private boolean unloadWhenFarAway = true;
 
     /*
     This is the generic constructor used in most instances of natural elite mob generation
@@ -91,6 +92,8 @@ public class EliteMobEntity {
         Start tracking the entity
          */
         EntityTracker.registerEliteMob(this);
+
+        eliteMob.setCanPickupItems(false);
 
     }
 
@@ -144,6 +147,70 @@ public class EliteMobEntity {
         Start tracking the entity
          */
         EntityTracker.registerEliteMob(new EliteMobEntity(livingEntity, this.eliteMobLevel));
+
+        eliteMob.setCanPickupItems(false);
+
+    }
+
+    /*
+    Boss mob constructor
+     */
+    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, boolean unloadWhenFarAway) {
+
+        /*
+        Register living entity to keep track of which entity this object is tied to
+         */
+        this.eliteMob = livingEntity;
+        /*
+        Register level, this is variable as per stacking rules
+         */
+        setEliteMobLevel(eliteMobLevel);
+        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        /*
+        Get correct instance of plugin data, necessary for settings names and health among other things
+         */
+        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
+        /*
+        Handle name, variable as per stacking rules
+         */
+        this.hasCustomName = true;
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
+            eliteMob.setCustomNameVisible(true);
+        /*
+        Handle health, max is variable as per stacking rules
+        Currently #setHealth() resets the health back to maximum
+         */
+        setMaxHealth(eliteMobProperties);
+        setHealth();
+        /*
+        Set the armor
+         */
+        this.hasCustomArmor = false;
+        /*
+        Set the power list
+         */
+        this.hasCustomPowers = true;
+        /*
+        Register whether or not the elite mob is natural
+         */
+        this.isNaturalEntity = EntityTracker.isNaturalEntity(livingEntity);
+        /*
+        Start tracking the entity
+         */
+        EntityTracker.registerBossMob(this);
+
+        /*
+        This prevents timed event boss mobs from despawning
+         */
+        this.unloadWhenFarAway = unloadWhenFarAway;
+        livingEntity.setRemoveWhenFarAway(unloadWhenFarAway);
+
+        /*
+        Prevent losing the boss mob to stacking
+         */
+        this.canStack = false;
+
+        eliteMob.setCanPickupItems(false);
 
     }
 
@@ -342,7 +409,7 @@ public class EliteMobEntity {
         return eliteMob;
     }
 
-    public int getEliteMobLevel() {
+    public int getLevel() {
         return eliteMobLevel;
     }
 
@@ -350,19 +417,19 @@ public class EliteMobEntity {
         return offensivePowers.contains(minorPower) || defensivePowers.contains(minorPower) || miscelleaneousPowers.contains(minorPower);
     }
 
-    public ArrayList<MinorPower> getOffensivePowers(){
+    public ArrayList<MinorPower> getOffensivePowers() {
         return this.offensivePowers;
     }
 
-    public ArrayList<MinorPower> getDefensivePowers(){
+    public ArrayList<MinorPower> getDefensivePowers() {
         return this.defensivePowers;
     }
 
-    public ArrayList<MinorPower> getMiscelleaneousPowers(){
+    public ArrayList<MinorPower> getMiscelleaneousPowers() {
         return this.miscelleaneousPowers;
     }
 
-    public ArrayList<MinorPower> getMinorPowers(){
+    public ArrayList<MinorPower> getMinorPowers() {
         ArrayList<MinorPower> arrayList = new ArrayList();
         arrayList.addAll(getOffensivePowers());
         arrayList.addAll(getDefensivePowers());
@@ -374,7 +441,7 @@ public class EliteMobEntity {
         return majorPowers.contains(majorPower);
     }
 
-    public ArrayList<MajorPowers> getMajorPowers(){
+    public ArrayList<MajorPowers> getMajorPowers() {
         return this.majorPowers;
     }
 
@@ -406,25 +473,32 @@ public class EliteMobEntity {
         return this.name;
     }
 
-    public boolean hasMinorVisualEffect(){
+    public boolean hasMinorVisualEffect() {
         return this.hasMinorVisualEffect;
     }
 
-    public void setHasMinorVisualEffect(boolean bool){
+    public void setHasMinorVisualEffect(boolean bool) {
         this.hasMinorVisualEffect = bool;
     }
 
-    public boolean hasMajorVisualEffect(){
+    public boolean hasMajorVisualEffect() {
         return this.hasMajorVisualEffect;
     }
 
-    public void setHasMajorVisualEffect(boolean bool){
+    public void setHasMajorVisualEffect(boolean bool) {
         this.hasMajorVisualEffect = bool;
     }
 
-    public boolean isNaturalEntity(){
+    public boolean isNaturalEntity() {
         return this.isNaturalEntity;
     }
 
+    public boolean canStack() {
+        return this.canStack;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }
