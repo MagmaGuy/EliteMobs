@@ -15,10 +15,12 @@
 
 package com.magmaguy.elitemobs.mobspawning;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.MobTierFinder;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -74,8 +76,7 @@ public class NaturalSpawning implements Listener {
 
         if (playerCount == 0 || eliteMobLevel < 1) return;
 
-        MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, eliteMobLevel);
-        AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
+        EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel);
 
     }
 
