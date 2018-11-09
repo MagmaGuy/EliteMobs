@@ -20,13 +20,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class PowerCooldown {
 
     /*
     This class just removes metadata after a variable delay, allows
      */
-    public static void startCooldownTimer(LivingEntity eliteMob, ArrayList<LivingEntity> cooldownList, int duration) {
+    public static void startCooldownTimer(LivingEntity eliteMob, HashSet<LivingEntity> cooldownList, int duration) {
 
         cooldownList.add(eliteMob);
 

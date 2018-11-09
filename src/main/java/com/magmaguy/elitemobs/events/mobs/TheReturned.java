@@ -92,7 +92,7 @@ public class TheReturned implements Listener {
         EliteMobEntity eliteMobEntity = new EliteMobEntity(theReturned, mobLevel);
         eliteMobEntity.setHasCustomArmor(true);
         eliteMobEntity.setHasCustomPowers(true);
-        eliteMobEntity.setCanStack(false);
+        eliteMobEntity.setHasStacking(false);
         eliteMobEntity.setName(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME)));
 
         double x = ThreadLocalRandom.current().nextDouble() - 0.5;
