@@ -35,11 +35,8 @@ public class MinorPowerStanceMath {
 
     public static HashMap<Integer, List<Vector>> minorPowerLocationConstructor(int trackAmount, int itemsPerTrack, int counter) {
 
-        if (storedRotatedValues.containsKey(counter)) {
-
+        if (storedRotatedValues.containsKey(counter))
             return storedRotatedValues.get(counter);
-
-        }
 
         HashMap<Integer, List<Vector>> trackHashMap = new HashMap();
 

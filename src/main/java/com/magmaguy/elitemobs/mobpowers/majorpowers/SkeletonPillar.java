@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class SkeletonPillar extends MajorPowers implements Listener {
+public class SkeletonPillar extends MajorPower implements Listener {
 
     String powerMetadata = MetadataHandler.SKELETON_PILLAR_MD;
 

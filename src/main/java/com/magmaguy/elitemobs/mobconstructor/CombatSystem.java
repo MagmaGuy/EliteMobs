@@ -66,7 +66,7 @@ public class CombatSystem implements Listener {
         if (!EntityTracker.isEliteMob(event.getDamager()))
             return;
         if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
-                !((LivingEntity) ((Projectile) event.getDamager()).getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD))
+                !EntityTracker.isEliteMob(event.getDamager()))
             return;
         if (event.getDamager() instanceof Projectile && !(((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
             return;
@@ -105,7 +105,7 @@ public class CombatSystem implements Listener {
 
         //Deal with the player getting killed
         if (player.getHealth() - event.getDamage() <= 0)
-            MetadataHandler.registerMetadata(player, MetadataHandler.KILLED_BY_ELITE_MOB, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity));
+            PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity));
 
     }
 
@@ -161,7 +161,7 @@ public class CombatSystem implements Listener {
     public void onEliteCreeperDetonation(ExplosionPrimeEvent event) {
 
         if (event.isCancelled()) return;
-        if (!(event.getEntity() instanceof Creeper && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)))
+        if (!(event.getEntity() instanceof Creeper && EntityTracker.isEliteMob(event.getEntity())))
             return;
 
         /*
@@ -170,11 +170,12 @@ public class CombatSystem implements Listener {
         for (PotionEffect potionEffect : ((Creeper) event.getEntity()).getActivePotionEffects())
             ((Creeper) event.getEntity()).removePotionEffect(potionEffect.getType());
 
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity((LivingEntity) event.getEntity());
 
-        int mobLevel = event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 1 ?
-                1 : event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+        int mobLevel = eliteMobEntity.getLevel() < 1 ? 1 : eliteMobEntity.getLevel();
 
-        float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.01 * mobLevel * event.getRadius() * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
+        float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.01 * mobLevel * event.getRadius() *
+                ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
 
         if (newExplosionRange > Integer.MAX_VALUE)
             newExplosionRange = Integer.MAX_VALUE;
@@ -197,7 +198,7 @@ public class CombatSystem implements Listener {
 
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof LivingEntity)) return;
-        if (!event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+        if (!EntityTracker.isEliteMob(event.getEntity())) return;
         if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
         if (!event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM))
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
@@ -212,7 +213,7 @@ public class CombatSystem implements Listener {
 
         if (event.isCancelled()) return;
         if (event.getEntity() instanceof Player || !(event.getEntity() instanceof LivingEntity) ||
-                !event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+                !EntityTracker.isEliteMob(event.getEntity())) return;
 
         LivingEntity damagingLivingEntity = null;
         LivingEntity damagedLivingEntity = (LivingEntity) event.getEntity();
@@ -231,7 +232,7 @@ public class CombatSystem implements Listener {
          */
 
         if (!(damagingLivingEntity instanceof Player) &&
-                (damagingLivingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) || damagedLivingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD))) {
+                (EntityTracker.isEliteMob(damagingLivingEntity) || EntityTracker.isEliteMob(damagedLivingEntity))) {
 
             event.setDamage(event.getDamage());
 

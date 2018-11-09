@@ -30,42 +30,42 @@
 
 package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackArrow;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
-public class SkeletonTrackingArrow extends MajorPowers implements Listener {
+public class SkeletonTrackingArrow extends MajorPower implements Listener {
 
-    String powerMetadata = MetadataHandler.SKELETON_TRACKING_ARROW_MD;
+    private static HashSet<LivingEntity> currentlyFiringEntities = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
 
         if (VersionChecker.currentVersionIsUnder(10, 0)) return;
 
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
-        majorPowerStanceMath.itemEffect(entity);
-        repeatingTrackingArrowTask(entity);
-
     }
 
-    @Override
-    public boolean existingPowers(Entity entity) {
+    @EventHandler
+    public void targetEvent(EntityTargetLivingEntityEvent event) {
 
-        return entity.hasMetadata(powerMetadata);
+        if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof Monster)) return;
+        if (!EntityTracker.hasPower(this, (LivingEntity) event.getEntity())) return;
+        repeatingTrackingArrowTask(event.getEntity());
+        currentlyFiringEntities.add((LivingEntity) event.getEntity());
 
     }
 

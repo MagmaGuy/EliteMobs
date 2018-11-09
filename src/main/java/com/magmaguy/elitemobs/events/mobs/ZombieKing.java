@@ -25,7 +25,7 @@ import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.uniqueitems.ZombieKingsAxe;
-import com.magmaguy.elitemobs.mobconstructor.BossMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.TimedBossMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -46,13 +46,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ZombieKing implements Listener {
 
-    private static ArrayList<BossMobEntity> zombieKingList = new ArrayList<>();
+    private static ArrayList<TimedBossMobEntity> zombieKingList = new ArrayList<>();
 
     public static boolean isZombieKing(Entity entity) {
         if (!(entity instanceof LivingEntity)) return false;
         if (zombieKingList.isEmpty()) return false;
-        for (BossMobEntity bossMobEntity : zombieKingList)
-            if (bossMobEntity.getEliteMobEntity().getLivingEntity().equals(entity))
+        for (TimedBossMobEntity bossMobEntity : zombieKingList)
+            if (bossMobEntity.getLivingEntity().equals(entity))
                 return true;
         return false;
     }
@@ -66,7 +66,7 @@ public class ZombieKing implements Listener {
 
 
         int kingLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
-        BossMobEntity zombieKingPluginEntity = new BossMobEntity(zombieKing, kingLevel,
+        TimedBossMobEntity zombieKingPluginEntity = new TimedBossMobEntity(zombieKing, kingLevel,
                 ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME)));
 
         zombieKingList.add(zombieKingPluginEntity);

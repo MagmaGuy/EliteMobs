@@ -72,7 +72,7 @@ import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 /**
  * Created by MagmaGuy on 07/05/2017.
  */
-public class ZombieTeamRocket extends MajorPowers implements Listener {
+public class ZombieTeamRocket extends MajorPower implements Listener {
 
     private static final ItemStack TEAM_ROCKET_CHESTPIECE = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
     private static final ItemStack TEAM_ROCKET_LEGGINGS = new ItemStack(Material.LEATHER_LEGGINGS, 1);

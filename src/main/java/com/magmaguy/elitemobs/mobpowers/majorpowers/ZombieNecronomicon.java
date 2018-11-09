@@ -45,55 +45,43 @@
 
 package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.mobconstructor.TrashMobEntity;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
 /**
  * Created by MagmaGuy on 18/05/2017.
  */
-public class ZombieNecronomicon extends MajorPowers implements Listener {
+public class ZombieNecronomicon extends MajorPower implements Listener {
 
-    private static Random random = new Random();
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.ZOMBIE_NECRONOMICON_MD;
-    Configuration configuration = ConfigValues.translationConfig;
     private int chantIndex = 0;
     private boolean summoningEffectOn = false;
+    private HashSet<LivingEntity> chantingMobs = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
-        majorPowerStanceMath.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
@@ -101,136 +89,27 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
         if (event.isCancelled()) return;
 
-        Entity targetter = event.getEntity();
-        Entity targetted = event.getTarget();
+        if (!(event.getTarget() instanceof LivingEntity && event.getTarget() instanceof LivingEntity)) return;
 
-        if (targetter.hasMetadata(MetadataHandler.ZOMBIE_CHANTING)) {
+        LivingEntity targetter = (LivingEntity) event.getEntity();
+        LivingEntity targetted = (LivingEntity) event.getTarget();
 
-            return;
+        if (chantingMobs.contains(targetter)) return;
+        chantingMobs.add(targetter);
 
-        }
-
-        MetadataHandler.registerMetadata(targetter, MetadataHandler.ZOMBIE_CHANTING, true);
-
-        if (targetted instanceof Player && targetter.hasMetadata(powerMetadata)) {
-
-            ((LivingEntity) targetter).setAI(false);
-
-            necronomiconVisualEffect((Zombie) targetter);
-
-            new BukkitRunnable() {
-
-                ArrayList<Entity> entityList = new ArrayList<>();
-
-                @Override
-                public void run() {
-
-                    if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
-                            || targetted.getLocation().distance(targetter.getLocation()) > 30) {
-
-
-                        for (Entity entity : entityList) {
-
-                            if (entity.isValid()) {
-
-                                entity.remove();
-
-                            }
-
-                        }
-
-                        ((LivingEntity) targetter).setAI(true);
-                        targetter.removeMetadata(MetadataHandler.ZOMBIE_CHANTING, plugin);
-                        cancel();
-                        return;
-
-                    }
-
-                    int randomizedNumber = random.nextInt(5) + 1;
-
-                    for (Iterator<Entity> iterator = entityList.iterator(); iterator.hasNext(); ) {
-
-                        Entity currentEntity = iterator.next();
-
-                        if (!currentEntity.isValid()) {
-
-                            iterator.remove();
-
-                        }
-
-                    }
-
-                    if (entityList.size() < 11) {
-
-                        ((Zombie) targetter).setAI(false);
-
-                        if (!summoningEffectOn) {
-
-                            necronomiconVisualEffect((Zombie) targetter);
-
-                        }
-
-                        if (randomizedNumber < 5) {
-
-                            Zombie zombie = (Zombie) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.ZOMBIE);
-                            MetadataHandler.registerMetadata(zombie, MetadataHandler.ELITE_MOB_MD, 1);
-                            MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_STACK, true);
-                            MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_POWERS_MD, true);
-                            MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_NAME, true);
-                            MetadataHandler.registerMetadata(zombie, MetadataHandler.CUSTOM_HEALTH, true);
-                            zombie.setMaxHealth(zombie.getMaxHealth() / 2);
-                            zombie.setCustomName(convert(configuration.getString("ZombieNecronomicon.Summoned zombie")));
-                            zombie.setCustomNameVisible(true);
-                            AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombie);
-
-                            zombie.setVelocity(new Vector((random.nextDouble() - 0.5) / 30, 0.5, (random.nextDouble() - 0.5) / 30));
-
-                            entityList.add(zombie);
-
-                        } else {
-
-                            Skeleton skeleton = (Skeleton) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.SKELETON);
-                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.ELITE_MOB_MD, 1);
-                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_STACK, true);
-                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_POWERS_MD, true);
-                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_NAME, true);
-                            MetadataHandler.registerMetadata(skeleton, MetadataHandler.CUSTOM_HEALTH, true);
-                            skeleton.setMaxHealth(skeleton.getMaxHealth() / 2);
-                            skeleton.setCustomName(convert(configuration.getString("ZombieNecronomicon.Summoned skeleton")));
-                            skeleton.setCustomNameVisible(true);
-                            AggressiveEliteMobConstructor.constructAggressiveEliteMob(skeleton);
-
-                            skeleton.setVelocity(new Vector((random.nextDouble() - 0.5) / 30, 0.5, (random.nextDouble() - 0.5) / 30));
-
-                            entityList.add(skeleton);
-
-                        }
-
-                    } else {
-
-                        ((Zombie) targetter).setAI(true);
-
-                    }
-
-
-                }
-
-            }.runTaskTimer(plugin, 20 * 3, 20 * 5);
-
-        }
+        necronomiconVisualEffect((Zombie) targetter);
+        spawnReinforcements(targetter, targetted);
 
     }
 
     private void necronomiconVisualEffect(Zombie zombie) {
 
+        zombie.setAI(false);
         summoningEffectOn = true;
         nameScroller(zombie);
 
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS)) {
-
+        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS))
             return;
-
-        }
 
         new BukkitRunnable() {
 
@@ -240,25 +119,14 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
             @Override
             public void run() {
 
-                if (zombie == null || !zombie.isValid() || zombie.isDead() || zombie.hasAI()) {
+                if (!zombie.isValid() || zombie.hasAI()) {
 
-                    for (List<Item> itemList : fourTrack.values()) {
-
-                        for (Item item : itemList) {
-
-                            item.removeMetadata(MetadataHandler.MAJOR_VISUAL_EFFECT_MD, plugin);
-                            item.removeMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, plugin);
+                    for (List<Item> itemList : fourTrack.values())
+                        for (Item item : itemList)
                             item.remove();
 
-                        }
-
-                    }
-
-                    if (zombie.isValid()) {
-
-                        zombie.setCustomName(NameHandler.customAggressiveName(zombie));
-
-                    }
+                    if (zombie.isValid())
+                        zombie.setCustomName(EntityTracker.getEliteMobEntity(zombie).getName());
 
                     summoningEffectOn = false;
                     cancel();
@@ -280,8 +148,8 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
                             Item item = zombie.getWorld().dropItem(zombie.getLocation(), itemStack);
                             item.setGravity(false);
                             item.setPickupDelay(Integer.MAX_VALUE);
-                            MetadataHandler.registerMetadata(item, MetadataHandler.MAJOR_POWER_AMOUNT_MD, true);
-                            MetadataHandler.registerMetadata(item, MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, true);
+                            EntityTracker.registerItemVisualEffects(item);
+//                            MetadataHandler.registerMetadata(item, MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, true);
 
                             itemList.add(item);
 
@@ -291,17 +159,15 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
                     }
 
-                } else {
-
+                } else
                     itemMover(fourTrack, zombie, counter);
 
-                }
 
                 counter++;
 
             }
 
-        }.runTaskTimer(plugin, 5, 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 5, 5);
 
     }
 
@@ -352,7 +218,7 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
         new BukkitRunnable() {
 
-            String fullChant = convert(configuration.getString("ZombieNecronomicon.Summoning chant"));
+            String fullChant = convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoning chant"));
 
             @Override
             public void run() {
@@ -379,20 +245,85 @@ public class ZombieNecronomicon extends MajorPowers implements Listener {
 
             }
 
-        }.runTaskTimer(plugin, 0, 1);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+
+    }
+
+    private void spawnReinforcements(LivingEntity targetter, LivingEntity targetted) {
+
+        new BukkitRunnable() {
+
+            ArrayList<Entity> entityList = new ArrayList<>();
+
+            @Override
+            public void run() {
+
+                if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
+                        || targetted.getLocation().distance(targetter.getLocation()) > 30) {
+
+                    for (Entity entity : entityList)
+                        if (entity.isValid())
+                            entity.remove();
+
+                    targetter.setAI(true);
+                    chantingMobs.remove(targetter);
+                    cancel();
+                    return;
+
+                }
+
+                int randomizedNumber = ThreadLocalRandom.current().nextInt(5) + 1;
+
+                entityList.removeIf(currentEntity -> !currentEntity.isValid());
+
+                if (entityList.size() < 11) {
+
+                    targetter.setAI(false);
+
+                    if (!summoningEffectOn)
+                        necronomiconVisualEffect((Zombie) targetter);
+
+                    if (randomizedNumber < 5) {
+
+                        Zombie zombie = (Zombie) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.ZOMBIE);
+                        TrashMobEntity trashMobEntity = new TrashMobEntity(zombie,
+                                ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned zombie")));
+
+                        zombie.setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
+                                (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
+
+                        entityList.add(zombie);
+
+                    } else {
+
+                        Skeleton skeleton = (Skeleton) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.SKELETON);
+                        TrashMobEntity trashMobEntity = new TrashMobEntity(skeleton,
+                                ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned skeleton")));
+
+                        skeleton.setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
+                                (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
+
+                        entityList.add(skeleton);
+
+                    }
+
+                } else
+                    targetter.setAI(true);
+
+
+            }
+
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 3, 20 * 5);
 
     }
 
     @EventHandler
     public void onSummonedCreatureDeath(EntityDeathEvent event) {
 
-        if (event.getEntity() instanceof Zombie && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity().getCustomName() != null &&
-                (event.getEntity().getCustomName().equals(configuration.getString("ZombieNecronomicon.Summoned zombie")) ||
-                        event.getEntity().getCustomName().equals(configuration.getString("ZombieNecronomicon.Summoned skeleton")))) {
-
+        if (event.getEntity() instanceof Zombie && EntityTracker.isEliteMob(event.getEntity()) && event.getEntity().getCustomName() != null &&
+                (event.getEntity().getCustomName().equals(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned zombie")) ||
+                        event.getEntity().getCustomName().equals(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned skeleton"))))
             event.getDrops().clear();
-
-        }
 
     }
 

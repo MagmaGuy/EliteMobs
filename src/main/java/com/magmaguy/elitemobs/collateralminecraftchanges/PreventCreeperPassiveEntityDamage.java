@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
+import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,7 +32,7 @@ public class PreventCreeperPassiveEntityDamage implements Listener {
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
 
-            if (ValidPassiveMobFilter.ValidPassiveMobFilter(event.getEntity()) ||
+            if (SuperMobProperties.isValidSuperMobType(event.getEntityType()) ||
                     event.getEntity() instanceof Horse || event.getEntity() instanceof Villager ||
                     event.getEntity() instanceof Bat || event.getEntity() instanceof ArmorStand ||
                     event.getEntity() instanceof Rabbit) {

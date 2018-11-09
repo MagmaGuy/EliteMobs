@@ -26,7 +26,7 @@ import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.mobconstructor.BossMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.TimedBossMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -49,15 +49,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureGoblin implements Listener {
 
-    private static ArrayList<BossMobEntity> treasureGoblinList = new ArrayList<>();
+    private static ArrayList<TimedBossMobEntity> treasureGoblinList = new ArrayList<>();
     private static ArrayList<LivingEntity> radialGoldExplosionCooldown = new ArrayList<>();
     private static ArrayList<LivingEntity> goldShotgunCooldown = new ArrayList<>();
 
     public static boolean isTreasureGoblin(Entity entity) {
         if (!(entity instanceof LivingEntity)) return false;
         if (treasureGoblinList.isEmpty()) return false;
-        for (BossMobEntity bossMobEntity : treasureGoblinList)
-            if (bossMobEntity.getEliteMobEntity().getLivingEntity().equals(entity))
+        for (TimedBossMobEntity bossMobEntity : treasureGoblinList)
+            if (bossMobEntity.getLivingEntity().equals(entity))
                 return true;
         return false;
     }
@@ -65,7 +65,7 @@ public class TreasureGoblin implements Listener {
     public static void createGoblin(Zombie treasureGoblin) {
 
         int mobLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
-        BossMobEntity treasureGoblinPluginEntity = new BossMobEntity(treasureGoblin, mobLevel,
+        TimedBossMobEntity treasureGoblinPluginEntity = new TimedBossMobEntity(treasureGoblin, mobLevel,
                 ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME)));
 
         treasureGoblinList.add(treasureGoblinPluginEntity);
