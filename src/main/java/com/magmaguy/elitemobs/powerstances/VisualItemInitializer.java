@@ -12,7 +12,7 @@ public class VisualItemInitializer {
 
         Item item = location.getWorld().dropItem(location, itemStack);
         item.setPickupDelay(Integer.MAX_VALUE);
-        EntityTracker.registerItemVisualEffectsStands(item);
+        EntityTracker.registerItemVisualEffects(item);
         if (!VersionChecker.currentVersionIsUnder(1, 11))
             item.setGravity(false);
         item.setInvulnerable(true);

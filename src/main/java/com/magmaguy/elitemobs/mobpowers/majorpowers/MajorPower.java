@@ -20,10 +20,8 @@ import org.bukkit.entity.Entity;
 /**
  * Created by MagmaGuy on 10/05/2017.
  */
-public abstract class MajorPowers {
+public abstract class MajorPower {
 
     public abstract void applyPowers(Entity entity);
-
-    public abstract boolean existingPowers(Entity entity);
 
 }

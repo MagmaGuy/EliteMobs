@@ -29,14 +29,14 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
 public class AttackArrow extends MinorPower implements Listener {
 
-    ArrayList<LivingEntity> currentlyFiringEntities = new ArrayList<>();
+    private static HashSet<LivingEntity> currentlyFiringEntities = new HashSet<>();
 
     @Override
 
@@ -47,7 +47,6 @@ public class AttackArrow extends MinorPower implements Listener {
     public void targetEvent(EntityTargetLivingEntityEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Monster)) return;
-        if (currentlyFiringEntities.contains(event.getEntity())) return;
         if (!EntityTracker.hasPower(this, (LivingEntity) event.getEntity())) return;
         repeatingArrowTask((Monster) event.getEntity());
         currentlyFiringEntities.add((LivingEntity) event.getEntity());

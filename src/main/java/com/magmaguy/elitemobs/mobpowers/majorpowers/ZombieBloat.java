@@ -63,7 +63,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ZombieBloat extends MajorPowers implements Listener {
+public class ZombieBloat extends MajorPower implements Listener {
 
     private static Random random = new Random();
     String powerMetadata = MetadataHandler.ZOMBIE_BLOAT_MD;

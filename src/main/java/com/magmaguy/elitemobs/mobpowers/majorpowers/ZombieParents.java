@@ -66,7 +66,7 @@ import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 /**
  * Created by MagmaGuy on 13/05/2017.
  */
-public class ZombieParents extends MajorPowers implements Listener {
+public class ZombieParents extends MajorPower implements Listener {
 
     private static Random random = new Random();
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);

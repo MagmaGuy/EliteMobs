@@ -45,56 +45,46 @@
 
 package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.plugin.Plugin;
 
-import java.util.Random;
+import java.util.HashSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
 /**
  * Created by MagmaGuy on 18/05/2017.
  */
-public class ZombieFriends extends MajorPowers implements Listener {
+public class ZombieFriends extends MajorPower implements Listener {
 
-    private static Random random = new Random();
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.ZOMBIE_FRIENDS_MD;
-    private int processID;
-    Configuration configuration = ConfigValues.translationConfig;
+    public static HashSet<LivingEntity> activatedZombies = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
-        majorPowerStanceMath.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
         if (event.isCancelled()) return;
+        if (ThreadLocalRandom.current().nextDouble() > 0.01) return;
+        if (!EntityTracker.isEliteMob(event.getEntity())) return;
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity((LivingEntity) event.getEntity());
+        if (!eliteMobEntity.hasPower(this)) return;
 
-        if (event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Zombie &&
+
+        if (EntityTracker.isEliteMob(event.getEntity())
+        event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Zombie &&
                 !event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_FRIENDS_ACTIVATED) && random.nextDouble() < 0.5) {
 
             Entity entity = event.getEntity();

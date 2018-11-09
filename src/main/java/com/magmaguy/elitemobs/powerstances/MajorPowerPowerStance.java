@@ -90,7 +90,7 @@ public class MajorPowerPowerStance implements Listener {
                 if (globalPositionCounter >= MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION)
                     globalPositionCounter = 0;
 
-                for (MajorPowers majorPower : eliteMobEntity.getMajorPowers()) {
+                for (MajorPower majorPower : eliteMobEntity.getMajorPowers()) {
 
                     if (majorPower instanceof ZombieFriends) {
 
