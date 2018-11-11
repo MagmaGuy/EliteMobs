@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.mobspawning;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -38,6 +37,9 @@ public class NaturalSpawning implements Listener {
 
     private static int range = Bukkit.getServer().getViewDistance() * 16;
 
+    /*
+    This manages elite mob entities that are spawned naturally
+     */
     public static void naturalMobProcessor(Entity entity) {
 
         List<Player> closePlayers = new ArrayList<>();

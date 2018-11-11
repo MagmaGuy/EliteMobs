@@ -8,14 +8,12 @@ import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 
 import static com.magmaguy.elitemobs.utils.VersionChecker.currentVersionIsUnder;
 
@@ -25,30 +23,30 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     This class only defines sets of mostly config-based data to be used by the EliteMobEntity.java class
      */
 
-    public static List<EliteMobProperties> eliteMobData = new ArrayList<>();
-    public ArrayList<MajorPower> validMajorPowers = new ArrayList<>();
-    public ArrayList<MinorPower> validDefensivePowers = new ArrayList<>();
-    public ArrayList<MinorPower> validOffensivePowers = new ArrayList<>();
-    public ArrayList<MinorPower> validMiscellaneousPowers = new ArrayList<>();
+    public static HashSet<EliteMobProperties> eliteMobData = new HashSet<>();
+    public HashSet<MajorPower> validMajorPowers = new HashSet<>();
+    public HashSet<MinorPower> validDefensivePowers = new HashSet<>();
+    public HashSet<MinorPower> validOffensivePowers = new HashSet<>();
+    public HashSet<MinorPower> validMiscellaneousPowers = new HashSet<>();
 
-    public ArrayList<MajorPower> getValidMajorPowers() {
+    public HashSet<MajorPower> getValidMajorPowers() {
         return validMajorPowers;
     }
 
-    public ArrayList<MinorPower> getValidDefensivePowers() {
+    public HashSet<MinorPower> getValidDefensivePowers() {
         return validDefensivePowers;
     }
 
-    public ArrayList<MinorPower> getValidOffensivePowers() {
+    public HashSet<MinorPower> getValidOffensivePowers() {
         return validOffensivePowers;
     }
 
-    public ArrayList<MinorPower> getValidMiscellaneousPowers() {
+    public HashSet<MinorPower> getValidMiscellaneousPowers() {
         return validMiscellaneousPowers;
     }
 
-    public static ArrayList<MinorPower> getAllDefensivePowers() {
-        return new ArrayList<>(Arrays.asList(
+    public HashSet<MinorPower> getAllDefensivePowers() {
+        return new HashSet<>(Arrays.asList(
                 new Invisibility(),
                 new InvulnerabilityArrow(),
                 new InvulnerabilityFallDamage(),
@@ -57,8 +55,8 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         ));
     }
 
-    public static ArrayList<MinorPower> getAllOffensivePowers() {
-        return new ArrayList<>(Arrays.asList(
+    public HashSet<MinorPower> getAllOffensivePowers() {
+        return new HashSet<>(Arrays.asList(
                 new AttackArrow(),
                 new AttackBlinding(),
                 new AttackConfusing(),
@@ -74,8 +72,8 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         ));
     }
 
-    public static ArrayList<MinorPower> getAllMiscellaneousPowers() {
-        return new ArrayList<>(Arrays.asList(
+    public HashSet<MinorPower> getAllMiscellaneousPowers() {
+        return new HashSet<>(Arrays.asList(
                 new BonusLoot(),
                 new MovementSpeed(),
                 new Taunt()
@@ -100,7 +98,6 @@ public abstract class EliteMobProperties extends PluginMobProperties {
          */
         if (!currentVersionIsUnder(1, 8)) {
             EliteEndermite eliteEndermite = new EliteEndermite();
-            eliteMobData.add(eliteEndermite);
         }
         /*
         Post-1.11
@@ -136,7 +133,6 @@ public abstract class EliteMobProperties extends PluginMobProperties {
             if (eliteMobProperties.getEntityType().equals(entityType))
                 return eliteMobProperties;
 
-        Bukkit.getLogger().warning("[EliteMobs] Something is wrong with the Elite Mob data, notify the dev!");
         return null;
 
     }

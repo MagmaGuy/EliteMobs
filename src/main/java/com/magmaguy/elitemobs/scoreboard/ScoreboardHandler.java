@@ -18,6 +18,7 @@ package com.magmaguy.elitemobs.scoreboard;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -54,7 +55,7 @@ public class ScoreboardHandler implements Listener {
 
                 for (Entity entity : nearbyEntities) {
 
-                    if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
+                    if (EntityTracker.isEliteMob(entity)) {
 
                         aggressiveEliteMobScoreboard(entity, player);
                         return;
@@ -76,6 +77,8 @@ public class ScoreboardHandler implements Listener {
 
     public void aggressiveEliteMobScoreboard(Entity entity, Player player) {
 
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(entity);
+
         processID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
             int iterator = 0;
@@ -92,19 +95,7 @@ public class ScoreboardHandler implements Listener {
 
                 }
 
-                MetadataHandler metadataHandler = new MetadataHandler();
-
-                int powerCounter = 0;
-
-                for (String string : MetadataHandler.allPowersList()) {
-
-                    if (entity.hasMetadata(string)) {
-
-                        powerCounter++;
-
-                    }
-
-                }
+                int powerCounter = eliteMobEntity.getPowers().size();
 
                 ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
                 Scoreboard board = scoreboardManager.getNewScoreboard();
@@ -119,64 +110,64 @@ public class ScoreboardHandler implements Listener {
 
                 int counter = 0;
 
-                for (String string : MetadataHandler.allPowersList()) {
-
-                    if (entity.hasMetadata(string)) {
-
-                        String finalString = MetadataHandler.machineToHumanTranslator(string);
-
-                        if (powerCounter > 13) {
-
-                            Score score = null;
-
-                            if (MetadataHandler.defensivePowerList.contains(string) || MetadataHandler.offensivePowerList.contains(string) ||
-                                    MetadataHandler.miscellaneousPowerList.contains(string)) {
-
-                                score = objective.getScore(ChatColor.AQUA + finalString);
-
-                            } else if (MetadataHandler.majorPowerList.contains(string)) {
-
-                                score = objective.getScore(ChatColor.DARK_AQUA + finalString);
-
-                            }
-
-                            if (counter + iterator < powerCounter) {
-
-                                score.setScore(counter + iterator);
-
-                            } else {
-
-                                int currentValue = (int) ((counter + iterator) - Math.floor(((counter + iterator) / powerCounter) * powerCounter));
-
-                                score.setScore(currentValue);
-
-                            }
-
-
-                        } else {
-
-                            Score score;
-
-                            if (MetadataHandler.defensivePowerList.contains(string) || MetadataHandler.offensivePowerList.contains(string) ||
-                                    MetadataHandler.miscellaneousPowerList.contains(string)) {
-
-                                score = objective.getScore(ChatColor.AQUA + finalString);
-
-                            } else {
-
-                                score = objective.getScore(ChatColor.DARK_AQUA + finalString);
-
-                            }
-
-                            score.setScore(counter);
-
-                        }
-
-                        counter++;
-
-                    }
-
-                }
+//                for (String string : MetadataHandler.allPowersList()) {
+//
+//                    if (entity.hasMetadata(string)) {
+//
+//                        String finalString = MetadataHandler.machineToHumanTranslator(string);
+//
+//                        if (powerCounter > 13) {
+//
+//                            Score score = null;
+//
+//                            if (MetadataHandler.defensivePowerList.contains(string) || MetadataHandler.offensivePowerList.contains(string) ||
+//                                    MetadataHandler.miscellaneousPowerList.contains(string)) {
+//
+//                                score = objective.getScore(ChatColor.AQUA + finalString);
+//
+//                            } else if (MetadataHandler.majorPowerList.contains(string)) {
+//
+//                                score = objective.getScore(ChatColor.DARK_AQUA + finalString);
+//
+//                            }
+//
+//                            if (counter + iterator < powerCounter) {
+//
+//                                score.setScore(counter + iterator);
+//
+//                            } else {
+//
+//                                int currentValue = (int) ((counter + iterator) - Math.floor(((counter + iterator) / powerCounter) * powerCounter));
+//
+//                                score.setScore(currentValue);
+//
+//                            }
+//
+//
+//                        } else {
+//
+//                            Score score;
+//
+//                            if (MetadataHandler.defensivePowerList.contains(string) || MetadataHandler.offensivePowerList.contains(string) ||
+//                                    MetadataHandler.miscellaneousPowerList.contains(string)) {
+//
+//                                score = objective.getScore(ChatColor.AQUA + finalString);
+//
+//                            } else {
+//
+//                                score = objective.getScore(ChatColor.DARK_AQUA + finalString);
+//
+//                            }
+//
+//                            score.setScore(counter);
+//
+//                        }
+//
+//                        counter++;
+//
+//                    }
+//
+//                }
 
                 player.setScoreboard(board);
                 playerHasScoreboard.put(player, true);

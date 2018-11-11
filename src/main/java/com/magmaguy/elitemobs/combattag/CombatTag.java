@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.combattag;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
@@ -60,14 +61,14 @@ public class CombatTag implements Listener {
 
     private static Player playerFinder(EntityDamageByEntityEvent event) {
 
-        if (event.getDamager() instanceof Player && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD))
+        if (event.getDamager() instanceof Player && EntityTracker.isEliteMob(event.getEntity()))
             return (Player) event.getDamager();
-        if (event.getEntity() instanceof Player && (event.getDamager().hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
+        if (event.getEntity() instanceof Player && (EntityTracker.isEliteMob(event.getEntity()) ||
                 event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
-                        ((LivingEntity) ((Projectile) event.getDamager()).getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD)))
+                        EntityTracker.isEliteMob(((LivingEntity) ((Projectile) event.getDamager()).getShooter()))))
             return (Player) event.getEntity();
         if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player &&
-                event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD))
+                EntityTracker.isEliteMob(event.getEntity()))
             return (Player) ((Projectile) event.getDamager()).getShooter();
 
         return null;

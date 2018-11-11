@@ -9,14 +9,17 @@ public class SuperMushroomCow extends SuperMobProperties {
 
     public SuperMushroomCow() {
 
-        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_SUPERMOBS.toLowerCase() + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS);
-
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_MUSHROOM_COW);
 
         this.entityType = EntityType.MUSHROOM_COW;
 
         this.defaultMaxHealth = 10;
+
+        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_SUPERMOBS + getEntityType().toString()) &&
+                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS);
+
+        if (this.isEnabled)
+            superMobData.add(this);
 
     }
 

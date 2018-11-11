@@ -15,8 +15,9 @@
 
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.GameMode;
 import org.bukkit.entity.*;
@@ -27,14 +28,14 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
 public class AttackFireball extends MinorPower implements Listener {
 
-    ArrayList<LivingEntity> currentlyFiringEntities = new ArrayList<>();
+    private static HashSet<EliteMobEntity> currentlyFiringEntities = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
@@ -42,12 +43,11 @@ public class AttackFireball extends MinorPower implements Listener {
 
     @EventHandler
     public void targetEvent(EntityTargetLivingEntityEvent event) {
-        if (event.isCancelled()) return;
-        if (!(event.getEntity() instanceof Monster)) return;
-        if (currentlyFiringEntities.contains(event.getEntity())) return;
-        if (!EntityTracker.hasPower(this, (LivingEntity) event.getEntity())) return;
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        if (currentlyFiringEntities.contains(eliteMobEntity)) return;
         repeatingFireballTask((Monster) event.getEntity());
-        currentlyFiringEntities.add((LivingEntity) event.getEntity());
+        currentlyFiringEntities.add(eliteMobEntity);
     }
 
     private void repeatingFireballTask(Monster monster) {

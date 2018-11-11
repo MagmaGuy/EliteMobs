@@ -15,25 +15,25 @@
 
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
 public class AttackFire extends MinorPower implements Listener {
 
-    private ArrayList<LivingEntity> cooldownList = new ArrayList<>();
+    private static HashSet<EliteMobEntity> cooldownList = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
@@ -42,13 +42,13 @@ public class AttackFire extends MinorPower implements Listener {
     @EventHandler
     public void attackFire(EntityDamageByEntityEvent event) {
 
-        if (!EventValidator.eventIsValid(this, event)) return;
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
         Player player = EntityFinder.findPlayer(event);
-        LivingEntity eliteMob = EntityFinder.getRealDamager(event);
-        if (PowerCooldown.isInCooldown(eliteMob, cooldownList)) return;
+        if (PowerCooldown.isInCooldown(eliteMobEntity, cooldownList)) return;
 
         player.setFireTicks(40);
-        PowerCooldown.startCooldownTimer(eliteMob, cooldownList, 10 * 20);
+        PowerCooldown.startCooldownTimer(eliteMobEntity, cooldownList, 10 * 20);
 
     }
 

@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobPowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
@@ -28,7 +29,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,14 +37,14 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
 public class AttackFreeze extends MinorPower implements Listener {
 
-    private ArrayList<LivingEntity> cooldownList = new ArrayList<>();
+    private static HashSet<EliteMobEntity> cooldowns = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
@@ -53,10 +53,10 @@ public class AttackFreeze extends MinorPower implements Listener {
     @EventHandler
     public void attackFreeze(EntityDamageByEntityEvent event) {
 
-        if (!EventValidator.eventIsValid(this, event)) return;
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
         Player player = EntityFinder.findPlayer(event);
-        LivingEntity eliteMob = EntityFinder.getRealDamager(event);
-        if (PowerCooldown.isInCooldown(eliteMob, cooldownList)) return;
+        if (PowerCooldown.isInCooldown(eliteMobEntity, cooldowns)) return;
 
         /*
         Slow player down
@@ -68,7 +68,7 @@ public class AttackFreeze extends MinorPower implements Listener {
                                 ConfigValues.mobPowerConfig.getString(
                                         MobPowersConfig.FROZEN_MESSAGE))));
 
-        PowerCooldown.startCooldownTimer(eliteMob, cooldownList, 20 * 15);
+        PowerCooldown.startCooldownTimer(eliteMobEntity, cooldowns, 20 * 15);
 
         /*
         Add block effect

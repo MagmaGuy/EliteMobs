@@ -1,10 +1,9 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
-import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
+import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.List;
+import java.util.HashSet;
 
 public class ActionBossMobEntity extends BossMobEntity {
 
@@ -15,9 +14,8 @@ public class ActionBossMobEntity extends BossMobEntity {
         super(livingEntity, eliteMobLevel, name);
     }
 
-    public ActionBossMobEntity(LivingEntity livingEntity, int eliteMobsLevel, String name, List<MajorPower> majorPowers,
-                               List<MinorPower> minorPowers) {
-        super(livingEntity, eliteMobsLevel, name, majorPowers, minorPowers);
+    public ActionBossMobEntity(LivingEntity livingEntity, int eliteMobsLevel, String name, HashSet<ElitePower> elitePowers) {
+        super(livingEntity, eliteMobsLevel, name, elitePowers);
     }
 
 }

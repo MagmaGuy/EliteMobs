@@ -16,26 +16,80 @@
 package com.magmaguy.elitemobs.mobpowers.minorpowers;
 
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 
 public class EventValidator {
 
-    public static boolean eventIsValid(MinorPower minorPower, EntityDamageByEntityEvent event) {
+    /*
+    This class checks if the event is valid
+    It does so by checking if it isn't cancelled, if it contains an elite mob and if that elite mob has the relevant
+    power for that event
+    As such, the event should be cancelled at a power level when this returns null
+     */
+    public static EliteMobEntity getEventEliteMob(ElitePower mobPower, EntityDamageByEntityEvent event) {
 
-        if (event.isCancelled()) return false;
+        if (event.isCancelled()) return null;
 
         Player player = EntityFinder.findPlayer(event);
 
-        if (player == null) return false;
+        if (player == null) return null;
 
-        LivingEntity eliteMob = EntityFinder.getRealDamager(event);
+        LivingEntity livingEntity = EntityFinder.getRealDamager(event);
 
-        if (eliteMob == null) return false;
+        if (livingEntity == null) return null;
 
-        return (EntityTracker.hasPower(minorPower, eliteMob));
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(livingEntity);
+
+        if (eliteMobEntity == null) return null;
+
+        if (!EntityTracker.hasPower(mobPower, eliteMobEntity)) return null;
+
+        return eliteMobEntity;
+
+    }
+
+    public static EliteMobEntity getEventEliteMob(ElitePower mobPower, EntityTargetLivingEntityEvent event) {
+
+        if (event.isCancelled()) return null;
+
+        Player player = EntityFinder.findPlayer(event);
+
+        if (player == null) return null;
+
+        LivingEntity livingEntity = EntityFinder.getRealDamager(event);
+
+        if (livingEntity == null) return null;
+
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(livingEntity);
+
+        if (eliteMobEntity == null) return null;
+
+        if (!EntityTracker.hasPower(mobPower, eliteMobEntity)) return null;
+
+        return eliteMobEntity;
+
+    }
+
+    public static EliteMobEntity getEventEliteMob(ElitePower mobPower, EntityDamageEvent event) {
+
+        if (event.isCancelled()) return null;
+
+        if (!(event.getEntity() instanceof LivingEntity)) return null;
+
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+
+        if (eliteMobEntity == null) return null;
+
+        if (!EntityTracker.hasPower(mobPower, eliteMobEntity)) return null;
+
+        return eliteMobEntity;
 
     }
 

@@ -15,14 +15,11 @@
 
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
+import com.magmaguy.elitemobs.EntityTracker;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Created by MagmaGuy on 14/07/2017.
@@ -32,27 +29,7 @@ public class EntityDeathMetadataFlusher implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDeathFlushMetadata(EntityDeathEvent event) {
 
-        Entity entity = event.getEntity();
-
-        for (String metadata : MetadataHandler.metadataList()) {
-
-            if (entity.hasMetadata(metadata)) {
-
-                new BukkitRunnable() {
-
-                    @Override
-                    public void run() {
-
-                        MetadataHandler.fullMetadataFlush(entity);
-
-                    }
-
-                }.runTaskLater(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 10);
-
-                return;
-            }
-
-        }
+        EntityTracker.deathWipe(event);
 
     }
 

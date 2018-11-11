@@ -9,22 +9,21 @@ public class EliteEndermite extends EliteMobProperties {
 
     public EliteEndermite() {
 
-        isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS.toLowerCase() + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
-
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_ENDERMITE);
 
         this.entityType = EntityType.ENDERMITE;
 
         this.defaultMaxHealth = 8;
 
-        if (!isEnabled) return;
+        this.validDefensivePowers.addAll(super.getAllDefensivePowers());
+        this.validOffensivePowers.addAll(super.getAllOffensivePowers());
+        this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        this.validDefensivePowers.addAll(super.getValidDefensivePowers());
-        this.validOffensivePowers.addAll(super.getValidOffensivePowers());
-        this.validMiscellaneousPowers.addAll(super.getValidMiscellaneousPowers());
+        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
+                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
 
-        eliteMobData.add(this);
+        if (this.isEnabled)
+            eliteMobData.add(this);
 
     }
 

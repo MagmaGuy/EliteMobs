@@ -30,26 +30,27 @@
 
 package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackArrow;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 public class SkeletonTrackingArrow extends MajorPower implements Listener {
 
-    private static HashSet<LivingEntity> currentlyFiringEntities = new HashSet<>();
+    private static HashSet<EliteMobEntity> currentlyFiringEntities = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
@@ -61,11 +62,11 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
     @EventHandler
     public void targetEvent(EntityTargetLivingEntityEvent event) {
 
-        if (event.isCancelled()) return;
-        if (!(event.getEntity() instanceof Monster)) return;
-        if (!EntityTracker.hasPower(this, (LivingEntity) event.getEntity())) return;
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        if (currentlyFiringEntities.contains(eliteMobEntity)) return;
         repeatingTrackingArrowTask(event.getEntity());
-        currentlyFiringEntities.add((LivingEntity) event.getEntity());
+        currentlyFiringEntities.add(eliteMobEntity);
 
     }
 
@@ -100,7 +101,7 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
 
     }
 
-    public static List<Arrow> trackingArrowList = new ArrayList();
+    public static HashSet<Arrow> trackingArrowList = new HashSet<>();
 
     private static void trackingArrowLoop(Player player, Arrow arrow) {
 

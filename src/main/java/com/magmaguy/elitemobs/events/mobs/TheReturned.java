@@ -37,12 +37,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TheReturned implements Listener {
 
-    HashSet<LivingEntity> theReturnedList = new HashSet<>();
+    private static HashSet<LivingEntity> theReturnedList = new HashSet<>();
+
+    public static boolean isTheReturned(LivingEntity livingEntity) {
+        return theReturnedList.contains(livingEntity);
+    }
 
     @EventHandler
     public void onSpawn(EntitySpawnEvent event) {
@@ -119,8 +122,7 @@ public class TheReturned implements Listener {
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
-        if (theReturnedList.contains(event.getEntity()))
-            theReturnedList.remove(event.getEntity());
+        theReturnedList.remove(event.getEntity());
     }
 
 }

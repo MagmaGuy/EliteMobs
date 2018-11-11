@@ -15,8 +15,6 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.items.LootTables;
 import org.bukkit.entity.Player;
 
 /**
@@ -26,15 +24,10 @@ public class SimLootHandler {
 
     public static void simLoot(Player player, int level) {
 
-        if (level < 1) {
-
-            level = 0;
-
-        }
-
-        MetadataHandler.registerMetadata(player, MetadataHandler.ELITE_MOB_MD, level);
-        LootTables.generateLoot(player);
-        player.removeMetadata(MetadataHandler.ELITE_MOB_MD, MetadataHandler.PLUGIN);
+//        if (level < 1)
+//            level = 0;
+//
+//        LootTables.generateLoot(player);
 
     }
 

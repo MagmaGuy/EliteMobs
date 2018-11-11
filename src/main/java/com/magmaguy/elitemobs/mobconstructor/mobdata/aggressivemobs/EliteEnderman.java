@@ -9,22 +9,22 @@ public class EliteEnderman extends EliteMobProperties {
 
     public EliteEnderman() {
 
-        isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS.toLowerCase() + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
-
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_ENDERMAN);
 
         this.entityType = EntityType.ENDERMAN;
 
         this.defaultMaxHealth = 40;
 
-        if (!isEnabled) return;
+        this.validDefensivePowers.addAll(super.getAllDefensivePowers());
+        this.validOffensivePowers.addAll(super.getAllOffensivePowers());
+        this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        this.validDefensivePowers.addAll(super.getValidDefensivePowers());
-        this.validOffensivePowers.addAll(super.getValidOffensivePowers());
-        this.validMiscellaneousPowers.addAll(super.getValidMiscellaneousPowers());
+        isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
+                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
 
-        eliteMobData.add(this);
+        if (this.isEnabled)
+            eliteMobData.add(this);
+
     }
 
 }

@@ -21,9 +21,8 @@ import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.entity.Entity;
+import org.bukkit.Location;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -44,17 +43,16 @@ public class LootTables implements Listener {
     public void onDeath(EntityDeathEvent event) {
 
         if (event.getEntity() == null) return;
-        LivingEntity livingEntity = event.getEntity();
 
-        if (!EntityTracker.isEliteMob(livingEntity)) return;
-
-        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(livingEntity);
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        if (eliteMobEntity == null) return;
 
         if (!eliteMobEntity.isNaturalEntity()) return;
+        if (!eliteMobEntity.getHasNormalLoot()) return;
 
         if (eliteMobEntity.getLevel() < 2) return;
 
-        Item item = generateLoot(livingEntity);
+        Item item = generateLoot(eliteMobEntity);
 
         if (item == null) return;
 
@@ -68,10 +66,10 @@ public class LootTables implements Listener {
     private static boolean staticWeightCustomItemsExist = CustomItemConstructor.staticCustomItemHashMap.size() > 0;
     private static boolean dynamicWeightCustomItemsExist = CustomItemConstructor.dynamicRankedItemStacks.size() > 0;
 
-    public static Item generateLoot(LivingEntity livingEntity) {
+    public static Item generateLoot(EliteMobEntity eliteMobEntity) {
 
 
-        int mobTier = (int) MobTierFinder.findMobTier(livingEntity);
+        int mobTier = (int) MobTierFinder.findMobTier(eliteMobEntity);
         /*
         Add some wiggle room to avoid making obtaining loot too linear
          */
@@ -100,14 +98,14 @@ public class LootTables implements Listener {
             String selectedLootSystem = pickWeighedProbability(weightedConfigValues);
 
             if (selectedLootSystem.equals(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT))
-                return dropProcedurallyGeneratedItem(itemTier, livingEntity);
+                return dropProcedurallyGeneratedItem(itemTier, eliteMobEntity);
 
 
         }
 
 
         if (proceduralItemsOn && !customItemsOn)
-            return dropProcedurallyGeneratedItem(itemTier, livingEntity);
+            return dropProcedurallyGeneratedItem(itemTier, eliteMobEntity);
 
 
 
@@ -124,7 +122,7 @@ public class LootTables implements Listener {
             String selectedLootSystem = pickWeighedProbability(weightedConfigValues);
 
             if (selectedLootSystem.equals(ItemsDropSettingsConfig.CUSTOM_STATIC_ITEM_WEIGHT)) {
-                return dropCustomStaticLoot(livingEntity);
+                return dropCustomStaticLoot(eliteMobEntity.getLivingEntity().getLocation());
 
             }
 
@@ -146,11 +144,11 @@ public class LootTables implements Listener {
 
         switch (selectedLootSystem) {
             case "dynamic":
-                return dropDynamicallyScalingItem(livingEntity, itemTier);
+                return dropDynamicallyScalingItem(eliteMobEntity, itemTier);
             case "limited":
-                return dropLimitedScalingItem(livingEntity, itemTier);
+                return dropLimitedScalingItem(eliteMobEntity, itemTier);
             case "static":
-                return dropStaticScalingItem(livingEntity, itemTier);
+                return dropStaticScalingItem(eliteMobEntity, itemTier);
         }
 
         return null;
@@ -184,7 +182,7 @@ public class LootTables implements Listener {
 
     }
 
-    private static Item dropCustomStaticLoot(Entity entity) {
+    private static Item dropCustomStaticLoot(Location location) {
 
         double totalWeight = 0;
 
@@ -208,32 +206,34 @@ public class LootTables implements Listener {
 
         }
 
-        return entity.getWorld().dropItem(entity.getLocation(), generatedItemStack);
+        return location.getWorld().dropItem(location, generatedItemStack);
 
     }
 
-    private static Item dropProcedurallyGeneratedItem(int tierLevel, LivingEntity livingEntity) {
+    private static Item dropProcedurallyGeneratedItem(int tierLevel, EliteMobEntity eliteMobEntity) {
 
-        ItemStack randomLoot = ItemConstructor.constructItem(tierLevel, livingEntity);
-        return livingEntity.getWorld().dropItem(livingEntity.getLocation(), randomLoot);
-
-    }
-
-    private static Item dropDynamicallyScalingItem(LivingEntity livingEntity, int itemTier) {
-
-        return livingEntity.getWorld().dropItem(livingEntity.getLocation(), ScalableItemConstructor.constructDynamicItem(itemTier));
+        ItemStack randomLoot = ItemConstructor.constructItem(tierLevel, eliteMobEntity);
+        return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(), randomLoot);
 
     }
 
-    private static Item dropLimitedScalingItem(LivingEntity livingEntity, int itemTier) {
+    private static Item dropDynamicallyScalingItem(EliteMobEntity eliteMobEntity, int itemTier) {
 
-        return livingEntity.getWorld().dropItem(livingEntity.getLocation(), ScalableItemConstructor.constructLimitedItem(itemTier));
+        return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
+                ScalableItemConstructor.constructDynamicItem(itemTier));
 
     }
 
-    private static Item dropStaticScalingItem(LivingEntity livingEntity, int itemTier) {
+    private static Item dropLimitedScalingItem(EliteMobEntity eliteMobEntity, int itemTier) {
 
-        return livingEntity.getWorld().dropItem(livingEntity.getLocation(),
+        return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
+                ScalableItemConstructor.constructLimitedItem(itemTier));
+
+    }
+
+    private static Item dropStaticScalingItem(EliteMobEntity eliteMobEntity, int itemTier) {
+
+        return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
                 ScalableItemConstructor.staticItems.get(itemTier).get(ThreadLocalRandom.current()
                         .nextInt(ScalableItemConstructor.staticItems.get(itemTier).size()) - 1));
 

@@ -6,8 +6,6 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.uniqueitems.TheFeller;
 import com.magmaguy.elitemobs.mobconstructor.ActionBossMobEntity;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackFire;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackFreeze;
 import org.bukkit.Bukkit;
@@ -21,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
@@ -89,15 +86,13 @@ public class Fae implements Listener {
                 fireFae,
                 level,
                 ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
-                new ArrayList<MajorPower>(),
-                new ArrayList<MinorPower>(Arrays.asList(new AttackFire())));
+                new HashSet<>(Arrays.asList(new AttackFire())));
 
         ActionBossMobEntity frostFaeBoss = new ActionBossMobEntity(
                 fireFae,
                 level,
                 ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
-                new ArrayList<MajorPower>(),
-                new ArrayList<MinorPower>(Arrays.asList(new AttackFreeze())));
+                new HashSet<>(Arrays.asList(new AttackFreeze())));
 
         faeVisualEffect(lightningFae, faeType.LIGHTING_FAE);
         faeVisualEffect(fireFae, faeType.FIRE_FAE);

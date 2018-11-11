@@ -50,7 +50,9 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.mobconstructor.TrashMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.ReinforcementMobEntity;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -58,7 +60,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -78,31 +80,29 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
     private int chantIndex = 0;
     private boolean summoningEffectOn = false;
-    private HashSet<LivingEntity> chantingMobs = new HashSet<>();
+    private HashSet<EliteMobEntity> chantingMobs = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
     }
 
     @EventHandler
-    public void onPlayerDetect(EntityTargetEvent event) {
+    public void onPlayerDetect(EntityTargetLivingEntityEvent event) {
 
-        if (event.isCancelled()) return;
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
 
-        if (!(event.getTarget() instanceof LivingEntity && event.getTarget() instanceof LivingEntity)) return;
+        if (chantingMobs.contains(eliteMobEntity)) return;
+        chantingMobs.add(eliteMobEntity);
 
-        LivingEntity targetter = (LivingEntity) event.getEntity();
-        LivingEntity targetted = (LivingEntity) event.getTarget();
-
-        if (chantingMobs.contains(targetter)) return;
-        chantingMobs.add(targetter);
-
-        necronomiconVisualEffect((Zombie) targetter);
-        spawnReinforcements(targetter, targetted);
+        necronomiconVisualEffect(eliteMobEntity);
+        spawnReinforcements(eliteMobEntity, event.getTarget());
 
     }
 
-    private void necronomiconVisualEffect(Zombie zombie) {
+    private void necronomiconVisualEffect(EliteMobEntity eliteMobEntity) {
+
+        Zombie zombie = (Zombie) eliteMobEntity.getLivingEntity();
 
         zombie.setAI(false);
         summoningEffectOn = true;
@@ -249,7 +249,9 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
     }
 
-    private void spawnReinforcements(LivingEntity targetter, LivingEntity targetted) {
+    private void spawnReinforcements(EliteMobEntity eliteMobEntity, LivingEntity targetted) {
+
+        LivingEntity targetter = eliteMobEntity.getLivingEntity();
 
         new BukkitRunnable() {
 
@@ -281,12 +283,12 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     targetter.setAI(false);
 
                     if (!summoningEffectOn)
-                        necronomiconVisualEffect((Zombie) targetter);
+                        necronomiconVisualEffect(eliteMobEntity);
 
                     if (randomizedNumber < 5) {
 
                         Zombie zombie = (Zombie) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.ZOMBIE);
-                        TrashMobEntity trashMobEntity = new TrashMobEntity(zombie,
+                        ReinforcementMobEntity trashMobEntity = new ReinforcementMobEntity(zombie, eliteMobEntity.getLevel(),
                                 ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned zombie")));
 
                         zombie.setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
@@ -297,7 +299,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     } else {
 
                         Skeleton skeleton = (Skeleton) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.SKELETON);
-                        TrashMobEntity trashMobEntity = new TrashMobEntity(skeleton,
+                        ReinforcementMobEntity trashMobEntity = new ReinforcementMobEntity(skeleton, eliteMobEntity.getLevel(),
                                 ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned skeleton")));
 
                         skeleton.setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,

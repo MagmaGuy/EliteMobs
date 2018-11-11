@@ -47,19 +47,19 @@ package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.Configuration;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.ReinforcementMobEntity;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Random;
+import java.util.HashSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
@@ -68,163 +68,107 @@ import static com.magmaguy.elitemobs.ChatColorConverter.convert;
  */
 public class ZombieParents extends MajorPower implements Listener {
 
-    private static Random random = new Random();
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.ZOMBIE_PARENTS_MD;
-    int processID;
-    Configuration configuration = ConfigValues.translationConfig;
+    public static HashSet<EliteMobEntity> activatedZombies = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
-        majorPowerStanceMath.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.isCancelled()) return;
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        if (ThreadLocalRandom.current().nextDouble() > 0.01) return;
+        if (activatedZombies.contains(eliteMobEntity)) return;
 
-        if (event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Zombie &&
-                !event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_PARENTS_ACTIVATED) && random.nextDouble() < 0.5) {
+        Skeleton zombieMom = (Skeleton) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.SKELETON);
+        Skeleton zombieDad = (Skeleton) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.SKELETON);
 
-            Entity entity = event.getEntity();
+        ReinforcementMobEntity reinforcementMom = new ReinforcementMobEntity(zombieMom, eliteMobEntity.getLevel(),
+                ConfigValues.translationConfig.getString("ZombieParents.Mom Name"));
 
-            MetadataHandler.registerMetadata(entity, MetadataHandler.ZOMBIE_PARENTS_ACTIVATED, true);
+        ReinforcementMobEntity reinforcementDad = new ReinforcementMobEntity(zombieDad, eliteMobEntity.getLevel(),
+                ConfigValues.translationConfig.getString("ZombieParents.Dad Name"));
 
-            int assistMobLevel = (int) Math.floor(entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 4);
-
-            if (assistMobLevel < 1) {
-
-                assistMobLevel = 1;
-
-            }
-
-            Skeleton zombieMom = (Skeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.SKELETON);
-            Skeleton zombieDad = (Skeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.SKELETON);
-
-            zombieDad.setCustomName(convert(configuration.getString("ZombieParents.Dad Name")));
-            zombieMom.setCustomName(convert(configuration.getString("ZombieParents.Mom Name")));
-
-            zombieDad.setCustomNameVisible(true);
-            zombieMom.setCustomNameVisible(true);
-
-            MetadataHandler.registerMetadata(zombieDad, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
-            MetadataHandler.registerMetadata(zombieMom, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
-            MetadataHandler.registerMetadata(zombieDad, MetadataHandler.CUSTOM_STACK, true);
-            MetadataHandler.registerMetadata(zombieMom, MetadataHandler.CUSTOM_STACK, true);
-            MetadataHandler.registerMetadata(zombieDad, MetadataHandler.CUSTOM_POWERS_MD, true);
-            MetadataHandler.registerMetadata(zombieMom, MetadataHandler.CUSTOM_POWERS_MD, true);
-            MetadataHandler.registerMetadata(zombieDad, MetadataHandler.CUSTOM_NAME, true);
-            MetadataHandler.registerMetadata(zombieMom, MetadataHandler.CUSTOM_NAME, true);
-
-            AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombieDad);
-            AggressiveEliteMobConstructor.constructAggressiveEliteMob(zombieMom);
-
-            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-                @Override
-                public void run() {
-
-                    if (!entity.isValid()) {
-
-                        if (zombieDad.isValid()) {
-
-                            nameClearer(zombieDad);
-
-                            zombieDad.setCustomName(convert(configuration.getStringList("ZombieParents.DeathMessage").
-                                    get(random.nextInt(configuration.getStringList("ZombieParents.DeathMessage")
-                                            .size()))));
-
-                        }
-
-                        if (zombieMom.isValid()) {
-
-                            nameClearer(zombieMom);
-
-                            zombieMom.setCustomName(convert(configuration.getStringList("ZombieParents.DeathMessage").
-                                    get(random.nextInt(configuration.getStringList("ZombieParents.DeathMessage")
-                                            .size()))));
-
-                        }
-
-                        Bukkit.getScheduler().cancelTask(processID);
-                        return;
-
-                    } else {
-
-                        if (random.nextDouble() < 0.5) {
-
-                            nameClearer(entity);
-
-                            entity.setCustomName(convert(configuration.getStringList("ZombieParents.ZombieDialog").
-                                    get(random.nextInt(configuration.getStringList("ZombieParents.ZombieDialog")
-                                            .size()))));
-
-                        }
-
-                        if (random.nextDouble() < 0.5 && zombieDad.isValid()) {
-
-                            nameClearer(zombieDad);
-
-                            zombieDad.setCustomName(convert(configuration.getStringList("ZombieParents.ZombieDadDialog").
-                                    get(random.nextInt(configuration.getStringList("ZombieParents.ZombieDadDialog")
-                                            .size()))));
-
-                        }
-
-                        if (random.nextDouble() < 0.5 && zombieMom.isValid()) {
-
-                            nameClearer(zombieMom);
-
-                            zombieMom.setCustomName(convert(configuration.getStringList("ZombieParents.ZombieMomDialog").
-                                    get(random.nextInt(configuration.getStringList("ZombieParents.ZombieMomDialog")
-                                            .size()))));
-
-                        }
-
-                    }
-
-                }
-
-            }, 20, 20 * 8);
-
-        }
-
-    }
-
-    private void nameClearer(Entity entity) {
-
-        String originalName = entity.getCustomName();
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                if (entity.isValid()) {
+                if (!eliteMobEntity.getLivingEntity().isValid()) {
 
-                    if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
-                        entity.setCustomName(originalName);
-                    } else {
-                        entity.setCustomName(NameHandler.customAggressiveName(entity));
+                    if (zombieDad.isValid()) {
+
+                        nameClearer(reinforcementDad);
+
+                        zombieDad.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieParents.DeathMessage").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.DeathMessage")
+                                        .size()))));
+
+                    }
+
+                    if (zombieMom.isValid()) {
+
+                        nameClearer(reinforcementMom);
+
+                        zombieMom.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieParents.DeathMessage").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.DeathMessage")
+                                        .size()))));
+
+                    }
+
+                    cancel();
+
+                } else {
+
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5) {
+
+                        nameClearer(eliteMobEntity);
+
+                        eliteMobEntity.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieDialog").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieDialog")
+                                        .size()))));
+
+                    }
+
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && zombieDad.isValid()) {
+
+                        nameClearer(reinforcementDad);
+
+                        zombieDad.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieDadDialog").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieDadDialog")
+                                        .size()))));
+
+                    }
+
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && zombieMom.isValid()) {
+
+                        nameClearer(reinforcementMom);
+
+                        zombieMom.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieMomDialog").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieMomDialog")
+                                        .size()))));
+
                     }
 
                 }
 
             }
 
-        }, 20 * 3);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 8);
+
+    }
+
+    private void nameClearer(EliteMobEntity eliteMobEntity) {
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (eliteMobEntity.getLivingEntity().isValid())
+                    eliteMobEntity.setName(eliteMobEntity.getName());
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
 
     }
 
