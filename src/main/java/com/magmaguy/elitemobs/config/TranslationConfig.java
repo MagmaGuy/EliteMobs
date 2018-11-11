@@ -24,7 +24,7 @@ import java.util.Arrays;
  */
 public class TranslationConfig {
 
-    private static final String ELITE_MOB_NAME = "Elite Mob Names.";
+    private static final String ELITE_MOB_NAME = "Elite mob names.";
     public static final String NAME_BLAZE = ELITE_MOB_NAME + "Blaze";
     public static final String NAME_CAVE_SPIDER = ELITE_MOB_NAME + "CaveSpider";
     public static final String NAME_CREEPER = ELITE_MOB_NAME + "Creeper";
@@ -61,7 +61,7 @@ public class TranslationConfig {
         configuration.addDefault(NAME_BLAZE, "Level $level Elite Blaze");
         configuration.addDefault(NAME_CAVE_SPIDER, "Level $level Elite Cave Spider");
         configuration.addDefault(NAME_CREEPER, "Level $level Elite Creeper");
-        configuration.addDefault(NAME_ENDERMAN, "Level $levelElite Enderman");
+        configuration.addDefault(NAME_ENDERMAN, "Level $level Elite Enderman");
         configuration.addDefault(NAME_ENDERMITE, "Level $level Elite Endermite");
         configuration.addDefault(NAME_HUSK, "Level $level Elite Husk");
         configuration.addDefault(NAME_IRON_GOLEM, "Level $level Elite Iron Golem");

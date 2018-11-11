@@ -17,7 +17,6 @@ package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,7 +31,7 @@ public class SmallTreasureGoblin implements Listener {
         entityQueued = true;
     }
 
-    public static void initalizeEvent(LivingEntity treasureGoblin) {
+    public static void initalizeEvent(Zombie treasureGoblin) {
 
         TreasureGoblin.createGoblin(treasureGoblin);
 
@@ -53,7 +52,7 @@ public class SmallTreasureGoblin implements Listener {
                     event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) &&
                     event.getEntity() instanceof Zombie) {
 
-                initalizeEvent(event.getEntity());
+                initalizeEvent((Zombie) event.getEntity());
 
             }
 

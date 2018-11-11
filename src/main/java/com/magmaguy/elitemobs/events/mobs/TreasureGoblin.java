@@ -26,6 +26,7 @@ import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.LootTables;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.TimedBossMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
@@ -43,23 +44,24 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureGoblin implements Listener {
 
-    private static ArrayList<TimedBossMobEntity> treasureGoblinList = new ArrayList<>();
-    private static ArrayList<LivingEntity> radialGoldExplosionCooldown = new ArrayList<>();
-    private static ArrayList<LivingEntity> goldShotgunCooldown = new ArrayList<>();
+    private static HashSet<TimedBossMobEntity> treasureGoblinList = new HashSet<>();
+    private static HashSet<EliteMobEntity> radialGoldExplosionCooldown = new HashSet<>();
+    private static HashSet<EliteMobEntity> goldShotgunCooldown = new HashSet<>();
 
-    public static boolean isTreasureGoblin(Entity entity) {
-        if (!(entity instanceof LivingEntity)) return false;
-        if (treasureGoblinList.isEmpty()) return false;
+    public static EliteMobEntity getTreasureGoblin(Zombie zombie) {
+        if (!zombie.getType().equals(EntityType.ZOMBIE)) return null;
+        if (treasureGoblinList.isEmpty()) return null;
         for (TimedBossMobEntity bossMobEntity : treasureGoblinList)
-            if (bossMobEntity.getLivingEntity().equals(entity))
-                return true;
-        return false;
+            if (bossMobEntity.getLivingEntity().equals(zombie))
+                return bossMobEntity;
+        return null;
     }
 
     public static void createGoblin(Zombie treasureGoblin) {
@@ -81,36 +83,41 @@ public class TreasureGoblin implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (isTreasureGoblin(event.getEntity())) {
+        if (!event.getEntity().getType().equals(EntityType.ZOMBIE)) return;
 
-            Entity entity = event.getEntity();
+        EliteMobEntity eliteMobEntity = getTreasureGoblin((Zombie) event.getEntity());
+        if (eliteMobEntity == null) return;
 
-            for (int i = 0; i < ConfigValues.eventsConfig.getInt(EventsConfig.SMALL_TREASURE_GOBLIN_REWARD); i++)
-                LootTables.generateLoot((LivingEntity) entity);
+        Zombie zombieKing = (Zombie) event.getEntity();
+
+        for (int i = 0; i < ConfigValues.eventsConfig.getInt(EventsConfig.SMALL_TREASURE_GOBLIN_REWARD); i++)
+            LootTables.generateLoot(eliteMobEntity);
 
 
-            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 
-                if (((LivingEntity) entity).getKiller() != null) {
+            if (zombieKing.getKiller() != null) {
 
-                    String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT).replace("$player", ((LivingEntity) entity).getKiller().getDisplayName());
-                    player.sendMessage(ChatColorConverter.convert(newMessage));
+                String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT)
+                        .replace("$player", (zombieKing).getKiller().getDisplayName());
+                player.sendMessage(ChatColorConverter.convert(newMessage));
 
-                } else
-                    player.sendMessage(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
-
-            }
+            } else
+                player.sendMessage(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
 
         }
+
 
     }
 
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
 
-        if (!(event.getDamager() instanceof LivingEntity ||
-                event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
+        if (!(event.getDamager().getType().equals(EntityType.ZOMBIE) ||
+                event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Zombie))
             return;
+
+        if (ThreadLocalRandom.current().nextDouble() > 0.5) return;
 
         LivingEntity livingEntity;
 
@@ -119,30 +126,22 @@ public class TreasureGoblin implements Listener {
         else
             livingEntity = (LivingEntity) event.getDamager();
 
-        if (isTreasureGoblin(livingEntity))
+        EliteMobEntity eliteMobEntity = getTreasureGoblin((Zombie) livingEntity);
+        if (eliteMobEntity == null) return;
 
-            if (ThreadLocalRandom.current().nextDouble() < 0.20) {
+        if (!PowerCooldown.isInCooldown(eliteMobEntity, radialGoldExplosionCooldown)) {
 
-                //run power
-                if (ThreadLocalRandom.current().nextDouble() < 0.5)
+            PowerCooldown.startCooldownTimer(eliteMobEntity, radialGoldExplosionCooldown,
+                    20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_RADIAL_EXPLOSION));
+            radialGoldExplosionInitializer((Zombie) event.getEntity());
 
-                    if (!PowerCooldown.isInCooldown((LivingEntity) event.getEntity(), radialGoldExplosionCooldown)) {
+        } else if (!PowerCooldown.isInCooldown(eliteMobEntity, goldShotgunCooldown)) {
 
-                        PowerCooldown.startCooldownTimer((LivingEntity) event.getEntity(), radialGoldExplosionCooldown,
-                                20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_RADIAL_EXPLOSION));
-                        radialGoldExplosionInitializer((Zombie) event.getEntity());
+            PowerCooldown.startCooldownTimer(eliteMobEntity, goldShotgunCooldown,
+                    20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL));
+            goldShotgunInitializer((Zombie) event.getEntity(), livingEntity.getLocation());
 
-                    } else if (!PowerCooldown.isInCooldown((LivingEntity) event.getEntity(), goldShotgunCooldown)) {
-
-                        PowerCooldown.startCooldownTimer((LivingEntity) event.getEntity(), goldShotgunCooldown,
-                                20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL));
-                        goldShotgunInitializer((Zombie) event.getEntity(), livingEntity.getLocation());
-
-                    }
-
-
-            }
-
+        }
 
     }
 
@@ -421,14 +420,15 @@ public class TreasureGoblin implements Listener {
 
     }
 
-    private static boolean goldNuggetDamage(List<Entity> entityList, Zombie eliteMob) {
+    private static boolean goldNuggetDamage(List<Entity> entityList, Zombie zombie) {
 
         for (Entity entity : entityList) {
 
-            if (isTreasureGoblin(entity)) break;
+            if (!entity.getType().equals(EntityType.ZOMBIE)) break;
+            EliteMobEntity eliteMobEntity = getTreasureGoblin((zombie));
+            if (eliteMobEntity == null) continue;
 
-            if (entity instanceof LivingEntity)
-                return BossSpecialAttackDamage.dealSpecialDamage(eliteMob, (LivingEntity) entity, 1);
+            return BossSpecialAttackDamage.dealSpecialDamage(zombie, (LivingEntity) entity, 1);
 
         }
 

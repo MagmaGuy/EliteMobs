@@ -52,9 +52,9 @@ public class KillHandler {
             int counter = 0;
 
             for (World world : EliteMobs.validWorldList)
-                for (EliteMobEntity eliteMobEntity : EntityTracker.eliteMobs.get(world)) {
+                for (EliteMobEntity eliteMobEntity : EntityTracker.getEliteMobs().get(world)) {
                     eliteMobEntity.getLivingEntity().remove();
-                    EntityTracker.elite(eliteMobEntity.getLivingEntity());
+                    EntityTracker.unregisterEliteMob(eliteMobEntity);
                     counter++;
                 }
 

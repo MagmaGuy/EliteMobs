@@ -15,9 +15,10 @@
 
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -36,7 +37,7 @@ import java.util.HashSet;
  */
 public class AttackArrow extends MinorPower implements Listener {
 
-    private static HashSet<LivingEntity> currentlyFiringEntities = new HashSet<>();
+    private static HashSet<EliteMobEntity> currentlyFiringEntities = new HashSet<>();
 
     @Override
 
@@ -45,30 +46,31 @@ public class AttackArrow extends MinorPower implements Listener {
 
     @EventHandler
     public void targetEvent(EntityTargetLivingEntityEvent event) {
-        if (event.isCancelled()) return;
-        if (!(event.getEntity() instanceof Monster)) return;
-        if (!EntityTracker.hasPower(this, (LivingEntity) event.getEntity())) return;
-        repeatingArrowTask((Monster) event.getEntity());
-        currentlyFiringEntities.add((LivingEntity) event.getEntity());
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        if (currentlyFiringEntities.contains(eliteMobEntity)) return;
+        repeatingArrowTask(eliteMobEntity);
+        currentlyFiringEntities.add(eliteMobEntity);
     }
 
-    private void repeatingArrowTask(Monster monster) {
+    private void repeatingArrowTask(EliteMobEntity eliteMobEntity) {
 
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                if (!monster.isValid() || monster.getTarget() == null) {
+                if (!eliteMobEntity.getLivingEntity().isValid() || ((Monster) eliteMobEntity.getLivingEntity()).getTarget() == null) {
+                    currentlyFiringEntities.remove(eliteMobEntity);
                     cancel();
                     return;
                 }
 
-                for (Entity nearbyEntity : monster.getNearbyEntities(20, 20, 20))
+                for (Entity nearbyEntity : eliteMobEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
                     if (nearbyEntity instanceof Player)
                         if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
                                 ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL))
-                            shootArrow(monster, (Player) nearbyEntity);
+                            shootArrow(eliteMobEntity.getLivingEntity(), (Player) nearbyEntity);
 
             }
 

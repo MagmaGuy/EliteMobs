@@ -18,9 +18,9 @@ package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
-import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -88,10 +88,10 @@ public class Taunt extends MinorPower implements Listener {
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
 
-        if (!EventValidator.eventIsValid(this, event)) return;
-        LivingEntity eliteMob = EntityFinder.getRealDamager(event);
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
 
-        nametagProcessor(eliteMob, HIT_LIST);
+        nametagProcessor(eliteMobEntity.getLivingEntity(), HIT_LIST);
 
     }
 
@@ -118,7 +118,7 @@ public class Taunt extends MinorPower implements Listener {
                 if (!entity.isValid())
                     return;
 
-                entity.setCustomName(EntityTracker.getEliteMobEntity((LivingEntity) entity).getName());
+                entity.setCustomName(EntityTracker.getEliteMobEntity(entity).getName());
 
             }
 

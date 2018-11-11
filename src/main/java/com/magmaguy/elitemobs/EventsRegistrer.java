@@ -4,9 +4,6 @@ import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combattag.CombatTag;
 import com.magmaguy.elitemobs.commands.LootGUI;
-import com.magmaguy.elitemobs.commands.guiconfig.GUIConfigHandler;
-import com.magmaguy.elitemobs.commands.guiconfig.configurers.MobSpawningAndLoot;
-import com.magmaguy.elitemobs.commands.guiconfig.configurers.ValidMobsConfigurer;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ItemSaleEvent;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
@@ -21,10 +18,10 @@ import com.magmaguy.elitemobs.events.mobs.sharedeventpowers.SpiritWalk;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
+import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobconstructor.displays.DamageDisplay;
 import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobconstructor.displays.HealthDisplay;
-import com.magmaguy.elitemobs.mobmerger.MergeHandler;
 import com.magmaguy.elitemobs.mobpowers.AggroPrevention;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityArrow;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFallDamage;
@@ -35,11 +32,10 @@ import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
-import com.magmaguy.elitemobs.mobspawning.NaturalMobMetadataAssigner;
+import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawningProcessor;
 import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -74,12 +70,6 @@ public class EventsRegistrer {
 
         //getloot AdventurersGuildGUI
         pluginManager.registerEvents(new LootGUI(), plugin);
-
-        //config AdventurersGuildGUI
-        pluginManager.registerEvents(new GUIConfigHandler(), plugin);
-        pluginManager.registerEvents(new ValidMobsConfigurer(), plugin);
-        pluginManager.registerEvents(new MobSpawningAndLoot(), plugin);
-
 
         /*
         While these powers could be registered in a more automated way, I realized that it's also a bad way of getting
@@ -126,11 +116,10 @@ public class EventsRegistrer {
         }
 
         //Natural Mob Metadata Assigner
-        pluginManager.registerEvents(new NaturalMobMetadataAssigner(), plugin);
+        pluginManager.registerEvents(new NaturalMobSpawningProcessor(), plugin);
 
         //Visual effects
         pluginManager.registerEvents(new EffectEventHandlers(), plugin);
-        pluginManager.registerEvents(new MinorPowerPowerStance(), plugin);
         pluginManager.registerEvents(new MajorPowerPowerStance(), plugin);
 
         //Loot

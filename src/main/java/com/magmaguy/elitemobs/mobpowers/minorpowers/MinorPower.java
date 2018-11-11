@@ -15,13 +15,11 @@
 
 package com.magmaguy.elitemobs.mobpowers.minorpowers;
 
-import org.bukkit.entity.Entity;
+import com.magmaguy.elitemobs.mobpowers.ElitePower;
 
 /**
  * Created by MagmaGuy on 05/11/2016.
  */
-public abstract class MinorPower {
-
-    public abstract void applyPowers(Entity entity);
+public abstract class MinorPower extends ElitePower {
 
 }

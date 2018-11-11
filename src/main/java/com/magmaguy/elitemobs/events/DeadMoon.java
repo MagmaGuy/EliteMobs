@@ -16,14 +16,17 @@
 package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.events.mobs.TheReturned;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
 import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -48,6 +51,7 @@ public class DeadMoon implements Listener {
 
         if (event.isCancelled()) return;
 
+        if (event.getEntity().getWorld().getTime() < 13184 || event.getEntity().getWorld().getTime() > 22800) return;
         if (!event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL)) return;
         if (!(event.getEntity() instanceof Zombie)) return;
         if (!EventLauncher.verifyPlayerCount()) return;
@@ -60,45 +64,39 @@ public class DeadMoon implements Listener {
         if (MoonPhaseDetector.detectMoonPhase(event.getEntity().getWorld()) != MoonPhaseDetector.moonPhase.NEW_MOON)
             return;
 
-        if (event.getEntity().getWorld().getTime() < 13184 || event.getEntity().getWorld().getTime() > 22800) return;
-
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING) ||
-                !ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS)) {
-
+                !ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS))
             return;
 
-        }
 
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && !ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.SPAWNERS_SPAWN_ELITE_MOBS))
             return;
 
         if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM)) return;
 
-        if (!event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) {
-
+        if (!EntityTracker.isEliteMob(event.getEntity()))
             NaturalSpawning.naturalMobProcessor(event.getEntity());
 
-        }
-
         //add entityQueued
-        if (entityQueued && !event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING)
-                && !event.getEntity().hasMetadata(MetadataHandler.THE_RETURNED)
+        if (entityQueued && !TheReturned.isTheReturned(event.getEntity())
                 && (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
                 event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM))) {
 
             eventOngoing = true;
             entityQueued = false;
 
-            EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_ANNOUNCEMENT_MESSAGE), event.getEntity().getWorld());
+            EventMessage.sendEventMessage(event.getEntity(), ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_ANNOUNCEMENT_MESSAGE));
 
             ZombieKing.spawnZombieKing((Zombie) event.getEntity());
-            terminateEvent(event.getEntity().getWorld());
+            terminateEvent(event.getEntity());
 
         }
 
     }
 
-    private void terminateEvent(World world) {
+    private void terminateEvent(LivingEntity livingEntity) {
+
+        World world = livingEntity.getWorld();
 
         new BukkitRunnable() {
 
@@ -109,7 +107,7 @@ public class DeadMoon implements Listener {
 
                     eventOngoing = false;
 
-                    EventMessage.sendEventMessage(ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_END_MESSAGE), world);
+                    EventMessage.sendEventMessage(livingEntity, ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_END_MESSAGE));
 
                     cancel();
 

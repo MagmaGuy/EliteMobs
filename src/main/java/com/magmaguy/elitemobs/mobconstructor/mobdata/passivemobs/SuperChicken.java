@@ -9,14 +9,17 @@ public class SuperChicken extends SuperMobProperties {
 
     public SuperChicken() {
 
-        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_SUPERMOBS.toLowerCase() + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS);
-
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_CHICKEN);
 
         this.entityType = EntityType.CHICKEN;
 
         this.defaultMaxHealth = 4;
+
+        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_SUPERMOBS + getEntityType().toString()) &&
+                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS);
+
+        if (this.isEnabled)
+            superMobData.add(this);
 
     }
 

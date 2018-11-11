@@ -17,6 +17,7 @@ package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.items.LootTables;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -35,8 +36,10 @@ public class BonusLoot extends MinorPower implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (EntityTracker.hasPower(this, event.getEntity()))
-            LootTables.generateLoot(event.getEntity());
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        if (eliteMobEntity == null) return;
+        if (!eliteMobEntity.hasPower(this)) return;
+        LootTables.generateLoot(eliteMobEntity);
 
     }
 

@@ -5,6 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 
 public class EntityFinder {
 
@@ -25,11 +26,21 @@ public class EntityFinder {
 
     }
 
+    public static LivingEntity getRealDamager(EntityTargetLivingEntityEvent event) {
+
+        return filterRangedDamagers(event.getEntity());
+
+    }
+
     private static Player playerFilter(Entity entity) {
         return (entity instanceof Player) ? (Player) entity : null;
     }
 
     public static Player findPlayer(EntityDamageByEntityEvent event) {
+        return playerFilter(event.getEntity());
+    }
+
+    public static Player findPlayer(EntityTargetLivingEntityEvent event) {
         return playerFilter(event.getEntity());
     }
 

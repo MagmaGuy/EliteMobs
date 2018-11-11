@@ -25,6 +25,7 @@ import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.uniqueitems.ZombieKingsAxe;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.TimedBossMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
@@ -40,21 +41,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ZombieKing implements Listener {
 
-    private static ArrayList<TimedBossMobEntity> zombieKingList = new ArrayList<>();
+    private static HashSet<EliteMobEntity> zombieKingList = new HashSet<>();
 
-    public static boolean isZombieKing(Entity entity) {
-        if (!(entity instanceof LivingEntity)) return false;
-        if (zombieKingList.isEmpty()) return false;
-        for (TimedBossMobEntity bossMobEntity : zombieKingList)
-            if (bossMobEntity.getLivingEntity().equals(entity))
-                return true;
-        return false;
+    public static EliteMobEntity getZombieKing(Zombie zombie) {
+        if (!(zombie instanceof LivingEntity)) return null;
+        if (zombieKingList.isEmpty()) return null;
+        for (EliteMobEntity bossMobEntity : zombieKingList)
+            if (bossMobEntity.getLivingEntity().equals(zombie))
+                return bossMobEntity;
+        return null;
     }
 
     public static void spawnZombieKing(Zombie zombie) {
@@ -115,31 +116,26 @@ public class ZombieKing implements Listener {
 
     }
 
-    private static ArrayList<LivingEntity> flamethrowerCooldown = new ArrayList<>();
-    private static ArrayList<LivingEntity> unholySmiteCooldown = new ArrayList<>();
-    private static ArrayList<LivingEntity> minionsCooldown = new ArrayList<>();
+    private static HashSet<EliteMobEntity> flamethrowerCooldown = new HashSet<>();
+    private static HashSet<EliteMobEntity> unholySmiteCooldown = new HashSet<>();
+    private static HashSet<EliteMobEntity> minionsCooldown = new HashSet<>();
 
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
 
-        if (!isZombieKing(event.getEntity())) return;
+        if (!event.getEntity().getType().equals(EntityType.ZOMBIE)) return;
+        EliteMobEntity eliteMobEntity = getZombieKing((Zombie) event.getEntity());
+        if (eliteMobEntity == null) return;
 
         LivingEntity livingEntity;
 
-        if (event.getDamager() instanceof LivingEntity) {
-
+        if (event.getDamager() instanceof LivingEntity)
             livingEntity = (LivingEntity) event.getDamager();
-
-        } else if (event.getDamager() instanceof Projectile &&
-                ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity) {
-
+        else if (event.getDamager() instanceof Projectile &&
+                ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
             livingEntity = (LivingEntity) ((Projectile) event.getDamager()).getShooter();
-
-        } else {
-
+        else
             livingEntity = null;
-
-        }
 
         if (livingEntity == null) return;
 
@@ -147,9 +143,9 @@ public class ZombieKing implements Listener {
 
             if (ThreadLocalRandom.current().nextDouble() < 0.33) {
 
-                if (!PowerCooldown.isInCooldown(livingEntity, flamethrowerCooldown)) {
+                if (!PowerCooldown.isInCooldown(eliteMobEntity, flamethrowerCooldown)) {
 
-                    PowerCooldown.startCooldownTimer(livingEntity, flamethrowerCooldown,
+                    PowerCooldown.startCooldownTimer(eliteMobEntity, flamethrowerCooldown,
                             20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_FLAMETHROWER_INTERVAL));
                     initializeFlamethrower(event.getEntity().getLocation(), livingEntity.getLocation(), (LivingEntity) event.getEntity());
 
@@ -157,9 +153,9 @@ public class ZombieKing implements Listener {
 
             } else if (ThreadLocalRandom.current().nextDouble() < 0.66) {
 
-                if (PowerCooldown.isInCooldown(livingEntity, unholySmiteCooldown)) {
+                if (PowerCooldown.isInCooldown(eliteMobEntity, unholySmiteCooldown)) {
 
-                    PowerCooldown.startCooldownTimer(livingEntity, unholySmiteCooldown,
+                    PowerCooldown.startCooldownTimer(eliteMobEntity, unholySmiteCooldown,
                             20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_UNHOLY_SMITE_INTERVAL));
                     initializeUnholySmite((LivingEntity) event.getEntity());
 
@@ -167,9 +163,9 @@ public class ZombieKing implements Listener {
 
             } else {
 
-                if (PowerCooldown.isInCooldown(livingEntity, minionsCooldown)) {
+                if (PowerCooldown.isInCooldown(eliteMobEntity, minionsCooldown)) {
 
-                    PowerCooldown.startCooldownTimer(livingEntity, minionsCooldown,
+                    PowerCooldown.startCooldownTimer(eliteMobEntity, minionsCooldown,
                             20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_SUMMON_MINIONS_INTERVAL));
                     initializeSummonMinions((LivingEntity) event.getEntity());
 
@@ -312,7 +308,6 @@ public class ZombieKing implements Listener {
         //todo: add visual warning
         livingEntity.setAI(false);
         unholySmitePhaseOne(livingEntity, Particle.SMOKE_NORMAL, false, 10);
-
 
     }
 
@@ -532,27 +527,28 @@ public class ZombieKing implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (isZombieKing(event.getEntity())) {
+        if (!event.getEntity().getType().equals(EntityType.ZOMBIE)) return;
+        EliteMobEntity eliteMobEntity = getZombieKing((Zombie) event.getEntity());
+        if (eliteMobEntity == null) return;
 
-            Zombie zombieKing = (Zombie) event.getEntity();
+        Zombie zombieKing = (Zombie) event.getEntity();
 
-            ZombieKingsAxe zombieKingAxe = new ZombieKingsAxe();
-            ItemStack zombieKingAxeItemStack = zombieKingAxe.constructItemStack();
+        ZombieKingsAxe zombieKingAxe = new ZombieKingsAxe();
+        ItemStack zombieKingAxeItemStack = zombieKingAxe.constructItemStack();
 
-            zombieKing.getWorld().dropItem(zombieKing.getLocation(), zombieKingAxeItemStack);
+        zombieKing.getWorld().dropItem(zombieKing.getLocation(), zombieKingAxeItemStack);
 
-            if (event.getEntity().getKiller() != null) {
+        if (event.getEntity().getKiller() != null) {
 
-                String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_PLAYER_END_TEXT)
-                        .replace("$player", event.getEntity().getKiller().getDisplayName());
+            String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_PLAYER_END_TEXT)
+                    .replace("$player", event.getEntity().getKiller().getDisplayName());
 
-                EventMessage.sendEventMessage(event.getEntity(), newMessage);
+            EventMessage.sendEventMessage(event.getEntity(), newMessage);
 
-            } else
-                EventMessage.sendEventMessage(event.getEntity(), ConfigValues.eventsConfig.getString(
-                        ChatColorConverter.convert(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)));
+        } else
+            EventMessage.sendEventMessage(event.getEntity(), ConfigValues.eventsConfig.getString(
+                    ChatColorConverter.convert(EventsConfig.DEAD_MOON_EVENT_OTHER_END_TEXT)));
 
-        }
 
     }
 

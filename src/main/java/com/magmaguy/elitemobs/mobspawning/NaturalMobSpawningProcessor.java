@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.mobspawning;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
@@ -37,7 +38,7 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 /**
  * Created by MagmaGuy on 24/04/2017.
  */
-public class NaturalMobMetadataAssigner implements Listener {
+public class NaturalMobSpawningProcessor implements Listener {
 
     private static int range = Bukkit.getServer().getViewDistance() * 16;
 
@@ -48,7 +49,7 @@ public class NaturalMobMetadataAssigner implements Listener {
         /*
         Deal with entities spawned within the plugin
          */
-        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+        if (EntityTracker.isEliteMob(event.getEntity())) return;
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING))
             return;
@@ -60,6 +61,7 @@ public class NaturalMobMetadataAssigner implements Listener {
             return;
         if (event.getEntity().getCustomName() != null && ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS))
             return;
+
         if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES)))
             return;
         if (!EliteMobProperties.isValidEliteMobType(event.getEntityType()))

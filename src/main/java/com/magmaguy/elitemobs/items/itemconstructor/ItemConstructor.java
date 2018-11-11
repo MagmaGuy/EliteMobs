@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -138,7 +138,7 @@ public class ItemConstructor {
     /*
     For procedurally generated items
      */
-    public static ItemStack constructItem(double itemTier, LivingEntity killedMob) {
+    public static ItemStack constructItem(double itemTier, EliteMobEntity killedMob) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;

@@ -24,6 +24,7 @@ import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
 import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
+import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -63,22 +64,15 @@ public class CombatSystem implements Listener {
 
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player)) return;
+
+        LivingEntity damager = EntityFinder.getRealDamager(event);
+        if (damager == null) return;
+
         if (!EntityTracker.isEliteMob(event.getDamager()))
             return;
-        if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
-                !EntityTracker.isEliteMob(event.getDamager()))
-            return;
-        if (event.getDamager() instanceof Projectile && !(((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
-            return;
 
-        LivingEntity livingEntity = null;
-
-        if (event.getDamager() instanceof LivingEntity) livingEntity = (LivingEntity) event.getDamager();
-        else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
-            livingEntity = (LivingEntity) ((Projectile) event.getDamager()).getShooter();
-
-        if (livingEntity == null) return;
-
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(damager);
+        if (eliteMobEntity == null) return;
 
         //From this point on, the damage event is fully altered by Elite Mobs
 
@@ -90,7 +84,7 @@ public class CombatSystem implements Listener {
         Player player = (Player) event.getEntity();
 
         //Determine tiers
-        double eliteTier = MobTierFinder.findMobTier(livingEntity);
+        double eliteTier = MobTierFinder.findMobTier(eliteMobEntity);
         double playerTier = ItemTierFinder.findArmorSetTier(player);
 
         double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, event);
@@ -105,7 +99,7 @@ public class CombatSystem implements Listener {
 
         //Deal with the player getting killed
         if (player.getHealth() - event.getDamage() <= 0)
-            PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity));
+            PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, damager));
 
     }
 
@@ -170,7 +164,7 @@ public class CombatSystem implements Listener {
         for (PotionEffect potionEffect : ((Creeper) event.getEntity()).getActivePotionEffects())
             ((Creeper) event.getEntity()).removePotionEffect(potionEffect.getType());
 
-        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity((LivingEntity) event.getEntity());
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
 
         int mobLevel = eliteMobEntity.getLevel() < 1 ? 1 : eliteMobEntity.getLevel();
 
@@ -212,30 +206,20 @@ public class CombatSystem implements Listener {
     public void eliteMobDamageByPlayer(EntityDamageByEntityEvent event) {
 
         if (event.isCancelled()) return;
-        if (event.getEntity() instanceof Player || !(event.getEntity() instanceof LivingEntity) ||
-                !EntityTracker.isEliteMob(event.getEntity())) return;
+        LivingEntity damager = EntityFinder.getRealDamager(event);
+        if (damager == null) return;
 
-        LivingEntity damagingLivingEntity = null;
-        LivingEntity damagedLivingEntity = (LivingEntity) event.getEntity();
-
-        if (event.getDamager() instanceof LivingEntity) damagingLivingEntity = (LivingEntity) event.getDamager();
-        else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
-            damagingLivingEntity = (LivingEntity) ((Projectile) event.getDamager()).getShooter();
-
-        if (damagingLivingEntity == null) return;
-
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        if (eliteMobEntity == null) return;
 
         //From this point on, the event damage is handled by Elite Mobs
 
         /*
         Case in which the player is not the entity dealing damage, just deal raw damage
          */
-
-        if (!(damagingLivingEntity instanceof Player) &&
-                (EntityTracker.isEliteMob(damagingLivingEntity) || EntityTracker.isEliteMob(damagedLivingEntity))) {
+        if (!damager.getType().equals(EntityType.PLAYER) && EntityTracker.isEliteMob(damager)) {
 
             event.setDamage(event.getDamage());
-
             return;
 
         }
@@ -248,17 +232,18 @@ public class CombatSystem implements Listener {
         Case in which a player has hit the Elite Mob
          */
 
-        Player player = (Player) damagingLivingEntity;
+        if (!damager.getType().equals(EntityType.PLAYER)) return;
+        Player player = (Player) damager;
 
         double playerTier;
         if (player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType().equals(Material.BOW) && event.getDamager() instanceof Player)
             playerTier = 0;
         else
             playerTier = ItemTierFinder.findBattleTier(player.getInventory().getItemInMainHand());
-        double eliteTier = MobTierFinder.findMobTier(damagedLivingEntity);
-        double maxHealth = damagedLivingEntity.getMaxHealth();
+        double eliteTier = MobTierFinder.findMobTier(eliteMobEntity);
+        double maxHealth = eliteMobEntity.getMaxHealth();
 
-        double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, damagedLivingEntity);
+        double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, eliteMobEntity.getLivingEntity());
 
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 

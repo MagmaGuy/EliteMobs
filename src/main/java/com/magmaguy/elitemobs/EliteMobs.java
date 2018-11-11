@@ -31,6 +31,7 @@ import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.runnables.*;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
@@ -93,6 +94,11 @@ public class EliteMobs extends JavaPlugin {
         Initialize mob values
          */
         PluginMobProperties.initializePluginMobValues();
+
+        /*
+        Cache vectors
+         */
+        MinorPowerStanceMath.initializeVectorCache();
 
         /*
         Check for new plugin version
