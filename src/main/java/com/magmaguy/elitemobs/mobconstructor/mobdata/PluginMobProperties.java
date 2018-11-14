@@ -18,11 +18,11 @@ public abstract class PluginMobProperties {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public EntityType getEntityType() {
-        return entityType;
+        return this.entityType;
     }
 
 

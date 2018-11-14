@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import org.bukkit.entity.LivingEntity;
 
 public class TimedBossMobEntity extends BossMobEntity {
@@ -8,6 +9,7 @@ public class TimedBossMobEntity extends BossMobEntity {
         super(livingEntity, eliteMobLevel, name);
         super.setHasFarAwayUnload(false);
         super.getLivingEntity().setRemoveWhenFarAway(false);
+        BossMobDeathCountdown.startDeathCountdown(livingEntity);
     }
 
 }

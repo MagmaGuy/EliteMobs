@@ -141,4 +141,11 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         return getPluginData(entity.getType());
     }
 
+    public static HashSet<EntityType> getValidMobTypes() {
+        HashSet<EntityType> livingEntities = new HashSet<>();
+        for (EliteMobProperties eliteMobProperties : eliteMobData)
+            livingEntities.add(eliteMobProperties.getEntityType());
+        return livingEntities;
+    }
+
 }

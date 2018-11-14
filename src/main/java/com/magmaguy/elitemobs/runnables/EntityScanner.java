@@ -19,17 +19,17 @@ public class EntityScanner extends BukkitRunnable {
                 public void run() {
                     EliteMobScanner.scanElites();
                 }
-            }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
+            }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
         }
 
 
         if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS)) {
-            BukkitTask scanElites = new BukkitRunnable() {
+            BukkitTask scanSuperMobs = new BukkitRunnable() {
                 @Override
                 public void run() {
                     SuperMobScanner.scanSuperMobs();
                 }
-            }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 12, 20 * 12);
+            }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 12, 20 * 12);
         }
 
 

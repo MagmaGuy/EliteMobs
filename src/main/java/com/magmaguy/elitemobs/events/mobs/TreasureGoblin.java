@@ -23,7 +23,6 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.EventMessage;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -56,7 +55,6 @@ public class TreasureGoblin implements Listener {
     private static HashSet<EliteMobEntity> goldShotgunCooldown = new HashSet<>();
 
     public static EliteMobEntity getTreasureGoblin(Zombie zombie) {
-        if (!zombie.getType().equals(EntityType.ZOMBIE)) return null;
         if (treasureGoblinList.isEmpty()) return null;
         for (TimedBossMobEntity bossMobEntity : treasureGoblinList)
             if (bossMobEntity.getLivingEntity().equals(zombie))
@@ -68,7 +66,7 @@ public class TreasureGoblin implements Listener {
 
         int mobLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
         TimedBossMobEntity treasureGoblinPluginEntity = new TimedBossMobEntity(treasureGoblin, mobLevel,
-                ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME)));
+                ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME));
 
         treasureGoblinList.add(treasureGoblinPluginEntity);
 
@@ -76,7 +74,6 @@ public class TreasureGoblin implements Listener {
 
         equipTreasureGoblin(treasureGoblin);
         EventMessage.sendEventMessage(treasureGoblin, ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT));
-        BossMobDeathCountdown.startDeathCountdown(treasureGoblin);
 
     }
 
@@ -106,7 +103,6 @@ public class TreasureGoblin implements Listener {
                 player.sendMessage(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
 
         }
-
 
     }
 

@@ -8,6 +8,8 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -31,7 +33,7 @@ public class EliteMobEntity {
     private double maxHealth;
     private String name;
     /*
-    Store all powers in oen set, makes no sense to access it in individual sets.
+    Store all powers in one set, makes no sense to access it in individual sets.
     The reason they are split up in the first place is to add them in a certain ratio
     Once added, they can just be stored in a pool
      */
@@ -52,8 +54,11 @@ public class EliteMobEntity {
     private boolean hasCustomHealth = false;
     private boolean hasNormalLoot = true;
 
-    /*
-    This is the generic constructor used in most instances of natural elite mob generation
+    /**
+     * This is the generic constructor used in most instances of natural elite mob generation
+     *
+     * @param livingEntity  Minecraft entity associated to this elite mob
+     * @param eliteMobLevel Level of the mob, can be modified during runtime. Dynamically assigned.
      */
     public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel) {
 
@@ -101,6 +106,62 @@ public class EliteMobEntity {
 
     }
 
+    /**
+     * Spawning method for boss mobs.
+     * Assumes custom powers and custom names.
+     *
+     * @param livingEntity  the living entity associated to the mob
+     * @param eliteMobLevel boss mob level, should be automatically generated based on the highest player tier online
+     * @param name          the name for this boss mob, overrides the usual elite mob name format
+     * @see BossMobEntity
+     */
+    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, String name) {
+
+        /*
+        Register living entity to keep track of which entity this object is tied to
+         */
+        this.eliteMob = livingEntity;
+        /*
+        Register level, this is variable as per stacking rules
+         */
+        setEliteMobLevel(eliteMobLevel);
+        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        /*
+        Get correct instance of plugin data, necessary for settings names and health among other things
+         */
+        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
+        /*
+        Handle name, variable as per stacking rules
+         */
+        setCustomName(name);
+        /*
+        Handle health, max is variable as per stacking rules
+        Currently #setHealth() resets the health back to maximum
+         */
+        setMaxHealth(eliteMobProperties);
+        setHealth();
+        /*
+        Set the armor
+         */
+        setArmor();
+        /*
+        Register whether or not the elite mob is natural
+         */
+        this.isNaturalEntity = EntityTracker.isNaturalEntity(livingEntity);
+        /*
+        These have custom powers
+         */
+        this.hasCustomPowers = true;
+        /*
+        Start tracking the entity
+         */
+        EntityTracker.registerEliteMob(this);
+
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
+            eliteMob.setCanPickupItems(false);
+
+    }
+
     /*
     This is the generic constructor for elite mobs spawned via commands
      */
@@ -134,9 +195,6 @@ public class EliteMobEntity {
          */
         setArmor();
         /*
-        Set whether or not the entity should be altered
-         */
-        /*
         Register whether or not the elite mob is natural
         All mobs spawned via commands are considered natural
          */
@@ -150,7 +208,8 @@ public class EliteMobEntity {
          */
         EntityTracker.registerEliteMob(new EliteMobEntity(livingEntity, this.eliteMobLevel));
 
-        eliteMob.setCanPickupItems(false);
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
+            eliteMob.setCanPickupItems(false);
 
     }
 
@@ -159,6 +218,14 @@ public class EliteMobEntity {
                 eliteMobProperties.getName().replace(
                         "$level", eliteMobLevel + ""));
         eliteMob.setCustomName(this.name);
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
+            eliteMob.setCustomNameVisible(true);
+    }
+
+    private void setCustomName(String name) {
+        this.name = ChatColorConverter.convert(name);
+        this.getLivingEntity().setCustomName(this.name);
+        this.hasCustomName = true;
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
             eliteMob.setCustomNameVisible(true);
     }
@@ -285,13 +352,8 @@ public class EliteMobEntity {
         //apply major powers
         applyPowers((HashSet<ElitePower>) eliteMobProperties.getValidMajorPowers().clone(), availableMajorPowers);
 
-        this.minorPowerCount = availableDefensivePowers + availableOffensivePowers + availableMiscellaneousPowers;
-        this.majorPowerCount = availableMajorPowers;
-
         MinorPowerPowerStance minorPowerStanceMath = new MinorPowerPowerStance(this);
-
-        MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
-        majorPowerPowerStance.itemEffect(eliteMob);
+        MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance(this);
 
     }
 
@@ -311,7 +373,31 @@ public class EliteMobEntity {
                 ElitePower selectedPower = localPowers.get(ThreadLocalRandom.current().nextInt(localPowers.size()));
                 this.powers.add(selectedPower);
                 localPowers.remove(selectedPower);
+                if (selectedPower instanceof MajorPower)
+                    this.majorPowerCount++;
+                if (selectedPower instanceof MinorPower)
+                    this.minorPowerCount++;
             }
+
+    }
+
+    public void setCustoMPowers(HashSet<ElitePower> elitePowers) {
+
+        this.powers = elitePowers;
+        for (ElitePower elitePower : elitePowers) {
+            if (elitePower instanceof MinorPower)
+                this.minorPowerCount++;
+            if (elitePower instanceof MajorPower)
+                this.majorPowerCount++;
+        }
+
+        if (this.minorPowerCount > 0) {
+            MinorPowerPowerStance minorPowerStanceMath = new MinorPowerPowerStance(this);
+        }
+
+        if (this.majorPowerCount > 0) {
+            MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance(this);
+        }
 
     }
 
@@ -331,7 +417,7 @@ public class EliteMobEntity {
         return this.minorPowerCount;
     }
 
-    public int majorPowerCount() {
+    public int getMajorPowerCount() {
         return this.majorPowerCount;
     }
 

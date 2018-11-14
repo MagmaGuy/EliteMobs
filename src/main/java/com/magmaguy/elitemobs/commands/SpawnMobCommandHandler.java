@@ -16,6 +16,15 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.events.mobs.*;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.mobpowers.ElitePower;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
@@ -25,6 +34,7 @@ import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
 
@@ -36,45 +46,44 @@ public class SpawnMobCommandHandler {
     public static void spawnMob(CommandSender commandSender, String[] args) {
 
         Location location = getLocation(commandSender, args);
+        if (location == null) return;
+
         EntityType entityType = getEntityType(commandSender, args);
+        if (entityType == null) return;
+
         Integer mobLevel = getLevel(commandSender, args);
+        if (mobLevel == null) return;
 
-        if (location == null || entityType == null) return;
+        HashSet<ElitePower> mobPowers = getPowers(commandSender, args);
 
-        ArrayList<String> mobPowers = getPowers(commandSender, args);
-
-        spawnEliteMob(mobLevel, entityType, location, mobPowers, commandSender);
+        LivingEntity eliteMob = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
+        EliteMobEntity eliteMobEntity = new EliteMobEntity(eliteMob, mobLevel, mobPowers);
 
     }
 
     private static Location getLocation(CommandSender commandSender, String args[]) {
 
-        Location location = null;
+        if (commandSender instanceof Player)
+            return getLocation((Player) commandSender);
 
-        if (commandSender instanceof Player) {
 
-            location = ((Player) commandSender).getTargetBlock(null, 30).getLocation().add(0.5, 1, 0.5);
-
-        } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
+        if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
 
             World world = null;
 
             try {
 
-                for (World worldIterator : validWorldList) {
-
-                    if (worldIterator.getName().equals(args[1])) {
-
+                for (World worldIterator : validWorldList)
+                    if (worldIterator.getName().equals(args[1]))
                         world = worldIterator;
-
-                    }
-
-                }
 
             } catch (Exception e) {
 
-                commandSender.sendMessage("[EliteMobs] Error when trying to obtain world name of console / command" +
-                        "block spawned Elite Mob");
+                commandSender.sendMessage("[EliteMobs] Invalid world name when summoning Elite Mob.");
+                commandSender.sendMessage("[EliteMobs] Valid worlds:");
+                for (World worldIterator : validWorldList)
+                    commandSender.sendMessage(worldIterator.getName());
+                commandSender.sendMessage("[EliteMobs] Is your world enabled in the ValidWorlds.yml config file?");
                 return null;
 
             }
@@ -89,27 +98,26 @@ public class SpawnMobCommandHandler {
 
             } catch (Exception e) {
 
-                commandSender.sendMessage("[EliteMobs] Error when trying to obtain X Y Z coordinates of console / " +
-                        "command block spawned Elite Mob");
+                commandSender.sendMessage("[EliteMobs] Invalid X Y Z coordinates.");
                 return null;
 
             }
 
-            location = new Location(world, xCoord, yCoord, zCoord);
+            return new Location(world, xCoord, yCoord, zCoord);
 
         }
 
-        return location;
+        return null;
 
     }
 
-    private static final String VALID_MOB_TYPES = "Valid mob types: blaze, cavespider, creeper, enderman, endermite, husk," +
-            " irongolem, pigzombie, polarbear, silverfish, skeleton, spider, stray, witch, witherskeleton," +
-            "zombie, chicken, cow, mushroomcow, pig, sheep";
+    private static Location getLocation(Player player) {
+        return player.getTargetBlock(null, 30).getLocation().add(0.5, 1, 0.5);
+    }
+
 
     private static EntityType getEntityType(CommandSender commandSender, String args[]) {
 
-        EntityType entityType = null;
         String entityInput = "";
 
         if (commandSender instanceof Player) {
@@ -120,8 +128,11 @@ public class SpawnMobCommandHandler {
 
             } catch (Exception e) {
 
-                commandSender.sendMessage("[EliteMobs] Error tryin to obtain mob type.");
-                commandSender.sendMessage(VALID_MOB_TYPES);
+                commandSender.sendMessage("[EliteMobs] Error trying to obtain mob type.");
+                String validEntities = "";
+                for (EntityType entities : EliteMobProperties.getValidMobTypes())
+                    validEntities += entities + ", ";
+                commandSender.sendMessage("[EliteMobs] Valid mob types:" + validEntities);
 
             }
 
@@ -136,92 +147,22 @@ public class SpawnMobCommandHandler {
             } catch (Exception e) {
 
                 commandSender.sendMessage("[EliteMobs] Error trying to obtain mob type.");
-                commandSender.sendMessage(VALID_MOB_TYPES);
+                String validEntities = "";
+                for (EntityType entities : EliteMobProperties.getValidMobTypes())
+                    validEntities += entities + ", ";
+                commandSender.sendMessage("[EliteMobs] Valid mob types:" + validEntities);
 
             }
 
-
         }
 
-        switch (entityInput) {
-
-            case "blaze":
-                entityType = EntityType.BLAZE;
-                break;
-            case "cavespider":
-                entityType = EntityType.CAVE_SPIDER;
-                break;
-            case "creeper":
-                entityType = EntityType.CREEPER;
-                break;
-            case "enderman":
-                entityType = EntityType.ENDERMAN;
-                break;
-            case "endermite":
-                entityType = EntityType.ENDERMITE;
-                break;
-            case "husk":
-                entityType = EntityType.HUSK;
-                break;
-            case "irongolem":
-                entityType = EntityType.IRON_GOLEM;
-                break;
-            case "pigzombie":
-                entityType = EntityType.PIG_ZOMBIE;
-                break;
-            case "polarbear":
-                entityType = EntityType.POLAR_BEAR;
-                break;
-            case "silverfish":
-                entityType = EntityType.SILVERFISH;
-                break;
-            case "skeleton":
-                entityType = EntityType.SKELETON;
-                break;
-            case "spider":
-                entityType = EntityType.SPIDER;
-                break;
-            case "stray":
-                entityType = EntityType.STRAY;
-                break;
-            case "vex":
-                entityType = EntityType.VEX;
-                break;
-            case "witch":
-                entityType = EntityType.WITCH;
-                break;
-            case "witherskeleton":
-                entityType = EntityType.WITHER_SKELETON;
-                break;
-            case "zombie":
-                entityType = EntityType.ZOMBIE;
-                break;
-            case "chicken":
-                entityType = EntityType.CHICKEN;
-                break;
-            case "cow":
-                entityType = EntityType.COW;
-                break;
-            case "mushroomcow":
-                entityType = EntityType.MUSHROOM_COW;
-                break;
-            case "pig":
-                entityType = EntityType.PIG;
-                break;
-            case "sheep":
-                entityType = EntityType.SHEEP;
-                break;
-            case "vindicator":
-                entityType = EntityType.VINDICATOR;
-            default:
-                commandSender.sendMessage("Could not spawn mob type " + entityInput +
-                        " If this is incorrect, please contact the dev.");
-                commandSender.sendMessage(VALID_MOB_TYPES);
-                break;
-
+        try {
+            return EntityType.valueOf(entityInput.toUpperCase());
+        } catch (Exception ex) {
+            commandSender.sendMessage("[EliteMobs] Could not spawn mob type " + entityInput +
+                    " If this is incorrect, please contact the dev.");
+            return null;
         }
-
-        return entityType;
 
     }
 
@@ -231,44 +172,39 @@ public class SpawnMobCommandHandler {
 
         if (commandSender instanceof Player) {
 
-            if (args.length > 2) {
+            try {
 
-                try {
+                mobLevel = Integer.valueOf(args[2]);
 
-                    mobLevel = Integer.valueOf(args[2]);
+            } catch (Error error) {
 
-                } catch (Error error) {
-
-                    commandSender.sendMessage("Error assigning mob level to Elite Mob. Mob level must be above 0.");
-
-                }
+                commandSender.sendMessage("Error assigning mob level to Elite Mob. Mob level must be above 0.");
 
             }
 
 
         } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
 
-            if (args.length > 6) {
+            try {
 
-                try {
+                mobLevel = Integer.valueOf(args[6]);
 
-                    mobLevel = Integer.valueOf(args[6]);
+            } catch (Error error) {
 
-                } catch (Error error) {
-
-                    commandSender.sendMessage("Error assigning mob level to Elite Mob. Mob level must be above 0.");
-
-                }
+                commandSender.sendMessage("Error assigning mob level to Elite Mob. Mob level must be above 0.");
 
             }
 
         }
 
+        if (mobLevel < 1)
+            mobLevel = 1;
+
         return mobLevel;
 
     }
 
-    private static ArrayList<String> getPowers(CommandSender commandSender, String args[]) {
+    private static HashSet<ElitePower> getPowers(CommandSender commandSender, String args[]) {
 
         ArrayList<String> mobPowers = new ArrayList();
 
@@ -281,11 +217,8 @@ public class SpawnMobCommandHandler {
                 for (String arg : args) {
 
                     //mob powers start after arg 2
-                    if (index > 2) {
-
+                    if (index > 2)
                         mobPowers.add(arg);
-
-                    }
 
                     index++;
 
@@ -302,11 +235,8 @@ public class SpawnMobCommandHandler {
                 for (String arg : args) {
 
                     //mob powers start after arg 6
-                    if (index > 6) {
-
+                    if (index > 6)
                         mobPowers.add(arg);
-
-                    }
 
                     index++;
 
@@ -316,199 +246,119 @@ public class SpawnMobCommandHandler {
 
         }
 
-        return mobPowers;
+        return getPowers(mobPowers, commandSender);
 
     }
 
-    private static Entity spawnEliteMob(int mobLevel, EntityType mobType, Location location, ArrayList<String> mobPowers, CommandSender commandSender) {
+    private static HashSet<ElitePower> getPowers(ArrayList<String> mobPowers, CommandSender commandSender) {
 
+        HashSet<ElitePower> elitePowers = new HashSet<>();
 
-        LivingEntity entity = (LivingEntity) location.getWorld().spawnEntity(location, mobType);
+        if (mobPowers.size() > 0) {
 
-//        if (mobType == EntityType.CHICKEN || mobType == EntityType.COW || mobType == EntityType.MUSHROOM_COW ||
-//                mobType == EntityType.PIG || mobType == EntityType.SHEEP) {
-//
-//            HealthHandler.passiveHealthHandler(entity, ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT));
-//            NameHandler.customPassiveName(entity);
-//
-//            return entity;
-//
-//        } else {
-//
-//            if (mobLevel > 0) {
-//
-//                MetadataHandler.registerMetadata(entity, MetadataHandler.ELITE_MOB_MD, mobLevel);
-//                applyPowers(entity, mobPowers, commandSender);
-//
-//                AggressiveEliteMobConstructor.constructAggressiveEliteMob(entity);
-//
-//            } else {
-//
-//                commandSender.sendMessage("[EliteMobs] Elite Mob level must be over 0!");
-//
-//            }
-//
-//        }
-//
-//        EntityTracker.registerNaturalEntity(entity);
+            for (String string : mobPowers) {
 
-        return entity;
+                switch (string.toLowerCase()) {
+                    //major powers
+                    case "zombiefriends":
+                        elitePowers.add(new ZombieFriends());
+                        break;
+                    case "zombienecronomicon":
+                        elitePowers.add(new ZombieNecronomicon());
+                        break;
+                    case "zombieteamrocket":
+                        elitePowers.add(new ZombieTeamRocket());
+                        break;
+                    case "zombieparents":
+                        elitePowers.add(new ZombieParents());
+                        break;
+                    case "zombiebloat":
+                        elitePowers.add(new ZombieBloat());
+                        break;
+                    case "skeletontrackingarrow":
+                        elitePowers.add(new SkeletonTrackingArrow());
+                        break;
+                    case "skeletonpillar":
+                        elitePowers.add(new SkeletonPillar());
+                        break;
+                    //minor powers
+                    case "attackarrow":
+                        elitePowers.add(new AttackArrow());
+                        break;
+                    case "attackblinding":
+                        elitePowers.add(new AttackBlinding());
+                        break;
+                    case "attackconfusing":
+                        elitePowers.add(new AttackConfusing());
+                        break;
+                    case "attackfire":
+                        elitePowers.add(new AttackConfusing());
+                        break;
+                    case "attackfireball":
+                        elitePowers.add(new AttackFireball());
+                        break;
+                    case "attackfreeze":
+                        elitePowers.add(new AttackFreeze());
+                        break;
+                    case "attackgravity":
+                        elitePowers.add(new AttackGravity());
+                        break;
+                    case "attackpoison":
+                        elitePowers.add(new AttackPoison());
+                        break;
+                    case "attackpush":
+                        elitePowers.add(new AttackPush());
+                        break;
+                    case "attackweakness":
+                        elitePowers.add(new AttackWeakness());
+                        break;
+                    case "attackweb":
+                        elitePowers.add(new AttackWeb());
+                        break;
+                    case "attackwither":
+                        elitePowers.add(new AttackWither());
+                        break;
+                    case "bonusloot":
+                        elitePowers.add(new BonusLoot());
+                        break;
+                    case "invisibility":
+                        elitePowers.add(new Invisibility());
+                        break;
+                    case "invulnerabilityarrow":
+                        elitePowers.add(new InvulnerabilityArrow());
+                        break;
+                    case "invulnerabilityfalldamage":
+                        elitePowers.add(new InvulnerabilityFallDamage());
+                        break;
+                    case "invulnerabilityfire":
+                        elitePowers.add(new InvulnerabilityFire());
+                        break;
+                    case "invulnerabilityknockback":
+                        elitePowers.add(new InvulnerabilityKnockback());
+                        break;
+                    case "movementspeed":
+                        elitePowers.add(new MovementSpeed());
+                        break;
+                    case "taunt":
+                        elitePowers.add(new Taunt());
+                        break;
+                    default:
+                        commandSender.sendMessage(string + " is not a valid power.");
+                        commandSender.sendMessage("Valid powers: attackarrow, attackblinding, attackconfusing," +
+                                " attackfire, attackfireball, attackfreeze,attackgravity, attackpoison, attackpush, " +
+                                "attackweakness, attackweb, attackwither, bonusloot, invisibility, invulnerabilityarrow," +
+                                "invulnerabilityfalldamage, invulnerabilityfire, invulnerabilityknockback, movementspeed," +
+                                "taunt, zombiefriends, zombienecronomicon, zombieteamrocket, zombieteamrocket, zombieparents," +
+                                "zombiebloat, skeletontrackingarrow, skeletonpillar");
+                        break;
 
-    }
+                }
 
-    private static void applyPowers(LivingEntity entity, ArrayList<String> mobPowers, CommandSender commandSender) {
+            }
 
-//        if (mobPowers.size() > 0) {
-//
-//            for (String string : mobPowers) {
-//
-//                switch (string) {
-//                    //major powers
-//                    case MetadataHandler.ZOMBIE_FRIENDS_H:
-//                        if (entity instanceof Zombie) {
-//                            ZombieFriends zombieFriends = new ZombieFriends();
-//                            zombieFriends.applyPowers(entity);
-//                        }
-//                        break;
-//                    case MetadataHandler.ZOMBIE_NECRONOMICON_H:
-//                        if (entity instanceof Zombie) {
-//                            ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
-//                            zombieNecronomicon.applyPowers(entity);
-//                        }
-//                        break;
-//                    case MetadataHandler.ZOMBIE_TEAM_ROCKET_H:
-//                        if (entity instanceof Zombie) {
-//                            ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
-//                            zombieTeamRocket.applyPowers(entity);
-//                        }
-//                        break;
-//                    case MetadataHandler.ZOMBIE_PARENTS_H:
-//                        if (entity instanceof Zombie) {
-//                            ZombieParents zombieParents = new ZombieParents();
-//                            zombieParents.applyPowers(entity);
-//                        }
-//                        break;
-//                    case MetadataHandler.ZOMBIE_BLOAT_H:
-//                        if (entity instanceof Zombie) {
-//                            ZombieBloat zombieBloat = new ZombieBloat();
-//                            zombieBloat.applyPowers(entity);
-//                        }
-//                        break;
-//                    case MetadataHandler.SKELETON_TRACKING_ARROW_H:
-//                        if (entity instanceof Skeleton) {
-//                            SkeletonTrackingArrow skeletonTrackingArrow = new SkeletonTrackingArrow();
-//                            skeletonTrackingArrow.applyPowers(entity);
-//                        }
-//                    case MetadataHandler.SKELETON_PILLAR_H:
-//                        if (entity instanceof Skeleton) {
-//                            SkeletonPillar skeletonPillar = new SkeletonPillar();
-//                            skeletonPillar.applyPowers(entity);
-//                        }
-//                        //minor powers
-//                    case MetadataHandler.ATTACK_ARROW_H:
-//                        AttackArrow attackArrow = new AttackArrow();
-//                        attackArrow.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_BLINDING_H:
-//                        AttackBlinding attackBlinding = new AttackBlinding();
-//                        attackBlinding.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_CONFUSING_H:
-//                        AttackConfusing attackConfusing = new AttackConfusing();
-//                        attackConfusing.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_FIRE_H:
-//                        AttackFire attackFire = new AttackFire();
-//                        attackFire.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_FIREBALL_H:
-//                        AttackFireball attackFireball = new AttackFireball();
-//                        attackFireball.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_FREEZE_H:
-//                        AttackFreeze attackFreeze = new AttackFreeze();
-//                        attackFreeze.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_GRAVITY_H:
-//                        AttackGravity attackGravity = new AttackGravity();
-//                        attackGravity.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_POISON_H:
-//                        AttackPoison attackPoison = new AttackPoison();
-//                        attackPoison.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_PUSH_H:
-//                        AttackPush attackPush = new AttackPush();
-//                        attackPush.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_WEAKNESS_H:
-//                        AttackWeakness attackWeakness = new AttackWeakness();
-//                        attackWeakness.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_WEB_H:
-//                        AttackWeb attackWeb = new AttackWeb();
-//                        attackWeb.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.ATTACK_WITHER_H:
-//                        AttackWither attackWither = new AttackWither();
-//                        attackWither.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.BONUS_LOOT_H:
-//                        BonusLoot bonusLoot = new BonusLoot();
-//                        bonusLoot.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.INVISIBILITY_H:
-//                        Invisibility invisibility = new Invisibility();
-//                        invisibility.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.INVULNERABILITY_ARROW_H:
-//                        InvulnerabilityArrow invulnerabilityArrow = new InvulnerabilityArrow();
-//                        invulnerabilityArrow.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.INVULNERABILITY_FALL_DAMAGE_H:
-//                        InvulnerabilityFallDamage invulnerabilityFallDamage = new InvulnerabilityFallDamage();
-//                        invulnerabilityFallDamage.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.INVULNERABILITY_FIRE_H:
-//                        InvulnerabilityFire invulnerabilityFire = new InvulnerabilityFire();
-//                        invulnerabilityFire.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.INVULNERABILITY_KNOCKBACK_H:
-//                        InvulnerabilityKnockback invulnerabilityKnockback = new InvulnerabilityKnockback();
-//                        invulnerabilityKnockback.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.MOVEMENT_SPEED_H:
-//                        MovementSpeed movementSpeed = new MovementSpeed();
-//                        movementSpeed.applyPowers(entity);
-//                        break;
-//                    case MetadataHandler.TAUNT_H:
-//                        Taunt taunt = new Taunt();
-//                        taunt.applyPowers(entity);
-//                        break;
-//                    case "custom":
-//                        MetadataHandler.registerMetadata(entity, MetadataHandler.CUSTOM_POWERS_MD, true);
-//                        break;
-//                    case "display":
-//                        entity.setAI(false);
-//                        entity.setRemoveWhenFarAway(false);
-//                        DisplayMob.nameEncoder(entity);
-//                        break;
-//                    default:
-//                        commandSender.sendMessage(string + " is not a valid power.");
-//                        commandSender.sendMessage("Valid powers: " + MetadataHandler.powerListHumanFormat + MetadataHandler.majorPowerList + " custom");
-//                        break;
-//
-//                }
-//
-//            }
-//
-//            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-//            MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance();
-//
-//            minorPowerPowerStance.itemEffect(entity);
-//            majorPowerPowerStance.itemEffect(entity);
-//
-//        }
+        }
+
+        return elitePowers;
 
     }
 

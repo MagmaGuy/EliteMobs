@@ -1,14 +1,12 @@
 package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.Invisibility;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityArrow;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFallDamage;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityKnockback;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
@@ -19,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 
@@ -29,7 +28,6 @@ public class MinorPowerPowerStance implements Listener {
 
     public static int trackAmount = 2;
     public static int individualEffectsPerTrack = 2;
-    private ArrayList<Object> effectsList = new ArrayList<>();
     private EliteMobEntity eliteMobEntity;
 
     //Secondary effect item processing
@@ -44,87 +42,102 @@ public class MinorPowerPowerStance implements Listener {
         this.eliteMobEntity = eliteMobEntity;
         if (eliteMobEntity.hasMinorVisualEffect()) return;
 
-        for (int i = 0; i < trackAmount; i++)
-            for (int k = 0; k < individualEffectsPerTrack; k++)
-                addAllEffects();
-
-        if (effectsList.size() < 1)
+        if (eliteMobEntity.getMinorPowerCount() < 1)
             return;
 
-        Object[][] multiDimensionalTrailTracker = new Object[trackAmount][effectsList.size()];
+        Object[][] multiDimensionalTrailTracker = new Object[trackAmount][eliteMobEntity.getMinorPowerCount() * individualEffectsPerTrack];
 
-        for (int i = 0; i < trackAmount; i++)
-            for (int j = 0; j < effectsList.size(); j++)
-                multiDimensionalTrailTracker[i][j] = effectsList.get(j);
+        for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
+            ArrayList<Object> localObjects = new ArrayList<>();
+            for (int a = 0; a < multiDimensionalTrailTracker.length; a++)
+                localObjects.addAll(addAllEffects());
+            for (int j = 0; j < multiDimensionalTrailTracker[0].length; j++)
+                if (localObjects.get(j) != null)
+                    multiDimensionalTrailTracker[i][j] = localObjects.get(j);
+        }
+
+        eliteMobEntity.setHasMinorVisualEffect(true);
 
         VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
                 MinorPowerStanceMath.cachedVectors, eliteMobEntity.hasMinorVisualEffect(),
-                MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, individualEffectsPerTrack, eliteMobEntity);
+                MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
 
     }
 
-    private void addAllEffects() {
+    private ArrayList<Object> addAllEffects() {
+
+        ArrayList<Object> effects = new ArrayList<>();
+
         for (ElitePower elitePower : eliteMobEntity.getPowers()) {
 
             if (elitePower instanceof AttackArrow)
-                addEffect(Material.ARROW);
+                effects.add(addEffect(Material.ARROW));
 
             if (elitePower instanceof AttackBlinding)
-                addEffect(Material.EYE_OF_ENDER);
+                effects.add(addEffect(Material.EYE_OF_ENDER));
+
+            if (elitePower instanceof AttackConfusing)
+                effects.add(addEffect(Particle.SPELL_MOB));
 
             if (elitePower instanceof AttackFire)
-                addEffect(Material.LAVA_BUCKET);
+                effects.add(addEffect(Material.LAVA_BUCKET));
 
             if (elitePower instanceof AttackFireball)
-                addEffect(Material.FIREBALL);
+                effects.add(addEffect(Material.FIREBALL));
 
             if (elitePower instanceof AttackFreeze)
-                addEffect(Material.PACKED_ICE);
+                effects.add(addEffect(Material.PACKED_ICE));
 
             if (elitePower instanceof AttackGravity)
-                addEffect(Material.ELYTRA);
+                effects.add(addEffect(Material.ELYTRA));
 
             if (elitePower instanceof AttackPoison)
-                addEffect(Material.EMERALD);
+                effects.add(addEffect(Material.EMERALD));
 
             if (elitePower instanceof AttackPush)
-                addEffect(Material.PISTON_BASE);
+                effects.add(addEffect(Material.PISTON_BASE));
 
             if (!VersionChecker.currentVersionIsUnder(11, 0))
                 if (elitePower instanceof AttackWeakness)
-                    addEffect(Material.TOTEM);
+                    effects.add(addEffect(Material.TOTEM));
 
             if (elitePower instanceof AttackWeb)
-                addEffect(Material.WEB);
+                effects.add(addEffect(Material.WEB));
 
             if (elitePower instanceof AttackWither)
-                addEffect(Material.SKULL_ITEM);
+                effects.add(addEffect(Material.SKULL_ITEM));
 
             if (elitePower instanceof BonusLoot)
-                addEffect(Material.CHEST);
-
-            if (elitePower instanceof Invisibility)
-                addEffect(Material.THIN_GLASS);
-
-            if (elitePower instanceof InvulnerabilityArrow)
-                addEffect(Material.SPECTRAL_ARROW);
-
-            if (elitePower instanceof InvulnerabilityFallDamage)
-                addEffect(Material.FEATHER);
-
-            if (elitePower instanceof InvulnerabilityKnockback)
-                addEffect(Material.ANVIL);
+                effects.add(addEffect(Material.CHEST));
 
             if (elitePower instanceof MovementSpeed)
-                addEffect(Material.GOLD_BOOTS);
+                effects.add(addEffect(Material.GOLD_BOOTS));
 
             if (elitePower instanceof Taunt)
-                addEffect(Material.JUKEBOX);
+                effects.add(addEffect(Material.JUKEBOX));
+
+            if (elitePower instanceof Invisibility)
+                effects.add(addEffect(Material.THIN_GLASS));
+
+            if (elitePower instanceof InvulnerabilityArrow)
+                effects.add(addEffect(Material.SPECTRAL_ARROW));
+
+            if (elitePower instanceof InvulnerabilityFallDamage)
+                effects.add(addEffect(Material.FEATHER));
+
+            if (elitePower instanceof InvulnerabilityFire)
+                effects.add(addEffect(Particle.FLAME));
+
+            if (elitePower instanceof InvulnerabilityKnockback)
+                effects.add(addEffect(Material.ANVIL));
 
         }
+
+        return effects;
+
     }
 
-    private void addEffect(Material material) {
+    private Object addEffect(Material material) {
 
         Item item = eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
                 new ItemStack(material));
@@ -133,14 +146,13 @@ public class MinorPowerPowerStance implements Listener {
             item.setGravity(false);
         item.setInvulnerable(true);
         EntityTracker.registerItemVisualEffects(item);
-        effectsList.add(item);
+        item.setMetadata("VisualEffect", new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        return item;
 
     }
 
-    private void addEffect(Particle particle) {
-
-        effectsList.add(particle);
-
+    private Object addEffect(Particle particle) {
+        return particle;
     }
 
 }

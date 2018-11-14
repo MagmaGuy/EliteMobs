@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
-import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,20 +15,21 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 public class EntityTracker implements Listener {
 
     /*
     These HashSets track basically everything for live plugin entities
      */
-    private static HashMap<World, HashSet<LivingEntity>> superMobs = new HashMap<>();
-    private static HashMap<World, HashSet<EliteMobEntity>> eliteMobs = new HashMap<>();
+    private static HashSet<LivingEntity> superMobs = new HashSet<>();
+    private static HashSet<EliteMobEntity> eliteMobs = new HashSet<>();
+    private static HashSet<LivingEntity> eliteMobsLivingEntities = new HashSet<>();
 
-    private static HashMap<World, HashSet<LivingEntity>> naturalEntities = new HashMap<>();
-    private static HashMap<World, HashSet<ArmorStand>> armorStands = new HashMap<>();
-    private static HashMap<World, HashSet<Item>> itemVisualEffects = new HashMap<>();
+    private static HashSet<LivingEntity> naturalEntities = new HashSet<>();
+    private static HashSet<ArmorStand> armorStands = new HashSet<>();
+    private static HashSet<Item> itemVisualEffects = new HashSet<>();
 
     /*
     This HashSet shouldn't really be scanned during runtime for aside from the occasional updates, it mostly exists to
@@ -41,7 +41,8 @@ public class EntityTracker implements Listener {
     Starts tracking elite mobs
      */
     public static void registerEliteMob(EliteMobEntity eliteMobEntity) {
-        genericHashMapHashSetAdder(eliteMobs, eliteMobEntity.getLivingEntity().getWorld(), eliteMobEntity);
+        eliteMobs.add(eliteMobEntity);
+        eliteMobsLivingEntities.add(eliteMobEntity.getLivingEntity());
         registerCullableEntity(eliteMobEntity.getLivingEntity());
     }
 
@@ -50,7 +51,7 @@ public class EntityTracker implements Listener {
      */
     public static void registerSuperMob(LivingEntity livingEntity) {
         if (!SuperMobProperties.isValidSuperMobType(livingEntity)) return;
-        genericHashMapHashSetAdder(superMobs, livingEntity.getWorld(), livingEntity);
+        superMobs.add(livingEntity);
     }
 
     /*
@@ -58,33 +59,18 @@ public class EntityTracker implements Listener {
      */
     public static void registerNaturalEntity(LivingEntity entity) {
         if (!EliteMobProperties.isValidEliteMobType(entity)) return;
-        genericHashMapHashSetAdder(naturalEntities, entity.getWorld(), entity);
+        naturalEntities.add(entity);
     }
 
 
     public static void registerArmorStands(ArmorStand armorStand) {
-        genericHashMapHashSetAdder(armorStands, armorStand.getWorld(), armorStand);
+        armorStands.add(armorStand);
         registerCullableEntity(armorStand);
     }
 
     public static void registerItemVisualEffects(Item item) {
-        genericHashMapHashSetAdder(itemVisualEffects, item.getWorld(), item);
+        itemVisualEffects.add(item);
         registerCullableEntity(item);
-    }
-
-    private static HashMap genericHashMapHashSetAdder(HashMap hashMap, Object world, Object object) {
-
-        HashSet hashSet = new HashSet();
-
-        if (hashMap.containsKey(world))
-            hashSet = (HashSet) hashMap.get(world);
-
-        hashSet.add(object);
-
-        hashMap.put(world, hashSet);
-
-        return hashMap;
-
     }
 
     /*
@@ -112,101 +98,85 @@ public class EntityTracker implements Listener {
     }
 
     private static void updateSuperMobs() {
-        HashMap<World, HashSet<LivingEntity>> cloneSet = (HashMap<World, HashSet<LivingEntity>>) superMobs.clone();
-        for (HashSet<LivingEntity> hashSet : cloneSet.values()) {
-            for (LivingEntity livingEntity : (HashSet<LivingEntity>) hashSet.clone())
-                if (!livingEntity.isValid())
-                    superMobs.get(livingEntity.getWorld()).remove(livingEntity);
+        Iterator iterator = superMobs.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if (!entity.isValid())
+                iterator.remove();
         }
     }
 
     private static void updateLivingEntities() {
-        HashMap<World, HashSet<LivingEntity>> cloneSet = (HashMap<World, HashSet<LivingEntity>>) naturalEntities.clone();
-        for (HashSet<LivingEntity> hashSet : cloneSet.values()) {
-            for (LivingEntity livingEntity : (HashSet<LivingEntity>) hashSet.clone())
-                if (!livingEntity.isValid())
-                    naturalEntities.get(livingEntity.getWorld()).remove(livingEntity);
+        Iterator iterator = naturalEntities.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if (!entity.isValid())
+                iterator.remove();
         }
     }
 
     private static void updateEliteMobEntities() {
-        HashMap<World, HashSet<EliteMobEntity>> cloneSet = (HashMap<World, HashSet<EliteMobEntity>>) eliteMobs.clone();
-        for (HashSet<EliteMobEntity> hashSet : cloneSet.values())
-            for (EliteMobEntity eliteMobEntity : (HashSet<EliteMobEntity>) hashSet.clone())
-                if (eliteMobEntity.getLivingEntity().isDead() ||
-                        !eliteMobEntity.getLivingEntity().isValid() && eliteMobEntity.getLivingEntity().getRemoveWhenFarAway())
-                    eliteMobs.get(eliteMobEntity.getLivingEntity().getWorld()).remove(eliteMobEntity);
+        Iterator iterator = eliteMobs.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = ((EliteMobEntity) iterator.next()).getLivingEntity();
+            if (entity.isDead() ||
+                    !entity.isValid() && ((LivingEntity) entity).getRemoveWhenFarAway())
+                iterator.remove();
+        }
     }
 
     private static void updateAmorStands() {
-        HashMap<World, HashSet<ArmorStand>> cloneSet = (HashMap<World, HashSet<ArmorStand>>) armorStands.clone();
-        for (HashSet<ArmorStand> hashSet : cloneSet.values())
-            for (ArmorStand armorStand : (HashSet<ArmorStand>) hashSet.clone())
-                if (!armorStand.isValid())
-                    unregisterArmorStand(armorStand);
+        Iterator iterator = armorStands.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if (!entity.isValid())
+                iterator.remove();
+        }
     }
 
     private static void updateCullables() {
-        HashSet<Entity> cloneSet = (HashSet<Entity>) cullablePluginEntities.clone();
-        for (Entity entity : (HashSet<Entity>) cloneSet.clone())
+        Iterator iterator = cullablePluginEntities.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
             if (!entity.isValid())
-                cullablePluginEntities.remove(entity);
+                iterator.remove();
+        }
     }
 
     private static void updateItems() {
-        HashMap<World, HashSet<Item>> cloneSet = (HashMap<World, HashSet<Item>>) itemVisualEffects.clone();
-        for (HashSet<Item> hashSet : cloneSet.values())
-            for (Item item : (HashSet<Item>) hashSet.clone())
-                if (!item.isValid())
-                    itemVisualEffects.remove(item);
+        Iterator iterator = itemVisualEffects.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if (!entity.isValid())
+                iterator.remove();
+        }
     }
 
     public static boolean isSuperMob(Entity entity) {
         if (!SuperMobProperties.isValidSuperMobType(entity)) return false;
-        return checkLivingEntityMap(superMobs, (LivingEntity) entity);
+        return superMobs.contains(entity);
     }
 
     public static boolean isEliteMob(Entity entity) {
         if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
-        return checkMap(eliteMobs, (LivingEntity) entity);
+        return eliteMobsLivingEntities.contains(entity);
     }
 
     public static EliteMobEntity getEliteMobEntity(Entity entity) {
         if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
-        return getMap(eliteMobs, entity);
+        for (EliteMobEntity eliteMobEntity : eliteMobs)
+            if (eliteMobEntity.getLivingEntity().equals(entity))
+                return eliteMobEntity;
+        return null;
     }
 
     public static boolean isNaturalEntity(Entity entity) {
         if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
-        return checkLivingEntityMap(naturalEntities, (LivingEntity) entity);
-    }
-
-    private static boolean checkLivingEntityMap(HashMap<World, HashSet<LivingEntity>> hashMap, LivingEntity livingEntity) {
-        if (hashMap.containsKey(livingEntity.getWorld()))
-            return hashMap.get(livingEntity.getWorld()).contains(livingEntity);
-        return false;
+        return naturalEntities.contains(entity);
     }
 
     public static boolean isItemVisualEffect(Entity entity) {
-        if (itemVisualEffects.containsKey(entity.getWorld()))
-            return itemVisualEffects.get(entity.getWorld()).contains(entity);
-        return false;
-    }
-
-    private static boolean checkMap(HashMap<World, HashSet<EliteMobEntity>> hashMap, LivingEntity livingEntity) {
-        if (hashMap.containsKey(livingEntity.getWorld()))
-            for (EliteMobEntity eliteMobEntity : hashMap.get(livingEntity.getWorld()))
-                if (eliteMobEntity.getLivingEntity().equals(livingEntity))
-                    return true;
-        return false;
-    }
-
-    private static EliteMobEntity getMap(HashMap<World, HashSet<EliteMobEntity>> hashMap, Entity entity) {
-        if (hashMap.containsKey(entity.getWorld()))
-            for (EliteMobEntity eliteMobEntity : hashMap.get(entity.getWorld()))
-                if (eliteMobEntity.getLivingEntity().equals(entity))
-                    return eliteMobEntity;
-        return null;
+        return (itemVisualEffects.contains(entity));
     }
 
     public static boolean hasPower(ElitePower mobPower, Entity entity) {
@@ -225,15 +195,15 @@ public class EntityTracker implements Listener {
     }
 
     public static void unregisterItemEntity(Item item) {
-        itemVisualEffects.get(item.getWorld()).remove(item);
+        itemVisualEffects.remove(item);
     }
 
     /*
     Used outside this class to remove individual elite mobs
      */
     public static void unregisterEliteMob(EliteMobEntity eliteMobEntity) {
-        eliteMobs.get(eliteMobEntity.getLivingEntity().getWorld()).remove(eliteMobEntity);
-        naturalEntities.get(eliteMobEntity.getLivingEntity().getWorld()).remove(eliteMobEntity.getLivingEntity());
+        eliteMobs.remove(eliteMobEntity);
+        naturalEntities.remove(eliteMobEntity.getLivingEntity());
         cullablePluginEntities.remove(eliteMobEntity.getLivingEntity());
     }
 
@@ -241,25 +211,25 @@ public class EntityTracker implements Listener {
     Used in this class to do mass wipes of data
      */
     private static void unregisterEliteMob(Entity entity) {
+        if (!isEliteMob(entity)) return;
         EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
         if (eliteMobEntity == null) return;
-        eliteMobs.get(eliteMobEntity.getLivingEntity().getWorld()).remove(eliteMobEntity);
+        eliteMobs.remove(eliteMobEntity);
+        eliteMobsLivingEntities.remove(eliteMobEntity.getLivingEntity());
     }
 
     public static void unregisterArmorStand(Entity armorStand) {
         if (!armorStand.getType().equals(EntityType.ARMOR_STAND)) return;
-        armorStands.get(armorStand.getWorld()).remove(armorStand);
+        armorStands.remove(armorStand);
     }
 
-    public static HashMap<World, HashSet<EliteMobEntity>> getEliteMobs() {
+    public static HashSet<EliteMobEntity> getEliteMobs() {
         return eliteMobs;
     }
 
     public static boolean getIsArmorStand(Entity entity) {
         if (!entity.getType().equals(EntityType.ARMOR_STAND)) return false;
-        if (armorStands.containsKey(entity.getWorld()))
-            return armorStands.get(entity.getWorld()).contains(entity);
-        return false;
+        return (armorStands.contains(entity));
     }
 
     public static void unregisterSuperMob(Entity entity) {
@@ -288,15 +258,20 @@ public class EntityTracker implements Listener {
     Natural entities get unregistered from being natural when exploit abuse is detected from the players
      */
     public static void unregisterNaturalEntity(LivingEntity livingEntity) {
-        HashSet<LivingEntity> entityHashSet = naturalEntities.get(livingEntity.getWorld());
-        entityHashSet.remove(livingEntity);
-        naturalEntities.put(livingEntity.getWorld(), entityHashSet);
+        naturalEntities.remove(livingEntity);
     }
 
     public static void shutdownPurger() {
 
         for (Entity entity : cullablePluginEntities)
             entity.remove();
+
+        eliteMobs.clear();
+        eliteMobsLivingEntities.clear();
+        superMobs.clear();
+        itemVisualEffects.clear();
+        armorStands.clear();
+        naturalEntities.clear();
 
     }
 
