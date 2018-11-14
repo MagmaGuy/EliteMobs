@@ -25,6 +25,8 @@ public class SuperMobScanner {
 
         for (World world : validWorldList) {
 
+            if (world.getLivingEntities() == null) continue;
+
             Iterator<LivingEntity> iterator = world.getLivingEntities().iterator();
 
             while (iterator.hasNext()) {

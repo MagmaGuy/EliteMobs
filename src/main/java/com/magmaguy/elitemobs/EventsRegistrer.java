@@ -35,7 +35,6 @@ import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawningProcessor;
 import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -120,7 +119,6 @@ public class EventsRegistrer {
 
         //Visual effects
         pluginManager.registerEvents(new EffectEventHandlers(), plugin);
-        pluginManager.registerEvents(new MajorPowerPowerStance(), plugin);
 
         //Loot
         if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_PLUGIN_LOOT)) {
@@ -136,8 +134,6 @@ public class EventsRegistrer {
         //Minecraft behavior canceller
         pluginManager.registerEvents(new ChunkUnloadMetadataPurge(), plugin);
         pluginManager.registerEvents(new EntityDeathMetadataFlusher(), plugin);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
-            pluginManager.registerEvents(new PreventMobItemPickup(), plugin);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
         //Prevent exploits

@@ -51,6 +51,7 @@ public class EffectEventHandlers implements Listener {
     public void itemDespawnPrevention(ItemDespawnEvent event) {
         if (EntityTracker.isItemVisualEffect(event.getEntity()))
             event.setCancelled(true);
+
     }
 
 }

@@ -10,27 +10,32 @@ public class BossMobEntity extends EliteMobEntity {
 
     public BossMobEntity(LivingEntity livingEntity, int eliteMobLevel, String name) {
 
-        super(livingEntity, eliteMobLevel);
-        setupBossMob(livingEntity, name);
+        super(livingEntity, eliteMobLevel, name);
+        setupBossMob(livingEntity);
 
     }
 
     public BossMobEntity(LivingEntity livingEntity, int eliteMobLevel, String name, HashSet<ElitePower> elitePowers) {
 
-        super(livingEntity, eliteMobLevel, elitePowers);
-        setupBossMob(livingEntity, name);
+        super(livingEntity, eliteMobLevel, name);
+        setupBossMob(livingEntity, elitePowers);
 
     }
 
-    private void setupBossMob(LivingEntity livingEntity, String name) {
+    private void setupBossMob(LivingEntity livingEntity) {
 
-        super.setName(name);
-        super.setHasCustomName(true);
         super.setHasStacking(false);
         super.setHasCustomArmor(true);
         super.setHasCustomPowers(true);
         super.setHasNormalLoot(true);
         BossMobDeathCountdown.startDeathCountdown(livingEntity);
+
+    }
+
+    private void setupBossMob(LivingEntity livingEntity, HashSet<ElitePower> elitePowers) {
+
+        setupBossMob(livingEntity);
+        super.setCustoMPowers(elitePowers);
 
     }
 

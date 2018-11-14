@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
@@ -13,9 +14,13 @@ public class EliteZombie extends EliteMobProperties {
 
     public EliteZombie() {
 
+        Bukkit.getLogger().info("Registering ZOMBIE");
+
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_ZOMBIE);
 
         this.entityType = EntityType.ZOMBIE;
+
+        this.defaultMaxHealth = 20;
 
         ZombieBloat zombieBloat = new ZombieBloat();
         ZombieFriends zombieFriends = new ZombieFriends();
@@ -23,8 +28,6 @@ public class EliteZombie extends EliteMobProperties {
         ZombieParents zombieParents = new ZombieParents();
         ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
         this.validMajorPowers = new HashSet<>(Arrays.asList(zombieBloat, zombieFriends, zombieNecronomicon, zombieParents, zombieTeamRocket));
-
-        if (!isEnabled) return;
 
         this.validDefensivePowers.addAll(super.getAllDefensivePowers());
         this.validOffensivePowers.addAll(super.getAllOffensivePowers());
