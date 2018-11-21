@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -10,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,27 +27,36 @@ public class SuperMobScanner {
 
         for (World world : validWorldList) {
 
-            if (world.getLivingEntities() == null) continue;
+            if (world.getLivingEntities().isEmpty()) continue;
 
             Iterator<LivingEntity> iterator = world.getLivingEntities().iterator();
 
-            while (iterator.hasNext()) {
+            new BukkitRunnable() {
 
-                LivingEntity livingEntity = iterator.next();
+                @Override
+                public void run() {
 
-                if (!SuperMobProperties.isValidSuperMobType(livingEntity)) continue;
+                    while (iterator.hasNext()) {
 
-                /*
-                Re-register lost passive mob
-                 */
-                checkLostSuperMob(livingEntity);
+                        LivingEntity livingEntity = iterator.next();
 
-                /*
-                Check passive mobs to register new super mobs
-                 */
-                newSuperMobScan(livingEntity);
+                        if (!SuperMobProperties.isValidSuperMobType(livingEntity)) continue;
 
-            }
+                        /*
+                        Re-register lost passive mob
+                        */
+                        checkLostSuperMob(livingEntity);
+
+                        /*
+                       Check passive mobs to register new super mobs
+                       */
+                        newSuperMobScan(livingEntity);
+
+                    }
+
+                }
+
+            }.runTaskAsynchronously(MetadataHandler.PLUGIN);
 
         }
 

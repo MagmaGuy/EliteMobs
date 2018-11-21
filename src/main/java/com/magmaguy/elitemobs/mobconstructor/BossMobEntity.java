@@ -24,9 +24,6 @@ public class BossMobEntity extends EliteMobEntity {
 
     private void setupBossMob(LivingEntity livingEntity) {
 
-        super.setHasStacking(false);
-        super.setHasCustomArmor(true);
-        super.setHasCustomPowers(true);
         super.setHasNormalLoot(true);
         BossMobDeathCountdown.startDeathCountdown(livingEntity);
 

@@ -28,7 +28,6 @@ public class ChunkUnloadMetadataPurge implements Listener {
 
     @EventHandler
     public void onUnload(ChunkUnloadEvent event) {
-
         EntityTracker.chunkWiper(event);
     }
 

@@ -163,7 +163,7 @@ public class EliteMobs extends JavaPlugin {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         new DynamicLoreUpdater().runTaskTimer(this, 20, 20 * 2);
 //        new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
-        EntityListUpdater.startUpdating();
+//        EntityListUpdater.startUpdating();
 
     }
 

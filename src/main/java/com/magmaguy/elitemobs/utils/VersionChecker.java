@@ -21,14 +21,14 @@ public class VersionChecker {
         if (Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) == version) {
             try {
 
-                Byte actualSubversion = Byte.parseByte(Bukkit.getBukkitVersion().split("[.]")[2].substring(0, 1));
+                byte actualSubversion = Byte.parseByte(Bukkit.getBukkitVersion().split("[.]")[2].substring(0, 1));
                 return actualSubversion < subVersion;
 
             } catch (Exception e) {
 
                 try {
 
-                    Byte actualSubversion = Byte.parseByte(Bukkit.getBukkitVersion().split("[.]")[2].substring(0, 0));
+                    byte actualSubversion = Byte.parseByte(Bukkit.getBukkitVersion().split("[.]")[2].substring(0, 0));
                     return actualSubversion < subVersion;
 
                 } catch (Exception ex) {

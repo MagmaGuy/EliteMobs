@@ -133,7 +133,7 @@ public class EventsRegistrer {
 
         //Minecraft behavior canceller
         pluginManager.registerEvents(new ChunkUnloadMetadataPurge(), plugin);
-        pluginManager.registerEvents(new EntityDeathMetadataFlusher(), plugin);
+        pluginManager.registerEvents(new EntityDeathDataFlusher(), plugin);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
         //Prevent exploits

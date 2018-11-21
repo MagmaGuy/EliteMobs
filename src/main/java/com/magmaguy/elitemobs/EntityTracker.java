@@ -86,14 +86,19 @@ public class EntityTracker implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                updateSuperMobs();
-                updateEliteMobEntities();
-                updateLivingEntities();
-                updateCullables();
-                updateAmorStands();
-                updateItems();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        updateSuperMobs();
+                        updateEliteMobEntities();
+                        updateLivingEntities();
+                        updateCullables();
+                        updateAmorStands();
+                        updateItems();
+                    }
+                }.runTaskAsynchronously(MetadataHandler.PLUGIN);
             }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
 
     }
 
@@ -214,6 +219,7 @@ public class EntityTracker implements Listener {
         if (!isEliteMob(entity)) return;
         EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
         if (eliteMobEntity == null) return;
+        eliteMobEntity.getLivingEntity().remove();
         eliteMobs.remove(eliteMobEntity);
         eliteMobsLivingEntities.remove(eliteMobEntity.getLivingEntity());
     }
@@ -279,6 +285,7 @@ public class EntityTracker implements Listener {
     This is run in sync for performance reasons
      */
     public static void wipeEntity(Entity entity) {
+        new BukkitRunnable().runTask()
         unregisterEliteMob(entity);
         unregisterSuperMob(entity);
         unregisterNaturalEntity(entity);

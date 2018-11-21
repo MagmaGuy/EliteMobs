@@ -27,10 +27,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
 
 /**
  * Created by MagmaGuy on 15/07/2017.
@@ -45,22 +43,7 @@ public class MergeHandler implements Listener {
     }
 
     @EventHandler
-    public void onOtherEntityDamageMerge(EntityDamageByEntityEvent event) {
-
-        validateEntityType(event.getEntity());
-        validateEntityType(event.getDamager());
-
-    }
-
-    @EventHandler
     public void onSpawnMerge(EntitySpawnEvent event) {
-
-        validateEntityType(event.getEntity());
-
-    }
-
-    @EventHandler
-    public void onDetectMerge(EntityTargetEvent event) {
 
         validateEntityType(event.getEntity());
 

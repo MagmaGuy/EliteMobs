@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobConstructor;
@@ -9,6 +10,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Iterator;
 
@@ -22,21 +24,30 @@ public class EliteMobScanner {
 
         for (World world : validWorldList) {
 
-            if (world.getLivingEntities() == null) continue;
+            if (world.getLivingEntities().isEmpty()) continue;
 
             Iterator<LivingEntity> iterator = world.getLivingEntities().iterator();
 
-            while (iterator.hasNext()) {
+            new BukkitRunnable() {
 
-                LivingEntity livingEntity = iterator.next();
+                @Override
+                public void run() {
 
-                if (!EliteMobProperties.isValidEliteMobType(livingEntity)) continue;
+                    while (iterator.hasNext()) {
 
-                if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_NATURAL_MOBS))
-                    if (EntityTracker.isNaturalEntity(livingEntity))
-                        scanValidAggressiveLivingEntity(livingEntity);
+                        LivingEntity livingEntity = iterator.next();
 
-            }
+                        if (!EliteMobProperties.isValidEliteMobType(livingEntity)) continue;
+
+                        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_NATURAL_MOBS))
+                            if (EntityTracker.isNaturalEntity(livingEntity))
+                                scanValidAggressiveLivingEntity(livingEntity);
+
+                    }
+
+                }
+
+            }.runTaskAsynchronously(MetadataHandler.PLUGIN);
 
         }
 
