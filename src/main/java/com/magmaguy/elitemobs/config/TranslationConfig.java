@@ -57,7 +57,6 @@ public class TranslationConfig {
 
     public void initializeConfig() {
 
-
         configuration.addDefault(NAME_BLAZE, "Level $level Elite Blaze");
         configuration.addDefault(NAME_CAVE_SPIDER, "Level $level Elite Cave Spider");
         configuration.addDefault(NAME_CREEPER, "Level $level Elite Creeper");

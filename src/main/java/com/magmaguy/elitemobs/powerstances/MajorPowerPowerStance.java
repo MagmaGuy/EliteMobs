@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by MagmaGuy on 11/05/2017.
@@ -40,6 +41,31 @@ public class MajorPowerPowerStance implements Listener {
         if (eliteMobEntity.getMajorPowerCount() < 1)
             return;
 
+        /*
+        Obfuscate powers to prevent TPS loss
+         */
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.OBFUSCATE_MOB_POWERS))
+            if (eliteMobEntity.getHasVisualEffectObfuscated()) {
+                Object[][] multiDimensionalTrailTracker = new Object[trackAmount][individualEffectsPerTrack];
+
+                for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
+                    ArrayList<Object> localObjects = new ArrayList<>();
+                    for (int a = 0; a < multiDimensionalTrailTracker.length; a++)
+                        localObjects.addAll(addObfuscatedEffects());
+                    for (int j = 0; j < multiDimensionalTrailTracker[0].length; j++)
+                        if (localObjects.get(j) != null)
+                            multiDimensionalTrailTracker[i][j] = localObjects.get(j);
+
+                    eliteMobEntity.setHasMinorVisualEffect(true);
+
+                    VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
+                            MinorPowerStanceMath.cachedVectors, eliteMobEntity.hasMinorVisualEffect(),
+                            MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
+                }
+
+                return;
+            }
+
         Object[][] multiDimensionalTrailTracker = new Object[trackAmount][eliteMobEntity.getMajorPowerCount() * individualEffectsPerTrack];
 
         for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
@@ -57,6 +83,10 @@ public class MajorPowerPowerStance implements Listener {
                 MajorPowerStanceMath.cachedVectors, eliteMobEntity.hasMajorVisualEffect(),
                 MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
 
+    }
+
+    private ArrayList<Object> addObfuscatedEffects() {
+        return new ArrayList<>(Arrays.asList(Particle.END_ROD));
     }
 
     private ArrayList<Object> addAllEffects() {

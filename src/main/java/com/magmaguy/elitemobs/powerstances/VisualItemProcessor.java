@@ -29,6 +29,7 @@ public class VisualItemProcessor {
         new BukkitRunnable() {
 
             int counter = 0;
+            boolean isObfuscated = eliteMobEntity.getHasVisualEffectObfuscated();
 
             @Override
             public void run() {
@@ -69,6 +70,20 @@ public class VisualItemProcessor {
                 counter++;
                 if (counter >= pointsPerRotation)
                     counter = 0;
+
+                /*
+                Check if the effect has ceased being obfuscated
+                 */
+                if (isObfuscated != eliteMobEntity.getHasVisualEffectObfuscated()){
+                    VisualItemRemover.removeItems(multiDimensionalTrailTracker);
+                    cancel();
+                    eliteMobEntity.setHasMinorVisualEffect(false);
+                    eliteMobEntity.setHasMajorVisualEffect(false);
+                    eliteMobEntity.setHasVisualEffectObfuscated(false);
+                    new MinorPowerPowerStance(eliteMobEntity);
+                    new MajorPowerPowerStance(eliteMobEntity);
+
+                }
 
             }
 

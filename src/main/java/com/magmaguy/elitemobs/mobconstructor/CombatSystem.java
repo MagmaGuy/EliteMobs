@@ -156,8 +156,8 @@ public class CombatSystem implements Listener {
         float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.01 * mobLevel * event.getRadius() *
                 ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
 
-        if (newExplosionRange > Integer.MAX_VALUE)
-            newExplosionRange = Integer.MAX_VALUE;
+        if (newExplosionRange > 20)
+            newExplosionRange = 20;
 
 
         event.setRadius(newExplosionRange);

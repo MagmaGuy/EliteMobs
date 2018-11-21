@@ -35,6 +35,7 @@ import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawningProcessor;
 import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
+import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -119,6 +120,8 @@ public class EventsRegistrer {
 
         //Visual effects
         pluginManager.registerEvents(new EffectEventHandlers(), plugin);
+        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.OBFUSCATE_MOB_POWERS))
+            pluginManager.registerEvents(new VisualEffectObfuscator(), plugin);
 
         //Loot
         if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_PLUGIN_LOOT)) {

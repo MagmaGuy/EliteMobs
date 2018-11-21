@@ -42,7 +42,7 @@ public class EliteMobEntity {
     private int majorPowerCount = 0;
     private boolean hasMinorVisualEffect = false;
     private boolean hasMajorVisualEffect = false;
-    private boolean visualEffectIsObfuscated = true;
+    private boolean hasVisualEffectObfuscated = true;
     private boolean isNaturalEntity;
     /*
     This just defines default behavior
@@ -381,7 +381,7 @@ public class EliteMobEntity {
 
     }
 
-    public void setCustoMPowers(HashSet<ElitePower> elitePowers) {
+    public void setCustomPowers(HashSet<ElitePower> elitePowers) {
 
         this.powers = elitePowers;
         for (ElitePower elitePower : elitePowers) {
@@ -517,6 +517,14 @@ public class EliteMobEntity {
 
     public void setHasCustomName(boolean bool) {
         this.hasCustomName = bool;
+    }
+
+    public void setHasVisualEffectObfuscated(boolean bool) {
+        this.hasVisualEffectObfuscated = bool;
+    }
+
+    public boolean getHasVisualEffectObfuscated() {
+        return this.hasVisualEffectObfuscated;
     }
 
 }

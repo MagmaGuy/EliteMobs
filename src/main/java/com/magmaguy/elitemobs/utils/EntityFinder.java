@@ -21,15 +21,11 @@ public class EntityFinder {
     }
 
     public static LivingEntity getRealDamager(EntityDamageByEntityEvent event) {
-
         return filterRangedDamagers(event.getDamager());
-
     }
 
     public static LivingEntity getRealDamager(EntityTargetLivingEntityEvent event) {
-
         return filterRangedDamagers(event.getEntity());
-
     }
 
     private static Player playerFilter(Entity entity) {
