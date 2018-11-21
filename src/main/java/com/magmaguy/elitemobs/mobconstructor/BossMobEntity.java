@@ -32,7 +32,7 @@ public class BossMobEntity extends EliteMobEntity {
     private void setupBossMob(LivingEntity livingEntity, HashSet<ElitePower> elitePowers) {
 
         setupBossMob(livingEntity);
-        super.setCustoMPowers(elitePowers);
+        super.setCustomPowers(elitePowers);
 
     }
 

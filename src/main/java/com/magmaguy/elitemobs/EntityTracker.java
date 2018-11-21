@@ -175,6 +175,15 @@ public class EntityTracker implements Listener {
         return null;
     }
 
+    public static EliteMobEntity getAsyncEliteMobEntity(Entity entity){
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
+        HashSet<EliteMobEntity> localEntities = (HashSet<EliteMobEntity>) eliteMobs.clone();
+        for (EliteMobEntity eliteMobEntity : localEntities)
+            if (eliteMobEntity.getLivingEntity().equals(entity))
+                return eliteMobEntity;
+        return null;
+    }
+
     public static boolean isNaturalEntity(Entity entity) {
         if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
         return naturalEntities.contains(entity);
@@ -217,7 +226,7 @@ public class EntityTracker implements Listener {
      */
     private static void unregisterEliteMob(Entity entity) {
         if (!isEliteMob(entity)) return;
-        EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
+        EliteMobEntity eliteMobEntity = getAsyncEliteMobEntity(entity);
         if (eliteMobEntity == null) return;
         eliteMobEntity.getLivingEntity().remove();
         eliteMobs.remove(eliteMobEntity);
@@ -278,6 +287,7 @@ public class EntityTracker implements Listener {
         itemVisualEffects.clear();
         armorStands.clear();
         naturalEntities.clear();
+        cullablePluginEntities.clear();
 
     }
 
@@ -285,7 +295,6 @@ public class EntityTracker implements Listener {
     This is run in sync for performance reasons
      */
     public static void wipeEntity(Entity entity) {
-        new BukkitRunnable().runTask()
         unregisterEliteMob(entity);
         unregisterSuperMob(entity);
         unregisterNaturalEntity(entity);
