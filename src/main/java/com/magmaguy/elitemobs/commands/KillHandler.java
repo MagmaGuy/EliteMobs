@@ -51,12 +51,11 @@ public class KillHandler {
         if (CommandHandler.permCheck(CommandHandler.KILLALL_AGGRESSIVEELITES, commandSender)) {
             int counter = 0;
 
-            for (World world : EliteMobs.validWorldList)
-                for (EliteMobEntity eliteMobEntity : EntityTracker.getEliteMobs()) {
-                    eliteMobEntity.getLivingEntity().remove();
-                    EntityTracker.unregisterEliteMob(eliteMobEntity);
-                    counter++;
-                }
+            for (EliteMobEntity eliteMobEntity : EntityTracker.getEliteMobs()) {
+                eliteMobEntity.getLivingEntity().remove();
+                EntityTracker.unregisterEliteMob(eliteMobEntity);
+                counter++;
+            }
 
 
             commandSender.sendMessage("Killed " + counter + " Elite Mobs.");

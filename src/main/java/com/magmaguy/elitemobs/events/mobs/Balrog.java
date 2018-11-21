@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.items.uniqueitems.DwarvenGreed;
-import com.magmaguy.elitemobs.mobconstructor.TimedBossMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.ActionBossMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.TrashMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,7 +25,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.UUID;
 
 public class Balrog implements Listener {
 
@@ -37,6 +36,8 @@ public class Balrog implements Listener {
 
     private static void balrogSpawnEffect(Location location) {
 
+        Bukkit.getLogger().info("preparing launch");
+
         new BukkitRunnable() {
 
             int i = 0;
@@ -46,6 +47,7 @@ public class Balrog implements Listener {
 
                 if (i > 20 * 3) {
 
+                    Bukkit.getLogger().info("launching");
                     intializeBalrog(location);
                     cancel();
                     return;
@@ -67,7 +69,7 @@ public class Balrog implements Listener {
 
         Silverfish balrog = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
         int eliteLevel = ActionDynamicBossLevelConstructor.determineDynamicBossLevel(balrog);
-        TimedBossMobEntity bossMobEntity = new TimedBossMobEntity(balrog, eliteLevel, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME));
+        ActionBossMobEntity bossMobEntity = new ActionBossMobEntity(balrog, eliteLevel, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME));
         balrogList.add(balrog);
 
         balrogVisualEffectLoop(balrog);
@@ -79,27 +81,18 @@ public class Balrog implements Listener {
     private static void balrogVisualEffectLoop(Silverfish balrog) {
 
         new BukkitRunnable() {
-
-            UUID uuid = balrog.getUniqueId();
-
             @Override
             public void run() {
 
-                Silverfish localBalrog = balrog;
-
-                if (!balrog.isValid())
-                    if (Bukkit.getEntity(uuid) != null)
-                        localBalrog = (Silverfish) Bukkit.getEntity(uuid);
-
-                if (balrog.isDead()) {
+                if (!balrog.isValid()) {
 
                     cancel();
                     return;
 
                 }
 
-                localBalrog.getWorld().spawnParticle(Particle.FLAME, localBalrog.getLocation(), 2, 0.1, 0.1, 0.1, 0.05);
-                localBalrog.getWorld().spawnParticle(Particle.SMOKE_LARGE, localBalrog.getLocation(), 4, 0.1, 0.1, 0.1, 0.05);
+                balrog.getWorld().spawnParticle(Particle.FLAME, balrog.getLocation(), 2, 0.1, 0.1, 0.1, 0.05);
+                balrog.getWorld().spawnParticle(Particle.SMOKE_LARGE, balrog.getLocation(), 4, 0.1, 0.1, 0.1, 0.05);
 
             }
 

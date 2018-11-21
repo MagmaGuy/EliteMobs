@@ -24,10 +24,10 @@ import org.bukkit.event.entity.EntityDeathEvent;
 /**
  * Created by MagmaGuy on 14/07/2017.
  */
-public class EntityDeathMetadataFlusher implements Listener {
+public class EntityDeathDataFlusher implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onEntityDeathFlushMetadata(EntityDeathEvent event) {
+    public void onEntityDeathFlushData(EntityDeathEvent event) {
 
         EntityTracker.deathWipe(event);
 

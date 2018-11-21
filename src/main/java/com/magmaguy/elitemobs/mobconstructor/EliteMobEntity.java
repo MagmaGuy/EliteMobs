@@ -42,6 +42,7 @@ public class EliteMobEntity {
     private int majorPowerCount = 0;
     private boolean hasMinorVisualEffect = false;
     private boolean hasMajorVisualEffect = false;
+    private boolean visualEffectIsObfuscated = true;
     private boolean isNaturalEntity;
     /*
     This just defines default behavior
@@ -141,10 +142,6 @@ public class EliteMobEntity {
         setMaxHealth(eliteMobProperties);
         setHealth();
         /*
-        Set the armor
-         */
-        setArmor();
-        /*
         Register whether or not the elite mob is natural
          */
         this.isNaturalEntity = EntityTracker.isNaturalEntity(livingEntity);
@@ -159,6 +156,9 @@ public class EliteMobEntity {
 
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
             eliteMob.setCanPickupItems(false);
+
+        this.setHasStacking(false);
+        this.setHasCustomArmor(true);
 
     }
 

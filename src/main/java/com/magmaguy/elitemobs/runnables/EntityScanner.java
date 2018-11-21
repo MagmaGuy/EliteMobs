@@ -19,7 +19,7 @@ public class EntityScanner extends BukkitRunnable {
                 public void run() {
                     EliteMobScanner.scanElites();
                 }
-            }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
+            }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
         }
 
 
@@ -29,7 +29,7 @@ public class EntityScanner extends BukkitRunnable {
                 public void run() {
                     SuperMobScanner.scanSuperMobs();
                 }
-            }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 12, 20 * 12);
+            }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 12, 20 * 12);
         }
 
 
