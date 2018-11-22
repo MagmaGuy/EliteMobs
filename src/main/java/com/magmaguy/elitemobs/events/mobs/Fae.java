@@ -63,42 +63,41 @@ public class Fae implements Listener {
 
     private static void initializeVex(Location location) {
 
-        Vex lightningFae = (Vex) location.getWorld().spawnEntity(location, EntityType.VEX);
-        Vex fireFae = (Vex) location.getWorld().spawnEntity(location, EntityType.VEX);
-        Vex frostFae = (Vex) location.getWorld().spawnEntity(location, EntityType.VEX);
-
         /*
         Good for all fae
          */
-        int level = ActionDynamicBossLevelConstructor.determineDynamicBossLevel(lightningFae) / 3;
-
-        faeList.addAll(Arrays.asList(lightningFae, fireFae, frostFae));
+        int level = ActionDynamicBossLevelConstructor.determineDynamicBossLevel(location) / 3;
 
         /*
         Construct specific fae
          */
         ActionBossMobEntity fireFaeBoss = new ActionBossMobEntity(
-                fireFae,
+                EntityType.VEX,
+                location,
                 level,
                 ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME));
 
         ActionBossMobEntity lightningFaeBoss = new ActionBossMobEntity(
-                fireFae,
+                EntityType.VEX,
+                location,
                 level,
                 ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
                 new HashSet<>(Arrays.asList(new AttackFire())));
 
         ActionBossMobEntity frostFaeBoss = new ActionBossMobEntity(
-                fireFae,
+                EntityType.VEX,
+                location,
                 level,
                 ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
                 new HashSet<>(Arrays.asList(new AttackFreeze())));
 
-        faeVisualEffect(lightningFae, faeType.LIGHTING_FAE);
-        faeVisualEffect(fireFae, faeType.FIRE_FAE);
-        faeVisualEffect(frostFae, faeType.FROST_FAE);
+        faeList.addAll(Arrays.asList(lightningFaeBoss.getLivingEntity(), fireFaeBoss.getLivingEntity(), frostFaeBoss.getLivingEntity()));
 
-        initializeSmiteAttack(lightningFae);
+        faeVisualEffect((Vex) lightningFaeBoss.getLivingEntity(), faeType.LIGHTING_FAE);
+        faeVisualEffect((Vex) fireFaeBoss.getLivingEntity(), faeType.FIRE_FAE);
+        faeVisualEffect((Vex) frostFaeBoss.getLivingEntity(), faeType.FROST_FAE);
+
+        initializeSmiteAttack((Vex) lightningFaeBoss.getLivingEntity());
 
     }
 

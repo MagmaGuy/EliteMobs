@@ -287,25 +287,23 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                     if (randomizedNumber < 5) {
 
-                        Zombie zombie = (Zombie) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.ZOMBIE);
-                        ReinforcementMobEntity trashMobEntity = new ReinforcementMobEntity(zombie, eliteMobEntity.getLevel(),
+                        ReinforcementMobEntity trashMobEntity = new ReinforcementMobEntity(EntityType.ZOMBIE, targetter.getLocation(), eliteMobEntity.getLevel(),
                                 ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned zombie")));
 
-                        zombie.setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
+                        trashMobEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
 
-                        entityList.add(zombie);
+                        entityList.add(trashMobEntity.getLivingEntity());
 
                     } else {
 
-                        Skeleton skeleton = (Skeleton) targetter.getWorld().spawnEntity(targetter.getLocation(), EntityType.SKELETON);
-                        ReinforcementMobEntity trashMobEntity = new ReinforcementMobEntity(skeleton, eliteMobEntity.getLevel(),
+                        ReinforcementMobEntity trashMobEntity = new ReinforcementMobEntity(EntityType.SKELETON, targetter.getLocation(), eliteMobEntity.getLevel(),
                                 ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned skeleton")));
 
-                        skeleton.setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
+                        trashMobEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
 
-                        entityList.add(skeleton);
+                        entityList.add(trashMobEntity.getLivingEntity());
 
                     }
 

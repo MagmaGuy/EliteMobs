@@ -117,6 +117,7 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(DISTANCE_TO_INCREMENT, 100);
         configuration.addDefault(LEVEL_TO_INCREMENT, 1);
         configuration.addDefault(ANTI_EXPLOIT_MESSAGE, "&c[EM AntiExploit] &7Nearby elite won't drop special loot.");
+        configuration.addDefault(OBFUSCATE_MOB_POWERS, true);
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

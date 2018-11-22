@@ -32,7 +32,6 @@ public class EntityScanner extends BukkitRunnable {
             }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 12, 20 * 12);
         }
 
-
     }
 
 }

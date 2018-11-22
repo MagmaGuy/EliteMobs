@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -13,7 +12,6 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +36,8 @@ public class MajorPowerPowerStance implements Listener {
         this.eliteMobEntity = eliteMobEntity;
 
         if (eliteMobEntity.hasMajorVisualEffect()) return;
+        eliteMobEntity.setHasMajorVisualEffect(true);
+
         if (eliteMobEntity.getMajorPowerCount() < 1)
             return;
 
@@ -56,12 +56,11 @@ public class MajorPowerPowerStance implements Listener {
                         if (localObjects.get(j) != null)
                             multiDimensionalTrailTracker[i][j] = localObjects.get(j);
 
-                    eliteMobEntity.setHasMinorVisualEffect(true);
-
-                    VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                            MinorPowerStanceMath.cachedVectors, eliteMobEntity.hasMinorVisualEffect(),
-                            MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
                 }
+
+                VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
+                        MajorPowerStanceMath.cachedVectors, eliteMobEntity.hasMajorVisualEffect(),
+                        MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
 
                 return;
             }
@@ -76,8 +75,6 @@ public class MajorPowerPowerStance implements Listener {
                 if (localObjects.get(j) != null)
                     multiDimensionalTrailTracker[i][j] = localObjects.get(j);
         }
-
-        eliteMobEntity.setHasMajorVisualEffect(true);
 
         VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
                 MajorPowerStanceMath.cachedVectors, eliteMobEntity.hasMajorVisualEffect(),
@@ -131,7 +128,6 @@ public class MajorPowerPowerStance implements Listener {
             item.setGravity(false);
         item.setInvulnerable(true);
         EntityTracker.registerItemVisualEffects(item);
-        item.setMetadata("VisualEffect", new FixedMetadataValue(MetadataHandler.PLUGIN, true));
         return item;
 
     }

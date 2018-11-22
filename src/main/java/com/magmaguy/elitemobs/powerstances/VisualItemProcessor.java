@@ -8,6 +8,8 @@ import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
+
 public class VisualItemProcessor {
 
     private boolean hasValidEffect;
@@ -77,11 +79,20 @@ public class VisualItemProcessor {
                 if (isObfuscated != eliteMobEntity.getHasVisualEffectObfuscated()){
                     VisualItemRemover.removeItems(multiDimensionalTrailTracker);
                     cancel();
-                    eliteMobEntity.setHasMinorVisualEffect(false);
-                    eliteMobEntity.setHasMajorVisualEffect(false);
-                    eliteMobEntity.setHasVisualEffectObfuscated(false);
-                    new MinorPowerPowerStance(eliteMobEntity);
-                    new MajorPowerPowerStance(eliteMobEntity);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            eliteMobEntity.setHasVisualEffectObfuscated(false);
+                            if (Arrays.deepEquals(cachedVectorPositions, MinorPowerStanceMath.cachedVectors)) {
+                                eliteMobEntity.setHasMinorVisualEffect(false);
+                                new MinorPowerPowerStance(eliteMobEntity);
+                            }
+                            if (Arrays.deepEquals(cachedVectorPositions, MajorPowerStanceMath.cachedVectors)) {
+                                eliteMobEntity.setHasMajorVisualEffect(false);
+                                new MajorPowerPowerStance(eliteMobEntity);
+                            }
+                        }
+                    }.runTask(MetadataHandler.PLUGIN);
 
                 }
 

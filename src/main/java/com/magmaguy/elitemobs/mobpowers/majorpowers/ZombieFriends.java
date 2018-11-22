@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.mobconstructor.ReinforcementMobEntity;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -38,36 +37,33 @@ public class ZombieFriends extends MajorPower implements Listener {
         if (activatedZombies.contains(eliteMobEntity)) return;
         activatedZombies.add(eliteMobEntity);
 
-        Zombie friend1 = (Zombie) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.ZOMBIE);
-        Zombie friend2 = (Zombie) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.ZOMBIE);
-
-        ReinforcementMobEntity reinforcement1 = new ReinforcementMobEntity(friend1,
+        ReinforcementMobEntity reinforcement1 = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(),
                 eliteMobEntity.getLevel(), ConfigValues.translationConfig.getString("ZombieFriends.Friend 1"));
 
-        ReinforcementMobEntity reinforcement2 = new ReinforcementMobEntity(friend2,
+        ReinforcementMobEntity reinforcement2 = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(),
                 eliteMobEntity.getLevel(), ConfigValues.translationConfig.getString("ZombieFriends.Friend 2"));
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!eliteMobEntity.getLivingEntity().isValid() || !friend1.isValid() && !friend2.isValid()) {
+                if (!eliteMobEntity.getLivingEntity().isValid() || !reinforcement1.getLivingEntity().isValid() && !reinforcement2.getLivingEntity().isValid()) {
 
-                    if (friend1.isValid()) {
+                    if (reinforcement1.getLivingEntity().isValid()) {
 
                         nameClearer(reinforcement1);
 
-                        friend1.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage").
+                        reinforcement1.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage").
                                 get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage")
                                         .size()))));
 
                     }
 
-                    if (friend2.isValid()) {
+                    if (reinforcement2.getLivingEntity().isValid()) {
 
 
                         nameClearer(reinforcement2);
 
-                        friend2.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage").
+                        reinforcement2.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage").
                                 get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage")
                                         .size()))));
 
@@ -88,21 +84,21 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && friend1.isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcement1.getLivingEntity().isValid()) {
 
                         nameClearer(reinforcement1);
 
-                        friend1.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog").
+                        reinforcement1.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog").
                                 get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog")
                                         .size()))));
 
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && friend2.isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcement2.getLivingEntity().isValid()) {
 
                         nameClearer(reinforcement2);
 
-                        friend2.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog").
+                        reinforcement2.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog").
                                 get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog")
                                         .size()))));
 

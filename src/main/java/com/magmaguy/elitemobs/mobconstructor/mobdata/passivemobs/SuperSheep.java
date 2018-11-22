@@ -13,13 +13,15 @@ public class SuperSheep extends SuperMobProperties {
 
         this.entityType = EntityType.SHEEP;
 
-        this.defaultMaxHealth = 4;
+        this.defaultMaxHealth = 8;
 
         this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_SUPERMOBS + getEntityType().toString()) &&
                 ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS);
 
-        if (this.isEnabled)
+        if (this.isEnabled) {
+            superMobTypeList.add(this.entityType);
             superMobData.add(this);
+        }
 
     }
 

@@ -41,30 +41,26 @@ public class ZombieKing implements Listener {
         return null;
     }
 
-    public static void spawnZombieKing(Zombie zombie) {
+    public static void spawnZombieKing(Location location) {
 
         DeadMoon.entityQueued = false;
 
-        Location location = zombie.getLocation();
-        Zombie zombieKing = (Zombie) location.getWorld().spawnEntity(location, EntityType.ZOMBIE);
-
-
         int kingLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
-        TimedBossMobEntity zombieKingPluginEntity = new TimedBossMobEntity(zombieKing, kingLevel,
+        TimedBossMobEntity zombieKing = new TimedBossMobEntity(EntityType.ZOMBIE, location, kingLevel,
                 ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME));
 
-        zombieKingList.add(zombieKingPluginEntity);
-        zombieKingFlair(zombieKing);
+        zombieKingList.add(zombieKing);
+        zombieKingFlair((Zombie) zombieKing.getLivingEntity());
 
-        zombieKing.setBaby(false);
+        ((Zombie) zombieKing.getLivingEntity()).setBaby(false);
 
-        zombieKing.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-        zombieKing.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-        zombieKing.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-        zombieKing.getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
-        zombieKing.getEquipment().setItemInMainHand(new ItemStack(Material.GOLD_AXE));
+        zombieKing.getLivingEntity().getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+        zombieKing.getLivingEntity().getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+        zombieKing.getLivingEntity().getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+        zombieKing.getLivingEntity().getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
+        zombieKing.getLivingEntity().getEquipment().setItemInMainHand(new ItemStack(Material.GOLD_AXE));
 
-        EventMessage.sendEventMessage(zombieKing, ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_ANNOUNCEMENT_TEXT));
+        EventMessage.sendEventMessage(zombieKing.getLivingEntity(), ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_ANNOUNCEMENT_TEXT));
 
     }
 
@@ -129,7 +125,7 @@ public class ZombieKing implements Listener {
 
                     PowerCooldown.startCooldownTimer(eliteMobEntity, flamethrowerCooldown,
                             20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_FLAMETHROWER_INTERVAL));
-                    initializeFlamethrower(event.getEntity().getLocation(), livingEntity.getLocation(), (LivingEntity) event.getEntity());
+                    initializeFlamethrower(event.getEntity().getLocation().clone(), livingEntity.getLocation().clone(), (LivingEntity) event.getEntity());
 
                 }
 
@@ -188,9 +184,9 @@ public class ZombieKing implements Listener {
                 if (counter > flamePoints)
                     cancel();
 
-                Location armorStandLocation = sourceLocation.add(toTarget);
+                Location newLocation = sourceLocation.add(toTarget);
 
-                flamethrowerDamage(armorStandLocation, shooter, toTarget, shotByPlayer);
+                flamethrowerDamage(newLocation, shooter, toTarget, shotByPlayer);
 
                 counter++;
 
@@ -221,7 +217,6 @@ public class ZombieKing implements Listener {
                  */
                 if (counter > 10) {
 
-
                     if (counter < 2 * 20) {
 
                         for (int i = 0; i < 5; i++) {
@@ -234,7 +229,7 @@ public class ZombieKing implements Listener {
                             if (shooter instanceof Player)
                                 shooter.getLocation().getWorld().spawnParticle(Particle.FLAME, shooter.getEyeLocation().clone().add(directionVector), 0, offsetX, offsetY, offsetZ, offsetVelocity);
                             else
-                                shooter.getLocation().getWorld().spawnParticle(Particle.FLAME, shooter.getEyeLocation().subtract(new Vector(0, 0.5, 0)).clone().add(directionVector), 0, offsetX, offsetY, offsetZ, offsetVelocity);
+                                shooter.getLocation().getWorld().spawnParticle(Particle.FLAME, shooter.getEyeLocation().clone().subtract(new Vector(0, 0.5, 0)).clone().add(directionVector), 0, offsetX, offsetY, offsetZ, offsetVelocity);
 
                         }
 
@@ -249,9 +244,7 @@ public class ZombieKing implements Listener {
                                 //TODO: add pvp mechanics here
 
                             } else {
-
                                 BossSpecialAttackDamage.dealSpecialDamage(shooter, (LivingEntity) entity, 1);
-
                             }
 
                         }
@@ -287,7 +280,6 @@ public class ZombieKing implements Listener {
 
     private void initializeUnholySmite(LivingEntity livingEntity) {
 
-        //todo: add visual warning
         livingEntity.setAI(false);
         unholySmitePhaseOne(livingEntity, Particle.SMOKE_NORMAL, false, 10);
 

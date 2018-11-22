@@ -38,12 +38,26 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 /**
  * Created by MagmaGuy on 24/04/2017.
  */
-public class NaturalMobSpawningProcessor implements Listener {
+public class NaturalMobSpawnEventHandler implements Listener {
 
     private static int range = Bukkit.getServer().getViewDistance() * 16;
+    private static boolean ignoreMob = false;
+
+    public static void setIgnoreMob(boolean bool) {
+        ignoreMob = bool;
+    }
+
+    private static boolean getIgnoreMob() {
+        return ignoreMob;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
+
+        if (getIgnoreMob()) {
+            setIgnoreMob(false);
+            return;
+        }
 
         if (event.isCancelled()) return;
         /*
@@ -68,7 +82,6 @@ public class NaturalMobSpawningProcessor implements Listener {
             return;
 
         LivingEntity livingEntity = event.getEntity();
-//        EntityTracker.registerNaturalEntity(livingEntity);
 
         int huntingGearChanceAdder = getHuntingGearBonus(livingEntity);
 
@@ -78,7 +91,7 @@ public class NaturalMobSpawningProcessor implements Listener {
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;
 
-        NaturalSpawning.naturalMobProcessor(livingEntity);
+        NaturalEliteMobSpawnEventHandler.naturalMobProcessor(livingEntity);
 
     }
 

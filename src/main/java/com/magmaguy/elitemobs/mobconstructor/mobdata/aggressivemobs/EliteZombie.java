@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
@@ -13,8 +12,6 @@ import java.util.HashSet;
 public class EliteZombie extends EliteMobProperties {
 
     public EliteZombie() {
-
-        Bukkit.getLogger().info("Registering ZOMBIE");
 
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_ZOMBIE);
 

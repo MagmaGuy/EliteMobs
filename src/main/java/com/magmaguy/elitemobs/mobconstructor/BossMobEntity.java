@@ -2,23 +2,25 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
+import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.HashSet;
 
 public class BossMobEntity extends EliteMobEntity {
 
-    public BossMobEntity(LivingEntity livingEntity, int eliteMobLevel, String name) {
+    public BossMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name) {
 
-        super(livingEntity, eliteMobLevel, name);
-        setupBossMob(livingEntity);
+        super(entityType, location, eliteMobLevel, name);
+        setupBossMob(super.getLivingEntity());
 
     }
 
-    public BossMobEntity(LivingEntity livingEntity, int eliteMobLevel, String name, HashSet<ElitePower> elitePowers) {
+    public BossMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name, HashSet<ElitePower> elitePowers) {
 
-        super(livingEntity, eliteMobLevel, name);
-        setupBossMob(livingEntity, elitePowers);
+        super(entityType, location, eliteMobLevel, name);
+        setupBossMob(super.getLivingEntity(), elitePowers);
 
     }
 

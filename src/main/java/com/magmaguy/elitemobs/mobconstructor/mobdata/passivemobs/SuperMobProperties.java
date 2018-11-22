@@ -46,4 +46,8 @@ public abstract class SuperMobProperties extends PluginMobProperties {
         return getDataInstance(entity.getType());
     }
 
+    public static double getSuperMobMaxHealth(Entity entity) {
+        return getDataInstance(entity.getType()).getSuperMobMaxHealth();
+    }
+
 }

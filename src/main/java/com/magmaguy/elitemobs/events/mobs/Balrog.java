@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCoun
 import com.magmaguy.elitemobs.items.uniqueitems.DwarvenGreed;
 import com.magmaguy.elitemobs.mobconstructor.ActionBossMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.TrashMobEntity;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -29,14 +28,10 @@ import java.util.HashSet;
 public class Balrog implements Listener {
 
     public static void spawnBalrog(Location location) {
-
         balrogSpawnEffect(location.add(new Vector(0.5, 0.5, 0.5)));
-
     }
 
     private static void balrogSpawnEffect(Location location) {
-
-        Bukkit.getLogger().info("preparing launch");
 
         new BukkitRunnable() {
 
@@ -47,7 +42,6 @@ public class Balrog implements Listener {
 
                 if (i > 20 * 3) {
 
-                    Bukkit.getLogger().info("launching");
                     intializeBalrog(location);
                     cancel();
                     return;
@@ -67,14 +61,13 @@ public class Balrog implements Listener {
 
     private static void intializeBalrog(Location location) {
 
-        Silverfish balrog = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
-        int eliteLevel = ActionDynamicBossLevelConstructor.determineDynamicBossLevel(balrog);
-        ActionBossMobEntity bossMobEntity = new ActionBossMobEntity(balrog, eliteLevel, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME));
-        balrogList.add(balrog);
+        int eliteLevel = ActionDynamicBossLevelConstructor.determineDynamicBossLevel(location);
+        ActionBossMobEntity bossMobEntity = new ActionBossMobEntity(EntityType.SILVERFISH, location, eliteLevel, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME));
+        balrogList.add(bossMobEntity.getLivingEntity());
 
-        balrogVisualEffectLoop(balrog);
+        balrogVisualEffectLoop((Silverfish) bossMobEntity.getLivingEntity());
 
-        BossMobDeathCountdown.startDeathCountdown(balrog);
+        BossMobDeathCountdown.startDeathCountdown(bossMobEntity.getLivingEntity());
 
     }
 
@@ -130,11 +123,10 @@ public class Balrog implements Listener {
 
     private static void spawnTrashMobs(Silverfish balrog) {
 
-        Silverfish silverTrash = (Silverfish) balrog.getLocation().getWorld().spawnEntity(balrog.getLocation(), EntityType.SILVERFISH);
-        TrashMobEntity trashMobEntity = new TrashMobEntity(silverTrash,
+        TrashMobEntity trashMobEntity = new TrashMobEntity(EntityType.SILVERFISH, balrog.getLocation(),
                 ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.BALROG_TRASH_MOB_NAME)));
 
-        trashMobVisualEffect(silverTrash);
+        trashMobVisualEffect((Silverfish) trashMobEntity.getLivingEntity());
 
     }
 

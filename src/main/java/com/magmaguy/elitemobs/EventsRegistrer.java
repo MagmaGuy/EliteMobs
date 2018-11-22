@@ -32,8 +32,8 @@ import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
-import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawningProcessor;
-import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
+import com.magmaguy.elitemobs.mobspawning.NaturalEliteMobSpawnEventHandler;
+import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -111,12 +111,12 @@ public class EventsRegistrer {
 
         //Natural EliteMobs Spawning
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING)) {
-            pluginManager.registerEvents(new NaturalSpawning(), plugin);
+            pluginManager.registerEvents(new NaturalEliteMobSpawnEventHandler(), plugin);
             pluginManager.registerEvents(new EntityTracker(), plugin);
         }
 
         //Natural Mob Metadata Assigner
-        pluginManager.registerEvents(new NaturalMobSpawningProcessor(), plugin);
+        pluginManager.registerEvents(new NaturalMobSpawnEventHandler(), plugin);
 
         //Visual effects
         pluginManager.registerEvents(new EffectEventHandlers(), plugin);
