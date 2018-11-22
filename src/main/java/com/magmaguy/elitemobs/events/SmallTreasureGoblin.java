@@ -36,8 +36,6 @@ public class SmallTreasureGoblin implements Listener {
 
         TreasureGoblin.createGoblin(location);
 
-        entityQueued = false;
-
     }
 
 
@@ -53,6 +51,7 @@ public class SmallTreasureGoblin implements Listener {
                     event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) &&
                     event.getEntity() instanceof Zombie) {
 
+                entityQueued = false;
                 initalizeEvent(event.getLocation());
 
             }
