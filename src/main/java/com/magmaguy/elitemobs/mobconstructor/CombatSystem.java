@@ -1,20 +1,6 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobconstructor;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.config.ConfigValues;
@@ -23,6 +9,7 @@ import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
 import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
+import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -41,7 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
-public class DamageAdjuster implements Listener {
+public class CombatSystem implements Listener {
 
     public static final double PER_LEVEL_POWER_INCREASE = 0.1;
     public static final double TARGET_HITS_TO_KILL = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.TARGET_HITS_TO_KILL);
@@ -62,22 +49,15 @@ public class DamageAdjuster implements Listener {
 
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player)) return;
-        if (event.getDamager() instanceof LivingEntity && !event.getDamager().hasMetadata(MetadataHandler.ELITE_MOB_MD))
+
+        LivingEntity damager = EntityFinder.getRealDamager(event);
+        if (damager == null) return;
+
+        if (!EntityTracker.isEliteMob(event.getDamager()))
             return;
-        if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
-                !((LivingEntity) ((Projectile) event.getDamager()).getShooter()).hasMetadata(MetadataHandler.ELITE_MOB_MD))
-            return;
-        if (event.getDamager() instanceof Projectile && !(((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
-            return;
 
-        LivingEntity livingEntity = null;
-
-        if (event.getDamager() instanceof LivingEntity) livingEntity = (LivingEntity) event.getDamager();
-        else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
-            livingEntity = (LivingEntity) ((Projectile) event.getDamager()).getShooter();
-
-        if (livingEntity == null) return;
-
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(damager);
+        if (eliteMobEntity == null) return;
 
         //From this point on, the damage event is fully altered by Elite Mobs
 
@@ -89,7 +69,7 @@ public class DamageAdjuster implements Listener {
         Player player = (Player) event.getEntity();
 
         //Determine tiers
-        double eliteTier = MobTierFinder.findMobTier(livingEntity);
+        double eliteTier = MobTierFinder.findMobTier(eliteMobEntity);
         double playerTier = ItemTierFinder.findArmorSetTier(player);
 
         double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, event);
@@ -99,17 +79,12 @@ public class DamageAdjuster implements Listener {
         if (newDamage < 1) newDamage = 1;
         if (newDamage > 19) newDamage = 19;
 
-
         //Set the final damage value
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
         //Deal with the player getting killed
-        if (player.getHealth() - event.getDamage() <= 0) {
-
-            MetadataHandler.registerMetadata(player, MetadataHandler.KILLED_BY_ELITE_MOB, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity));
-//            PlayerDeathMessageByEliteMob.intializeDeathMessage(player, livingEntity);
-
-        }
+        if (player.getHealth() - event.getDamage() <= 0)
+            PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, damager));
 
     }
 
@@ -138,17 +113,13 @@ public class DamageAdjuster implements Listener {
 
             for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
 
-                if (enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()) && event.getDamager() instanceof Projectile) {
-
+                if (enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()) && event.getDamager() instanceof Projectile)
                     totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
 
-                }
 
-                if (enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) && event.getCause().equals(EntityDamageByEntityEvent.DamageCause.ENTITY_EXPLOSION)) {
-
+                if (enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) && event.getCause().equals(EntityDamageByEntityEvent.DamageCause.ENTITY_EXPLOSION))
                     totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
 
-                }
 
             }
 
@@ -169,7 +140,7 @@ public class DamageAdjuster implements Listener {
     public void onEliteCreeperDetonation(ExplosionPrimeEvent event) {
 
         if (event.isCancelled()) return;
-        if (!(event.getEntity() instanceof Creeper && event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)))
+        if (!(event.getEntity() instanceof Creeper && EntityTracker.isEliteMob(event.getEntity())))
             return;
 
         /*
@@ -178,17 +149,16 @@ public class DamageAdjuster implements Listener {
         for (PotionEffect potionEffect : ((Creeper) event.getEntity()).getActivePotionEffects())
             ((Creeper) event.getEntity()).removePotionEffect(potionEffect.getType());
 
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
 
-        int mobLevel = event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() < 1 ?
-                1 : event.getEntity().getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt();
+        int mobLevel = eliteMobEntity.getLevel() < 1 ? 1 : eliteMobEntity.getLevel();
 
-        float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.01 * mobLevel * event.getRadius() * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
+        float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.01 * mobLevel * event.getRadius() *
+                ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
 
-        if (newExplosionRange > Integer.MAX_VALUE) {
+        if (newExplosionRange > 20)
+            newExplosionRange = 20;
 
-            newExplosionRange = Integer.MAX_VALUE;
-
-        }
 
         event.setRadius(newExplosionRange);
 
@@ -207,13 +177,10 @@ public class DamageAdjuster implements Listener {
 
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof LivingEntity)) return;
-        if (!event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+        if (!EntityTracker.isEliteMob(event.getEntity())) return;
         if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
-        if (!event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
-
+        if (!event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM))
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
-
-        }
 
     }
 
@@ -224,30 +191,20 @@ public class DamageAdjuster implements Listener {
     public void eliteMobDamageByPlayer(EntityDamageByEntityEvent event) {
 
         if (event.isCancelled()) return;
-        if (event.getEntity() instanceof Player || !(event.getEntity() instanceof LivingEntity) ||
-                !event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+        LivingEntity damager = EntityFinder.getRealDamager(event);
+        if (damager == null) return;
 
-        LivingEntity damagingLivingEntity = null;
-        LivingEntity damagedLivingEntity = (LivingEntity) event.getEntity();
-
-        if (event.getDamager() instanceof LivingEntity) damagingLivingEntity = (LivingEntity) event.getDamager();
-        else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
-            damagingLivingEntity = (LivingEntity) ((Projectile) event.getDamager()).getShooter();
-
-        if (damagingLivingEntity == null) return;
-
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        if (eliteMobEntity == null) return;
 
         //From this point on, the event damage is handled by Elite Mobs
 
         /*
         Case in which the player is not the entity dealing damage, just deal raw damage
          */
-
-        if (!(damagingLivingEntity instanceof Player) &&
-                (damagingLivingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) || damagedLivingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD))) {
+        if (!damager.getType().equals(EntityType.PLAYER) && EntityTracker.isEliteMob(damager)) {
 
             event.setDamage(event.getDamage());
-
             return;
 
         }
@@ -260,17 +217,18 @@ public class DamageAdjuster implements Listener {
         Case in which a player has hit the Elite Mob
          */
 
-        Player player = (Player) damagingLivingEntity;
+        if (!damager.getType().equals(EntityType.PLAYER)) return;
+        Player player = (Player) damager;
 
         double playerTier;
         if (player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType().equals(Material.BOW) && event.getDamager() instanceof Player)
             playerTier = 0;
         else
             playerTier = ItemTierFinder.findBattleTier(player.getInventory().getItemInMainHand());
-        double eliteTier = MobTierFinder.findMobTier(damagedLivingEntity);
-        double maxHealth = damagedLivingEntity.getMaxHealth();
+        double eliteTier = MobTierFinder.findMobTier(eliteMobEntity);
+        double maxHealth = eliteMobEntity.getMaxHealth();
 
-        double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, damagedLivingEntity);
+        double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, eliteMobEntity.getLivingEntity());
 
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
@@ -323,9 +281,7 @@ public class DamageAdjuster implements Listener {
     This part is pretty much a copy of how Minecraft does the cooldown check
      */
     private float getCooldownPeriod(Player player) {
-
         return (float) (1.0D / player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue() * 20.0D);
-
     }
 
     private static int clock = 0;
@@ -338,7 +294,6 @@ public class DamageAdjuster implements Listener {
             public void run() {
 
                 if (clock == Integer.MAX_VALUE) clock = 0;
-
                 clock++;
 
             }
@@ -406,9 +361,7 @@ public class DamageAdjuster implements Listener {
     }
 
     private int getMaxEnchantmentLevel(Enchantment enchantment) {
-
         return ConfigValues.itemsProceduralSettingsConfig.getInt("Valid Enchantments." + enchantment.getName() + ".Max Level");
-
     }
 
     private HashMap<Player, Integer> playerHitCooldownHashMap = new HashMap<>();

@@ -66,6 +66,7 @@ public class MobCombatSettingsConfig {
     public static final String DISTANCE_TO_INCREMENT = "Distance between increments";
     public static final String LEVEL_TO_INCREMENT = "Amount of levels incremented per distance";
     public static final String ANTI_EXPLOIT_MESSAGE = "Anti exploit message";
+    public static final String OBFUSCATE_MOB_POWERS = "Hide mob powers until they are engaged";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -116,6 +117,7 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(DISTANCE_TO_INCREMENT, 100);
         configuration.addDefault(LEVEL_TO_INCREMENT, 1);
         configuration.addDefault(ANTI_EXPLOIT_MESSAGE, "&c[EM AntiExploit] &7Nearby elite won't drop special loot.");
+        configuration.addDefault(OBFUSCATE_MOB_POWERS, true);
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

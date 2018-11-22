@@ -16,59 +16,61 @@
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.HashSet;
+
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackArrow extends MinorPowers {
+public class AttackArrow extends MinorPower implements Listener {
 
-    String powerMetadata = MetadataHandler.ATTACK_ARROW_MD;
+    private static HashSet<EliteMobEntity> currentlyFiringEntities = new HashSet<>();
 
     @Override
+
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-        repeatingArrowTask(entity);
-
     }
 
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
+    @EventHandler
+    public void targetEvent(EntityTargetLivingEntityEvent event) {
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        if (currentlyFiringEntities.contains(eliteMobEntity)) return;
+        repeatingArrowTask(eliteMobEntity);
+        currentlyFiringEntities.add(eliteMobEntity);
     }
 
-    private void repeatingArrowTask(Entity entity) {
+    private void repeatingArrowTask(EliteMobEntity eliteMobEntity) {
 
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                if (!entity.isValid() || entity.isDead()) {
-
+                if (!eliteMobEntity.getLivingEntity().isValid() || ((Monster) eliteMobEntity.getLivingEntity()).getTarget() == null) {
+                    currentlyFiringEntities.remove(eliteMobEntity);
                     cancel();
                     return;
-
                 }
 
-                for (Entity nearbyEntity : entity.getNearbyEntities(20, 20, 20))
+                for (Entity nearbyEntity : eliteMobEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
                     if (nearbyEntity instanceof Player)
                         if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
                                 ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL))
-                            shootArrow(entity, (Player) nearbyEntity);
+                            shootArrow(eliteMobEntity.getLivingEntity(), (Player) nearbyEntity);
 
             }
 
@@ -87,6 +89,7 @@ public class AttackArrow extends MinorPowers {
         repeatingArrow.setShooter((ProjectileSource) entity);
 
         return repeatingArrow;
+
     }
 
 }

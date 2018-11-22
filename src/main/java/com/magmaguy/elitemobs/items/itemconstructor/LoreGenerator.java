@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -59,7 +59,7 @@ public class LoreGenerator {
     }
 
     public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
-                                        HashMap<String, Integer> customEnchantments, LivingEntity livingEntity) {
+                                        HashMap<String, Integer> customEnchantments, EliteMobEntity eliteMobEntity) {
 
         List<String> lore = new ArrayList<>();
 
@@ -81,7 +81,7 @@ public class LoreGenerator {
             else if (string.contains("$tier"))
                 lore.add(string.replace("$tier", ItemTierFinder.findGenericTier(material, enchantmentMap) + ""));
             else if (string.equals("$itemSource"))
-                lore.add(itemSource(livingEntity));
+                lore.add(itemSource(eliteMobEntity));
             else
                 lore.add(string);
 
@@ -321,14 +321,16 @@ public class LoreGenerator {
 
     }
 
-    private static String itemSource(LivingEntity livingEntity) {
+    private static String itemSource(EliteMobEntity eliteMobEntity) {
+
+        LivingEntity livingEntity = eliteMobEntity.getLivingEntity();
 
         String itemSource;
 
         if (livingEntity != null) {
 
             itemSource = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_MOB_LEVEL_SOURCE).replace("$level",
-                    livingEntity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() + "");
+                    eliteMobEntity.getLevel() + "");
 
             String newName = "";
 

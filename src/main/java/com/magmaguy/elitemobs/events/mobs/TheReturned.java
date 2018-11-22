@@ -16,32 +16,52 @@
 package com.magmaguy.elitemobs.events.mobs;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.DeadMoon;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobconstructor.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Husk;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.Random;
+import java.util.HashSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TheReturned implements Listener {
 
-    private static Random random = new Random();
+    private static HashSet<LivingEntity> theReturnedList = new HashSet<>();
+
+    public static boolean isTheReturned(LivingEntity livingEntity) {
+        return theReturnedList.contains(livingEntity);
+    }
+
+    @EventHandler
+    public void onSpawn(EntitySpawnEvent event) {
+
+        if (!DeadMoon.eventOngoing) return;
+
+        if (event.getEntity() instanceof LivingEntity && theReturnedList.contains(event.getEntity()))
+            spawnTheReturned((Zombie) event.getEntity());
+
+    }
 
     private void spawnTheReturned(Zombie zombie) {
 
+        /*
+        Wait a tick before spawning as third party compatibility can get messy with spawn events
+         */
         new BukkitRunnable() {
 
             @Override
@@ -49,12 +69,12 @@ public class TheReturned implements Listener {
 
                 if (!zombie.isValid()) return;
 
-                if (zombie.hasMetadata(MetadataHandler.THE_RETURNED)) return;
+                if (theReturnedList.contains(zombie)) return;
 
                 int mobLevel;
 
-                if (zombie.hasMetadata(MetadataHandler.ELITE_MOB_MD))
-                    mobLevel = (int) Math.ceil(zombie.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 2);
+                if (EntityTracker.isEliteMob(zombie))
+                    mobLevel = (int) Math.ceil(EntityTracker.getEliteMobEntity(zombie).getLevel() / 2);
                 else mobLevel = 1;
 
                 theReturnedConstructor(mobLevel, zombie);
@@ -72,19 +92,16 @@ public class TheReturned implements Listener {
 
         Husk theReturned = (Husk) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.HUSK);
 
-        MetadataHandler.registerMetadata(theReturned, MetadataHandler.THE_RETURNED, true);
-        MetadataHandler.registerMetadata(theReturned, MetadataHandler.ELITE_MOB_MD, mobLevel);
-        MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_ARMOR, true);
-        MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_POWERS_MD, true);
-        MetadataHandler.registerMetadata(theReturned, MetadataHandler.CUSTOM_STACK, true);
-        NameHandler.customUniqueNameAssigner(theReturned, ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME)));
+        EliteMobEntity eliteMobEntity = new EliteMobEntity(theReturned, mobLevel);
+        eliteMobEntity.setHasCustomArmor(true);
+        eliteMobEntity.setHasCustomPowers(true);
+        eliteMobEntity.setHasStacking(false);
+        eliteMobEntity.setName(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME)));
 
-        double x = random.nextDouble() - 0.5;
-        double z = random.nextDouble() - 0.5;
+        double x = ThreadLocalRandom.current().nextDouble() - 0.5;
+        double z = ThreadLocalRandom.current().nextDouble() - 0.5;
 
         theReturned.setVelocity(new Vector(x, 0.5, z));
-
-        AggressiveEliteMobConstructor.constructAggressiveEliteMob(theReturned);
 
         new BukkitRunnable() {
 
@@ -104,13 +121,8 @@ public class TheReturned implements Listener {
     }
 
     @EventHandler
-    public void onSpawn(EntitySpawnEvent event) {
-
-        if (!DeadMoon.eventOngoing) return;
-
-        if (event.getEntity() instanceof Zombie && !event.getEntity().hasMetadata(MetadataHandler.THE_RETURNED))
-            spawnTheReturned((Zombie) event.getEntity());
-
+    public void onDeath(EntityDeathEvent event) {
+        theReturnedList.remove(event.getEntity());
     }
 
 }

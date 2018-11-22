@@ -15,73 +15,43 @@
 
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.ProjectileMetadataDetector;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
+import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashSet;
+
 /**
  * Created by MagmaGuy on 06/05/2017.
  */
-public class AttackWeakness extends MinorPowers implements Listener {
+public class AttackWeakness extends MinorPower implements Listener {
 
-    String powerMetadata = MetadataHandler.ATTACK_WEAKNESS_MD;
+    private static HashSet<EliteMobEntity> cooldownList = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void attackWeakness(EntityDamageByEntityEvent event) {
 
-        Entity damager = event.getDamager();
-        Entity damagee = event.getEntity();
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        Player player = EntityFinder.findPlayer(event);
+        if (PowerCooldown.isInCooldown(eliteMobEntity, cooldownList)) return;
 
-        if (damager == null) return;
+        player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 0));
 
-        if (damager.hasMetadata(powerMetadata)) {
-
-            if (damagee instanceof Player) {
-
-                Player player = (Player) damagee;
-
-                player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 0));
-
-            }
-
-        } else if (damager instanceof Projectile && damagee instanceof Player) {
-
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
-
-                Player player = (Player) damagee;
-
-                player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 0));
-
-            }
-
-        }
-
+        PowerCooldown.startCooldownTimer(eliteMobEntity, cooldownList, 10 * 20);
 
     }
 

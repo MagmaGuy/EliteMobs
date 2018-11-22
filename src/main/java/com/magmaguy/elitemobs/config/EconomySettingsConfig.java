@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.configuration.Configuration;
 
 import java.util.Arrays;
@@ -166,10 +166,10 @@ public class EconomySettingsConfig {
 
     public void initializeConfig() {
 
-        double diamondLevel = DamageAdjuster.DIAMOND_TIER_LEVEL + 10;
-        double ironLevel = DamageAdjuster.IRON_TIER_LEVEL + 10;
-        double stoneChainLevel = DamageAdjuster.STONE_CHAIN_TIER_LEVEL + 10;
-        double goldWoodLeatherLevel = DamageAdjuster.GOLD_WOOD_LEATHER_TIER_LEVEL + 10;
+        double diamondLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10;
+        double ironLevel = CombatSystem.IRON_TIER_LEVEL + 10;
+        double stoneChainLevel = CombatSystem.STONE_CHAIN_TIER_LEVEL + 10;
+        double goldWoodLeatherLevel = CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL + 10;
 
         configuration.addDefault(ENABLE_ECONOMY, true);
         configuration.addDefault(RESALE_VALUE, 5);

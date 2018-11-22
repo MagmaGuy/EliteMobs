@@ -15,10 +15,11 @@
 
 package com.magmaguy.elitemobs.mobspawning;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
-import com.magmaguy.elitemobs.mobscanner.ValidAggressiveMobFilter;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -37,18 +38,32 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 /**
  * Created by MagmaGuy on 24/04/2017.
  */
-public class NaturalMobMetadataAssigner implements Listener {
+public class NaturalMobSpawnEventHandler implements Listener {
 
     private static int range = Bukkit.getServer().getViewDistance() * 16;
+    private static boolean ignoreMob = false;
+
+    public static void setIgnoreMob(boolean bool) {
+        ignoreMob = bool;
+    }
+
+    private static boolean getIgnoreMob() {
+        return ignoreMob;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
+
+        if (getIgnoreMob()) {
+            setIgnoreMob(false);
+            return;
+        }
 
         if (event.isCancelled()) return;
         /*
         Deal with entities spawned within the plugin
          */
-        if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD)) return;
+        if (EntityTracker.isEliteMob(event.getEntity())) return;
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING))
             return;
@@ -60,14 +75,13 @@ public class NaturalMobMetadataAssigner implements Listener {
             return;
         if (event.getEntity().getCustomName() != null && ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS))
             return;
+
         if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES)))
             return;
-        if (!ValidAggressiveMobFilter.checkValidAggressiveMob(event.getEntity()))
+        if (!EliteMobProperties.isValidEliteMobType(event.getEntityType()))
             return;
 
         LivingEntity livingEntity = event.getEntity();
-//        MetadataHandler.registerMetadata(livingEntity, MetadataHandler.NATURAL_MOB_MD, true); //todo: remove this metadata
-//        EntityTracker.registerNaturalEntity(livingEntity);
 
         int huntingGearChanceAdder = getHuntingGearBonus(livingEntity);
 
@@ -77,7 +91,7 @@ public class NaturalMobMetadataAssigner implements Listener {
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;
 
-        NaturalSpawning.naturalMobProcessor(livingEntity);
+        NaturalEliteMobSpawnEventHandler.naturalMobProcessor(livingEntity);
 
     }
 

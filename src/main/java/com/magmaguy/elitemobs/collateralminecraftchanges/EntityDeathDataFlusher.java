@@ -13,17 +13,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.mobpowers.majorpowers;
+package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import org.bukkit.entity.Entity;
+import com.magmaguy.elitemobs.EntityTracker;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 /**
- * Created by MagmaGuy on 10/05/2017.
+ * Created by MagmaGuy on 14/07/2017.
  */
-public abstract class MajorPowers {
+public class EntityDeathDataFlusher implements Listener {
 
-    public abstract void applyPowers(Entity entity);
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityDeathFlushData(EntityDeathEvent event) {
 
-    public abstract boolean existingPowers(Entity entity);
+        EntityTracker.deathWipe(event);
+
+    }
+
 
 }
