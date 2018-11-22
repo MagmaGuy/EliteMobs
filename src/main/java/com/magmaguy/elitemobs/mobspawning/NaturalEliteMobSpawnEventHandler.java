@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Created by MagmaGuy on 10/10/2016.
  */
-public class NaturalSpawning implements Listener {
+public class NaturalEliteMobSpawnEventHandler implements Listener {
 
     private static int range = Bukkit.getServer().getViewDistance() * 16;
 

@@ -10,9 +10,11 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
+import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -108,64 +110,12 @@ public class EliteMobEntity {
     }
 
     /**
-     * Spawning method for boss mobs.
-     * Assumes custom powers and custom names.
+     * This is the generic constructor used in most instances of natural elite mob generation
      *
-     * @param livingEntity  the living entity associated to the mob
-     * @param eliteMobLevel boss mob level, should be automatically generated based on the highest player tier online
-     * @param name          the name for this boss mob, overrides the usual elite mob name format
-     * @see BossMobEntity
+     * @param livingEntity  Minecraft entity associated to this elite mob
+     * @param eliteMobLevel Level of the mob, can be modified during runtime. Dynamically assigned.
      */
-    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, String name) {
-
-        /*
-        Register living entity to keep track of which entity this object is tied to
-         */
-        this.eliteMob = livingEntity;
-        /*
-        Register level, this is variable as per stacking rules
-         */
-        setEliteMobLevel(eliteMobLevel);
-        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
-        /*
-        Get correct instance of plugin data, necessary for settings names and health among other things
-         */
-        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
-        /*
-        Handle name, variable as per stacking rules
-         */
-        setCustomName(name);
-        /*
-        Handle health, max is variable as per stacking rules
-        Currently #setHealth() resets the health back to maximum
-         */
-        setMaxHealth(eliteMobProperties);
-        setHealth();
-        /*
-        Register whether or not the elite mob is natural
-         */
-        this.isNaturalEntity = EntityTracker.isNaturalEntity(livingEntity);
-        /*
-        These have custom powers
-         */
-        this.hasCustomPowers = true;
-        /*
-        Start tracking the entity
-         */
-        EntityTracker.registerEliteMob(this);
-
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
-            eliteMob.setCanPickupItems(false);
-
-        this.setHasStacking(false);
-        this.setHasCustomArmor(true);
-
-    }
-
-    /*
-    This is the generic constructor for elite mobs spawned via commands
-     */
-    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, HashSet<ElitePower> mobPowers) {
+    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, double currentHealthPercent) {
 
         /*
         Register living entity to keep track of which entity this object is tied to
@@ -196,6 +146,111 @@ public class EliteMobEntity {
         setArmor();
         /*
         Register whether or not the elite mob is natural
+         */
+        this.isNaturalEntity = EntityTracker.isNaturalEntity(livingEntity);
+        /*
+        Set the power list
+         */
+        randomizePowers(eliteMobProperties);
+        /*
+        Start tracking the entity
+         */
+        EntityTracker.registerEliteMob(this);
+
+        eliteMob.setCanPickupItems(false);
+
+    }
+
+
+    /**
+     * Spawning method for boss mobs.
+     * Assumes custom powers and custom names.
+     *
+     * @param livingEntity  the living entity associated to the mob
+     * @param eliteMobLevel boss mob level, should be automatically generated based on the highest player tier online
+     * @param name          the name for this boss mob, overrides the usual elite mob name format
+     * @see BossMobEntity
+     */
+    public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name) {
+
+        /*
+        Register living entity to keep track of which entity this object is tied to
+         */
+        this.eliteMob = spawnBossMobLivingEntity(entityType, location);
+        /*
+        Register level, this is variable as per stacking rules
+         */
+        setEliteMobLevel(eliteMobLevel);
+        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        /*
+        Get correct instance of plugin data, necessary for settings names and health among other things
+         */
+        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(entityType);
+        /*
+        Handle name, variable as per stacking rules
+         */
+        setCustomName(name);
+        /*
+        Handle health, max is variable as per stacking rules
+        Currently #setHealth() resets the health back to maximum
+         */
+        setMaxHealth(eliteMobProperties);
+        setHealth();
+        /*
+        Register whether or not the elite mob is natural
+         */
+        this.isNaturalEntity = EntityTracker.isNaturalEntity(this.eliteMob);
+        /*
+        These have custom powers
+         */
+        this.hasCustomPowers = true;
+        /*
+        Start tracking the entity
+         */
+        EntityTracker.registerEliteMob(this);
+
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
+            eliteMob.setCanPickupItems(false);
+
+        this.setHasStacking(false);
+        this.setHasCustomArmor(true);
+
+    }
+
+    /*
+    This is the generic constructor for elite mobs spawned via commands
+     */
+    public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, HashSet<ElitePower> mobPowers) {
+
+        /*
+        Register living entity to keep track of which entity this object is tied to
+         */
+        this.eliteMob = spawnBossMobLivingEntity(entityType, location);
+        /*
+        Register level, this is variable as per stacking rules
+         */
+        setEliteMobLevel(eliteMobLevel);
+        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        /*
+        Get correct instance of plugin data, necessary for settings names and health among other things
+         */
+        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(entityType);
+        /*
+        Handle name, variable as per stacking rules
+         */
+        setCustomName(eliteMobProperties);
+        /*
+        Handle health, max is variable as per stacking rules
+        Currently #setHealth() resets the health back to maximum
+         */
+        setMaxHealth(eliteMobProperties);
+        setHealth();
+        /*
+        Set the armor
+         */
+        setArmor();
+        /*
+        Register whether or not the elite mob is natural
         All mobs spawned via commands are considered natural
          */
         this.isNaturalEntity = true;
@@ -206,11 +261,19 @@ public class EliteMobEntity {
         /*
         Start tracking the entity
          */
-        EntityTracker.registerEliteMob(new EliteMobEntity(livingEntity, this.eliteMobLevel));
+        EntityTracker.registerEliteMob(new EliteMobEntity(this.eliteMob, this.eliteMobLevel));
 
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
             eliteMob.setCanPickupItems(false);
 
+    }
+
+    /*
+    This avoids accidentally assigning an elite mob to an entity spawned specifically to be a boss mob or reinforcement
+    */
+    private static LivingEntity spawnBossMobLivingEntity(EntityType entityType, Location location) {
+        NaturalMobSpawnEventHandler.setIgnoreMob(true);
+        return (LivingEntity) location.getWorld().spawnEntity(location, entityType);
     }
 
     private void setCustomName(EliteMobProperties eliteMobProperties) {
@@ -245,6 +308,11 @@ public class EliteMobEntity {
     private void setHealth() {
         eliteMob.setHealth(maxHealth = (maxHealth > 2048) ? 2048 : maxHealth);
     }
+
+    private void setHealth(double healthPercentage) {
+        eliteMob.setHealth(this.maxHealth * healthPercentage);
+    }
+
 
     private void setArmor() {
 
@@ -372,6 +440,7 @@ public class EliteMobEntity {
             else {
                 ElitePower selectedPower = localPowers.get(ThreadLocalRandom.current().nextInt(localPowers.size()));
                 this.powers.add(selectedPower);
+                selectedPower.applyPowers(this.eliteMob);
                 localPowers.remove(selectedPower);
                 if (selectedPower instanceof MajorPower)
                     this.majorPowerCount++;
@@ -385,6 +454,7 @@ public class EliteMobEntity {
 
         this.powers = elitePowers;
         for (ElitePower elitePower : elitePowers) {
+            elitePower.applyPowers(this.eliteMob);
             if (elitePower instanceof MinorPower)
                 this.minorPowerCount++;
             if (elitePower instanceof MajorPower)
@@ -410,7 +480,10 @@ public class EliteMobEntity {
     }
 
     public boolean hasPower(ElitePower mobPower) {
-        return this.powers.contains(mobPower);
+        for (ElitePower elitePower : powers)
+            if (elitePower.getClass().getTypeName().equals(mobPower.getClass().getTypeName()))
+                return true;
+        return false;
     }
 
     public int getMinorPowerCount() {

@@ -52,7 +52,7 @@ import com.magmaguy.elitemobs.mobconstructor.ReinforcementMobEntity;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -82,14 +82,15 @@ public class ZombieParents extends MajorPower implements Listener {
         if (ThreadLocalRandom.current().nextDouble() > 0.01) return;
         if (activatedZombies.contains(eliteMobEntity)) return;
 
-        Skeleton zombieMom = (Skeleton) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.SKELETON);
-        Skeleton zombieDad = (Skeleton) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.SKELETON);
-
-        ReinforcementMobEntity reinforcementMom = new ReinforcementMobEntity(zombieMom, eliteMobEntity.getLevel(),
+        ReinforcementMobEntity reinforcementMom = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(),
                 ConfigValues.translationConfig.getString("ZombieParents.Mom Name"));
 
-        ReinforcementMobEntity reinforcementDad = new ReinforcementMobEntity(zombieDad, eliteMobEntity.getLevel(),
+        LivingEntity zombieMom = reinforcementMom.getLivingEntity();
+
+        ReinforcementMobEntity reinforcementDad = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(),
                 ConfigValues.translationConfig.getString("ZombieParents.Dad Name"));
+
+        LivingEntity zombieDad = reinforcementDad.getLivingEntity();
 
         new BukkitRunnable() {
 

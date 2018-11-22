@@ -17,7 +17,9 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.events.mobs.*;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
@@ -30,7 +32,10 @@ import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Squid;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -51,13 +56,17 @@ public class SpawnMobCommandHandler {
         EntityType entityType = getEntityType(commandSender, args);
         if (entityType == null) return;
 
+        if (SuperMobProperties.isValidSuperMobType(entityType)) {
+            spawnSuperMob(entityType, location);
+            return;
+        }
+
         Integer mobLevel = getLevel(commandSender, args);
         if (mobLevel == null) return;
 
         HashSet<ElitePower> mobPowers = getPowers(commandSender, args);
 
-        LivingEntity eliteMob = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
-        EliteMobEntity eliteMobEntity = new EliteMobEntity(eliteMob, mobLevel, mobPowers);
+        EliteMobEntity eliteMobEntity = new EliteMobEntity(entityType, location, mobLevel, mobPowers);
 
     }
 
@@ -362,23 +371,24 @@ public class SpawnMobCommandHandler {
 
     }
 
+    private static void spawnSuperMob(EntityType entityType, Location location) {
+        SuperMobConstructor.constructSuperMob((LivingEntity) location.getWorld().spawnEntity(location, entityType));
+    }
+
     public static void spawnBossMob(Player player, String[] args) {
 
         Location cursorLocation = player.getTargetBlock(null, 5).getLocation().add(new Vector(0.5, 2, 0.5));
 
         if (args[1].equalsIgnoreCase("treasuregoblin")) {
 
-            Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
-            TreasureGoblin.createGoblin(zombie);
+            TreasureGoblin.createGoblin(cursorLocation);
             player.sendMessage("Spawned treasure goblin");
 
         }
 
         if (args[1].equalsIgnoreCase("zombieking")) {
 
-            Zombie zombie = (Zombie) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.ZOMBIE);
-            ZombieKing.spawnZombieKing(zombie);
-            zombie.remove();
+            ZombieKing.spawnZombieKing(cursorLocation);
             player.sendMessage("Spawned zombie king");
 
         }
@@ -394,18 +404,14 @@ public class SpawnMobCommandHandler {
 
         if (args[1].equalsIgnoreCase("balrog")) {
 
-            Silverfish balrog = (Silverfish) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.SILVERFISH);
-            Balrog.spawnBalrog(balrog.getLocation());
-            balrog.remove();
+            Balrog.spawnBalrog(cursorLocation);
             player.sendMessage("Spawned Balrog");
 
         }
 
         if (args[1].equalsIgnoreCase("fae")) {
 
-            Vex fae = (Vex) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.VEX);
-            Fae.spawnFae(fae.getLocation());
-            fae.remove();
+            Fae.spawnFae(cursorLocation);
             player.sendMessage("Spawned Fae");
 
         }

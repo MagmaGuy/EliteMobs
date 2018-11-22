@@ -175,7 +175,7 @@ public class EntityTracker implements Listener {
         return null;
     }
 
-    public static EliteMobEntity getAsyncEliteMobEntity(Entity entity){
+    public static EliteMobEntity getAsyncEliteMobEntity(Entity entity) {
         if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
         HashSet<EliteMobEntity> localEntities = (HashSet<EliteMobEntity>) eliteMobs.clone();
         for (EliteMobEntity eliteMobEntity : localEntities)
@@ -295,30 +295,25 @@ public class EntityTracker implements Listener {
     This is run in sync for performance reasons
      */
     public static void wipeEntity(Entity entity) {
-        unregisterEliteMob(entity);
-        unregisterSuperMob(entity);
-        unregisterNaturalEntity(entity);
-        unregisterArmorStand(entity);
-        unregisterCullableEntity(entity);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                unregisterEliteMob(entity);
+                unregisterSuperMob(entity);
+                unregisterNaturalEntity(entity);
+                unregisterArmorStand(entity);
+                unregisterCullableEntity(entity);
+            }
+        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
 
     public static void chunkWiper(ChunkUnloadEvent event) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Entity entity : event.getChunk().getEntities())
-                    wipeEntity(entity);
-            }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+        for (Entity entity : event.getChunk().getEntities())
+            wipeEntity(entity);
     }
 
     public static void deathWipe(EntityDeathEvent event) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                wipeEntity(event.getEntity());
-            }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+        wipeEntity(event.getEntity());
     }
 
 }

@@ -15,7 +15,6 @@
 
 package com.magmaguy.elitemobs.mobconstructor;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
@@ -52,17 +51,8 @@ public class MergeHandler implements Listener {
     private void validateEntityType(Entity eventEntity) {
 
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) &&
-                EliteMobProperties.isValidEliteMobType(eventEntity)) {
-
-            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_NATURAL_MOBS) &&
-                    EntityTracker.isNaturalEntity(eventEntity))
-                EliteMobScanner.scanValidAggressiveLivingEntity((LivingEntity) eventEntity);
-
-            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_SPAWNER_MOBS) &&
-                    !EntityTracker.isNaturalEntity(eventEntity))
-                EliteMobScanner.scanValidAggressiveLivingEntity((LivingEntity) eventEntity);
-
-        }
+                EliteMobProperties.isValidEliteMobType(eventEntity))
+            EliteMobScanner.scanValidAggressiveLivingEntity((LivingEntity) eventEntity);
 
         if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
                 SuperMobProperties.isValidSuperMobType(eventEntity))

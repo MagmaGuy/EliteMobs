@@ -56,7 +56,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ocelot;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -91,7 +90,7 @@ public class ZombieTeamRocket extends MajorPower implements Listener {
 
         EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
         if (eliteMobEntity == null) return;
-        if (ThreadLocalRandom.current().nextDouble() > 0.01) return;
+        if (ThreadLocalRandom.current().nextDouble() < 0.20) return;
         if (activatedZombies.contains(eliteMobEntity)) return;
         activatedZombies.add(eliteMobEntity);
 
@@ -117,19 +116,17 @@ public class ZombieTeamRocket extends MajorPower implements Listener {
         jamesHelmetMeta.setColor(Color.BLUE);
         jamesHelmet.setItemMeta(jamesHelmetMeta);
 
-        Zombie jesse = (Zombie) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.ZOMBIE);
-        ReinforcementMobEntity jesseReinforcement = new ReinforcementMobEntity(jesse, eliteMobEntity.getLevel(), "Jesse");
-        jesse.getEquipment().setHelmet(jesseHelmet);
-        jesse.getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
-        jesse.getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);
-        jesse.getEquipment().setBoots(TEAM_ROCKET_BOOTS);
+        ReinforcementMobEntity jesseReinforcement = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), "Jesse");
+        jesseReinforcement.getLivingEntity().getEquipment().setHelmet(jesseHelmet);
+        jesseReinforcement.getLivingEntity().getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
+        jesseReinforcement.getLivingEntity().getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);
+        jesseReinforcement.getLivingEntity().getEquipment().setBoots(TEAM_ROCKET_BOOTS);
 
-        Zombie james = (Zombie) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.ZOMBIE);
-        ReinforcementMobEntity jamesReinforcement = new ReinforcementMobEntity(james, eliteMobEntity.getLevel(), "James");
-        james.getEquipment().setHelmet(jamesHelmet);
-        james.getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
-        james.getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);
-        james.getEquipment().setBoots(TEAM_ROCKET_BOOTS);
+        ReinforcementMobEntity jamesReinforcement = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), "James");
+        jamesReinforcement.getLivingEntity().getEquipment().setHelmet(jamesHelmet);
+        jamesReinforcement.getLivingEntity().getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
+        jamesReinforcement.getLivingEntity().getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);
+        jamesReinforcement.getLivingEntity().getEquipment().setBoots(TEAM_ROCKET_BOOTS);
 
         Ocelot meowth = (Ocelot) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(eliteMobEntity.getLivingEntity().getLocation(), EntityType.OCELOT);
         meowth.setCustomName("Meowth");
@@ -149,82 +146,82 @@ public class ZombieTeamRocket extends MajorPower implements Listener {
                 switch (counter) {
 
                     case 1:
-                        jesse.setCustomNameVisible(true);
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(0)));
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(true);
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(0)));
                         break;
                     case 2:
-                        jesse.setCustomNameVisible(false);
-                        james.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(1)));
-                        james.setCustomNameVisible(true);
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(1)));
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 3:
-                        james.setCustomNameVisible(false);
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(2)));
-                        jesse.setCustomNameVisible(true);
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(2)));
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 4:
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(3)));
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(3)));
                         break;
                     case 5:
-                        jesse.setCustomNameVisible(false);
-                        james.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(4)));
-                        james.setCustomNameVisible(true);
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(4)));
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 6:
-                        james.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(5)));
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(5)));
                         break;
                     case 7:
-                        james.setCustomNameVisible(false);
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(6)));
-                        jesse.setCustomNameVisible(true);
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(6)));
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 8:
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(7)));
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(7)));
                         break;
                     case 9:
-                        jesse.setCustomNameVisible(false);
-                        james.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(8)));
-                        james.setCustomNameVisible(true);
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(8)));
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 10:
-                        james.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(9)));
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(9)));
                         break;
                     case 11:
-                        james.setCustomNameVisible(false);
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(10)));
-                        jesse.setCustomNameVisible(true);
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(10)));
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 12:
-                        jesse.setCustomNameVisible(false);
-                        james.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(11)));
-                        james.setCustomNameVisible(true);
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(11)));
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 13:
-                        james.setCustomNameVisible(false);
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(12)));
-                        jesse.setCustomNameVisible(true);
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(12)));
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 14:
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(13)));
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(13)));
                         break;
                     case 15:
-                        jesse.setCustomNameVisible(false);
-                        james.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(14)));
-                        james.setCustomNameVisible(true);
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(false);
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(14)));
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(true);
                         break;
                     case 16:
-                        james.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(15)));
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(15)));
                         break;
                     case 17:
-                        james.setCustomNameVisible(false);
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(false);
                         meowth.setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieTeamRocket.Intro").get(16)));
                         meowth.setCustomNameVisible(true);
                         break;
                     case 18:
-                        jesse.setCustomName(convert(ConfigValues.translationConfig.getString("ZombieTeamRocket.Jesse name")));
-                        jesse.setCustomNameVisible(true);
-                        james.setCustomName(convert(ConfigValues.translationConfig.getString("ZombieTeamRocket.James name")));
-                        james.setCustomNameVisible(true);
+                        jesseReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getString("ZombieTeamRocket.Jesse name")));
+                        jesseReinforcement.getLivingEntity().setCustomNameVisible(true);
+                        jamesReinforcement.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getString("ZombieTeamRocket.James name")));
+                        jamesReinforcement.getLivingEntity().setCustomNameVisible(true);
                         meowth.setCustomName(convert(ConfigValues.translationConfig.getString("ZombieTeamRocket.Meowth name")));
                     case 30:
                         meowth.remove();

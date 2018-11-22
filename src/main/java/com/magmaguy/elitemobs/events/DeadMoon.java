@@ -24,7 +24,7 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.events.mobs.TheReturned;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
-import com.magmaguy.elitemobs.mobspawning.NaturalSpawning;
+import com.magmaguy.elitemobs.mobspawning.NaturalEliteMobSpawnEventHandler;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
@@ -75,7 +75,7 @@ public class DeadMoon implements Listener {
         if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM)) return;
 
         if (!EntityTracker.isEliteMob(event.getEntity()))
-            NaturalSpawning.naturalMobProcessor(event.getEntity());
+            NaturalEliteMobSpawnEventHandler.naturalMobProcessor(event.getEntity());
 
         //add entityQueued
         if (entityQueued && !TheReturned.isTheReturned(event.getEntity())
@@ -87,7 +87,7 @@ public class DeadMoon implements Listener {
 
             EventMessage.sendEventMessage(event.getEntity(), ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_ANNOUNCEMENT_MESSAGE));
 
-            ZombieKing.spawnZombieKing((Zombie) event.getEntity());
+            ZombieKing.spawnZombieKing(event.getLocation());
             terminateEvent(event.getEntity());
 
         }
