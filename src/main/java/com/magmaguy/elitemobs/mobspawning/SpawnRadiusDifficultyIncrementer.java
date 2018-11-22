@@ -18,17 +18,16 @@ package com.magmaguy.elitemobs.mobspawning;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
 
 public class SpawnRadiusDifficultyIncrementer {
 
-    public static int distanceFromSpawnLevelIncrease(LivingEntity livingEntity) {
+    public static int distanceFromSpawnLevelIncrease(Location location) {
 
         double distanceUnit = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.DISTANCE_TO_INCREMENT);
         double levelToIncrement = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.LEVEL_TO_INCREMENT);
 
-        Location spawnLocation = livingEntity.getWorld().getSpawnLocation();
-        Location entityLocation = livingEntity.getLocation();
+        Location spawnLocation = location.getWorld().getSpawnLocation();
+        Location entityLocation = location;
 
         double distanceFromSpawn = spawnLocation.distance(entityLocation);
 

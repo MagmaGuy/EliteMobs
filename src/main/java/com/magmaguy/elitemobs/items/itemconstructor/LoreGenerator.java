@@ -80,10 +80,12 @@ public class LoreGenerator {
                 lore.add(itemWorth(material, enchantmentMap));
             else if (string.contains("$tier"))
                 lore.add(string.replace("$tier", ItemTierFinder.findGenericTier(material, enchantmentMap) + ""));
-            else if (string.equals("$itemSource"))
-                lore.add(itemSource(eliteMobEntity));
-            else
-                lore.add(string);
+            else if (string.equals("$itemSource")) {
+                if (eliteMobEntity != null) {
+                    lore.add(itemSource(eliteMobEntity));
+                } else
+                    lore.add(string);
+            }
 
         }
 
@@ -166,9 +168,9 @@ public class LoreGenerator {
                 obfuscatedString.append(enchantment.getName()).append(":").append(enchantmentMap.get(enchantment)).append(",");
         }
 
-        if (!customEnchantments.isEmpty()){
+        if (!customEnchantments.isEmpty()) {
             obfuscatedString.append(OBFUSCATED_CUSTOM_ENCHANTMENTS).append(",");
-            for (String string: customEnchantments.keySet())
+            for (String string : customEnchantments.keySet())
                 obfuscatedString.append(string).append(":").append(customEnchantments.get(string)).append(",");
         }
 
