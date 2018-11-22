@@ -2,9 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobscanner.ValidAggressiveMobFilter;
-import com.magmaguy.elitemobs.mobscanner.ValidPassiveMobFilter;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -52,12 +50,13 @@ public class KillHandler {
 
         if (CommandHandler.permCheck(CommandHandler.KILLALL_AGGRESSIVEELITES, commandSender)) {
             int counter = 0;
-            for (World world : EliteMobs.validWorldList)
-                for (LivingEntity livingEntity : world.getLivingEntities())
-                    if (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAggressiveMobFilter.checkValidAggressiveMob(livingEntity)) {
-                        livingEntity.remove();
-                        counter++;
-                    }
+
+            for (EliteMobEntity eliteMobEntity : EntityTracker.getEliteMobs()) {
+                eliteMobEntity.getLivingEntity().remove();
+                EntityTracker.unregisterEliteMob(eliteMobEntity);
+                counter++;
+            }
+
 
             commandSender.sendMessage("Killed " + counter + " Elite Mobs.");
 
@@ -71,7 +70,7 @@ public class KillHandler {
             int counter = 0;
             for (World world : EliteMobs.validWorldList)
                 for (LivingEntity livingEntity : world.getLivingEntities())
-                    if (EntityTracker.isPassiveMob(livingEntity) && ValidPassiveMobFilter.ValidPassiveMobFilter(livingEntity)) {
+                    if (EntityTracker.isSuperMob(livingEntity)) {
                         livingEntity.remove();
                         counter++;
                     }
@@ -91,8 +90,8 @@ public class KillHandler {
                 for (World world : EliteMobs.validWorldList)
                     for (LivingEntity livingEntity : world.getLivingEntities())
                         if (livingEntity.getType().equals(entityType) &&
-                                (livingEntity.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
-                                        EntityTracker.isPassiveMob(livingEntity))) {
+                                (EntityTracker.isEliteMob(livingEntity) ||
+                                        EntityTracker.isSuperMob(livingEntity))) {
                             livingEntity.remove();
                             counter++;
                         }
@@ -116,7 +115,7 @@ public class KillHandler {
 
             int counter = 0;
             for (Entity entity : ((Player) commandSender).getNearbyEntities(Integer.parseInt(args[2]), Integer.parseInt(args[2]), Integer.parseInt(args[2])))
-                if (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) && ValidAggressiveMobFilter.checkValidAggressiveMob(entity)) {
+                if (EntityTracker.isEliteMob(entity)) {
                     entity.remove();
                     counter++;
                 }
@@ -137,7 +136,7 @@ public class KillHandler {
         try {
             int counter = 0;
             for (Entity entity : ((Player) commandSender).getNearbyEntities(Integer.parseInt(args[2]), Integer.parseInt(args[2]), Integer.parseInt(args[2])))
-                if (EntityTracker.isPassiveMob(entity) && ValidPassiveMobFilter.ValidPassiveMobFilter(entity)) {
+                if (EntityTracker.isSuperMob(entity)) {
                     entity.remove();
                     counter++;
                 }
@@ -161,8 +160,8 @@ public class KillHandler {
             int counter = 0;
             for (Entity entity : ((Player) commandSender).getNearbyEntities(Integer.parseInt(args[2]), Integer.parseInt(args[2]), Integer.parseInt(args[2])))
                 if (entity.getType().equals(entityType) &&
-                        (entity.hasMetadata(MetadataHandler.ELITE_MOB_MD) ||
-                                EntityTracker.isPassiveMob(entity))) {
+                        (EntityTracker.isEliteMob(entity) ||
+                                EntityTracker.isSuperMob(entity))) {
                     entity.remove();
                     counter++;
                 }

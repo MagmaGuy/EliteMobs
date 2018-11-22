@@ -4,17 +4,14 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.items.uniqueitems.TheFeller;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobconstructor.NameHandler;
+import com.magmaguy.elitemobs.mobconstructor.ActionBossMobEntity;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackFire;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackFreeze;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Vex;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -22,6 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -64,39 +63,41 @@ public class Fae implements Listener {
 
     private static void initializeVex(Location location) {
 
-        Vex lightningFae = (Vex) location.getWorld().spawnEntity(location, EntityType.VEX);
-        Vex fireFae = (Vex) location.getWorld().spawnEntity(location, EntityType.VEX);
-        Vex frostFae = (Vex) location.getWorld().spawnEntity(location, EntityType.VEX);
+        /*
+        Good for all fae
+         */
+        int level = ActionDynamicBossLevelConstructor.determineDynamicBossLevel(location) / 3;
 
-        MetadataHandler.registerMetadata(fireFae, MetadataHandler.ATTACK_FIRE_MD, true);
-        MetadataHandler.registerMetadata(frostFae, MetadataHandler.ATTACK_FREEZE_MD, true);
+        /*
+        Construct specific fae
+         */
+        ActionBossMobEntity fireFaeBoss = new ActionBossMobEntity(
+                EntityType.VEX,
+                location,
+                level,
+                ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME));
 
-        faeConstructor(lightningFae);
-        faeConstructor(fireFae);
-        faeConstructor(frostFae);
+        ActionBossMobEntity lightningFaeBoss = new ActionBossMobEntity(
+                EntityType.VEX,
+                location,
+                level,
+                ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
+                new HashSet<>(Arrays.asList(new AttackFire())));
 
-        faeVisualEffect(lightningFae, faeType.LIGHTING_FAE);
-        faeVisualEffect(fireFae, faeType.FIRE_FAE);
-        faeVisualEffect(frostFae, faeType.FROST_FAE);
+        ActionBossMobEntity frostFaeBoss = new ActionBossMobEntity(
+                EntityType.VEX,
+                location,
+                level,
+                ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
+                new HashSet<>(Arrays.asList(new AttackFreeze())));
 
-        initializeSmiteAttack(lightningFae);
+        faeList.addAll(Arrays.asList(lightningFaeBoss.getLivingEntity(), fireFaeBoss.getLivingEntity(), frostFaeBoss.getLivingEntity()));
 
-    }
+        faeVisualEffect((Vex) lightningFaeBoss.getLivingEntity(), faeType.LIGHTING_FAE);
+        faeVisualEffect((Vex) fireFaeBoss.getLivingEntity(), faeType.FIRE_FAE);
+        faeVisualEffect((Vex) frostFaeBoss.getLivingEntity(), faeType.FROST_FAE);
 
-    private static void faeConstructor(Vex fae) {
-
-        MetadataHandler.registerMetadata(fae, MetadataHandler.ELITE_MOB_MD, ActionDynamicBossLevelConstructor.determineDynamicBossLevel(fae) / 3);
-        MetadataHandler.registerMetadata(fae, MetadataHandler.FAE, true);
-        MetadataHandler.registerMetadata(fae, MetadataHandler.EVENT_CREATURE, true);
-        MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_ARMOR, true);
-        MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_POWERS_MD, true);
-        MetadataHandler.registerMetadata(fae, MetadataHandler.CUSTOM_STACK, true);
-        MetadataHandler.registerMetadata(fae, MetadataHandler.PERSISTENT_ENTITY, true);
-
-        NameHandler.customUniqueNameAssigner(fae, ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME));
-        AggressiveEliteMobConstructor.constructAggressiveEliteMob(fae);
-
-        BossMobDeathCountdown.startDeathCountdown(fae);
+        initializeSmiteAttack((Vex) lightningFaeBoss.getLivingEntity());
 
     }
 
@@ -207,10 +208,12 @@ public class Fae implements Listener {
 
     }
 
+    private static HashSet<LivingEntity> faeList = new HashSet<>();
+
     @EventHandler
     public void onFaeDeath(EntityDeathEvent event) {
 
-        if (!event.getEntity().hasMetadata(MetadataHandler.FAE)) return;
+        if (!faeList.contains(event.getEntity())) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.33) return;
 
         TheFeller theFeller = new TheFeller();

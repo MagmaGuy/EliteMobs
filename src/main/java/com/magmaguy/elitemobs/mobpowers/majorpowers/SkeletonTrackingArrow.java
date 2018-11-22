@@ -31,41 +31,42 @@
 package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackArrow;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
-public class SkeletonTrackingArrow extends MajorPowers implements Listener {
+public class SkeletonTrackingArrow extends MajorPower implements Listener {
 
-    String powerMetadata = MetadataHandler.SKELETON_TRACKING_ARROW_MD;
+    private static HashSet<EliteMobEntity> currentlyFiringEntities = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
 
         if (VersionChecker.currentVersionIsUnder(10, 0)) return;
 
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
-        majorPowerStanceMath.itemEffect(entity);
-        repeatingTrackingArrowTask(entity);
-
     }
 
-    @Override
-    public boolean existingPowers(Entity entity) {
+    @EventHandler
+    public void targetEvent(EntityTargetLivingEntityEvent event) {
 
-        return entity.hasMetadata(powerMetadata);
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        if (currentlyFiringEntities.contains(eliteMobEntity)) return;
+        repeatingTrackingArrowTask(event.getEntity());
+        currentlyFiringEntities.add(eliteMobEntity);
 
     }
 
@@ -100,7 +101,7 @@ public class SkeletonTrackingArrow extends MajorPowers implements Listener {
 
     }
 
-    public static List<Arrow> trackingArrowList = new ArrayList();
+    public static HashSet<Arrow> trackingArrowList = new HashSet<>();
 
     private static void trackingArrowLoop(Player player, Arrow arrow) {
 

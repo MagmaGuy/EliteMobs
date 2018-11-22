@@ -27,7 +27,7 @@ public class ItemsCustomLootSettingsConfig {
 //    public static final String SHOW_POTION_EFFECTS = "Show potion effects on lore";
     public static final String SHOW_ITEM_VALUE = "Show item value on lore";
     public static final String SHOW_ITEM_TIER = "Show item tier on lore";
-    public static final String LORE_STRUCTURE = "Lore structure";
+    public static final String LORE_STRUCTURE = "Lore Structure";
     public static final String PREVENT_CUSTOM_ITEM_PLACING = "Prevent players from placing pleaceable Elite custom items";
     public static final String DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX = "Default potion effect duration (seconds, on hit).";
     public static final String ABSORPTION = DEFAULT_POTION_EFFECT_DURATION_NODE_PREFIX + "ABSORPTION";

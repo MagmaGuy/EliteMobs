@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.mobconstructor.displays;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -33,14 +34,6 @@ import org.bukkit.util.Vector;
 
 public class HealthDisplay implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onHitArmorStand(EntityDamageEvent event) {
-
-        if (event.getEntity() instanceof ArmorStand && event.getEntity().hasMetadata(MetadataHandler.ARMOR_STAND_DISPLAY))
-            event.setCancelled(true);
-
-    }
-
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHit(EntityDamageEvent event) {
 
@@ -49,18 +42,11 @@ public class HealthDisplay implements Listener {
         if (!(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof ArmorStand) return;
 
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_HEALTH_FOR_ELITE_MOBS)) {
-
-            if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
-
+            if (EntityTracker.isEliteMob(event.getEntity()))
                 displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
 
-            }
-
-        } else {
-
+        } else
             displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
-
-        }
 
     }
 
@@ -82,10 +68,8 @@ public class HealthDisplay implements Listener {
         armorStand.setVisible(false);
         armorStand.setMarker(true);
         armorStand.setCustomName(setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
-        armorStand.setCustomNameVisible(true);
         armorStand.setGravity(false);
-        MetadataHandler.registerMetadata(armorStand, MetadataHandler.ARMOR_STAND_DISPLAY, true);
-
+        EntityTracker.registerCullableEntity(armorStand);
 
 
         new BukkitRunnable() {
@@ -94,6 +78,8 @@ public class HealthDisplay implements Listener {
 
             @Override
             public void run() {
+
+                armorStand.setCustomNameVisible(true);
 
                 Location newLocation = new Location(livingEntity.getWorld(), livingEntity.getLocation().getX(),
                         livingEntity.getLocation().getY() + livingEntity.getEyeHeight() + 0.5, livingEntity.getLocation().getZ());
@@ -105,7 +91,7 @@ public class HealthDisplay implements Listener {
                 if (taskTimer == 15) {
 
                     cancel();
-                    armorStand.removeMetadata(MetadataHandler.ARMOR_STAND_DISPLAY, Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS));
+                    EntityTracker.unregisterCullableEntity(armorStand);
                     armorStand.remove();
 
                 }

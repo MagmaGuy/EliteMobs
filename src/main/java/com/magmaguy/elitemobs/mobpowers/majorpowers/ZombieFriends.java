@@ -1,227 +1,124 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobconstructor.NameHandler;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.Configuration;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.ReinforcementMobEntity;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Random;
+import java.util.HashSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
 /**
  * Created by MagmaGuy on 18/05/2017.
  */
-public class ZombieFriends extends MajorPowers implements Listener {
+public class ZombieFriends extends MajorPower implements Listener {
 
-    private static Random random = new Random();
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.ZOMBIE_FRIENDS_MD;
-    private int processID;
-    Configuration configuration = ConfigValues.translationConfig;
+    public static HashSet<EliteMobEntity> activatedZombies = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
-        majorPowerStanceMath.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.isCancelled()) return;
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        if (ThreadLocalRandom.current().nextDouble() > 0.01) return;
+        if (activatedZombies.contains(eliteMobEntity)) return;
+        activatedZombies.add(eliteMobEntity);
 
-        if (event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Zombie &&
-                !event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_FRIENDS_ACTIVATED) && random.nextDouble() < 0.5) {
+        ReinforcementMobEntity reinforcement1 = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(),
+                eliteMobEntity.getLevel(), ConfigValues.translationConfig.getString("ZombieFriends.Friend 1"));
 
-            Entity entity = event.getEntity();
+        ReinforcementMobEntity reinforcement2 = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(),
+                eliteMobEntity.getLevel(), ConfigValues.translationConfig.getString("ZombieFriends.Friend 2"));
 
-            MetadataHandler.registerMetadata(entity, MetadataHandler.ZOMBIE_FRIENDS_ACTIVATED, true);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!eliteMobEntity.getLivingEntity().isValid() || !reinforcement1.getLivingEntity().isValid() && !reinforcement2.getLivingEntity().isValid()) {
 
-            int assistMobLevel = (int) Math.floor(entity.getMetadata(MetadataHandler.ELITE_MOB_MD).get(0).asInt() / 4);
+                    if (reinforcement1.getLivingEntity().isValid()) {
 
-            if (assistMobLevel < 1) {
+                        nameClearer(reinforcement1);
 
-                assistMobLevel = 1;
+                        reinforcement1.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage")
+                                        .size()))));
 
-            }
+                    }
 
-            Zombie friend1 = (Zombie) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.ZOMBIE);
-            Zombie friend2 = (Zombie) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.ZOMBIE);
-
-            MetadataHandler.registerMetadata(friend1, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
-            MetadataHandler.registerMetadata(friend2, MetadataHandler.ELITE_MOB_MD, assistMobLevel);
-            MetadataHandler.registerMetadata(friend1, MetadataHandler.CUSTOM_STACK, true);
-            MetadataHandler.registerMetadata(friend2, MetadataHandler.CUSTOM_STACK, true);
-            MetadataHandler.registerMetadata(friend1, MetadataHandler.CUSTOM_POWERS_MD, true);
-            MetadataHandler.registerMetadata(friend2, MetadataHandler.CUSTOM_POWERS_MD, true);
-            friend1.setCustomName(convert(configuration.getString("ZombieFriends.Friend 1")));
-            friend2.setCustomName(convert(configuration.getString("ZombieFriends.Friend 2")));
-            friend1.setCustomNameVisible(true);
-            friend2.setCustomNameVisible(true);
-            AggressiveEliteMobConstructor.constructAggressiveEliteMob(friend1);
-            AggressiveEliteMobConstructor.constructAggressiveEliteMob(friend2);
-
-            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-                @Override
-                public void run() {
-
-                    if (!entity.isValid() || !friend1.isValid() && !friend2.isValid()) {
-
-                        if (friend1.isValid()) {
-
-                            nameClearer(friend1);
-
-                            friend1.setCustomName(convert(configuration.getStringList("ZombieFriends.DeathMessage").
-                                    get(random.nextInt(configuration.getStringList("ZombieFriends.DeathMessage")
-                                            .size()))));
-
-                        }
-
-                        if (friend2.isValid()) {
+                    if (reinforcement2.getLivingEntity().isValid()) {
 
 
-                            nameClearer(friend1);
+                        nameClearer(reinforcement2);
 
-                            friend2.setCustomName(convert(configuration.getStringList("ZombieFriends.DeathMessage").
-                                    get(random.nextInt(configuration.getStringList("ZombieFriends.DeathMessage")
-                                            .size()))));
+                        reinforcement2.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage")
+                                        .size()))));
 
-                        }
+                    }
 
-                        Bukkit.getScheduler().cancelTask(processID);
-                        return;
+                    cancel();
+                    return;
 
-                    } else {
+                } else {
 
-                        if (random.nextDouble() < 0.5) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5) {
 
-                            nameClearer(entity);
+                        nameClearer(eliteMobEntity);
 
-                            entity.setCustomName(convert(configuration.getStringList("ZombieFriends.ZombieDialog").
-                                    get(random.nextInt(configuration.getStringList("ZombieFriends.ZombieDialog")
-                                            .size()))));
+                        eliteMobEntity.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.ZombieDialog").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.ZombieDialog")
+                                        .size()))));
 
-                        }
+                    }
 
-                        if (random.nextDouble() < 0.5 && friend1.isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcement1.getLivingEntity().isValid()) {
 
-                            nameClearer(friend1);
+                        nameClearer(reinforcement1);
 
-                            friend1.setCustomName(convert(configuration.getStringList("ZombieFriends.FriendDialog").
-                                    get(random.nextInt(configuration.getStringList("ZombieFriends.FriendDialog")
-                                            .size()))));
+                        reinforcement1.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog")
+                                        .size()))));
 
-                        }
+                    }
 
-                        if (random.nextDouble() < 0.5 && friend2.isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcement2.getLivingEntity().isValid()) {
 
-                            nameClearer(friend2);
+                        nameClearer(reinforcement2);
 
-                            friend2.setCustomName(convert(configuration.getStringList("ZombieFriends.FriendDialog").
-                                    get(random.nextInt(configuration.getStringList("ZombieFriends.FriendDialog")
-                                            .size()))));
-
-                        }
+                        reinforcement2.getLivingEntity().setCustomName(convert(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog").
+                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog")
+                                        .size()))));
 
                     }
 
                 }
-
-            }, 20, 20 * 8);
-
-        }
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 8);
 
     }
 
-    private void nameClearer(Entity entity) {
+    private void nameClearer(EliteMobEntity eliteMobEntity) {
 
-        String originalName = entity.getCustomName();
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
+        new BukkitRunnable() {
             @Override
             public void run() {
-
-                if (entity.isValid()) {
-
-                    if (entity.hasMetadata(MetadataHandler.CUSTOM_NAME)) {
-                        entity.setCustomName(originalName);
-                    } else {
-                        entity.setCustomName(NameHandler.customAggressiveName(entity));
-                    }
-
-                }
-
+                if (eliteMobEntity.getLivingEntity().isValid())
+                    eliteMobEntity.setName(eliteMobEntity.getName());
             }
-
-        }, 20 * 3);
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
 
     }
 

@@ -23,10 +23,10 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.EventMessage;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.TimedBossMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -43,94 +43,64 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureGoblin implements Listener {
 
-    private static Random random = new Random();
+    private static HashSet<TimedBossMobEntity> treasureGoblinList = new HashSet<>();
+    private static HashSet<EliteMobEntity> radialGoldExplosionCooldown = new HashSet<>();
+    private static HashSet<EliteMobEntity> goldShotgunCooldown = new HashSet<>();
 
-    public static void createGoblin(LivingEntity treasureGoblin) {
+    public static EliteMobEntity getTreasureGoblin(Zombie zombie) {
+        if (treasureGoblinList.isEmpty()) return null;
+        for (TimedBossMobEntity bossMobEntity : treasureGoblinList)
+            if (bossMobEntity.getLivingEntity().equals(zombie))
+                return bossMobEntity;
+        return null;
+    }
+
+    public static void createGoblin(Location location) {
 
         int mobLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
+        TimedBossMobEntity treasureGoblinPluginEntity = new TimedBossMobEntity(EntityType.ZOMBIE, location, mobLevel,
+                ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME));
 
-        //Give custom setup to entity
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.ELITE_MOB_MD, mobLevel);
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_POWERS_MD, true);
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_NAME, true);
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_ARMOR, true);
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_STACK, true);
-        EntityTracker.registerNaturalEntity(treasureGoblin);
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.CUSTOM_STACK, true);
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.PERSISTENT_ENTITY, true);
-        AggressiveEliteMobConstructor.constructAggressiveEliteMob(treasureGoblin);
+        treasureGoblinList.add(treasureGoblinPluginEntity);
 
-        ((Zombie) treasureGoblin).setBaby(true);
-        ((Zombie) treasureGoblin).setRemoveWhenFarAway(false);
+        ((Zombie) treasureGoblinPluginEntity.getLivingEntity()).setBaby(true);
 
-        treasureGoblin.setCustomName(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME)));
-        treasureGoblin.setCustomNameVisible(true);
-
-        MetadataHandler.registerMetadata(treasureGoblin, MetadataHandler.TREASURE_GOBLIN, true);
-        TreasureGoblin.equipTreasureGoblin((Zombie) treasureGoblin);
-
-        String coordinates = treasureGoblin.getLocation().getBlockX() + ", " + treasureGoblin.getLocation().getBlockY() + ", " + treasureGoblin.getLocation().getBlockZ();
-        String sendString = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT).replace("$location", coordinates);
-        String worldName = "";
-
-        if (treasureGoblin.getWorld().getName().contains("_")) {
-
-            for (String string : treasureGoblin.getWorld().getName().split("_")) {
-
-                worldName += string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase() + " ";
-
-            }
-
-        } else {
-
-            worldName = treasureGoblin.getWorld().getName().substring(0, 1).toUpperCase() + treasureGoblin.getWorld().getName().substring(1).toLowerCase();
-
-        }
-
-        sendString = sendString.replace("$world", worldName);
-
-        sendString = ChatColorConverter.convert(sendString);
-
-        EventMessage.sendEventMessage(sendString, treasureGoblin.getWorld());
-
-        BossMobDeathCountdown.startDeathCountdown((LivingEntity) treasureGoblin);
+        equipTreasureGoblin((Zombie) treasureGoblinPluginEntity.getLivingEntity());
+        EventMessage.sendEventMessage(treasureGoblinPluginEntity.getLivingEntity(), ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_ANNOUNCEMENT_TEXT));
 
     }
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN)) {
+        if (!event.getEntity().getType().equals(EntityType.ZOMBIE)) return;
 
-            Entity entity = event.getEntity();
+        EliteMobEntity eliteMobEntity = getTreasureGoblin((Zombie) event.getEntity());
+        if (eliteMobEntity == null) return;
 
-            for (int i = 0; i < ConfigValues.eventsConfig.getInt(EventsConfig.SMALL_TREASURE_GOBLIN_REWARD); i++) {
+        Zombie zombieKing = (Zombie) event.getEntity();
 
-                LootTables.generateLoot((LivingEntity) entity);
+        for (int i = 0; i < ConfigValues.eventsConfig.getInt(EventsConfig.SMALL_TREASURE_GOBLIN_REWARD); i++)
+            LootTables.generateLoot(eliteMobEntity);
 
-            }
 
-            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 
-                if (((LivingEntity) entity).getKiller() != null) {
+            if (zombieKing.getKiller() != null) {
 
-                    String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT).replace("$player", ((LivingEntity) entity).getKiller().getDisplayName());
+                String newMessage = ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_PLAYER_END_TEXT)
+                        .replace("$player", (zombieKing).getKiller().getDisplayName());
+                player.sendMessage(ChatColorConverter.convert(newMessage));
 
-                    player.sendMessage(ChatColorConverter.convert(newMessage));
-
-                } else {
-
-                    player.sendMessage(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
-
-                }
-
-            }
+            } else
+                player.sendMessage(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_OTHER_END_TEXT)));
 
         }
 
@@ -139,48 +109,33 @@ public class TreasureGoblin implements Listener {
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
 
-        if (!(event.getDamager() instanceof LivingEntity ||
-                event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
+        if (!(event.getDamager().getType().equals(EntityType.ZOMBIE) ||
+                event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Zombie))
             return;
+
+        if (ThreadLocalRandom.current().nextDouble() > 0.5) return;
 
         LivingEntity livingEntity;
 
-        if (event.getDamager() instanceof Projectile) {
-
+        if (event.getDamager() instanceof Projectile)
             livingEntity = (LivingEntity) ((Projectile) event.getDamager()).getShooter();
-
-        } else {
-
+        else
             livingEntity = (LivingEntity) event.getDamager();
 
-        }
+        EliteMobEntity eliteMobEntity = getTreasureGoblin((Zombie) livingEntity);
+        if (eliteMobEntity == null) return;
 
-        if (event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN)) {
+        if (!PowerCooldown.isInCooldown(eliteMobEntity, radialGoldExplosionCooldown)) {
 
-            if (random.nextDouble() < 0.20) {
+            PowerCooldown.startCooldownTimer(eliteMobEntity, radialGoldExplosionCooldown,
+                    20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_RADIAL_EXPLOSION));
+            radialGoldExplosionInitializer((Zombie) event.getDamager());
 
-                //run power
-                if (random.nextDouble() < 0.5) {
+        } else if (!PowerCooldown.isInCooldown(eliteMobEntity, goldShotgunCooldown)) {
 
-                    if (!event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN)) {
-
-                        PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.TREASURE_GOBLIN_RADIAL_GOLD_EXPLOSION_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_RADIAL_EXPLOSION));
-                        radialGoldExplosionInitializer((Zombie) event.getEntity());
-
-                    }
-
-                } else {
-
-                    if (!event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN)) {
-
-                        PowerCooldown.startCooldownTimer(event.getEntity(), MetadataHandler.TREASURE_GOBLIN_GOLD_SHOTGUN_COOLDOWN, 20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL));
-                        goldShotgunInitializer((Zombie) event.getEntity(), livingEntity.getLocation());
-
-                    }
-
-                }
-
-            }
+            PowerCooldown.startCooldownTimer(eliteMobEntity, goldShotgunCooldown,
+                    20 * ConfigValues.eventsConfig.getInt(EventsConfig.TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL));
+            goldShotgunInitializer((Zombie) event.getDamager(), livingEntity.getLocation());
 
         }
 
@@ -205,12 +160,8 @@ public class TreasureGoblin implements Listener {
 
                 }
 
-                if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS)) {
-
+                if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS))
                     zombie.getWorld().spawnParticle(Particle.SMOKE_NORMAL, zombie.getLocation(), counter, 1, 1, 1, 0);
-
-                }
-
 
                 counter++;
 
@@ -227,9 +178,9 @@ public class TreasureGoblin implements Listener {
 
         for (int i = 0; i < projectileCount; i++) {
 
-            double x = random.nextDouble() - 0.5;
-            double y = random.nextDouble() / 1.5;
-            double z = random.nextDouble() - 0.5;
+            double x = ThreadLocalRandom.current().nextDouble() - 0.5;
+            double y = ThreadLocalRandom.current().nextDouble() / 1.5;
+            double z = ThreadLocalRandom.current().nextDouble() - 0.5;
 
             Vector locationAdjuster = new Vector(x, 0, z).normalize();
 
@@ -242,7 +193,7 @@ public class TreasureGoblin implements Listener {
              */
             ItemMeta itemMeta = visualProjectileItemStack.getItemMeta();
             List<String> lore = new ArrayList<>();
-            lore.add("" + random.nextDouble() + "" + random.nextDouble());
+            lore.add("" + ThreadLocalRandom.current().nextDouble() + "" + ThreadLocalRandom.current().nextDouble());
             itemMeta.setLore(lore);
             visualProjectileItemStack.setItemMeta(itemMeta);
 
@@ -251,7 +202,7 @@ public class TreasureGoblin implements Listener {
             Vector velocity = new Vector(x, y, z).multiply(2);
             visualProjectile.setVelocity(velocity);
             visualProjectile.setPickupDelay(Integer.MAX_VALUE);
-            MetadataHandler.registerMetadata(visualProjectile, MetadataHandler.VISUAL_EFFECT_MD, true);
+            EntityTracker.registerCullableEntity(visualProjectile);
 
             itemList.add(visualProjectile);
 
@@ -280,33 +231,23 @@ public class TreasureGoblin implements Listener {
 
                     }
 
-                    if (item == null || !item.isValid() || item.isDead()) {
-
+                    if (item == null || !item.isValid() || item.isDead())
                         iterator.remove();
 
-                    } else if (item.isOnGround()) {
+                    else if (item.isOnGround()) {
+                        iterator.remove();
+                        item.remove();
+                    } else if (goldNuggetDamage(item.getNearbyEntities(0, 0, 0), zombie)) {
 
                         iterator.remove();
                         item.remove();
-
-                    } else {
-
-                        if (goldNuggetDamage(item.getNearbyEntities(0, 0, 0), zombie)) {
-
-                            iterator.remove();
-                            item.remove();
-
-                        }
 
                     }
 
                 }
 
-                if (counter > 20 * 5) {
-
+                if (counter > 20 * 5)
                     cancel();
-
-                }
 
                 counter++;
 
@@ -326,9 +267,9 @@ public class TreasureGoblin implements Listener {
 
         for (int i = 0; i < projectileCount; i++) {
 
-            double x = random.nextDouble() * 2 - 1;
-            double y = random.nextDouble() * 2 - 1;
-            double z = random.nextDouble() * 2 - 1;
+            double x = ThreadLocalRandom.current().nextDouble() * 2 - 1;
+            double y = ThreadLocalRandom.current().nextDouble() * 2 - 1;
+            double z = ThreadLocalRandom.current().nextDouble() * 2 - 1;
 
             Location tempLocation = targetLocation.clone();
 
@@ -365,9 +306,9 @@ public class TreasureGoblin implements Listener {
 
                     for (int i = 0; i < particleCount; i++) {
 
-                        double x = random.nextDouble() * 2 - 1;
-                        double y = random.nextDouble() * 2 - 1;
-                        double z = random.nextDouble() * 2 - 1;
+                        double x = ThreadLocalRandom.current().nextDouble() * 2 - 1;
+                        double y = ThreadLocalRandom.current().nextDouble() * 2 - 1;
+                        double z = ThreadLocalRandom.current().nextDouble() * 2 - 1;
 
                         Location tempLocation = targetLocation.clone();
 
@@ -398,9 +339,9 @@ public class TreasureGoblin implements Listener {
 
         for (int i = 0; i < projectileCount; i++) {
 
-            double x = random.nextDouble() * 2 - 1;
-            double y = random.nextDouble() * 2 - 1;
-            double z = random.nextDouble() * 2 - 1;
+            double x = ThreadLocalRandom.current().nextDouble() * 2 - 1;
+            double y = ThreadLocalRandom.current().nextDouble() * 2 - 1;
+            double z = ThreadLocalRandom.current().nextDouble() * 2 - 1;
 
             Location tempLocation = livingEntityLocation.clone();
 
@@ -414,7 +355,7 @@ public class TreasureGoblin implements Listener {
              */
             ItemMeta itemMeta = visualProjectileItemStack.getItemMeta();
             List<String> lore = new ArrayList<>();
-            lore.add("" + random.nextDouble() + "" + random.nextDouble());
+            lore.add("" + ThreadLocalRandom.current().nextDouble() + "" + ThreadLocalRandom.current().nextDouble());
             itemMeta.setLore(lore);
             visualProjectileItemStack.setItemMeta(itemMeta);
 
@@ -423,7 +364,7 @@ public class TreasureGoblin implements Listener {
             visualProjectile.setGravity(false);
             visualProjectile.setVelocity(toPlayer.multiply(0.9));
             visualProjectile.setPickupDelay(Integer.MAX_VALUE);
-            MetadataHandler.registerMetadata(visualProjectile, MetadataHandler.VISUAL_EFFECT_MD, true);
+            EntityTracker.registerCullableEntity(visualProjectile);
 
             itemList.add(visualProjectile);
 
@@ -444,20 +385,16 @@ public class TreasureGoblin implements Listener {
 
                     Item item = iterator.next();
 
-                    if (item == null || !item.isValid() || item.isDead()) {
-
+                    if (item == null || !item.isValid() || item.isDead())
                         iterator.remove();
 
-                    } else {
+                    else if (goldNuggetDamage(item.getNearbyEntities(0.5, 0.5, 0.5), zombie)) {
 
-                        if (goldNuggetDamage(item.getNearbyEntities(0.5, 0.5, 0.5), zombie)) {
-
-                            iterator.remove();
-                            item.remove();
-
-                        }
+                        iterator.remove();
+                        item.remove();
 
                     }
+
 
                     if (counter > 20 * 3) {
 
@@ -468,11 +405,8 @@ public class TreasureGoblin implements Listener {
 
                 }
 
-                if (counter > 20 * 3) {
-
+                if (counter > 20 * 3)
                     cancel();
-
-                }
 
                 counter++;
 
@@ -482,17 +416,13 @@ public class TreasureGoblin implements Listener {
 
     }
 
-    private static boolean goldNuggetDamage(List<Entity> entityList, Zombie eliteMob) {
+    private static boolean goldNuggetDamage(List<Entity> entityList, Zombie zombie) {
 
         for (Entity entity : entityList) {
 
-            if (entity.hasMetadata(MetadataHandler.TREASURE_GOBLIN)) break;
-
-            if (entity instanceof LivingEntity) {
-
-                return BossSpecialAttackDamage.dealSpecialDamage(eliteMob, (LivingEntity) entity, 1);
-
-            }
+            if (!(entity instanceof LivingEntity)) continue;
+            if (entity.getType().equals(EntityType.ZOMBIE)) continue;
+            return BossSpecialAttackDamage.dealSpecialDamage(zombie, (LivingEntity) entity, 1);
 
         }
 

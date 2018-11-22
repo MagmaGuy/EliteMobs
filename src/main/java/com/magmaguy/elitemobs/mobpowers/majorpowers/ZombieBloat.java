@@ -48,58 +48,39 @@ package com.magmaguy.elitemobs.mobpowers.majorpowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
-import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class ZombieBloat extends MajorPowers implements Listener {
+public class ZombieBloat extends MajorPower implements Listener {
 
-    private static Random random = new Random();
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.ZOMBIE_BLOAT_MD;
-    Configuration configuration = ConfigValues.translationConfig;
+    private static HashSet<EliteMobEntity> cooldowns = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MajorPowerPowerStance majorPowerStanceMath = new MajorPowerPowerStance();
-        majorPowerStanceMath.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void onHit(EntityDamageEvent event) {
 
-        if (event.isCancelled()) return;
-        if (!(event.getEntity().hasMetadata(powerMetadata) && event.getEntity() instanceof Zombie)) return;
-        if (event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_BLOAT_COOLDOWN)) return;
-
-        /*
-        Run random check to see if the power should activate
-         */
-        if (random.nextDouble() > 0.20) return;
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        if (cooldowns.contains(eliteMobEntity)) return;
+        if (ThreadLocalRandom.current().nextDouble() > 0.20) return;
+        cooldowns.add(eliteMobEntity);
 
         /*
         Create early warning that entity is about to bloat
@@ -113,32 +94,26 @@ public class ZombieBloat extends MajorPowers implements Listener {
             public void run() {
 
                 if (timer > 40) {
-
                     bloatEffect(eventZombie);
                     cancel();
-
                 }
 
                 if (timer == 21) {
-
                     /*
                     Remove AI to prevent entity from moving while effect activates
                     */
                     eventZombie.setAI(false);
-
                     /*
                     Start power cooldown, 10 seconds
                     */
-                    PowerCooldown.startCooldownTimer(eventZombie, MetadataHandler.ZOMBIE_BLOAT_COOLDOWN, 10 * 20);
-
+                    PowerCooldown.startCooldownTimer(eliteMobEntity, cooldowns, 10 * 20);
                 }
 
-                if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS)) {
-                        eventZombie.getWorld().spawnParticle(Particle.TOTEM, new Location(eventZombie.getWorld(),
-                                        eventZombie.getLocation().getX(), eventZombie.getLocation().getY() + eventZombie.getHeight(), eventZombie.getLocation().getZ()),
-                                20, timer / 24, timer / 9, timer / 24, 0.1);
-
-                }
+                if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS))
+                    eventZombie.getWorld().spawnParticle(Particle.TOTEM, new Location(eventZombie.getWorld(),
+                                    eventZombie.getLocation().getX(), eventZombie.getLocation().getY() +
+                                    eventZombie.getHeight(), eventZombie.getLocation().getZ()), 20, timer / 24,
+                            timer / 9, timer / 24, 0.1);
 
                 timer++;
 
@@ -162,19 +137,10 @@ public class ZombieBloat extends MajorPowers implements Listener {
         List<Entity> nearbyEntities = giant.getNearbyEntities(4, 15, 4);
         List<LivingEntity> nearbyValidLivingEntities = new ArrayList<>();
 
-        if (nearbyEntities.size() > 0) {
-
-            for (Entity entity : nearbyEntities) {
-
-                if (entity instanceof LivingEntity && !entity.equals(eventZombie)) {
-
+        if (nearbyEntities.size() > 0)
+            for (Entity entity : nearbyEntities)
+                if (entity instanceof LivingEntity && !entity.equals(eventZombie))
                     nearbyValidLivingEntities.add((LivingEntity) entity);
-
-                }
-
-            }
-
-        }
 
         Location entityLocation = eventZombie.getLocation();
 
@@ -234,25 +200,16 @@ public class ZombieBloat extends MajorPowers implements Listener {
             @Override
             public void run() {
 
-                if (counter > 1.5 * 20) {
-
+                if (counter > 1.5 * 20)
                     cancel();
 
-                }
-
-                for (LivingEntity livingEntity : livingEntities) {
-
-                    if (!(livingEntity == null || livingEntity.isDead() || !livingEntity.isValid())) {
-
+                for (LivingEntity livingEntity : livingEntities)
+                    if (!(livingEntity == null || livingEntity.isDead() || !livingEntity.isValid()))
                         livingEntity.getWorld().spawnParticle(Particle.CLOUD, new Location(livingEntity.getWorld(),
                                         livingEntity.getLocation().getX(),
                                         livingEntity.getLocation().getY() + livingEntity.getHeight() - 1,
                                         livingEntity.getLocation().getZ()),
                                 0, 0, 0, 0);
-
-                    }
-
-                }
 
                 counter++;
 

@@ -7,15 +7,12 @@ import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonPillar;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
 import org.bukkit.entity.EntityType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class EliteSkeleton extends EliteMobProperties {
 
     public EliteSkeleton() {
-
-        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS.toLowerCase() + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
 
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_SKELETON);
 
@@ -25,11 +22,17 @@ public class EliteSkeleton extends EliteMobProperties {
 
         SkeletonTrackingArrow skeletonTrackingArrow = new SkeletonTrackingArrow();
         SkeletonPillar skeletonPillar = new SkeletonPillar();
-        this.validMajorPowers = new ArrayList<>(Arrays.asList(skeletonPillar, skeletonTrackingArrow));
+        this.validMajorPowers = new HashSet<>(Arrays.asList(skeletonPillar, skeletonTrackingArrow));
 
-        if (!isEnabled) return;
+        this.validDefensivePowers.addAll(super.getAllDefensivePowers());
+        this.validOffensivePowers.addAll(super.getAllOffensivePowers());
+        this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        eliteMobData.add(this);
+        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
+                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
+
+        if (this.isEnabled)
+            eliteMobData.add(this);
 
     }
 

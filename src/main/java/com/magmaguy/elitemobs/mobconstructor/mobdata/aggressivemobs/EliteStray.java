@@ -9,18 +9,21 @@ public class EliteStray extends EliteMobProperties {
 
     public EliteStray() {
 
-        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS.toLowerCase() + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
-
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_STRAY);
 
         this.entityType = EntityType.STRAY;
 
         this.defaultMaxHealth = 20;
 
-        if (!isEnabled) return;
+        this.validDefensivePowers.addAll(super.getAllDefensivePowers());
+        this.validOffensivePowers.addAll(super.getAllOffensivePowers());
+        this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        eliteMobData.add(this);
+        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
+                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
+
+        if (this.isEnabled)
+            eliteMobData.add(this);
 
     }
 

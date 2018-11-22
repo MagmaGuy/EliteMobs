@@ -16,24 +16,39 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.mobconstructor.NameHandler;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+import java.util.HashMap;
+
 public class PlayerDeathMessageByEliteMob implements Listener {
+
+    private static HashMap<Player, String> deadPlayerList = new HashMap<>();
+
+    public static void addDeadPlayer(Player player, String deathMessage) {
+        deadPlayerList.put(player, deathMessage);
+    }
+
+    private static boolean isDeadPlayer(Player player) {
+        return deadPlayerList.containsKey(player);
+    }
+
+    private static void removeDeadPlayer(Player player) {
+        deadPlayerList.remove(player);
+    }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.KILLED_BY_ELITE_MOB)) {
-            event.setDeathMessage(event.getEntity().getMetadata(MetadataHandler.KILLED_BY_ELITE_MOB).get(0).asString());
-            event.getEntity().removeMetadata(MetadataHandler.KILLED_BY_ELITE_MOB, MetadataHandler.PLUGIN);
+        if (isDeadPlayer(event.getEntity())) {
+            event.setDeathMessage(deadPlayerList.get(event.getEntity()));
+            removeDeadPlayer(event.getEntity());
         }
 
     }
@@ -113,7 +128,7 @@ public class PlayerDeathMessageByEliteMob implements Listener {
 
     private static String deathMessagePlaceholderConversion(String deathMessage, Player player, LivingEntity livingEntity) {
 
-        String livingEntityName = NameHandler.customAggressiveNameIgnoresCustomName(livingEntity);
+        String livingEntityName = EntityTracker.getEliteMobEntity(livingEntity).getName();
 
         deathMessage = deathMessage.replace("$player", player.getDisplayName());
         deathMessage = deathMessage.replace("$entity", livingEntityName);

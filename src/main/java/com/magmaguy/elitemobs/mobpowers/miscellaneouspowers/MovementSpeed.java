@@ -15,39 +15,20 @@
 
 package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 /**
  * Created by MagmaGuy on 05/11/2016.
  */
-public class MovementSpeed extends MinorPowers {
-
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.MOVEMENT_SPEED_MD;
+public class MovementSpeed extends MinorPower {
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
         ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
 }

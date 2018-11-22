@@ -9,18 +9,21 @@ public class EliteVex extends EliteMobProperties {
 
     public EliteVex() {
 
-        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS.toLowerCase() + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
-
         this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_VEX);
 
         this.entityType = EntityType.VEX;
 
         this.defaultMaxHealth = 14;
 
-        if (!isEnabled) return;
+        this.validDefensivePowers.addAll(super.getAllDefensivePowers());
+        this.validOffensivePowers.addAll(super.getAllOffensivePowers());
+        this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        eliteMobData.add(this);
+        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
+                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
+
+        if (this.isEnabled)
+            eliteMobData.add(this);
 
     }
 

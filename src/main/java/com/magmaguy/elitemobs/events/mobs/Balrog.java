@@ -1,16 +1,17 @@
 package com.magmaguy.elitemobs.events.mobs;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.items.uniqueitems.DwarvenGreed;
-import com.magmaguy.elitemobs.mobconstructor.AggressiveEliteMobConstructor;
-import com.magmaguy.elitemobs.mobconstructor.NameHandler;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.mobconstructor.ActionBossMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.TrashMobEntity;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.event.EventHandler;
@@ -22,14 +23,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.UUID;
+import java.util.HashSet;
 
 public class Balrog implements Listener {
 
     public static void spawnBalrog(Location location) {
-
         balrogSpawnEffect(location.add(new Vector(0.5, 0.5, 0.5)));
-
     }
 
     private static void balrogSpawnEffect(Location location) {
@@ -62,48 +61,31 @@ public class Balrog implements Listener {
 
     private static void intializeBalrog(Location location) {
 
-        Silverfish balrog = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
-        MetadataHandler.registerMetadata(balrog, MetadataHandler.ELITE_MOB_MD, ActionDynamicBossLevelConstructor.determineDynamicBossLevel(balrog));
-        MetadataHandler.registerMetadata(balrog, MetadataHandler.BALROG, true);
-        MetadataHandler.registerMetadata(balrog, MetadataHandler.EVENT_CREATURE, true);
-        MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_ARMOR, true);
-        MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_POWERS_MD, true);
-        MetadataHandler.registerMetadata(balrog, MetadataHandler.CUSTOM_STACK, true);
-        MetadataHandler.registerMetadata(balrog, MetadataHandler.PERSISTENT_ENTITY, true);
+        int eliteLevel = ActionDynamicBossLevelConstructor.determineDynamicBossLevel(location);
+        ActionBossMobEntity bossMobEntity = new ActionBossMobEntity(EntityType.SILVERFISH, location, eliteLevel, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME));
+        balrogList.add(bossMobEntity.getLivingEntity());
 
-        NameHandler.customUniqueNameAssigner(balrog, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME));
-        AggressiveEliteMobConstructor.constructAggressiveEliteMob(balrog);
+        balrogVisualEffectLoop((Silverfish) bossMobEntity.getLivingEntity());
 
-        balrogVisualEffectLoop(balrog);
-
-        BossMobDeathCountdown.startDeathCountdown(balrog);
+        BossMobDeathCountdown.startDeathCountdown(bossMobEntity.getLivingEntity());
 
     }
 
     private static void balrogVisualEffectLoop(Silverfish balrog) {
 
         new BukkitRunnable() {
-
-            UUID uuid = balrog.getUniqueId();
-
             @Override
             public void run() {
 
-                Silverfish localBalrog = balrog;
-
-                if (!balrog.isValid())
-                    if (Bukkit.getEntity(uuid) != null)
-                        localBalrog = (Silverfish) Bukkit.getEntity(uuid);
-
-                if (balrog.isDead()) {
+                if (!balrog.isValid()) {
 
                     cancel();
                     return;
 
                 }
 
-                localBalrog.getWorld().spawnParticle(Particle.FLAME, localBalrog.getLocation(), 2, 0.1, 0.1, 0.1, 0.05);
-                localBalrog.getWorld().spawnParticle(Particle.SMOKE_LARGE, localBalrog.getLocation(), 4, 0.1, 0.1, 0.1, 0.05);
+                balrog.getWorld().spawnParticle(Particle.FLAME, balrog.getLocation(), 2, 0.1, 0.1, 0.1, 0.05);
+                balrog.getWorld().spawnParticle(Particle.SMOKE_LARGE, balrog.getLocation(), 4, 0.1, 0.1, 0.1, 0.05);
 
             }
 
@@ -111,10 +93,14 @@ public class Balrog implements Listener {
 
     }
 
+    private static HashSet<Entity> balrogList = new HashSet<>();
+
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (!event.getEntity().hasMetadata(MetadataHandler.BALROG)) return;
+        if (!balrogList.contains(event.getEntity())) return;
+
+        balrogList.remove(event.getEntity());
 
         DwarvenGreed dwarvenGreed = new DwarvenGreed();
         ItemStack dwarvenGreedItemStack = dwarvenGreed.constructItemStack();
@@ -127,7 +113,7 @@ public class Balrog implements Listener {
     public void onHit(EntityDamageEvent event) {
 
         if (event.isCancelled()) return;
-        if (!event.getEntity().hasMetadata(MetadataHandler.BALROG)) return;
+        if (!balrogList.contains(event.getEntity())) return;
         if (event.getFinalDamage() < 2) return;
 
         spawnTrashMobs((Silverfish) event.getEntity());
@@ -137,20 +123,10 @@ public class Balrog implements Listener {
 
     private static void spawnTrashMobs(Silverfish balrog) {
 
-        Silverfish trashMob = (Silverfish) balrog.getLocation().getWorld().spawnEntity(balrog.getLocation(), EntityType.SILVERFISH);
+        TrashMobEntity trashMobEntity = new TrashMobEntity(EntityType.SILVERFISH, balrog.getLocation(),
+                ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.BALROG_TRASH_MOB_NAME)));
 
-        MetadataHandler.registerMetadata(trashMob, MetadataHandler.ELITE_MOB_MD, 1);
-        MetadataHandler.registerMetadata(trashMob, MetadataHandler.CUSTOM_ARMOR, true);
-        MetadataHandler.registerMetadata(trashMob, MetadataHandler.CUSTOM_POWERS_MD, true);
-        MetadataHandler.registerMetadata(trashMob, MetadataHandler.CUSTOM_STACK, true);
-        MetadataHandler.registerMetadata(trashMob, MetadataHandler.CUSTOM_HEALTH, true);
-
-        trashMob.setMaxHealth(1);
-        trashMob.setHealth(1);
-
-        NameHandler.customUniqueNameAssigner(trashMob, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_TRASH_MOB_NAME));
-
-        trashMobVisualEffect(trashMob);
+        trashMobVisualEffect((Silverfish) trashMobEntity.getLivingEntity());
 
     }
 
