@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.mobconstructor.displays;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -39,8 +40,8 @@ public class DamageDisplay implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHitArmorStand(EntityDamageEvent event) {
 
-        if (event.getEntity() instanceof ArmorStand && event.getEntity().hasMetadata(MetadataHandler.ARMOR_STAND_DISPLAY))
-            event.setCancelled(true);
+        if (!EntityTracker.getIsArmorStand(event.getEntity())) return;
+        event.setCancelled(true);
 
     }
 
@@ -53,7 +54,7 @@ public class DamageDisplay implements Listener {
 
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS)) {
 
-            if (event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD) && event.getEntity() instanceof LivingEntity) {
+            if (EntityTracker.isEliteMob(event.getEntity()) && event.getEntity() instanceof LivingEntity) {
 
                 if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getFinalDamage());
 
@@ -90,7 +91,7 @@ public class DamageDisplay implements Listener {
         armorStand.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + "" + newDisplayDamage + "");
         armorStand.setCustomNameVisible(true);
         armorStand.setGravity(false);
-        MetadataHandler.registerMetadata(armorStand, MetadataHandler.ARMOR_STAND_DISPLAY, true);
+        EntityTracker.registerArmorStands(armorStand);
 
         new BukkitRunnable() {
 
@@ -111,7 +112,7 @@ public class DamageDisplay implements Listener {
                 if (taskTimer == 15) {
 
                     cancel();
-                    armorStand.removeMetadata(MetadataHandler.ARMOR_STAND_DISPLAY, Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS));
+                    EntityTracker.unregisterArmorStand(armorStand);
                     armorStand.remove();
 
                 }

@@ -29,7 +29,7 @@ public class PassiveEliteMobDeathHandler implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
 
-        if (EntityTracker.isPassiveMob(event.getEntity())) {
+        if (EntityTracker.isSuperMob(event.getEntity())) {
 
             event.getEntity().getLocation().getWorld().spawnEntity(event.getEntity().getLocation(), event.getEntityType());
             event.getEntity().getLocation().getWorld().spawnEntity(event.getEntity().getLocation(), event.getEntityType());

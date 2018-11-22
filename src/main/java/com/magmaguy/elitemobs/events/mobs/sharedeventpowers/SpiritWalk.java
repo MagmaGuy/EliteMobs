@@ -18,10 +18,14 @@ package com.magmaguy.elitemobs.events.mobs.sharedeventpowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
+import com.magmaguy.elitemobs.events.mobs.ZombieKing;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -41,8 +45,9 @@ public class SpiritWalk implements Listener {
     @EventHandler
     public void onBossMobGotHit(EntityDamageEvent event) {
 
-        if (!(event.getEntity() instanceof LivingEntity &&
-                (event.getEntity().hasMetadata(MetadataHandler.ZOMBIE_KING) || event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN))))
+        if (!(event.getEntity().getType().equals(EntityType.ZOMBIE) &&
+                (ZombieKing.getZombieKing((Zombie) event.getEntity()) != null ||
+                        TreasureGoblin.getTreasureGoblin((Zombie) event.getEntity()) != null)))
             return;
 
         if (entityHitCount.containsKey(event.getEntity()))
@@ -62,8 +67,9 @@ public class SpiritWalk implements Listener {
 
         if (event.getDamager() instanceof Projectile && !(((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
             return;
-        if (event.getDamager() instanceof LivingEntity &&
-                (!(event.getDamager().hasMetadata(MetadataHandler.ZOMBIE_KING) || event.getEntity().hasMetadata(MetadataHandler.TREASURE_GOBLIN))))
+        if (event.getEntity().getType().equals(EntityType.ZOMBIE) &&
+                (!(ZombieKing.getZombieKing((Zombie) event.getEntity()) != null ||
+                        TreasureGoblin.getTreasureGoblin((Zombie) event.getEntity()) != null)))
             return;
         if (!(event.getDamager() instanceof LivingEntity)) return;
         entityHitCount.put((LivingEntity) event.getDamager(), 0);

@@ -1,14 +1,19 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPowers;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import static com.magmaguy.elitemobs.utils.VersionChecker.currentVersionIsUnder;
 
@@ -18,11 +23,61 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     This class only defines sets of mostly config-based data to be used by the EliteMobEntity.java class
      */
 
-    public static List<EliteMobProperties> eliteMobData = new ArrayList<>();
-    public ArrayList<MajorPowers> validMajorPowers = new ArrayList<>();
+    public static HashSet<EliteMobProperties> eliteMobData = new HashSet<>();
+    public HashSet<MajorPower> validMajorPowers = new HashSet<>();
+    public HashSet<MinorPower> validDefensivePowers = new HashSet<>();
+    public HashSet<MinorPower> validOffensivePowers = new HashSet<>();
+    public HashSet<MinorPower> validMiscellaneousPowers = new HashSet<>();
 
-    public List<MajorPowers> getValidMajorPowers() {
+    public HashSet<MajorPower> getValidMajorPowers() {
         return validMajorPowers;
+    }
+
+    public HashSet<MinorPower> getValidDefensivePowers() {
+        return validDefensivePowers;
+    }
+
+    public HashSet<MinorPower> getValidOffensivePowers() {
+        return validOffensivePowers;
+    }
+
+    public HashSet<MinorPower> getValidMiscellaneousPowers() {
+        return validMiscellaneousPowers;
+    }
+
+    public HashSet<MinorPower> getAllDefensivePowers() {
+        return new HashSet<>(Arrays.asList(
+                new Invisibility(),
+                new InvulnerabilityArrow(),
+                new InvulnerabilityFallDamage(),
+                new InvulnerabilityFire(),
+                new InvulnerabilityKnockback()
+        ));
+    }
+
+    public HashSet<MinorPower> getAllOffensivePowers() {
+        return new HashSet<>(Arrays.asList(
+                new AttackArrow(),
+                new AttackBlinding(),
+                new AttackConfusing(),
+                new AttackFire(),
+                new AttackFireball(),
+                new AttackFreeze(),
+                new AttackGravity(),
+                new AttackPoison(),
+                new AttackPush(),
+                new AttackWeakness(),
+                new AttackWeb(),
+                new AttackWither()
+        ));
+    }
+
+    public HashSet<MinorPower> getAllMiscellaneousPowers() {
+        return new HashSet<>(Arrays.asList(
+                new BonusLoot(),
+                new MovementSpeed(),
+                new Taunt()
+        ));
     }
 
     public static void initializeEliteMobValues() {
@@ -43,7 +98,6 @@ public abstract class EliteMobProperties extends PluginMobProperties {
          */
         if (!currentVersionIsUnder(1, 8)) {
             EliteEndermite eliteEndermite = new EliteEndermite();
-            eliteMobData.add(eliteEndermite);
         }
         /*
         Post-1.11
@@ -79,13 +133,19 @@ public abstract class EliteMobProperties extends PluginMobProperties {
             if (eliteMobProperties.getEntityType().equals(entityType))
                 return eliteMobProperties;
 
-        Bukkit.getLogger().warning("[EliteMobs] Something is wrong with the Elite Mob data, notify the dev!");
         return null;
 
     }
 
     public static EliteMobProperties getPluginData(Entity entity) {
         return getPluginData(entity.getType());
+    }
+
+    public static HashSet<EntityType> getValidMobTypes() {
+        HashSet<EntityType> livingEntities = new HashSet<>();
+        for (EliteMobProperties eliteMobProperties : eliteMobData)
+            livingEntities.add(eliteMobProperties.getEntityType());
+        return livingEntities;
     }
 
 }

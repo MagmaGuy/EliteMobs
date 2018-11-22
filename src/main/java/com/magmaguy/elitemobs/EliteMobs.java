@@ -1,18 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs;
 
 /*
@@ -27,10 +12,12 @@ import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
-import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
+import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.runnables.*;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
@@ -38,8 +25,6 @@ import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -89,12 +74,18 @@ public class EliteMobs extends JavaPlugin {
         eventLauncher.eventRepeatingTask();
 
         //launch internal clock for attack cooldown
-        DamageAdjuster.launchInternalClock();
+        CombatSystem.launchInternalClock();
 
         /*
         Initialize mob values
          */
         PluginMobProperties.initializePluginMobValues();
+
+        /*
+        Cache animation vectors
+         */
+        MinorPowerStanceMath.initializeVectorCache();
+        MajorPowerStanceMath.initializeVectorCache();
 
         /*
         Check for new plugin version
@@ -103,27 +94,12 @@ public class EliteMobs extends JavaPlugin {
         if (!VersionChecker.pluginIsUpToDate)
             this.getServer().getPluginManager().registerEvents(new VersionWarner(), this);
 
-        /*
-        Metadata wiper repeating task
-         */
-        MetadataHandler.metadataWiper();
-
     }
 
     @Override
     public void onDisable() {
 
-        /*
-        Flush all elitemob entities
-        This deletes all metadata and all aggressive mobs
-         */
-        for (World world : validWorldList)
-            for (Entity entity : world.getEntities()) {
-                MetadataHandler.fullMetadataFlush(entity);
-                if (entity instanceof Player)
-                    ((Player) entity).setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-            }
-
+        EntityTracker.shutdownPurger();
 
         /*
         Flush lingering arrows from the arrow tracking power
@@ -171,8 +147,8 @@ public class EliteMobs extends JavaPlugin {
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         new DynamicLoreUpdater().runTaskTimer(this, 20, 20 * 2);
-        new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
-        EntityListUpdater.startUpdating();
+//        new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
+//        EntityListUpdater.startUpdating();
 
     }
 

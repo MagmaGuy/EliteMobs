@@ -1,104 +1,84 @@
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
+import com.magmaguy.elitemobs.mobpowers.ElitePower;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class EntityTracker implements Listener {
 
-    public static HashMap<World, List<LivingEntity>> passiveMobs = new HashMap<>();
-    public static HashMap<World, List<EliteMobEntity>> eliteMobs = new HashMap<>();
-    public static HashMap<World, List<EliteMobEntity>> bossMobs = new HashMap<>();
-    public static List<Entity> allCullableEliteMobEntities = new ArrayList<>();
-    public static HashMap<World, List<LivingEntity>> naturalEntities = new HashMap<>();
+    /*
+    These HashSets track basically everything for live plugin entities
+     */
+    private static HashSet<LivingEntity> superMobs = new HashSet<>();
+    private static HashSet<EliteMobEntity> eliteMobs = new HashSet<>();
+    private static HashSet<LivingEntity> eliteMobsLivingEntities = new HashSet<>();
+
+    private static HashSet<LivingEntity> naturalEntities = new HashSet<>();
+    private static HashSet<ArmorStand> armorStands = new HashSet<>();
+    private static HashSet<Item> itemVisualEffects = new HashSet<>();
 
     /*
-    Starts tracking elite mob
+    This HashSet shouldn't really be scanned during runtime for aside from the occasional updates, it mostly exists to
+    cull entities once the server shuts down
+     */
+    private static HashSet<Entity> cullablePluginEntities = new HashSet<>();
+
+    /*
+    Starts tracking elite mobs
      */
     public static void registerEliteMob(EliteMobEntity eliteMobEntity) {
-        eliteMobs = eliteMobAdder(eliteMobs, eliteMobEntity);
-        registerEntity(eliteMobEntity.getLivingEntity());
-    }
-
-    /*
-    Starts tracking boss mob
-     */
-    public static void registerBossMob(EliteMobEntity eliteMobEntity) {
-        bossMobs = eliteMobAdder(bossMobs, eliteMobEntity);
-        registerEntity(eliteMobEntity.getLivingEntity());
-    }
-
-    private static HashMap<World, List<EliteMobEntity>> eliteMobAdder(HashMap<World, List<EliteMobEntity>> currentHashMap, EliteMobEntity eliteMob) {
-
-        HashMap<World, List<EliteMobEntity>> newHashMap = (HashMap<World, List<EliteMobEntity>>) currentHashMap.clone();
-
-        if (currentHashMap.containsKey(eliteMob.getLivingEntity().getWorld())) {
-            List<EliteMobEntity> eliteMobEntityList = newHashMap.get(eliteMob.getLivingEntity().getWorld());
-            /*
-            Check if the entity is already in the list
-             */
-            if (eliteMobEntityList.contains(eliteMob))
-                return newHashMap;
-
-            eliteMobEntityList.add(eliteMob);
-            newHashMap.put(eliteMob.getLivingEntity().getWorld(), eliteMobEntityList);
-        } else
-            newHashMap.put(eliteMob.getLivingEntity().getWorld(), new ArrayList(Collections.singletonList(eliteMob)));
-
-        return newHashMap;
-
+        eliteMobs.add(eliteMobEntity);
+        eliteMobsLivingEntities.add(eliteMobEntity.getLivingEntity());
+        registerCullableEntity(eliteMobEntity.getLivingEntity());
     }
 
     /*
     Starts tracking super mob
      */
-    public static void registerPassiveMob(LivingEntity livingEntity) {
-        passiveMobs = livingEntityAdder(passiveMobs, livingEntity);
-    }
-
-    private static HashMap<World, List<LivingEntity>> livingEntityAdder(HashMap<World, List<LivingEntity>> currentHashMap, LivingEntity livingEntity) {
-
-        HashMap<World, List<LivingEntity>> newHashMap = currentHashMap;
-
-        if (currentHashMap.containsKey(livingEntity.getWorld())) {
-            List<LivingEntity> currentLivingEntities = currentHashMap.get(livingEntity.getWorld());
-            /*
-            Check if the entity is already in the list
-             */
-            if (currentLivingEntities.contains(livingEntity))
-                return newHashMap;
-            currentLivingEntities.add(livingEntity);
-            newHashMap.put(livingEntity.getWorld(), currentLivingEntities);
-        } else
-            newHashMap.put(livingEntity.getWorld(), new ArrayList<>(Collections.singletonList(livingEntity)));
-
-        return newHashMap;
-
-    }
-
-    /*
-    Starts tracking any entity generated or managed by EliteMobs, useful for when they need to be culled
-    Does not include passive mobs to avoid culling them by mistake
-     */
-    public static void registerEntity(Entity entity) {
-        allCullableEliteMobEntities.add(entity);
+    public static void registerSuperMob(LivingEntity livingEntity) {
+        if (!SuperMobProperties.isValidSuperMobType(livingEntity)) return;
+        superMobs.add(livingEntity);
     }
 
     /*
     Registers mobs that spawn naturally, necessary for elite mob rewards
      */
     public static void registerNaturalEntity(LivingEntity entity) {
-        naturalEntities = livingEntityAdder(passiveMobs, entity);
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return;
+        naturalEntities.add(entity);
+    }
+
+
+    public static void registerArmorStands(ArmorStand armorStand) {
+        armorStands.add(armorStand);
+        registerCullableEntity(armorStand);
+    }
+
+    public static void registerItemVisualEffects(Item item) {
+        itemVisualEffects.add(item);
+        registerCullableEntity(item);
+    }
+
+    /*
+    Starts tracking any entity generated or managed by EliteMobs, useful for when they need to be culled
+    Does not include super mobs to avoid culling them by mistake
+     */
+    public static void registerCullableEntity(Entity entity) {
+        cullablePluginEntities.add(entity);
     }
 
     public static void checkEntityState() {
@@ -106,142 +86,234 @@ public class EntityTracker implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                passiveMobs = updateValidEntities(passiveMobs);
-                eliteMobs = updateValidEliteMobs(eliteMobs);
-                bossMobs = updateValidEliteMobs(bossMobs);
-                naturalEntities = updateValidEntities(naturalEntities);
-                allCullableEliteMobEntities = checkEntityList(allCullableEliteMobEntities);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        updateSuperMobs();
+                        updateEliteMobEntities();
+                        updateLivingEntities();
+                        updateCullables();
+                        updateAmorStands();
+                        updateItems();
+                    }
+                }.runTaskAsynchronously(MetadataHandler.PLUGIN);
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
 
     }
 
-    private static HashMap<World, List<LivingEntity>> updateValidEntities(HashMap<World, List<LivingEntity>> livingEntityHashMap) {
-
-        HashMap<World, List<LivingEntity>> hashMap = (HashMap<World, List<LivingEntity>>) livingEntityHashMap.clone();
-
-        for (World world : hashMap.keySet()) {
-            List<LivingEntity> livingEntityList = new ArrayList<>();
-            livingEntityList.addAll(hashMap.get(world));
-            for (LivingEntity livingEntity : livingEntityList)
-                if (!livingEntity.isValid())
-                    hashMap = livingEntitySubtractor(livingEntityHashMap, livingEntity);
-        }
-
-        return hashMap;
-
-    }
-
-    private static HashMap<World, List<EliteMobEntity>> updateValidEliteMobs(HashMap<World, List<EliteMobEntity>> livingEntityHashMap) {
-
-        HashMap<World, List<EliteMobEntity>> hashMap = (HashMap<World, List<EliteMobEntity>>) livingEntityHashMap.clone();
-
-        for (World world : livingEntityHashMap.keySet()) {
-            List<EliteMobEntity> livingEntityList = new ArrayList<>();
-            livingEntityList.addAll(hashMap.get(world));
-            for (EliteMobEntity livingEntity : livingEntityList)
-                if (!livingEntity.getLivingEntity().isValid())
-                    hashMap = eliteMobsSubtractor(hashMap, livingEntity.getLivingEntity());
-        }
-
-        return hashMap;
-
-    }
-
-    private static HashMap<World, List<LivingEntity>> livingEntitySubtractor(HashMap<World, List<LivingEntity>> currentHashMap, LivingEntity livingEntity) {
-
-        HashMap<World, List<LivingEntity>> newHashMap = currentHashMap;
-
-        List<LivingEntity> currentLivingEntities = currentHashMap.get(livingEntity.getWorld());
-        currentLivingEntities.remove(livingEntity);
-        newHashMap.put(livingEntity.getWorld(), currentLivingEntities);
-
-        return newHashMap;
-
-    }
-
-    private static HashMap<World, List<EliteMobEntity>> eliteMobsSubtractor(HashMap<World, List<EliteMobEntity>> currentHashMap, LivingEntity livingEntity) {
-
-        HashMap<World, List<EliteMobEntity>> newHashMap = currentHashMap;
-
-        List<EliteMobEntity> currentLivingEntities = currentHashMap.get(livingEntity.getWorld());
-        currentLivingEntities.remove(livingEntity);
-        newHashMap.put(livingEntity.getWorld(), currentLivingEntities);
-
-        return newHashMap;
-
-    }
-
-    private static List<Entity> checkEntityList(List<Entity> entityList) {
-
-        List<Entity> newArrayList = entityList;
-
-        for (Entity entity : entityList)
+    private static void updateSuperMobs() {
+        Iterator iterator = superMobs.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
             if (!entity.isValid())
-                newArrayList.remove(entity);
-
-        return newArrayList;
-
+                iterator.remove();
+        }
     }
 
-    public static boolean isPassiveMob(Entity entity) {
-        if (!(entity instanceof LivingEntity)) return false;
-        return checkLivingEntityMap(passiveMobs, (LivingEntity) entity);
+    private static void updateLivingEntities() {
+        Iterator iterator = naturalEntities.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if (!entity.isValid())
+                iterator.remove();
+        }
     }
 
-    public static boolean isEliteMob(LivingEntity livingEntity) {
-        return checkEliteMobMap(eliteMobs, livingEntity);
+    private static void updateEliteMobEntities() {
+        Iterator iterator = eliteMobs.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = ((EliteMobEntity) iterator.next()).getLivingEntity();
+            if (entity.isDead() ||
+                    !entity.isValid() && ((LivingEntity) entity).getRemoveWhenFarAway())
+                iterator.remove();
+        }
     }
 
-    public static boolean isBossMob(LivingEntity livingEntity) {
-        return checkEliteMobMap(bossMobs, livingEntity);
+    private static void updateAmorStands() {
+        Iterator iterator = armorStands.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if (!entity.isValid())
+                iterator.remove();
+        }
     }
 
-    public static boolean isPluginEntity(Entity entity) {
-        return allCullableEliteMobEntities.contains(entity);
+    private static void updateCullables() {
+        Iterator iterator = cullablePluginEntities.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if (!entity.isValid())
+                iterator.remove();
+        }
+    }
+
+    private static void updateItems() {
+        Iterator iterator = itemVisualEffects.iterator();
+        while (iterator.hasNext()) {
+            Entity entity = (Entity) iterator.next();
+            if (!entity.isValid())
+                iterator.remove();
+        }
+    }
+
+    public static boolean isSuperMob(Entity entity) {
+        if (!SuperMobProperties.isValidSuperMobType(entity)) return false;
+        return superMobs.contains(entity);
+    }
+
+    public static boolean isEliteMob(Entity entity) {
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
+        return eliteMobsLivingEntities.contains(entity);
+    }
+
+    public static EliteMobEntity getEliteMobEntity(Entity entity) {
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
+        for (EliteMobEntity eliteMobEntity : eliteMobs)
+            if (eliteMobEntity.getLivingEntity().equals(entity))
+                return eliteMobEntity;
+        return null;
+    }
+
+    public static EliteMobEntity getAsyncEliteMobEntity(Entity entity) {
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
+        HashSet<EliteMobEntity> localEntities = (HashSet<EliteMobEntity>) eliteMobs.clone();
+        for (EliteMobEntity eliteMobEntity : localEntities)
+            if (eliteMobEntity.getLivingEntity().equals(entity))
+                return eliteMobEntity;
+        return null;
     }
 
     public static boolean isNaturalEntity(Entity entity) {
-        if (!(entity instanceof LivingEntity)) return false;
-        return checkLivingEntityMap(naturalEntities, (LivingEntity) entity);
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
+        return naturalEntities.contains(entity);
     }
 
-    public static boolean isCullablePluginEntity(Entity entity) {
-        return allCullableEliteMobEntities.contains(entity);
+    public static boolean isItemVisualEffect(Entity entity) {
+        return (itemVisualEffects.contains(entity));
     }
 
-    private static boolean checkLivingEntityMap(HashMap<World, List<LivingEntity>> hashMap, LivingEntity livingEntity) {
-
-        if (hashMap.containsKey(livingEntity.getWorld()))
-            return hashMap.get(livingEntity.getWorld()).contains(livingEntity);
-        return false;
-
+    public static boolean hasPower(ElitePower mobPower, Entity entity) {
+        EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
+        if (eliteMobEntity == null) return false;
+        return eliteMobEntity.hasPower(mobPower);
     }
 
-    private static boolean checkEliteMobMap(HashMap<World, List<EliteMobEntity>> hashMap, LivingEntity livingEntity) {
+    public static boolean hasPower(ElitePower mobPower, EliteMobEntity eliteMobEntity) {
+        if (eliteMobEntity == null) return false;
+        return eliteMobEntity.hasPower(mobPower);
+    }
 
-        if (hashMap.containsKey(livingEntity.getWorld()))
-            return hashMap.get(livingEntity.getWorld()).contains(livingEntity);
-        return false;
+    public static void unregisterCullableEntity(Entity entity) {
+        cullablePluginEntities.remove(entity);
+    }
 
+    public static void unregisterItemEntity(Item item) {
+        itemVisualEffects.remove(item);
+    }
+
+    /*
+    Used outside this class to remove individual elite mobs
+     */
+    public static void unregisterEliteMob(EliteMobEntity eliteMobEntity) {
+        eliteMobs.remove(eliteMobEntity);
+        naturalEntities.remove(eliteMobEntity.getLivingEntity());
+        cullablePluginEntities.remove(eliteMobEntity.getLivingEntity());
+    }
+
+    /*
+    Used in this class to do mass wipes of data
+     */
+    private static void unregisterEliteMob(Entity entity) {
+        if (!isEliteMob(entity)) return;
+        EliteMobEntity eliteMobEntity = getAsyncEliteMobEntity(entity);
+        if (eliteMobEntity == null) return;
+        eliteMobEntity.getLivingEntity().remove();
+        eliteMobs.remove(eliteMobEntity);
+        eliteMobsLivingEntities.remove(eliteMobEntity.getLivingEntity());
+    }
+
+    public static void unregisterArmorStand(Entity armorStand) {
+        if (!armorStand.getType().equals(EntityType.ARMOR_STAND)) return;
+        armorStands.remove(armorStand);
+    }
+
+    public static HashSet<EliteMobEntity> getEliteMobs() {
+        return eliteMobs;
+    }
+
+    public static boolean getIsArmorStand(Entity entity) {
+        if (!entity.getType().equals(EntityType.ARMOR_STAND)) return false;
+        return (armorStands.contains(entity));
+    }
+
+    public static void unregisterSuperMob(Entity entity) {
+        if (!SuperMobProperties.isValidSuperMobType(entity)) return;
+        superMobs.remove(entity);
+    }
+
+    public static void unregisterNaturalEntity(Entity entity) {
+        if (EliteMobProperties.isValidEliteMobType(entity)) return;
+        naturalEntities.remove(entity);
     }
 
     /*
     Custom spawn reasons can be considered as natural spawns under specific config options
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void registerNaturalEntity(CreatureSpawnEvent event) {
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL))
+        if (event.isCancelled()) return;
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
+                event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) &&
+                        !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES))
             registerNaturalEntity(event.getEntity());
     }
 
     /*
     Natural entities get unregistered from being natural when exploit abuse is detected from the players
      */
-    public static void unregisterNaturalEntity(Entity livingEntity) {
-        List<LivingEntity> entityList = naturalEntities.get(livingEntity.getWorld());
-        entityList.remove(livingEntity);
-        naturalEntities.put(livingEntity.getWorld(), entityList);
+    public static void unregisterNaturalEntity(LivingEntity livingEntity) {
+        naturalEntities.remove(livingEntity);
+    }
+
+    public static void shutdownPurger() {
+
+        for (Entity entity : cullablePluginEntities)
+            entity.remove();
+
+        eliteMobs.clear();
+        eliteMobsLivingEntities.clear();
+        superMobs.clear();
+        itemVisualEffects.clear();
+        armorStands.clear();
+        naturalEntities.clear();
+        cullablePluginEntities.clear();
+
+    }
+
+    /*
+    This is run in sync for performance reasons
+     */
+    public static void wipeEntity(Entity entity) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                unregisterEliteMob(entity);
+                unregisterSuperMob(entity);
+                unregisterNaturalEntity(entity);
+                unregisterArmorStand(entity);
+                unregisterCullableEntity(entity);
+            }
+        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+    }
+
+    public static void chunkWiper(ChunkUnloadEvent event) {
+        for (Entity entity : event.getChunk().getEntities())
+            wipeEntity(entity);
+    }
+
+    public static void deathWipe(EntityDeathEvent event) {
+        wipeEntity(event.getEntity());
     }
 
 }

@@ -13,26 +13,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.magmaguy.elitemobs.collateralminecraftchanges;
+package com.magmaguy.elitemobs.mobpowers.majorpowers;
 
-import com.magmaguy.elitemobs.mobscanner.ValidAggressiveMobFilter;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPickupItemEvent;
+import com.magmaguy.elitemobs.mobpowers.ElitePower;
 
-public class PreventMobItemPickup implements Listener {
-
-    @EventHandler
-    public void onPickup(EntityPickupItemEvent event) {
-
-        if (event.getEntity() instanceof Player) return;
-        if (ValidAggressiveMobFilter.checkValidAggressiveMob(event.getEntity())) {
-
-            event.setCancelled(true);
-
-        }
-
-    }
+/**
+ * Created by MagmaGuy on 10/05/2017.
+ */
+public abstract class MajorPower extends ElitePower {
 
 }

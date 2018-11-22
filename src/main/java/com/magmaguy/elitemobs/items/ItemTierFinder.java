@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
-import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -115,10 +115,10 @@ public class ItemTierFinder {
 
     }
 
-    private static final double IRON_TIER = DamageAdjuster.IRON_TIER_LEVEL;
-    private static final double STONE_CHAIN_TIER = DamageAdjuster.IRON_TIER_LEVEL;
-    private static final double GOLD_WOOD_LEATHER_TIER = DamageAdjuster.GOLD_WOOD_LEATHER_TIER_LEVEL;
-    private static final double DIAMOND_TIER = DamageAdjuster.DIAMOND_TIER_LEVEL;
+    private static final double IRON_TIER = CombatSystem.IRON_TIER_LEVEL;
+    private static final double STONE_CHAIN_TIER = CombatSystem.IRON_TIER_LEVEL;
+    private static final double GOLD_WOOD_LEATHER_TIER = CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL;
+    private static final double DIAMOND_TIER = CombatSystem.DIAMOND_TIER_LEVEL;
 
     public static double findGenericTier(Material material, HashMap<Enchantment, Integer> enchantmentList) {
 

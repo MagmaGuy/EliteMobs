@@ -16,146 +16,57 @@
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.ProjectileMetadataDetector;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
+import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashSet;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class AttackWeb extends MinorPowers implements Listener {
+public class AttackWeb extends MinorPower implements Listener {
 
-    String powerMetadata = MetadataHandler.ATTACK_WEB_MD;
-    private int processID;
+    private static HashSet<EliteMobEntity> cooldownList = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void attackWeb(EntityDamageByEntityEvent event) {
 
-        Entity damager = event.getDamager();
-        Entity damagee = event.getEntity();
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        Player player = EntityFinder.findPlayer(event);
+        if (PowerCooldown.isInCooldown(eliteMobEntity, cooldownList)) return;
 
-        Block block = damagee.getLocation().getBlock();
+        Block block = player.getLocation().getBlock();
         Material originalMaterial = block.getType();
 
-        if (!originalMaterial.equals(Material.AIR) || !(damagee instanceof Player)) {
-
+        if (!originalMaterial.equals(Material.AIR))
             return;
 
-        }
+        block.setType(Material.WEB);
 
-        if (damager.hasMetadata(MetadataHandler.ATTACK_FREEZE_MD) || damager instanceof Projectile &&
-                ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, MetadataHandler.ATTACK_FREEZE_MD)) {
-
-            return;
-
-        }
-
-        if (damagee.hasMetadata("WebCooldown")) {
-
-            return;
-
-        }
-
-        if (damager.hasMetadata(powerMetadata)) {
-
-            //if a block spawned by the plugin is already in place, skip effect
-            if (block.hasMetadata("TemporaryBlock")) {
-
-                return;
-
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                block.setType(originalMaterial);
             }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
 
-            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MetadataHandler.PLUGIN, new Runnable() {
-
-                int counter = 0;
-
-                @Override
-                public void run() {
-
-                    webEffectApplier(counter, damagee, block);
-                    counter++;
-
-                }
-
-            }, 2, 1);
-
-        }
-
-        if (damager instanceof Projectile) {
-
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
-
-                processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(MetadataHandler.PLUGIN, new Runnable() {
-
-                    int counter = 0;
-
-                    @Override
-                    public void run() {
-
-                        webEffectApplier(counter, damagee, block);
-                        counter++;
-
-                    }
-
-                }, 1, 1);
-
-            }
-
-        }
-
-
-    }
-
-    private void webEffectApplier(int counter, Entity damagee, Block block) {
-
-        if (counter == 0) {
-
-            MetadataHandler.registerMetadata(damagee, MetadataHandler.WEB_COOLDOWN, true);
-            block.setType(Material.WEB);
-
-            MetadataHandler.registerMetadata(block, MetadataHandler.TEMPORARY_BLOCK, true);
-
-        }
-
-        if (counter == 20 * 4) {
-
-            block.setType(Material.AIR);
-
-            block.removeMetadata("TemporaryBlock", MetadataHandler.PLUGIN);
-
-        }
-
-        if (counter == 20 * 7) {
-
-            damagee.removeMetadata("WebCooldown", MetadataHandler.PLUGIN);
-            Bukkit.getScheduler().cancelTask(processID);
-
-        }
+        PowerCooldown.startCooldownTimer(eliteMobEntity, cooldownList, 3 * 20);
 
     }
 

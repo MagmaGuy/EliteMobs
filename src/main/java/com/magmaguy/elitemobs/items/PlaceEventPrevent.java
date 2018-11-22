@@ -21,7 +21,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class PlaceEventPrevent implements Listener {
 
@@ -37,17 +36,8 @@ public class PlaceEventPrevent implements Listener {
 
         if (event.getItem() == null || event.getItem().getItemMeta() == null) return;
 
-
-        for (ItemStack itemStack : CustomItemConstructor.customItemList) {
-
-            if (itemStack.getItemMeta().equals(event.getItem().getItemMeta()) && itemStack.getType().equals(event.getItem().getType())) {
-
-                event.setCancelled(true);
-                return;
-
-            }
-
-        }
+        if (ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(event.getItem()))
+            event.setCancelled(true);
 
     }
 

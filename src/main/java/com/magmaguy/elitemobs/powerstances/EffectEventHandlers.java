@@ -15,12 +15,9 @@
 
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.entity.EntityType;
+import com.magmaguy.elitemobs.EntityTracker;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
@@ -33,57 +30,27 @@ public class EffectEventHandlers implements Listener {
 
     @EventHandler
     public void playerPickupSafeguard(PlayerPickupItemEvent event) {
-
-        if (event.getItem().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)|| event.getItem().hasMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD))
+        if (EntityTracker.isItemVisualEffect(event.getItem()))
             event.setCancelled(true);
-
     }
 
     @EventHandler
     public void hopperPickupSafeguard(InventoryPickupItemEvent event) {
-
-        if (event.getItem().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD) || event.getItem().hasMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD))
+        if (EntityTracker.isItemVisualEffect(event.getItem()))
             event.setCancelled(true);
-
-
     }
 
     //todo: this prevents elite mobs from going through portals, might want to change it at some point
     @EventHandler
     public void portalPickupSafeguard(EntityPortalEvent event) {
-
-        if (event.getEntity().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD) ||
-                event.getEntity().hasMetadata(MetadataHandler.ELITE_MOB_MD))
+        if (EntityTracker.isItemVisualEffect(event.getEntity()) || EntityTracker.isEliteMob(event.getEntity()))
             event.setCancelled(true);
-
     }
 
     @EventHandler
     public void itemDespawnPrevention(ItemDespawnEvent event) {
-
-        if (event.getEntity().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)|| event.getEntity().hasMetadata(MetadataHandler.MAJOR_POWER_AMOUNT_MD))
+        if (EntityTracker.isItemVisualEffect(event.getEntity()))
             event.setCancelled(true);
-
-    }
-
-    @EventHandler
-    public void itemBurnPrevention(EntityCombustEvent event) {
-
-        if (event.getEntity().getType().equals(EntityType.DROPPED_ITEM) && event.getEntity().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)){
-            event.setCancelled(true);
-
-        }
-
-    }
-
-    @EventHandler
-    public void itemBurnPrevention(EntityDamageEvent event) {
-
-        if (event.getEntity().getType().equals(EntityType.DROPPED_ITEM) && event.getEntity().hasMetadata(MetadataHandler.VISUAL_EFFECT_MD)){
-
-            event.setCancelled(true);
-
-        }
 
     }
 

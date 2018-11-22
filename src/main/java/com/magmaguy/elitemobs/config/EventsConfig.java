@@ -61,6 +61,8 @@ public class EventsConfig {
     public static final String FAE_NAME = "Name of mob in Fae event";
     public static final String FAE_CHANCE_ON_CHOP = "Fae chance on chop";
     public static final String ANNOUNCEMENT_BROADCAST_WORLD_ONLY = "Only broadcast event message in event world";
+    public static final String DEADMOON_ANNOUNCEMENT_MESSAGE = "Deadmoon announcement message";
+    public static final String DEADMOON_END_MESSAGE = "Deadmoon end message";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -105,6 +107,8 @@ public class EventsConfig {
         configuration.addDefault(FAE_NAME, "&aFae");
         configuration.addDefault(FAE_CHANCE_ON_CHOP, 0.001);
         configuration.addDefault(ANNOUNCEMENT_BROADCAST_WORLD_ONLY, false);
+        configuration.addDefault(DEADMOON_ANNOUNCEMENT_MESSAGE, "A dead moon rises, and the undead with it...");
+        configuration.addDefault(DEADMOON_END_MESSAGE, "Dawn rises, the Dead Moon wanes for those still alive...");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

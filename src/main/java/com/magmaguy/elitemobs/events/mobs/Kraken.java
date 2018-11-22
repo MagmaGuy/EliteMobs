@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.items.uniqueitems.DepthsSeeker;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
@@ -21,26 +20,45 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 public class Kraken implements Listener {
 
+    private static HashSet<Squid> krakens = new HashSet<>();
+
+    public static boolean isKraken(Squid kraken) {
+        return krakens.contains(kraken);
+    }
+
+    public static void removeKraken(Squid kraken) {
+        krakens.remove(kraken);
+    }
+
+    private static HashSet<Fireball> fireballs = new HashSet<>();
+
+    public static boolean isFireball(Fireball fireball) {
+        return fireballs.contains(fireball);
+    }
+
+    public static void removeFireball(Fireball fireball) {
+        fireballs.remove(fireball);
+    }
+
     public static void spawnKraken(Location location) {
-
         krakenSpawnEffect(location);
-
     }
 
     private static void krakenSpawnEffect(Location location) {
 
         new BukkitRunnable() {
 
-            int i = 0;
+            int counter = 0;
 
             @Override
             public void run() {
 
-                if (i > 20 * 3) {
+                if (counter > 20 * 3) {
 
                     initializeKraken(location);
                     cancel();
@@ -50,7 +68,7 @@ public class Kraken implements Listener {
 
                 location.getWorld().spawnParticle(Particle.PORTAL, location, 20, 1, 1, 1, 0.1);
 
-                i++;
+                counter++;
 
             }
 
@@ -63,16 +81,17 @@ public class Kraken implements Listener {
 
         Squid kraken = (Squid) location.getWorld().spawnEntity(location, EntityType.SQUID);
 
-        kraken.setMaxHealth(200);
-        kraken.setHealth(200);
+        krakens.add(kraken);
+
+        /*
+        This boss is not fully integrated into the plugin yet, might not really make the cut
+         */
+
+        kraken.setMaxHealth(100);
+        kraken.setHealth(100);
 
         kraken.setCustomName(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.KRAKEN_NAME)));
         kraken.setCustomNameVisible(true);
-
-        MetadataHandler.registerMetadata(kraken, MetadataHandler.KRAKEN, true);
-        MetadataHandler.registerMetadata(kraken, MetadataHandler.ELITE_MOB_MD, ActionDynamicBossLevelConstructor.determineDynamicBossLevel(kraken));
-        MetadataHandler.registerMetadata(kraken, MetadataHandler.EVENT_CREATURE, true);
-        MetadataHandler.registerMetadata(kraken, MetadataHandler.PERSISTENT_ENTITY, true);
 
         krakenDamageLoop(kraken);
         krakenVisualEffectLoop(kraken);
@@ -89,21 +108,13 @@ public class Kraken implements Listener {
             public void run() {
 
                 if (kraken.isDead()) {
-
                     cancel();
                     return;
-
                 }
 
-                for (Entity entity : kraken.getNearbyEntities(16, 16, 16)) {
-
-                    if (entity instanceof Player) {
-
+                for (Entity entity : kraken.getNearbyEntities(16, 16, 16))
+                    if (entity instanceof Player)
                         fireballInitializer(kraken, (Player) entity);
-
-                    }
-
-                }
 
             }
 
@@ -122,9 +133,7 @@ public class Kraken implements Listener {
         repeatingFireball.setIsIncendiary(true);
         repeatingFireball.setYield(2F);
 
-        MetadataHandler.registerMetadata(repeatingFireball, MetadataHandler.KRAKEN_FIREBALL, true);
-
-//        repeatingFireball.setShooter(kraken);
+        fireballs.add(repeatingFireball);
 
     }
 
@@ -162,13 +171,12 @@ public class Kraken implements Listener {
     public void onSuffocate(EntityDamageEvent event) {
 
         if (event.isCancelled()) return;
+        if (!event.getEntity().getType().equals(EntityType.SQUID)) return;
+        if (!isKraken((Squid) event.getEntity())) return;
+        if (!event.getCause().equals(EntityDamageEvent.DamageCause.DROWNING) &&
+                !event.getCause().equals(EntityDamageEvent.DamageCause.FIRE)) return;
 
-        if (event.getEntity().hasMetadata(MetadataHandler.KRAKEN) && event.getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
-                event.getCause().equals(EntityDamageEvent.DamageCause.FIRE)) {
-
-            event.setCancelled(true);
-
-        }
+        event.setCancelled(true);
 
     }
 
@@ -177,9 +185,8 @@ public class Kraken implements Listener {
 
         if (event.getDamager() instanceof Fireball && ((Fireball) event.getDamager()).getShooter() != null &&
                 ((Fireball) event.getDamager()).getShooter() instanceof Squid) {
-
             event.setCancelled(true);
-
+            removeFireball((Fireball) event.getDamager());
         }
 
     }
@@ -188,32 +195,33 @@ public class Kraken implements Listener {
     public void fireballDamage(EntityDamageByEntityEvent event) {
 
         if (event.isCancelled()) return;
+        if (!event.getEntity().getType().equals(EntityType.PLAYER)) return;
+        if (!event.getDamager().getType().equals(EntityType.FIREBALL)) return;
+        if (!isFireball((Fireball) event.getDamager())) return;
 
-        if (event.getEntity() instanceof  Player && event.getDamager().getType().equals(EntityType.FIREBALL) &&
-                event.getDamager().hasMetadata(MetadataHandler.KRAKEN_FIREBALL)) {
+        for (EntityDamageByEntityEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
+            if (event.isApplicable(modifier))
+                event.setDamage(modifier, 0);
 
-            for (EntityDamageByEntityEvent.DamageModifier modifier : EntityDamageByEntityEvent.DamageModifier.values())
-                if (event.isApplicable(modifier))
-                    event.setDamage(modifier, 0);
-            event.setDamage(EntityDamageEvent.DamageModifier.BASE, 2);
+        event.setDamage(EntityDamageEvent.DamageModifier.BASE, 2);
 
-            event.getDamager().removeMetadata(MetadataHandler.KRAKEN_FIREBALL, MetadataHandler.PLUGIN);
-
-        }
+        removeFireball((Fireball) event.getDamager());
 
     }
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
 
-        if (event.getEntity().hasMetadata(MetadataHandler.KRAKEN)) {
+        if (!event.getEntity().getType().equals(EntityType.SQUID)) return;
+        if (!isKraken((Squid) event.getEntity())) return;
 
-            DepthsSeeker depthsSeeker = new DepthsSeeker();
-            ItemStack depthSeekerItemStack = depthsSeeker.constructItemStack();
-            event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), depthSeekerItemStack);
-
-        }
+        DepthsSeeker depthsSeeker = new DepthsSeeker();
+        ItemStack depthSeekerItemStack = depthsSeeker.constructItemStack();
+        event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), depthSeekerItemStack);
+        removeKraken((Squid) event.getEntity());
 
     }
 
 }
+
+

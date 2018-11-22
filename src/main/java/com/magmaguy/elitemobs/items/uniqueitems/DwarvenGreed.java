@@ -35,7 +35,6 @@ public class DwarvenGreed extends UniqueItem {
     public List<String> defineEnchantments() {
         return Arrays.asList(
                 "LOOT_BONUS_BLOCKS,4",
-                "SILK_TOUCH,1",
                 "DURABILITY,6",
                 "DIG_SPEED,6",
                 "VANISHING_CURSE,1"

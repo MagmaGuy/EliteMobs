@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
-import com.magmaguy.elitemobs.mobconstructor.DamageAdjuster;
+import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -26,7 +26,7 @@ public class MaterialGenerator {
 
         if (localValidMaterials.isEmpty()) intializeValidProceduralMaterials();
 
-        if (itemTier < DamageAdjuster.DIAMOND_TIER_LEVEL) {
+        if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL) {
 
             localValidMaterials.remove(DIAMOND);
             localValidMaterials.remove(DIAMOND_AXE);
@@ -44,7 +44,7 @@ public class MaterialGenerator {
 
         }
 
-        if (itemTier < DamageAdjuster.IRON_TIER_LEVEL) {
+        if (itemTier < CombatSystem.IRON_TIER_LEVEL) {
 
             localValidMaterials.remove(IRON_AXE);
             localValidMaterials.remove(IRON_BARDING);
@@ -63,7 +63,7 @@ public class MaterialGenerator {
 
         }
 
-        if (itemTier < DamageAdjuster.STONE_CHAIN_TIER_LEVEL) {
+        if (itemTier < CombatSystem.STONE_CHAIN_TIER_LEVEL) {
 
             localValidMaterials.remove(CHAINMAIL_BOOTS);
             localValidMaterials.remove(CHAINMAIL_CHESTPLATE);

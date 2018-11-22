@@ -15,177 +15,78 @@
 
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.ProjectileMetadataDetector;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPowers;
-import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.MobPowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
+import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
+import com.magmaguy.elitemobs.utils.EntityFinder;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashSet;
 
 /**
  * Created by MagmaGuy on 28/04/2017.
  */
-public class AttackFreeze extends MinorPowers implements Listener {
+public class AttackFreeze extends MinorPower implements Listener {
 
-    Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    String powerMetadata = MetadataHandler.ATTACK_FREEZE_MD;
-
-    private int processID;
+    private static HashSet<EliteMobEntity> cooldowns = new HashSet<>();
 
     @Override
     public void applyPowers(Entity entity) {
-
-        MetadataHandler.registerMetadata(entity, powerMetadata, true);
-        MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance();
-        minorPowerPowerStance.itemEffect(entity);
-
-    }
-
-    @Override
-    public boolean existingPowers(Entity entity) {
-
-        return entity.hasMetadata(powerMetadata);
-
     }
 
     @EventHandler
     public void attackFreeze(EntityDamageByEntityEvent event) {
 
-        Entity damager = event.getDamager();
-        Entity damagee = event.getEntity();
+        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
+        if (eliteMobEntity == null) return;
+        Player player = EntityFinder.findPlayer(event);
+        if (PowerCooldown.isInCooldown(eliteMobEntity, cooldowns)) return;
 
-        Block block = damagee.getLocation().getBlock();
+        /*
+        Slow player down
+         */
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 10));
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(
+                        ChatColorConverter.convert(
+                                ConfigValues.mobPowerConfig.getString(
+                                        MobPowersConfig.FROZEN_MESSAGE))));
+
+        PowerCooldown.startCooldownTimer(eliteMobEntity, cooldowns, 20 * 15);
+
+        /*
+        Add block effect
+         */
+        Block block = player.getLocation().getBlock();
         Material originalMaterial = block.getType();
 
-        if (!originalMaterial.equals(Material.AIR) || !(damagee instanceof Player)) {
-
+        if (!originalMaterial.equals(Material.AIR))
             return;
 
-        }
+        block.setType(Material.PACKED_ICE);
 
-        if (damagee.hasMetadata(MetadataHandler.FROZEN_COOLDOWN)) {
-
-            return;
-
-        }
-
-        //if a block spawned by the plugin is already in place, skip effect
-        if (block.hasMetadata("TemporaryBlock")) {
-
-            return;
-
-        }
-
-        if (damager.hasMetadata(powerMetadata)) {
-
-            processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-                int counter = 0;
-
-                @Override
-                public void run() {
-
-                    iceEffectApplier(counter, damagee, block);
-                    counter++;
-
-                }
-
-            }, 1, 1);
-
-
-        }
-
-        if (damager instanceof Projectile) {
-
-            if (ProjectileMetadataDetector.projectileMetadataDetector((Projectile) damager, powerMetadata)) {
-
-                processID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-                    int counter = 0;
-
-                    @Override
-                    public void run() {
-
-                        iceEffectApplier(counter, damagee, block);
-                        counter++;
-
-                    }
-
-                }, 1, 1);
-
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                block.setType(originalMaterial);
             }
-
-
-        }
-
-    }
-
-    public void iceEffectApplier(int counter, Entity damagee, Block block) {
-
-        if (counter == 0) {
-
-            MetadataHandler.registerMetadata(damagee, MetadataHandler.FROZEN, true);
-            MetadataHandler.registerMetadata(damagee, MetadataHandler.FROZEN_COOLDOWN, true);
-
-            if (block.getType() == Material.AIR) {
-
-                block.setType(Material.PACKED_ICE);
-                MetadataHandler.registerMetadata(block, MetadataHandler.TEMPORARY_BLOCK, true);
-
-            }
-
-
-            if (damagee instanceof Player) {
-
-                Player player = (Player) damagee;
-
-                player.sendTitle("", "Frozen!");
-
-            }
-
-        }
-
-        if (counter == 40) {
-
-            damagee.removeMetadata(MetadataHandler.FROZEN, plugin);
-
-            if (block.getType() == Material.PACKED_ICE) {
-
-                block.setType(Material.AIR);
-                block.removeMetadata("TemporaryBlock", plugin);
-
-            }
-
-        }
-
-        if (counter == 20 * 7) {
-
-            damagee.removeMetadata(MetadataHandler.FROZEN_COOLDOWN, plugin);
-            Bukkit.getScheduler().cancelTask(processID);
-
-        }
-
-    }
-
-    @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-
-        Player player = event.getPlayer();
-
-        if (player.hasMetadata(MetadataHandler.FROZEN)) {
-
-            event.setCancelled(true);
-
-        }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
 
     }
 

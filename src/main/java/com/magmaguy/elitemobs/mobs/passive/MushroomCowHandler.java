@@ -44,7 +44,7 @@ public class MushroomCowHandler implements Listener {
 
         }
 
-        if (event.getEntity() instanceof MushroomCow && EntityTracker.isPassiveMob(event.getEntity())) {
+        if (event.getEntity() instanceof MushroomCow && EntityTracker.isSuperMob(event.getEntity())) {
 
             Random random = new Random();
 
@@ -100,7 +100,7 @@ public class MushroomCowHandler implements Listener {
     @EventHandler
     public void onShear(PlayerShearEntityEvent event) {
 
-        if (event.getEntity() instanceof MushroomCow && EntityTracker.isPassiveMob(event.getEntity())) {
+        if (event.getEntity() instanceof MushroomCow && EntityTracker.isSuperMob(event.getEntity())) {
 
             MushroomCow mushroomCow = (MushroomCow) event.getEntity();
 

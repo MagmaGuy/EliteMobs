@@ -32,13 +32,12 @@ public class BossMobDeathCountdown {
             @Override
             public void run() {
 
-                if (entity.isValid() && !entity.isDead()) {
+                if (entity.isDead()) return;
 
-                    entity.remove();
-                    String eventMessage = ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.EVENT_TIMEOUT_MESSAGE).replace("$bossmob", entity.getCustomName()));
-                    EventMessage.sendEventMessage(eventMessage, entity.getWorld());
-
-                }
+                entity.remove();
+                String eventMessage = ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.EVENT_TIMEOUT_MESSAGE)
+                        .replace("$bossmob", entity.getCustomName()));
+                EventMessage.sendEventMessage(entity, eventMessage);
 
             }
 

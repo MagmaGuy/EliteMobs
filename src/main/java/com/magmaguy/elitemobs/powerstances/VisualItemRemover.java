@@ -1,29 +1,21 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.EntityTracker;
 import org.bukkit.entity.Item;
-
-import java.util.HashMap;
-import java.util.List;
 
 public class VisualItemRemover {
 
-    public static void removeItems(HashMap<Integer, HashMap<Integer, List<Item>>> powerItemLocationTracker, int trackAmount, int itemsPerTrack) {
+    public static void removeItems(Object[][] multiDimensionalTrailTracker) {
 
-        for (int i = 0; i < powerItemLocationTracker.size(); i++) {
+        for (int i = 0; i < multiDimensionalTrailTracker.length; i++)
+            for (int j = 0; j < multiDimensionalTrailTracker[i].length; j++) {
 
-            for (int j = 0; j < trackAmount; j++) {
-
-                for (int h = 0; h < itemsPerTrack; h++) {
-
-                    powerItemLocationTracker.get(i).get(j).get(h).remove();
-                    MetadataHandler.fullMetadataFlush(powerItemLocationTracker.get(i).get(j).get(h));
-
-                }
+                if (!(multiDimensionalTrailTracker[i][j] instanceof Item)) continue;
+                Item item = (Item) multiDimensionalTrailTracker[i][j];
+                item.remove();
+                EntityTracker.unregisterItemEntity(item);
 
             }
-
-        }
 
     }
 
