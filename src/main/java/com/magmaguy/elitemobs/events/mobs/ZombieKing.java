@@ -131,7 +131,7 @@ public class ZombieKing implements Listener {
 
             } else if (ThreadLocalRandom.current().nextDouble() < 0.66) {
 
-                if (PowerCooldown.isInCooldown(eliteMobEntity, unholySmiteCooldown)) {
+                if (!PowerCooldown.isInCooldown(eliteMobEntity, unholySmiteCooldown)) {
 
                     PowerCooldown.startCooldownTimer(eliteMobEntity, unholySmiteCooldown,
                             20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_UNHOLY_SMITE_INTERVAL));
@@ -141,7 +141,7 @@ public class ZombieKing implements Listener {
 
             } else {
 
-                if (PowerCooldown.isInCooldown(eliteMobEntity, minionsCooldown)) {
+                if (!PowerCooldown.isInCooldown(eliteMobEntity, minionsCooldown)) {
 
                     PowerCooldown.startCooldownTimer(eliteMobEntity, minionsCooldown,
                             20 * ConfigValues.eventsConfig.getInt(EventsConfig.ZOMBIE_KING_SUMMON_MINIONS_INTERVAL));
@@ -186,7 +186,7 @@ public class ZombieKing implements Listener {
 
                 Location newLocation = sourceLocation.add(toTarget);
 
-                flamethrowerDamage(newLocation, shooter, toTarget, shotByPlayer);
+                flamethrowerDamage(newLocation.clone(), shooter, toTarget, shotByPlayer);
 
                 counter++;
 

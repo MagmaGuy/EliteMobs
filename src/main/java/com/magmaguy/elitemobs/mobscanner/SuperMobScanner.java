@@ -64,12 +64,17 @@ public class SuperMobScanner {
 
     private static void checkLostSuperMob(LivingEntity livingEntity) {
 
-        if (livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() !=
-                SuperMobProperties.getSuperMobMaxHealth(livingEntity))
-            return;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() !=
+                        SuperMobProperties.getSuperMobMaxHealth(livingEntity))
+                    return;
 
-        if (!EntityTracker.isSuperMob(livingEntity))
-            EntityTracker.registerSuperMob(livingEntity);
+                if (!EntityTracker.isSuperMob(livingEntity))
+                    EntityTracker.registerSuperMob(livingEntity);
+            }
+        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
 
     }
 

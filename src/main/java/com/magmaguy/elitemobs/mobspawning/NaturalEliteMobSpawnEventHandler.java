@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -42,10 +43,19 @@ public class NaturalEliteMobSpawnEventHandler implements Listener {
      */
     public static void naturalMobProcessor(Entity entity) {
 
+        int eliteMobLevel = getNaturalMobLevel(entity.getLocation());
+        if (eliteMobLevel < 0) return;
+
+        EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel);
+
+    }
+
+    public static int getNaturalMobLevel(Location spawnLocation) {
+
         List<Player> closePlayers = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers())
-            if (player.getWorld().equals(entity.getWorld()) && player.getLocation().distanceSquared(entity.getLocation()) < Math.pow(range, 2))
+            if (player.getWorld().equals(spawnLocation.getWorld()) && player.getLocation().distanceSquared(spawnLocation) < Math.pow(range, 2))
                 if (!player.getGameMode().equals(GameMode.SPECTATOR) && (!player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) ||
                         player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) && !player.getMetadata(MetadataHandler.VANISH_NO_PACKET).get(0).asBoolean()))
                     closePlayers.add(player);
@@ -71,14 +81,14 @@ public class NaturalEliteMobSpawnEventHandler implements Listener {
 
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE)) {
 
-            int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease((LivingEntity) entity);
+            int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease(spawnLocation);
             eliteMobLevel += levelIncrement;
 
         }
 
-        if (playerCount == 0 || eliteMobLevel < 1) return;
+        if (playerCount == 0 || eliteMobLevel < 1) return 0;
 
-        EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel);
+        return eliteMobLevel;
 
     }
 

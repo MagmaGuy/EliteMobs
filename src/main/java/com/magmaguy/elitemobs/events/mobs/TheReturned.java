@@ -15,17 +15,15 @@
 
 package com.magmaguy.elitemobs.events.mobs;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.DeadMoon;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.ReinforcementMobEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Husk;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
@@ -90,29 +88,24 @@ public class TheReturned implements Listener {
 
         Location spawnLocation = zombie.getLocation();
 
-        Husk theReturned = (Husk) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.HUSK);
-
-        EliteMobEntity eliteMobEntity = new EliteMobEntity(theReturned, mobLevel);
-        eliteMobEntity.setHasCustomArmor(true);
-        eliteMobEntity.setHasCustomPowers(true);
-        eliteMobEntity.setHasStacking(false);
-        eliteMobEntity.setName(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME)));
+        ReinforcementMobEntity reinforcementMobEntity = new ReinforcementMobEntity(EntityType.HUSK, spawnLocation,
+                mobLevel, ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME));
 
         double x = ThreadLocalRandom.current().nextDouble() - 0.5;
         double z = ThreadLocalRandom.current().nextDouble() - 0.5;
 
-        theReturned.setVelocity(new Vector(x, 0.5, z));
+        reinforcementMobEntity.getLivingEntity().setVelocity(new Vector(x, 0.5, z));
 
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                theReturned.getEquipment().setBoots(new ItemStack(Material.AIR));
-                theReturned.getEquipment().setLeggings(new ItemStack(Material.AIR));
-                theReturned.getEquipment().setChestplate(new ItemStack(Material.AIR));
-                theReturned.getEquipment().setHelmet(new ItemStack(Material.AIR));
-                theReturned.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
+                reinforcementMobEntity.getLivingEntity().getEquipment().setBoots(new ItemStack(Material.AIR));
+                reinforcementMobEntity.getLivingEntity().getEquipment().setLeggings(new ItemStack(Material.AIR));
+                reinforcementMobEntity.getLivingEntity().getEquipment().setChestplate(new ItemStack(Material.AIR));
+                reinforcementMobEntity.getLivingEntity().getEquipment().setHelmet(new ItemStack(Material.AIR));
+                reinforcementMobEntity.getLivingEntity().getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
 
             }
 
