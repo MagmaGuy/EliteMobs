@@ -55,9 +55,6 @@ public class EliteMobScanner {
 
     public static void scanValidAggressiveLivingEntity(LivingEntity livingEntity) {
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
                 if (!EntityTracker.isNaturalEntity(livingEntity) &&
                         !ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.STACK_AGGRESSIVE_SPAWNER_MOBS))
                     return;
@@ -112,8 +109,6 @@ public class EliteMobScanner {
                     secondEntity.remove();
 
                 }
-            }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
 
     }
 

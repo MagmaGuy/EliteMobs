@@ -26,8 +26,8 @@ import com.magmaguy.elitemobs.events.mobs.TheReturned;
 import com.magmaguy.elitemobs.events.mobs.ZombieKing;
 import com.magmaguy.elitemobs.mobspawning.NaturalEliteMobSpawnEventHandler;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -53,7 +53,8 @@ public class DeadMoon implements Listener {
 
         if (event.getEntity().getWorld().getTime() < 13184 || event.getEntity().getWorld().getTime() > 22800) return;
         if (!event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL)) return;
-        if (!(event.getEntity() instanceof Zombie)) return;
+        if (!(event.getEntity().getType().equals(EntityType.ZOMBIE)) && !(event.getEntity().getType().equals(EntityType.HUSK)))
+            return;
         if (!EventLauncher.verifyPlayerCount()) return;
 
         if (!EliteMobs.validWorldList.contains(event.getEntity().getWorld())) return;
