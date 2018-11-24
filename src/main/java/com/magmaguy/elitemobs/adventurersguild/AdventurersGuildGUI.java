@@ -314,7 +314,7 @@ public class AdventurersGuildGUI implements Listener {
 
     private static int tierPriceCalculator(int tier) {
 
-        return (tier - 10) * (tier - 10) * 1000;
+        return (tier - 10) * (tier - 10) * 100;
 
     }
 

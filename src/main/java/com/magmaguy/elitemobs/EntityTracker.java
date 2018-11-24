@@ -175,14 +175,14 @@ public class EntityTracker implements Listener {
         return null;
     }
 
-    public static EliteMobEntity getAsyncEliteMobEntity(Entity entity) {
-        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
-        HashSet<EliteMobEntity> localEntities = (HashSet<EliteMobEntity>) eliteMobs.clone();
-        for (EliteMobEntity eliteMobEntity : localEntities)
-            if (eliteMobEntity.getLivingEntity().equals(entity))
-                return eliteMobEntity;
-        return null;
-    }
+//    public static EliteMobEntity getAsyncEliteMobEntity(Entity entity) {
+//        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
+//        HashSet<EliteMobEntity> localEntities = (HashSet<EliteMobEntity>) eliteMobs.clone();
+//        for (EliteMobEntity eliteMobEntity : localEntities)
+//            if (eliteMobEntity.getLivingEntity().equals(entity))
+//                return eliteMobEntity;
+//        return null;
+//    }
 
     public static boolean isNaturalEntity(Entity entity) {
         if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
@@ -226,7 +226,7 @@ public class EntityTracker implements Listener {
      */
     private static void unregisterEliteMob(Entity entity) {
         if (!isEliteMob(entity)) return;
-        EliteMobEntity eliteMobEntity = getAsyncEliteMobEntity(entity);
+        EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
         if (eliteMobEntity == null) return;
         eliteMobEntity.getLivingEntity().remove();
         eliteMobs.remove(eliteMobEntity);
@@ -298,7 +298,12 @@ public class EntityTracker implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                unregisterEliteMob(entity);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        unregisterEliteMob(entity);
+                    }
+                }.runTask(MetadataHandler.PLUGIN);
                 unregisterSuperMob(entity);
                 unregisterNaturalEntity(entity);
                 unregisterArmorStand(entity);

@@ -24,10 +24,6 @@ public class SkeletonPillar extends MajorPower implements Listener {
         return cooldowns.contains(eliteMobEntity);
     }
 
-    public static HashSet<EliteMobEntity> getCooldowns(EliteMobEntity eliteMobEntity) {
-        return cooldowns;
-    }
-
     @Override
     public void applyPowers(Entity entity) {
     }
@@ -52,8 +48,10 @@ public class SkeletonPillar extends MajorPower implements Listener {
         eliteMobEntity.getLivingEntity().setAI(false);
         PowerCooldown.startCooldownTimer(eliteMobEntity, cooldowns, 20 * 27);
 
-        Location location1 = locationMover(eliteMobEntity.getLivingEntity().getLocation().clone(), 20, 7);
-        Location location2 = locationMover(eliteMobEntity.getLivingEntity().getLocation().clone(), 20, 7);
+        Location location1 = eliteMobEntity.getLivingEntity().getLocation().clone()
+                .add(locationMover(eliteMobEntity.getLivingEntity().getLocation().clone(), 20, 7));
+        Location location2 = eliteMobEntity.getLivingEntity().getLocation().clone()
+                .add(locationMover(eliteMobEntity.getLivingEntity().getLocation().clone(), 20, -7));
 
         new BukkitRunnable() {
 
@@ -69,8 +67,8 @@ public class SkeletonPillar extends MajorPower implements Listener {
 
                 } else if (timer > 20 * 1 && timer < 20 * 7) {
 
-                    pillarEffect(location1, timer, 7);
-                    pillarEffect(location2, timer, -7);
+                    pillarEffect(eliteMobEntity.getLivingEntity().getLocation().clone(), timer, 7);
+                    pillarEffect(eliteMobEntity.getLivingEntity().getLocation().clone(), timer, -7);
 
                 } else {
 
@@ -89,15 +87,15 @@ public class SkeletonPillar extends MajorPower implements Listener {
 
     private void pillarEffect(Location location, int timer, int offset) {
 
-        location.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, location, 50, 0.1, 5, 0.1, 0.05);
-        locationMover(location, timer, offset);
+        location.add(locationMover(location, timer, offset));
+        location.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, location, 15, 0.1, 5, 0.1, 0.05);
         pillarDamage(location);
 
     }
 
     private void pillarWarningEffect(Location location) {
 
-        location.getWorld().spawnParticle(Particle.SMOKE_LARGE, location, 10, 0.1, 5, 0.1, 0.05);
+        location.getWorld().spawnParticle(Particle.SMOKE_LARGE, location, 5, 0.1, 5, 0.1, 0.05);
 
     }
 
@@ -124,7 +122,7 @@ public class SkeletonPillar extends MajorPower implements Listener {
         Location newLocation = GenericRotationMatrixMath.applyRotation(0, 1, 0, numberOfPointsPerRotation,
                 0, 0, offset, timer).toLocation(location.getWorld());
 
-        return newLocation.add(location);
+        return newLocation;
 
     }
 

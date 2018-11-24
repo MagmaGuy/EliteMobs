@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.Invisibility;
 import org.bukkit.entity.EntityType;
 
@@ -21,7 +22,13 @@ public class EliteCreeper extends EliteMobProperties {
         this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
 //        todo: add a way to configure powers per entity type
-        this.validMiscellaneousPowers.remove(new Invisibility());
+        ElitePower elitePower = null;
+        for (ElitePower elitePower1 : this.validMiscellaneousPowers)
+            if (elitePower1 instanceof Invisibility)
+                elitePower = elitePower1;
+
+        if (elitePower != null)
+            this.validMiscellaneousPowers.remove(elitePower);
 
         isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
                 ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);

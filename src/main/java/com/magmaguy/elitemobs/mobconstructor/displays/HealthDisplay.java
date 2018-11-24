@@ -70,6 +70,7 @@ public class HealthDisplay implements Listener {
         armorStand.setCustomName(setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
         armorStand.setGravity(false);
         EntityTracker.registerCullableEntity(armorStand);
+        armorStand.setCustomNameVisible(false);
 
 
         new BukkitRunnable() {

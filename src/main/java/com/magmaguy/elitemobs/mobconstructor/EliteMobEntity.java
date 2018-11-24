@@ -306,7 +306,7 @@ public class EliteMobEntity {
     }
 
     private void setHealth() {
-        eliteMob.setHealth(maxHealth = (maxHealth > 2048) ? 2048 : maxHealth);
+        eliteMob.setHealth(maxHealth = (maxHealth > 2000) ? 2000 : maxHealth);
     }
 
     private void setHealth(double healthPercentage) {
