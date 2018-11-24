@@ -37,7 +37,7 @@ public class EntityFinder {
     }
 
     public static Player findPlayer(EntityTargetLivingEntityEvent event) {
-        return playerFilter(event.getEntity());
+        return playerFilter(event.getTarget());
     }
 
 }

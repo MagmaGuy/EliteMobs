@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
@@ -28,6 +29,8 @@ public class SuperMobConstructor {
         livingEntity.setCustomNameVisible(true);
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(newMaxHealth);
         livingEntity.setHealth(newMaxHealth);
+
+        EntityTracker.registerSuperMob(livingEntity);
 
         return livingEntity;
 

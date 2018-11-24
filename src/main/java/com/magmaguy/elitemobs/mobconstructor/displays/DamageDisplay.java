@@ -89,9 +89,9 @@ public class DamageDisplay implements Listener {
         armorStand.setMarker(true);
         int newDisplayDamage = (int) damage;
         armorStand.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + "" + newDisplayDamage + "");
-        armorStand.setCustomNameVisible(true);
         armorStand.setGravity(false);
         EntityTracker.registerArmorStands(armorStand);
+        armorStand.setCustomNameVisible(false);
 
         new BukkitRunnable() {
 
@@ -99,6 +99,8 @@ public class DamageDisplay implements Listener {
 
             @Override
             public void run() {
+
+                armorStand.setCustomNameVisible(true);
 
                 if (taskTimer == 0)
                     armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
