@@ -15,7 +15,9 @@
 
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Created by MagmaGuy on 08/06/2017.
@@ -23,12 +25,8 @@ import org.bukkit.entity.Player;
 public class SimLootHandler {
 
     public static void simLoot(Player player, int level) {
-
-//        if (level < 1)
-//            level = 0;
-//
-//        LootTables.generateLoot(player);
-
+        ItemStack itemStack = ItemConstructor.constructItem(level, null);
+        player.getWorld().dropItem(player.getLocation(), itemStack);
     }
 
 }
