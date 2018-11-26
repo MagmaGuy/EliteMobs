@@ -43,12 +43,12 @@ public class KillHandler {
         } else
             commandSender.sendMessage("[EliteMobs] Incorrect command syntax. Try /em kill aggressive/passive/mobType [radius]");
 
-
     }
 
     private static void killAggressiveMobs(CommandSender commandSender) {
 
         if (CommandHandler.permCheck(CommandHandler.KILLALL_AGGRESSIVEELITES, commandSender)) {
+
             int counter = 0;
 
             for (EliteMobEntity eliteMobEntity : EntityTracker.getEliteMobs()) {
@@ -56,7 +56,6 @@ public class KillHandler {
                 EntityTracker.unregisterEliteMob(eliteMobEntity);
                 counter++;
             }
-
 
             commandSender.sendMessage("Killed " + counter + " Elite Mobs.");
 

@@ -123,20 +123,20 @@ public class VisualItemProcessor {
         Location currentLocation = item.getLocation().clone();
         Location newLocation = eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 1, 0)).add(vector);
 
-        if (currentLocation.distanceSquared(newLocation) > Math.pow(3, 2)) {
-            item.teleport(newLocation);
-            item.setVelocity(new Vector(0.01, 0.01, 0.01));
-            return;
-        }
+//        if (currentLocation.distanceSquared(newLocation) > Math.pow(3, 2)) {
+//            item.teleport(newLocation);
+//            item.setVelocity(new Vector(0.01, 0.01, 0.01));
+//            return;
+//        }
 
         Vector movementVector = (newLocation.subtract(currentLocation)).toVector();
         movementVector = movementVector.multiply(0.3);
 
-        if (Math.abs(movementVector.getX()) > 3 || Math.abs(movementVector.getY()) > 3 || Math.abs(movementVector.getZ()) > 3) {
-            item.teleport(newLocation);
-        } else {
+//        if (Math.abs(movementVector.getX()) > 3 || Math.abs(movementVector.getY()) > 3 || Math.abs(movementVector.getZ()) > 3) {
+//            item.teleport(newLocation);
+//        } else {
             item.setVelocity(movementVector);
-        }
+//        }
 
     }
 

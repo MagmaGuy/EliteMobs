@@ -24,7 +24,7 @@ import org.bukkit.configuration.Configuration;
  */
 public class DefaultConfig {
 
-    public static final String ALWAYS_SHOW_NAMETAGS = "Always show Elite Mob nametags";
+    public static final String ALWAYS_SHOW_NAMETAGS = "Always show Elite Mob name tags";
     public static final String SUPERMOB_STACK_AMOUNT = "SuperMob (passive EliteMobs) stack amount";
     public static final String MMORPG_COLORS = "Use MMORPG colors for item ranks";
     public static final String CREEPER_PASSIVE_DAMAGE_PREVENTER = "Prevent creepers from killing passive mobs";
@@ -53,7 +53,7 @@ public class DefaultConfig {
         configuration.addDefault(CREEPER_PASSIVE_DAMAGE_PREVENTER, true);
         configuration.addDefault(ENABLE_PERMISSION_TITLES, true);
         configuration.addDefault(ENABLE_POWER_SCOREBOARDS, false);
-        configuration.addDefault(ALWAYS_SHOW_NAMETAGS, true);
+        configuration.addDefault(ALWAYS_SHOW_NAMETAGS, false);
         configuration.addDefault(HIDE_ENCHANTMENTS_ATTRIBUTE, false);
         configuration.addDefault(PREVENT_ITEM_PICKUP, false);
         configuration.addDefault(PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS, true);
