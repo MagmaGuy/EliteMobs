@@ -31,32 +31,23 @@ public class SuperMobScanner {
 
             Iterator<LivingEntity> iterator = world.getLivingEntities().iterator();
 
-            new BukkitRunnable() {
+            while (iterator.hasNext()) {
 
-                @Override
-                public void run() {
+                LivingEntity livingEntity = iterator.next();
 
-                    while (iterator.hasNext()) {
-
-                        LivingEntity livingEntity = iterator.next();
-
-                        if (!SuperMobProperties.isValidSuperMobType(livingEntity)) continue;
+                if (!SuperMobProperties.isValidSuperMobType(livingEntity)) continue;
 
                         /*
                         Re-register lost passive mob
                         */
-                        checkLostSuperMob(livingEntity);
+                checkLostSuperMob(livingEntity);
 
                         /*
                        Check passive mobs to register new super mobs
                        */
-                        newSuperMobScan(livingEntity);
+                newSuperMobScan(livingEntity);
 
-                    }
-
-                }
-
-            }.runTask(MetadataHandler.PLUGIN);
+            }
 
         }
 

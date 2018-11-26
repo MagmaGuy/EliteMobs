@@ -33,6 +33,7 @@ public class ReloadConfigCommandHandler {
         CustomItemConstructor customItemConstructor = new CustomItemConstructor();
         customItemConstructor.superDropParser();
 
+
         Bukkit.getLogger().info("EliteMobs config reloaded!");
 
     }

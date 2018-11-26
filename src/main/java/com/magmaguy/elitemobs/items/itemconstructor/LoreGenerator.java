@@ -82,10 +82,12 @@ public class LoreGenerator {
                 lore.add(string.replace("$tier", ItemTierFinder.findGenericTier(material, enchantmentMap) + ""));
             else if (string.equals("$itemSource")) {
                 if (eliteMobEntity != null) {
-                    lore.add(itemSource(eliteMobEntity));
-                } else
-                    lore.add(string);
-            }
+                    {
+                        lore.add(itemSource(eliteMobEntity));
+                    }
+                }
+            } else
+                lore.add(string);
 
         }
 
