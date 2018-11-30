@@ -21,6 +21,9 @@ public class LoreGenerator {
     public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
                                         HashMap<String, Integer> customEnchantments, List<String> potionList, List<String> loreList) {
 
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
+            return itemMeta;
+
         List<String> lore = new ArrayList<>();
 
         for (Object object : ConfigValues.itemsCustomLootSettingsConfig.getList(ItemsCustomLootSettingsConfig.LORE_STRUCTURE)) {
@@ -60,6 +63,9 @@ public class LoreGenerator {
 
     public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
                                         HashMap<String, Integer> customEnchantments, EliteMobEntity eliteMobEntity) {
+
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
+            return itemMeta;
 
         List<String> lore = new ArrayList<>();
 
