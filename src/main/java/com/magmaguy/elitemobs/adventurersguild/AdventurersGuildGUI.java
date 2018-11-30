@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -368,6 +369,7 @@ public class AdventurersGuildGUI implements Listener {
                 difficultyMenu((Player) event.getWhoClicked());
                 Bukkit.broadcastMessage(ChatColorConverter.convert(
                         ((Player) event.getWhoClicked()).getDisplayName() + " has reached the " + rankNamer(selectedTier) + " &fguild rank!"));
+                event.getWhoClicked().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue((selectedTier - 10) * 2 + 20);
             }
         }
 

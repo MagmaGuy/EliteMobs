@@ -17,9 +17,11 @@ package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -76,7 +78,9 @@ public class AttackFireball extends MinorPower implements Listener {
 
     private static void shootFireball(Entity entity, Player player) {
 
-        Fireball repeatingFireball = (Fireball) entity.getWorld().spawnEntity(entity.getLocation().add(0, 3, 0), EntityType.FIREBALL);
+        Location fireballLocation = ProjectileLocationGenerator.generateLocation((LivingEntity) entity, player);
+
+        Fireball repeatingFireball = (Fireball) entity.getWorld().spawnEntity(fireballLocation, EntityType.FIREBALL);
 
         Vector targetterToTargetted = player.getLocation().toVector().subtract(repeatingFireball.getLocation().toVector()).normalize();
 

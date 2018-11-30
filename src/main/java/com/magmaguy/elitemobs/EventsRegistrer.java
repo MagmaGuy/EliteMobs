@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
+import com.magmaguy.elitemobs.adventurersguild.MaxHealthBoost;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combattag.CombatTag;
 import com.magmaguy.elitemobs.commands.LootGUI;
@@ -189,6 +190,7 @@ public class EventsRegistrer {
 
         //Initialize adventurer's guild
         pluginManager.registerEvents(new AdventurersGuildGUI(), plugin);
+        pluginManager.registerEvents(new MaxHealthBoost(), plugin);
 
         //Combat tag
         if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))

@@ -32,7 +32,7 @@ public class LootTables implements Listener {
         EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
         if (eliteMobEntity == null) return;
 
-        if (!eliteMobEntity.getHasNormalLoot()) return;
+        if (!eliteMobEntity.getHasSpecialLoot()) return;
 
         if (eliteMobEntity.getLevel() < 2) return;
 
@@ -52,6 +52,7 @@ public class LootTables implements Listener {
 
     public static Item generateLoot(EliteMobEntity eliteMobEntity) {
 
+        if (!eliteMobEntity.getHasSpecialLoot()) return null;
 
         int mobTier = (int) MobTierFinder.findMobTier(eliteMobEntity);
         /*

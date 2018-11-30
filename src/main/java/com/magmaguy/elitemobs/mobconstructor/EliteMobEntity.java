@@ -567,7 +567,7 @@ public class EliteMobEntity {
         this.hasFarAwayUnload = bool;
     }
 
-    public boolean getHasNormalLoot() {
+    public boolean getHasSpecialLoot() {
         return this.hasNormalLoot;
     }
 

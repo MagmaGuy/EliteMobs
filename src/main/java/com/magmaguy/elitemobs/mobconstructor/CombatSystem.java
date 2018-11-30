@@ -33,7 +33,7 @@ public class CombatSystem implements Listener {
     public static final double PER_LEVEL_POWER_INCREASE = 0.1;
     public static final double TARGET_HITS_TO_KILL = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.TARGET_HITS_TO_KILL);
     public static final double BASE_DAMAGE_DEALT_TO_PLAYERS = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.BASE_DAMAGE_DEALT_TO_PLAYER);
-    public static final double TO_PLAYER_DAMAGE_TIER_HANDICAP = 0.75;
+    //    public static final double TO_PLAYER_DAMAGE_TIER_HANDICAP = 0.75;
     public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.33;
 
     public static final double DIAMOND_TIER_LEVEL = 3;
@@ -96,10 +96,9 @@ public class CombatSystem implements Listener {
         /*
         Apply secondary enchantment damage reduction
          */
-        double newBaseDamage = BASE_DAMAGE_DEALT_TO_PLAYERS - secondaryEnchantmentDamageReduction(player, event) * 2;
+        double newBaseDamage = BASE_DAMAGE_DEALT_TO_PLAYERS - secondaryEnchantmentDamageReduction(player, event);
 
-        return newBaseDamage +
-                newBaseDamage * (tierDifference) * TO_PLAYER_DAMAGE_TIER_HANDICAP;
+        return newBaseDamage + newBaseDamage * (tierDifference);
 
     }
 
@@ -241,13 +240,13 @@ public class CombatSystem implements Listener {
         /*
         This caps the tier difference between mobs and players to prevent insurmountable boss fights
          */
-        tierDifference = Math.abs(tierDifference) > 2.5 ? (tierDifference > 0 ? 2.5 : -2.5) : tierDifference;
+        tierDifference = Math.abs(tierDifference) > 3 ? (tierDifference > 0 ? 3 : -3) : tierDifference;
 
         /*
         This applies secondary enchantments, that is, it applies enchantments that only affect specific mob types
         such as smite which only works with undead mobs
          */
-        double bonusSecondaryEnchantmentDamage = 3 * secondaryEnchantmentDamageIncrease(player.getInventory().getItemInMainHand(), eliteMob);
+        double bonusSecondaryEnchantmentDamage = secondaryEnchantmentDamageIncrease(player.getInventory().getItemInMainHand(), eliteMob);
         double newTargetHitsToKill = TARGET_HITS_TO_KILL - bonusSecondaryEnchantmentDamage;
 
         double finalDamage = getCooledAttackStrength(player) * (maxHealth / newTargetHitsToKill +
