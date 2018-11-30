@@ -154,7 +154,6 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
 
 
-
         if (!VersionChecker.currentVersionIsUnder(11, 0)) {
             //Initialize custom events
             pluginManager.registerEvents(new SmallTreasureGoblin(), plugin);
@@ -189,8 +188,10 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FlamethrowerEnchantment(), plugin);
 
         //Initialize adventurer's guild
-        pluginManager.registerEvents(new AdventurersGuildGUI(), plugin);
-        pluginManager.registerEvents(new MaxHealthBoost(), plugin);
+        if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ENABLE_ADVENTURERS_GUILD))
+            pluginManager.registerEvents(new AdventurersGuildGUI(), plugin);
+        if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
+            pluginManager.registerEvents(new MaxHealthBoost(), plugin);
 
         //Combat tag
         if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
