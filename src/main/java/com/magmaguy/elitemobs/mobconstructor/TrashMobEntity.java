@@ -12,7 +12,7 @@ public class TrashMobEntity extends ReinforcementMobEntity {
         super.setHasCustomHealth(true);
         super.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1);
         super.getLivingEntity().setHealth(1);
-        super.setHasNormalLoot(false);
+        super.setHasSpecialLoot(false);
 
     }
 
