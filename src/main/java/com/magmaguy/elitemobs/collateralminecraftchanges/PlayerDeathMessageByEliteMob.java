@@ -132,7 +132,7 @@ public class PlayerDeathMessageByEliteMob implements Listener {
 
         deathMessage = deathMessage.replace("$player", player.getDisplayName());
         deathMessage = deathMessage.replace("$entity", livingEntityName);
-        deathMessage = ChatColorConverter.convert(deathMessage);
+        deathMessage = ChatColorConverter.convert("&7" + deathMessage);
 
         return deathMessage;
 

@@ -17,20 +17,12 @@ package com.magmaguy.elitemobs.mobpowers;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.util.Vector;
 
 public class ProjectileLocationGenerator {
 
     public static Location generateLocation(LivingEntity targetter, LivingEntity targetted) {
 
-        Location targetterLocation = targetter.getLocation();
-        Vector toTargetVector = targetted.getEyeLocation().subtract(targetterLocation).toVector().normalize();
-        Location offsetLocation = new Location(targetterLocation.getWorld(),
-                targetterLocation.getX() + toTargetVector.getX(),
-                targetterLocation.getY() + 1,
-                targetterLocation.getZ() + toTargetVector.getZ());
-
-        return offsetLocation;
+        return targetter.getLocation().clone().add(0, 1, 0).add(targetted.getLocation().clone().subtract(targetter.getLocation().clone()).toVector().normalize()).setDirection(targetted.getLocation().clone().subtract(targetter.getLocation()).toVector());
 
     }
 

@@ -24,7 +24,7 @@ public class SetMaxItemTierCommand {
         customConfigLoader1.saveCustomConfig(ItemsProceduralSettingsConfig.CONFIG_NAME);
 
 
-        int maxMobLevel = (int) (tier * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.PER_TIER_LEVEL_INCREASE) * 10);
+        int maxMobLevel = (int) (tier * ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.PER_TIER_LEVEL_INCREASE) * 3);
 
         CustomConfigLoader customConfigLoader2 = new CustomConfigLoader();
         Configuration mobCombatSettingsConfig = customConfigLoader2.getCustomConfig(MobCombatSettingsConfig.CONFIG_NAME);
