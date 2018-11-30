@@ -10,7 +10,7 @@ public class ReinforcementMobEntity extends EliteMobEntity {
      */
     public ReinforcementMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name) {
         super(entityType, location, (int) Math.ceil(eliteMobLevel / 2), name);
-        super.setHasNormalLoot(false);
+        super.setHasSpecialLoot(false);
     }
 
 }
