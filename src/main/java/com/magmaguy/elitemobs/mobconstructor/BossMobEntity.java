@@ -26,7 +26,7 @@ public class BossMobEntity extends EliteMobEntity {
 
     private void setupBossMob(LivingEntity livingEntity) {
 
-        super.setHasNormalLoot(true);
+        super.setHasSpecialLoot(true);
         BossMobDeathCountdown.startDeathCountdown(livingEntity);
 
     }

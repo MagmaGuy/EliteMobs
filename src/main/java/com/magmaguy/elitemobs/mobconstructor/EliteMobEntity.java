@@ -571,7 +571,7 @@ public class EliteMobEntity {
         return this.hasNormalLoot;
     }
 
-    public void setHasNormalLoot(boolean bool) {
+    public void setHasSpecialLoot(boolean bool) {
         this.isNaturalEntity = bool;
         this.hasNormalLoot = bool;
     }

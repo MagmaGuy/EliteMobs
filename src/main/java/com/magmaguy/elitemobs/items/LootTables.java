@@ -32,7 +32,6 @@ public class LootTables implements Listener {
         EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
         if (eliteMobEntity == null) return;
 
-        if (!eliteMobEntity.isNaturalEntity()) return;
         if (!eliteMobEntity.getHasNormalLoot()) return;
 
         if (eliteMobEntity.getLevel() < 2) return;
