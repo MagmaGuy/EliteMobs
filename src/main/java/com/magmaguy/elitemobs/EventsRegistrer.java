@@ -149,6 +149,9 @@ public class EventsRegistrer {
         //Prevent tower exploit
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_TOWER_EXPLOIT))
             pluginManager.registerEvents(new PreventTowerExploit(), plugin);
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ENDERMAN_HEIGHT_EXPLOIT))
+            pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
+
 
 
         if (!VersionChecker.currentVersionIsUnder(11, 0)) {

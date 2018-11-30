@@ -37,6 +37,7 @@ public class DefaultConfig {
     public static final String STRICT_SPAWNING_RULES = "Strict spawning rules mode for better compatibility with other plugins";
     public static final String PREVENT_TOWER_EXPLOIT = "Prevent tower exploit";
     public static final String PREVENT_DARKROOM_EXPLOIT = "Prevent dark room spawner exploit";
+    public static final String PREVENT_ENDERMAN_HEIGHT_EXPLOIT = "Prevent enderman height exploit";
 
     public static void reloadConfig() {
 
@@ -61,6 +62,7 @@ public class DefaultConfig {
         configuration.addDefault(PREVENT_MOUNT_EXPLOIT, true);
         configuration.addDefault(PREVENT_TOWER_EXPLOIT, true);
         configuration.addDefault(PREVENT_DARKROOM_EXPLOIT, true);
+        configuration.addDefault(PREVENT_ENDERMAN_HEIGHT_EXPLOIT, true);
 
         configuration.options().copyDefaults(true);
 
