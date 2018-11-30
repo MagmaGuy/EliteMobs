@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -97,7 +98,7 @@ public class AdventurersGuildGUI implements Listener {
                 else lowTierWarning = ChatColorConverter.convert("&aElites can drop better loot!");
                 unlockedMeta.setLore(Arrays.asList(
                         ChatColorConverter.convert("&f&m-------------------------------"),
-                       ChatColorConverter.convert( "&aThis rank is unlocked!"),
+                        ChatColorConverter.convert("&aThis rank is unlocked!"),
                         ChatColorConverter.convert("&fYou can select it."),
                         lowTierWarning,
                         ChatColorConverter.convert("&f&m-------------------------------"),
@@ -140,7 +141,8 @@ public class AdventurersGuildGUI implements Listener {
                 itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 1);
                 ItemMeta nextMeta = itemStack.getItemMeta();
                 String priceString = "";
-                if (!PlayerData.playerCurrency.containsKey(player.getUniqueId())) PlayerData.playerCurrency.put(player.getUniqueId(), 0.0);
+                if (!PlayerData.playerCurrency.containsKey(player.getUniqueId()))
+                    PlayerData.playerCurrency.put(player.getUniqueId(), 0.0);
                 if (tierPriceCalculator(rank) > PlayerData.playerCurrency.get(player.getUniqueId()))
                     priceString = "&c" + tierPriceCalculator(rank);
                 else
@@ -345,7 +347,7 @@ public class AdventurersGuildGUI implements Listener {
 
         event.setCancelled(true);
 
-        if (!event.getClickedInventory().getName().equals("Guild rank selector")){
+        if (!event.getClickedInventory().getName().equals("Guild rank selector")) {
             event.setCancelled(true);
             return;
         }
@@ -369,14 +371,14 @@ public class AdventurersGuildGUI implements Listener {
                 difficultyMenu((Player) event.getWhoClicked());
                 Bukkit.broadcastMessage(ChatColorConverter.convert(
                         ((Player) event.getWhoClicked()).getDisplayName() + " has reached the " + rankNamer(selectedTier) + " &fguild rank!"));
-                event.getWhoClicked().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue((selectedTier - 10) * 2 + 20);
+                if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
+                    event.getWhoClicked().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue((selectedTier - 10) * 2 + 20);
             }
         }
 
         if (selectedTier > maxTier + 1) {
             event.getWhoClicked().sendMessage("[EliteMobs] You need to unlock other ranks first!");
         }
-
 
 
     }
