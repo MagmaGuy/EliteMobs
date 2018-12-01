@@ -208,8 +208,10 @@ public class EntityTracker implements Listener {
         cullablePluginEntities.remove(entity);
     }
 
-    public static void unregisterItemEntity(Item item) {
-        itemVisualEffects.remove(item);
+    public static void unregisterItemEntity(Entity entity) {
+        if (!entity.getType().equals(EntityType.DROPPED_ITEM)) return;
+        itemVisualEffects.remove(entity);
+        entity.remove();
     }
 
     /*
@@ -236,6 +238,7 @@ public class EntityTracker implements Listener {
     public static void unregisterArmorStand(Entity armorStand) {
         if (!armorStand.getType().equals(EntityType.ARMOR_STAND)) return;
         armorStands.remove(armorStand);
+        armorStand.remove();
     }
 
     public static HashSet<EliteMobEntity> getEliteMobs() {
@@ -292,7 +295,7 @@ public class EntityTracker implements Listener {
     }
 
     /*
-    This is run in sync for performance reasons
+    This is run in async for performance reasons
      */
     public static void wipeEntity(Entity entity) {
         new BukkitRunnable() {
@@ -308,6 +311,7 @@ public class EntityTracker implements Listener {
                 unregisterNaturalEntity(entity);
                 unregisterArmorStand(entity);
                 unregisterCullableEntity(entity);
+                unregisterItemEntity(entity);
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
