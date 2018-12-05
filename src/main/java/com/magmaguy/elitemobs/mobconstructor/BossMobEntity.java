@@ -10,6 +10,22 @@ import java.util.HashSet;
 
 public class BossMobEntity extends EliteMobEntity {
 
+    private byte hitsCounter = 0;
+
+    public void incrementHitsCounter(){
+        this.hitsCounter++;
+        if (this.hitsCounter > 9)
+            this.hitsCounter = 0;
+    }
+
+    public void resetHitsCounter(){
+        this.hitsCounter = 0;
+    }
+
+    public byte getHitsCounter(){
+        return this.hitsCounter;
+    }
+
     public BossMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name) {
 
         super(entityType, location, eliteMobLevel, name);

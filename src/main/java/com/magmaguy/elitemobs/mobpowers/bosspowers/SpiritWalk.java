@@ -1,31 +1,14 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+package com.magmaguy.elitemobs.mobpowers.bosspowers;
 
-package com.magmaguy.elitemobs.events.mobs.sharedeventpowers;
-
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.EventsConfig;
-import com.magmaguy.elitemobs.events.mobs.TreasureGoblin;
-import com.magmaguy.elitemobs.events.mobs.ZombieKing;
+import com.magmaguy.elitemobs.mobconstructor.BossMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -35,44 +18,39 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class SpiritWalk implements Listener {
+public class SpiritWalk extends BossPower implements Listener {
+    @Override
+    public void applyPowers(Entity entity) {
 
-    HashMap<LivingEntity, Integer> entityHitCount = new HashMap<>();
+    }
 
     @EventHandler
     public void onBossMobGotHit(EntityDamageEvent event) {
 
-        if (!(event.getEntity().getType().equals(EntityType.ZOMBIE) &&
-                (ZombieKing.getZombieKing((Zombie) event.getEntity()) != null ||
-                        TreasureGoblin.getTreasureGoblin((Zombie) event.getEntity()) != null)))
-            return;
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        if (eliteMobEntity == null) return;
+        if (!(eliteMobEntity instanceof BossMobEntity)) return;
 
-        if (entityHitCount.containsKey(event.getEntity()))
-            entityHitCount.put((LivingEntity) event.getEntity(), entityHitCount.get(event.getEntity()) + 1);
-        else entityHitCount.put((LivingEntity) event.getEntity(), 1);
+        BossMobEntity bossMobEntity = (BossMobEntity) eliteMobEntity;
 
-        if (entityHitCount.get(event.getEntity()) > ConfigValues.eventsConfig.getInt(EventsConfig.SPIRIT_WALK_HIT_INTERVAL)) {
+        if (bossMobEntity.getHitsCounter() != 9) return;
 
-            initializeSpiritWalk((LivingEntity) event.getEntity());
-            entityHitCount.put((LivingEntity) event.getEntity(), 0);
-        }
+        initializeSpiritWalk(bossMobEntity.getLivingEntity());
 
     }
 
     @EventHandler
     public void onBossMobHit(EntityDamageByEntityEvent event) {
 
-        if (event.getDamager() instanceof Projectile && !(((Projectile) event.getDamager()).getShooter() instanceof LivingEntity))
-            return;
-        if (event.getEntity().getType().equals(EntityType.ZOMBIE) &&
-                (!(ZombieKing.getZombieKing((Zombie) event.getEntity()) != null ||
-                        TreasureGoblin.getTreasureGoblin((Zombie) event.getEntity()) != null)))
-            return;
-        if (!(event.getDamager() instanceof LivingEntity)) return;
-        entityHitCount.put((LivingEntity) event.getDamager(), 0);
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(EntityFinder.getRealDamager(event));
+        if (eliteMobEntity == null) return;
+        if (!(eliteMobEntity instanceof BossMobEntity)) return;
+
+        BossMobEntity bossMobEntity = (BossMobEntity) eliteMobEntity;
+
+        bossMobEntity.resetHitsCounter();
 
     }
 
