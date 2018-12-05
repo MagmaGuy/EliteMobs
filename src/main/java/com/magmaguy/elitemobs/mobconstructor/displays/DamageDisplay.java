@@ -37,14 +37,6 @@ import java.util.Random;
 
 public class DamageDisplay implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onHitArmorStand(EntityDamageEvent event) {
-
-        if (!EntityTracker.getIsArmorStand(event.getEntity())) return;
-        event.setCancelled(true);
-
-    }
-
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHit(EntityDamageEvent event) {
 
@@ -100,11 +92,12 @@ public class DamageDisplay implements Listener {
             @Override
             public void run() {
 
-                armorStand.setCustomNameVisible(true);
-
                 if (taskTimer == 0)
+                {
                     armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
                             armorStand.getLocation().getY() - 50, armorStand.getLocation().getZ()));
+                    armorStand.setCustomNameVisible(true);
+                }
                 else
                     armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
                             armorStand.getLocation().getY() + 0.1, armorStand.getLocation().getZ()));
@@ -121,7 +114,7 @@ public class DamageDisplay implements Listener {
 
             }
 
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 0, 1);
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 1, 1);
 
     }
 

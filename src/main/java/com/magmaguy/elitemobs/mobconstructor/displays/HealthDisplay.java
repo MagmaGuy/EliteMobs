@@ -80,12 +80,13 @@ public class HealthDisplay implements Listener {
             @Override
             public void run() {
 
-                armorStand.setCustomNameVisible(true);
-
                 Location newLocation = new Location(livingEntity.getWorld(), livingEntity.getLocation().getX(),
                         livingEntity.getLocation().getY() + livingEntity.getEyeHeight() + 0.5, livingEntity.getLocation().getZ());
 
                 armorStand.teleport(newLocation);
+
+                if (taskTimer == 0)
+                    armorStand.setCustomNameVisible(true);
 
                 taskTimer++;
 

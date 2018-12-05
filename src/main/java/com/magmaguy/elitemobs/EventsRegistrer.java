@@ -15,7 +15,6 @@ import com.magmaguy.elitemobs.events.actionevents.BalrogEvent;
 import com.magmaguy.elitemobs.events.actionevents.FaeEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.mobs.*;
-import com.magmaguy.elitemobs.events.mobs.sharedeventpowers.SpiritWalk;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
@@ -161,7 +160,7 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new DeadMoon(), plugin);
             pluginManager.registerEvents(new TheReturned(), plugin);
             pluginManager.registerEvents(new ZombieKing(), plugin);
-            pluginManager.registerEvents(new SpiritWalk(), plugin);
+            pluginManager.registerEvents(new com.magmaguy.elitemobs.mobpowers.bosspowers.SpiritWalk(), plugin);
 
             if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
                 pluginManager.registerEvents(new Kraken(), plugin);
