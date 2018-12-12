@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.runnables.*;
+import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import org.bstats.Metrics;
@@ -100,6 +101,11 @@ public class EliteMobs extends JavaPlugin {
         if (!VersionChecker.pluginIsUpToDate)
             this.getServer().getPluginManager().registerEvents(new VersionWarner(), this);
 
+        /*
+        Initialize anticheat block values
+         */
+        NonSolidBlockTypes.initializeNonSolidBlocks();
+
     }
 
     @Override
@@ -113,6 +119,11 @@ public class EliteMobs extends JavaPlugin {
         for (Arrow arrow : SkeletonTrackingArrow.trackingArrowList)
             arrow.remove();
         SkeletonTrackingArrow.trackingArrowList.clear();
+
+        /*
+        Flush lingering blocks
+         */
+
 
         CustomItemConstructor.customItemList.clear();
         CustomItemConstructor.staticCustomItemHashMap.clear();

@@ -20,7 +20,7 @@ public class ZombieKingsAxe extends UniqueItem {
 
     @Override
     public String defineName() {
-        return "&4Zombie King's Axe";
+        return "&4Zombie Kings Axe";
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.items.itemconstructor.ScallableItemObject;
+import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ScalableItemConstructor {
-
 
     public static List<ScallableItemObject> dynamicallyScalableItems = new ArrayList<>();
     public static HashMap<Integer, List<ScallableItemObject>> limitedScalableItems = new HashMap<>();
@@ -37,6 +37,51 @@ public class ScalableItemConstructor {
                 scalableItemObject.potionEffects,
                 scalableItemObject.lore
         );
+
+    }
+
+    public static ItemStack constructScalableItem(int itemTier, String itemName) {
+
+        Bukkit.getLogger().info("name: " + itemName);
+
+        for (ScallableItemObject scalableItemObject : dynamicallyScalableItems) {
+            Bukkit.getLogger().info("Dynamic Name: " + scalableItemObject.rawName);
+            if (scalableItemObject.rawName.equals(itemName)) {
+
+                HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(scalableItemObject.enchantments, itemTier);
+
+                return ItemConstructor.constructItem(
+                        scalableItemObject.rawName,
+                        scalableItemObject.material,
+                        newEnchantmentList,
+                        scalableItemObject.customEnchantments,
+                        scalableItemObject.potionEffects,
+                        scalableItemObject.lore
+                );
+            }
+        }
+
+        for (List<ScallableItemObject> scalableItemList : limitedScalableItems.values())
+            for (ScallableItemObject scallableItemObject : scalableItemList) {
+                Bukkit.getLogger().info("Limited Name: " + scallableItemObject.rawName);
+                if (scallableItemObject.rawName.equals(itemName)) {
+
+                    HashMap<Enchantment, Integer> newEnchantmentList = updateLimitedEnchantments(scallableItemObject.enchantments, itemTier);
+
+                    return ItemConstructor.constructItem(
+                            scallableItemObject.rawName,
+                            scallableItemObject.material,
+                            newEnchantmentList,
+                            scallableItemObject.customEnchantments,
+                            scallableItemObject.potionEffects,
+                            scallableItemObject.lore
+                    );
+                }
+            }
+
+        Bukkit.getLogger().warning("[EliteMobs] Something went wrong generating the " + itemName + " scallable item. Report this to the dev!");
+
+        return null;
 
     }
 

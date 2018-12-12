@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.6.13
+version: 6.6.14
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]

@@ -29,6 +29,8 @@ import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFire;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityKnockback;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Corpse;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Implosion;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
@@ -82,6 +84,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new InvulnerabilityKnockback(), plugin);
         pluginManager.registerEvents(new BonusLoot(), plugin);
         pluginManager.registerEvents(new Taunt(), plugin);
+        pluginManager.registerEvents(new Corpse(), plugin);
+        pluginManager.registerEvents(new Implosion(), plugin);
         pluginManager.registerEvents(new AttackArrow(), plugin);
         pluginManager.registerEvents(new AttackBlinding(), plugin);
         pluginManager.registerEvents(new AttackFire(), plugin);
@@ -93,6 +97,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new AttackWeakness(), plugin);
         pluginManager.registerEvents(new AttackWeb(), plugin);
         pluginManager.registerEvents(new AttackWither(), plugin);
+        pluginManager.registerEvents(new AttackVacuum(), plugin);
 
         //Major mob powers
         pluginManager.registerEvents(new SkeletonPillar(), plugin);
@@ -106,7 +111,7 @@ public class EventsRegistrer {
         //Metadata (player purger)
         pluginManager.registerEvents(new MetadataHandler(), plugin);
 
-        //Mob merger TODO: maybe add a config scan here?
+        //Mob merger
         pluginManager.registerEvents(new MergeHandler(), plugin);
 
         //Natural EliteMobs Spawning

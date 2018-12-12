@@ -27,6 +27,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +42,15 @@ public class NaturalEliteMobSpawnEventHandler implements Listener {
     /*
     This manages elite mob entities that are spawned naturally
      */
-    public static void naturalMobProcessor(Entity entity) {
+    public static void naturalMobProcessor(Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         int eliteMobLevel = getNaturalMobLevel(entity.getLocation());
         if (eliteMobLevel < 0) return;
 
         EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel);
+
+        if (spawnReason.equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
+            eliteMobEntity.setHasSpecialLoot(false);
 
     }
 

@@ -44,6 +44,8 @@ public class HealthDisplay implements Listener {
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_HEALTH_FOR_ELITE_MOBS)) {
             if (EntityTracker.isEliteMob(event.getEntity()))
                 displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
+            else if (EntityTracker.isSuperMob(event.getEntity()))
+                displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
 
         } else
             displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
@@ -63,13 +65,13 @@ public class HealthDisplay implements Listener {
         /*
         Dirty fix: armorstands don't render invisibly on their first tick, so it gets moved elsewhere temporarily
          */
-        ArmorStand armorStand = (ArmorStand) entityLocation.getWorld().spawnEntity(entityLocation.add(new Vector(0, 50, 0)), EntityType.ARMOR_STAND);
+        ArmorStand armorStand = (ArmorStand) entityLocation.getWorld().spawnEntity(entityLocation.add(new Vector(0, -50, 0)), EntityType.ARMOR_STAND);
 
         armorStand.setVisible(false);
         armorStand.setMarker(true);
         armorStand.setCustomName(setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
         armorStand.setGravity(false);
-        EntityTracker.registerCullableEntity(armorStand);
+        EntityTracker.registerArmorStands(armorStand);
         armorStand.setCustomNameVisible(false);
 
 
@@ -85,22 +87,21 @@ public class HealthDisplay implements Listener {
 
                 armorStand.teleport(newLocation);
 
-                if (taskTimer == 0)
+                if (taskTimer == 1)
                     armorStand.setCustomNameVisible(true);
 
                 taskTimer++;
 
-                if (taskTimer == 15) {
+                if (taskTimer > 15) {
 
+                    EntityTracker.unregisterArmorStand(armorStand);
                     cancel();
-                    EntityTracker.unregisterCullableEntity(armorStand);
-                    armorStand.remove();
 
                 }
 
             }
 
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 1, 1L);
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 0, 1L);
 
     }
 

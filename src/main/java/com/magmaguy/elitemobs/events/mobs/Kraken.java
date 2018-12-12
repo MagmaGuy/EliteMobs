@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCoun
 import com.magmaguy.elitemobs.items.uniqueitems.DepthsSeeker;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.*;
@@ -113,7 +114,8 @@ public class Kraken implements Listener {
                 }
 
                 for (Entity entity : kraken.getNearbyEntities(16, 16, 16))
-                    if (entity instanceof Player)
+                    if (entity instanceof Player && ((Player) entity).getGameMode().equals(GameMode.ADVENTURE) ||
+                            ((Player) entity).getGameMode().equals(GameMode.SURVIVAL))
                         fireballInitializer(kraken, (Player) entity);
 
             }
@@ -216,7 +218,7 @@ public class Kraken implements Listener {
         if (!isKraken((Squid) event.getEntity())) return;
 
         DepthsSeeker depthsSeeker = new DepthsSeeker();
-        ItemStack depthSeekerItemStack = depthsSeeker.constructItemStack();
+        ItemStack depthSeekerItemStack = depthsSeeker.constructItemStack(10);
         event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), depthSeekerItemStack);
         removeKraken((Squid) event.getEntity());
 

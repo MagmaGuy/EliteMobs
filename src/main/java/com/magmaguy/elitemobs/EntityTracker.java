@@ -157,6 +157,10 @@ public class EntityTracker implements Listener {
         }
     }
 
+    public static HashSet<LivingEntity> getSuperMobs() {
+        return superMobs;
+    }
+
     public static boolean isSuperMob(Entity entity) {
         if (!SuperMobProperties.isValidSuperMobType(entity)) return false;
         return superMobs.contains(entity);
@@ -206,6 +210,7 @@ public class EntityTracker implements Listener {
 
     public static void unregisterCullableEntity(Entity entity) {
         cullablePluginEntities.remove(entity);
+        entity.remove();
     }
 
     public static void unregisterItemEntity(Entity entity) {
@@ -237,8 +242,8 @@ public class EntityTracker implements Listener {
 
     public static void unregisterArmorStand(Entity armorStand) {
         if (!armorStand.getType().equals(EntityType.ARMOR_STAND)) return;
-        armorStands.remove(armorStand);
         armorStand.remove();
+        armorStands.remove(armorStand);
     }
 
     public static HashSet<EliteMobEntity> getEliteMobs() {
@@ -305,12 +310,12 @@ public class EntityTracker implements Listener {
                     @Override
                     public void run() {
                         unregisterEliteMob(entity);
+                        unregisterCullableEntity(entity);
                     }
                 }.runTask(MetadataHandler.PLUGIN);
                 unregisterSuperMob(entity);
                 unregisterNaturalEntity(entity);
                 unregisterArmorStand(entity);
-                unregisterCullableEntity(entity);
                 unregisterItemEntity(entity);
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);

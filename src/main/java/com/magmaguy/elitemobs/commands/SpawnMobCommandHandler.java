@@ -23,9 +23,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobPropert
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -351,6 +349,18 @@ public class SpawnMobCommandHandler {
                     case "taunt":
                         elitePowers.add(new Taunt());
                         break;
+                    case "corpse":
+                        elitePowers.add(new Corpse());
+                        break;
+                    case "moonwalk":
+                        elitePowers.add(new MoonWalk());
+                        break;
+                    case "implosion":
+                        elitePowers.add(new Implosion());
+                        break;
+                    case "attackvacuum":
+                        elitePowers.add(new AttackVacuum());
+                        break;
                     default:
                         commandSender.sendMessage(string + " is not a valid power.");
                         commandSender.sendMessage("Valid powers: attackarrow, attackblinding, attackconfusing," +
@@ -358,7 +368,7 @@ public class SpawnMobCommandHandler {
                                 "attackweakness, attackweb, attackwither, bonusloot, invisibility, invulnerabilityarrow," +
                                 "invulnerabilityfalldamage, invulnerabilityfire, invulnerabilityknockback, movementspeed," +
                                 "taunt, zombiefriends, zombienecronomicon, zombieteamrocket, zombieteamrocket, zombieparents," +
-                                "zombiebloat, skeletontrackingarrow, skeletonpillar");
+                                "zombiebloat, skeletontrackingarrow, skeletonpillar, corpse, moonwalk, implosion");
                         break;
 
                 }

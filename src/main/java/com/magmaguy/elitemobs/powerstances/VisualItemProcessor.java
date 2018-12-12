@@ -144,7 +144,7 @@ public class VisualItemProcessor {
         Particle particle = (Particle) particleObject;
         eliteMobEntity.getLivingEntity().getWorld().spawnParticle(
                 particle, eliteMobEntity.getLivingEntity().getLocation().add(0, 1, 0).add(vector),
-                5, 0, 0, 0, 0.01);
+                1, 0, 0, 0, 0.01);
     }
 
 }
