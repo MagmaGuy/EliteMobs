@@ -26,6 +26,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -76,6 +77,8 @@ public class AttackFireball extends MinorPower implements Listener {
 
     }
 
+    private static HashSet<Fireball> fireballs = new HashSet<>();
+
     private static void shootFireball(Entity entity, Player player) {
 
         Location fireballLocation = ProjectileLocationGenerator.generateLocation((LivingEntity) entity, player);
@@ -85,9 +88,24 @@ public class AttackFireball extends MinorPower implements Listener {
         Vector targetterToTargetted = player.getLocation().toVector().subtract(repeatingFireball.getLocation().toVector()).normalize();
 
         repeatingFireball.setVelocity(targetterToTargetted);
-        repeatingFireball.setYield(1F);
+        repeatingFireball.setYield(0F);
         repeatingFireball.setIsIncendiary(true);
         repeatingFireball.setShooter((ProjectileSource) entity);
+
+        fireballs.add(repeatingFireball);
+
+    }
+
+    @EventHandler
+    public void explosionEvent(ExplosionPrimeEvent event) {
+
+        if (!(event.getEntity() instanceof Fireball)) return;
+        if (!fireballs.contains(event.getEntity())) return;
+
+        event.setCancelled(true);
+
+        event.getEntity().getLocation().getWorld().createExplosion(event.getEntity().getLocation(), 3F, true);
+        fireballs.remove(event.getEntity());
 
     }
 

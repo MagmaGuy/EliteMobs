@@ -19,16 +19,16 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.Material;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,8 +42,6 @@ import static org.bukkit.Material.RAW_CHICKEN;
  * Created by MagmaGuy on 19/12/2016.
  */
 public class ChickenHandler implements Listener {
-
-    public static List<Chicken> activeChickenList = new ArrayList<>();
 
     /*
     Augmented egg drops
@@ -106,75 +104,23 @@ public class ChickenHandler implements Listener {
 
     }
 
-    @EventHandler
-    public void superChickenAppearEvent(EntitySpawnEvent event) {
-
-        if (event.getEntityType().equals(EntityType.CHICKEN)) {
-
-            Chicken chicken = (Chicken) event.getEntity();
-
-            if (EntityTracker.isSuperMob(chicken)) {
-
-                if (!activeChickenList.contains(chicken)) {
-
-                    activeChickenList.add(chicken);
-
-                }
-
-            }
-
-        }
-
-    }
-
-    @EventHandler
-    public void superChickenDeathEvent(EntityDeathEvent event) {
-
-        if (event.getEntityType().equals(EntityType.CHICKEN)) {
-
-            Chicken chicken = (Chicken) event.getEntity();
-
-            activeChickenList.remove(chicken);
-
-        }
-
-    }
-
-    @EventHandler
-    public void superChickenChunkUnloadEvent(ChunkUnloadEvent event) {
-
-        Entity[] entityList = event.getChunk().getEntities();
-
-        for (Entity entity : entityList) {
-
-            if (entity instanceof Chicken && EntityTracker.isSuperMob(entity)) {
-
-                activeChickenList.remove(entity);
-
-            }
-
-        }
-
-    }
-
     private List<String> lore = new ArrayList<>(Arrays.asList("SuperChicken Egg"));
 
     //Egg drop chance is based on the underlying timer
     public void dropEggs() {
-
-        if (activeChickenList.isEmpty()) return;
 
         ItemStack eggStack = new ItemStack(Material.EGG, 1);
         ItemMeta eggMeta = eggStack.getItemMeta();
         eggMeta.setLore(lore);
         eggStack.setItemMeta(eggMeta);
 
-        Iterator<Chicken> superChickenIterator = activeChickenList.iterator();
+        Iterator<LivingEntity> superChickenIterator = EntityTracker.getSuperMobs().iterator();
 
         while (superChickenIterator.hasNext()) {
 
-            Chicken chicken = superChickenIterator.next();
+            LivingEntity chicken = superChickenIterator.next();
 
+            if (!(chicken instanceof Chicken)) continue;
 
             if (chicken == null || !chicken.isValid()) {
 

@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventMessage;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
+import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.items.uniqueitems.ZombieKingsAxe;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.TimedBossMobEntity;
@@ -508,7 +509,7 @@ public class ZombieKing implements Listener {
         Zombie zombieKing = (Zombie) event.getEntity();
 
         ZombieKingsAxe zombieKingAxe = new ZombieKingsAxe();
-        ItemStack zombieKingAxeItemStack = zombieKingAxe.constructItemStack();
+        ItemStack zombieKingAxeItemStack = zombieKingAxe.constructItemStack((int) MobTierFinder.findMobTier(eliteMobEntity.getLevel()));
 
         zombieKing.getWorld().dropItem(zombieKing.getLocation(), zombieKingAxeItemStack);
 

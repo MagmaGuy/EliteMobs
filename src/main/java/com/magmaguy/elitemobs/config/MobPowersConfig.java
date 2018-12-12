@@ -44,6 +44,7 @@ public class MobPowersConfig {
     public static final String ATTACK_WEAKNESS = OFFENSIVE_POWERS + "AttackWeakness";
     public static final String ATTACK_WEB = OFFENSIVE_POWERS + "AttackWeb";
     public static final String ATTACK_WITHER = OFFENSIVE_POWERS + "AttackWither";
+    public static final String ATTACK_VACUUM = OFFENSIVE_POWERS + "AttackVacuum";
 
     public static final String INVISIBILITY = DEFENSIVE_POWERS + "Invisibility";
     public static final String INVULNERABILITY_ARROW = DEFENSIVE_POWERS + "InvulnerabilityArrow";
@@ -54,6 +55,9 @@ public class MobPowersConfig {
     public static final String BONUS_LOOT = MISCELLANEOUS_POWERS + "BonusLoot";
     public static final String MOVEMENT_SPEED = MISCELLANEOUS_POWERS + "MovementSpeed";
     public static final String TAUNT = MISCELLANEOUS_POWERS + "Taunt";
+    public static final String CORPSE = MISCELLANEOUS_POWERS + "Corpse";
+    public static final String MOON_WALK = MISCELLANEOUS_POWERS + "MoonWalk";
+    public static final String IMPLOSION = MISCELLANEOUS_POWERS + "Implosion";
 
     public static final String SKELETON_PILLAR = MAJOR_POWERS + "SkeletonPillar";
     public static final String SKELETON_TRACKING_ARROW = MAJOR_POWERS + "SkeletonTrackingArrow";
@@ -79,6 +83,7 @@ public class MobPowersConfig {
         configuration.addDefault(ATTACK_WEAKNESS, true);
         configuration.addDefault(ATTACK_WEB, true);
         configuration.addDefault(ATTACK_WITHER, true);
+        configuration.addDefault(ATTACK_VACUUM, true);
 
         configuration.addDefault(INVISIBILITY, true);
         configuration.addDefault(INVULNERABILITY_ARROW, true);
@@ -89,6 +94,10 @@ public class MobPowersConfig {
         configuration.addDefault(BONUS_LOOT, true);
         configuration.addDefault(MOVEMENT_SPEED, true);
         configuration.addDefault(TAUNT, true);
+        configuration.addDefault(CORPSE, true);
+        configuration.addDefault(MOON_WALK, true);
+        configuration.addDefault(IMPLOSION, true);
+
         configuration.addDefault(SKELETON_PILLAR, true);
         configuration.addDefault(SKELETON_TRACKING_ARROW, true);
         configuration.addDefault(ZOMBIE_BLOAT, true);

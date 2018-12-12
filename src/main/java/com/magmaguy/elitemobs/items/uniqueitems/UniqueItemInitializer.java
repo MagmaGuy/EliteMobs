@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.uniqueitems;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -21,47 +22,48 @@ public class UniqueItemInitializer {
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_HUNTING_SET)) {
 
             HuntingHelmet huntingHelmet = new HuntingHelmet();
-            huntingHelmet.constructItemStack();
+            huntingHelmet.initializeItemStack();
 
             HuntingChestplate huntingChestplate = new HuntingChestplate();
-            huntingChestplate.constructItemStack();
+            huntingChestplate.initializeItemStack();
 
             HuntingLeggings huntingLeggings = new HuntingLeggings();
-            huntingLeggings.constructItemStack();
+            huntingLeggings.initializeItemStack();
 
             HuntingBoots huntingBoots = new HuntingBoots();
-            huntingBoots.constructItemStack();
+            huntingBoots.initializeItemStack();
 
             HuntingBow huntingBow = new HuntingBow();
-            huntingBow.constructItemStack();
+            huntingBow.initializeItemStack();
 
         }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_ZOMBIE_KING_AXE)) {
 
+            Bukkit.getLogger().info("ASDKJSAHDKSD");
             ZombieKingsAxe zombieKingsAxe = new ZombieKingsAxe();
-            zombieKingsAxe.constructItemStack();
+            zombieKingsAxe.initializeItemStack();
 
         }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_KRAKEN_FISHING_ROD)) {
 
             DepthsSeeker depthsSeeker = new DepthsSeeker();
-            depthsSeeker.constructItemStack();
+            depthsSeeker.initializeItemStack();
 
         }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_GREED)) {
 
             DwarvenGreed dwarvenGreed = new DwarvenGreed();
-            dwarvenGreed.constructItemStack();
+            dwarvenGreed.initializeItemStack();
 
         }
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_THE_FELLER)) {
 
             TheFeller theFeller = new TheFeller();
-            theFeller.constructItemStack();
+            theFeller.initializeItemStack();
 
         }
 

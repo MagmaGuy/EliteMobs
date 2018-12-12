@@ -166,8 +166,8 @@ public class EliteMobEntity {
      * Spawning method for boss mobs.
      * Assumes custom powers and custom names.
      *
-     * @param entityType  type of mob that this entity is slated to become
-     * @param location  location at which the elite mob will spawn
+     * @param entityType    type of mob that this entity is slated to become
+     * @param location      location at which the elite mob will spawn
      * @param eliteMobLevel boss mob level, should be automatically generated based on the highest player tier online
      * @param name          the name for this boss mob, overrides the usual elite mob name format
      * @see BossMobEntity
@@ -210,8 +210,7 @@ public class EliteMobEntity {
          */
         EntityTracker.registerEliteMob(this);
 
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
-            eliteMob.setCanPickupItems(false);
+        eliteMob.setCanPickupItems(false);
 
         this.setHasStacking(false);
         this.setHasCustomArmor(true);
@@ -261,6 +260,7 @@ public class EliteMobEntity {
         if (!mobPowers.isEmpty()) {
             this.powers = mobPowers;
             for (ElitePower elitePower : powers) {
+                elitePower.applyPowers(eliteMob);
                 if (elitePower instanceof MajorPower)
                     this.majorPowerCount++;
                 if (elitePower instanceof MinorPower)
@@ -277,8 +277,7 @@ public class EliteMobEntity {
          */
         EntityTracker.registerEliteMob(this);
 
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ITEM_PICKUP))
-            eliteMob.setCanPickupItems(false);
+        eliteMob.setCanPickupItems(false);
 
     }
 

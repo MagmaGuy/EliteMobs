@@ -91,7 +91,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;
 
-        NaturalEliteMobSpawnEventHandler.naturalMobProcessor(livingEntity);
+        NaturalEliteMobSpawnEventHandler.naturalMobProcessor(livingEntity, event.getSpawnReason());
 
     }
 

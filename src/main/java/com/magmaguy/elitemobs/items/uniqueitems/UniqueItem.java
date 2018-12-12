@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.uniqueitems;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.items.parserutil.*;
 import org.bukkit.Material;
@@ -37,7 +38,7 @@ public abstract class UniqueItem {
                 defineEnchantments(), definePotionEffects(), defineDropWeight(), defineScalability());
     }
 
-    public ItemStack constructItemStack() {
+    public ItemStack initializeItemStack() {
         HashMap<Enchantment, Integer> enchantments = EnchantmentConfigParser.parseEnchantments(ConfigValues.itemsUniqueConfig,
                 "Items." + definePath());
         HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsUniqueConfig,
@@ -49,6 +50,14 @@ public abstract class UniqueItem {
 
         return ItemConstructor.constructItem(defineName(), Material.getMaterial(defineType()), enchantments, customEnchantments,
                 potionEffects, defineLore(), dropType, scalability);
+    }
+
+    public ItemStack constructItemStack(int itemTier) {
+        String scalability = ScalabilityConfigParser.parseItemScalability(ConfigValues.itemsUniqueConfig, "Items." + definePath());
+        if (scalability.equalsIgnoreCase("dynamic") || scalability.equalsIgnoreCase("static"))
+            return ScalableItemConstructor.constructScalableItem(itemTier, defineName());
+
+        return initializeItemStack();
     }
 
 }

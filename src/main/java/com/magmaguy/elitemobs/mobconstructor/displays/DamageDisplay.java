@@ -47,10 +47,9 @@ public class DamageDisplay implements Listener {
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS)) {
 
             if (EntityTracker.isEliteMob(event.getEntity()) && event.getEntity() instanceof LivingEntity) {
-
                 if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getFinalDamage());
-
-            }
+            } else if (EntityTracker.isSuperMob(event.getEntity()))
+                displayDamage(event.getEntity(), event.getFinalDamage());
 
         } else {
 
@@ -75,7 +74,7 @@ public class DamageDisplay implements Listener {
          /*
         Dirty fix: armorstands don't render invisibly on their first tick, so it gets moved elsewhere temporarily
          */
-        ArmorStand armorStand = (ArmorStand) newLocation.getWorld().spawnEntity(newLocation.add(new Vector(0, 50, 0)), EntityType.ARMOR_STAND);
+        ArmorStand armorStand = (ArmorStand) newLocation.getWorld().spawnEntity(newLocation.add(new Vector(0, -50, 0)), EntityType.ARMOR_STAND);
 
         armorStand.setVisible(false);
         armorStand.setMarker(true);
@@ -92,29 +91,28 @@ public class DamageDisplay implements Listener {
             @Override
             public void run() {
 
-                if (taskTimer == 0)
-                {
+                if (taskTimer == 0) {
                     armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
-                            armorStand.getLocation().getY() - 50, armorStand.getLocation().getZ()));
-                    armorStand.setCustomNameVisible(true);
-                }
-                else
+                            armorStand.getLocation().getY() + 50, armorStand.getLocation().getZ()));
+                } else
                     armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
                             armorStand.getLocation().getY() + 0.1, armorStand.getLocation().getZ()));
 
+                if (taskTimer == 1)
+                    armorStand.setCustomNameVisible(true);
+
                 taskTimer++;
 
-                if (taskTimer == 15) {
+                if (taskTimer > 15) {
 
-                    cancel();
                     EntityTracker.unregisterArmorStand(armorStand);
-                    armorStand.remove();
+                    cancel();
 
                 }
 
             }
 
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 1, 1);
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 0, 1);
 
     }
 
