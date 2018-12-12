@@ -6,9 +6,7 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
@@ -156,6 +154,18 @@ public class MinorPowerPowerStance implements Listener {
 
             if (elitePower instanceof InvulnerabilityKnockback)
                 effects.add(addEffect(Material.ANVIL));
+
+            if (elitePower instanceof Corpse)
+                effects.add(addEffect(Material.BONE_BLOCK));
+
+            if (elitePower instanceof MoonWalk)
+                effects.add(addEffect(Material.SLIME_BLOCK));
+
+            if (elitePower instanceof Implosion)
+                effects.add(addEffect(Material.SLIME_BALL));
+
+            if (elitePower instanceof AttackVacuum)
+                effects.add(addEffect(Material.LEASH));
 
         }
 

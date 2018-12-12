@@ -15,11 +15,13 @@
 
 package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Created by MagmaGuy on 05/11/2016.
@@ -28,7 +30,12 @@ public class MovementSpeed extends MinorPower {
 
     @Override
     public void applyPowers(Entity entity) {
-        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1));
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 5);
     }
 
 }

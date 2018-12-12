@@ -6,9 +6,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
 import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.MovementSpeed;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -90,6 +88,8 @@ public abstract class EliteMobProperties extends PluginMobProperties {
             offensivePowers.add(new AttackWeb());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WITHER))
             offensivePowers.add(new AttackWither());
+        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_VACUUM))
+            offensivePowers.add(new AttackVacuum());
 
         return offensivePowers;
     }
@@ -103,6 +103,12 @@ public abstract class EliteMobProperties extends PluginMobProperties {
             miscellaneousPowers.add(new MovementSpeed());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.TAUNT))
             miscellaneousPowers.add(new Taunt());
+        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.CORPSE))
+            miscellaneousPowers.add(new Corpse());
+        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.MOON_WALK))
+            miscellaneousPowers.add(new MoonWalk());
+        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.IMPLOSION))
+            miscellaneousPowers.add(new Implosion());
 
         return miscellaneousPowers;
     }

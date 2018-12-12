@@ -35,9 +35,16 @@ public class SpiritWalk extends BossPower implements Listener {
 
         BossMobEntity bossMobEntity = (BossMobEntity) eliteMobEntity;
 
+        if (event.getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
+                event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)) {
+            initializeSpiritWalk(bossMobEntity.getLivingEntity());
+            bossMobEntity.resetHitsCounter();
+        }
+
         if (bossMobEntity.getHitsCounter() != 9) return;
 
         initializeSpiritWalk(bossMobEntity.getLivingEntity());
+        bossMobEntity.resetHitsCounter();
 
     }
 

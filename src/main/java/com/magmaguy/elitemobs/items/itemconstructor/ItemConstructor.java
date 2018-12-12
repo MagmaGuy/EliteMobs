@@ -83,7 +83,6 @@ public class ItemConstructor {
     /*
     For scalable items
      */
-
     public static ItemStack constructItem(String rawName, Material material, HashMap<Enchantment,
             Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
                                           List<String> lore) {

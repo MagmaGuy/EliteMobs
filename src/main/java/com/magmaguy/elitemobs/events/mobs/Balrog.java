@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.events.mobs;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
+import com.magmaguy.elitemobs.items.MobTierFinder;
 import com.magmaguy.elitemobs.items.uniqueitems.DwarvenGreed;
 import com.magmaguy.elitemobs.mobconstructor.ActionBossMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.TrashMobEntity;
@@ -103,7 +105,7 @@ public class Balrog implements Listener {
         balrogList.remove(event.getEntity());
 
         DwarvenGreed dwarvenGreed = new DwarvenGreed();
-        ItemStack dwarvenGreedItemStack = dwarvenGreed.constructItemStack();
+        ItemStack dwarvenGreedItemStack = dwarvenGreed.constructItemStack((int) MobTierFinder.findMobTier(EntityTracker.getEliteMobEntity(event.getEntity()).getLevel()));
 
         event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), dwarvenGreedItemStack);
 
@@ -138,13 +140,10 @@ public class Balrog implements Listener {
             public void run() {
 
                 if (!raug.isValid() || raug.isDead()) {
-
                     cancel();
                     return;
-
                 }
 
-                raug.getWorld().spawnParticle(Particle.FLAME, raug.getLocation(), 1, 0.1, 0.1, 0.1, 0.05);
                 raug.getWorld().spawnParticle(Particle.SMOKE_LARGE, raug.getLocation(), 1, 0.1, 0.1, 0.1, 0.05);
 
             }

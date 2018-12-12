@@ -76,7 +76,7 @@ public class DeadMoon implements Listener {
         if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM)) return;
 
         if (!EntityTracker.isEliteMob(event.getEntity()))
-            NaturalEliteMobSpawnEventHandler.naturalMobProcessor(event.getEntity());
+            NaturalEliteMobSpawnEventHandler.naturalMobProcessor(event.getEntity(), CreatureSpawnEvent.SpawnReason.NATURAL);
 
         //add entityQueued
         if (entityQueued && !TheReturned.isTheReturned(event.getEntity())
