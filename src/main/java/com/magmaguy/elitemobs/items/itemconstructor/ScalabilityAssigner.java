@@ -24,7 +24,7 @@ public class ScalabilityAssigner {
         if (!DropWeightHandler.isDynamic(dropType)) return;
         if (!isScalable(scalabilityType)) return;
 
-        ScallableItemObject scalableItemObject = new ScallableItemObject();
+        ScalableItemObject scalableItemObject = new ScalableItemObject();
         scalableItemObject.initializeItemObject(rawName, material, enchantments, customEnchantments, potionEffects,
                 lore);
 
@@ -40,7 +40,7 @@ public class ScalabilityAssigner {
             if (!ScalableItemConstructor.limitedScalableItems.containsKey(itemTier))
                 ScalableItemConstructor.limitedScalableItems.put((int) ItemTierFinder.findBattleTier(itemStack), new ArrayList<>(Arrays.asList(scalableItemObject)));
             else {
-                List<ScallableItemObject> existingList = ScalableItemConstructor.limitedScalableItems.get(itemTier);
+                List<ScalableItemObject> existingList = ScalableItemConstructor.limitedScalableItems.get(itemTier);
                 existingList.add(scalableItemObject);
                 ScalableItemConstructor.limitedScalableItems.put((int) ItemTierFinder.findBattleTier(itemStack), existingList);
             }
