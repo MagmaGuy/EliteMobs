@@ -229,6 +229,17 @@ public class CombatSystem implements Listener {
 
         double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, eliteMobEntity.getLivingEntity());
 
+        if (event.getDamager() instanceof Arrow){
+            double arrowSpeedMultiplier = Math.sqrt(Math.pow(event.getDamager().getVelocity().getX(), 2) +
+                    Math.pow(event.getDamager().getVelocity().getY(), 2) +
+                    Math.pow(event.getDamager().getVelocity().getZ(), 2)) / 5;
+
+            arrowSpeedMultiplier = (arrowSpeedMultiplier < 1) ? arrowSpeedMultiplier : 1;
+
+            newDamage *= arrowSpeedMultiplier;
+
+        }
+
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
     }

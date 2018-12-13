@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class ScallableItemObject {
+public class ScalableItemObject {
 
     public String rawName;
     public Material material;
@@ -22,8 +21,6 @@ public class ScallableItemObject {
     public void initializeItemObject(String rawName, Material material, HashMap<Enchantment,
             Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
                                      List<String> lore) {
-
-        Bukkit.getLogger().info("INITIALIZING " + rawName);
 
         this.rawName = rawName;
         this.material = material;
