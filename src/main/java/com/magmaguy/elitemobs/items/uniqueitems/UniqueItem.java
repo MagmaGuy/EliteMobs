@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.uniqueitems;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.items.itemconstructor.ScalableItemObject;
 import com.magmaguy.elitemobs.items.parserutil.*;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -53,10 +54,27 @@ public abstract class UniqueItem {
     }
 
     public ItemStack constructItemStack(int itemTier) {
-        String scalability = ScalabilityConfigParser.parseItemScalability(ConfigValues.itemsUniqueConfig, "Items." + definePath());
-        if (scalability.equalsIgnoreCase("dynamic") || scalability.equalsIgnoreCase("static"))
-            return ScalableItemConstructor.constructScalableItem(itemTier, defineName());
 
+        HashMap<Enchantment, Integer> enchantments = EnchantmentConfigParser.parseEnchantments(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        List<String> potionEffects = PotionEffectConfigParser.itemPotionEffectHandler(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        String dropType = DropWeightConfigParser.getDropType(ConfigValues.itemsUniqueConfig, "Items." + definePath());
+        String scalability = ScalabilityConfigParser.parseItemScalability(ConfigValues.itemsUniqueConfig, "Items." + definePath());
+
+        ScalableItemObject scalableItemObject = new ScalableItemObject();
+        scalableItemObject.initializeItemObject(defineName(), Material.getMaterial(defineType()), enchantments, customEnchantments,
+                potionEffects, defineLore());
+
+        if (scalability.equalsIgnoreCase("dynamic"))
+            return ScalableItemConstructor.constructDynamicItem(itemTier);
+
+        if (scalability.equalsIgnoreCase("limited"))
+            return ScalableItemConstructor.constructLimitedItem(itemTier);
+
+        //used for default purposes, supposedly only triggers for the static tag
         return initializeItemStack();
     }
 

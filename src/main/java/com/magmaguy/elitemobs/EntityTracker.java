@@ -303,16 +303,11 @@ public class EntityTracker implements Listener {
     This is run in async for performance reasons
      */
     public static void wipeEntity(Entity entity) {
+        unregisterEliteMob(entity);
+        unregisterCullableEntity(entity);
         new BukkitRunnable() {
             @Override
             public void run() {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        unregisterEliteMob(entity);
-                        unregisterCullableEntity(entity);
-                    }
-                }.runTask(MetadataHandler.PLUGIN);
                 unregisterSuperMob(entity);
                 unregisterNaturalEntity(entity);
                 unregisterArmorStand(entity);
