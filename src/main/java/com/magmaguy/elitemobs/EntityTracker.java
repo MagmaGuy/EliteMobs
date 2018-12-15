@@ -86,19 +86,14 @@ public class EntityTracker implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        updateSuperMobs();
-                        updateEliteMobEntities();
-                        updateLivingEntities();
-                        updateCullables();
-                        updateAmorStands();
-                        updateItems();
-                    }
-                }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+                updateSuperMobs();
+                updateEliteMobEntities();
+                updateLivingEntities();
+                updateCullables();
+                updateAmorStands();
+                updateItems();
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
+        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
 
     }
 
@@ -209,6 +204,7 @@ public class EntityTracker implements Listener {
     }
 
     public static void unregisterCullableEntity(Entity entity) {
+        if (!cullablePluginEntities.contains(entity)) return;
         cullablePluginEntities.remove(entity);
         entity.remove();
     }
@@ -308,10 +304,14 @@ public class EntityTracker implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                unregisterSuperMob(entity);
-                unregisterNaturalEntity(entity);
-                unregisterArmorStand(entity);
-                unregisterItemEntity(entity);
+                if (isSuperMob(entity))
+                    unregisterSuperMob(entity);
+                if (isNaturalEntity(entity))
+                    unregisterNaturalEntity(entity);
+                if (getIsArmorStand(entity))
+                    unregisterArmorStand(entity);
+                if (isItemVisualEffect(entity))
+                    unregisterItemEntity(entity);
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
