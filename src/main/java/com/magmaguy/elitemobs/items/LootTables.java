@@ -205,14 +205,14 @@ public class LootTables implements Listener {
     private static Item dropDynamicallyScalingItem(EliteMobEntity eliteMobEntity, int itemTier) {
 
         return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
-                ScalableItemConstructor.constructDynamicItem(itemTier));
+                ScalableItemConstructor.assembleDynamicItems(itemTier));
 
     }
 
     private static Item dropLimitedScalingItem(EliteMobEntity eliteMobEntity, int itemTier) {
 
         return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
-                ScalableItemConstructor.constructLimitedItem(itemTier));
+                ScalableItemConstructor.assembleLimitedItem(itemTier));
 
     }
 

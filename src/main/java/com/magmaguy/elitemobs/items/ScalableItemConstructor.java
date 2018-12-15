@@ -22,12 +22,17 @@ public class ScalableItemConstructor {
     Fully dynamic scalable items can be of any item rank all the way up to the maximum valid item tier.
     As such, there is no sense in trying to sort this by tiers.
      */
-    public static ItemStack constructDynamicItem(int itemTier) {
+    public static ItemStack assembleDynamicItems(int itemTier) {
 
         ScalableItemObject scalableItemObject = dynamicallyScalableItems.get(ThreadLocalRandom.current().nextInt(dynamicallyScalableItems.size()));
 
-        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(scalableItemObject.enchantments, itemTier);
+        return constructDynamicItem(itemTier, scalableItemObject);
 
+    }
+
+    public static ItemStack constructDynamicItem(int itemTier, ScalableItemObject scalableItemObject) {
+
+        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(scalableItemObject.enchantments, itemTier);
         return ItemConstructor.constructItem(
                 scalableItemObject.rawName,
                 scalableItemObject.material,
@@ -106,7 +111,7 @@ public class ScalableItemConstructor {
     entry, and every other entry is just a nerfed version of that item. Basically an easy way to limit an item in a
     predictable way.
      */
-    public static ItemStack constructLimitedItem(int itemTier) {
+    public static ItemStack assembleLimitedItem(int itemTier) {
 
         List<ScalableItemObject> localLootList = new ArrayList<>();
 
@@ -116,6 +121,13 @@ public class ScalableItemConstructor {
 
 
         ScalableItemObject scalableItemObject = localLootList.get(ThreadLocalRandom.current().nextInt(localLootList.size()) - 1);
+
+        return constructLimitedItem(itemTier, scalableItemObject);
+
+    }
+
+    public static ItemStack constructLimitedItem(int itemTier, ScalableItemObject scalableItemObject) {
+
         HashMap<Enchantment, Integer> newEnchantmentList = updateLimitedEnchantments(scalableItemObject.enchantments, itemTier);
 
         return ItemConstructor.constructItem(
