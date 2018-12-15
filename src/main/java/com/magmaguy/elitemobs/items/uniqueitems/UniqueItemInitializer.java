@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.items.uniqueitems;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ public class UniqueItemInitializer {
 
         if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_ZOMBIE_KING_AXE)) {
 
-            Bukkit.getLogger().info("ASDKJSAHDKSD");
             ZombieKingsAxe zombieKingsAxe = new ZombieKingsAxe();
             zombieKingsAxe.initializeItemStack();
 

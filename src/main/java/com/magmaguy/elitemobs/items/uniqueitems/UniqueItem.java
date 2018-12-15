@@ -69,10 +69,10 @@ public abstract class UniqueItem {
                 potionEffects, defineLore());
 
         if (scalability.equalsIgnoreCase("dynamic"))
-            return ScalableItemConstructor.constructDynamicItem(itemTier);
+            return ScalableItemConstructor.constructDynamicItem(itemTier, scalableItemObject);
 
         if (scalability.equalsIgnoreCase("limited"))
-            return ScalableItemConstructor.constructLimitedItem(itemTier);
+            return ScalableItemConstructor.assembleLimitedItem(itemTier);
 
         //used for default purposes, supposedly only triggers for the static tag
         return initializeItemStack();
