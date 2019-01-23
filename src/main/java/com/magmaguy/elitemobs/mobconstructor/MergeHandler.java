@@ -37,6 +37,8 @@ public class MergeHandler implements Listener {
     @EventHandler
     public void onDamageMerge(EntityDamageEvent event) {
 
+        if (!ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
+            return;
         validateEntityType(event.getEntity());
 
     }
@@ -44,6 +46,8 @@ public class MergeHandler implements Listener {
     @EventHandler
     public void onSpawnMerge(EntitySpawnEvent event) {
 
+        if (!ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
+            return;
         validateEntityType(event.getEntity());
 
     }

@@ -244,7 +244,7 @@ public class ItemsProceduralSettingsConfig {
 
 
         configuration.addDefault(ARROW_DAMAGE_BOOL, true);
-        configuration.addDefault(ARROW_DAMAGE_MAX_LEVEL, 5);
+        configuration.addDefault(ARROW_DAMAGE_MAX_LEVEL, 10);
 
         configuration.addDefault(ARROW_FIRE_BOOL, true);
         configuration.addDefault(ARROW_FIRE_MAX_LEVEL, 1);
@@ -257,7 +257,7 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(BINDING_CURSE_BOOL, true);
 
         configuration.addDefault(DAMAGE_ALL_BOOL, true);
-        configuration.addDefault(DAMAGE_ALL_MAX_LEVEL, 5);
+        configuration.addDefault(DAMAGE_ALL_MAX_LEVEL, 10);
 
         configuration.addDefault(DAMAGE_ARTHROPODS_BOOL, true);
         configuration.addDefault(DAMAGE_ARTHROPODS_MAX_LEVEL, 5);
@@ -301,7 +301,7 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(OXYGEN_MAX_LEVEL, 3);
 
         configuration.addDefault(PROTECTION_ENVIRONMENTAL_BOOL, true);
-        configuration.addDefault(PROTECTION_ENVIRONMENTAL_MAX_LEVEL, 4);
+        configuration.addDefault(PROTECTION_ENVIRONMENTAL_MAX_LEVEL, 10);
 
         configuration.addDefault(PROTECTION_EXPLOSIONS_BOOL, true);
         configuration.addDefault(PROTECTION_EXPLOSIONS_MAX_LEVEL, 4);
