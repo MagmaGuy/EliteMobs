@@ -156,7 +156,7 @@ public class EliteMobs extends JavaPlugin {
         int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
 
         new EntityScanner().runTaskTimer(this, 20, 20 * 10);
-        new PotionEffectApplier().runTaskTimer(this, 20, 20);
+        new PotionEffectApplier().runTaskTimer(this, 20, 20 * 5);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_POWER_SCOREBOARDS))
             new ScoreboardUpdater().runTaskTimer(this, 20, 20);
         if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&

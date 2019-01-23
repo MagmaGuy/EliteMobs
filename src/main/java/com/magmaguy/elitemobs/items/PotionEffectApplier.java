@@ -258,7 +258,10 @@ public class PotionEffectApplier implements Listener {
         if (potionEffectType.equals(PotionEffectType.NIGHT_VISION)) {
             return new PotionEffect(potionEffectType, 15 * 20, potionEffectMagnitude);
         }
-        return new PotionEffect(potionEffectType, 2 * 20, potionEffectMagnitude);
+        if (potionEffectType.equals(PotionEffectType.SATURATION)) {
+            return new PotionEffect(potionEffectType, 1, potionEffectMagnitude);
+        }
+        return new PotionEffect(potionEffectType, 5 * 20, potionEffectMagnitude);
 
     }
 
