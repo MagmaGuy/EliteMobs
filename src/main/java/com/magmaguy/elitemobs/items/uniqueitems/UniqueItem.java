@@ -72,7 +72,7 @@ public abstract class UniqueItem {
             return ScalableItemConstructor.constructDynamicItem(itemTier, scalableItemObject);
 
         if (scalability.equalsIgnoreCase("limited"))
-            return ScalableItemConstructor.assembleLimitedItem(itemTier);
+            return ScalableItemConstructor.constructLimitedItem(itemTier, scalableItemObject);
 
         //used for default purposes, supposedly only triggers for the static tag
         return initializeItemStack();
