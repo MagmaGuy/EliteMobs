@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.TranslationConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -39,7 +40,6 @@ public class CommandHandler implements CommandExecutor {
     private final static String GETLOOT = "elitemobs.getloot";
     private final static String SIMLOOT = "elitemobs.simloot";
     public final static String RELOAD_CONFIGS = "elitemobs.reload";
-    private final static String RELOAD_LOOT = "elitemobs.reload.loot";
     private final static String GIVELOOT = "elitemobs.giveloot";
     private final static String SPAWNMOB = "elitemobs.spawnmob";
     private final static String SPAWN_BOSS_MOB = "elitemobs.spawnbossmob";
@@ -240,8 +240,8 @@ public class CommandHandler implements CommandExecutor {
 
             Player player = (Player) commandSender;
 
-            player.sendTitle("I'm afraid I can't let you do that, " + player.getDisplayName() + ".",
-                    "You need the following permission: " + permission);
+            player.sendTitle(ConfigValues.translationConfig.getString(TranslationConfig.MISSING_PERMISSION_TITLE).replace("$username", player.getDisplayName()),
+                    ConfigValues.translationConfig.getString(TranslationConfig.MISSING_PERMISSION_SUBTITLE).replace("$permission", permission));
 
         } else {
 
@@ -274,7 +274,7 @@ public class CommandHandler implements CommandExecutor {
 
             Player player = (Player) commandSender;
 
-            player.sendMessage("[EliteMobs] Valid commands:");
+            player.sendMessage("[EliteMobs] " + ConfigValues.translationConfig.getString(TranslationConfig.VALID_COMMANDS));
             if (silentPermCheck(STATS, commandSender))
                 player.sendMessage("/elitemobs stats");
             if (silentPermCheck(SHOP, commandSender))
@@ -323,7 +323,7 @@ public class CommandHandler implements CommandExecutor {
 
         } else if (commandSender instanceof ConsoleCommandSender) {
 
-            commandSender.sendMessage("[EliteMobs] Command not recognized. Valid commands:");
+            commandSender.sendMessage("[EliteMobs] " + ConfigValues.translationConfig.getString(TranslationConfig.INVALID_COMMAND));
             commandSender.sendMessage("elitemobs stats");
             commandSender.sendMessage("elitemobs reload");
             commandSender.sendMessage("elitemobs check [username]");
