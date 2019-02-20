@@ -177,6 +177,11 @@ public class SpawnMobCommandHandler {
 
         int mobLevel = 0;
 
+        if (args.length < 3) {
+            commandSender.sendMessage("[EliteMobs] Missing Elite Mob level.");
+            commandSender.sendMessage("[EliteMobs] Command syntax: /em spawn [mobType] [level]");
+        }
+
         if (commandSender instanceof Player) {
 
             try {
@@ -388,6 +393,14 @@ public class SpawnMobCommandHandler {
     public static void spawnBossMob(Player player, String[] args) {
 
         Location cursorLocation = player.getTargetBlock(null, 5).getLocation().add(new Vector(0.5, 2, 0.5));
+
+        if (args.length < 2) {
+
+            player.sendMessage("Valid arguments:");
+            player.sendMessage("treasuregoblin, zombieking, kraken, balrog");
+            return;
+
+        }
 
         if (args[1].equalsIgnoreCase("treasuregoblin")) {
 

@@ -51,6 +51,15 @@ public class TranslationConfig {
     public static final String NAME_PIG = ELITE_MOB_NAME + "Pig";
     public static final String NAME_SHEEP = ELITE_MOB_NAME + "Sheep";
 
+    /*
+    Translation for commands
+     */
+
+    public static final String MISSING_PERMISSION_TITLE = "Missing permission message title";
+    public static final String MISSING_PERMISSION_SUBTITLE = "Missing permission message subtitle";
+    public static final String VALID_COMMANDS = "Valid commands message";
+    public static final String INVALID_COMMAND = "Invalid command message";
+
     public static final String CONFIG_NAME = "translation.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -520,6 +529,11 @@ public class TranslationConfig {
                 "Stop this!",
                 "Did you take out the garbage?"
         ));
+
+        configuration.addDefault(MISSING_PERMISSION_TITLE, "I'm afraid I can't let you do that, $username.");
+        configuration.addDefault(MISSING_PERMISSION_SUBTITLE, "You need the following permission: $permission");
+        configuration.addDefault(VALID_COMMANDS, "Valid commands:");
+        configuration.addDefault(INVALID_COMMAND, "Command not recognized. Valid commands:");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);
