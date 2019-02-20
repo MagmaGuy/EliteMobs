@@ -23,12 +23,12 @@ public class EliteCreeper extends EliteMobProperties {
 
 //        todo: add a way to configure powers per entity type
         ElitePower elitePower = null;
-        for (ElitePower elitePower1 : this.validMiscellaneousPowers)
+        for (ElitePower elitePower1 : this.validDefensivePowers)
             if (elitePower1 instanceof Invisibility)
                 elitePower = elitePower1;
 
         if (elitePower != null)
-            this.validMiscellaneousPowers.remove(elitePower);
+            this.validDefensivePowers.remove(elitePower);
 
         isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
                 ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
