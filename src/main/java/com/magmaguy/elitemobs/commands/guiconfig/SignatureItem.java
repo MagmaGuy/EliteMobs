@@ -15,8 +15,11 @@
 
 package com.magmaguy.elitemobs.commands.guiconfig;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
@@ -31,14 +34,25 @@ public class SignatureItem {
 
     private static ItemStack setSignatureItem() {
 
-        ItemStack signature = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
-        SkullMeta signatureSkullMeta = (SkullMeta) signature.getItemMeta();
-        signatureSkullMeta.setOwner("magmaguy");
-        signatureSkullMeta.setDisplayName("EliteMobs by MagmaGuy");
-        List<String> signatureList = new ArrayList<>();
-        signatureList.add("Support the plugins you enjoy!");
-        signatureSkullMeta.setLore(signatureList);
-        signature.setItemMeta(signatureSkullMeta);
+        ItemStack signature;
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.SKULL_SIGNATURE_ITEM)) {
+            signature = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+            SkullMeta signatureSkullMeta = (SkullMeta) signature.getItemMeta();
+            signatureSkullMeta.setOwner("magmaguy");
+            signatureSkullMeta.setDisplayName("EliteMobs by MagmaGuy");
+            List<String> signatureList = new ArrayList<>();
+            signatureList.add("Support the plugins you enjoy!");
+            signatureSkullMeta.setLore(signatureList);
+            signature.setItemMeta(signatureSkullMeta);
+        } else {
+            signature = new ItemStack(Material.PAPER);
+            ItemMeta itemMeta = signature.getItemMeta();
+            itemMeta.setDisplayName("EliteMobs by MagmaGuy");
+            List<String> signatureList = new ArrayList<>();
+            signatureList.add("Support the plugins you enjoy!");
+            itemMeta.setLore(signatureList);
+            signature.setItemMeta(itemMeta);
+        }
 
         return signature;
 

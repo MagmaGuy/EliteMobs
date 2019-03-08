@@ -57,6 +57,7 @@ public class TranslationConfig {
 
     public static final String MISSING_PERMISSION_TITLE = "Missing permission message title";
     public static final String MISSING_PERMISSION_SUBTITLE = "Missing permission message subtitle";
+    public static final String MISSING_PERMISSION_MESSAGE = "Missing permission message";
     public static final String VALID_COMMANDS = "Valid commands message";
     public static final String INVALID_COMMAND = "Invalid command message";
 
@@ -532,6 +533,7 @@ public class TranslationConfig {
 
         configuration.addDefault(MISSING_PERMISSION_TITLE, "I'm afraid I can't let you do that, $username.");
         configuration.addDefault(MISSING_PERMISSION_SUBTITLE, "You need the following permission: $permission");
+        configuration.addDefault(MISSING_PERMISSION_MESSAGE, "[EliteMobs] You may not run this command.");
         configuration.addDefault(VALID_COMMANDS, "Valid commands:");
         configuration.addDefault(INVALID_COMMAND, "Command not recognized. Valid commands:");
 
