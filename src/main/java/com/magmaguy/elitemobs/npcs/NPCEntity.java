@@ -16,7 +16,7 @@ public class NPCEntity {
 
     private String name;
     private Villager.Career career;
-    private Location location;
+    private Location spawnLocation;
     private List<String> greetings;
     private List<String> dialog;
     private List<String> farewell;
@@ -36,7 +36,7 @@ public class NPCEntity {
 
         setName(configuration.getString(key + NPCConfig.NAME));
         setCareer(configuration.getString(key + NPCConfig.TYPE));
-        setLocation(configuration.getString(key + NPCConfig.LOCATION));
+        setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION));
         setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
         setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
         setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
@@ -47,33 +47,29 @@ public class NPCEntity {
 
     }
 
-    /**
-     * Sets the display name of the npc
-     *
-     * @param name Name the NPC will display
-     */
-    public void setName(String name) {
+    private String getName() {
+        return this.name;
+    }
+
+    private void setName(String name) {
         this.name = name;
         this.villager.setCustomName(name);
         this.villager.setCustomNameVisible(true);
     }
 
-    /**
-     * Sets the career that the NPC will have. This determines its skin.
-     *
-     * @param career Valid parameters: ARMORER, BUTCHER, CARTOGRAPHER, CLERIC, FARMER, FISHERMAN, FLETCHER, LEATHERWORKER,
-     *               LIBRARIAN, NITWIT, SHEPHERD, TOOL_SMITH, WEAPON_SMITH
-     */
-    public void setCareer(String career) {
+    private Villager.Career getCareer() {
+        return this.career;
+    }
+
+    private void setCareer(String career) {
         this.villager.setCareer(Villager.Career.valueOf(career));
     }
 
-    /**
-     * Sets the spawn location. Actual location may vary if movement is allowed.
-     *
-     * @param location The spawning location
-     */
-    public void setLocation(String location) {
+    private Location getSpawnLocation() {
+        return this.spawnLocation;
+    }
+
+    private void setSpawnLocation(String spawnLocation) {
         int counter = 0;
         World world = null;
         double x = 0;
@@ -81,7 +77,7 @@ public class NPCEntity {
         double z = 0;
         float yaw = 0;
         float pitch = 0;
-        for (String substring : location.split(",")) {
+        for (String substring : spawnLocation.split(",")) {
             switch (counter) {
                 case 0:
                     /*
@@ -120,49 +116,62 @@ public class NPCEntity {
 
         if (world == null) return;
 
-        this.location = new Location(world, x, y, z, yaw, pitch);
+        this.spawnLocation = new Location(world, x, y, z, yaw, pitch);
     }
 
-    /**
-     * Sets the list of greetings that the NPC will display when players enter the activation radius
-     *
-     * @param greetings List of greetings
-     */
-    public void setGreetings(List<String> greetings) {
+    private List<String> getGreetings() {
+        return this.greetings;
+    }
+
+    private void setGreetings(List<String> greetings) {
         this.greetings = greetings;
     }
 
-    /**
-     * Sets the dialog the NPC will display when players are within range but not interacting
-     *
-     * @param dialog List of dialog
-     */
-    public void setDialog(List<String> dialog) {
+    private List<String> getDialog() {
+        return this.dialog;
+    }
+
+    private void setDialog(List<String> dialog) {
         this.dialog = dialog;
     }
 
-    /**
-     * Sets the list of farewells
-     *
-     * @param farewell
-     */
-    public void setFarewell(List<String> farewell) {
+    private List getFarewell(List<String> farewell) {
+        return this.farewell;
+    }
+
+    private void setFarewell(List<String> farewell) {
         this.farewell = farewell;
     }
 
-    public void setCanMove(boolean canMove) {
+    private boolean getCanMove() {
+        return this.canMove;
+    }
+
+    private void setCanMove(boolean canMove) {
         this.canMove = canMove;
     }
 
-    public void setCanTalk(boolean canTalk) {
+    private boolean getCanTalk() {
+        return this.canTalk;
+    }
+
+    private void setCanTalk(boolean canTalk) {
         this.canTalk = canTalk;
     }
 
-    public void setActivationRadius(double activationRadius) {
+    private double getActivationRadius() {
+        return this.activationRadius;
+    }
+
+    private void setActivationRadius(double activationRadius) {
         this.activationRadius = activationRadius;
     }
 
-    public void setDisappearsAtNight(boolean disappearsAtNight) {
+    private boolean getDisappearsAtNight() {
+        return this.disappearsAtNight;
+    }
+
+    private void setDisappearsAtNight(boolean disappearsAtNight) {
         this.disappearsAtNight = disappearsAtNight;
     }
 

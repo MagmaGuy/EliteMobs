@@ -26,6 +26,7 @@ public class EntityTracker implements Listener {
     private static HashSet<LivingEntity> superMobs = new HashSet<>();
     private static HashSet<EliteMobEntity> eliteMobs = new HashSet<>();
     private static HashSet<LivingEntity> eliteMobsLivingEntities = new HashSet<>();
+    private static HashSet<LivingEntity> npcEntities = new HashSet<>();
 
     private static HashSet<LivingEntity> naturalEntities = new HashSet<>();
     private static HashSet<ArmorStand> armorStands = new HashSet<>();
@@ -37,8 +38,19 @@ public class EntityTracker implements Listener {
      */
     private static HashSet<Entity> cullablePluginEntities = new HashSet<>();
 
-    /*
-    Starts tracking elite mobs
+    /**
+     * Gets all living elite mobs
+     *
+     * @return HashSet of all living elite mobs
+     */
+    public static HashSet<EliteMobEntity> getEliteMobs() {
+        return eliteMobs;
+    }
+
+    /**
+     * Registers an entity as an elite mob
+     *
+     * @param eliteMobEntity registers entity as elite mob
      */
     public static void registerEliteMob(EliteMobEntity eliteMobEntity) {
         eliteMobs.add(eliteMobEntity);
@@ -46,41 +58,294 @@ public class EntityTracker implements Listener {
         registerCullableEntity(eliteMobEntity.getLivingEntity());
     }
 
-    /*
-    Starts tracking super mob
+    /**
+     * Fully unregisters an elite mob
+     *
+     * @param eliteMobEntity unregisters this entity from the plugin
+     */
+    public static void unregisterEliteMob(EliteMobEntity eliteMobEntity) {
+        eliteMobs.remove(eliteMobEntity);
+        naturalEntities.remove(eliteMobEntity.getLivingEntity());
+        cullablePluginEntities.remove(eliteMobEntity.getLivingEntity());
+    }
+
+    /**
+     * Returns whether or not an entity is an elite mob
+     *
+     * @param entity entity which will be checked
+     * @return if the entity is an elite mob
+     */
+    public static boolean isEliteMob(Entity entity) {
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
+        return eliteMobsLivingEntities.contains(entity);
+    }
+
+    /**
+     * Gets the EliteMob object from an entity. If the entity isn't an elite mob, it returns null.
+     * It's faster to get this and compare it to null than to use #isEliteMob first and then get this method.
+     *
+     * @param entity entity to check
+     * @return returns the EliteMob object or null if the entity isn't one
+     */
+    public static EliteMobEntity getEliteMobEntity(Entity entity) {
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
+        for (EliteMobEntity eliteMobEntity : eliteMobs)
+            if (eliteMobEntity.getLivingEntity().equals(entity))
+                return eliteMobEntity;
+        return null;
+    }
+
+    /**
+     * Fully unregisters an elite mob from an entity
+     *
+     * @param entity
+     */
+    private static void unregisterEliteMob(Entity entity) {
+        if (!isEliteMob(entity)) return;
+        EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
+        if (eliteMobEntity == null) return;
+        eliteMobEntity.getLivingEntity().remove();
+        eliteMobs.remove(eliteMobEntity);
+        eliteMobsLivingEntities.remove(eliteMobEntity.getLivingEntity());
+    }
+
+    /**
+     * Gets a full list of super mobs
+     *
+     * @return full list of super mobs
+     */
+    public static HashSet<LivingEntity> getSuperMobs() {
+        return superMobs;
+    }
+
+    /**
+     * Registers an entity as a super mob
+     *
+     * @param livingEntity entity to be registered
      */
     public static void registerSuperMob(LivingEntity livingEntity) {
         if (!SuperMobProperties.isValidSuperMobType(livingEntity)) return;
         superMobs.add(livingEntity);
     }
 
-    /*
-    Registers mobs that spawn naturally, necessary for elite mob rewards
+    /**
+     * Unregisters an entity as a super mob
+     *
+     * @param entity entity to be unregistered
      */
-    public static void registerNaturalEntity(LivingEntity entity) {
-        if (!EliteMobProperties.isValidEliteMobType(entity)) return;
-        naturalEntities.add(entity);
+    public static void unregisterSuperMob(Entity entity) {
+        if (!SuperMobProperties.isValidSuperMobType(entity)) return;
+        superMobs.remove(entity);
     }
 
+    /**
+     * Gets if the entity is a super mob
+     *
+     * @param entity entity to check
+     * @return whether the entity is a super mob
+     */
+    public static boolean isSuperMob(Entity entity) {
+        if (!SuperMobProperties.isValidSuperMobType(entity)) return false;
+        return superMobs.contains(entity);
+    }
 
+    /**
+     * Registers a LivingEntity as a natural entity
+     *
+     * @param livingEntity livingEntity to be registered
+     */
+    public static void registerNaturalEntity(LivingEntity livingEntity) {
+        if (!EliteMobProperties.isValidEliteMobType(livingEntity)) return;
+        naturalEntities.add(livingEntity);
+    }
+
+    /**
+     * Unregisters a LivingEntity from the natural entities list
+     *
+     * @param livingEntity LivingEntity to unregister
+     */
+    public static void unregisterNaturalEntity(LivingEntity livingEntity) {
+        naturalEntities.remove(livingEntity);
+    }
+
+    /**
+     * Unregisters an Entity from the Natural Entity list
+     *
+     * @param entity Entity to unregister
+     */
+    public static void unregisterNaturalEntity(Entity entity) {
+        if (EliteMobProperties.isValidEliteMobType(entity)) return;
+        naturalEntities.remove(entity);
+    }
+
+    /**
+     * Checks if an Entity is a natural entity
+     *
+     * @param entity entity to check
+     * @return whether the Entity is naturally spawned
+     */
+    public static boolean isNaturalEntity(Entity entity) {
+        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
+        return naturalEntities.contains(entity);
+    }
+
+    /**
+     * Registers an Armorstand for specific display purposes
+     *
+     * @param armorStand Armorstand to register
+     */
     public static void registerArmorStands(ArmorStand armorStand) {
         armorStands.add(armorStand);
         registerCullableEntity(armorStand);
     }
 
+    /**
+     * Unregisters an Armorstand from the armorstand list
+     *
+     * @param armorStand Armorstand to unregister
+     */
+    public static void unregisterArmorStand(Entity armorStand) {
+        if (!armorStand.getType().equals(EntityType.ARMOR_STAND)) return;
+        armorStand.remove();
+        armorStands.remove(armorStand);
+    }
+
+    /**
+     * Checks if an entity is a registered Armorstand
+     *
+     * @param entity Entity to be checked
+     * @return whether the Entity is a registered Armorstand
+     */
+    public static boolean isArmorStand(Entity entity) {
+        if (!entity.getType().equals(EntityType.ARMOR_STAND)) return false;
+        return (armorStands.contains(entity));
+    }
+
+    /**
+     * Registers an item visual effect
+     *
+     * @param item Item to be registered
+     */
     public static void registerItemVisualEffects(Item item) {
         itemVisualEffects.add(item);
         registerCullableEntity(item);
     }
 
-    /*
-    Starts tracking any entity generated or managed by EliteMobs, useful for when they need to be culled
-    Does not include super mobs to avoid culling them by mistake
+    /**
+     * Unregisters an item visual effect. Should only happen after the entity has been removed.
+     *
+     * @param entity Entity to be unregistered
+     */
+    public static void unregisterItemVisualEffects(Entity entity) {
+        if (!entity.getType().equals(EntityType.DROPPED_ITEM)) return;
+        itemVisualEffects.remove(entity);
+        entity.remove();
+    }
+
+    /**
+     * Checks if an Entity is a registered item visual effect
+     *
+     * @param entity Entity to be checked
+     * @return whether the entity is a visual effect
+     */
+    public static boolean isItemVisualEffect(Entity entity) {
+        return (itemVisualEffects.contains(entity));
+    }
+
+    /**
+     * Registers cullable entities. Cullable entities are killed when chunks get unloaded. Super mobs aren't registered
+     * for safety purposes.
+     *
+     * @param entity Entity to be registered
      */
     public static void registerCullableEntity(Entity entity) {
         cullablePluginEntities.add(entity);
     }
 
+    /**
+     * Unregisters a cullable entity. This should only ever happen when the entity has already been removed.
+     *
+     * @param entity Entity to be unregistered.
+     */
+    public static void unregisterCullableEntity(Entity entity) {
+        if (!cullablePluginEntities.contains(entity)) return;
+        cullablePluginEntities.remove(entity);
+        entity.remove();
+    }
+
+    /*
+    Custom spawn reasons can be considered as natural spawns under specific config options
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    public void registerNaturalEntity(CreatureSpawnEvent event) {
+        if (event.isCancelled()) return;
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
+                event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) &&
+                        !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES))
+            registerNaturalEntity(event.getEntity());
+    }
+
+    /*
+    Natural entities get unregistered from being natural when exploit abuse is detected from the players
+     */
+
+
+    public static void shutdownPurger() {
+
+        for (Entity entity : cullablePluginEntities)
+            entity.remove();
+
+        eliteMobs.clear();
+        eliteMobsLivingEntities.clear();
+        superMobs.clear();
+        itemVisualEffects.clear();
+        armorStands.clear();
+        naturalEntities.clear();
+        cullablePluginEntities.clear();
+
+    }
+
+    /*
+    This is run in async for performance reasons
+     */
+    private static void wipeEntity(Entity entity) {
+        unregisterEliteMob(entity);
+        unregisterCullableEntity(entity);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (isSuperMob(entity))
+                    unregisterSuperMob(entity);
+                if (isNaturalEntity(entity))
+                    unregisterNaturalEntity(entity);
+                if (isArmorStand(entity))
+                    unregisterArmorStand(entity);
+                if (isItemVisualEffect(entity))
+                    unregisterItemVisualEffects(entity);
+            }
+        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+    }
+
+    /**
+     * Wipes a chunk clean of all relevant plugin entities and data.
+     *
+     * @param event ChunkUnloadEvent to be cleared
+     */
+    public static void chunkWiper(ChunkUnloadEvent event) {
+        for (Entity entity : event.getChunk().getEntities())
+            wipeEntity(entity);
+    }
+
+    /**
+     * Wiped an entity of all relevant plugin data on death.
+     *
+     * @param event Entity to be wiped.
+     */
+    public static void deathWipe(EntityDeathEvent event) {
+        wipeEntity(event.getEntity());
+    }
+
+    /*
     public static void checkEntityState() {
 
         new BukkitRunnable() {
@@ -152,45 +417,6 @@ public class EntityTracker implements Listener {
         }
     }
 
-    public static HashSet<LivingEntity> getSuperMobs() {
-        return superMobs;
-    }
-
-    public static boolean isSuperMob(Entity entity) {
-        if (!SuperMobProperties.isValidSuperMobType(entity)) return false;
-        return superMobs.contains(entity);
-    }
-
-    public static boolean isEliteMob(Entity entity) {
-        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
-        return eliteMobsLivingEntities.contains(entity);
-    }
-
-    public static EliteMobEntity getEliteMobEntity(Entity entity) {
-        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
-        for (EliteMobEntity eliteMobEntity : eliteMobs)
-            if (eliteMobEntity.getLivingEntity().equals(entity))
-                return eliteMobEntity;
-        return null;
-    }
-
-//    public static EliteMobEntity getAsyncEliteMobEntity(Entity entity) {
-//        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
-//        HashSet<EliteMobEntity> localEntities = (HashSet<EliteMobEntity>) eliteMobs.clone();
-//        for (EliteMobEntity eliteMobEntity : localEntities)
-//            if (eliteMobEntity.getLivingEntity().equals(entity))
-//                return eliteMobEntity;
-//        return null;
-//    }
-
-    public static boolean isNaturalEntity(Entity entity) {
-        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
-        return naturalEntities.contains(entity);
-    }
-
-    public static boolean isItemVisualEffect(Entity entity) {
-        return (itemVisualEffects.contains(entity));
-    }
 
     public static boolean hasPower(ElitePower mobPower, Entity entity) {
         EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
@@ -202,127 +428,6 @@ public class EntityTracker implements Listener {
         if (eliteMobEntity == null) return false;
         return eliteMobEntity.hasPower(mobPower);
     }
-
-    public static void unregisterCullableEntity(Entity entity) {
-        if (!cullablePluginEntities.contains(entity)) return;
-        cullablePluginEntities.remove(entity);
-        entity.remove();
-    }
-
-    public static void unregisterItemEntity(Entity entity) {
-        if (!entity.getType().equals(EntityType.DROPPED_ITEM)) return;
-        itemVisualEffects.remove(entity);
-        entity.remove();
-    }
-
-    /*
-    Used outside this class to remove individual elite mobs
-     */
-    public static void unregisterEliteMob(EliteMobEntity eliteMobEntity) {
-        eliteMobs.remove(eliteMobEntity);
-        naturalEntities.remove(eliteMobEntity.getLivingEntity());
-        cullablePluginEntities.remove(eliteMobEntity.getLivingEntity());
-    }
-
-    /*
-    Used in this class to do mass wipes of data
-     */
-    private static void unregisterEliteMob(Entity entity) {
-        if (!isEliteMob(entity)) return;
-        EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
-        if (eliteMobEntity == null) return;
-        eliteMobEntity.getLivingEntity().remove();
-        eliteMobs.remove(eliteMobEntity);
-        eliteMobsLivingEntities.remove(eliteMobEntity.getLivingEntity());
-    }
-
-    public static void unregisterArmorStand(Entity armorStand) {
-        if (!armorStand.getType().equals(EntityType.ARMOR_STAND)) return;
-        armorStand.remove();
-        armorStands.remove(armorStand);
-    }
-
-    public static HashSet<EliteMobEntity> getEliteMobs() {
-        return eliteMobs;
-    }
-
-    public static boolean getIsArmorStand(Entity entity) {
-        if (!entity.getType().equals(EntityType.ARMOR_STAND)) return false;
-        return (armorStands.contains(entity));
-    }
-
-    public static void unregisterSuperMob(Entity entity) {
-        if (!SuperMobProperties.isValidSuperMobType(entity)) return;
-        superMobs.remove(entity);
-    }
-
-    public static void unregisterNaturalEntity(Entity entity) {
-        if (EliteMobProperties.isValidEliteMobType(entity)) return;
-        naturalEntities.remove(entity);
-    }
-
-    /*
-    Custom spawn reasons can be considered as natural spawns under specific config options
-     */
-    @EventHandler(priority = EventPriority.LOW)
-    public void registerNaturalEntity(CreatureSpawnEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
-                event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) &&
-                        !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES))
-            registerNaturalEntity(event.getEntity());
-    }
-
-    /*
-    Natural entities get unregistered from being natural when exploit abuse is detected from the players
-     */
-    public static void unregisterNaturalEntity(LivingEntity livingEntity) {
-        naturalEntities.remove(livingEntity);
-    }
-
-    public static void shutdownPurger() {
-
-        for (Entity entity : cullablePluginEntities)
-            entity.remove();
-
-        eliteMobs.clear();
-        eliteMobsLivingEntities.clear();
-        superMobs.clear();
-        itemVisualEffects.clear();
-        armorStands.clear();
-        naturalEntities.clear();
-        cullablePluginEntities.clear();
-
-    }
-
-    /*
-    This is run in async for performance reasons
-     */
-    public static void wipeEntity(Entity entity) {
-        unregisterEliteMob(entity);
-        unregisterCullableEntity(entity);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (isSuperMob(entity))
-                    unregisterSuperMob(entity);
-                if (isNaturalEntity(entity))
-                    unregisterNaturalEntity(entity);
-                if (getIsArmorStand(entity))
-                    unregisterArmorStand(entity);
-                if (isItemVisualEffect(entity))
-                    unregisterItemEntity(entity);
-            }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
-    }
-
-    public static void chunkWiper(ChunkUnloadEvent event) {
-        for (Entity entity : event.getChunk().getEntities())
-            wipeEntity(entity);
-    }
-
-    public static void deathWipe(EntityDeathEvent event) {
-        wipeEntity(event.getEntity());
-    }
+    */
 
 }

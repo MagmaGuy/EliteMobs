@@ -13,7 +13,7 @@ public class VisualItemRemover {
                 if (!(multiDimensionalTrailTracker[i][j] instanceof Item)) continue;
                 Item item = (Item) multiDimensionalTrailTracker[i][j];
                 item.remove();
-                EntityTracker.unregisterItemEntity(item);
+                EntityTracker.unregisterItemVisualEffects(item);
 
             }
 
