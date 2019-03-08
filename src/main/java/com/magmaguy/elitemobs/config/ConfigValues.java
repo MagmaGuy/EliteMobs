@@ -28,7 +28,7 @@ public class ConfigValues {
             itemsProceduralSettingsConfig, economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig,
             validMobsConfig, validWorldsConfig, itemsUniqueConfig, mobCombatSettingsConfig, itemsDropSettingsConfig,
             playerMoneyData, playerRankData, playerMaxRankData, combatTagConfig, adventurersGuildConfig,
-            customEnchantmentsConfig;
+            customEnchantmentsConfig, npcConfig;
 
     public static void initializeCachedConfigurations() {
 
@@ -93,6 +93,9 @@ public class ConfigValues {
         customConfigLoader = new CustomConfigLoader();
         customEnchantmentsConfig = customConfigLoader.getCustomConfig(CustomEnchantmentsConfig.CONFIG_NAME);
 
+        customConfigLoader = new CustomConfigLoader();
+        npcConfig = customConfigLoader.getCustomConfig(NPCConfig.CONFIG_NAME);
+
     }
 
     public static void intializeConfigurations() {
@@ -156,6 +159,9 @@ public class ConfigValues {
 
         CustomEnchantmentsConfig customEnchantmentsConfig = new CustomEnchantmentsConfig();
         customEnchantmentsConfig.initializeConfig();
+
+        NPCConfig npcConfig = new NPCConfig();
+        npcConfig.initializeConfig();
 
     }
 
