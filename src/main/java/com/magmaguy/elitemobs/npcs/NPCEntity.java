@@ -1,12 +1,17 @@
 package com.magmaguy.elitemobs.npcs;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.NPCConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -24,6 +29,7 @@ public class NPCEntity {
     private boolean canTalk;
     private double activationRadius;
     private boolean disappearsAtNight;
+    private NPCInteractions.NPCInteractionType npcInteractionType;
 
     /**
      * Spawns NPC based off of the values in the NPCConfig config file. Runs at startup and on reload.
@@ -32,11 +38,18 @@ public class NPCEntity {
      */
     public NPCEntity(String key) {
 
+        Bukkit.getLogger().warning(key);
+
+        key += ".";
+
         Configuration configuration = ConfigValues.npcConfig;
 
-        setName(configuration.getString(key + NPCConfig.NAME));
-        setCareer(configuration.getString(key + NPCConfig.TYPE));
         setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION));
+
+        this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+
+        setName(configuration.getString(key + NPCConfig.NAME));
+//        setCareer(configuration.getString(key + NPCConfig.TYPE));
         setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
         setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
         setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
@@ -44,32 +57,50 @@ public class NPCEntity {
         setCanTalk(configuration.getBoolean(key + NPCConfig.CAN_TALK));
         setActivationRadius(configuration.getDouble(key + NPCConfig.ACTIVATION_RADIUS));
         setDisappearsAtNight(configuration.getBoolean(key + NPCConfig.DISAPPEARS_AT_NIGHT));
+        setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
+
+        EntityTracker.registerNPCEntity(this);
+
+        Bukkit.getLogger().warning("Spawned at " + villager.getLocation().toString());
 
     }
 
-    private String getName() {
+    public void respawnNPC() {
+        this.villager.remove();
+
+        this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+        villager.setCustomName(this.name);
+        villager.setCustomNameVisible(true);
+        villager.setCareer(this.career);
+        villager.setAI(!this.canMove);
+
+    }
+
+    public Villager getVillager() {
+        return this.villager;
+    }
+
+    public String getName() {
         return this.name;
     }
 
-    private void setName(String name) {
+    public void setName(String name) {
+        name = ChatColorConverter.convert(name);
         this.name = name;
         this.villager.setCustomName(name);
         this.villager.setCustomNameVisible(true);
     }
 
-    private Villager.Career getCareer() {
-        return this.career;
+    public void setCareer(String career) {
+        this.career = Villager.Career.valueOf(career);
+        this.villager.setCareer(this.career);
     }
 
-    private void setCareer(String career) {
-        this.villager.setCareer(Villager.Career.valueOf(career));
-    }
-
-    private Location getSpawnLocation() {
+    public Location getSpawnLocation() {
         return this.spawnLocation;
     }
 
-    private void setSpawnLocation(String spawnLocation) {
+    public void setSpawnLocation(String spawnLocation) {
         int counter = 0;
         World world = null;
         double x = 0;
@@ -119,60 +150,72 @@ public class NPCEntity {
         this.spawnLocation = new Location(world, x, y, z, yaw, pitch);
     }
 
-    private List<String> getGreetings() {
+    public List<String> getGreetings() {
         return this.greetings;
     }
 
-    private void setGreetings(List<String> greetings) {
+    public void setGreetings(List<String> greetings) {
         this.greetings = greetings;
     }
 
-    private List<String> getDialog() {
+    public List<String> getDialog() {
         return this.dialog;
     }
 
-    private void setDialog(List<String> dialog) {
+    public void setDialog(List<String> dialog) {
         this.dialog = dialog;
     }
 
-    private List getFarewell(List<String> farewell) {
+    public List getFarewell(List<String> farewell) {
         return this.farewell;
     }
 
-    private void setFarewell(List<String> farewell) {
+    public void setFarewell(List<String> farewell) {
         this.farewell = farewell;
     }
 
-    private boolean getCanMove() {
+    public boolean getCanMove() {
         return this.canMove;
     }
 
-    private void setCanMove(boolean canMove) {
+    public void setCanMove(boolean canMove) {
         this.canMove = canMove;
+        this.villager.setAI(canMove);
+        Bukkit.getLogger().warning("AI: " + canMove);
+        if (!canMove)
+            villager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
     }
 
-    private boolean getCanTalk() {
+    public boolean getCanTalk() {
         return this.canTalk;
     }
 
-    private void setCanTalk(boolean canTalk) {
+    public void setCanTalk(boolean canTalk) {
         this.canTalk = canTalk;
     }
 
-    private double getActivationRadius() {
+    public double getActivationRadius() {
         return this.activationRadius;
     }
 
-    private void setActivationRadius(double activationRadius) {
+    public void setActivationRadius(double activationRadius) {
         this.activationRadius = activationRadius;
     }
 
-    private boolean getDisappearsAtNight() {
+    public boolean getDisappearsAtNight() {
         return this.disappearsAtNight;
     }
 
-    private void setDisappearsAtNight(boolean disappearsAtNight) {
+    public void setDisappearsAtNight(boolean disappearsAtNight) {
         this.disappearsAtNight = disappearsAtNight;
+    }
+
+    public NPCInteractions.NPCInteractionType getInteractionType() {
+        return this.npcInteractionType;
+    }
+
+    public void setNpcInteractionType(String npcInteractionType) {
+        this.npcInteractionType = NPCInteractions.NPCInteractionType.valueOf(npcInteractionType);
     }
 
 }
