@@ -33,5 +33,4 @@ public class EntityDeathDataFlusher implements Listener {
 
     }
 
-
 }

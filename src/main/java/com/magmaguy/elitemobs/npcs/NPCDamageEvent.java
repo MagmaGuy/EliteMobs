@@ -1,0 +1,30 @@
+package com.magmaguy.elitemobs.npcs;
+
+import com.magmaguy.elitemobs.EntityTracker;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+
+public class NPCDamageEvent implements Listener {
+
+    @EventHandler
+    public void onNPCDamage(EntityDamageEvent event) {
+
+        if (!EntityTracker.isNPCEntity(event.getEntity())) return;
+
+        event.setCancelled(true);
+
+    }
+
+    @EventHandler
+    public void onOPNPCDamage(EntityDamageByEntityEvent event) {
+
+        if (!event.getDamager().isOp()) return;
+        if (!EntityTracker.isNPCEntity(event.getEntity())) return;
+
+        event.getEntity().remove();
+
+    }
+
+}

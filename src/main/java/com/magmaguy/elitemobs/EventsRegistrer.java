@@ -36,6 +36,9 @@ import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalEliteMobSpawnEventHandler;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
+import com.magmaguy.elitemobs.npcs.NPCChunkLoad;
+import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -210,6 +213,12 @@ public class EventsRegistrer {
         //Player effect when a rare item is on the ground
         if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_RARE_DROP_EFFECT))
             pluginManager.registerEvents(new RareDropEffect(), plugin);
+
+        //NPCs
+        pluginManager.registerEvents(new NPCChunkLoad(), plugin);
+        pluginManager.registerEvents(new NPCDamageEvent(), plugin);
+        pluginManager.registerEvents(new NPCInteractions(), plugin);
+
 
     }
 
