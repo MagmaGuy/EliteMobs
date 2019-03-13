@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobPropert
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -14,12 +15,17 @@ public class FindSuperMobs implements Listener {
     @EventHandler
     public void findSuperMob(ChunkLoadEvent event) {
 
-        for (Entity entity : event.getChunk().getEntities())
+        for (Entity entity : event.getChunk().getEntities()) {
             if (SuperMobProperties.isValidSuperMobType(entity))
                 if (((LivingEntity) entity).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() ==
                         SuperMobProperties.getDataInstance(entity).getSuperMobMaxHealth())
                     if (!EntityTracker.isSuperMob(entity))
                         EntityTracker.registerSuperMob((LivingEntity) entity);
+                    else if (entity instanceof Villager) {
+
+                    }
+        }
+
 
     }
 

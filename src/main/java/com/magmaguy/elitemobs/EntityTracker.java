@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
+import com.magmaguy.elitemobs.npcs.NPCEntity;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,7 +17,6 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
-import java.util.Iterator;
 
 public class EntityTracker implements Listener {
 
@@ -26,7 +26,7 @@ public class EntityTracker implements Listener {
     private static HashSet<LivingEntity> superMobs = new HashSet<>();
     private static HashSet<EliteMobEntity> eliteMobs = new HashSet<>();
     private static HashSet<LivingEntity> eliteMobsLivingEntities = new HashSet<>();
-    private static HashSet<LivingEntity> npcEntities = new HashSet<>();
+    private static HashSet<NPCEntity> npcEntities = new HashSet<>();
 
     private static HashSet<LivingEntity> naturalEntities = new HashSet<>();
     private static HashSet<ArmorStand> armorStands = new HashSet<>();
@@ -48,7 +48,7 @@ public class EntityTracker implements Listener {
     }
 
     /**
-     * Registers an entity as an elite mob
+     * Registers an Entity as an elite mob
      *
      * @param eliteMobEntity registers entity as elite mob
      */
@@ -59,7 +59,7 @@ public class EntityTracker implements Listener {
     }
 
     /**
-     * Fully unregisters an elite mob
+     * Fully unregisters an elite mob. Should only run after the Entity has been removed.
      *
      * @param eliteMobEntity unregisters this entity from the plugin
      */
@@ -96,9 +96,9 @@ public class EntityTracker implements Listener {
     }
 
     /**
-     * Fully unregisters an elite mob from an entity
+     * Fully unregisters an elite mob from an entity. Should only be unregistered after being removed.
      *
-     * @param entity
+     * @param entity Entity to be unregistered
      */
     private static void unregisterEliteMob(Entity entity) {
         if (!isEliteMob(entity)) return;
@@ -129,7 +129,7 @@ public class EntityTracker implements Listener {
     }
 
     /**
-     * Unregisters an entity as a super mob
+     * Unregisters an Entity from the super mob list
      *
      * @param entity entity to be unregistered
      */
@@ -147,6 +147,15 @@ public class EntityTracker implements Listener {
     public static boolean isSuperMob(Entity entity) {
         if (!SuperMobProperties.isValidSuperMobType(entity)) return false;
         return superMobs.contains(entity);
+    }
+
+    /**
+     * Gets all living natural entities
+     *
+     * @return full list of natural entities
+     */
+    public static HashSet<LivingEntity> getNaturalEntities() {
+        return naturalEntities;
     }
 
     /**
@@ -211,7 +220,7 @@ public class EntityTracker implements Listener {
     }
 
     /**
-     * Checks if an entity is a registered Armorstand
+     * Checks if an entity is a registered Armorstand. These are used for hologram displays.
      *
      * @param entity Entity to be checked
      * @return whether the Entity is a registered Armorstand
@@ -219,6 +228,15 @@ public class EntityTracker implements Listener {
     public static boolean isArmorStand(Entity entity) {
         if (!entity.getType().equals(EntityType.ARMOR_STAND)) return false;
         return (armorStands.contains(entity));
+    }
+
+    /**
+     * Gets all items currently acting as visual effects
+     *
+     * @return List of all items acting as visual effects
+     */
+    public static HashSet<Item> getItemVisualEffects() {
+        return itemVisualEffects;
     }
 
     /**
@@ -273,6 +291,79 @@ public class EntityTracker implements Listener {
         entity.remove();
     }
 
+    /**
+     * Gets all NPCs currently alive
+     *
+     * @return HashSet of all living NPC entities
+     */
+    public static HashSet<NPCEntity> getNPCEntities() {
+        return npcEntities;
+    }
+
+    /**
+     * Sets a NPC as a being a registered NPC
+     *
+     * @param npc NPC to be registered
+     */
+    public static void registerNPCEntity(NPCEntity npc) {
+        npcEntities.add(npc);
+        registerCullableEntity(npc.getVillager());
+    }
+
+    public static void unregisterNPCEntity(Entity entity) {
+        if (!entity.getType().equals(EntityType.VILLAGER)) return;
+        for (NPCEntity npcEntity : npcEntities)
+            if (npcEntity.getVillager().equals(entity))
+                entity.remove();
+    }
+
+    /**
+     * Checks whether or not an entity is a registered NPC
+     *
+     * @param entity Entity to be checked
+     * @return Whether the Entity is a registered NPC
+     */
+    public static boolean isNPCEntity(Entity entity) {
+        if (!entity.getType().equals(EntityType.VILLAGER)) return false;
+        for (NPCEntity npcEntity : npcEntities)
+            if (npcEntity.getVillager().equals(entity))
+                return true;
+        return false;
+    }
+
+    public static NPCEntity getNPCEntity(Entity entity) {
+        if (!entity.getType().equals(EntityType.VILLAGER)) return null;
+        for (NPCEntity npcEntity : npcEntities)
+            if (npcEntity.getVillager().equals(entity))
+                return npcEntity;
+        return null;
+    }
+
+    /**
+     * Returns if the Entity has a certain mob power
+     *
+     * @param mobPower mob power to look up
+     * @param entity   entity to check for powers
+     * @return Whether the entity has that power
+     */
+    public static boolean hasPower(ElitePower mobPower, Entity entity) {
+        EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
+        if (eliteMobEntity == null) return false;
+        return eliteMobEntity.hasPower(mobPower);
+    }
+
+    /**
+     * Returns if the EliteMobEntity has a certain mob power
+     *
+     * @param mobPower       mob power to look up
+     * @param eliteMobEntity entity to check for powers
+     * @return Whether the entity has that power
+     */
+    public static boolean hasPower(ElitePower mobPower, EliteMobEntity eliteMobEntity) {
+        if (eliteMobEntity == null) return false;
+        return eliteMobEntity.hasPower(mobPower);
+    }
+
     /*
     Custom spawn reasons can be considered as natural spawns under specific config options
      */
@@ -284,10 +375,6 @@ public class EntityTracker implements Listener {
                         !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES))
             registerNaturalEntity(event.getEntity());
     }
-
-    /*
-    Natural entities get unregistered from being natural when exploit abuse is detected from the players
-     */
 
 
     public static void shutdownPurger() {
@@ -302,6 +389,7 @@ public class EntityTracker implements Listener {
         armorStands.clear();
         naturalEntities.clear();
         cullablePluginEntities.clear();
+        npcEntities.clear();
 
     }
 
@@ -322,6 +410,8 @@ public class EntityTracker implements Listener {
                     unregisterArmorStand(entity);
                 if (isItemVisualEffect(entity))
                     unregisterItemVisualEffects(entity);
+                if (isNPCEntity(entity))
+                    unregisterNPCEntity(entity);
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
@@ -345,89 +435,79 @@ public class EntityTracker implements Listener {
         wipeEntity(event.getEntity());
     }
 
-    /*
-    public static void checkEntityState() {
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                updateSuperMobs();
-                updateEliteMobEntities();
-                updateLivingEntities();
-                updateCullables();
-                updateAmorStands();
-                updateItems();
-            }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
+//    public static void checkEntityState() {
+//
+//        new BukkitRunnable() {
+//            @Override
+//            public void run() {
+//                updateSuperMobs();
+//                updateEliteMobEntities();
+//                updateLivingEntities();
+//                updateCullables();
+//                updateAmorStands();
+//                updateItems();
+//            }
+//        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
+//
+//    }
+//
+//    private static void updateSuperMobs() {
+//        Iterator iterator = superMobs.iterator();
+//        while (iterator.hasNext()) {
+//            Entity entity = (Entity) iterator.next();
+//            if (!entity.isValid())
+//                iterator.remove();
+//        }
+//    }
+//
+//    private static void updateLivingEntities() {
+//        Iterator iterator = naturalEntities.iterator();
+//        while (iterator.hasNext()) {
+//            Entity entity = (Entity) iterator.next();
+//            if (!entity.isValid())
+//                iterator.remove();
+//        }
+//    }
+//
+//    private static void updateEliteMobEntities() {
+//        Iterator iterator = eliteMobs.iterator();
+//        while (iterator.hasNext()) {
+//            Entity entity = ((EliteMobEntity) iterator.next()).getLivingEntity();
+//            if (entity.isDead() ||
+//                    !entity.isValid() && ((LivingEntity) entity).getRemoveWhenFarAway())
+//                iterator.remove();
+//        }
+//    }
+//
+//    private static void updateAmorStands() {
+//        Iterator iterator = armorStands.iterator();
+//        while (iterator.hasNext()) {
+//            Entity entity = (Entity) iterator.next();
+//            if (!entity.isValid())
+//                iterator.remove();
+//        }
+//    }
+//
+//    private static void updateCullables() {
+//        Iterator iterator = cullablePluginEntities.iterator();
+//        while (iterator.hasNext()) {
+//            Entity entity = (Entity) iterator.next();
+//            if (!entity.isValid())
+//                iterator.remove();
+//        }
+//    }
+//
+//    private static void updateItems() {
+//        Iterator iterator = itemVisualEffects.iterator();
+//        while (iterator.hasNext()) {
+//            Entity entity = (Entity) iterator.next();
+//            if (!entity.isValid())
+//                iterator.remove();
+//        }
+//    }
+//
+//
 
-    }
-
-    private static void updateSuperMobs() {
-        Iterator iterator = superMobs.iterator();
-        while (iterator.hasNext()) {
-            Entity entity = (Entity) iterator.next();
-            if (!entity.isValid())
-                iterator.remove();
-        }
-    }
-
-    private static void updateLivingEntities() {
-        Iterator iterator = naturalEntities.iterator();
-        while (iterator.hasNext()) {
-            Entity entity = (Entity) iterator.next();
-            if (!entity.isValid())
-                iterator.remove();
-        }
-    }
-
-    private static void updateEliteMobEntities() {
-        Iterator iterator = eliteMobs.iterator();
-        while (iterator.hasNext()) {
-            Entity entity = ((EliteMobEntity) iterator.next()).getLivingEntity();
-            if (entity.isDead() ||
-                    !entity.isValid() && ((LivingEntity) entity).getRemoveWhenFarAway())
-                iterator.remove();
-        }
-    }
-
-    private static void updateAmorStands() {
-        Iterator iterator = armorStands.iterator();
-        while (iterator.hasNext()) {
-            Entity entity = (Entity) iterator.next();
-            if (!entity.isValid())
-                iterator.remove();
-        }
-    }
-
-    private static void updateCullables() {
-        Iterator iterator = cullablePluginEntities.iterator();
-        while (iterator.hasNext()) {
-            Entity entity = (Entity) iterator.next();
-            if (!entity.isValid())
-                iterator.remove();
-        }
-    }
-
-    private static void updateItems() {
-        Iterator iterator = itemVisualEffects.iterator();
-        while (iterator.hasNext()) {
-            Entity entity = (Entity) iterator.next();
-            if (!entity.isValid())
-                iterator.remove();
-        }
-    }
-
-
-    public static boolean hasPower(ElitePower mobPower, Entity entity) {
-        EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
-        if (eliteMobEntity == null) return false;
-        return eliteMobEntity.hasPower(mobPower);
-    }
-
-    public static boolean hasPower(ElitePower mobPower, EliteMobEntity eliteMobEntity) {
-        if (eliteMobEntity == null) return false;
-        return eliteMobEntity.hasPower(mobPower);
-    }
-    */
 
 }

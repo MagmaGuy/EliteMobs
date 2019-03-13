@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class NPCConfig {
 
-    public static final String CONFIG_NAME = "NPCConfig.yml";
+    public static final String CONFIG_NAME = "NPCs.yml";
 
     public static final String NAME = "Name";
     public static final String TYPE = "Type";
@@ -62,7 +62,7 @@ public class NPCConfig {
         configuration.addDefault(GUILD_GREETER_CAN_TALK, true);
         configuration.addDefault(GUILD_GREETER_ACTIVATION_RADIUS, 3);
         configuration.addDefault(GUILD_GREETER_DISAPPEARS_AT_NIGHT, false);
-        configuration.addDefault(GUILD_GREETER_INTERACTION_MENU, "");
+        configuration.addDefault(GUILD_GREETER_INTERACTION_MENU, "GUILD_GREETER");
 
         customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);
