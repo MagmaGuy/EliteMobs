@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
 import com.magmaguy.elitemobs.adventurersguild.MaxHealthBoost;
+import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combattag.CombatTag;
 import com.magmaguy.elitemobs.commands.LootGUI;
@@ -39,6 +40,7 @@ import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCChunkLoad;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -199,6 +201,7 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new AdventurersGuildGUI(), plugin);
         if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
             pluginManager.registerEvents(new MaxHealthBoost(), plugin);
+        pluginManager.registerEvents(new SpawnControl(), plugin);
 
         //Combat tag
         if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
@@ -218,7 +221,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new NPCChunkLoad(), plugin);
         pluginManager.registerEvents(new NPCDamageEvent(), plugin);
         pluginManager.registerEvents(new NPCInteractions(), plugin);
-
+        pluginManager.registerEvents(new NPCProximitySensor(), plugin);
 
     }
 
