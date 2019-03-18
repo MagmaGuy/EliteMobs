@@ -41,7 +41,10 @@ public class CustomShopHandler implements Listener {
 
     public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.CUSTOM_SHOP_NAME);
 
-    public void initializeShop(Player player) {
+    public CustomShopHandler() {
+    }
+
+    public static void CustomShopHandler(Player player) {
 
         Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
 
@@ -51,7 +54,7 @@ public class CustomShopHandler implements Listener {
 
     }
 
-    private void populateShop(Inventory shopInventory) {
+    public static void populateShop(Inventory shopInventory) {
 
         SharedShopElements.shopHeader(shopInventory);
         shopContents(shopInventory);
@@ -60,7 +63,7 @@ public class CustomShopHandler implements Listener {
 
     private static List<Integer> validSlots = (List<Integer>) ConfigValues.economyConfig.getList(EconomySettingsConfig.CUSTOM_SHOP_VALID_SLOTS);
 
-    private void shopContents(Inventory shopInventory) {
+    public static void shopContents(Inventory shopInventory) {
 
         //Anything after 8 is populated
         Random random = new Random();
@@ -83,7 +86,6 @@ public class CustomShopHandler implements Listener {
             return;
 
         }
-
         if (!event.getInventory().getName().equals(SHOP_NAME)) return;
 
         //reroll loot button

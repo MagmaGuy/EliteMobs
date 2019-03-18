@@ -4,22 +4,29 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.NPCConfig;
+import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity {
 
     private Villager villager;
 
     private String name;
+    private String role;
+    private ArmorStand roleDisplay;
     private Villager.Career career;
     private Location spawnLocation;
     private List<String> greetings;
@@ -44,11 +51,12 @@ public class NPCEntity {
 
         Configuration configuration = ConfigValues.npcConfig;
 
-        setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION));
+        if (!setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION))) return;
 
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
         setName(configuration.getString(key + NPCConfig.NAME));
+        setRole(configuration.getString(key + NPCConfig.ROLE));
 //        setCareer(configuration.getString(key + NPCConfig.TYPE));
         setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
         setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
@@ -60,8 +68,6 @@ public class NPCEntity {
         setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
 
         EntityTracker.registerNPCEntity(this);
-
-        Bukkit.getLogger().warning("Spawned at " + villager.getLocation().toString());
 
     }
 
@@ -91,6 +97,21 @@ public class NPCEntity {
         this.villager.setCustomNameVisible(true);
     }
 
+    public String getRole() {
+        return this.role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+        this.roleDisplay = (ArmorStand) this.villager.getWorld().spawnEntity(villager.getLocation().add(new Vector(0, 1.72, 0)), EntityType.ARMOR_STAND);
+        EntityTracker.registerArmorStands(this.roleDisplay);
+        this.roleDisplay.setCustomName(role);
+        this.roleDisplay.setCustomNameVisible(true);
+        this.roleDisplay.setMarker(true);
+        this.roleDisplay.setVisible(false);
+        this.roleDisplay.setGravity(false);
+    }
+
     public void setCareer(String career) {
         this.career = Villager.Career.valueOf(career);
         this.villager.setCareer(this.career);
@@ -100,7 +121,7 @@ public class NPCEntity {
         return this.spawnLocation;
     }
 
-    public void setSpawnLocation(String spawnLocation) {
+    public boolean setSpawnLocation(String spawnLocation) {
         int counter = 0;
         World world = null;
         double x = 0;
@@ -145,9 +166,11 @@ public class NPCEntity {
             counter++;
         }
 
-        if (world == null) return;
+        if (world == null) return false;
 
         this.spawnLocation = new Location(world, x, y, z, yaw, pitch);
+
+        return true;
     }
 
     public List<String> getGreetings() {
@@ -216,6 +239,30 @@ public class NPCEntity {
 
     public void setNpcInteractionType(String npcInteractionType) {
         this.npcInteractionType = NPCInteractions.NPCInteractionType.valueOf(npcInteractionType);
+    }
+
+    public void say(List<String> messages, Player player) {
+        new NPCChatBubble(selectString(messages), this.villager, player);
+    }
+
+    public void say(String message, Player player) {
+        new NPCChatBubble(message, this.villager, player);
+    }
+
+    public void sayGreeting(Player player) {
+        new NPCChatBubble(selectString(this.greetings), this.villager, player);
+    }
+
+    public void sayDialog(Player player) {
+        new NPCChatBubble(selectString(this.dialog), this.villager, player);
+    }
+
+    public void sayFarewell(Player player) {
+        new NPCChatBubble(selectString(this.farewell), this.villager, player);
+    }
+
+    private String selectString(List<String> strings) {
+        return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
     }
 
 }
