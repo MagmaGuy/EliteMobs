@@ -41,7 +41,10 @@ public class ShopHandler implements Listener {
 
     public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.SHOP_NAME);
 
-    public void initializeShop(Player player) {
+    public ShopHandler() {
+    }
+
+    public ShopHandler(Player player) {
 
         Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
 

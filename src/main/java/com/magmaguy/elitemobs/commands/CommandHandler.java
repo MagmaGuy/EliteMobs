@@ -16,10 +16,8 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
@@ -71,8 +69,8 @@ public class CommandHandler implements CommandExecutor {
             case "ag":
             case "adventurersguild":
             case "adventurerguild":
-                if (userPermCheck(ADVENTURERS_GUILD, commandSender) && ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ENABLE_ADVENTURERS_GUILD))
-                    AdventurersGuildGUI.mainMenu((Player) commandSender);
+                if (userPermCheck(ADVENTURERS_GUILD, commandSender))
+                    new AdventurersGuildCommand((Player) commandSender);
                 return true;
         }
 
@@ -93,7 +91,7 @@ public class CommandHandler implements CommandExecutor {
             case "adventurersguild":
             case "adventurerguild":
                 if (userPermCheck(ADVENTURERS_GUILD, commandSender))
-                    AdventurersGuildGUI.mainMenu((Player) commandSender);
+                    new AdventurersGuildCommand((Player) commandSender);
                 return true;
             case "stats":
                 if (permCheck(STATS, commandSender))
@@ -114,8 +112,7 @@ public class CommandHandler implements CommandExecutor {
             case "shop":
             case "store":
                 if (userPermCheck(SHOP, commandSender)) {
-                    ShopHandler shopHandler = new ShopHandler();
-                    shopHandler.initializeShop((Player) commandSender);
+                    new ShopHandler((Player) commandSender);
                 }
                 return true;
             case "customshop":
@@ -123,8 +120,7 @@ public class CommandHandler implements CommandExecutor {
             case "customstore":
             case "cstore":
                 if (userPermCheck(CUSTOMSHOP, commandSender)) {
-                    CustomShopHandler customShopHandler = new CustomShopHandler();
-                    customShopHandler.initializeShop((Player) commandSender);
+                    CustomShopHandler.CustomShopHandler((Player) commandSender);
                 }
                 return true;
             case "wallet":

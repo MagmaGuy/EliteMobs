@@ -188,6 +188,7 @@ public class ItemTierFinder {
             case CHAINMAIL_LEGGINGS:
                 return STONE_CHAIN_TIER + mainEnchantment2;
             case STONE_SWORD:
+            case STONE_AXE:
                 return STONE_CHAIN_TIER + mainEnchantment;
             case GOLD_BOOTS:
             case GOLD_CHESTPLATE:
