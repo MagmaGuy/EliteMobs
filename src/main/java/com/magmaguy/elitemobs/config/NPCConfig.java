@@ -84,7 +84,8 @@ public class NPCConfig {
                 "You can sell items to the\\nblacksmith for coins!",
                 "You can talk to the arena\\nmaster to take the arena on!",
                 "You can buy equipment from\\nthe blacksmith!",
-                "You can talk to the combat\\nmaster to check your combat level!"
+                "You can talk to the combat\\nmaster to check your combat level!",
+                "Unlocking new guid tiers\\nincreases your maximum health!"
         ));
         configuration.addDefault(GUILD_GREETER_FAREWELL, Arrays.asList(
                 "See you soon!",

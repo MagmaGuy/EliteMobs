@@ -15,8 +15,10 @@
 
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
@@ -51,21 +53,48 @@ public class CurrencyCommandsHandler {
                 payCommand(args[1], Integer.parseInt(args[2]));
                 subtractCommand(commandSender.getName(), Integer.parseInt(args[2]));
 
-                commandSender.sendMessage("You have paisd " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " to " + args[1]);
-                commandSender.sendMessage("You now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())) + " " + ConfigValues.economyConfig.get("Currency name"));
+                commandSender.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig
+                                        .getString(TranslationConfig.ECONOMY_PAY_MESSAGE)
+                                        .replace("$amount_sent", args[2])
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))
+                                        .replace("$receiver", args[1])));
+                commandSender.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig
+                                        .getString(TranslationConfig.ECONOMY_CURRENCY_LEFT_MESSAGE)
+                                        .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))))
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
 
                 Player recipient = getServer().getPlayer(args[1]);
-                recipient.sendMessage("You have received " + args[2] + " " + ConfigValues.economyConfig.get("Currency name") + " from " + commandSender.getDisplayName());
+                recipient.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig
+                                        .getString(TranslationConfig.ECONOMY_PAYMENT_RECIEVED_MESSAGE)
+                                        .replace("$amount_sent", args[2])
+                                        .replace("$sender", commandSender.getDisplayName())
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
 
             } else if (Double.parseDouble(args[2]) < 0)
-                commandSender.sendMessage("Nice try. This plugin doesn't make the same mistake as some banks have in the past.");
+                commandSender.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig
+                                        .getString(TranslationConfig.ECONOMY_PAYMENT_RECIEVED_MESSAGE)));
             else
-                commandSender.sendMessage("You don't have enough " + ConfigValues.economyConfig.get("Currency name") + " to do that!");
+                commandSender.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig
+                                        .getString(TranslationConfig.ECONOMY_PAYMENT_INSUFICIENT_CURRENCY)
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
 
 
         } catch (Exception e) {
 
-            commandSender.sendMessage("Input not valid. Command format: /em pay [playerName] [amount]");
+            commandSender.sendMessage(
+                    ChatColorConverter.convert(
+                            ConfigValues.translationConfig
+                                    .getString(TranslationConfig.ECONOMY_INVALID_PAY_COMMAND_SYNTAX)));
 
         }
 
@@ -160,11 +189,14 @@ public class CurrencyCommandsHandler {
         return EconomyHandler.checkCurrency(UUIDFilter.guessUUI(playerName));
 
     }
+
     public static void walletCommand(CommandSender commandSender, String[] args) {
 
-        commandSender.sendMessage(ChatColor.GREEN + "You have " +
-                CurrencyCommandsHandler.walletCommand(commandSender.getName()) + " " +
-                ConfigValues.economyConfig.getString("Currency name"));
+        commandSender.sendMessage(
+                ConfigValues.translationConfig
+                        .getString(TranslationConfig.ECONOMY_WALLET_COMMAND)
+                        .replace("$balance", String.valueOf(CurrencyCommandsHandler.walletCommand(commandSender.getName())))
+                        .replace("currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
 
     }
 
