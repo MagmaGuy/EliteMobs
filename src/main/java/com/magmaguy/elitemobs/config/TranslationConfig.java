@@ -61,6 +61,17 @@ public class TranslationConfig {
     public static final String VALID_COMMANDS = "Valid commands message";
     public static final String INVALID_COMMAND = "Invalid command message";
 
+    /*
+    Translation for the economy messages
+     */
+    public static final String ECONOMY_PAY_MESSAGE = "Economy pay message";
+    public static final String ECONOMY_CURRENCY_LEFT_MESSAGE = "Economy currency left message";
+    public static final String ECONOMY_PAYMENT_RECIEVED_MESSAGE = "Economy money from payment message";
+    public static final String ECONOMY_NEGATIVE_VALUE_MESSAGE = "Economy payment for negative value";
+    public static final String ECONOMY_PAYMENT_INSUFICIENT_CURRENCY = "Economy payment insuficient currency";
+    public static final String ECONOMY_INVALID_PAY_COMMAND_SYNTAX = "Economy invalid pay command syntax";
+    public static final String ECONOMY_WALLET_COMMAND = "Wallet command message";
+
     public static final String CONFIG_NAME = "translation.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -531,11 +542,21 @@ public class TranslationConfig {
                 "Did you take out the garbage?"
         ));
 
+        //commands
         configuration.addDefault(MISSING_PERMISSION_TITLE, "I'm afraid I can't let you do that, $username.");
         configuration.addDefault(MISSING_PERMISSION_SUBTITLE, "You need the following permission: $permission");
         configuration.addDefault(MISSING_PERMISSION_MESSAGE, "[EliteMobs] You may not run this command.");
         configuration.addDefault(VALID_COMMANDS, "Valid commands:");
         configuration.addDefault(INVALID_COMMAND, "Command not recognized. Valid commands:");
+
+        //economy commands
+        configuration.addDefault(ECONOMY_PAY_MESSAGE, "You have paid &2$amount_sent $currency_name &fto $receiver");
+        configuration.addDefault(ECONOMY_CURRENCY_LEFT_MESSAGE, "You now have &2$amount_left $currency_name");
+        configuration.addDefault(ECONOMY_PAYMENT_RECIEVED_MESSAGE, "You have received &2$amount_sent $currency_name &ffrom $sender");
+        configuration.addDefault(ECONOMY_NEGATIVE_VALUE_MESSAGE, "&cNice try. This plugin doesn't make the same mistake as some banks have in the past.");
+        configuration.addDefault(ECONOMY_PAYMENT_INSUFICIENT_CURRENCY, "&cYou don't have enough $currency_name to do that!");
+        configuration.addDefault(ECONOMY_INVALID_PAY_COMMAND_SYNTAX, "&cInput not valid. Command format: &e/em pay [playerName] [amount]");
+        configuration.addDefault(ECONOMY_WALLET_COMMAND, "You have &2$balance $currency_name");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);
