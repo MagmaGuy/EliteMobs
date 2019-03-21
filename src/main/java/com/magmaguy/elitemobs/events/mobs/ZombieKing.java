@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
 import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
 import com.magmaguy.elitemobs.events.DeadMoon;
 import com.magmaguy.elitemobs.events.EventMessage;
@@ -508,10 +509,12 @@ public class ZombieKing implements Listener {
 
         Zombie zombieKing = (Zombie) event.getEntity();
 
-        ZombieKingsAxe zombieKingAxe = new ZombieKingsAxe();
-        ItemStack zombieKingAxeItemStack = zombieKingAxe.constructItemStack((int) MobTierFinder.findMobTier(eliteMobEntity.getLevel()));
+        if (ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_ZOMBIE_KING_AXE)) {
+            ZombieKingsAxe zombieKingAxe = new ZombieKingsAxe();
+            ItemStack zombieKingAxeItemStack = zombieKingAxe.constructItemStack((int) MobTierFinder.findMobTier(eliteMobEntity.getLevel()));
 
-        zombieKing.getWorld().dropItem(zombieKing.getLocation(), zombieKingAxeItemStack);
+            zombieKing.getWorld().dropItem(zombieKing.getLocation(), zombieKingAxeItemStack);
+        }
 
         if (event.getEntity().getKiller() != null) {
 
