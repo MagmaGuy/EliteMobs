@@ -55,6 +55,12 @@ public abstract class UniqueItem {
 
     public ItemStack constructItemStack(int itemTier) {
 
+        String name = NameConfigParser.parseName(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        Material type = MaterialConfigParser.parseMaterial(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        List<String> lore = LoreConfigParser.parseLore(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
         HashMap<Enchantment, Integer> enchantments = EnchantmentConfigParser.parseEnchantments(ConfigValues.itemsUniqueConfig,
                 "Items." + definePath());
         HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsUniqueConfig,
@@ -75,6 +81,15 @@ public abstract class UniqueItem {
             return ScalableItemConstructor.constructLimitedItem(itemTier, scalableItemObject);
 
         //used for default purposes, supposedly only triggers for the static tag
+        ItemConstructor.constructItem(name,
+                type,
+                enchantments,
+                customEnchantments,
+                potionEffects,
+                lore,
+                dropType,
+                scalability);
+
         return initializeItemStack();
     }
 

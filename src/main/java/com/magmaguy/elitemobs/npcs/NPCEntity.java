@@ -45,8 +45,6 @@ public class NPCEntity {
      */
     public NPCEntity(String key) {
 
-        Bukkit.getLogger().warning(key);
-
         key += ".";
 
         Configuration configuration = ConfigValues.npcConfig;
@@ -56,7 +54,7 @@ public class NPCEntity {
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
         setName(configuration.getString(key + NPCConfig.NAME));
-        setRole(configuration.getString(key + NPCConfig.ROLE));
+        initializeRole(configuration.getString(key + NPCConfig.ROLE));
 //        setCareer(configuration.getString(key + NPCConfig.TYPE));
         setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
         setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
@@ -71,6 +69,10 @@ public class NPCEntity {
 
     }
 
+    /**
+     * Respawns the villager associated with the NPCEntity. Used for when chunks that contain NPCEntities load back up
+     * as it makes sure the former Villager is slain.
+     */
     public void respawnNPC() {
         this.villager.remove();
 
@@ -82,14 +84,29 @@ public class NPCEntity {
 
     }
 
+    /**
+     * Returns the Villager associated to this NPCEntity
+     *
+     * @return Villager associated to this NPCEntity
+     */
     public Villager getVillager() {
         return this.villager;
     }
 
+    /**
+     * Returns the name of this NCPEntity
+     *
+     * @return Name of this NPCEntity
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Sets the name of the NPCEntity
+     *
+     * @param name Name to be set
+     */
     public void setName(String name) {
         name = ChatColorConverter.convert(name);
         this.name = name;
@@ -97,11 +114,17 @@ public class NPCEntity {
         this.villager.setCustomNameVisible(true);
     }
 
+    /**
+     * Gets the role of the NPCEntity. The role is the text that shows up below the name of the NPCEntity.
+     *
+     * @return Role name
+     */
     public String getRole() {
         return this.role;
     }
 
-    public void setRole(String role) {
+    //Can't be used after the NPCEntity is done initialising
+    private void initializeRole(String role) {
         this.role = role;
         this.roleDisplay = (ArmorStand) this.villager.getWorld().spawnEntity(villager.getLocation().add(new Vector(0, 1.72, 0)), EntityType.ARMOR_STAND);
         EntityTracker.registerArmorStands(this.roleDisplay);
@@ -112,16 +135,38 @@ public class NPCEntity {
         this.roleDisplay.setGravity(false);
     }
 
+    /**
+     * Sets the role of the NPCEntity. The role is the text that shows up below the name of the NPCEntity.
+     *
+     * @param role Role to be set
+     */
+    public void setRole(String role) {
+        this.role = role;
+        this.roleDisplay.setCustomName(role);
+    }
+
+    //TODO: Figure out why changing careers errors
+
+    /**
+     * Sets the career of the NPC, changing the skin the villager uses.
+     *
+     * @param career Career to be set
+     */
     public void setCareer(String career) {
         this.career = Villager.Career.valueOf(career);
         this.villager.setCareer(this.career);
     }
 
+    /**
+     * Gets the spawn location of the NPCEntity
+     *
+     * @return Entity's spawn location
+     */
     public Location getSpawnLocation() {
         return this.spawnLocation;
     }
 
-    public boolean setSpawnLocation(String spawnLocation) {
+    private boolean setSpawnLocation(String spawnLocation) {
         int counter = 0;
         World world = null;
         double x = 0;
@@ -173,46 +218,97 @@ public class NPCEntity {
         return true;
     }
 
+    /**
+     * Returns the list of greetings that this NPCEntity uses
+     *
+     * @return List of greetings used by this NPCEntity
+     */
     public List<String> getGreetings() {
         return this.greetings;
     }
 
+    /**
+     * Sets the list of greetings to be used by the NPCEntity
+     *
+     * @param greetings List of greetings to be set
+     */
     public void setGreetings(List<String> greetings) {
         this.greetings = greetings;
     }
 
+    /**
+     * Returns the list of dialogs that this NPCEntity uses. Dialog is triggered if the player remains near the NPCEntity
+     * after being greeted by it.
+     *
+     * @return List of dialog used by this NPCEntity
+     */
     public List<String> getDialog() {
         return this.dialog;
     }
 
+    /**
+     * Sets the list of dialogs to be used by this NPCEntity. Dialog is triggered if the player remains near the NPCEntity
+     * after being greeted by it.
+     *
+     * @param dialog List of dialogs to be set
+     */
     public void setDialog(List<String> dialog) {
         this.dialog = dialog;
     }
 
-    public List getFarewell(List<String> farewell) {
+    /**
+     * Returns the list of farewells that this NPCEntity uses. Farewells are triggered when a player exits an NPC's
+     * GUI.
+     *
+     * @return List of farewells used by this NPCEntity
+     */
+    public List getFarewell() {
         return this.farewell;
     }
 
+    /**
+     * Sets the list of farewells to be used by this NPCEntity. Farewells are triggered when a player exits an NPC's
+     * GUI.
+     *
+     * @param farewell List of farewells to be set
+     */
     public void setFarewell(List<String> farewell) {
         this.farewell = farewell;
     }
 
+    /**
+     * Returns whether or not the NPCEntity can move.
+     *
+     * @return whether the NPCEntity can move
+     */
     public boolean getCanMove() {
         return this.canMove;
     }
 
+    /**
+     * Sets the NPCEntity's ability to move
+     *
+     * @param canMove Sets if the NPCEntity can move
+     */
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
         this.villager.setAI(canMove);
-        Bukkit.getLogger().warning("AI: " + canMove);
         if (!canMove)
             villager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
     }
 
+    /**
+     * Returns whether the NPCEntity can use NPCChatBubble
+     *
+     * @return Whether the NPCEntity can use NPCChatBubble
+     */
     public boolean getCanTalk() {
         return this.canTalk;
     }
 
+    /**
+     * @param canTalk
+     */
     public void setCanTalk(boolean canTalk) {
         this.canTalk = canTalk;
     }
