@@ -74,8 +74,6 @@ public class NPCEntity {
      * as it makes sure the former Villager is slain.
      */
     public void respawnNPC() {
-        this.villager.remove();
-
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         villager.setCustomName(this.name);
         villager.setCustomNameVisible(true);

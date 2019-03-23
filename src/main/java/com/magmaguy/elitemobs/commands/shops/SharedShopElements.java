@@ -42,8 +42,6 @@ public class SharedShopElements {
 
     public static boolean inventoryNullPointerPreventer(InventoryClickEvent event) {
 
-        //Check if economy is enabled
-        if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return false;
         //Check if current item is valid
         if (event.getCurrentItem() == null) return false;
         if (event.getCurrentItem().getType().equals(Material.AIR)) return false;

@@ -377,6 +377,9 @@ public class EntityTracker implements Listener {
     }
 
 
+    /**
+     * Purges all removable entities for a shutdown (or reload)
+     */
     public static void shutdownPurger() {
 
         for (Entity entity : cullablePluginEntities)
@@ -399,6 +402,7 @@ public class EntityTracker implements Listener {
     private static void wipeEntity(Entity entity) {
         unregisterEliteMob(entity);
         unregisterCullableEntity(entity);
+        unregisterNPCEntity(entity);
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -410,8 +414,7 @@ public class EntityTracker implements Listener {
                     unregisterArmorStand(entity);
                 if (isItemVisualEffect(entity))
                     unregisterItemVisualEffects(entity);
-                if (isNPCEntity(entity))
-                    unregisterNPCEntity(entity);
+
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
