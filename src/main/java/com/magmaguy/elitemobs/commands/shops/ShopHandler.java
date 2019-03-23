@@ -46,6 +46,8 @@ public class ShopHandler implements Listener {
 
     public ShopHandler(Player player) {
 
+        if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return;
+
         Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
 
         populateShop(shopInventory);
