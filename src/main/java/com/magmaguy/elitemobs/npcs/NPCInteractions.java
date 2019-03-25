@@ -19,6 +19,7 @@ public class NPCInteractions implements Listener {
         CHAT,
         CUSTOM_SHOP,
         PROCEDURALLY_GENERATED_SHOP,
+        BAR,
         ARENA,
         NONE
     }
@@ -28,6 +29,7 @@ public class NPCInteractions implements Listener {
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
         if (npcEntity == null) return;
+        if (npcEntity.getIsSleeping()) return;
 
         event.setCancelled(true);
 
@@ -40,9 +42,9 @@ public class NPCInteractions implements Listener {
                             AdventurersGuildGUI.mainMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
-
                 break;
             case CHAT:
+                npcEntity.sayDialog(event.getPlayer());
                 break;
             case CUSTOM_SHOP:
                 if (event.getPlayer().hasPermission("elitemobs.customshop"))
@@ -62,6 +64,8 @@ public class NPCInteractions implements Listener {
                             new ShopHandler(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
+            case BAR:
                 break;
             case ARENA:
                 break;

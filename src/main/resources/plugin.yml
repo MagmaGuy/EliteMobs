@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 6.7.1
+version: 6.7.3
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core]
@@ -159,3 +159,12 @@ permissions:
   elitemobs.adventurersguild:
     description: Allows players to use the /ag command to set their difficulty level and get quests
     default: true
+  elitemobs.npc.set:
+    description: Allows players to set the location of a specific NPC
+    default: op
+  elitemobs.npc.remove:
+    description: Allows players to remove a specific NPC
+    default: op
+  elitemobs.npc.add:
+    description: Allows players to add a specifc NPC
+    default: op
