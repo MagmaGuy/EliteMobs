@@ -193,10 +193,11 @@ public class CurrencyCommandsHandler {
     public static void walletCommand(CommandSender commandSender, String[] args) {
 
         commandSender.sendMessage(
-                ConfigValues.translationConfig
-                        .getString(TranslationConfig.ECONOMY_WALLET_COMMAND)
-                        .replace("$balance", String.valueOf(CurrencyCommandsHandler.walletCommand(commandSender.getName())))
-                        .replace("currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
+                ChatColorConverter.convert(
+                        ConfigValues.translationConfig
+                                .getString(TranslationConfig.ECONOMY_WALLET_COMMAND)
+                                .replace("$balance", String.valueOf(CurrencyCommandsHandler.walletCommand(commandSender.getName())))
+                                .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
 
     }
 

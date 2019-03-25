@@ -15,7 +15,7 @@ public class NPCWorkingHours {
         return sleepEnabledNPCs;
     }
 
-    public static void registerSlepEnabledNPC(NPCEntity npcEntity) {
+    public static void registerSleepEnabledNPC(NPCEntity npcEntity) {
         sleepEnabledNPCs.add(npcEntity);
     }
 
@@ -26,8 +26,19 @@ public class NPCWorkingHours {
                 for (NPCEntity npcEntity : sleepEnabledNPCs)
                     if (npcEntity.getVillager().getWorld().getTime() < 24000 &&
                             npcEntity.getVillager().getWorld().getTime() > 12000) {
-                        npcEntity.getVillager().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 21, 1));
-                        npcEntity.setRole("<Sleeping>");
+                        npcEntity.getVillager().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 12000, 1));
+
+                        if (!npcEntity.getIsSleeping()) {
+                            npcEntity.setTempRole("<Sleeping>");
+                            npcEntity.setIsSleeping(true);
+                        }
+
+                    } else {
+                        if (npcEntity.getIsSleeping()) {
+                            npcEntity.setRole(npcEntity.getRole());
+                            npcEntity.setIsSleeping(false);
+                            npcEntity.getVillager().removePotionEffect(PotionEffectType.INVISIBILITY);
+                        }
                     }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);

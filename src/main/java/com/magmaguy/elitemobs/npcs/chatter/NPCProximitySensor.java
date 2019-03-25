@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.NPCConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -35,7 +36,8 @@ public class NPCProximitySensor implements Listener {
                                 npcEntity.getActivationRadius(), npcEntity.getActivationRadius()))
                             if (entity.getType().equals(EntityType.PLAYER)) {
                                 if (nearbyPlayers.contains(entity)) {
-                                    npcEntity.sayDialog((Player) entity);
+                                    if (!npcEntity.getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
+                                        npcEntity.sayDialog((Player) entity);
                                     seenPlayerList.remove(entity);
                                     break;
                                 } else {
