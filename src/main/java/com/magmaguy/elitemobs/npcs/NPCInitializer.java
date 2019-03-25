@@ -12,6 +12,8 @@ public class NPCInitializer {
         for (String npcKey : ConfigValues.npcConfig.getKeys(false))
             new NPCEntity(npcKey);
 
+        new NPCWorkingHours();
+
     }
 
 }

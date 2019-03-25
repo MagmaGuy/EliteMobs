@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.npcs;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.NPCConfig;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
@@ -15,28 +16,56 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity {
 
+    private static HashSet<NPCEntity> npcEntityList = new HashSet<>();
+
     private Villager villager;
 
+    private String key;
     private String name;
     private String role;
     private ArmorStand roleDisplay;
-    private Villager.Career career;
+    private Villager.Profession profession;
     private Location spawnLocation;
     private List<String> greetings;
     private List<String> dialog;
     private List<String> farewell;
     private boolean canMove;
     private boolean canTalk;
+    private boolean isTalking = false;
     private double activationRadius;
     private boolean disappearsAtNight;
+    private boolean isSleeping = false;
     private NPCInteractions.NPCInteractionType npcInteractionType;
+
+    public static HashSet<NPCEntity> getNPCEntityList() {
+        return npcEntityList;
+    }
+
+    public static void addNPCEntity(NPCEntity npcEntity) {
+        npcEntityList.add(npcEntity);
+    }
+
+    public static void removeNPCEntity(NPCEntity npcEntity) {
+        npcEntity.villager.remove();
+        npcEntity.roleDisplay.remove();
+        npcEntityList.remove(npcEntity);
+    }
+
+    public static NPCEntity getNPCEntityFromKey(String key) {
+        for (NPCEntity npcEntity : npcEntityList)
+            if (npcEntity.key.equalsIgnoreCase(key))
+                return npcEntity;
+        return null;
+    }
 
     /**
      * Spawns NPC based off of the values in the NPCConfig config file. Runs at startup and on reload.
@@ -45,17 +74,20 @@ public class NPCEntity {
      */
     public NPCEntity(String key) {
 
+        this.key = key;
+
         key += ".";
 
         Configuration configuration = ConfigValues.npcConfig;
 
         if (!setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION))) return;
+        if (!configuration.getBoolean(key + NPCConfig.ENABLED)) return;
 
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
         setName(configuration.getString(key + NPCConfig.NAME));
         initializeRole(configuration.getString(key + NPCConfig.ROLE));
-//        setCareer(configuration.getString(key + NPCConfig.TYPE));
+        setProfession(configuration.getString(key + NPCConfig.TYPE));
         setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
         setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
         setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
@@ -66,6 +98,7 @@ public class NPCEntity {
         setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
 
         EntityTracker.registerNPCEntity(this);
+        addNPCEntity(this);
 
     }
 
@@ -77,9 +110,8 @@ public class NPCEntity {
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         villager.setCustomName(this.name);
         villager.setCustomNameVisible(true);
-        villager.setCareer(this.career);
+        villager.setProfession(this.profession);
         villager.setAI(!this.canMove);
-
     }
 
     /**
@@ -143,16 +175,18 @@ public class NPCEntity {
         this.roleDisplay.setCustomName(role);
     }
 
-    //TODO: Figure out why changing careers errors
+    public void setTempRole(String tempRole) {
+        this.roleDisplay.setCustomName(tempRole);
+    }
 
     /**
-     * Sets the career of the NPC, changing the skin the villager uses.
+     * Sets the profession of the NPC, changing the skin the villager uses.
      *
-     * @param career Career to be set
+     * @param profession Career to be set
      */
-    public void setCareer(String career) {
-        this.career = Villager.Career.valueOf(career);
-        this.villager.setCareer(this.career);
+    public void setProfession(String profession) {
+        this.profession = Villager.Profession.valueOf(profession);
+        this.villager.setProfession(this.profession);
     }
 
     /**
@@ -311,20 +345,81 @@ public class NPCEntity {
         this.canTalk = canTalk;
     }
 
+    public boolean getIsTalking() {
+        return this.isTalking;
+    }
+
+    public void setIsTalking(boolean isTalking) {
+        this.isTalking = isTalking;
+    }
+
+    public void startTalkingCooldown() {
+        this.isTalking = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                isTalking = false;
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
+    }
+
+    /**
+     * Radius to be used to search for players near the NPCEntity. The various dialog options will only trigger if a player
+     * is found within this radius.
+     *
+     * @return Radius to look for players
+     */
     public double getActivationRadius() {
         return this.activationRadius;
     }
 
+    /**
+     * Sets the radius to be used to search for players near the NPCEntity. The various dialog options will only trigger
+     * if a player is found within this radius
+     *
+     * @param activationRadius Radius to be set
+     */
     public void setActivationRadius(double activationRadius) {
         this.activationRadius = activationRadius;
     }
 
+    /**
+     * Gets whether this NPCEntity goes to "sleep" during night time. This prevents any interactions with this NPCEntity
+     * during night time.
+     *
+     * @return Whether the entity goes to "sleep" at night time.
+     */
     public boolean getDisappearsAtNight() {
         return this.disappearsAtNight;
     }
 
+    /**
+     * Sets whether the NPCEntity goes to "sleep" during night time. Going to "sleep" prevents player interactions with
+     * it during night time
+     *
+     * @param disappearsAtNight Whether the entity goes to "sleep" at night time
+     */
     public void setDisappearsAtNight(boolean disappearsAtNight) {
+        if (disappearsAtNight) NPCWorkingHours.registerSleepEnabledNPC(this);
         this.disappearsAtNight = disappearsAtNight;
+    }
+
+    /**
+     * Returns if the NPCEntity is currently sleeping, which prevents any player interactions with it
+     *
+     * @return Whether the entity is sleeping
+     */
+    public boolean getIsSleeping() {
+        return this.isSleeping;
+    }
+
+    /**
+     * Sets the NPCEntity to a sleep state
+     *
+     * @param isSleeping Whether the NPCEntity is considered to be sleeping
+     */
+    public void setIsSleeping(boolean isSleeping) {
+        this.isSleeping = isSleeping;
     }
 
     public NPCInteractions.NPCInteractionType getInteractionType() {
@@ -336,23 +431,23 @@ public class NPCEntity {
     }
 
     public void say(List<String> messages, Player player) {
-        new NPCChatBubble(selectString(messages), this.villager, player);
+        new NPCChatBubble(selectString(messages), this, player);
     }
 
     public void say(String message, Player player) {
-        new NPCChatBubble(message, this.villager, player);
+        new NPCChatBubble(message, this, player);
     }
 
     public void sayGreeting(Player player) {
-        new NPCChatBubble(selectString(this.greetings), this.villager, player);
+        new NPCChatBubble(selectString(this.greetings), this, player);
     }
 
     public void sayDialog(Player player) {
-        new NPCChatBubble(selectString(this.dialog), this.villager, player);
+        new NPCChatBubble(selectString(this.dialog), this, player);
     }
 
     public void sayFarewell(Player player) {
-        new NPCChatBubble(selectString(this.farewell), this.villager, player);
+        new NPCChatBubble(selectString(this.farewell), this, player);
     }
 
     private String selectString(List<String> strings) {

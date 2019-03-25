@@ -3,11 +3,12 @@ package com.magmaguy.elitemobs.npcs.chatter;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.npcs.NPCEntity;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -16,14 +17,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCChatBubble {
 
-    public NPCChatBubble(String message, LivingEntity npcEntity, Player player) {
+    public NPCChatBubble(String message, NPCEntity npcEntity, Player player) {
+
+        if (npcEntity.getVillager().hasPotionEffect(PotionEffectType.INVISIBILITY)) return;
+        if (npcEntity.getIsTalking()) return;
+        npcEntity.startTalkingCooldown();
 
         int lineCounter = 0;
 
         for (String substring : message.split("\\\\n")) {
 
-            Location newLocation = npcEntity.getEyeLocation().clone()
-                    .add(player.getLocation().clone().subtract(npcEntity.getLocation()).toVector().normalize().multiply(0.5))
+            Location newLocation = npcEntity.getVillager().getEyeLocation().clone()
+                    .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
                     .add(new Vector(0, -50 - (0.2 * lineCounter), 0));
 
             ArmorStand messageBubble = (ArmorStand) newLocation.getWorld().spawnEntity(newLocation, EntityType.ARMOR_STAND);
@@ -61,7 +66,7 @@ public class NPCChatBubble {
 
     }
 
-    public NPCChatBubble(List<String> message, LivingEntity npcEntity, Player player) {
+    public NPCChatBubble(List<String> message, NPCEntity npcEntity, Player player) {
 
         String selectedMessage = message.get(ThreadLocalRandom.current().nextInt(message.size()));
 
