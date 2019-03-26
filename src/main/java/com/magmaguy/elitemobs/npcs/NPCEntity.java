@@ -46,6 +46,11 @@ public class NPCEntity {
     private boolean isSleeping = false;
     private NPCInteractions.NPCInteractionType npcInteractionType;
 
+    /**
+     * Returns the full list of NPCEntities currently registered, alive or not.
+     *
+     * @return List of all NPCEntities
+     */
     public static HashSet<NPCEntity> getNPCEntityList() {
         return npcEntityList;
     }
@@ -54,12 +59,23 @@ public class NPCEntity {
         npcEntityList.add(npcEntity);
     }
 
+    /**
+     * Deletes the NPCEntity's data and entities associated to it.
+     *
+     * @param npcEntity NPCEntity to be deleted
+     */
     public static void removeNPCEntity(NPCEntity npcEntity) {
         npcEntity.villager.remove();
         npcEntity.roleDisplay.remove();
         npcEntityList.remove(npcEntity);
     }
 
+    /**
+     * Gets a specific NPCEntity based on the config key they have
+     *
+     * @param key Key of the NPCEntity to get
+     * @return NPCEntity associated to this key
+     */
     public static NPCEntity getNPCEntityFromKey(String key) {
         for (NPCEntity npcEntity : npcEntityList)
             if (npcEntity.key.equalsIgnoreCase(key))
@@ -107,6 +123,7 @@ public class NPCEntity {
      * as it makes sure the former Villager is slain.
      */
     public void respawnNPC() {
+        Bukkit.getEntity(this.villager.getUniqueId()).remove();
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         villager.setCustomName(this.name);
         villager.setCustomNameVisible(true);
@@ -345,14 +362,27 @@ public class NPCEntity {
         this.canTalk = canTalk;
     }
 
+    /**
+     * Returns if the entity is currently talking. Useful to avoid speech overlapping.
+     *
+     * @return Whether the NPCEntity is currently talking
+     */
     public boolean getIsTalking() {
         return this.isTalking;
     }
 
+    /**
+     * Sets whether the NPCEntity is talking
+     *
+     * @param isTalking Value to be set
+     */
     public void setIsTalking(boolean isTalking) {
         this.isTalking = isTalking;
     }
 
+    /**
+     * Starts a cooldown for the talking state. Useful to avoid overlapping speech.
+     */
     public void startTalkingCooldown() {
         this.isTalking = true;
         new BukkitRunnable() {
@@ -422,34 +452,74 @@ public class NPCEntity {
         this.isSleeping = isSleeping;
     }
 
+    /**
+     * Returns the type of interaction which this NPCEntity has
+     *
+     * @return Interaction type enum
+     */
     public NPCInteractions.NPCInteractionType getInteractionType() {
         return this.npcInteractionType;
     }
 
+    /**
+     * Sets the type of interaction which this NPCEntity has
+     *
+     * @param npcInteractionType Type of interaction enum to be set
+     */
     public void setNpcInteractionType(String npcInteractionType) {
         this.npcInteractionType = NPCInteractions.NPCInteractionType.valueOf(npcInteractionType);
     }
 
+    /**
+     * Selects a message from the list to output through an NPCChatBubble to a player
+     *
+     * @param messages List of messages to pick from
+     * @param player   Player to whom the message is directed
+     */
     public void say(List<String> messages, Player player) {
         new NPCChatBubble(selectString(messages), this, player);
     }
 
+    /**
+     * Sends a message to a player through an NPCChatBubble
+     *
+     * @param message List of messages to pick from
+     * @param player  Player to whom the message is directed
+     */
     public void say(String message, Player player) {
         new NPCChatBubble(message, this, player);
     }
 
+    /**
+     * Sends a greeting to a player from the list of greetings the NPCEntity has
+     *
+     * @param player Player to send the greeting to
+     */
     public void sayGreeting(Player player) {
         new NPCChatBubble(selectString(this.greetings), this, player);
     }
 
+    /**
+     * Sends a dialog message to a player from the list of dialog messages the NPCEntity has
+     *
+     * @param player Player to send the dialog to
+     */
     public void sayDialog(Player player) {
         new NPCChatBubble(selectString(this.dialog), this, player);
     }
 
+    /**
+     * Sends a farewell message to a player from the list of farewell messages the NPCEntity has
+     *
+     * @param player
+     */
     public void sayFarewell(Player player) {
         new NPCChatBubble(selectString(this.farewell), this, player);
     }
 
+    /*
+    Selects a string from a list of strings
+     */
     private String selectString(List<String> strings) {
         return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
     }
