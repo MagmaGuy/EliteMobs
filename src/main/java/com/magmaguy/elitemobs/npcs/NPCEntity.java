@@ -101,6 +101,8 @@ public class NPCEntity {
 
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
+        this.villager.setRemoveWhenFarAway(true);
+
         setName(configuration.getString(key + NPCConfig.NAME));
         initializeRole(configuration.getString(key + NPCConfig.ROLE));
         setProfession(configuration.getString(key + NPCConfig.TYPE));
@@ -123,12 +125,18 @@ public class NPCEntity {
      * as it makes sure the former Villager is slain.
      */
     public void respawnNPC() {
-        Bukkit.getEntity(this.villager.getUniqueId()).remove();
-        this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
-        villager.setCustomName(this.name);
+        if (Bukkit.getEntity(villager.getUniqueId()) != null)
+            Bukkit.getEntity(villager.getUniqueId()).remove();
+        villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+        villager.setCustomName(name);
         villager.setCustomNameVisible(true);
-        villager.setProfession(this.profession);
-        villager.setAI(!this.canMove);
+        villager.setProfession(profession);
+        villager.setAI(canMove);
+        villager.setRemoveWhenFarAway(true);
+        if (Bukkit.getEntity(roleDisplay.getUniqueId()) != null)
+            Bukkit.getEntity(roleDisplay.getUniqueId()).remove();
+        initializeRole(role);
+        EntityTracker.registerNPCEntity(this);
     }
 
     /**

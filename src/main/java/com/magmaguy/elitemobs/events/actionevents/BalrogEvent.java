@@ -21,7 +21,7 @@ public class BalrogEvent implements Listener {
         if (event.isCancelled()) return;
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
-//        if (!event.getPlayer().hasPermission("elitemobs.events.balrog")) return;
+        if (!event.getPlayer().hasPermission("elitemobs.events.balrog")) return;
         if (event.getPlayer().getInventory().getItemInMainHand().hasItemMeta() &&
                 event.getPlayer().getInventory().getItemInMainHand().getEnchantments().containsKey(Enchantment.SILK_TOUCH))
             return;
