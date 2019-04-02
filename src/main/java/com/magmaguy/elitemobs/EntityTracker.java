@@ -7,6 +7,8 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
@@ -310,11 +313,13 @@ public class EntityTracker implements Listener {
         registerCullableEntity(npc.getVillager());
     }
 
-    public static void unregisterNPCEntity(Entity entity) {
+    private static void unregisterNPCEntity(Entity entity) {
         if (!entity.getType().equals(EntityType.VILLAGER)) return;
         for (NPCEntity npcEntity : npcEntities)
-            if (npcEntity.getVillager().equals(entity))
+            if (npcEntity.getVillager().equals(entity)) {
                 entity.remove();
+                return;
+            }
     }
 
     /**
@@ -382,8 +387,13 @@ public class EntityTracker implements Listener {
      */
     public static void shutdownPurger() {
 
-        for (Entity entity : cullablePluginEntities)
+        Bukkit.getLogger().warning("Detected " + cullablePluginEntities.size() + " cullable entities.");
+        int counter = 0;
+        for (Entity entity : cullablePluginEntities) {
             entity.remove();
+            counter++;
+            Bukkit.getLogger().warning("Removed entity " + counter + " / " + cullablePluginEntities.size());
+        }
 
         eliteMobs.clear();
         eliteMobsLivingEntities.clear();
@@ -392,6 +402,9 @@ public class EntityTracker implements Listener {
         armorStands.clear();
         naturalEntities.clear();
         cullablePluginEntities.clear();
+        for (NPCEntity npcEntity : NPCEntity.getNPCEntityList())
+            if (Bukkit.getEntity(npcEntity.getVillager().getUniqueId()) != null)
+                Bukkit.getEntity(npcEntity.getVillager().getUniqueId()).remove();
         npcEntities.clear();
 
     }
@@ -403,6 +416,9 @@ public class EntityTracker implements Listener {
         unregisterEliteMob(entity);
         unregisterCullableEntity(entity);
         unregisterNPCEntity(entity);
+        unregisterArmorStand(entity);
+        unregisterItemVisualEffects(entity);
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -410,10 +426,6 @@ public class EntityTracker implements Listener {
                     unregisterSuperMob(entity);
                 if (isNaturalEntity(entity))
                     unregisterNaturalEntity(entity);
-                if (isArmorStand(entity))
-                    unregisterArmorStand(entity);
-                if (isItemVisualEffect(entity))
-                    unregisterItemVisualEffects(entity);
 
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
@@ -427,6 +439,12 @@ public class EntityTracker implements Listener {
     public static void chunkWiper(ChunkUnloadEvent event) {
         for (Entity entity : event.getChunk().getEntities())
             wipeEntity(entity);
+    }
+
+    public static void chunkWiper(WorldUnloadEvent event) {
+        for (Chunk chunk : event.getWorld().getLoadedChunks())
+            for (Entity entity : chunk.getEntities())
+                wipeEntity(entity);
     }
 
     /**
@@ -511,6 +529,5 @@ public class EntityTracker implements Listener {
 //    }
 //
 //
-
 
 }

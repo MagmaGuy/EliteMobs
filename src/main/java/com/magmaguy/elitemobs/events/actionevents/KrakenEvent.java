@@ -22,7 +22,7 @@ public class KrakenEvent implements Listener {
         if (event.isCancelled()) return;
         if (!currentVersionIsUnder(13, 0)) return;
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
-//        if (!event.getPlayer().hasPermission("elitemobs.events.kraken")) return;
+        if (!event.getPlayer().hasPermission("elitemobs.events.kraken")) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
             return;
         if (event.getHook().getLocation().getBlock().isEmpty() || !event.getHook().getLocation().getBlock().isEmpty() &&

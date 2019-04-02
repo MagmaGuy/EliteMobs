@@ -8,7 +8,7 @@ import static com.magmaguy.elitemobs.items.parserutil.ConfigPathBuilder.automate
 public class MaterialConfigParser {
 
     public static Material parseMaterial(Configuration configuration, String previousPath) {
-        String path = automatedStringBuilder(previousPath, "Type");
+        String path = automatedStringBuilder(previousPath, "Item Type");
         return Material.getMaterial(configuration.getString(path));
     }
 

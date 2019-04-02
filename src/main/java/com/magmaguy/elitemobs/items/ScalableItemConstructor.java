@@ -77,6 +77,8 @@ public class ScalableItemConstructor {
             else
                 secondaryEnchantmentList.put(enchantment, enchantmentsList.get(enchantment));
 
+        if (itemTier < 2) return newEnchantmentList;
+
         int secondaryEnchantmentPool = ThreadLocalRandom.current().nextInt((int) Math.ceil((double) itemTier / 2));
 
         for (int i = 0; i < secondaryEnchantmentPool; i++) {
