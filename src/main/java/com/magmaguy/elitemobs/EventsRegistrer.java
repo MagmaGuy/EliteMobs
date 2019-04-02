@@ -37,7 +37,6 @@ import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalEliteMobSpawnEventHandler;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
-import com.magmaguy.elitemobs.npcs.NPCChunkLoad;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
@@ -218,7 +217,6 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new RareDropEffect(), plugin);
 
         //NPCs
-        pluginManager.registerEvents(new NPCChunkLoad(), plugin);
         pluginManager.registerEvents(new NPCDamageEvent(), plugin);
         pluginManager.registerEvents(new NPCInteractions(), plugin);
         pluginManager.registerEvents(new NPCProximitySensor(), plugin);
