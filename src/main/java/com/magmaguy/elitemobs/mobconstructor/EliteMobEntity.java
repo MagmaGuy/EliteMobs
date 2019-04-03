@@ -217,8 +217,13 @@ public class EliteMobEntity {
 
     }
 
-    /*
-    This is the generic constructor for elite mobs spawned via commands
+    /**
+     * Constructor for Elite Mobs spawned via command
+     *
+     * @param entityType    Type of entity to be spawned
+     * @param location      Location at which the entity will spawn
+     * @param eliteMobLevel Level of the Elite Mob
+     * @param mobPowers     HashSet of ElitePower that the entity will have (can be empty)
      */
     public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, HashSet<ElitePower> mobPowers) {
 
@@ -281,14 +286,19 @@ public class EliteMobEntity {
 
     }
 
-    /*
-    This avoids accidentally assigning an elite mob to an entity spawned specifically to be a boss mob or reinforcement
-    */
+    /**
+     * This avoids accidentally assigning an elite mob to an entity spawned specifically to be a boss mob or reinforcement
+     */
     private static LivingEntity spawnBossMobLivingEntity(EntityType entityType, Location location) {
         NaturalMobSpawnEventHandler.setIgnoreMob(true);
         return (LivingEntity) location.getWorld().spawnEntity(location, entityType);
     }
 
+    /**
+     * Sets the display name to be used by this Elite Mob
+     *
+     * @param eliteMobProperties EliteMobProperties from where the display name will be obtained
+     */
     private void setCustomName(EliteMobProperties eliteMobProperties) {
         this.name = ChatColorConverter.convert(
                 eliteMobProperties.getName().replace(
@@ -298,6 +308,11 @@ public class EliteMobEntity {
             eliteMob.setCustomNameVisible(true);
     }
 
+    /**
+     * Sets the display name to be used by this Elite Mob
+     *
+     * @param name String which defines the display name
+     */
     private void setCustomName(String name) {
         this.name = ChatColorConverter.convert(name);
         this.getLivingEntity().setCustomName(this.name);
@@ -306,27 +321,50 @@ public class EliteMobEntity {
             eliteMob.setCustomNameVisible(true);
     }
 
+    /**
+     * Sets the level of the Elite Mob. Values below 1 default to 1
+     *
+     * @param newLevel Level of the Elite Mob
+     */
     private void setEliteMobLevel(int newLevel) {
         if (newLevel < 1)
             newLevel = 1;
         this.eliteMobLevel = newLevel;
     }
 
+    /**
+     * Sets the max health of the Elite Mob. This is calculated based on the Elite Mob level. Maxes out at 2000 due to
+     * Minecraft restrictions
+     *
+     * @param eliteMobProperties EliteMobProperties from where the default max health of the mob will be obtained
+     */
     private void setMaxHealth(EliteMobProperties eliteMobProperties) {
         double defaultMaxHealth = eliteMobProperties.getDefaultMaxHealth();
         this.maxHealth = (eliteMobLevel * CombatSystem.PER_LEVEL_POWER_INCREASE * defaultMaxHealth + defaultMaxHealth);
         eliteMob.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
     }
 
+    /**
+     * Sets the health of the Elite Mob. This is the same value as the max health. Caps out at 2000.
+     */
     private void setHealth() {
         eliteMob.setHealth(maxHealth = (maxHealth > 2000) ? 2000 : maxHealth);
     }
 
+    /**
+     * Sets the health of the Elite Mob. This is a percentage of the maximum health.
+     *
+     * @param healthPercentage Percentage of the maximum health to be set
+     */
     private void setHealth(double healthPercentage) {
         eliteMob.setHealth(this.maxHealth * healthPercentage);
     }
 
 
+    /**
+     * Sets the armor of the EliteMob. The equipment progresses with every passing Elite Mob tier and dynamically adjusts
+     * itself to the maximum tier set.
+     */
     private void setArmor() {
 
         if (VersionChecker.currentVersionIsUnder(12, 2)) return;
@@ -402,6 +440,12 @@ public class EliteMobEntity {
 
     }
 
+    /**
+     * Randomizes the powers that the EliteMob has. Determines which powers will be picked by randomizing the powers
+     * from pools associated to the mob type and conditioned by config settings
+     *
+     * @param eliteMobProperties Properties of the Elite Mob Type
+     */
     private void randomizePowers(EliteMobProperties eliteMobProperties) {
 
         if (hasCustomPowers) return;
@@ -438,6 +482,12 @@ public class EliteMobEntity {
 
     }
 
+    /**
+     * Applies the power to the Elite Mob based on a HashSet of powers
+     *
+     * @param elitePowers          ElitePower HashSet from which the powers will be randomized
+     * @param availablePowerAmount Amount of powers to pick
+     */
     private void applyPowers(HashSet<ElitePower> elitePowers, int availablePowerAmount) {
 
         if (availablePowerAmount < 1) return;
@@ -463,6 +513,11 @@ public class EliteMobEntity {
 
     }
 
+    /**
+     * Applies a HashSet of ElitePower to an Elite Mob
+     *
+     * @param elitePowers HashSet of Elite Powers to be applied
+     */
     public void setCustomPowers(HashSet<ElitePower> elitePowers) {
 
         this.powers = elitePowers;
@@ -484,14 +539,30 @@ public class EliteMobEntity {
 
     }
 
+    /**
+     * Returns the living EliteMob
+     *
+     * @return LivingEntity associated to the Elite Mob
+     */
     public LivingEntity getLivingEntity() {
         return eliteMob;
     }
 
+    /**
+     * Returns the level of the Elite Mob
+     *
+     * @return Level of the Elite Mob
+     */
     public int getLevel() {
         return eliteMobLevel;
     }
 
+    /**
+     * Checks if an EliteMobs has that MobPower
+     *
+     * @param mobPower MobPower to be checked
+     * @return If the EliteMob has this MobPower
+     */
     public boolean hasPower(ElitePower mobPower) {
         for (ElitePower elitePower : powers)
             if (elitePower.getClass().getTypeName().equals(mobPower.getClass().getTypeName()))
@@ -499,116 +570,262 @@ public class EliteMobEntity {
         return false;
     }
 
+    /**
+     * Returns how many minor powers this Elite Mob has
+     *
+     * @return How many minor powers this Elite Mob has
+     */
     public int getMinorPowerCount() {
         return this.minorPowerCount;
     }
 
+    /**
+     * Returns how many major powers this Elite Mob has
+     *
+     * @return How many major powers this Elite Mob has
+     */
     public int getMajorPowerCount() {
         return this.majorPowerCount;
     }
 
+    /**
+     * Returns the MobPowers that this Elite Mob has
+     *
+     * @return MobPowers that this Elite Mob has
+     */
     public HashSet<ElitePower> getPowers() {
         return powers;
     }
 
+    /**
+     * Returns the maximum health that this Elite Mob has
+     *
+     * @return Maximum health that this Elite Mob has
+     */
     public double getMaxHealth() {
         return maxHealth;
     }
 
+    /**
+     * Sets whether this Elite Mob can stack with other Elite Mobs or Entities of the the same Type
+     *
+     * @param bool Whether the Elite Mob can stack
+     */
     public void setHasStacking(boolean bool) {
         this.hasStacking = bool;
     }
 
+    /**
+     * Returns if this Elite Mob has custom armor
+     *
+     * @return Whether Elite Mob has custom armor
+     */
     public boolean getHasCustomArmor() {
         return this.hasCustomArmor;
     }
 
+    /**
+     * Sets if this Elite Mob will wear custom armor. Will then only be applied by other methods.
+     *
+     * @param bool whether this Elite Mob will wear custom armor
+     */
     public void setHasCustomArmor(boolean bool) {
         this.hasCustomArmor = bool;
     }
 
+    /**
+     * Returns whether the Elite Mob has custom ElitePower
+     *
+     * @return Whether the Elite Mob has custom ElitePower
+     */
     public boolean getHasCustomPowers() {
         return this.hasCustomPowers;
     }
 
+    /**
+     * Sets if the Elite Mob will have custom ElitePower
+     *
+     * @param bool Whether the Elite Mob will have custom EltiePower
+     */
     public void setHasCustomPowers(boolean bool) {
         this.hasCustomPowers = bool;
     }
 
+    /**
+     * Returns the name of the Elite Mob
+     *
+     * @return Name of the Elite Mob
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Returns whether the Elite Mob has minor visual effects
+     *
+     * @return Whether the Elite Mob has minor visual effects
+     */
     public boolean hasMinorVisualEffect() {
         return this.hasMinorVisualEffect;
     }
 
+    /**
+     * Sets whether the Elite Mob has a minor visual effect
+     *
+     * @param bool Whether the Elite Mob has a minor visual effect
+     */
     public void setHasMinorVisualEffect(boolean bool) {
         this.hasMinorVisualEffect = bool;
     }
 
+    /**
+     * Returns whether the Elite Mob has a major visual effect
+     *
+     * @return Whether the Elite Mob has a major visual effect
+     */
     public boolean hasMajorVisualEffect() {
         return this.hasMajorVisualEffect;
     }
 
+    /**
+     * Sets whether the Elite Mob has a major visual effect
+     *
+     * @param bool Whether the Elite Mob has a major visual effect
+     */
     public void setHasMajorVisualEffect(boolean bool) {
         this.hasMajorVisualEffect = bool;
     }
 
+    /**
+     * Returns whether the Elite Mob is a natural entity. Only natural entities can drop special plugin loot. Additionally,
+     * based on the settings, only natural Elite Mobs tend to only have visual effects if they are natural.
+     *
+     * @return Whether the Elite Mob is a natural entity.
+     */
     public boolean isNaturalEntity() {
         return this.isNaturalEntity;
     }
 
+    /**
+     * Sets whether the ELite Mob is a natural entity. Only natural entities can drop special plugin loot. Additionally,
+     * based on the settings, only natural Elite Mobs tend to only have visual effects if they are natural.
+     *
+     * @param bool Whether the Elite Mob is a natural entity.
+     */
     public void setIsNaturalEntity(Boolean bool) {
         this.isNaturalEntity = bool;
         this.hasNormalLoot = bool;
     }
 
+    /**
+     * Returns whether the Elite Mob can stack.
+     *
+     * @return Whether the Elite Mob can stack.
+     */
     public boolean canStack() {
         return this.hasStacking;
     }
 
+    /**
+     * Sets the name of the Elite Mob.
+     *
+     * @param name Name of the Elite Mob.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns whether the Elite Mob will unload when far away.
+     *
+     * @return Whether the Elite Mob will unload when far away.
+     */
     public boolean getHasFarAwayUnload() {
         return this.hasFarAwayUnload;
     }
 
+    /**
+     * Sets whether the Elite Mob will unload when far away.
+     *
+     * @param bool Whether the Elite Mob will unload when far away.
+     */
     public void setHasFarAwayUnload(boolean bool) {
         this.hasFarAwayUnload = bool;
     }
 
+    /**
+     * Returns whether the Elite Mob can drop special loot. This only affects its eligibility and does not necessarily
+     * mean it will drop special loot.
+     *
+     * @return Whether the ELite Mob can drop special loot.
+     */
     public boolean getHasSpecialLoot() {
         return this.hasNormalLoot;
     }
 
+    /**
+     * Sets whether the ELite Mob can drop special loot. This only affects its eligibility and does not necessarily
+     * mean it will drop special loot.
+     *
+     * @param bool Whether the Elite Mob can drop special loot.
+     */
     public void setHasSpecialLoot(boolean bool) {
         this.isNaturalEntity = bool;
         this.hasNormalLoot = bool;
     }
 
+    /**
+     * Returns whether the Elite Mob has a special health value. Default values are simply multiplied from the default
+     * health.
+     *
+     * @return Whether the Elite Mob has a special health value.
+     */
     public boolean getHasCustomHealth() {
         return this.hasCustomHealth;
     }
 
+    /**
+     * Sets whether the Elite Mob has a special health value. Default health values are simply multiplied from the default
+     * health.
+     *
+     * @param bool Whether the Elite Mob has a special health value.
+     */
     public void setHasCustomHealth(boolean bool) {
         this.hasCustomHealth = bool;
     }
 
+    /**
+     * Returns whether the Elite Mob has a custom name
+     *
+     * @return Whether the Elite Mob has a custom name
+     */
     public boolean getHasCustomName() {
         return this.hasCustomName;
     }
 
+    /**
+     * Sets whether the Elite Mob has a custom name
+     *
+     * @param bool Whether the Elite Mob has a custom name
+     */
     public void setHasCustomName(boolean bool) {
         this.hasCustomName = bool;
     }
 
+    /**
+     * Sets whether the Elite Mob has obfuscate visual effects
+     *
+     * @param bool Whether the Elite Mob has visual effects
+     */
     public void setHasVisualEffectObfuscated(boolean bool) {
         this.hasVisualEffectObfuscated = bool;
     }
 
+    /**
+     * Returns whether the Elite Mob has obfuscated visual effects
+     *
+     * @return Whether the Elite Mob has obfuscated visual effects
+     */
     public boolean getHasVisualEffectObfuscated() {
         return this.hasVisualEffectObfuscated;
     }
