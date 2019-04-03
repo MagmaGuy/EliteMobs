@@ -518,7 +518,7 @@ public class NPCEntity {
 
     /**
      * Sends a farewell message to a player from the list of farewell messages the NPCEntity has
-     *
+     *e
      * @param player
      */
     public void sayFarewell(Player player) {
