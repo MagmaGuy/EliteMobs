@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class EliteMobEntity {
     private boolean hasFarAwayUnload = true;
     private boolean hasCustomHealth = false;
     private boolean hasNormalLoot = true;
+    private CreatureSpawnEvent.SpawnReason spawnReason;
 
     /**
      * This is the generic constructor used in most instances of natural elite mob generation
@@ -63,7 +65,7 @@ public class EliteMobEntity {
      * @param livingEntity  Minecraft entity associated to this elite mob
      * @param eliteMobLevel Level of the mob, can be modified during runtime. Dynamically assigned.
      */
-    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel) {
+    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         /*
         Register living entity to keep track of which entity this object is tied to
@@ -74,6 +76,14 @@ public class EliteMobEntity {
          */
         setEliteMobLevel(eliteMobLevel);
         eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        /*
+        Sets the spawn reason
+         */
+        setSpawnReason(spawnReason);
+        /*
+        Start tracking the entity
+         */
+        if (!EntityTracker.registerEliteMob(this)) return;
         /*
         Get correct instance of plugin data, necessary for settings names and health among other things
          */
@@ -100,10 +110,6 @@ public class EliteMobEntity {
         Set the power list
          */
         randomizePowers(eliteMobProperties);
-        /*
-        Start tracking the entity
-         */
-        EntityTracker.registerEliteMob(this);
 
         eliteMob.setCanPickupItems(false);
 
@@ -115,7 +121,7 @@ public class EliteMobEntity {
      * @param livingEntity  Minecraft entity associated to this elite mob
      * @param eliteMobLevel Level of the mob, can be modified during runtime. Dynamically assigned.
      */
-    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, double currentHealthPercent) {
+    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, double currentHealthPercent, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         /*
         Register living entity to keep track of which entity this object is tied to
@@ -126,6 +132,14 @@ public class EliteMobEntity {
          */
         setEliteMobLevel(eliteMobLevel);
         eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        /*
+        Sets the spawn reason
+         */
+        setSpawnReason(spawnReason);
+        /*
+        Start tracking the entity
+         */
+        if (!EntityTracker.registerEliteMob(this)) return;
         /*
         Get correct instance of plugin data, necessary for settings names and health among other things
          */
@@ -152,10 +166,6 @@ public class EliteMobEntity {
         Set the power list
          */
         randomizePowers(eliteMobProperties);
-        /*
-        Start tracking the entity
-         */
-        EntityTracker.registerEliteMob(this);
 
         eliteMob.setCanPickupItems(false);
 
@@ -172,7 +182,7 @@ public class EliteMobEntity {
      * @param name          the name for this boss mob, overrides the usual elite mob name format
      * @see BossMobEntity
      */
-    public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name) {
+    public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         /*
         Register living entity to keep track of which entity this object is tied to
@@ -183,6 +193,14 @@ public class EliteMobEntity {
          */
         setEliteMobLevel(eliteMobLevel);
         eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        /*
+        Sets the spawn reason
+         */
+        setSpawnReason(spawnReason);
+        /*
+        Start tracking the entity
+         */
+        if (!EntityTracker.registerEliteMob(this)) return;
         /*
         Get correct instance of plugin data, necessary for settings names and health among other things
          */
@@ -208,7 +226,7 @@ public class EliteMobEntity {
         /*
         Start tracking the entity
          */
-        EntityTracker.registerEliteMob(this);
+//        EntityTracker.registerEliteMob(this);
 
         eliteMob.setCanPickupItems(false);
 
@@ -225,7 +243,7 @@ public class EliteMobEntity {
      * @param eliteMobLevel Level of the Elite Mob
      * @param mobPowers     HashSet of ElitePower that the entity will have (can be empty)
      */
-    public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, HashSet<ElitePower> mobPowers) {
+    public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         /*
         Register living entity to keep track of which entity this object is tied to
@@ -236,6 +254,14 @@ public class EliteMobEntity {
          */
         setEliteMobLevel(eliteMobLevel);
         eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        /*
+        Sets the spawn reason
+         */
+        setSpawnReason(spawnReason);
+        /*
+        Start tracking the entity
+         */
+        if (!EntityTracker.registerEliteMob(this)) return;
         /*
         Get correct instance of plugin data, necessary for settings names and health among other things
          */
@@ -276,11 +302,6 @@ public class EliteMobEntity {
         } else {
             randomizePowers(eliteMobProperties);
         }
-
-        /*
-        Start tracking the entity
-         */
-        EntityTracker.registerEliteMob(this);
 
         eliteMob.setCanPickupItems(false);
 
@@ -828,6 +849,24 @@ public class EliteMobEntity {
      */
     public boolean getHasVisualEffectObfuscated() {
         return this.hasVisualEffectObfuscated;
+    }
+
+    /**
+     * Gets the spawn reason for the LivingEntity. Used for the API.
+     *
+     * @return Spawn reason for the LivingEntity.
+     */
+    public CreatureSpawnEvent.SpawnReason getSpawnReason() {
+        return this.spawnReason;
+    }
+
+    /**
+     * Sets the spawn reason for the Living Entity. Used for the API.
+     *
+     * @param spawnReason Spawn reason for the Living Entity.
+     */
+    public void setSpawnReason(CreatureSpawnEvent.SpawnReason spawnReason) {
+        this.spawnReason = spawnReason;
     }
 
 }

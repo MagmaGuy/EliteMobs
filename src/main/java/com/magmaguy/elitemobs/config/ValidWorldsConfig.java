@@ -23,7 +23,7 @@ public class ValidWorldsConfig {
 
     public static final String CONFIG_NAME = "ValidWorlds.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
     public void initializeConfig() {
 

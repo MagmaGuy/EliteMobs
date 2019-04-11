@@ -35,6 +35,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -66,7 +67,7 @@ public class TreasureGoblin implements Listener {
 
         int mobLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
         TimedBossMobEntity treasureGoblinPluginEntity = new TimedBossMobEntity(EntityType.ZOMBIE, location, mobLevel,
-                ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME));
+                ConfigValues.eventsConfig.getString(EventsConfig.TREASURE_GOBLIN_NAME), CreatureSpawnEvent.SpawnReason.NATURAL);
 
         treasureGoblinList.add(treasureGoblinPluginEntity);
 

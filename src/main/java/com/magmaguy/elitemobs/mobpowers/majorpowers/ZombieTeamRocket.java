@@ -58,6 +58,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -116,13 +117,13 @@ public class ZombieTeamRocket extends MajorPower implements Listener {
         jamesHelmetMeta.setColor(Color.BLUE);
         jamesHelmet.setItemMeta(jamesHelmetMeta);
 
-        ReinforcementMobEntity jesseReinforcement = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), "Jesse");
+        ReinforcementMobEntity jesseReinforcement = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), "Jesse", CreatureSpawnEvent.SpawnReason.CUSTOM);
         jesseReinforcement.getLivingEntity().getEquipment().setHelmet(jesseHelmet);
         jesseReinforcement.getLivingEntity().getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
         jesseReinforcement.getLivingEntity().getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);
         jesseReinforcement.getLivingEntity().getEquipment().setBoots(TEAM_ROCKET_BOOTS);
 
-        ReinforcementMobEntity jamesReinforcement = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), "James");
+        ReinforcementMobEntity jamesReinforcement = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), "James", CreatureSpawnEvent.SpawnReason.CUSTOM);
         jamesReinforcement.getLivingEntity().getEquipment().setHelmet(jamesHelmet);
         jamesReinforcement.getLivingEntity().getEquipment().setChestplate(TEAM_ROCKET_CHESTPIECE);
         jamesReinforcement.getLivingEntity().getEquipment().setLeggings(TEAM_ROCKET_LEGGINGS);

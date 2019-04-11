@@ -117,7 +117,13 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onDisable() {
 
+        Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
+
         EntityTracker.shutdownPurger();
+
+        for (World world : validWorldList) {
+            world.save();
+        }
 
         /*
         Flush lingering arrows from the arrow tracking power
@@ -127,7 +133,7 @@ public class EliteMobs extends JavaPlugin {
         SkeletonTrackingArrow.trackingArrowList.clear();
 
         /*
-        Flush lingering blocks
+        todo: Flush lingering blocks
          */
 
 
@@ -146,7 +152,7 @@ public class EliteMobs extends JavaPlugin {
 
     }
 
-    public void worldScanner() {
+    public static void worldScanner() {
 
         for (World world : Bukkit.getWorlds())
             if (ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + world.getName()))

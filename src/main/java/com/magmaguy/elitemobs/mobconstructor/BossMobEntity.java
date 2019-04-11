@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.HashSet;
 
@@ -26,16 +27,16 @@ public class BossMobEntity extends EliteMobEntity {
         return this.hitsCounter;
     }
 
-    public BossMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name) {
+    public BossMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name, CreatureSpawnEvent.SpawnReason spawnReason) {
 
-        super(entityType, location, eliteMobLevel, name);
+        super(entityType, location, eliteMobLevel, name, spawnReason);
         setupBossMob(super.getLivingEntity());
 
     }
 
-    public BossMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name, HashSet<ElitePower> elitePowers) {
+    public BossMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name, HashSet<ElitePower> elitePowers, CreatureSpawnEvent.SpawnReason spawnReason) {
 
-        super(entityType, location, eliteMobLevel, name);
+        super(entityType, location, eliteMobLevel, name, spawnReason);
         setupBossMob(super.getLivingEntity(), elitePowers);
 
     }
