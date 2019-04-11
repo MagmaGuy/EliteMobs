@@ -20,6 +20,7 @@ import org.bukkit.entity.Silverfish;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -65,7 +66,7 @@ public class Balrog implements Listener {
     private static void intializeBalrog(Location location) {
 
         int eliteLevel = ActionDynamicBossLevelConstructor.determineDynamicBossLevel(location);
-        ActionBossMobEntity bossMobEntity = new ActionBossMobEntity(EntityType.SILVERFISH, location, eliteLevel, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME));
+        ActionBossMobEntity bossMobEntity = new ActionBossMobEntity(EntityType.SILVERFISH, location, eliteLevel, ConfigValues.eventsConfig.getString(EventsConfig.BALROG_NAME), CreatureSpawnEvent.SpawnReason.NATURAL);
         balrogList.add(bossMobEntity.getLivingEntity());
 
         balrogVisualEffectLoop((Silverfish) bossMobEntity.getLivingEntity());

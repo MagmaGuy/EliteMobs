@@ -28,6 +28,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -89,7 +90,7 @@ public class TheReturned implements Listener {
         Location spawnLocation = zombie.getLocation();
 
         ReinforcementMobEntity reinforcementMobEntity = new ReinforcementMobEntity(EntityType.HUSK, spawnLocation,
-                mobLevel, ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME));
+                mobLevel, ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_THE_RETURNED_NAME), CreatureSpawnEvent.SpawnReason.NATURAL);
 
         double x = ThreadLocalRandom.current().nextDouble() - 0.5;
         double z = ThreadLocalRandom.current().nextDouble() - 0.5;

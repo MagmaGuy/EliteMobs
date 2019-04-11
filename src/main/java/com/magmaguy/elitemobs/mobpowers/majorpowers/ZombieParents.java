@@ -55,6 +55,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -83,12 +84,12 @@ public class ZombieParents extends MajorPower implements Listener {
         if (activatedZombies.contains(eliteMobEntity)) return;
 
         ReinforcementMobEntity reinforcementMom = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(),
-                ConfigValues.translationConfig.getString("ZombieParents.Mom Name"));
+                ConfigValues.translationConfig.getString("ZombieParents.Mom Name"), CreatureSpawnEvent.SpawnReason.CUSTOM);
 
         LivingEntity zombieMom = reinforcementMom.getLivingEntity();
 
         ReinforcementMobEntity reinforcementDad = new ReinforcementMobEntity(EntityType.ZOMBIE, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(),
-                ConfigValues.translationConfig.getString("ZombieParents.Dad Name"));
+                ConfigValues.translationConfig.getString("ZombieParents.Dad Name"), CreatureSpawnEvent.SpawnReason.CUSTOM);
 
         LivingEntity zombieDad = reinforcementDad.getLivingEntity();
 

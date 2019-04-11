@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Iterator;
@@ -105,7 +106,7 @@ public class EliteMobScanner {
                     This is a bit of a dirty hack
                     It won't register the entity twice, but it will overwrite the existing method
                     */
-                    eliteMobEntity1 = new EliteMobEntity(livingEntity, newLevel, healthPercentage);
+                    eliteMobEntity1 = new EliteMobEntity(livingEntity, newLevel, healthPercentage, CreatureSpawnEvent.SpawnReason.CUSTOM);
                     secondEntity.remove();
 
                 }

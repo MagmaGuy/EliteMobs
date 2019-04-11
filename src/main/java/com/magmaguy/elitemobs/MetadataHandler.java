@@ -40,5 +40,11 @@ public class MetadataHandler implements Listener {
     public final static String BETTERDROPS_COMPATIBILITY_MD = "betterdrops_ignore";
     public final static String VANISH_NO_PACKET = "vanished";
 
+    //Plugin values
+    //This value stores the level as an int. Any mob with this metadata is an Elite Mob
+    public final static String ELITE_MOB_METADATA = "Elitemob";
+    //This value only stores if the passive mob is a Super Mob. The stored value is always true
+    public final static String SUPER_MOB_METADATA = "Supermob";
+
 
 }

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -7,7 +8,6 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -17,6 +17,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
@@ -51,14 +52,19 @@ public class EntityTracker implements Listener {
     }
 
     /**
-     * Registers an Entity as an elite mob
+     * Registers an Entity as an elite mob. Can be cancelled by third party plugins as it calls the EliteMobSpawnEvent
+     * which is cancellable. Cancelling that event will cancel the spawn of the Elite Mob.
      *
      * @param eliteMobEntity registers entity as elite mob
      */
-    public static void registerEliteMob(EliteMobEntity eliteMobEntity) {
+    public static boolean registerEliteMob(EliteMobEntity eliteMobEntity) {
+        EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteMobEntity.getLivingEntity(), eliteMobEntity, eliteMobEntity.getSpawnReason());
+        if (eliteMobSpawnEvent.isCancelled()) return false;
         eliteMobs.add(eliteMobEntity);
         eliteMobsLivingEntities.add(eliteMobEntity.getLivingEntity());
         registerCullableEntity(eliteMobEntity.getLivingEntity());
+        eliteMobEntity.getLivingEntity().setMetadata(MetadataHandler.ELITE_MOB_METADATA, new FixedMetadataValue(MetadataHandler.PLUGIN, eliteMobEntity.getLevel()));
+        return true;
     }
 
     /**
@@ -70,6 +76,7 @@ public class EntityTracker implements Listener {
         eliteMobs.remove(eliteMobEntity);
         naturalEntities.remove(eliteMobEntity.getLivingEntity());
         cullablePluginEntities.remove(eliteMobEntity.getLivingEntity());
+        eliteMobEntity.getLivingEntity().removeMetadata(MetadataHandler.ELITE_MOB_METADATA, MetadataHandler.PLUGIN);
     }
 
     /**
@@ -129,6 +136,7 @@ public class EntityTracker implements Listener {
     public static void registerSuperMob(LivingEntity livingEntity) {
         if (!SuperMobProperties.isValidSuperMobType(livingEntity)) return;
         superMobs.add(livingEntity);
+        livingEntity.setMetadata(MetadataHandler.SUPER_MOB_METADATA, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
     }
 
     /**
@@ -139,6 +147,7 @@ public class EntityTracker implements Listener {
     public static void unregisterSuperMob(Entity entity) {
         if (!SuperMobProperties.isValidSuperMobType(entity)) return;
         superMobs.remove(entity);
+        entity.removeMetadata(MetadataHandler.SUPER_MOB_METADATA, MetadataHandler.PLUGIN);
     }
 
     /**
@@ -387,13 +396,8 @@ public class EntityTracker implements Listener {
      */
     public static void shutdownPurger() {
 
-        Bukkit.getLogger().warning("Detected " + cullablePluginEntities.size() + " cullable entities.");
-        int counter = 0;
-        for (Entity entity : cullablePluginEntities) {
+        for (Entity entity : cullablePluginEntities)
             entity.remove();
-            counter++;
-            Bukkit.getLogger().warning("Removed entity " + counter + " / " + cullablePluginEntities.size());
-        }
 
         eliteMobs.clear();
         eliteMobsLivingEntities.clear();
@@ -402,15 +406,12 @@ public class EntityTracker implements Listener {
         armorStands.clear();
         naturalEntities.clear();
         cullablePluginEntities.clear();
-        for (NPCEntity npcEntity : NPCEntity.getNPCEntityList())
-            if (Bukkit.getEntity(npcEntity.getVillager().getUniqueId()) != null)
-                Bukkit.getEntity(npcEntity.getVillager().getUniqueId()).remove();
         npcEntities.clear();
 
     }
 
-    /*
-    This is run in async for performance reasons
+    /**
+     * This is run in async for performance reasons
      */
     private static void wipeEntity(Entity entity) {
         unregisterEliteMob(entity);
@@ -455,79 +456,5 @@ public class EntityTracker implements Listener {
     public static void deathWipe(EntityDeathEvent event) {
         wipeEntity(event.getEntity());
     }
-
-
-//    public static void checkEntityState() {
-//
-//        new BukkitRunnable() {
-//            @Override
-//            public void run() {
-//                updateSuperMobs();
-//                updateEliteMobEntities();
-//                updateLivingEntities();
-//                updateCullables();
-//                updateAmorStands();
-//                updateItems();
-//            }
-//        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
-//
-//    }
-//
-//    private static void updateSuperMobs() {
-//        Iterator iterator = superMobs.iterator();
-//        while (iterator.hasNext()) {
-//            Entity entity = (Entity) iterator.next();
-//            if (!entity.isValid())
-//                iterator.remove();
-//        }
-//    }
-//
-//    private static void updateLivingEntities() {
-//        Iterator iterator = naturalEntities.iterator();
-//        while (iterator.hasNext()) {
-//            Entity entity = (Entity) iterator.next();
-//            if (!entity.isValid())
-//                iterator.remove();
-//        }
-//    }
-//
-//    private static void updateEliteMobEntities() {
-//        Iterator iterator = eliteMobs.iterator();
-//        while (iterator.hasNext()) {
-//            Entity entity = ((EliteMobEntity) iterator.next()).getLivingEntity();
-//            if (entity.isDead() ||
-//                    !entity.isValid() && ((LivingEntity) entity).getRemoveWhenFarAway())
-//                iterator.remove();
-//        }
-//    }
-//
-//    private static void updateAmorStands() {
-//        Iterator iterator = armorStands.iterator();
-//        while (iterator.hasNext()) {
-//            Entity entity = (Entity) iterator.next();
-//            if (!entity.isValid())
-//                iterator.remove();
-//        }
-//    }
-//
-//    private static void updateCullables() {
-//        Iterator iterator = cullablePluginEntities.iterator();
-//        while (iterator.hasNext()) {
-//            Entity entity = (Entity) iterator.next();
-//            if (!entity.isValid())
-//                iterator.remove();
-//        }
-//    }
-//
-//    private static void updateItems() {
-//        Iterator iterator = itemVisualEffects.iterator();
-//        while (iterator.hasNext()) {
-//            Entity entity = (Entity) iterator.next();
-//            if (!entity.isValid())
-//                iterator.remove();
-//        }
-//    }
-//
-//
 
 }

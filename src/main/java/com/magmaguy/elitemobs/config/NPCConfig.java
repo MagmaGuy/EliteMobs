@@ -247,7 +247,7 @@ public class NPCConfig {
         configuration.addDefault(COMBAT_INSTRUCTOR_NAME, "Charles");
         configuration.addDefault(COMBAT_INSTRUCTOR_ROLE, "<Combat Instructor>");
         configuration.addDefault(COMBAT_INSTRUCTOR_TYPE, "NITWIT");
-        configuration.addDefault(COMBAT_INSTRUCTOR_LOCATION, "EliteMobs_adventurers_guild,264.5,87,217.5,40,0");
+        configuration.addDefault(COMBAT_INSTRUCTOR_LOCATION, "EliteMobs_adventurers_guild,277.41,90.0,286.23,-214.85,-1.95");
         configuration.addDefault(COMBAT_INSTRUCTOR_GREET, Arrays.asList(
                 "Want to learn about combat?",
                 "Need a combat lesson?",

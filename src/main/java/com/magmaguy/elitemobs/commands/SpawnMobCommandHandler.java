@@ -34,6 +34,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Squid;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class SpawnMobCommandHandler {
 
         HashSet<ElitePower> mobPowers = getPowers(commandSender, args);
 
-        EliteMobEntity eliteMobEntity = new EliteMobEntity(entityType, location, mobLevel, mobPowers);
+        EliteMobEntity eliteMobEntity = new EliteMobEntity(entityType, location, mobLevel, mobPowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
 
     }
 

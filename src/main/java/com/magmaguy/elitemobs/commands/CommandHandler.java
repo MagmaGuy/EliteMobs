@@ -250,10 +250,15 @@ public class CommandHandler implements CommandExecutor {
                                     + Round.twoDecimalPlaces(playerLocation.getPitch());
 
                             try {
-                                NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromKey(args[2]));
+                                try {
+                                    NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromKey(args[2]));
+                                } catch (Exception e) {
+                                }
                                 NPCConfig npcConfig = new NPCConfig();
+                                npcConfig.configuration.set(args[2] + "." + NPCConfig.ENABLED, true);
                                 npcConfig.configuration.set(args[2] + "." + NPCConfig.LOCATION, location);
                                 npcConfig.customConfigLoader.saveCustomConfig(NPCConfig.CONFIG_NAME);
+                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.ENABLED, true);
                                 ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.LOCATION, location);
                                 new NPCEntity(args[2]);
                             } catch (Exception e) {

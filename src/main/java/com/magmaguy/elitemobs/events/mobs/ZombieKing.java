@@ -21,6 +21,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -49,7 +50,7 @@ public class ZombieKing implements Listener {
 
         int kingLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
         TimedBossMobEntity zombieKing = new TimedBossMobEntity(EntityType.ZOMBIE, location, kingLevel,
-                ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME));
+                ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_ZOMBIE_KING_NAME), CreatureSpawnEvent.SpawnReason.NATURAL);
 
         zombieKingList.add(zombieKing);
         zombieKingFlair((Zombie) zombieKing.getLivingEntity());
