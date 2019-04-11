@@ -17,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -78,21 +79,24 @@ public class Fae implements Listener {
                 EntityType.VEX,
                 location,
                 level,
-                ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME));
+                ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
+                CreatureSpawnEvent.SpawnReason.NATURAL);
 
         ActionBossMobEntity lightningFaeBoss = new ActionBossMobEntity(
                 EntityType.VEX,
                 location,
                 level,
                 ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
-                new HashSet<>(Arrays.asList(new AttackFire())));
+                new HashSet<>(Arrays.asList(new AttackFire())),
+                CreatureSpawnEvent.SpawnReason.NATURAL);
 
         ActionBossMobEntity frostFaeBoss = new ActionBossMobEntity(
                 EntityType.VEX,
                 location,
                 level,
                 ConfigValues.eventsConfig.getString(EventsConfig.FAE_NAME),
-                new HashSet<>(Arrays.asList(new AttackFreeze())));
+                new HashSet<>(Arrays.asList(new AttackFreeze())),
+                CreatureSpawnEvent.SpawnReason.CUSTOM);
 
         faeList.addAll(Arrays.asList(lightningFaeBoss.getLivingEntity(), fireFaeBoss.getLivingEntity(), frostFaeBoss.getLivingEntity()));
 

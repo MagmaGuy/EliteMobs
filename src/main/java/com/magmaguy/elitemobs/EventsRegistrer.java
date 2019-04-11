@@ -35,7 +35,6 @@ import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Implosion;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
-import com.magmaguy.elitemobs.mobspawning.NaturalEliteMobSpawnEventHandler;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
@@ -120,7 +119,6 @@ public class EventsRegistrer {
 
         //Natural EliteMobs Spawning
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING)) {
-            pluginManager.registerEvents(new NaturalEliteMobSpawnEventHandler(), plugin);
             pluginManager.registerEvents(new EntityTracker(), plugin);
         }
 
@@ -220,6 +218,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new NPCDamageEvent(), plugin);
         pluginManager.registerEvents(new NPCInteractions(), plugin);
         pluginManager.registerEvents(new NPCProximitySensor(), plugin);
+        pluginManager.registerEvents(new FindNewWorlds(), plugin);
 
     }
 

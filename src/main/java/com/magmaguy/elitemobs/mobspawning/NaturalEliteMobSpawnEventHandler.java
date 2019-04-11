@@ -26,7 +26,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.ArrayList;
@@ -35,25 +34,38 @@ import java.util.List;
 /**
  * Created by MagmaGuy on 10/10/2016.
  */
-public class NaturalEliteMobSpawnEventHandler implements Listener {
+public class NaturalEliteMobSpawnEventHandler {
 
     private static int range = Bukkit.getServer().getViewDistance() * 16;
 
-    /*
-    This manages elite mob entities that are spawned naturally
+    /**
+     * This manages Elite Mob that are spawned naturally. It takes a mob that spawns normally in the world, randomizes
+     * its chance to become an Elite Mob, scans the area around it for players, finds what combat tier those players,
+     * finds if there are additional players, increases the tier of the Elite Mob accordingly and adds sets it as a new
+     * Elite Mob
+     *
+     * @param entity      Entity to check for Elite Mob conversion
+     * @param spawnReason Reason for the mob spawning
      */
     public static void naturalMobProcessor(Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         int eliteMobLevel = getNaturalMobLevel(entity.getLocation());
         if (eliteMobLevel < 0) return;
 
-        EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel);
+        EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel, spawnReason);
 
         if (spawnReason.equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
             eliteMobEntity.setHasSpecialLoot(false);
 
     }
 
+    /**
+     * This gets the level the natural Elite Mob should have. This level is determined by the power of the armor and weapons
+     * the players are wearing, as well as by how many players are in the area.
+     *
+     * @param spawnLocation Location to scan around for players
+     * @return
+     */
     public static int getNaturalMobLevel(Location spawnLocation) {
 
         List<Player> closePlayers = new ArrayList<>();
@@ -78,7 +90,7 @@ public class NaturalEliteMobSpawnEventHandler implements Listener {
         }
 
         /*
-        Add in party system modifier
+        Party system modifier
         Each player adds a +0.2 tier bonus
          */
         eliteMobLevel += playerCount * 0.2 * MobTierFinder.PER_TIER_LEVEL_INCREASE;

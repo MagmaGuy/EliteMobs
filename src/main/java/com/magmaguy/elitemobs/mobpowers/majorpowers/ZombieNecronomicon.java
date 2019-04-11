@@ -59,6 +59,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -288,7 +289,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     if (randomizedNumber < 5) {
 
                         ReinforcementMobEntity trashMobEntity = new ReinforcementMobEntity(EntityType.ZOMBIE, targetter.getLocation(), eliteMobEntity.getLevel(),
-                                ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned zombie")));
+                                ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned zombie")), CreatureSpawnEvent.SpawnReason.CUSTOM);
 
                         trashMobEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
@@ -298,7 +299,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     } else {
 
                         ReinforcementMobEntity trashMobEntity = new ReinforcementMobEntity(EntityType.SKELETON, targetter.getLocation(), eliteMobEntity.getLevel(),
-                                ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned skeleton")));
+                                ChatColorConverter.convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned skeleton")), CreatureSpawnEvent.SpawnReason.CUSTOM);
 
                         trashMobEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
