@@ -41,22 +41,23 @@ public class ShopHandler implements Listener {
 
     public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.SHOP_NAME);
 
-    public ShopHandler() {
-    }
-
-    public ShopHandler(Player player) {
+    public static void shopInitializer(Player player) {
 
         if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return;
 
+        BuyOrSellMenu.constructBuyOrSellMenu(player, "Buy dynamic items");
+
+    }
+
+    public static void shopConstructor(Player player) {
+
         Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
-
         populateShop(shopInventory);
-
         player.openInventory(shopInventory);
 
     }
 
-    private void populateShop(Inventory shopInventory) {
+    private static void populateShop(Inventory shopInventory) {
 
         SharedShopElements.shopHeader(shopInventory);
         shopContents(shopInventory);
@@ -65,7 +66,7 @@ public class ShopHandler implements Listener {
 
     private static List<Integer> validSlots = (List<Integer>) ConfigValues.economyConfig.getList(EconomySettingsConfig.SHOP_VALID_SLOTS);
 
-    private void shopContents(Inventory shopInventory) {
+    private static void shopContents(Inventory shopInventory) {
 
         Random random = new Random();
 

@@ -33,7 +33,6 @@ public class LootTables implements Listener {
         if (eliteMobEntity == null) return;
 
         if (!eliteMobEntity.getHasSpecialLoot()) return;
-
         if (eliteMobEntity.getLevel() < 2) return;
 
         Item item = generateLoot(eliteMobEntity);

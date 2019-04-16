@@ -778,7 +778,7 @@ public class EliteMobEntity {
      * Returns whether the Elite Mob can drop special loot. This only affects its eligibility and does not necessarily
      * mean it will drop special loot.
      *
-     * @return Whether the ELite Mob can drop special loot.
+     * @return Whether the Elite Mob can drop special loot.
      */
     public boolean getHasSpecialLoot() {
         return this.hasNormalLoot;
