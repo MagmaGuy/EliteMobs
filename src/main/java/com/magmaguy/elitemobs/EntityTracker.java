@@ -18,7 +18,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 
@@ -146,6 +145,7 @@ public class EntityTracker implements Listener {
      */
     public static void unregisterSuperMob(Entity entity) {
         if (!SuperMobProperties.isValidSuperMobType(entity)) return;
+        if (!isSuperMob(entity)) return;
         superMobs.remove(entity);
         entity.removeMetadata(MetadataHandler.SUPER_MOB_METADATA, MetadataHandler.PLUGIN);
     }
@@ -196,6 +196,7 @@ public class EntityTracker implements Listener {
      */
     public static void unregisterNaturalEntity(Entity entity) {
         if (EliteMobProperties.isValidEliteMobType(entity)) return;
+        if (!isNaturalEntity(entity)) return;
         naturalEntities.remove(entity);
     }
 
@@ -227,6 +228,7 @@ public class EntityTracker implements Listener {
      */
     public static void unregisterArmorStand(Entity armorStand) {
         if (!armorStand.getType().equals(EntityType.ARMOR_STAND)) return;
+        if (!isArmorStand(armorStand)) return;
         armorStand.remove();
         armorStands.remove(armorStand);
     }
@@ -268,6 +270,7 @@ public class EntityTracker implements Listener {
      */
     public static void unregisterItemVisualEffects(Entity entity) {
         if (!entity.getType().equals(EntityType.DROPPED_ITEM)) return;
+        if (!isItemVisualEffect(entity)) return;
         itemVisualEffects.remove(entity);
         entity.remove();
     }
@@ -410,26 +413,14 @@ public class EntityTracker implements Listener {
 
     }
 
-    /**
-     * This is run in async for performance reasons
-     */
     private static void wipeEntity(Entity entity) {
         unregisterEliteMob(entity);
         unregisterCullableEntity(entity);
         unregisterNPCEntity(entity);
         unregisterArmorStand(entity);
         unregisterItemVisualEffects(entity);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (isSuperMob(entity))
-                    unregisterSuperMob(entity);
-                if (isNaturalEntity(entity))
-                    unregisterNaturalEntity(entity);
-
-            }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+        unregisterSuperMob(entity);
+        unregisterNaturalEntity(entity);
     }
 
     /**

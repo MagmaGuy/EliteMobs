@@ -72,6 +72,17 @@ public class TranslationConfig {
     public static final String ECONOMY_INVALID_PAY_COMMAND_SYNTAX = "Economy invalid pay command syntax";
     public static final String ECONOMY_WALLET_COMMAND = "Wallet command message";
 
+    /*
+    Translation for the shop messages
+     */
+    public static final String SHOP_BUY_MESSAGE = "Shop buy message";
+    public static final String SHOP_SELL_MESSAGE = "Shop sell message";
+    public static final String SHOP_INSUFFICIENT_FUNDS_MESSAGE = "Shop insufficient funds message";
+    public static final String SHOP_SALE_INSTRUCTIONS = "Shop sale instructions";
+    public static final String SHOP_CURRENT_BALANCE = "Shop current balance message";
+    public static final String SHOP_ITEM_PRICE = "Shop item cost message";
+
+
     public static final String CONFIG_NAME = "translation.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -557,6 +568,14 @@ public class TranslationConfig {
         configuration.addDefault(ECONOMY_PAYMENT_INSUFICIENT_CURRENCY, "&cYou don't have enough $currency_name to do that!");
         configuration.addDefault(ECONOMY_INVALID_PAY_COMMAND_SYNTAX, "&cInput not valid. Command format: &e/em pay [playerName] [amount]");
         configuration.addDefault(ECONOMY_WALLET_COMMAND, "You have &2$balance $currency_name");
+
+        //shop messages
+        configuration.addDefault(SHOP_BUY_MESSAGE, "&aYou have bought $item_name &afor $item_value $currency_name!");
+        configuration.addDefault(SHOP_CURRENT_BALANCE, "&aYou have $currency_amount $currency_name.");
+        configuration.addDefault(SHOP_INSUFFICIENT_FUNDS_MESSAGE, "&cYou don't have enough $currency_name!");
+        configuration.addDefault(SHOP_ITEM_PRICE, "That item costs &c$item_value $currency_name.");
+        configuration.addDefault(SHOP_SELL_MESSAGE, "&aYou have sold $item_name &afor $currency_amount $currency_name!");
+        configuration.addDefault(SHOP_SALE_INSTRUCTIONS, "&cYou can only sell EliteMobs loot here! (Armor / weapons dropped from elites showing a value on their lore)");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);
