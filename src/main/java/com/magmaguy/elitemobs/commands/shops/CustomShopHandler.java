@@ -39,24 +39,32 @@ import java.util.Random;
  */
 public class CustomShopHandler implements Listener {
 
+    /**
+     * Fixed shop name, used to track if an event is happening within it
+     */
     public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.CUSTOM_SHOP_NAME);
 
-    public CustomShopHandler() {
-    }
-
-    public static void CustomShopHandler(Player player) {
+    /**
+     * Generates a new custom item shop menu for a player
+     *
+     * @param player Player for whom the shop menu will pop up
+     */
+    public static void customShopInitializer(Player player) {
 
         if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return;
+        BuyOrSellMenu.constructBuyOrSellMenu(player, "Buy custom items");
+
+    }
+
+    public static void customShopConstructor(Player player) {
 
         Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
-
         populateShop(shopInventory);
-
         player.openInventory(shopInventory);
 
     }
 
-    public static void populateShop(Inventory shopInventory) {
+    private static void populateShop(Inventory shopInventory) {
 
         SharedShopElements.shopHeader(shopInventory);
         shopContents(shopInventory);
@@ -65,7 +73,7 @@ public class CustomShopHandler implements Listener {
 
     private static List<Integer> validSlots = (List<Integer>) ConfigValues.economyConfig.getList(EconomySettingsConfig.CUSTOM_SHOP_VALID_SLOTS);
 
-    public static void shopContents(Inventory shopInventory) {
+    private static void shopContents(Inventory shopInventory) {
 
         //Anything after 8 is populated
         Random random = new Random();
@@ -83,11 +91,7 @@ public class CustomShopHandler implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (!SharedShopElements.inventoryNullPointerPreventer(event)) {
-
-            return;
-
-        }
+        if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
         if (!event.getInventory().getName().equals(SHOP_NAME)) return;
 
         //reroll loot button
@@ -100,10 +104,8 @@ public class CustomShopHandler implements Listener {
         }
 
         if (!ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(event.getCurrentItem())) {
-
             event.setCancelled(true);
             return;
-
         }
 
         Player player = (Player) event.getWhoClicked();

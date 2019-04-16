@@ -6,8 +6,9 @@ import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combattag.CombatTag;
 import com.magmaguy.elitemobs.commands.LootGUI;
+import com.magmaguy.elitemobs.commands.shops.BuyOrSellMenu;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
-import com.magmaguy.elitemobs.commands.shops.ItemSaleEvent;
+import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.events.DeadMoon;
@@ -139,7 +140,8 @@ public class EventsRegistrer {
         //Shops
         pluginManager.registerEvents(new ShopHandler(), plugin);
         pluginManager.registerEvents(new CustomShopHandler(), plugin);
-        pluginManager.registerEvents(new ItemSaleEvent(), plugin);
+        pluginManager.registerEvents(new BuyOrSellMenu(), plugin);
+        pluginManager.registerEvents(new SellMenu(), plugin);
 
         //Minecraft behavior canceller
         pluginManager.registerEvents(new ChunkUnloadMetadataPurge(), plugin);

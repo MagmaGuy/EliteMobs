@@ -116,7 +116,7 @@ public class CommandHandler implements CommandExecutor {
             case "shop":
             case "store":
                 if (userPermCheck(SHOP, commandSender)) {
-                    new ShopHandler((Player) commandSender);
+                    ShopHandler.shopInitializer((Player) commandSender);
                 }
                 return true;
             case "customshop":
@@ -124,7 +124,7 @@ public class CommandHandler implements CommandExecutor {
             case "customstore":
             case "cstore":
                 if (userPermCheck(CUSTOMSHOP, commandSender)) {
-                    CustomShopHandler.CustomShopHandler((Player) commandSender);
+                    CustomShopHandler.customShopInitializer((Player) commandSender);
                 }
                 return true;
             case "wallet":

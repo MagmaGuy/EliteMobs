@@ -51,7 +51,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            CustomShopHandler.CustomShopHandler(event.getPlayer());
+                            CustomShopHandler.customShopInitializer(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
 
@@ -61,7 +61,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            new ShopHandler(event.getPlayer());
+                            ShopHandler.shopInitializer(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;

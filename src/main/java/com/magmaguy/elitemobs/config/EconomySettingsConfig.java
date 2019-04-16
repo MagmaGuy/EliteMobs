@@ -36,6 +36,17 @@ public class EconomySettingsConfig {
     public static final String SIGNATURE_ITEM_LOCATION_SHOPS = "Reroll button location for EliteMobs Shops";
     public static final String SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Shop";
     public static final String CUSTOM_SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Custom Shop";
+    public static final String SELL_SHOP_NAME = "Sell shop name";
+    public static final String SELL_SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Sell Shop";
+    public static final String SELL_SHOP_INFO_SLOT = "Sell shop info slot";
+    public static final String SELL_SHOP_INFO_NAME = "Sell shop info item name";
+    public static final String SELL_SHOP_INFO_LORE = "Sell shop info item lore";
+    public static final String SELL_SHOP_CANCEL_SLOT = "Sell shop cancel slot";
+    public static final String SELL_SHOP_CANCEL_NAME = "Sell shop cancel name";
+    public static final String SELL_SHOP_CANCEL_LORE = "Sell shop cancel lore";
+    public static final String SELL_SHOP_CONFIRM_SLOT = "Sell shop confirm slot";
+    public static final String SELL_SHOP_CONFIRM_NAME = "Sell shop confirm name";
+    public static final String SELL_SHOP_CONFIRM_LORE = "Sell shop confirm lore";
 
     private static final String MATERIAL_WORTH = "Material worth.";
     public static final String DIAMOND_AXE = MATERIAL_WORTH + "DIAMOND_AXE";
@@ -185,6 +196,23 @@ public class EconomySettingsConfig {
         configuration.addDefault(CUSTOM_SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
                 46, 47, 48, 49, 50, 51, 52, 53));
+
+        configuration.addDefault(SELL_SHOP_NAME, "EliteMobs Sell Menu");
+        configuration.addDefault(SELL_SHOP_INFO_SLOT, 8);
+        configuration.addDefault(SELL_SHOP_INFO_NAME, "&cWarning!");
+        configuration.addDefault(SELL_SHOP_INFO_LORE, Arrays.asList(
+                "&cYou can only sell special",
+                "&cElite Mobs drops in this",
+                "&cshop! These should have",
+                "&ca value on their lore."));
+        configuration.addDefault(SELL_SHOP_CANCEL_SLOT, 27);
+        configuration.addDefault(SELL_SHOP_CANCEL_NAME, "&4Cancel");
+        configuration.addDefault(SELL_SHOP_CANCEL_LORE, Arrays.asList("&cCancel sale!"));
+        configuration.addDefault(SELL_SHOP_CONFIRM_SLOT, 35);
+        configuration.addDefault(SELL_SHOP_CONFIRM_NAME, "&2Confirm sale!");
+        configuration.addDefault(SELL_SHOP_CONFIRM_LORE, Arrays.asList("&aSell items for", "&a$currency_amount $currency_name"));
+        configuration.addDefault(SELL_SHOP_VALID_SLOTS, Arrays.asList(19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33,
+                34, 37, 38, 39, 40, 41, 42, 43));
 
         configuration.addDefault(DIAMOND_AXE, diamondLevel);
         configuration.addDefault(DIAMOND_BARDING, diamondLevel);
