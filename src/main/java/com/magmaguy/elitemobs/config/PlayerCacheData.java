@@ -15,7 +15,11 @@
 
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
+
+import java.io.File;
 
 /**
  * Created by MagmaGuy on 02/07/2017.
@@ -28,11 +32,9 @@ public class PlayerCacheData {
 
     public void initializeConfig() {
 
-        //no real defaults, just a data file
-        customConfigLoader.getCustomConfig(CONFIG_NAME, true).options().copyDefaults(true);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME, true);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME, true);
-
+        File file = new File(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDataFolder().getAbsolutePath() + "/data/" + CONFIG_NAME);
+        if (!file.exists())
+            new CustomConfigConstructor(CONFIG_NAME, CONFIG_NAME);
     }
 
 }
