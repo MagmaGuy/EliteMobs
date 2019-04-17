@@ -10,6 +10,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.util.Iterator;
+
 public class KillHandler {
 
     public static void killCommand(CommandSender commandSender, String[] args) {
@@ -51,9 +53,12 @@ public class KillHandler {
 
             int counter = 0;
 
-            for (EliteMobEntity eliteMobEntity : EntityTracker.getEliteMobs()) {
+            Iterator<EliteMobEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().iterator();
+
+            while (eliteMobEntityIterator.hasNext()) {
+                EliteMobEntity eliteMobEntity = eliteMobEntityIterator.next();
                 eliteMobEntity.getLivingEntity().remove();
-                EntityTracker.unregisterEliteMob(eliteMobEntity);
+                eliteMobEntityIterator.remove();
                 counter++;
             }
 
@@ -68,11 +73,14 @@ public class KillHandler {
         if (CommandHandler.permCheck(CommandHandler.KILLALL_PASSIVEELITES, commandSender)) {
             int counter = 0;
             for (World world : EliteMobs.validWorldList)
-                for (LivingEntity livingEntity : world.getLivingEntities())
+                for (Iterator<LivingEntity> livingEntityIterator = world.getLivingEntities().iterator(); livingEntityIterator.hasNext(); ) {
+                    LivingEntity livingEntity = livingEntityIterator.next();
                     if (EntityTracker.isSuperMob(livingEntity)) {
+                        EntityTracker.registerSuperMob(livingEntity);
                         livingEntity.remove();
                         counter++;
                     }
+                }
 
             commandSender.sendMessage("Killed " + counter + " Elite Mobs.");
 

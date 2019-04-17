@@ -29,15 +29,9 @@ public class ItemsCustomLootListConfig {
 
     public void intializeConfig() {
 
-        Bukkit.getLogger().info(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDataFolder().getAbsolutePath() + "/data/" + CONFIG_NAME);
-
         File file = new File(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDataFolder().getAbsolutePath() + "/data/" + CONFIG_NAME);
-
-        if (!file.exists()) {
-
-            CustomConfigConstructor customConfigConstructor = new CustomConfigConstructor(CONFIG_NAME, CONFIG_NAME);
-
-        }
+        if (!file.exists())
+            new CustomConfigConstructor(CONFIG_NAME, CONFIG_NAME);
 
     }
 

@@ -1,6 +1,10 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
+
+import java.io.File;
 
 public class PlayerMaxGuildRank {
 
@@ -10,10 +14,9 @@ public class PlayerMaxGuildRank {
 
     public void intializeConfig() {
 
-        //no real defaults, just a data file
-        customConfigLoader.getCustomConfig(CONFIG_NAME, true).options().copyDefaults(true);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME, true);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME, true);
+        File file = new File(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDataFolder().getAbsolutePath() + "/data/" + CONFIG_NAME);
+        if (!file.exists())
+            new CustomConfigConstructor(CONFIG_NAME, CONFIG_NAME);
 
     }
 
