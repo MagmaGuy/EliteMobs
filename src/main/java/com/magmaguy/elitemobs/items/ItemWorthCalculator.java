@@ -335,7 +335,7 @@ public class ItemWorthCalculator {
 
         double potionEffectValue = 0;
 
-        if (potionString == null || potionString.isEmpty()) return potionEffectValue;
+        if (potionString == null || potionString.isEmpty() || potionString.get(0) == null) return potionEffectValue;
 
         for (String string : potionString)
             potionEffectValue += getPotionEffectValue(string.split(",")[0]) * (Integer.parseInt(string.split(",")[1]) + 1);
