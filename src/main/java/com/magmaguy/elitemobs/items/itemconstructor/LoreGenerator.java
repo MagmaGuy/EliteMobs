@@ -88,9 +88,7 @@ public class LoreGenerator {
                 lore.add(string.replace("$tier", ItemTierFinder.findGenericTier(material, enchantmentMap) + ""));
             else if (string.equals("$itemSource")) {
                 if (eliteMobEntity != null) {
-                    {
-                        lore.add(itemSource(eliteMobEntity));
-                    }
+                    lore.add(itemSource(eliteMobEntity));
                 }
             } else
                 lore.add(string);
@@ -152,7 +150,7 @@ public class LoreGenerator {
                 obfuscatedString.append(string).append(":").append(customEnchantments.get(string)).append(",");
         }
 
-        if (potionList != null && !potionList.isEmpty()) {
+        if (potionList != null && !potionList.isEmpty() && potionList.get(0) != null) {
             obfuscatedString.append(OBFUSCATED_POTIONS).append(",");
             for (String string : potionList)
                 obfuscatedString.append(string.replace(",", ":")).append(",");
@@ -291,8 +289,7 @@ public class LoreGenerator {
 
         List<String> potionsLore = new ArrayList<>();
 
-
-        if (potionList == null || potionList.isEmpty()) return potionsLore;
+        if (potionList == null || potionList.isEmpty() || potionList.get(0) == null) return potionsLore;
 
         for (String string : potionList) {
             String loreLine = ChatColorConverter.convert("&2" + getPotionName(string.split(",")[0]) + " " + string.split(",")[1]);
