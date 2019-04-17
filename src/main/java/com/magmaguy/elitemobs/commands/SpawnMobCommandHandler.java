@@ -69,7 +69,7 @@ public class SpawnMobCommandHandler {
 
     }
 
-    private static Location getLocation(CommandSender commandSender, String args[]) {
+    private static Location getLocation(CommandSender commandSender, String[] args) {
 
         if (commandSender instanceof Player)
             return getLocation((Player) commandSender);
@@ -124,7 +124,7 @@ public class SpawnMobCommandHandler {
     }
 
 
-    private static EntityType getEntityType(CommandSender commandSender, String args[]) {
+    private static EntityType getEntityType(CommandSender commandSender, String[] args) {
 
         String entityInput = "";
 
@@ -174,13 +174,14 @@ public class SpawnMobCommandHandler {
 
     }
 
-    private static Integer getLevel(CommandSender commandSender, String args[]) {
+    private static Integer getLevel(CommandSender commandSender, String[] args) {
 
         int mobLevel = 0;
 
         if (args.length < 3) {
             commandSender.sendMessage("[EliteMobs] Missing Elite Mob level.");
             commandSender.sendMessage("[EliteMobs] Command syntax: /em spawn [mobType] [level]");
+            return null;
         }
 
         if (commandSender instanceof Player) {
@@ -217,7 +218,7 @@ public class SpawnMobCommandHandler {
 
     }
 
-    private static HashSet<ElitePower> getPowers(CommandSender commandSender, String args[]) {
+    private static HashSet<ElitePower> getPowers(CommandSender commandSender, String[] args) {
 
         ArrayList<String> mobPowers = new ArrayList();
 
