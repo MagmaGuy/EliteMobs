@@ -17,6 +17,8 @@ public class EnchantmentConfigParser {
         List enchantments = configuration.getList(path);
         HashMap enchantmentMap = new HashMap();
 
+        if (enchantments.isEmpty()) return enchantmentMap;
+
         try {
             for (Object object : enchantments) {
 

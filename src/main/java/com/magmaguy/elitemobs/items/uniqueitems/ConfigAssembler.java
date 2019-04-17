@@ -12,9 +12,12 @@ public class ConfigAssembler {
 
         configuration.addDefault("Items." + path + ".Item Type", itemType);
         configuration.addDefault("Items." + path + ".Item Name", itemName);
-        configuration.addDefault("Items." + path + ".Item Lore", itemLore);
-        configuration.addDefault("Items." + path + ".Enchantments", enchantments);
-        configuration.addDefault("Items." + path + ".Potion Effects", potionEffects);
+        if (!configuration.contains("Items." + path + ".Item Lore"))
+            configuration.addDefault("Items." + path + ".Item Lore", itemLore);
+        if (!configuration.contains("Items." + path + ".Enchantments"))
+            configuration.addDefault("Items." + path + ".Enchantments", enchantments);
+        if (!configuration.contains("Items." + path + ".Potion Effects"))
+            configuration.addDefault("Items." + path + ".Potion Effects", potionEffects);
         configuration.addDefault("Items." + path + ".Drop Weight", itemWeight);
         configuration.addDefault("Items." + path + ".Scalability", itemScalability);
 

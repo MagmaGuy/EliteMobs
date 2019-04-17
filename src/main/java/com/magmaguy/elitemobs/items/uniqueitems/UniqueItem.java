@@ -40,6 +40,12 @@ public abstract class UniqueItem {
     }
 
     public ItemStack initializeItemStack() {
+        String name = NameConfigParser.parseName(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        Material type = MaterialConfigParser.parseMaterial(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
+        List<String> lore = LoreConfigParser.parseLore(ConfigValues.itemsUniqueConfig,
+                "Items." + definePath());
         HashMap<Enchantment, Integer> enchantments = EnchantmentConfigParser.parseEnchantments(ConfigValues.itemsUniqueConfig,
                 "Items." + definePath());
         HashMap<String, Integer> customEnchantments = CustomEnchantmentConfigParser.parseCustomEnchantments(ConfigValues.itemsUniqueConfig,
@@ -49,8 +55,8 @@ public abstract class UniqueItem {
         String dropType = DropWeightConfigParser.getDropType(ConfigValues.itemsUniqueConfig, "Items." + definePath());
         String scalability = ScalabilityConfigParser.parseItemScalability(ConfigValues.itemsUniqueConfig, "Items." + definePath());
 
-        return ItemConstructor.constructItem(defineName(), Material.getMaterial(defineType()), enchantments, customEnchantments,
-                potionEffects, defineLore(), dropType, scalability);
+        return ItemConstructor.constructItem(name, type, enchantments, customEnchantments,
+                potionEffects, lore, dropType, scalability);
     }
 
     public ItemStack constructItemStack(int itemTier) {
