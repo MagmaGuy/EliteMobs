@@ -48,6 +48,8 @@ public class EconomySettingsConfig {
     public static final String SELL_SHOP_CONFIRM_NAME = "Sell shop confirm name";
     public static final String SELL_SHOP_CONFIRM_LORE = "Sell shop confirm lore";
 
+    public static final String USE_VAULT = "Use Vault instead of Elite Coins (BAD IDEA)";
+
     private static final String MATERIAL_WORTH = "Material worth.";
     public static final String DIAMOND_AXE = MATERIAL_WORTH + "DIAMOND_AXE";
     public static final String DIAMOND_BARDING = MATERIAL_WORTH + "DIAMOND_BARDING";
@@ -143,6 +145,9 @@ public class EconomySettingsConfig {
     public static final String VANISHING_CURSE = ENCHANTMENT_WORTH + "VANISHING_CURSE";
     public static final String WATER_WORKER = ENCHANTMENT_WORTH + "WATER_WORKER";
 
+    public static final String FLAMETHROWER = ENCHANTMENT_WORTH + "FLAMETHROWER";
+    public static final String HUNTER = ENCHANTMENT_WORTH + "HUNTER";
+
     private static final String POTION_EFFECT_WORTH = "Potion effect worth.";
     public static final String ABSORPTION = POTION_EFFECT_WORTH + "ABSORPTION";
     public static final String BLINDNESS = POTION_EFFECT_WORTH + "BLINDNESS";
@@ -213,6 +218,8 @@ public class EconomySettingsConfig {
         configuration.addDefault(SELL_SHOP_CONFIRM_LORE, Arrays.asList("&aSell items for", "&a$currency_amount $currency_name"));
         configuration.addDefault(SELL_SHOP_VALID_SLOTS, Arrays.asList(19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33,
                 34, 37, 38, 39, 40, 41, 42, 43));
+
+        configuration.addDefault(USE_VAULT, false);
 
         configuration.addDefault(DIAMOND_AXE, diamondLevel);
         configuration.addDefault(DIAMOND_BARDING, diamondLevel);
@@ -306,6 +313,9 @@ public class EconomySettingsConfig {
         configuration.addDefault(THORNS, diamondLevel);
         configuration.addDefault(VANISHING_CURSE, -1);
         configuration.addDefault(WATER_WORKER, 1);
+
+        configuration.addDefault(FLAMETHROWER, 5);
+        configuration.addDefault(HUNTER, 3);
 
         configuration.addDefault(ABSORPTION, (diamondLevel) * 10);
         configuration.addDefault(BLINDNESS, (diamondLevel / 2) * 10);

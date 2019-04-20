@@ -60,12 +60,35 @@ public class EliteMobEntity {
     private CreatureSpawnEvent.SpawnReason spawnReason;
 
     /**
+     * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
+     * the Elite Mob conversion
+     *
+     * @param location Location to be checked
+     * @return Whether the location is valid
+     */
+    private static boolean validSpawnLocation(Location location) {
+        //todo: reenable this for 1.14
+        return true;
+//        if (!Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) return true;
+//        com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
+//        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+//        RegionQuery query = container.createQuery();
+//        ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
+//        return set.testState(null, EliteMobs.ELITEMOBS_SPAWN_FLAG);
+    }
+
+    /**
      * This is the generic constructor used in most instances of natural elite mob generation
      *
      * @param livingEntity  Minecraft entity associated to this elite mob
      * @param eliteMobLevel Level of the mob, can be modified during runtime. Dynamically assigned.
      */
     public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, CreatureSpawnEvent.SpawnReason spawnReason) {
+
+        /*
+        Run a WorldGuard check to see if the entity is allowed to get converted at this location
+         */
+        if (!validSpawnLocation(livingEntity.getLocation())) return;
 
         /*
         Register living entity to keep track of which entity this object is tied to
@@ -122,6 +145,11 @@ public class EliteMobEntity {
      * @param eliteMobLevel Level of the mob, can be modified during runtime. Dynamically assigned.
      */
     public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, double currentHealthPercent, CreatureSpawnEvent.SpawnReason spawnReason) {
+
+        /*
+        Run a WorldGuard check to see if the entity is allowed to get converted at this location
+         */
+        if (!validSpawnLocation(livingEntity.getLocation())) return;
 
         /*
         Register living entity to keep track of which entity this object is tied to
@@ -185,6 +213,11 @@ public class EliteMobEntity {
     public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         /*
+        Run a WorldGuard check to see if the entity is allowed to get converted at this location
+         */
+        if (!validSpawnLocation(location)) return;
+
+        /*
         Register living entity to keep track of which entity this object is tied to
          */
         this.eliteMob = spawnBossMobLivingEntity(entityType, location);
@@ -244,6 +277,11 @@ public class EliteMobEntity {
      * @param mobPowers     HashSet of ElitePower that the entity will have (can be empty)
      */
     public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
+
+        /*
+        Run a WorldGuard check to see if the entity is allowed to get converted at this location
+         */
+        if (!validSpawnLocation(location)) return;
 
         /*
         Register living entity to keep track of which entity this object is tied to

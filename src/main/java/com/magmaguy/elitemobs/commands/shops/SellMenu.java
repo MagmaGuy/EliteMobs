@@ -99,7 +99,7 @@ public class SellMenu implements Listener {
                 continue;
             }
 
-            sellInventory.setItem(i, new ItemStack(Material.THIN_GLASS));
+            sellInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.THIN_GLASS));
 
         }
 
@@ -116,7 +116,7 @@ public class SellMenu implements Listener {
         if (event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME)) {
 
             //Signature item
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName())) {
+            if (!event.getCurrentItem().getItemMeta().hasDisplayName() || event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName())) {
                 event.setCancelled(true);
                 return;
             }

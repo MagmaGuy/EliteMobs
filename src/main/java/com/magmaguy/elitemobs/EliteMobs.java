@@ -7,7 +7,9 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
@@ -20,10 +22,16 @@ import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
-import com.magmaguy.elitemobs.runnables.*;
+import com.magmaguy.elitemobs.runnables.EggRunnable;
+import com.magmaguy.elitemobs.runnables.EntityScanner;
+import com.magmaguy.elitemobs.runnables.PotionEffectApplier;
+import com.magmaguy.elitemobs.runnables.ScoreboardUpdater;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -36,9 +44,27 @@ import java.util.List;
 public class EliteMobs extends JavaPlugin {
 
     public static List<World> validWorldList = new ArrayList();
+    public static final StateFlag ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
+    public static boolean VAULT_ENABLED = false;
 
     @Override
     public void onEnable() {
+
+        //Enable WorldGuard
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) {
+            Bukkit.getLogger().info("[EliteMobs] WorldGuard detected.");
+            try {
+                FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+                Bukkit.getLogger().info("[EliteMobs] Enabling flags:");
+
+                registry.register(ELITEMOBS_SPAWN_FLAG);
+                Bukkit.getLogger().info("[EliteMobs] - elitemobspawn");
+
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work.");
+            }
+
+        }
 
         //Enable stats
         Metrics metrics = new Metrics(this);
@@ -49,6 +75,21 @@ public class EliteMobs extends JavaPlugin {
         //Load loot from config
         ConfigValues.intializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
+
+        //Enable Vault
+        if (getServer().getPluginManager().isPluginEnabled("Vault")) {
+            Bukkit.getLogger().info("[EliteMobs] Vault detected.");
+            if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.USE_VAULT)) {
+                Bukkit.getLogger().warning("[EliteMobs] Vault preference detected. This is not the recommended setting. Ask the dev or check the wiki as to why.");
+                VAULT_ENABLED = true;
+                VaultCompatibility.setupEconomy();
+                VaultCompatibility vaultCompatibility = new VaultCompatibility();
+                vaultCompatibility.setupChat();
+                vaultCompatibility.setupPermissions();
+            }
+
+        }
+
 
         //Parse loot
         CustomItemConstructor superDrops = new CustomItemConstructor();
@@ -121,10 +162,6 @@ public class EliteMobs extends JavaPlugin {
 
         EntityTracker.shutdownPurger();
 
-        for (World world : validWorldList) {
-            world.save();
-        }
-
         /*
         Flush lingering arrows from the arrow tracking power
          */
@@ -175,7 +212,6 @@ public class EliteMobs extends JavaPlugin {
                 ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.CHICKEN) &&
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
-        new DynamicLoreUpdater().runTaskTimer(this, 20, 20 * 2);
 //        new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
 //        EntityListUpdater.startUpdating();
 

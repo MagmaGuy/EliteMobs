@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -18,9 +19,20 @@ public class EnchantmentGenerator {
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
 
         for (Enchantment enchantment : enchantmentMap.keySet())
-            if (enchantmentMap.get(enchantment) > 5 && ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
-                itemMeta.addEnchant(enchantment, 5, true);
-            else
+            if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() && ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
+                if (enchantment.getName().equals(Enchantment.DAMAGE_ALL.getName()) ||
+                        enchantment.getName().equals(Enchantment.ARROW_DAMAGE.getName()) ||
+                        enchantment.getName().equals(Enchantment.PROTECTION_ENVIRONMENTAL.getName()) ||
+                        enchantment.getName().equals(Enchantment.DAMAGE_ARTHROPODS.getName()) ||
+                        enchantment.getName().equals(Enchantment.DAMAGE_UNDEAD.getName()) ||
+                        enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) ||
+                        enchantment.getName().equals(Enchantment.PROTECTION_FIRE.getName()) ||
+                        enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName())) {
+                    itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
+                } else
+                    itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
+
+            } else
                 itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
 
         return itemMeta;
@@ -108,6 +120,8 @@ public class EnchantmentGenerator {
             case IRON_HOE:
             case STONE_HOE:
             case WOOD_HOE:
+                if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.HOES_AS_WEAPONS))
+                    enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
             case SHIELD:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DURABILITY", itemTier));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
@@ -255,7 +269,7 @@ public class EnchantmentGenerator {
 
     }
 
-    public static HashMap<String, Integer> generateCustomEnchantments(double itemTier, Material material){
+    public static HashMap<String, Integer> generateCustomEnchantments(double itemTier, Material material) {
 
         HashMap<String, Integer> enchantmentMap = new HashMap<>();
 
@@ -309,28 +323,28 @@ public class EnchantmentGenerator {
             case GOLD_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("HUNTER"));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
                 break;
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
             case GOLD_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("HUNTER"));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
                 break;
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
             case GOLD_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("HUNTER"));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
                 break;
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
             case GOLD_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("HUNTER"));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
                 break;
             case FISHING_ROD:
                 break;

@@ -22,7 +22,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment implements Listen
     private static ArrayList<Player> playersUsingFlamethrower = new ArrayList<>();
 
     @EventHandler
-    public void onIteract(PlayerInteractEvent event) {
+    public void onInteract(PlayerInteractEvent event) {
 
         Player player = event.getPlayer();
 
