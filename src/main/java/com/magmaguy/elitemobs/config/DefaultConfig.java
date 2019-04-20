@@ -31,7 +31,6 @@ public class DefaultConfig {
     public static final String ENABLE_PERMISSION_TITLES = "Use titles to warn players they are missing a permission";
     public static final String ENABLE_POWER_SCOREBOARDS = "Use scoreboards to display mob powers using permissions";
     public static final String HIDE_ENCHANTMENTS_ATTRIBUTE = "Hide enchantment attributes on plugin-generated items";
-    public static final String PREVENT_ITEM_PICKUP = "Prevent item pickup for elite mobs";
     public static final String PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS = "Make aggressive named mobs unable to become Elite Mobs";
     public static final String PREVENT_MOUNT_EXPLOIT = "Prevent Minecraft living entity mount exploit for Elite Mobs";
     public static final String STRICT_SPAWNING_RULES = "Strict spawning rules mode for better compatibility with other plugins";
@@ -51,7 +50,6 @@ public class DefaultConfig {
         configuration.addDefault(ENABLE_POWER_SCOREBOARDS, false);
         configuration.addDefault(ALWAYS_SHOW_NAMETAGS, false);
         configuration.addDefault(HIDE_ENCHANTMENTS_ATTRIBUTE, false);
-        configuration.addDefault(PREVENT_ITEM_PICKUP, true);
         configuration.addDefault(PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS, true);
         configuration.addDefault(STRICT_SPAWNING_RULES, false);
         configuration.addDefault(PREVENT_MOUNT_EXPLOIT, true);

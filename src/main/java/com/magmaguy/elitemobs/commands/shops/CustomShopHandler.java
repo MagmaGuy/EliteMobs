@@ -15,9 +15,11 @@
 
 package com.magmaguy.elitemobs.commands.shops;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
@@ -52,7 +54,7 @@ public class CustomShopHandler implements Listener {
     public static void customShopInitializer(Player player) {
 
         if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return;
-        BuyOrSellMenu.constructBuyOrSellMenu(player, "Buy custom items");
+        BuyOrSellMenu.constructBuyOrSellMenu(player, ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.BUY_OR_SELL_CUSTOM_ITEMS)));
 
     }
 

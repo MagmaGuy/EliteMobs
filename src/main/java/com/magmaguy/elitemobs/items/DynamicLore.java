@@ -43,9 +43,11 @@ public class DynamicLore {
                         && itemStack.getItemMeta().hasLore()))
                     continue;
 
-                if (ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(itemStack)
-                        && !player.getInventory().getItemInMainHand().equals(itemStack)
-                        && !player.getInventory().getItemInOffHand().equals(itemStack)) {
+                if (!player.getInventory().getItemInMainHand().equals(itemStack)
+                        && !player.getInventory().getItemInOffHand().equals(itemStack)
+                        && ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(itemStack)) {
+
+                    Bukkit.getLogger().warning("Item: " + itemStack.getItemMeta().getDisplayName());
 
                     if (displayWorth) {
 

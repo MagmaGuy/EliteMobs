@@ -105,12 +105,16 @@ public class ItemsDropSettingsConfig {
     public static final String WEAKNESS_NAME = POTION_EFFECT_NAME + "WEAKNESS";
     public static final String WITHER_NAME = POTION_EFFECT_NAME + "WITHER";
     public static final String ENABLE_RARE_DROP_EFFECT = "Enable rare drop visual effect";
+    public static final String HOES_AS_WEAPONS = "Enable hoes as weapons";
 
     /*
     Custom enchantments
      */
-    public static final String FLAMETHROWER_NAME = ENCHANTMENT_NAME + CustomEnchantmentCache.flamethrowerEnchantment.getKey();
-    public static final String HUNTER_NAME = ENCHANTMENT_NAME + CustomEnchantmentCache.hunterEnchantment.getKey();
+    private static final String CUSTOM_ENCHANTMENT_NAME = "Custom Enchantment name.";
+    public static final String FLAMETHROWER_NAME = CUSTOM_ENCHANTMENT_NAME + CustomEnchantmentCache.flamethrowerEnchantment.getKey();
+    public static final String HUNTER_NAME = CUSTOM_ENCHANTMENT_NAME + CustomEnchantmentCache.hunterEnchantment.getKey();
+
+    public static final String ELITE_ENCHANTMENT_NAME = "Elite Enchantment name";
 
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
@@ -197,8 +201,13 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(WATER_BREATHING_NAME, "Water Breathing");
         configuration.addDefault(WEAKNESS_NAME, "Weakness");
         configuration.addDefault(WITHER_NAME, "Wither");
+
+
         configuration.addDefault(FLAMETHROWER_NAME, "Flamethrower");
         configuration.addDefault(HUNTER_NAME, "Hunter");
+
+        configuration.addDefault(ELITE_ENCHANTMENT_NAME, "&6Elite");
+
         configuration.addDefault(ENABLE_RARE_DROP_EFFECT, true);
 
         configuration.options().copyDefaults(true);

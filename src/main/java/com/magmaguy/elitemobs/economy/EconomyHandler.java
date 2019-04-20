@@ -15,6 +15,7 @@
 
 package com.magmaguy.elitemobs.economy;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.PlayerMoneyData;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
@@ -31,6 +32,11 @@ public class EconomyHandler {
 
     public static void addCurrency(UUID user, double amount) {
 
+        if (EliteMobs.VAULT_ENABLED) {
+            VaultCompatibility.addVaultCurrency(user, amount);
+            return;
+        }
+
         if (!checkUserExists(user)) createUser(user);
 
         PlayerData.playerCurrency.put(user, roundDecimals(checkCurrency(user) + amount));
@@ -40,6 +46,11 @@ public class EconomyHandler {
 
 
     public static void subtractCurrency(UUID user, double amount) {
+
+        if (EliteMobs.VAULT_ENABLED) {
+            VaultCompatibility.subtractCurrency(user, amount);
+            return;
+        }
 
         if (!checkUserExists(user)) createUser(user);
 
@@ -58,6 +69,10 @@ public class EconomyHandler {
     }
 
     public static double checkCurrency(UUID user) {
+
+        if (EliteMobs.VAULT_ENABLED) {
+            return VaultCompatibility.checkCurrency(user);
+        }
 
         if (!checkUserExists(user))
             createUser(user);

@@ -81,6 +81,9 @@ public class TranslationConfig {
     public static final String SHOP_SALE_INSTRUCTIONS = "Shop sale instructions";
     public static final String SHOP_CURRENT_BALANCE = "Shop current balance message";
     public static final String SHOP_ITEM_PRICE = "Shop item cost message";
+    public static final String BUY_OR_SELL_CUSTOM_ITEMS = "Shop custom items purchase name";
+    public static final String BUY_OR_SELL_DYNAMIC_ITEMS = "Shop dynamic items purchase name";
+    public static final String BUY_OR_SELL_SELL_ITEMS = "Shop sell items name";
 
 
     public static final String CONFIG_NAME = "translation.yml";
@@ -576,6 +579,10 @@ public class TranslationConfig {
         configuration.addDefault(SHOP_ITEM_PRICE, "That item costs &c$item_value $currency_name.");
         configuration.addDefault(SHOP_SELL_MESSAGE, "&aYou have sold $item_name &afor $currency_amount $currency_name!");
         configuration.addDefault(SHOP_SALE_INSTRUCTIONS, "&cYou can only sell EliteMobs loot here! (Armor / weapons dropped from elites showing a value on their lore)");
+
+        configuration.addDefault(BUY_OR_SELL_CUSTOM_ITEMS, "&aBuy custom items!");
+        configuration.addDefault(BUY_OR_SELL_DYNAMIC_ITEMS, "&aBuy dynamic items!");
+        configuration.addDefault(BUY_OR_SELL_SELL_ITEMS, "&cSell items");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);
