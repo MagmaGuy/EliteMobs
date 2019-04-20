@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.Material;
@@ -206,6 +208,20 @@ public class ItemTierFinder {
                 return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             case BOW:
                 return IRON_TIER + mainEnchantment3;
+            case DIAMOND_HOE:
+            case IRON_HOE:
+            case STONE_HOE:
+            case GOLD_HOE:
+            case WOOD_HOE:
+                if (!ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.HOES_AS_WEAPONS)) return 0;
+                if (material.equals(Material.DIAMOND_HOE))
+                    return DIAMOND_TIER + mainEnchantment;
+                if (material.equals(Material.IRON_HOE))
+                    return IRON_TIER + mainEnchantment;
+                if (material.equals(Material.STONE_HOE))
+                    return STONE_CHAIN_TIER + mainEnchantment;
+                if (material.equals(Material.GOLD_HOE) || material.equals(Material.WOOD_HOE))
+                    return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             default:
                 return 0;
         }

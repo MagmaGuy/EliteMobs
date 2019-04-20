@@ -17,7 +17,9 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
+import com.magmaguy.elitemobs.utils.RawEnchantmentGetters;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -39,17 +41,17 @@ public class ItemWorthCalculator {
 
     }
 
-    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap) {
+//    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap) {
+//
+//        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap)) * 100.0) / 100.0;
+//
+//        return itemWorth;
+//
+//    }
 
-        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap)) * 100.0) / 100.0;
+    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap, List<String> potionsMap, HashMap<String, Integer> customEnchantments) {
 
-        return itemWorth;
-
-    }
-
-    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap, List<String> potionsMap) {
-
-        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap) + potionEffectValue(potionsMap)) * 100.0) / 100.0;
+        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap, customEnchantments) + potionEffectValue(potionsMap)) * 100.0) / 100.0;
 
         return itemWorth;
 
@@ -58,6 +60,14 @@ public class ItemWorthCalculator {
     public static double determineResaleWorth(ItemStack itemStack) {
 
         double resaleWorth = Math.round((determineItemWorth(itemStack) * (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.RESALE_VALUE) / 100)) * 100.0) / 100.0;
+
+        return resaleWorth;
+
+    }
+
+    public static double determineResaleWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap, List<String> potionsMap, HashMap<String, Integer> customEnchantments) {
+
+        double resaleWorth = Math.round((determineItemWorth(material, enchantmentsMap, potionsMap, customEnchantments) * (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.RESALE_VALUE) / 100)) * 100.0) / 100.0;
 
         return resaleWorth;
 
@@ -204,33 +214,37 @@ public class ItemWorthCalculator {
 
         double enchantmentsValue = 0;
 
-        if (!itemStack.getEnchantments().isEmpty()) {
+        Map<Enchantment, Integer> enchantments = RawEnchantmentGetters.vanillaEnchantmentsList(itemStack);
 
-            for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
+        if (!itemStack.getEnchantments().isEmpty())
+            for (Enchantment enchantment : enchantments.keySet())
+                enchantmentsValue += enchantmentWorthGetter(enchantment) * enchantments.get(enchantment);
 
-                enchantmentsValue += enchantmentWorthGetter(entry.getKey()) * entry.getValue();
+        if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(itemStack))
+            enchantmentsValue += configGetter(HUNTER);
 
-            }
-
-        }
+        if (CustomEnchantmentCache.flamethrowerEnchantment.hasCustomEnchantment(itemStack))
+            enchantmentsValue += configGetter(FLAMETHROWER);
 
         return enchantmentsValue;
 
     }
 
-    private static double getAllEnchantmentsValue(HashMap<Enchantment, Integer> enchantmentsMap) {
+    private static double getAllEnchantmentsValue(HashMap<Enchantment, Integer> enchantmentsMap, HashMap<String, Integer> customEnchantments) {
 
         double enchantmentsValue = 0;
 
-        if (!enchantmentsMap.isEmpty()) {
-
-            for (Enchantment enchantment : enchantmentsMap.keySet()) {
-
+        if (!enchantmentsMap.isEmpty())
+            for (Enchantment enchantment : enchantmentsMap.keySet())
                 enchantmentsValue += enchantmentWorthGetter(enchantment) * enchantmentsMap.get(enchantment);
 
+        if (!customEnchantments.isEmpty())
+            for (String customEnchantment : customEnchantments.keySet()) {
+                if (customEnchantment.equalsIgnoreCase(CustomEnchantmentCache.hunterEnchantment.key))
+                    enchantmentsValue += configGetter(HUNTER);
+                else if (customEnchantment.equalsIgnoreCase(CustomEnchantmentCache.flamethrowerEnchantment.key))
+                    enchantmentsValue += configGetter(FLAMETHROWER);
             }
-
-        }
 
         return enchantmentsValue;
 

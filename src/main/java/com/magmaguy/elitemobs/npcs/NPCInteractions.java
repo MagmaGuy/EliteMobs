@@ -47,7 +47,7 @@ public class NPCInteractions implements Listener {
                 npcEntity.sayDialog(event.getPlayer());
                 break;
             case CUSTOM_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.customshop"))
+                if (event.getPlayer().hasPermission("elitemobs.customshop.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -57,7 +57,7 @@ public class NPCInteractions implements Listener {
 
                 break;
             case PROCEDURALLY_GENERATED_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.shop"))
+                if (event.getPlayer().hasPermission("elitemobs.shop.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {

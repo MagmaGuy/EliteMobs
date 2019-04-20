@@ -86,6 +86,9 @@ public class CommandHandler implements CommandExecutor {
         args[0] = args[0].toLowerCase();
 
         switch (args[0]) {
+//            case "test":
+//                ((Player) commandSender).getInventory().addItem(HuntingHelmet.)
+//                return true;
             case "spawn":
             case "spawnmob":
                 if (permCheck(SPAWNMOB, commandSender))
@@ -115,7 +118,7 @@ public class CommandHandler implements CommandExecutor {
                 return true;
             case "shop":
             case "store":
-                if (userPermCheck(SHOP, commandSender)) {
+                if (userPermCheck("elitemobs.shop.command", commandSender)) {
                     ShopHandler.shopInitializer((Player) commandSender);
                 }
                 return true;
@@ -123,7 +126,7 @@ public class CommandHandler implements CommandExecutor {
             case "cshop":
             case "customstore":
             case "cstore":
-                if (userPermCheck(CUSTOMSHOP, commandSender)) {
+                if (userPermCheck("elitemobs.customshop.command", commandSender)) {
                     CustomShopHandler.customShopInitializer((Player) commandSender);
                 }
                 return true;
@@ -239,6 +242,15 @@ public class CommandHandler implements CommandExecutor {
                                 commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
                                 return true;
                             }
+
+                            boolean validKey = false;
+                            for (String key : ConfigValues.npcConfig.getKeys(false)) {
+                                if (!key.equalsIgnoreCase(args[2])) continue;
+                                validKey = true;
+                                break;
+                            }
+
+                            if (!validKey) return true;
 
                             Location playerLocation = ((Player) commandSender).getLocation();
 
