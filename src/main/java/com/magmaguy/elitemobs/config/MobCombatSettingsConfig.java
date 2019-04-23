@@ -83,7 +83,7 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(AGGRESSIVE_STACK_RANGE, 1);
         configuration.addDefault(PASSIVE_STACK_RANGE, 15);
         configuration.addDefault(NATURAL_ELITEMOB_LEVEL_CAP, 3000);
-        configuration.addDefault(TARGET_HITS_TO_KILL, 20);
+        configuration.addDefault(TARGET_HITS_TO_KILL, 10);
         configuration.addDefault(BASE_DAMAGE_DEALT_TO_PLAYER, 2);
         configuration.addDefault(ELITE_CREEPER_EXPLOSION_MULTIPLIER, 1.0);
         configuration.addDefault(ELITE_ARMOR, true);

@@ -11,7 +11,7 @@
   ~  GNU General Public License for more details.
   ~
   ~  You should have received a copy of the GNU General Public License
-  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~  along with this program.  If not, see <http://www.gnu.org/leicenses/>.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -21,7 +21,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.0.4</version>
+    <version>7.0.7</version>
     <packaging>jar</packaging>
 
     <properties>

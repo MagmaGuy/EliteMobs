@@ -61,6 +61,11 @@ public class EconomyHandler {
 
     public static void setCurrency(UUID user, double amount) {
 
+        if (EliteMobs.VAULT_ENABLED) {
+            VaultCompatibility.setCurrency(user, amount);
+            return;
+        }
+
         if (!checkUserExists(user)) createUser(user);
 
         PlayerData.playerCurrency.put(user, roundDecimals(amount));
