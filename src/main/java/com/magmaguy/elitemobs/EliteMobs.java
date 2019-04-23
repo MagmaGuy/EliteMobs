@@ -29,9 +29,6 @@ import com.magmaguy.elitemobs.runnables.ScoreboardUpdater;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -44,27 +41,27 @@ import java.util.List;
 public class EliteMobs extends JavaPlugin {
 
     public static List<World> validWorldList = new ArrayList();
-    public static final StateFlag ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
+    //    public static final StateFlag ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
     public static boolean VAULT_ENABLED = false;
 
     @Override
     public void onEnable() {
 
         //Enable WorldGuard
-        if (Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) {
-            Bukkit.getLogger().info("[EliteMobs] WorldGuard detected.");
-            try {
-                FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
-                Bukkit.getLogger().info("[EliteMobs] Enabling flags:");
+//        if (Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) {
+//            Bukkit.getLogger().info("[EliteMobs] WorldGuard detected.");
+//            try {
+//                FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+//                Bukkit.getLogger().info("[EliteMobs] Enabling flags:");
+//
+//                registry.register(ELITEMOBS_SPAWN_FLAG);
+//                Bukkit.getLogger().info("[EliteMobs] - elitemobspawn");
+//
+//            } catch (Exception e) {
+//                Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work.");
+//            }
 
-                registry.register(ELITEMOBS_SPAWN_FLAG);
-                Bukkit.getLogger().info("[EliteMobs] - elitemobspawn");
-
-            } catch (Exception e) {
-                Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work.");
-            }
-
-        }
+//        }
 
         //Enable stats
         Metrics metrics = new Metrics(this);

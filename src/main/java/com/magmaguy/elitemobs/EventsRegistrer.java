@@ -70,6 +70,7 @@ public class EventsRegistrer {
 
         //Mob loot
         pluginManager.registerEvents(new DefaultDropsHandler(), plugin);
+        pluginManager.registerEvents(new ItemLootShower(), plugin);
 
         //potion effects
         pluginManager.registerEvents(new PotionEffectApplier(), plugin);
