@@ -52,7 +52,14 @@ public class VaultCompatibility {
 
     public static double checkCurrency(UUID user) {
         Bukkit.getLogger().warning(Bukkit.getOfflinePlayer(user).toString());
-        return econ.getBalance(Bukkit.getOfflinePlayer(user));
+        double currency = 0;
+        try {
+            currency = econ.getBalance(Bukkit.getOfflinePlayer(user));
+        } catch (NullPointerException e) {
+            Bukkit.getLogger().warning("[EliteMobs] Player tried to check currency when they had no economy entry" +
+                    "associated to them. This is an issue with your Vault/economy implementation, not EliteMobs.");
+        }
+        return currency;
 
     }
 

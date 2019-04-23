@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.0.4
+version: 7.0.7
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 softdepend: [Multiverse-Core, WorldGuard, Vault]

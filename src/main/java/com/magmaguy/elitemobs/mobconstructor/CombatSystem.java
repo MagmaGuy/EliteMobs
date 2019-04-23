@@ -34,7 +34,7 @@ public class CombatSystem implements Listener {
     public static final double TARGET_HITS_TO_KILL = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.TARGET_HITS_TO_KILL);
     public static final double BASE_DAMAGE_DEALT_TO_PLAYERS = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.BASE_DAMAGE_DEALT_TO_PLAYER);
     //    public static final double TO_PLAYER_DAMAGE_TIER_HANDICAP = 0.75;
-    public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.33;
+    public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.5;
 
     public static final double DIAMOND_TIER_LEVEL = 3;
     public static final double IRON_TIER_LEVEL = 2;
@@ -251,7 +251,8 @@ public class CombatSystem implements Listener {
         /*
         This caps the tier difference between mobs and players to prevent insurmountable boss fights
          */
-        tierDifference = Math.abs(tierDifference) > 3 ? (tierDifference > 0 ? 3 : -3) : tierDifference;
+        double maxTierDifference = 1;
+        tierDifference = Math.abs(tierDifference) > maxTierDifference ? (tierDifference > 0 ? maxTierDifference : -maxTierDifference) : tierDifference;
 
         /*
         This applies secondary enchantments, that is, it applies enchantments that only affect specific mob types
