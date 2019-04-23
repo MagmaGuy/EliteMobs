@@ -6,6 +6,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -20,14 +22,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemLootShower implements Listener {
 
     public static void runShower(double eliteMobTier, Location location) {
 
+        if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_CURRENCY_SHOWER))
+            return;
+
         new BukkitRunnable() {
-            int currencyAmount = (int) (eliteMobTier * 7);
+            int currencyAmount = (int) (eliteMobTier * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.CURRENCY_SHOWER_MULTIPLIER));
 
             @Override
             public void run() {
@@ -143,6 +149,8 @@ public class ItemLootShower implements Listener {
         currencyItem.setCustomNameVisible(true);
     }
 
+    private static HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
+
     @EventHandler(priority = EventPriority.LOWEST)
     public static void onItemPickup(PlayerPickupItemEvent event) {
 
@@ -157,37 +165,88 @@ public class ItemLootShower implements Listener {
         Player player = event.getPlayer();
 
         if (event.getItem().getItemStack().getType().equals(Material.GOLD_NUGGET)) {
+            sendCurrencyNotification(player);
             EconomyHandler.addCurrency(player.getUniqueId(), 1);
-            player.sendMessage(ChatColorConverter.convert("&7[EM] You've picked up 1 " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + "!"));
+            sendActionBarMessage(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_SHOWER_MESSAGE_1), player);
             event.setCancelled(true);
             event.getItem().remove();
             return;
         }
 
         if (event.getItem().getItemStack().getType().equals(Material.GOLD_INGOT)) {
+            sendCurrencyNotification(player);
             EconomyHandler.addCurrency(player.getUniqueId(), 5);
-            player.sendMessage(ChatColorConverter.convert("&7[EM] You've picked up &f5 &7" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + "!"));
+            sendActionBarMessage(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_SHOWER_MESSAGE_5), player);
             event.setCancelled(true);
             event.getItem().remove();
             return;
         }
 
         if (event.getItem().getItemStack().getType().equals(Material.EMERALD)) {
+            sendCurrencyNotification(player);
             EconomyHandler.addCurrency(player.getUniqueId(), 10);
-            player.sendMessage(ChatColorConverter.convert("&7[EM] You've picked up &a10 &7" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + "!"));
+            sendActionBarMessage(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_SHOWER_MESSAGE_10), player);
             event.setCancelled(true);
             event.getItem().remove();
             return;
         }
 
         if (event.getItem().getItemStack().getType().equals(Material.EMERALD_BLOCK)) {
+            sendCurrencyNotification(player);
             EconomyHandler.addCurrency(player.getUniqueId(), 20);
-            player.sendMessage(ChatColorConverter.convert("&7[EM] You've picked up &220 &7" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + "!"));
+            sendActionBarMessage(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_SHOWER_MESSAGE_20), player);
             event.setCancelled(true);
             event.getItem().remove();
             return;
         }
 
+    }
+
+    private static void sendActionBarMessage(String string, Player player) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(
+                        ChatColorConverter.convert(string.replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)))));
+    }
+
+    private static void sendCurrencyNotification(Player player) {
+        if (playerCurrencyPickup.containsKey(player)) return;
+
+        new BukkitRunnable() {
+            double originalAmount = EconomyHandler.checkCurrency(player.getUniqueId());
+
+            @Override
+            public void run() {
+
+                if (!playerCurrencyPickup.containsKey(player)) {
+                    playerCurrencyPickup.put(player, 0.0);
+                    return;
+                }
+
+                if (originalAmount + playerCurrencyPickup.get(player) != EconomyHandler.checkCurrency(player.getUniqueId())) {
+
+                    playerCurrencyPickup.put(player, EconomyHandler.checkCurrency(player.getUniqueId()) - originalAmount);
+                    return;
+
+                }
+
+                player.sendMessage(ChatColorConverter.convert(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_LOOT_MESSAGE)
+                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))
+                        .replace("$amount", playerCurrencyPickup.get(player) + "")));
+
+                playerCurrencyPickup.remove(player);
+                sendAdventurersGuildNotification(player);
+
+                cancel();
+
+            }
+
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
+
+    }
+
+    private static void sendAdventurersGuildNotification(Player player) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(ChatColorConverter.convert(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_AG_NOTIFICATION))));
     }
 
 }

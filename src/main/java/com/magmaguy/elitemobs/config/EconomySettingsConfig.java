@@ -50,6 +50,15 @@ public class EconomySettingsConfig {
 
     public static final String USE_VAULT = "Use Vault instead of Elite Coins (BAD IDEA)";
 
+    public static final String CURRENCY_SHOWER_MULTIPLIER = "Tier multiplier for currency payout on Elite Mob death";
+    public static final String CURRENCY_LOOT_MESSAGE = "Currency loot message";
+    public static final String ENABLE_CURRENCY_SHOWER = "Enable currency shower";
+    public static final String CURRENCY_SHOWER_MESSAGE_1 = "Currency shower message for 1 currency";
+    public static final String CURRENCY_SHOWER_MESSAGE_5 = "Currency shower message for 5 currency";
+    public static final String CURRENCY_SHOWER_MESSAGE_10 = "Currency shower message for 10 currency";
+    public static final String CURRENCY_SHOWER_MESSAGE_20 = "Currency shower message for 20 currency";
+    public static final String CURRENCY_AG_NOTIFICATION = "Adventurers Guild notification message";
+
     private static final String MATERIAL_WORTH = "Material worth.";
     public static final String DIAMOND_AXE = MATERIAL_WORTH + "DIAMOND_AXE";
     public static final String DIAMOND_BARDING = MATERIAL_WORTH + "DIAMOND_BARDING";
@@ -220,6 +229,15 @@ public class EconomySettingsConfig {
                 34, 37, 38, 39, 40, 41, 42, 43));
 
         configuration.addDefault(USE_VAULT, false);
+
+        configuration.addDefault(CURRENCY_SHOWER_MULTIPLIER, 1);
+        configuration.addDefault(CURRENCY_LOOT_MESSAGE, "&7[EM] You've picked up &a$amount $currency_name!");
+        configuration.addDefault(ENABLE_CURRENCY_SHOWER, true);
+        configuration.addDefault(CURRENCY_SHOWER_MESSAGE_1, "&7[EM] You've picked up 1 $currency_name!");
+        configuration.addDefault(CURRENCY_SHOWER_MESSAGE_5, "&7[EM] You've picked up &f5 &7$currency_name!");
+        configuration.addDefault(CURRENCY_SHOWER_MESSAGE_10, "&7[EM] You've picked up &a10 &7$currency_name!");
+        configuration.addDefault(CURRENCY_SHOWER_MESSAGE_20, "&7[EM] You've picked up &220 &7$currency_name!");
+        configuration.addDefault(CURRENCY_AG_NOTIFICATION, "&7[EM] Extra spending money? Try &a/ag &7or &a/em shop&7!");
 
         configuration.addDefault(DIAMOND_AXE, diamondLevel);
         configuration.addDefault(DIAMOND_BARDING, diamondLevel);
