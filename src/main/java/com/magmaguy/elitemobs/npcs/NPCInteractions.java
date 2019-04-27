@@ -35,7 +35,7 @@ public class NPCInteractions implements Listener {
 
         switch (npcEntity.getInteractionType()) {
             case GUILD_GREETER:
-                if (event.getPlayer().hasPermission("elitemobs.adventurersguild"))
+                if (event.getPlayer().hasPermission("elitemobs.adventurersguild.menu"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {

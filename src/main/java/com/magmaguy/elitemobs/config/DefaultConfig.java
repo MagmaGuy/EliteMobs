@@ -1,18 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -36,6 +21,8 @@ public class DefaultConfig {
     public static final String STRICT_SPAWNING_RULES = "Strict spawning rules mode for better compatibility with other plugins";
     public static final String PREVENT_TOWER_EXPLOIT = "Prevent tower exploit";
     public static final String PREVENT_DARKROOM_EXPLOIT = "Prevent dark room spawner exploit";
+    public static final String PREVENT_LARGE_DARKROOM_EXPLOIT = "Prevent large dark room spawner exploit";
+    public static final String PREVENT_OTHER_EXPLOITS = "Prevent other exploits";
     public static final String PREVENT_ENDERMAN_HEIGHT_EXPLOIT = "Prevent enderman height exploit";
     public static final String SKULL_SIGNATURE_ITEM = "Use a skull for signature item";
 
@@ -55,6 +42,8 @@ public class DefaultConfig {
         configuration.addDefault(PREVENT_MOUNT_EXPLOIT, true);
         configuration.addDefault(PREVENT_TOWER_EXPLOIT, true);
         configuration.addDefault(PREVENT_DARKROOM_EXPLOIT, true);
+        configuration.addDefault(PREVENT_LARGE_DARKROOM_EXPLOIT, true);
+        configuration.addDefault(PREVENT_OTHER_EXPLOITS, true);
         configuration.addDefault(PREVENT_ENDERMAN_HEIGHT_EXPLOIT, true);
         configuration.addDefault(SKULL_SIGNATURE_ITEM, true);
 

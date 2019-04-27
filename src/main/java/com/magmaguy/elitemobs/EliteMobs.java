@@ -139,6 +139,11 @@ public class EliteMobs extends JavaPlugin {
         new NPCInitializer();
 
         /*
+        Make sure entities are getting culled - necessary due to some plugins on some servers
+         */
+        EntityTracker.entityValidator();
+
+        /*
         Check for new plugin version
          */
         VersionChecker.updateComparer();

@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -156,7 +157,7 @@ public class LoreGenerator {
                 obfuscatedString.append(string.replace(",", ":")).append(",");
         }
 
-        String finalString = stringObfuscator(obfuscatedString);
+        String finalString = ObfuscatedStringHandler.obfuscateString(obfuscatedString.toString());
 
         return finalString;
 
@@ -180,34 +181,7 @@ public class LoreGenerator {
                 obfuscatedString.append(string).append(":").append(customEnchantments.get(string)).append(",");
         }
 
-        String finalString = stringObfuscator(obfuscatedString);
-
-        return finalString;
-
-    }
-
-    private static String stringObfuscator(StringBuilder originalString) {
-
-        String insert = "§";
-        int period = 1;
-
-        StringBuilder stringBuilder = new StringBuilder(originalString.length() + insert.length() * (originalString.length() / period));
-
-        int index = 0;
-        String prefix = "";
-
-        while (index < originalString.length()) {
-
-            stringBuilder.append(prefix);
-            prefix = insert;
-            stringBuilder.append(originalString, index, Math.min(index + period, originalString.length()));
-            index += period;
-
-        }
-
-        String finalString = stringBuilder.toString();
-
-        finalString = "§" + finalString;
+        String finalString = ObfuscatedStringHandler.obfuscateString(obfuscatedString.toString());
 
         return finalString;
 
@@ -281,7 +255,7 @@ public class LoreGenerator {
 
     private static String getCustomEnchantmentName(String customEnchantmentKey) {
 
-        if (!ConfigValues.itemsDropSettingsConfig.getKeys(true).contains(ItemsDropSettingsConfig.ENCHANTMENT_NAME + customEnchantmentKey)) {
+        if (!ConfigValues.itemsDropSettingsConfig.getKeys(true).contains(ItemsDropSettingsConfig.CUSTOM_ENCHANTMENT_NAME + customEnchantmentKey)) {
 
             Bukkit.getLogger().warning("[EliteMobs] Missing enchantment name " + customEnchantmentKey);
             Bukkit.getLogger().warning("[EliteMobs] Report this to the dev!");
@@ -289,7 +263,7 @@ public class LoreGenerator {
 
         }
 
-        return ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.ENCHANTMENT_NAME + customEnchantmentKey);
+        return ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.CUSTOM_ENCHANTMENT_NAME + customEnchantmentKey);
 
     }
 
