@@ -30,19 +30,11 @@ public class EventMessage {
         String sendString = configMessage.replace("$location", coordinates);
         String worldName = "";
 
-        if (livingEntity.getWorld().getName().contains("_")) {
-
-            for (String string : livingEntity.getWorld().getName().split("_")) {
-
+        if (livingEntity.getWorld().getName().contains("_"))
+            for (String string : livingEntity.getWorld().getName().split("_"))
                 worldName += string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase() + " ";
-
-            }
-
-        } else {
-
+        else
             worldName = livingEntity.getWorld().getName().substring(0, 1).toUpperCase() + livingEntity.getWorld().getName().substring(1).toLowerCase();
-
-        }
 
         sendString = ChatColorConverter.convert(sendString.replace("$world", worldName));
 

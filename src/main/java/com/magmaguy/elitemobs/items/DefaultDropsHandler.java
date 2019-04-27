@@ -58,8 +58,9 @@ public class DefaultDropsHandler implements Listener {
 
         for (ItemStack itemStack : droppedItems) {
 
-//                ItemStack can be null for some reason, probably due to other plugins
+//                ItemStack can be null for some reason, probably due to other plugins, same with air
             if (itemStack == null) continue;
+            if (itemStack.getType().equals(Material.AIR)) continue;
             boolean itemIsWorn = false;
 
             for (ItemStack wornItem : wornItems)

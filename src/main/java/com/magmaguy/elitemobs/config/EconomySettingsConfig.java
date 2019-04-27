@@ -33,6 +33,7 @@ public class EconomySettingsConfig {
     public static final String CURRENCY_NAME = "Currency name";
     public static final String SHOP_NAME = "Shop name";
     public static final String CUSTOM_SHOP_NAME = "Custom shop name";
+    public static final String BUY_OR_SELL_SHOP_NAME = "Buy or sell shop name";
     public static final String SIGNATURE_ITEM_LOCATION_SHOPS = "Reroll button location for EliteMobs Shops";
     public static final String SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Shop";
     public static final String CUSTOM_SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Custom Shop";
@@ -201,8 +202,9 @@ public class EconomySettingsConfig {
         configuration.addDefault(LOWEST_PROCEDURALLY_SIMULATED_LOOT, 1);
         configuration.addDefault(HIGHEST_PROCEDURALLY_SIMULATED_LOOT, 5);
         configuration.addDefault(CURRENCY_NAME, "Elite Coins");
-        configuration.addDefault(SHOP_NAME, "EliteMobs Shop");
-        configuration.addDefault(CUSTOM_SHOP_NAME, "EliteMobs Custom Shop");
+        configuration.addDefault(SHOP_NAME, "[EM] Shop");
+        configuration.addDefault(CUSTOM_SHOP_NAME, "[EM] Custom Shop");
+        configuration.addDefault(BUY_OR_SELL_SHOP_NAME, "[EM] Buy/Sell");
         configuration.addDefault(SIGNATURE_ITEM_LOCATION_SHOPS, 4);
         configuration.addDefault(SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
@@ -211,7 +213,7 @@ public class EconomySettingsConfig {
                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
                 46, 47, 48, 49, 50, 51, 52, 53));
 
-        configuration.addDefault(SELL_SHOP_NAME, "EliteMobs Sell Menu");
+        configuration.addDefault(SELL_SHOP_NAME, "[EM] Sell Menu");
         configuration.addDefault(SELL_SHOP_INFO_SLOT, 8);
         configuration.addDefault(SELL_SHOP_INFO_NAME, "&cWarning!");
         configuration.addDefault(SELL_SHOP_INFO_LORE, Arrays.asList(

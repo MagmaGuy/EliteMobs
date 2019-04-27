@@ -18,8 +18,10 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
+import java.util.Iterator;
 
 public class EntityTracker implements Listener {
 
@@ -277,7 +279,7 @@ public class EntityTracker implements Listener {
 
     /**
      * Checks if an Entity is a registered item visual effect
-     *
+     *an
      * @param entity Entity to be checked
      * @return whether the entity is a visual effect
      */
@@ -446,6 +448,65 @@ public class EntityTracker implements Listener {
      */
     public static void deathWipe(EntityDeathEvent event) {
         wipeEntity(event.getEntity());
+    }
+
+    public static void entityValidator() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+
+                int entitiesCleared = 0;
+
+
+                for (Iterator<LivingEntity> iterator = superMobs.iterator(); iterator.hasNext(); ) {
+                    LivingEntity livingEntity = iterator.next();
+                    if (livingEntity == null || livingEntity.isDead()) {
+                        iterator.remove();
+                        entitiesCleared++;
+                    }
+                }
+
+                for (Iterator<EliteMobEntity> iterator = eliteMobs.iterator(); iterator.hasNext(); ) {
+                    EliteMobEntity eliteMobEntity = iterator.next();
+                    if (eliteMobEntity == null || eliteMobEntity.getLivingEntity() == null || eliteMobEntity.getLivingEntity().isDead()) {
+                        iterator.remove();
+                        entitiesCleared++;
+                    }
+                }
+                for (Iterator<LivingEntity> iterator = eliteMobsLivingEntities.iterator(); iterator.hasNext(); ) {
+                    LivingEntity livingEntity = iterator.next();
+                    if (livingEntity == null || livingEntity.isDead()) {
+                        iterator.remove();
+                        entitiesCleared++;
+                    }
+                }
+
+                for (Iterator<LivingEntity> iterator = naturalEntities.iterator(); iterator.hasNext(); ) {
+                    LivingEntity livingEntity = iterator.next();
+                    if (livingEntity == null || livingEntity.isDead()) {
+                        iterator.remove();
+                        entitiesCleared++;
+                    }
+                }
+                for (Iterator<ArmorStand> iterator = armorStands.iterator(); iterator.hasNext(); ) {
+                    ArmorStand armorStand = iterator.next();
+                    if (armorStand == null || armorStand.isDead()) {
+                        iterator.remove();
+                        entitiesCleared++;
+                    }
+                }
+                for (Iterator<Item> iterator = itemVisualEffects.iterator(); iterator.hasNext(); ) {
+                    Item item = iterator.next();
+                    if (item == null || item.isDead()) {
+                        iterator.remove();
+                        entitiesCleared++;
+                    }
+                }
+
+//                Bukkit.getLogger().warning("[EliteMobs] Entities cleared: " + entitiesCleared);
+
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60, 20 * 60);
     }
 
 }
