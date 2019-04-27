@@ -1,36 +1,21 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.NPCConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
+import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.io.File;
 
 /**
  * Created by MagmaGuy on 21/01/2017.
@@ -339,6 +324,31 @@ public class CommandHandler implements CommandExecutor {
                         return true;
                     }
                 }
+                return true;
+            case "autosetup":
+                if (!permCheck("elitemobs.autosetup", commandSender)) return true;
+                File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
+                File[] listOfFiles = folder.listFiles();
+                boolean worldFolderExists = false;
+
+                for (File listOfFile : listOfFiles) {
+                    if (listOfFile.isDirectory() &&
+                            listOfFile.getName().equals(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME))) {
+                        commandSender.sendMessage("[EliteMobs] World " + ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " found! Loading it in...");
+                        worldFolderExists = true;
+                        break;
+                    }
+                }
+
+                if (!worldFolderExists) {
+                    commandSender.sendMessage("[EliteMobs] Could not import world " + ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " ! " +
+                            "It is not in your worlds directory. If you wish to use the default world, you can find the link to download it on the resource page over at https://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/");
+                    return true;
+                }
+
+                Bukkit.createWorld(new WorldCreator(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME)));
+                commandSender.sendMessage("[EliteMobs] Successfully imported the world!");
+                commandSender.sendMessage("[EliteMobs] Now all you need to do is add the permission elitemobs.user to your users and you're all set!");
                 return true;
             default:
                 validCommands(commandSender);
