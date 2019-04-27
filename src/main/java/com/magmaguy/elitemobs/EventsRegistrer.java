@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.adventurersguild.MaxHealthBoost;
 import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combattag.CombatTag;
+import com.magmaguy.elitemobs.combattag.TeleportTag;
 import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.commands.shops.BuyOrSellMenu;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
@@ -149,6 +150,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new EntityDeathDataFlusher(), plugin);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
+
         //Prevent exploits
         //Prevent mount exploit
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_MOUNT_EXPLOIT))
@@ -156,6 +158,12 @@ public class EventsRegistrer {
         //Prevent darkroom exploit
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_DARKROOM_EXPLOIT))
             pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
+        //Prevent large darkroom exploit
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_LARGE_DARKROOM_EXPLOIT))
+            pluginManager.registerEvents(new PreventLargeDarkroomExploit(), plugin);
+        //Prevent other exploits
+        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_OTHER_EXPLOITS))
+            pluginManager.registerEvents(new PreventOtherExploits(), plugin);
         //Prevent tower exploit
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_TOWER_EXPLOIT))
             pluginManager.registerEvents(new PreventTowerExploit(), plugin);
@@ -206,6 +214,9 @@ public class EventsRegistrer {
         //Combat tag
         if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
             pluginManager.registerEvents(new CombatTag(), plugin);
+        if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_TELEPORT_TIMER))
+            pluginManager.registerEvents(new TeleportTag(), plugin);
+
 
         //Prevent elitemob on elitemob aggro
         pluginManager.registerEvents(new AggroPrevention(), plugin);

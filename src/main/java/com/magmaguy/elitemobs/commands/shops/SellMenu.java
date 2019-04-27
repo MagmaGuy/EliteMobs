@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,7 +29,9 @@ import java.util.List;
 
 public class SellMenu implements Listener {
 
-    private final static String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.SELL_SHOP_NAME);
+    private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("///");
+    public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.SELL_SHOP_NAME) + SHOP_KEY;
+
     private static List<Integer> validSlots = (List<Integer>) ConfigValues.economyConfig.getList(EconomySettingsConfig.SELL_SHOP_VALID_SLOTS);
 
     /**

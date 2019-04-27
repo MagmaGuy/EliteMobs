@@ -1,18 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.config;
 
 import org.bukkit.configuration.Configuration;
@@ -84,6 +69,14 @@ public class TranslationConfig {
     public static final String BUY_OR_SELL_CUSTOM_ITEMS = "Shop custom items purchase name";
     public static final String BUY_OR_SELL_DYNAMIC_ITEMS = "Shop dynamic items purchase name";
     public static final String BUY_OR_SELL_SELL_ITEMS = "Shop sell items name";
+    public static final String INVENTORY_FULL_MESSAGE = "Shop full inventory message";
+    public static final String BUY_OR_SELL_INSTRUCTIONS = "Buy or sell menu instructions";
+
+    /*
+    Translation for the teleport messages
+     */
+    public static final String TELEPORT_TIME_LEFT = "Teleport time left";
+    public static final String TELEPORT_CANCELLED = "Teleport cancelled";
 
 
     public static final String CONFIG_NAME = "translation.yml";
@@ -579,10 +572,16 @@ public class TranslationConfig {
         configuration.addDefault(SHOP_ITEM_PRICE, "That item costs &c$item_value $currency_name.");
         configuration.addDefault(SHOP_SELL_MESSAGE, "&aYou have sold $item_name &afor $currency_amount $currency_name!");
         configuration.addDefault(SHOP_SALE_INSTRUCTIONS, "&cYou can only sell EliteMobs loot here! (Armor / weapons dropped from elites showing a value on their lore)");
+        configuration.addDefault(INVENTORY_FULL_MESSAGE, "&4Your inventory is full! You can't buy items until you get some free space.");
+        configuration.addDefault(BUY_OR_SELL_INSTRUCTIONS, Arrays.asList(
+                "Sell items you looted from", "Elite Mobs! These should", "show their worth on", "the lore."));
 
         configuration.addDefault(BUY_OR_SELL_CUSTOM_ITEMS, "&aBuy custom items!");
         configuration.addDefault(BUY_OR_SELL_DYNAMIC_ITEMS, "&aBuy dynamic items!");
         configuration.addDefault(BUY_OR_SELL_SELL_ITEMS, "&cSell items");
+
+        configuration.addDefault(TELEPORT_TIME_LEFT, "&7[EM] Teleporting in &a$time &7seconds...");
+        configuration.addDefault(TELEPORT_CANCELLED, "&7[EM] &cTeleport interrupted!");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

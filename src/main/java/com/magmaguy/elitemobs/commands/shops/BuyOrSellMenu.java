@@ -3,7 +3,9 @@ package com.magmaguy.elitemobs.commands.shops;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
+import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,7 +20,8 @@ import java.util.Arrays;
 
 public class BuyOrSellMenu implements Listener {
 
-    private static final String SHOP_NAME = "Shop menu";
+    private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("/");
+    public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.BUY_OR_SELL_SHOP_NAME) + SHOP_KEY;
 
     public static void constructBuyOrSellMenu(Player player, String buyString) {
 
@@ -27,7 +30,7 @@ public class BuyOrSellMenu implements Listener {
         ItemStack sellItem = new ItemStack(Material.REDSTONE);
         ItemMeta sellMeta = sellItem.getItemMeta();
         sellMeta.setDisplayName(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.BUY_OR_SELL_SELL_ITEMS)));
-        sellMeta.setLore(Arrays.asList("Sell items you looted from", "Elite Mobs! These should", "show their worth on", "the lore."));
+        sellMeta.setLore(ConfigValues.translationConfig.getStringList(TranslationConfig.BUY_OR_SELL_INSTRUCTIONS));
         sellItem.setItemMeta(sellMeta);
 
         ItemStack buyItem = new ItemStack(Material.EMERALD);

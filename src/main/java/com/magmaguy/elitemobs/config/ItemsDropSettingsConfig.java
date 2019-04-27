@@ -110,7 +110,7 @@ public class ItemsDropSettingsConfig {
     /*
     Custom enchantments
      */
-    private static final String CUSTOM_ENCHANTMENT_NAME = "Custom Enchantment name.";
+    public static final String CUSTOM_ENCHANTMENT_NAME = "Custom Enchantment name.";
     public static final String FLAMETHROWER_NAME = CUSTOM_ENCHANTMENT_NAME + CustomEnchantmentCache.flamethrowerEnchantment.getKey();
     public static final String HUNTER_NAME = CUSTOM_ENCHANTMENT_NAME + CustomEnchantmentCache.hunterEnchantment.getKey();
 

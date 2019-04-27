@@ -1,18 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.commands.shops;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
@@ -25,6 +10,7 @@ import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,7 +27,8 @@ import java.util.Random;
  */
 public class ShopHandler implements Listener {
 
-    public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.SHOP_NAME);
+    private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("////");
+    public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.SHOP_NAME) + SHOP_KEY;
 
     public static void shopInitializer(Player player) {
 
@@ -89,9 +76,7 @@ public class ShopHandler implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (!SharedShopElements.inventoryNullPointerPreventer(event))
-            return;
-
+        if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
         if (!event.getInventory().getName().equals(SHOP_NAME)) return;
 
         //reroll loot button
@@ -133,7 +118,7 @@ public class ShopHandler implements Listener {
 
             if (!inventoryHasFreeSlots) {
 
-                player.sendMessage("Your inventory is full! You can't buy items until you get some free space.");
+                player.sendMessage(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.INVENTORY_FULL_MESSAGE)));
                 player.closeInventory();
 
             } else if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
