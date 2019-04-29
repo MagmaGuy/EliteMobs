@@ -49,7 +49,6 @@ public class CommandHandler implements CommandExecutor {
     private final static String SET_MAX_TIER = "elitemobs.config.setmaxtier";
     private final static String GET_TIER = "elitemobs.gettier";
     private final static String CHECK_MAX_TIER = "elitemobs.checkmaxtier";
-    private final static String ADVENTURERS_GUILD = "elitemobs.adventurersguild";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -58,8 +57,7 @@ public class CommandHandler implements CommandExecutor {
             case "ag":
             case "adventurersguild":
             case "adventurerguild":
-                if (userPermCheck(ADVENTURERS_GUILD, commandSender))
-                    new AdventurersGuildCommand((Player) commandSender);
+                new AdventurersGuildCommand((Player) commandSender);
                 return true;
         }
 
@@ -71,9 +69,6 @@ public class CommandHandler implements CommandExecutor {
         args[0] = args[0].toLowerCase();
 
         switch (args[0]) {
-//            case "test":
-//                ((Player) commandSender).getInventory().addItem(HuntingHelmet.)
-//                return true;
             case "spawn":
             case "spawnmob":
                 if (permCheck(SPAWNMOB, commandSender))
@@ -82,8 +77,7 @@ public class CommandHandler implements CommandExecutor {
             case "ag":
             case "adventurersguild":
             case "adventurerguild":
-                if (userPermCheck(ADVENTURERS_GUILD, commandSender))
-                    new AdventurersGuildCommand((Player) commandSender);
+                new AdventurersGuildCommand((Player) commandSender);
                 return true;
             case "stats":
                 if (permCheck(STATS, commandSender))
@@ -467,9 +461,7 @@ public class CommandHandler implements CommandExecutor {
     }
 
     private static boolean silentPermCheck(String permission, CommandSender commandSender) {
-
         return commandSender.hasPermission(permission);
-
     }
 
 

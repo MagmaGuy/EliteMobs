@@ -36,7 +36,7 @@ public class SignatureItem {
 
         ItemStack signature;
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.SKULL_SIGNATURE_ITEM)) {
-            signature = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+            signature = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
             SkullMeta signatureSkullMeta = (SkullMeta) signature.getItemMeta();
             signatureSkullMeta.setOwner("magmaguy");
             signatureSkullMeta.setDisplayName("EliteMobs by MagmaGuy");

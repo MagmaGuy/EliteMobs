@@ -1,6 +1,6 @@
 Loot:
   Magmaguy's Toothpick:
-    Item Type: WOOD_SWORD
+    Item Type: WOODEN_SWORD
     Item Name: "&4Magmaguy&c's &aToothpick"
     Item Lore:
     - "&l&5Nearly mint condition!"
@@ -88,7 +88,7 @@ Loot:
     - SLOW,4,self,onHit
     Drop Weight: 1
   Cheetah Charm:
-    Item Type: GOLD_BOOTS
+    Item Type: GOLDEN_BOOTS
     Item Name: "Cheetah Charm"
     Item Lore:
     - "Cheetahs can reach speeds of"
@@ -125,7 +125,7 @@ Loot:
     - FIRE_RESISTANCE,1,self,continuous
     Drop Weight: 1
   Berserker Charm:
-    Item Type: TOTEM
+    Item Type: TOTEM_OF_UNDYING
     Item Name: "Berserker Charm"
     Item Lore:
     - "Lose yourself in the face of"
@@ -149,7 +149,7 @@ Loot:
     - GLOWING,1,target,onHit
     Drop Weight: 1
   Slowpoke Charm:
-    Item Type: CARROT_STICK
+    Item Type: CARROT_ON_A_STICK
     Item Name: "Slowpoke Charm"
     Item Lore:
     - "Let's just hope it doesn't hit"
@@ -161,7 +161,7 @@ Loot:
     - CONFUSION,1,target,onHit
     Drop Weight: 1
   Fishy Charm:
-    Item Type: RAW_FISH
+    Item Type: COD
     Item Name: "Fishy Charm"
     Item Lore:
     - "There's just something not"

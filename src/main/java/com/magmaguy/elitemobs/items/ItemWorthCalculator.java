@@ -85,7 +85,7 @@ public class ItemWorthCalculator {
 
             case DIAMOND_AXE:
                 return configGetter(DIAMOND_AXE);
-            case DIAMOND_BARDING:
+            case DIAMOND_HORSE_ARMOR:
                 return configGetter(DIAMOND_BARDING);
             case DIAMOND_BLOCK:
                 return configGetter(DIAMOND_BLOCK);
@@ -103,13 +103,13 @@ public class ItemWorthCalculator {
                 return configGetter(DIAMOND_ORE);
             case DIAMOND_PICKAXE:
                 return configGetter(DIAMOND_PICKAXE);
-            case DIAMOND_SPADE:
+            case DIAMOND_SHOVEL:
                 return configGetter(DIAMOND_SPADE);
             case DIAMOND_SWORD:
                 return configGetter(DIAMOND_SWORD);
             case IRON_AXE:
                 return configGetter(IRON_AXE);
-            case IRON_BARDING:
+            case IRON_HORSE_ARMOR:
                 return configGetter(IRON_BARDING);
             case IRON_BLOCK:
                 return configGetter(IRON_BLOCK);
@@ -131,7 +131,7 @@ public class ItemWorthCalculator {
                 return configGetter(IRON_ORE);
             case IRON_PICKAXE:
                 return configGetter(IRON_PICKAXE);
-            case IRON_SPADE:
+            case IRON_SHOVEL:
                 return configGetter(IRON_SPADE);
             case IRON_SWORD:
                 return configGetter(IRON_SWORD);
@@ -149,39 +149,39 @@ public class ItemWorthCalculator {
                 return configGetter(CHAINMAIL_LEGGINGS);
             case STONE_SWORD:
                 return configGetter(STONE_SWORD);
-            case STONE_SPADE:
+            case STONE_SHOVEL:
                 return configGetter(STONE_SPADE);
             case STONE_AXE:
                 return configGetter(STONE_AXE);
             case STONE_PICKAXE:
                 return configGetter(STONE_PICKAXE);
-            case GOLD_AXE:
+            case GOLDEN_AXE:
                 return configGetter(GOLD_AXE);
-            case GOLD_BARDING:
+            case GOLDEN_HORSE_ARMOR:
                 return configGetter(GOLD_BARDING);
             case GOLD_BLOCK:
                 return configGetter(GOLD_BLOCK);
-            case GOLD_BOOTS:
+            case GOLDEN_BOOTS:
                 return configGetter(GOLD_BOOTS);
-            case GOLD_CHESTPLATE:
+            case GOLDEN_CHESTPLATE:
                 return configGetter(GOLD_CHESTPLATE);
-            case GOLD_HELMET:
+            case GOLDEN_HELMET:
                 return configGetter(GOLD_HELMET);
-            case GOLD_HOE:
+            case GOLDEN_HOE:
                 return configGetter(GOLD_HOE);
             case GOLD_INGOT:
                 return configGetter(GOLD_INGOT);
-            case GOLD_LEGGINGS:
+            case GOLDEN_LEGGINGS:
                 return configGetter(GOLD_LEGGINGS);
             case GOLD_NUGGET:
                 return configGetter(GOLD_NUGGET);
             case GOLD_ORE:
                 return configGetter(GOLD_ORE);
-            case GOLD_PICKAXE:
+            case GOLDEN_PICKAXE:
                 return configGetter(GOLD_PICKAXE);
-            case GOLD_SPADE:
+            case GOLDEN_SHOVEL:
                 return configGetter(GOLD_SPADE);
-            case GOLD_SWORD:
+            case GOLDEN_SWORD:
                 return configGetter(GOLD_SWORD);
             case GOLDEN_APPLE:
                 return configGetter(GOLDEN_APPLE);
@@ -195,13 +195,13 @@ public class ItemWorthCalculator {
                 return configGetter(LEATHER_HELMET);
             case LEATHER_LEGGINGS:
                 return configGetter(LEATHER_LEGGINGS);
-            case WOOD_SWORD:
+            case WOODEN_SWORD:
                 return configGetter(WOOD_SWORD);
-            case WOOD_AXE:
+            case WOODEN_AXE:
                 return configGetter(WOOD_AXE);
-            case WOOD_PICKAXE:
+            case WOODEN_PICKAXE:
                 return configGetter(WOOD_PICKAXE);
-            case WOOD_HOE:
+            case WOODEN_HOE:
                 return configGetter(WOOD_HOE);
             default:
                 return configGetter(OTHER);

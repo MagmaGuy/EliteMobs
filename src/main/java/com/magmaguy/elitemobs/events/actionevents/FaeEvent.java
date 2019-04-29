@@ -17,10 +17,17 @@ public class FaeEvent implements Listener {
     public void onTreeFell(BlockBreakEvent event) {
 
         if (event.isCancelled()) return;
-        if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
-        if (!(event.getBlock().getType().equals(Material.LOG) || event.getBlock().getType().equals(Material.LOG_2)))
+        if (!event.getPlayer().hasPermission("elitemobs.events.fae")) return;
+        if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
             return;
-//        if (!event.getPlayer().hasPermission("elitemobs.events.fae")) return;
+        if (!(event.getBlock().getType().equals(Material.ACACIA_WOOD)
+                || event.getBlock().getType().equals(Material.BIRCH_WOOD)
+                || event.getBlock().getType().equals(Material.DARK_OAK_WOOD)
+                || event.getBlock().getType().equals(Material.JUNGLE_WOOD)
+                || event.getBlock().getType().equals(Material.OAK_WOOD)
+                || event.getBlock().getType().equals(Material.SPRUCE_WOOD)))
+            return;
+
         if (ThreadLocalRandom.current().nextDouble() > ConfigValues.eventsConfig.getDouble(EventsConfig.FAE_CHANCE_ON_CHOP))
             return;
 

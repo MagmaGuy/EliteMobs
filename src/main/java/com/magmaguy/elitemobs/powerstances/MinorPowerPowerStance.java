@@ -98,7 +98,7 @@ public class MinorPowerPowerStance implements Listener {
                 effects.add(addEffect(Material.ARROW));
 
             if (elitePower instanceof AttackBlinding)
-                effects.add(addEffect(Material.EYE_OF_ENDER));
+                effects.add(addEffect(Material.ENDER_EYE));
 
             if (elitePower instanceof AttackConfusing)
                 effects.add(addEffect(Particle.SPELL_MOB));
@@ -107,7 +107,7 @@ public class MinorPowerPowerStance implements Listener {
                 effects.add(addEffect(Material.LAVA_BUCKET));
 
             if (elitePower instanceof AttackFireball)
-                effects.add(addEffect(Material.FIREBALL));
+                effects.add(addEffect(Material.FIRE_CHARGE));
 
             if (elitePower instanceof AttackFreeze)
                 effects.add(addEffect(Material.PACKED_ICE));
@@ -119,29 +119,29 @@ public class MinorPowerPowerStance implements Listener {
                 effects.add(addEffect(Material.EMERALD));
 
             if (elitePower instanceof AttackPush)
-                effects.add(addEffect(Material.PISTON_BASE));
+                effects.add(addEffect(Material.PISTON));
 
             if (!VersionChecker.currentVersionIsUnder(11, 0))
                 if (elitePower instanceof AttackWeakness)
-                    effects.add(addEffect(Material.TOTEM));
+                    effects.add(addEffect(Material.TOTEM_OF_UNDYING));
 
             if (elitePower instanceof AttackWeb)
-                effects.add(addEffect(Material.WEB));
+                effects.add(addEffect(Material.COBWEB));
 
             if (elitePower instanceof AttackWither)
-                effects.add(addEffect(Material.SKULL_ITEM));
+                effects.add(addEffect(Material.WITHER_SKELETON_SKULL));
 
             if (elitePower instanceof BonusLoot)
                 effects.add(addEffect(Material.CHEST));
 
             if (elitePower instanceof MovementSpeed)
-                effects.add(addEffect(Material.GOLD_BOOTS));
+                effects.add(addEffect(Material.GOLDEN_BOOTS));
 
             if (elitePower instanceof Taunt)
                 effects.add(addEffect(Material.JUKEBOX));
 
             if (elitePower instanceof Invisibility)
-                effects.add(addEffect(Material.THIN_GLASS));
+                effects.add(addEffect(Material.GLASS_PANE));
 
             if (elitePower instanceof InvulnerabilityArrow)
                 effects.add(addEffect(Material.SPECTRAL_ARROW));
@@ -165,7 +165,7 @@ public class MinorPowerPowerStance implements Listener {
                 effects.add(addEffect(Material.SLIME_BALL));
 
             if (elitePower instanceof AttackVacuum)
-                effects.add(addEffect(Material.LEASH));
+                effects.add(addEffect(Material.LEAD));
 
         }
 

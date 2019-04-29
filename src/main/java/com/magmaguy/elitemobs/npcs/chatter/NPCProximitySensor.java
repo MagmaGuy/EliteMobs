@@ -59,7 +59,7 @@ public class NPCProximitySensor implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getName().equals("Guild rank selector"))
+        if (event.getView().getTitle().equals("Guild rank selector"))
             for (Entity entity : event.getPlayer().getNearbyEntities(ConfigValues.npcConfig.getDouble(NPCConfig.GUILD_GREETER_ACTIVATION_RADIUS),
                     ConfigValues.npcConfig.getDouble(NPCConfig.GUILD_GREETER_ACTIVATION_RADIUS),
                     ConfigValues.npcConfig.getDouble(NPCConfig.GUILD_GREETER_ACTIVATION_RADIUS))) {
@@ -68,7 +68,7 @@ public class NPCProximitySensor implements Listener {
 
             }
 
-        if (event.getInventory().getName().equals(ConfigValues.economyConfig.getString(EconomySettingsConfig.SHOP_NAME)))
+        if (event.getView().getTitle().equals(ConfigValues.economyConfig.getString(EconomySettingsConfig.SHOP_NAME)))
             for (Entity entity : event.getPlayer().getNearbyEntities(ConfigValues.npcConfig.getDouble(NPCConfig.BLACKSMITH_ACTIVATION_RADIUS),
                     ConfigValues.npcConfig.getDouble(NPCConfig.BLACKSMITH_ACTIVATION_RADIUS),
                     ConfigValues.npcConfig.getDouble(NPCConfig.BLACKSMITH_ACTIVATION_RADIUS))) {
@@ -77,7 +77,7 @@ public class NPCProximitySensor implements Listener {
 
             }
 
-        if (event.getInventory().getName().equals(ConfigValues.economyConfig.getString(EconomySettingsConfig.CUSTOM_SHOP_NAME)))
+        if (event.getView().getTitle().equals(ConfigValues.economyConfig.getString(EconomySettingsConfig.CUSTOM_SHOP_NAME)))
             for (Entity entity : event.getPlayer().getNearbyEntities(ConfigValues.npcConfig.getDouble(NPCConfig.SPECIAL_BLACKSMITH_ACTIVATION_RADIUS),
                     ConfigValues.npcConfig.getDouble(NPCConfig.SPECIAL_BLACKSMITH_ACTIVATION_RADIUS),
                     ConfigValues.npcConfig.getDouble(NPCConfig.SPECIAL_BLACKSMITH_ACTIVATION_RADIUS))) {

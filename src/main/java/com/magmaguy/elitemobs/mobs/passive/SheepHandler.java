@@ -65,57 +65,57 @@ public class SheepHandler implements Listener {
             int dropMinAmount = (int) dropChance;
 
             ItemStack muttonStack = new ItemStack(MUTTON, random.nextInt(2) + 1);
-            ItemStack woolStack = new ItemStack(WOOL, 1);
+            ItemStack woolStack = new ItemStack(WHITE_WOOL, 1);
 
             //for different wool colors
             switch (sheep.getColor()) {
                 case WHITE:
-                    woolStack = new ItemStack(WOOL, 1);
+                    woolStack = new ItemStack(WHITE_WOOL, 1);
                     break;
                 case ORANGE:
-                    woolStack = new ItemStack(WOOL, 1, (short) 1);
+                    woolStack = new ItemStack(ORANGE_WOOL, 1);
                     break;
                 case MAGENTA:
-                    woolStack = new ItemStack(WOOL, 1, (short) 2);
+                    woolStack = new ItemStack(MAGENTA_WOOL, 1);
                     break;
                 case LIGHT_BLUE:
-                    woolStack = new ItemStack(WOOL, 1, (short) 3);
+                    woolStack = new ItemStack(LIGHT_BLUE_WOOL, 1);
                     break;
                 case YELLOW:
-                    woolStack = new ItemStack(WOOL, 1, (short) 4);
+                    woolStack = new ItemStack(YELLOW_WOOL, 1);
                     break;
                 case LIME:
-                    woolStack = new ItemStack(WOOL, 1, (short) 5);
+                    woolStack = new ItemStack(LIME_WOOL, 1);
                     break;
                 case PINK:
-                    woolStack = new ItemStack(WOOL, 1, (short) 6);
+                    woolStack = new ItemStack(PINK_WOOL, 1);
                     break;
                 case GRAY:
-                    woolStack = new ItemStack(WOOL, 1, (short) 7);
+                    woolStack = new ItemStack(GRAY_WOOL, 1);
                     break;
-                case SILVER:
-                    woolStack = new ItemStack(WOOL, 1, (short) 8);
+                case LIGHT_GRAY:
+                    woolStack = new ItemStack(LIGHT_GRAY_WOOL, 1);
                     break;
                 case CYAN:
-                    woolStack = new ItemStack(WOOL, 1, (short) 9);
+                    woolStack = new ItemStack(CYAN_WOOL, 1);
                     break;
                 case PURPLE:
-                    woolStack = new ItemStack(WOOL, 1, (short) 10);
+                    woolStack = new ItemStack(PURPLE_WOOL, 1);
                     break;
                 case BLUE:
-                    woolStack = new ItemStack(WOOL, 1, (short) 11);
+                    woolStack = new ItemStack(BLUE_WOOL, 1);
                     break;
                 case BROWN:
-                    woolStack = new ItemStack(WOOL, 1, (short) 12);
+                    woolStack = new ItemStack(BROWN_WOOL, 1);
                     break;
                 case GREEN:
-                    woolStack = new ItemStack(WOOL, 1, (short) 13);
+                    woolStack = new ItemStack(GREEN_WOOL, 1);
                     break;
                 case RED:
-                    woolStack = new ItemStack(WOOL, 1, (short) 14);
+                    woolStack = new ItemStack(RED_WOOL, 1);
                     break;
                 case BLACK:
-                    woolStack = new ItemStack(WOOL, 1, (short) 15);
+                    woolStack = new ItemStack(BLACK_WOOL, 1);
                     break;
                 default:
                     getLogger().info("Something went wrong with the sheep colors, one is missing. Contact the dev.");
@@ -147,7 +147,7 @@ public class SheepHandler implements Listener {
 
             Sheep sheep = (Sheep) event.getEntity();
 
-            ItemStack sheepMonsterEgg = new ItemStack(MONSTER_EGG, 2, (short) 91);
+            ItemStack sheepMonsterEgg = new ItemStack(SHEEP_SPAWN_EGG, 2);
             sheep.getWorld().dropItem(sheep.getLocation(), sheepMonsterEgg);
 
         }
@@ -176,56 +176,56 @@ public class SheepHandler implements Listener {
 
         Random random = new Random();
 
-        ItemStack woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1) * 50));
+        ItemStack woolStack = new ItemStack(WHITE_WOOL, ((random.nextInt(3) + 1) * 50));
 
         switch (sheep.getColor()) {
             case WHITE:
-                woolStack = new ItemStack(WOOL, (random.nextInt(3) + 1));
+                woolStack = new ItemStack(WHITE_WOOL, (random.nextInt(3) + 1));
                 break;
             case ORANGE:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 1);
+                woolStack = new ItemStack(ORANGE_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case MAGENTA:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 2);
+                woolStack = new ItemStack(MAGENTA_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case LIGHT_BLUE:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 3);
+                woolStack = new ItemStack(LIGHT_BLUE_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case YELLOW:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 4);
+                woolStack = new ItemStack(YELLOW_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case LIME:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 5);
+                woolStack = new ItemStack(LIME_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case PINK:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 6);
+                woolStack = new ItemStack(PINK_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case GRAY:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 7);
+                woolStack = new ItemStack(GRAY_WOOL, ((random.nextInt(3) + 1)));
                 break;
-            case SILVER:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 8);
+            case LIGHT_GRAY:
+                woolStack = new ItemStack(LIGHT_GRAY_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case CYAN:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 9);
+                woolStack = new ItemStack(CYAN_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case PURPLE:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 10);
+                woolStack = new ItemStack(PURPLE_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case BLUE:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 11);
+                woolStack = new ItemStack(BLUE_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case BROWN:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 12);
+                woolStack = new ItemStack(BROWN_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case GREEN:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 13);
+                woolStack = new ItemStack(GREEN_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case RED:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 14);
+                woolStack = new ItemStack(RED_WOOL, ((random.nextInt(3) + 1)));
                 break;
             case BLACK:
-                woolStack = new ItemStack(WOOL, ((random.nextInt(3) + 1)), (short) 15);
+                woolStack = new ItemStack(BLACK_WOOL, ((random.nextInt(3) + 1)));
                 break;
             default:
                 getLogger().info("Something went wrong with the sheep colors, one is missing. Contact the dev.");
