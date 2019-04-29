@@ -27,7 +27,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
-import static org.bukkit.Material.PORK;
+import static org.bukkit.Material.PORKCHOP;
 
 /**
  * Created by MagmaGuy on 19/12/2016.
@@ -62,7 +62,7 @@ public class PigHandler implements Listener {
             //this rounds down
             int dropMinAmount = (int) dropChance;
 
-            ItemStack porkchopStack = new ItemStack(PORK, random.nextInt(3) + 1);
+            ItemStack porkchopStack = new ItemStack(PORKCHOP, random.nextInt(3) + 1);
 
             for (int i = 0; i < dropMinAmount; i++) {
 

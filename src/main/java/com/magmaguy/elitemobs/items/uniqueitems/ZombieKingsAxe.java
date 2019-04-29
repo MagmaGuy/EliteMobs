@@ -15,7 +15,7 @@ public class ZombieKingsAxe extends UniqueItem {
 
     @Override
     public String defineType() {
-        return Material.GOLD_AXE.toString();
+        return Material.GOLDEN_AXE.toString();
     }
 
     @Override

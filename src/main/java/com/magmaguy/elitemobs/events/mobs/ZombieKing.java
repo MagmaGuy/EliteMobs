@@ -60,8 +60,8 @@ public class ZombieKing implements Listener {
         zombieKing.getLivingEntity().getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
         zombieKing.getLivingEntity().getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
         zombieKing.getLivingEntity().getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-        zombieKing.getLivingEntity().getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET));
-        zombieKing.getLivingEntity().getEquipment().setItemInMainHand(new ItemStack(Material.GOLD_AXE));
+        zombieKing.getLivingEntity().getEquipment().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
+        zombieKing.getLivingEntity().getEquipment().setItemInMainHand(new ItemStack(Material.GOLDEN_AXE));
 
         EventMessage.sendEventMessage(zombieKing.getLivingEntity(), ConfigValues.eventsConfig.getString(EventsConfig.DEAD_MOON_EVENT_ANNOUNCEMENT_TEXT));
 

@@ -83,8 +83,8 @@ public class ItemTierFinder {
                 if (material.equals(Material.DIAMOND_SWORD) || material.equals(Material.DIAMOND_AXE) ||
                         material.equals(Material.IRON_SWORD) || material.equals(Material.IRON_AXE) ||
                         material.equals(Material.STONE_SWORD) || material.equals(Material.STONE_AXE) ||
-                        material.equals(Material.GOLD_SWORD) || material.equals(Material.GOLD_AXE) ||
-                        material.equals(Material.WOOD_SWORD) || material.equals(Material.WOOD_AXE) ||
+                        material.equals(Material.GOLDEN_SWORD) || material.equals(Material.GOLDEN_AXE) ||
+                        material.equals(Material.WOODEN_SWORD) || material.equals(Material.WOODEN_AXE) ||
                         material.equals(Material.BOW)) {
 
                     itemList.add(player.getInventory().getItem(i));
@@ -128,18 +128,18 @@ public class ItemTierFinder {
 
         switch (material) {
             case DIAMOND_PICKAXE:
-            case DIAMOND_SPADE:
+            case DIAMOND_SHOVEL:
                 return DIAMOND_TIER + findMainEnchantment(enchantmentList, Enchantment.DIG_SPEED);
             case STONE_PICKAXE:
-            case STONE_SPADE:
+            case STONE_SHOVEL:
                 return STONE_CHAIN_TIER + findMainEnchantment(enchantmentList, Enchantment.DIG_SPEED);
             case IRON_PICKAXE:
-            case IRON_SPADE:
+            case IRON_SHOVEL:
                 return IRON_TIER + findMainEnchantment(enchantmentList, Enchantment.DIG_SPEED);
-            case GOLD_PICKAXE:
-            case GOLD_SPADE:
-            case WOOD_PICKAXE:
-            case WOOD_SPADE:
+            case GOLDEN_PICKAXE:
+            case GOLDEN_SHOVEL:
+            case WOODEN_PICKAXE:
+            case WOODEN_SHOVEL:
                 return GOLD_WOOD_LEATHER_TIER + findMainEnchantment(enchantmentList, Enchantment.DIG_SPEED);
         }
 
@@ -192,27 +192,27 @@ public class ItemTierFinder {
             case STONE_SWORD:
             case STONE_AXE:
                 return STONE_CHAIN_TIER + mainEnchantment;
-            case GOLD_BOOTS:
-            case GOLD_CHESTPLATE:
-            case GOLD_HELMET:
-            case GOLD_LEGGINGS:
+            case GOLDEN_BOOTS:
+            case GOLDEN_CHESTPLATE:
+            case GOLDEN_HELMET:
+            case GOLDEN_LEGGINGS:
             case LEATHER_BOOTS:
             case LEATHER_CHESTPLATE:
             case LEATHER_HELMET:
             case LEATHER_LEGGINGS:
                 return GOLD_WOOD_LEATHER_TIER + mainEnchantment2;
-            case WOOD_SWORD:
-            case WOOD_AXE:
-            case GOLD_SWORD:
-            case GOLD_AXE:
+            case WOODEN_SWORD:
+            case WOODEN_AXE:
+            case GOLDEN_SWORD:
+            case GOLDEN_AXE:
                 return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             case BOW:
                 return IRON_TIER + mainEnchantment3;
             case DIAMOND_HOE:
             case IRON_HOE:
             case STONE_HOE:
-            case GOLD_HOE:
-            case WOOD_HOE:
+            case GOLDEN_HOE:
+            case WOODEN_HOE:
                 if (!ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.HOES_AS_WEAPONS)) return 0;
                 if (material.equals(Material.DIAMOND_HOE))
                     return DIAMOND_TIER + mainEnchantment;
@@ -220,7 +220,7 @@ public class ItemTierFinder {
                     return IRON_TIER + mainEnchantment;
                 if (material.equals(Material.STONE_HOE))
                     return STONE_CHAIN_TIER + mainEnchantment;
-                if (material.equals(Material.GOLD_HOE) || material.equals(Material.WOOD_HOE))
+                if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
                     return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             default:
                 return 0;

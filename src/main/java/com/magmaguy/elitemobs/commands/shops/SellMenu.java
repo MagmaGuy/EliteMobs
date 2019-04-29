@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -41,11 +42,11 @@ public class SellMenu implements Listener {
      */
     public void constructSellMenu(Player player) {
 
-        Inventory sellInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
+        Inventory sellInventory = Bukkit.createInventory(player, InventoryType.CHEST, SHOP_NAME);
 
         ItemStack advice;
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.SKULL_SIGNATURE_ITEM)) {
-            advice = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+            advice = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
             SkullMeta arrowLeftSkullMeta = (SkullMeta) advice.getItemMeta();
             arrowLeftSkullMeta.setOwner("MHF_Exclamation");
             arrowLeftSkullMeta.setDisplayName(ChatColorConverter.convert(ConfigValues.economyConfig.getString(EconomySettingsConfig.SELL_SHOP_INFO_NAME)));
@@ -102,7 +103,7 @@ public class SellMenu implements Listener {
                 continue;
             }
 
-            sellInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.THIN_GLASS));
+            sellInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
         }
 
@@ -113,16 +114,17 @@ public class SellMenu implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
+        if (!event.getView().getTitle().equals(SHOP_NAME)) return;
+        event.setCancelled(true);
         if (!SharedShopElements.sellMenuNullPointPreventer(event)) return;
-        if (!event.getInventory().getName().equals(SHOP_NAME)) return;
 
-        if (event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME)) {
+        if (!event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
 
             //Signature item
-            if (!event.getCurrentItem().getItemMeta().hasDisplayName() || event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName())) {
-                event.setCancelled(true);
+            if (!event.getCurrentItem().getItemMeta().hasDisplayName()
+                    || event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName()))
                 return;
-            }
+
 
             //sell
             if (event.getSlot() == ConfigValues.economyConfig.getInt(EconomySettingsConfig.SELL_SHOP_CONFIRM_SLOT)) {
@@ -147,7 +149,6 @@ public class SellMenu implements Listener {
                                 ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
                                         .replace("$currency_amount", EconomyHandler.checkCurrency(UUIDFilter.guessUUI(event.getWhoClicked().getName())) + "")
                                         .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
-                event.setCancelled(true);
                 return;
             }
 
@@ -162,21 +163,16 @@ public class SellMenu implements Listener {
                         }
                     positionCounter++;
                 }
-                event.setCancelled(true);
                 event.getWhoClicked().closeInventory();
                 return;
             }
 
+            if (!validSlots.contains(event.getSlot())) return;
 
-            if (!validSlots.contains(event.getSlot())) {
-                event.setCancelled(true);
-                return;
-            }
 
             if (validSlots.contains(event.getSlot())) {
                 event.getWhoClicked().getInventory().addItem(event.getCurrentItem());
                 event.getCurrentItem().setAmount(0);
-                event.setCancelled(true);
                 //Update worth of things to be sold
                 double itemWorth = 0;
                 int positionCounter = 0;
@@ -205,12 +201,10 @@ public class SellMenu implements Listener {
         }
 
         if (!EliteMobsItemDetector.isEliteMobsItem(event.getCurrentItem())) {
-            event.setCancelled(true);
             event.getWhoClicked().sendMessage(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SALE_INSTRUCTIONS)));
             return;
         }
 
-        event.setCancelled(true);
         boolean inventoryIsFull = true;
         for (int i : validSlots)
             if (event.getInventory().getItem(i) == null) {
@@ -249,7 +243,7 @@ public class SellMenu implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
 
-        if (!event.getInventory().getName().equals(SHOP_NAME)) return;
+        if (!event.getView().getTitle().equals(SHOP_NAME)) return;
 
         int positionCounter = 0;
         for (ItemStack itemStack : event.getInventory()) {
@@ -259,7 +253,6 @@ public class SellMenu implements Listener {
                 }
             positionCounter++;
         }
-
 
     }
 

@@ -60,10 +60,10 @@ public class EnchantmentGenerator {
          */
         switch (material) {
             case DIAMOND_SWORD:
-            case GOLD_SWORD:
+            case GOLDEN_SWORD:
             case IRON_SWORD:
             case STONE_SWORD:
-            case WOOD_SWORD:
+            case WOODEN_SWORD:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ARTHROPODS"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_UNDEAD"));
@@ -85,10 +85,10 @@ public class EnchantmentGenerator {
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
                 break;
             case DIAMOND_PICKAXE:
-            case GOLD_PICKAXE:
+            case GOLDEN_PICKAXE:
             case IRON_PICKAXE:
             case STONE_PICKAXE:
-            case WOOD_PICKAXE:
+            case WOODEN_PICKAXE:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DIG_SPEED", itemTier));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
@@ -100,11 +100,11 @@ public class EnchantmentGenerator {
                     validSecondaryEnchantments.putAll(validateSecondaryEnchantments("SILK_TOUCH"));
                 }
                 break;
-            case DIAMOND_SPADE:
-            case GOLD_SPADE:
-            case IRON_SPADE:
-            case STONE_SPADE:
-            case WOOD_SPADE:
+            case DIAMOND_SHOVEL:
+            case GOLDEN_SHOVEL:
+            case IRON_SHOVEL:
+            case STONE_SHOVEL:
+            case WOODEN_SHOVEL:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DIG_SPEED", itemTier));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
@@ -116,10 +116,10 @@ public class EnchantmentGenerator {
                 }
                 break;
             case DIAMOND_HOE:
-            case GOLD_HOE:
+            case GOLDEN_HOE:
             case IRON_HOE:
             case STONE_HOE:
-            case WOOD_HOE:
+            case WOODEN_HOE:
                 if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.HOES_AS_WEAPONS))
                     enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
             case SHIELD:
@@ -128,10 +128,10 @@ public class EnchantmentGenerator {
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
                 break;
             case DIAMOND_AXE:
-            case GOLD_AXE:
+            case GOLDEN_AXE:
             case IRON_AXE:
             case STONE_AXE:
-            case WOOD_AXE:
+            case WOODEN_AXE:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_ARTHROPODS"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DAMAGE_UNDEAD"));
@@ -143,7 +143,7 @@ public class EnchantmentGenerator {
                 break;
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:
-            case GOLD_HELMET:
+            case GOLDEN_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
@@ -160,7 +160,7 @@ public class EnchantmentGenerator {
                 break;
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
-            case GOLD_CHESTPLATE:
+            case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
@@ -174,7 +174,7 @@ public class EnchantmentGenerator {
                 break;
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
-            case GOLD_LEGGINGS:
+            case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
@@ -189,7 +189,7 @@ public class EnchantmentGenerator {
                 break;
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
-            case GOLD_BOOTS:
+            case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
@@ -286,62 +286,62 @@ public class EnchantmentGenerator {
          */
         switch (material) {
             case DIAMOND_SWORD:
-            case GOLD_SWORD:
+            case GOLDEN_SWORD:
             case IRON_SWORD:
             case STONE_SWORD:
-            case WOOD_SWORD:
+            case WOODEN_SWORD:
                 break;
             case BOW:
                 break;
             case DIAMOND_PICKAXE:
-            case GOLD_PICKAXE:
+            case GOLDEN_PICKAXE:
             case IRON_PICKAXE:
             case STONE_PICKAXE:
-            case WOOD_PICKAXE:
+            case WOODEN_PICKAXE:
                 break;
-            case DIAMOND_SPADE:
-            case GOLD_SPADE:
-            case IRON_SPADE:
-            case STONE_SPADE:
-            case WOOD_SPADE:
+            case DIAMOND_SHOVEL:
+            case GOLDEN_SHOVEL:
+            case IRON_SHOVEL:
+            case STONE_SHOVEL:
+            case WOODEN_SHOVEL:
                 break;
             case DIAMOND_HOE:
-            case GOLD_HOE:
+            case GOLDEN_HOE:
             case IRON_HOE:
             case STONE_HOE:
-            case WOOD_HOE:
+            case WOODEN_HOE:
             case SHIELD:
                 break;
             case DIAMOND_AXE:
-            case GOLD_AXE:
+            case GOLDEN_AXE:
             case IRON_AXE:
             case STONE_AXE:
-            case WOOD_AXE:
+            case WOODEN_AXE:
                 break;
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:
-            case GOLD_HELMET:
+            case GOLDEN_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
                 validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
                 break;
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
-            case GOLD_CHESTPLATE:
+            case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
                 validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
                 break;
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
-            case GOLD_LEGGINGS:
+            case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
                 validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
                 break;
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
-            case GOLD_BOOTS:
+            case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
                 validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));

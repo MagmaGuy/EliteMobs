@@ -91,7 +91,7 @@ public class AdventurersGuildGUI implements Listener {
         switch (guildRankStatus) {
 
             case UNLOCKED:
-                itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
+                itemStack = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS);
                 ItemMeta unlockedMeta = itemStack.getItemMeta();
                 String lowTierWarning = "";
                 if (rank < 10) lowTierWarning = ChatColorConverter.convert("&cElites can't drop better loot!");
@@ -108,7 +108,7 @@ public class AdventurersGuildGUI implements Listener {
                 itemStack.setItemMeta(unlockedMeta);
                 break;
             case LOCKED:
-                itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+                itemStack = new ItemStack(Material.RED_STAINED_GLASS_PANE);
                 ItemMeta lockedMeta = itemStack.getItemMeta();
                 lockedMeta.setLore(Arrays.asList(
                         ChatColorConverter.convert("&f&m-------------------------------"),
@@ -121,7 +121,7 @@ public class AdventurersGuildGUI implements Listener {
                 itemStack.setItemMeta(lockedMeta);
                 break;
             case SELECTED:
-                itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
+                itemStack = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
                 ItemMeta selectedMeta = itemStack.getItemMeta();
                 String tierWarning = "";
                 if (rank < 10) tierWarning = ChatColorConverter.convert("&cElites can't drop better loot!");
@@ -138,7 +138,7 @@ public class AdventurersGuildGUI implements Listener {
                 PlayerData.playerSelectedGuildRankChanged = true;
                 break;
             case NEXT_UNLOCK:
-                itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 1);
+                itemStack = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
                 ItemMeta nextMeta = itemStack.getItemMeta();
                 String priceString = "";
                 if (!PlayerData.playerCurrency.containsKey(player.getUniqueId()))
@@ -302,7 +302,7 @@ public class AdventurersGuildGUI implements Listener {
 
     private static ItemStack skullItemInitializer(String mhfValue, String title, List<String> lore) {
 
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack item = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         ItemMeta itemMeta = item.getItemMeta();
         SkullMeta skullMeta = (SkullMeta) itemMeta;
         skullMeta.setOwner(mhfValue);
@@ -325,7 +325,7 @@ public class AdventurersGuildGUI implements Listener {
     public void onMainMenuClick(InventoryClickEvent event) {
 
         if (!(event.getWhoClicked() instanceof Player)) return;
-        if (!event.getInventory().getName().equalsIgnoreCase("Adventurer's guild")) return;
+        if (!event.getView().getTitle().equalsIgnoreCase("Adventurer's guild")) return;
         if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
         if (event.getCurrentItem().equals(difficulty))
             difficultyMenu((Player) event.getWhoClicked());
@@ -342,12 +342,12 @@ public class AdventurersGuildGUI implements Listener {
     public void onRankSelectorClick(InventoryClickEvent event) {
 
         if (!(event.getWhoClicked() instanceof Player)) return;
-        if (!event.getInventory().getName().equalsIgnoreCase("Guild rank selector")) return;
+        if (!event.getView().getTitle().equalsIgnoreCase("Guild rank selector")) return;
         if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
 
         event.setCancelled(true);
 
-        if (!event.getClickedInventory().getName().equals("Guild rank selector")) {
+        if (!event.getView().getTitle().equals("Guild rank selector")) {
             event.setCancelled(true);
             return;
         }

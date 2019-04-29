@@ -35,8 +35,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
+import static org.bukkit.Material.CHICKEN;
 import static org.bukkit.Material.FEATHER;
-import static org.bukkit.Material.RAW_CHICKEN;
 
 /**
  * Created by MagmaGuy on 19/12/2016.
@@ -78,7 +78,7 @@ public class ChickenHandler implements Listener {
             int dropMinAmount = (int) dropChance;
 
             ItemStack featherStack = new ItemStack(FEATHER, (random.nextInt(2) + 1));
-            ItemStack poultryStack = new ItemStack(RAW_CHICKEN, 1);
+            ItemStack poultryStack = new ItemStack(CHICKEN, 1);
 
             for (int i = 0; i < dropMinAmount; i++) {
 

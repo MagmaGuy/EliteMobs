@@ -102,16 +102,16 @@ public class MajorPowerPowerStance implements Listener {
                 effects.add(addEffect(Material.RED_MUSHROOM));
 
             if (elitePower instanceof ZombieFriends)
-                effects.add(addEffect(Material.SKULL_ITEM));
+                effects.add(addEffect(Material.ZOMBIE_HEAD));
 
             if (elitePower instanceof ZombieNecronomicon)
                 effects.add(addEffect(Material.WRITTEN_BOOK));
 
             if (elitePower instanceof ZombieParents)
-                effects.add(addEffect(Material.MONSTER_EGG));
+                effects.add(addEffect(Material.ZOMBIE_SPAWN_EGG));
 
             if (elitePower instanceof ZombieTeamRocket)
-                effects.add(addEffect(Material.FIREWORK));
+                effects.add(addEffect(Material.FIREWORK_ROCKET));
 
         }
 
