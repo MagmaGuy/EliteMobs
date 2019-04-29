@@ -57,7 +57,7 @@ public class AttackWeb extends MinorPower implements Listener {
         if (!originalMaterial.equals(Material.AIR))
             return;
 
-        block.setType(Material.WEB);
+        block.setType(Material.COBWEB);
 
         new BukkitRunnable() {
             @Override

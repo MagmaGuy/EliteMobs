@@ -57,7 +57,7 @@ public class MushroomCowHandler implements Listener {
             //this rounds down
             int dropMinAmount = (int) dropChance;
 
-            ItemStack beefStack = new ItemStack(RAW_BEEF, (random.nextInt(3) + 1));
+            ItemStack beefStack = new ItemStack(BEEF, (random.nextInt(3) + 1));
             //leather can drop 0, meaning that it could create visual artifacts. Have to filter that out.
             ItemStack leatherStack = new ItemStack(LEATHER, (random.nextInt(2)));
 

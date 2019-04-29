@@ -61,7 +61,7 @@ public class LootGUI implements Listener {
 
     private void headerConstructor(Inventory inventory) {
 
-        ItemStack arrowLeft = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack arrowLeft = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowLeftSkullMeta = (SkullMeta) arrowLeft.getItemMeta();
         arrowLeftSkullMeta.setOwner("MHF_ArrowLeft");
         arrowLeftSkullMeta.setDisplayName("Previous Item Ranks");
@@ -70,7 +70,7 @@ public class LootGUI implements Listener {
         inventory.setItem(0, arrowLeft);
 
 
-        ItemStack arrowRight = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack arrowRight = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowRightSkullMeta = (SkullMeta) arrowRight.getItemMeta();
         arrowRightSkullMeta.setOwner("MHF_ArrowRight");
         arrowRightSkullMeta.setDisplayName("Next Item Ranks");
@@ -79,7 +79,7 @@ public class LootGUI implements Listener {
         inventory.setItem(8, arrowRight);
 
 
-        ItemStack signature = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack signature = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta signatureSkullMeta = (SkullMeta) signature.getItemMeta();
         signatureSkullMeta.setOwner("magmaguy");
         signatureSkullMeta.setDisplayName("EliteMobs by MagmaGuy");
@@ -131,7 +131,7 @@ public class LootGUI implements Listener {
 
     private void lootNavigationConstructor(Inventory inventory) {
 
-        ItemStack arrowLeft = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack arrowLeft = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowLeftSkullMeta = (SkullMeta) arrowLeft.getItemMeta();
         arrowLeftSkullMeta.setOwner("MHF_ArrowLeft");
         arrowLeftSkullMeta.setDisplayName("Previous Loot Page");
@@ -140,7 +140,7 @@ public class LootGUI implements Listener {
         inventory.setItem(27, arrowLeft);
 
 
-        ItemStack arrowRight = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack arrowRight = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowRightSkullMeta = (SkullMeta) arrowRight.getItemMeta();
         arrowRightSkullMeta.setOwner("MHF_ArrowRight");
         arrowRightSkullMeta.setDisplayName("Next Loot Page");
@@ -192,7 +192,7 @@ public class LootGUI implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (event.getInventory().getName().equalsIgnoreCase(shopName)) {
+        if (event.getView().getTitle().equalsIgnoreCase(shopName)) {
 
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
 

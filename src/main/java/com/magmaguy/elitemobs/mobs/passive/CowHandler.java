@@ -27,8 +27,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
+import static org.bukkit.Material.BEEF;
 import static org.bukkit.Material.LEATHER;
-import static org.bukkit.Material.RAW_BEEF;
 
 /**
  * Created by MagmaGuy on 19/12/2016.
@@ -63,7 +63,7 @@ public class CowHandler implements Listener {
             //this rounds down
             int dropMinAmount = (int) dropChance;
 
-            ItemStack beefStack = new ItemStack(RAW_BEEF, (random.nextInt(3) + 1));
+            ItemStack beefStack = new ItemStack(BEEF, (random.nextInt(3) + 1));
             //leather can drop 0, meaning that it could create visual artifacts. Have to filter that out.
             ItemStack leatherStack = new ItemStack(LEATHER, (random.nextInt(2)));
 

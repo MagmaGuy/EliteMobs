@@ -80,8 +80,9 @@ public class CustomShopHandler implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
+        if (!event.getView().getTitle().equals(SHOP_NAME)) return;
+        event.setCancelled(true);
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
-        if (!event.getInventory().getName().equals(SHOP_NAME)) return;
 
         //reroll loot button
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName())) {
@@ -104,7 +105,7 @@ public class CustomShopHandler implements Listener {
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
         //These slots are for buying items
-        if (validSlots.contains(event.getSlot()) && event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME)) {
+        if (validSlots.contains(event.getSlot()) && event.getView().getTitle().equalsIgnoreCase(SHOP_NAME)) {
 
             boolean inventoryHasFreeSlots = false;
             for (ItemStack iteratedStack : player.getInventory()) {
@@ -139,8 +140,6 @@ public class CustomShopHandler implements Listener {
             }
 
         }
-
-        event.setCancelled(true);
 
     }
 

@@ -50,7 +50,7 @@ public class BuyOrSellMenu implements Listener {
     public void onInventoryInteraction(InventoryClickEvent event) {
 
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
-        if (!event.getInventory().getName().equals(SHOP_NAME)) return;
+        if (!event.getView().getTitle().equals(SHOP_NAME)) return;
 
         //reroll loot button
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColorConverter.convert(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName()))) {

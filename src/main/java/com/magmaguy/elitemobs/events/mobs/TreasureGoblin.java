@@ -433,10 +433,10 @@ public class TreasureGoblin implements Listener {
 
     public static void equipTreasureGoblin(Zombie zombie) {
 
-        zombie.getEquipment().setHelmet(new ItemStack(Material.GOLD_HELMET, 1));
-        zombie.getEquipment().setChestplate(new ItemStack(Material.GOLD_CHESTPLATE));
-        zombie.getEquipment().setLeggings(new ItemStack(Material.GOLD_LEGGINGS));
-        zombie.getEquipment().setBoots(new ItemStack(Material.GOLD_BOOTS));
+        zombie.getEquipment().setHelmet(new ItemStack(Material.GOLDEN_HELMET, 1));
+        zombie.getEquipment().setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
+        zombie.getEquipment().setLeggings(new ItemStack(Material.GOLDEN_LEGGINGS));
+        zombie.getEquipment().setBoots(new ItemStack(Material.GOLDEN_BOOTS));
 
     }
 

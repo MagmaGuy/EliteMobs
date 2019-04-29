@@ -76,23 +76,20 @@ public class ShopHandler implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
+        if (!event.getView().getTitle().equals(SHOP_NAME)) return;
+        event.setCancelled(true);
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
-        if (!event.getInventory().getName().equals(SHOP_NAME)) return;
 
         //reroll loot button
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName())) {
-
             populateShop(event.getInventory());
             event.setCancelled(true);
             return;
-
         }
 
         if (!ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(event.getCurrentItem())) {
-
             event.setCancelled(true);
             return;
-
         }
 
         Player player = (Player) event.getWhoClicked();
@@ -102,19 +99,14 @@ public class ShopHandler implements Listener {
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
         boolean inventoryHasFreeSlots = false;
-        for (ItemStack iteratedStack : player.getInventory().getStorageContents()) {
-
+        for (ItemStack iteratedStack : player.getInventory().getStorageContents())
             if (iteratedStack == null) {
-
                 inventoryHasFreeSlots = true;
                 break;
-
             }
 
-        }
-
         //These slots are for buying items
-        if (event.getClickedInventory().getName().equalsIgnoreCase(SHOP_NAME) && validSlots.contains(event.getSlot())) {
+        if (event.getView().getTitle().equalsIgnoreCase(SHOP_NAME) && validSlots.contains(event.getSlot())) {
 
             if (!inventoryHasFreeSlots) {
 
@@ -137,8 +129,6 @@ public class ShopHandler implements Listener {
             }
 
         }
-
-        event.setCancelled(true);
 
     }
 

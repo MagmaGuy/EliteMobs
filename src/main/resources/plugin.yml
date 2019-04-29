@@ -2,6 +2,7 @@ name: EliteMobs
 version: 7.0.10
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
+api-version: 1.13
 softdepend: [Multiverse-Core, WorldGuard, Vault]
 
 commands:

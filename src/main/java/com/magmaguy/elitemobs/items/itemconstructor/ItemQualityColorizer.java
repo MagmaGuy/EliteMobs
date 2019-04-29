@@ -243,9 +243,9 @@ public class ItemQualityColorizer {
 
         Material material = itemStack.getType();
 
-        if (material.equals(Material.DIAMOND_SWORD) || material.equals(Material.GOLD_SWORD) ||
+        if (material.equals(Material.DIAMOND_SWORD) || material.equals(Material.GOLDEN_SWORD) ||
                 material.equals(Material.IRON_SWORD) || material.equals(Material.STONE_SWORD) ||
-                material.equals(Material.WOOD_SWORD)) {
+                material.equals(Material.WOODEN_SWORD)) {
 
             maxRank += DAMAGE_ARTHROPODS;
             maxRank += VANISHING_CURSE;
@@ -268,9 +268,9 @@ public class ItemQualityColorizer {
             maxRank += ARROW_KNOCKBACK;
             maxRank += DURABILITY;
 
-        } else if (material.equals(Material.DIAMOND_PICKAXE) || material.equals(Material.GOLD_PICKAXE) ||
+        } else if (material.equals(Material.DIAMOND_PICKAXE) || material.equals(Material.GOLDEN_SWORD) ||
                 material.equals(Material.IRON_PICKAXE) || material.equals(Material.STONE_PICKAXE) ||
-                material.equals(Material.WOOD_PICKAXE)) {
+                material.equals(Material.WOODEN_SWORD)) {
 
             maxRank += VANISHING_CURSE;
             maxRank += DIG_SPEED;
@@ -279,9 +279,9 @@ public class ItemQualityColorizer {
             maxRank += SILK_TOUCH;
             maxRank += DURABILITY;
 
-        } else if (material.equals(Material.DIAMOND_SPADE) || material.equals(Material.GOLD_SPADE) ||
-                material.equals(Material.IRON_SPADE) || material.equals(Material.STONE_SPADE) ||
-                material.equals(Material.WOOD_SPADE)) {
+        } else if (material.equals(Material.DIAMOND_SHOVEL) || material.equals(Material.GOLDEN_SHOVEL) ||
+                material.equals(Material.IRON_SHOVEL) || material.equals(Material.STONE_SHOVEL) ||
+                material.equals(Material.WOODEN_SHOVEL)) {
 
             maxRank += VANISHING_CURSE;
             maxRank += DIG_SPEED;
@@ -290,17 +290,17 @@ public class ItemQualityColorizer {
             maxRank += SILK_TOUCH;
             maxRank += DURABILITY;
 
-        } else if (material.equals(Material.DIAMOND_HOE) || material.equals(Material.GOLD_HOE) ||
+        } else if (material.equals(Material.DIAMOND_HOE) || material.equals(Material.GOLDEN_HOE) ||
                 material.equals(Material.IRON_HOE) || material.equals(Material.STONE_HOE) ||
-                material.equals(Material.WOOD_HOE)) {
+                material.equals(Material.WOODEN_HOE)) {
 
             maxRank += VANISHING_CURSE;
             maxRank += MENDING;
             maxRank += DURABILITY;
 
-        } else if (material.equals(Material.DIAMOND_AXE) || material.equals(Material.GOLD_AXE) ||
+        } else if (material.equals(Material.DIAMOND_AXE) || material.equals(Material.GOLDEN_AXE) ||
                 material.equals(Material.IRON_AXE) || material.equals(Material.STONE_AXE) ||
-                material.equals(Material.WOOD_AXE)) {
+                material.equals(Material.WOODEN_AXE)) {
 
             maxRank += DAMAGE_ARTHROPODS;
             maxRank += VANISHING_CURSE;
@@ -313,7 +313,7 @@ public class ItemQualityColorizer {
             maxRank += DURABILITY;
 
         } else if (material.equals(Material.CHAINMAIL_HELMET) || material.equals(Material.DIAMOND_HELMET) ||
-                material.equals(Material.GOLD_HELMET) || material.equals(Material.IRON_HELMET) ||
+                material.equals(Material.GOLDEN_HELMET) || material.equals(Material.IRON_HELMET) ||
                 material.equals(Material.LEATHER_HELMET)) {
 
             maxRank += BINDING_CURSE;
@@ -329,7 +329,7 @@ public class ItemQualityColorizer {
             maxRank += WATER_WORKER;
 
         } else if (material.equals(Material.CHAINMAIL_CHESTPLATE) || material.equals(Material.DIAMOND_CHESTPLATE) ||
-                material.equals(Material.GOLD_CHESTPLATE) || material.equals(Material.IRON_CHESTPLATE) ||
+                material.equals(Material.GOLDEN_CHESTPLATE) || material.equals(Material.IRON_CHESTPLATE) ||
                 material.equals(Material.LEATHER_CHESTPLATE)) {
 
             maxRank += BINDING_CURSE;
@@ -343,7 +343,7 @@ public class ItemQualityColorizer {
             maxRank += VANISHING_CURSE;
 
         } else if (material.equals(Material.CHAINMAIL_LEGGINGS) || material.equals(Material.DIAMOND_LEGGINGS) ||
-                material.equals(Material.GOLD_LEGGINGS) || material.equals(Material.IRON_LEGGINGS) ||
+                material.equals(Material.GOLDEN_LEGGINGS) || material.equals(Material.IRON_LEGGINGS) ||
                 material.equals(Material.LEATHER_LEGGINGS)) {
 
             maxRank += BINDING_CURSE;
@@ -357,7 +357,7 @@ public class ItemQualityColorizer {
             maxRank += VANISHING_CURSE;
 
         } else if (material.equals(Material.CHAINMAIL_BOOTS) || material.equals(Material.DIAMOND_BOOTS) ||
-                material.equals(Material.GOLD_BOOTS) || material.equals(Material.IRON_BOOTS) ||
+                material.equals(Material.GOLDEN_BOOTS) || material.equals(Material.IRON_BOOTS) ||
                 material.equals(Material.LEATHER_BOOTS)) {
 
             maxRank += BINDING_CURSE;
