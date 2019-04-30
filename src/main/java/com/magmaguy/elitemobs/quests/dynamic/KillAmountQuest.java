@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class KillAmountQuest {
+public class KillAmountQuest implements Cloneable{
 
     private static HashMap<Player, KillAmountQuest> activeKillAmountQuests = new HashMap<>();
 
