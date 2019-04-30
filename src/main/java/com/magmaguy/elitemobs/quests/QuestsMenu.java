@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.quests.dynamic.KillAmountQuest;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.MenuUtils;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
@@ -85,11 +86,22 @@ public class QuestsMenu implements Listener {
     }
 
     @EventHandler
-    public void onTierQuestClick(InventoryClickEvent event) {
-        if (!MenuUtils.isValidMenu(event, MAIN_MENU_NAME)) return;
+    public void onTierQuestClick(InventoryClickEvent event) throws CloneNotSupportedException {
+        if (!event.getView().getTitle().contains(QuestTierMenu.TIER_MENU_NAME)) return;
+        if (!MenuUtils.isValidMenu(event)) return;
         event.setCancelled(true);
         if (event.getInventory().getType().equals(InventoryType.PLAYER)) return;
 
+        int tier = 0;
+
+        for (int i = 11; i < 21; i++)
+            if (event.getView().getTitle().contains(GuildRank.getRankName(i))) {
+                tier = i;
+                break;
+            }
+
+        QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier);
+        KillAmountQuest killAmountQuest = questTierMenu.getKillAmountQuests().get(event.getSlot() / 2);
 
     }
 
