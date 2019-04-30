@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
-import com.magmaguy.elitemobs.items.MobTierFinder;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.uniqueitems.DwarvenGreed;
 import com.magmaguy.elitemobs.mobconstructor.ActionBossMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.TrashMobEntity;
@@ -109,7 +109,7 @@ public class Balrog implements Listener {
         if (!ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_GREED)) return;
 
         DwarvenGreed dwarvenGreed = new DwarvenGreed();
-        ItemStack dwarvenGreedItemStack = dwarvenGreed.constructItemStack((int) MobTierFinder.findMobTier(EntityTracker.getEliteMobEntity(event.getEntity()).getLevel()));
+        ItemStack dwarvenGreedItemStack = dwarvenGreed.constructItemStack((int) MobTierCalculator.findMobTier(EntityTracker.getEliteMobEntity(event.getEntity()).getLevel()));
 
         event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), dwarvenGreedItemStack);
 

@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.items.MobTierFinder;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.uniqueitems.TheFeller;
 import com.magmaguy.elitemobs.mobconstructor.ActionBossMobEntity;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.AttackFire;
@@ -226,7 +226,7 @@ public class Fae implements Listener {
         if (!ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_THE_FELLER)) return;
 
         TheFeller theFeller = new TheFeller();
-        ItemStack theFellerItemStack = theFeller.constructItemStack((int) MobTierFinder.findMobTier(EntityTracker.getEliteMobEntity(event.getEntity()).getLevel()));
+        ItemStack theFellerItemStack = theFeller.constructItemStack((int) MobTierCalculator.findMobTier(EntityTracker.getEliteMobEntity(event.getEntity()).getLevel()));
 
         event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), theFellerItemStack);
 

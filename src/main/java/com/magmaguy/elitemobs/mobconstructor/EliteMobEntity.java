@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.items.MobTierFinder;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
@@ -59,6 +59,8 @@ public class EliteMobEntity {
     private boolean hasNormalLoot = true;
     private CreatureSpawnEvent.SpawnReason spawnReason;
 
+    private HashSet<Player> damagers = new HashSet<>();
+
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
      * the Elite Mob conversion
@@ -98,7 +100,7 @@ public class EliteMobEntity {
         Register level, this is variable as per stacking rules
          */
         setEliteMobLevel(eliteMobLevel);
-        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        eliteMobTier = MobTierCalculator.findMobTier(eliteMobLevel);
         /*
         Sets the spawn reason
          */
@@ -159,7 +161,7 @@ public class EliteMobEntity {
         Register level, this is variable as per stacking rules
          */
         setEliteMobLevel(eliteMobLevel);
-        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        eliteMobTier = MobTierCalculator.findMobTier(eliteMobLevel);
         /*
         Sets the spawn reason
          */
@@ -225,7 +227,7 @@ public class EliteMobEntity {
         Register level, this is variable as per stacking rules
          */
         setEliteMobLevel(eliteMobLevel);
-        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        eliteMobTier = MobTierCalculator.findMobTier(eliteMobLevel);
         /*
         Sets the spawn reason
          */
@@ -291,7 +293,7 @@ public class EliteMobEntity {
         Register level, this is variable as per stacking rules
          */
         setEliteMobLevel(eliteMobLevel);
-        eliteMobTier = MobTierFinder.findMobTier(eliteMobLevel);
+        eliteMobTier = MobTierCalculator.findMobTier(eliteMobLevel);
         /*
         Sets the spawn reason
          */
@@ -905,6 +907,18 @@ public class EliteMobEntity {
      */
     public void setSpawnReason(CreatureSpawnEvent.SpawnReason spawnReason) {
         this.spawnReason = spawnReason;
+    }
+
+    public HashSet<Player> getDamagers() {
+        return this.damagers;
+    }
+
+    public void addDamager(Player player) {
+        this.damagers.add(player);
+    }
+
+    public boolean hasDamagers() {
+        return !damagers.isEmpty();
     }
 
 }

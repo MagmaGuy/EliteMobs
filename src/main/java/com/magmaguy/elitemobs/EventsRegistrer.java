@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
+import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
 import com.magmaguy.elitemobs.adventurersguild.MaxHealthBoost;
 import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
@@ -43,6 +43,7 @@ import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
+import com.magmaguy.elitemobs.quests.QuestsMenu;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -76,7 +77,7 @@ public class EventsRegistrer {
         //potion effects
         pluginManager.registerEvents(new PotionEffectApplier(), plugin);
 
-        //getloot AdventurersGuildGUI
+        //getloot AdventurersGuildMenu
         pluginManager.registerEvents(new LootGUI(), plugin);
 
         /*
@@ -206,10 +207,12 @@ public class EventsRegistrer {
 
         //Initialize adventurer's guild
         if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ENABLE_ADVENTURERS_GUILD))
-            pluginManager.registerEvents(new AdventurersGuildGUI(), plugin);
+            pluginManager.registerEvents(new AdventurersGuildMenu(), plugin);
         if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
             pluginManager.registerEvents(new MaxHealthBoost(), plugin);
         pluginManager.registerEvents(new SpawnControl(), plugin);
+        //register quests
+        pluginManager.registerEvents(new QuestsMenu(), plugin);
 
         //Combat tag
         if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))

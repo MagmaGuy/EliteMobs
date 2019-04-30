@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEli
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.items.MobTierFinder;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
 import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
 import com.magmaguy.elitemobs.utils.EntityFinder;
@@ -69,7 +69,7 @@ public class CombatSystem implements Listener {
         Player player = (Player) event.getEntity();
 
         //Determine tiers
-        double eliteTier = MobTierFinder.findMobTier(eliteMobEntity);
+        double eliteTier = MobTierCalculator.findMobTier(eliteMobEntity);
         double playerTier = ItemTierFinder.findArmorSetTier(player);
 
         double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, event);
@@ -202,10 +202,8 @@ public class CombatSystem implements Listener {
         Case in which the player is not the entity dealing damage, just deal raw damage
          */
         if (!damager.getType().equals(EntityType.PLAYER) && EntityTracker.isEliteMob(damager)) {
-
             event.setDamage(event.getDamage());
             return;
-
         }
 
         for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
@@ -218,13 +216,14 @@ public class CombatSystem implements Listener {
 
         if (!damager.getType().equals(EntityType.PLAYER)) return;
         Player player = (Player) damager;
+        eliteMobEntity.addDamager(player);
 
         double playerTier;
         if (player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType().equals(Material.BOW) && event.getDamager() instanceof Player)
             playerTier = 0;
         else
             playerTier = ItemTierFinder.findBattleTier(player.getInventory().getItemInMainHand());
-        double eliteTier = MobTierFinder.findMobTier(eliteMobEntity);
+        double eliteTier = MobTierCalculator.findMobTier(eliteMobEntity);
         double maxHealth = eliteMobEntity.getMaxHealth();
 
         double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, eliteMobEntity.getLivingEntity());
@@ -233,11 +232,8 @@ public class CombatSystem implements Listener {
             double arrowSpeedMultiplier = Math.sqrt(Math.pow(event.getDamager().getVelocity().getX(), 2) +
                     Math.pow(event.getDamager().getVelocity().getY(), 2) +
                     Math.pow(event.getDamager().getVelocity().getZ(), 2)) / 5;
-
             arrowSpeedMultiplier = (arrowSpeedMultiplier < 1) ? arrowSpeedMultiplier : 1;
-
             newDamage *= arrowSpeedMultiplier;
-
         }
 
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
