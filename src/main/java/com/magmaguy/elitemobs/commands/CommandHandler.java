@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.quests.QuestCommand;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -344,6 +345,10 @@ public class CommandHandler implements CommandExecutor {
                 commandSender.sendMessage("[EliteMobs] Successfully imported the world!");
                 commandSender.sendMessage("[EliteMobs] Now all you need to do is add the permission elitemobs.user to your users and you're all set!");
                 return true;
+            case "quest":
+                if (!userPermCheck("elitemobs.adventurersguild", commandSender)) return true;
+                new QuestCommand((Player) commandSender);
+                return true;
             default:
                 validCommands(commandSender);
                 return true;
@@ -425,7 +430,7 @@ public class CommandHandler implements CommandExecutor {
             if (silentPermCheck(SIMLOOT, commandSender))
                 player.sendMessage("/elitemobs simloot [mob level]");
             if (silentPermCheck(GETLOOT, commandSender))
-                player.sendMessage("/elitemobs getloot [loot name (no loot name = AdventurersGuildGUI)]");
+                player.sendMessage("/elitemobs getloot [loot name (no loot name = AdventurersGuildMenu)]");
             if (silentPermCheck(GIVELOOT, commandSender))
                 player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
             if (silentPermCheck(SPAWNMOB, commandSender))

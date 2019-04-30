@@ -9,7 +9,7 @@ public class CheckTierCommand {
     public static void checkTier(Player player) {
 
         double gearTier = ItemTierFinder.findPlayerTier(player);
-        double guildTier = (GuildRank.getGuildRank(player.getUniqueId()) - 10) * 0.2;
+        double guildTier = (GuildRank.getRank(player) - 10) * 0.2;
 
         player.sendMessage("Your combat tier is " + gearTier);
         player.sendMessage("Your guild tier bonus is " + guildTier);

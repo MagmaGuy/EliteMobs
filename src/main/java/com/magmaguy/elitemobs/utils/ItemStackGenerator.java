@@ -5,18 +5,22 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ItemStackGenerator {
 
-    public static ItemStack generateItemStack(Material material, String name, List<String> lore) {
-        ItemStack itemStack = generateItemStack(material, name);
+    public static ItemStack generateItemStack(ItemStack itemStack, String name, List<String> lore) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        List<String> colorizedLore = new ArrayList<>();
-        for (String string : lore)
-            colorizedLore.add(ChatColorConverter.convert(string));
-        itemMeta.setLore(colorizedLore);
+        itemMeta.setDisplayName(ChatColorConverter.convert(name));
+        itemMeta.setLore(ChatColorConverter.convert(lore));
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    public static ItemStack generateItemStack(Material material, String name, List<String> lore) {
+        ItemStack itemStack = generateItemStack(material, ChatColorConverter.convert(name));
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setLore(ChatColorConverter.convert(lore));
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

@@ -53,7 +53,7 @@ public class LootTables implements Listener {
 
         if (!eliteMobEntity.getHasSpecialLoot()) return null;
 
-        int mobTier = (int) MobTierFinder.findMobTier(eliteMobEntity);
+        int mobTier = (int) MobTierCalculator.findMobTier(eliteMobEntity);
 
         ItemLootShower.runShower(mobTier, eliteMobEntity.getLivingEntity().getLocation());
 

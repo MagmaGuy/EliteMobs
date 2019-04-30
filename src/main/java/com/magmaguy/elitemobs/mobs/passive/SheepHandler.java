@@ -39,11 +39,8 @@ public class SheepHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void superDrops(EntityDamageByEntityEvent event) {
 
-        if (event.isCancelled()) {
-
+        if (event.isCancelled())
             return;
-
-        }
 
         if (event.getFinalDamage() < 1) {
 
@@ -156,6 +153,8 @@ public class SheepHandler implements Listener {
 
     @EventHandler
     public void onShear(PlayerShearEntityEvent event) {
+
+        if (event.isCancelled()) return;
 
         if (event.getEntity() instanceof Sheep && EntityTracker.isSuperMob(event.getEntity())) {
 

@@ -33,7 +33,7 @@ public class ItemLootShower implements Listener {
             return;
 
         new BukkitRunnable() {
-            int currencyAmount = (int) (eliteMobTier * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.CURRENCY_SHOWER_MULTIPLIER));
+            int currencyAmount = (int) (eliteMobTier / 2 * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.CURRENCY_SHOWER_MULTIPLIER));
 
             @Override
             public void run() {

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.npcs;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
+import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import org.bukkit.event.EventHandler;
@@ -39,7 +39,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            AdventurersGuildGUI.mainMenu(event.getPlayer());
+                            AdventurersGuildMenu.mainMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;

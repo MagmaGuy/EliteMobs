@@ -42,7 +42,7 @@ public class SellMenu implements Listener {
      */
     public void constructSellMenu(Player player) {
 
-        Inventory sellInventory = Bukkit.createInventory(player, InventoryType.CHEST, SHOP_NAME);
+        Inventory sellInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
 
         ItemStack advice;
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.SKULL_SIGNATURE_ITEM)) {
