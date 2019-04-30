@@ -22,7 +22,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.util.Arrays;
 import java.util.List;
 
-public class AdventurersGuildGUI implements Listener {
+public class AdventurersGuildMenu implements Listener {
 
     private static ItemStack difficulty = new ItemStack(Material.DIAMOND_SWORD);
     private static ItemStack quest = skullItemInitializer("MHF_Question", "Quests", Arrays.asList("Coming soon!"));
@@ -91,7 +91,7 @@ public class AdventurersGuildGUI implements Listener {
         switch (guildRankStatus) {
 
             case UNLOCKED:
-                itemStack = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS);
+                itemStack = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
                 ItemMeta unlockedMeta = itemStack.getItemMeta();
                 String lowTierWarning = "";
                 if (rank < 10) lowTierWarning = ChatColorConverter.convert("&cElites can't drop better loot!");
@@ -365,7 +365,8 @@ public class AdventurersGuildGUI implements Listener {
                 event.getWhoClicked().sendMessage("[EliteMobs] You don't have enough Elite Coins! Sell some Elite Mob loot to [/em shop]!");
             else {
                 EconomyHandler.subtractCurrency(event.getWhoClicked().getUniqueId(), tierPriceCalculator(selectedTier));
-                PlayerData.playerMaxGuildRank.put(event.getWhoClicked().getUniqueId(), selectedTier);
+                GuildRank.setRank((Player) event.getWhoClicked(), selectedTier);
+                GuildRank.setActiveRank((Player) event.getWhoClicked(), selectedTier);
                 event.getWhoClicked().sendMessage(ChatColorConverter.convert("&aYou have unlocked the " + rankNamer(selectedTier) + " &arank for " +
                         tierPriceCalculator(selectedTier) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + ". \n&6Happy hunting!"));
                 difficultyMenu((Player) event.getWhoClicked());
@@ -379,7 +380,6 @@ public class AdventurersGuildGUI implements Listener {
         if (selectedTier > maxTier + 1) {
             event.getWhoClicked().sendMessage("[EliteMobs] You need to unlock other ranks first!");
         }
-
 
     }
 

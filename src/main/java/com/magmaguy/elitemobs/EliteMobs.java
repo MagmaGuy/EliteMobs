@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
+import com.magmaguy.elitemobs.quests.QuestRefresher;
 import com.magmaguy.elitemobs.runnables.EggRunnable;
 import com.magmaguy.elitemobs.runnables.EntityScanner;
 import com.magmaguy.elitemobs.runnables.PotionEffectApplier;
@@ -155,6 +156,11 @@ public class EliteMobs extends JavaPlugin {
          */
         NonSolidBlockTypes.initializeNonSolidBlocks();
 
+        /*
+        Launch quests
+         */
+        QuestRefresher.generateNewQuestMenus();
+
     }
 
     @Override
@@ -214,8 +220,6 @@ public class EliteMobs extends JavaPlugin {
                 ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.CHICKEN) &&
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
-//        new ReapplyDisplayEffects().runTaskTimer(this, 20, 20);
-//        EntityListUpdater.startUpdating();
 
     }
 

@@ -18,7 +18,7 @@ package com.magmaguy.elitemobs.mobspawning;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.items.MobTierFinder;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -93,7 +93,7 @@ public class NaturalEliteMobSpawnEventHandler {
         Party system modifier
         Each player adds a +0.2 tier bonus
          */
-        eliteMobLevel += playerCount * 0.2 * MobTierFinder.PER_TIER_LEVEL_INCREASE;
+        eliteMobLevel += playerCount * 0.2 * MobTierCalculator.PER_TIER_LEVEL_INCREASE;
 
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE)) {
 

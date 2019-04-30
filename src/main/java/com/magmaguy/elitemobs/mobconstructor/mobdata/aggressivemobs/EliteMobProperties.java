@@ -14,8 +14,6 @@ import org.bukkit.entity.LivingEntity;
 
 import java.util.HashSet;
 
-import static com.magmaguy.elitemobs.utils.VersionChecker.currentVersionIsUnder;
-
 public abstract class EliteMobProperties extends PluginMobProperties {
 
     /*
@@ -126,22 +124,14 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         EliteWitch eliteWitch = new EliteWitch();
         EliteWitherSkeleton eliteWitherSkeleton = new EliteWitherSkeleton();
         EliteZombie eliteZombie = new EliteZombie();
-        /*
-        Post-1.8
-         */
-        if (!currentVersionIsUnder(1, 8)) {
-            EliteEndermite eliteEndermite = new EliteEndermite();
-        }
-        /*
-        Post-1.11
-         */
-        if (!currentVersionIsUnder(1, 11)) {
-            EliteStray eliteStray = new EliteStray();
-            EliteHusk eliteHusk = new EliteHusk();
-            EliteVex eliteVex = new EliteVex();
-            EliteVindicator eliteVindicator = new EliteVindicator();
-            ElitePolarBear elitePolarBear = new ElitePolarBear();
-        }
+
+        EliteEndermite eliteEndermite = new EliteEndermite();
+
+        EliteStray eliteStray = new EliteStray();
+        EliteHusk eliteHusk = new EliteHusk();
+        EliteVex eliteVex = new EliteVex();
+        EliteVindicator eliteVindicator = new EliteVindicator();
+        ElitePolarBear elitePolarBear = new ElitePolarBear();
     }
 
     public static boolean isValidEliteMobType(EntityType entityType) {
