@@ -44,6 +44,7 @@ import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
+import com.magmaguy.elitemobs.quests.QuestsTracker;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -213,6 +214,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new SpawnControl(), plugin);
         //register quests
         pluginManager.registerEvents(new QuestsMenu(), plugin);
+        pluginManager.registerEvents(new QuestsTracker(), plugin);
 
         //Combat tag
         if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))

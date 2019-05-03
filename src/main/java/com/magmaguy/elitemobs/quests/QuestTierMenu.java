@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.quests.dynamic.KillAmountQuest;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class QuestTierMenu {
 
     private Inventory inventory;
     private int questTier;
-    private List<KillAmountQuest> killAmountQuests = new ArrayList<>();
+    private List<PlayerQuest> playerQuests = new ArrayList<>();
 
     public QuestTierMenu(int questTier) {
         setQuestTier(questTier);
@@ -35,21 +35,43 @@ public class QuestTierMenu {
     private void setInventory() {
         this.inventory = Bukkit.createInventory(null, 9, TIER_MENU_NAME + " " + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier() + 10)));
         for (int i = 1; i < 4; i++) {
-            KillAmountQuest killAmountQuest = new KillAmountQuest(getQuestTier());
-            this.inventory.setItem(2 * i, killAmountQuest.generateQuestItemStack());
-            addKillAmountQuests(killAmountQuest);
+            PlayerQuest playerQuest = QuestRandomizer.generateQuest(questTier);
+            this.inventory.setItem(2 * i, playerQuest.generateQuestItemStack());
+            addKillAmountQuests(playerQuest);
         }
     }
 
-    public Inventory getInventory() {
+    private Inventory generatePlayerInventory(List<PlayerQuest> localPlayerQuests) {
+        Inventory localInventory = Bukkit.createInventory(null, 9, TIER_MENU_NAME + " " + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier() + 10)));
+        for (int i = 1; i < 4; i++)
+            localInventory.setItem(2 * i, localPlayerQuests.get(i - 1).generateQuestItemStack());
+        return localInventory;
+    }
+
+    public Inventory getInventory(Player player) {
+        List<PlayerQuest> playerQuests = new ArrayList<>();
+        boolean hasQuest = false;
+        if (PlayerQuest.hasPlayerQuest(player))
+            for (PlayerQuest playerQuest : getPlayerQuests()) {
+                if (playerQuest.getQuestReward().equals(PlayerQuest.getPlayerQuest(player).getQuestReward())) {
+                    playerQuest = PlayerQuest.getPlayerQuest(player);
+                    playerQuests.add(playerQuest);
+                    hasQuest = true;
+                } else
+                    playerQuests.add(playerQuest);
+            }
+
+        if (hasQuest)
+            return generatePlayerInventory(playerQuests);
+
         return this.inventory;
     }
 
-    public void addKillAmountQuests(KillAmountQuest killAmountQuests) {
-        getKillAmountQuests().add(killAmountQuests);
+    public void addKillAmountQuests(PlayerQuest playerQuest) {
+        getPlayerQuests().add(playerQuest);
     }
 
-    public List<KillAmountQuest> getKillAmountQuests() {
-        return this.killAmountQuests;
+    public List<PlayerQuest> getPlayerQuests() {
+        return this.playerQuests;
     }
 }
