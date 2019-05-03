@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.quests.dynamic.KillAmountQuest;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.MenuUtils;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
@@ -81,7 +80,7 @@ public class QuestsMenu implements Listener {
         int questTier = menuSlot + 1;
         if (menuSlot == 13) questTier = 10;
 
-        player.openInventory(QuestRefresher.getQuestTierInventory(questTier).getInventory());
+        player.openInventory(QuestRefresher.getQuestTierInventory(questTier).getInventory(player));
 
     }
 
@@ -100,8 +99,12 @@ public class QuestsMenu implements Listener {
                 break;
             }
 
-        QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier);
-        KillAmountQuest killAmountQuest = questTierMenu.getKillAmountQuests().get(event.getSlot() / 2);
+        QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier - 10);
+        PlayerQuest playerQuest = questTierMenu.getPlayerQuests().get(event.getSlot() / 2 - 1);
+        PlayerQuest.addPlayerInQuests((Player) event.getWhoClicked(), playerQuest.clone());
+
+        event.getWhoClicked().sendMessage("[EM] You have accepted a quest!");
+        event.getWhoClicked().closeInventory();
 
     }
 

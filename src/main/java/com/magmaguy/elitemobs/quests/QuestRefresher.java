@@ -9,12 +9,12 @@ public class QuestRefresher {
 
     private static HashMap<Integer, QuestTierMenu> questTierInventories = new HashMap<>();
 
-    public static void addQuestTierInventories(int level, QuestTierMenu questTierMenu) {
-        questTierInventories.put(level, questTierMenu);
+    public static void addQuestTierInventories(int questTier, QuestTierMenu questTierMenu) {
+        questTierInventories.put(questTier, questTierMenu);
     }
 
-    public static QuestTierMenu getQuestTierInventory(int tier) {
-        return questTierInventories.get(tier);
+    public static QuestTierMenu getQuestTierInventory(int questTier) {
+        return questTierInventories.get(questTier);
     }
 
     public static void generateNewQuestMenus() {
@@ -25,7 +25,7 @@ public class QuestRefresher {
             public void run() {
 
                 for (int i = 1; i < 11; i++)
-                    questTierInventories.put(i, new QuestTierMenu(i));
+                    addQuestTierInventories(i, new QuestTierMenu(i));
 
             }
 
