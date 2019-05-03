@@ -825,7 +825,7 @@ public class EliteMobEntity {
     }
 
     /**
-     * Sets whether the ELite Mob can drop special loot. This only affects its eligibility and does not necessarily
+     * Sets whether the Elite Mob can drop special loot. This only affects its eligibility and does not necessarily
      * mean it will drop special loot.
      *
      * @param bool Whether the Elite Mob can drop special loot.
