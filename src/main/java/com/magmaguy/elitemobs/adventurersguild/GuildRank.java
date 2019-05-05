@@ -42,7 +42,7 @@ public class GuildRank {
      */
     public static int getRank(Player player) {
         intializeGuildRank(player.getUniqueId());
-        return PlayerData.playerSelectedGuildRank.get(player);
+        return PlayerData.playerSelectedGuildRank.get(player.getUniqueId());
     }
 
     /**

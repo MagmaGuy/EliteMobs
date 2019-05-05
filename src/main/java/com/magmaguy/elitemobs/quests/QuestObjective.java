@@ -129,7 +129,6 @@ public class QuestObjective {
     }
 
     public void sendQuestStartMessage(Player player) {
-        player.sendMessage("Quest accepted");
         StringColorAnimator.startTitleAnimation(player, "You have accepted a quest!",
                 "Kill " + getObjectiveKills() + " " + getEliteMobName(), ChatColor.DARK_GREEN, ChatColor.GREEN);
     }

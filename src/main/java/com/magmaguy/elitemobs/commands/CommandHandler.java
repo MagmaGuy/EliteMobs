@@ -4,8 +4,11 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.quests.PlayerQuest;
 import com.magmaguy.elitemobs.quests.QuestCommand;
+import com.magmaguy.elitemobs.quests.QuestsMenu;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -59,6 +62,9 @@ public class CommandHandler implements CommandExecutor {
             case "adventurersguild":
             case "adventurerguild":
                 new AdventurersGuildCommand((Player) commandSender);
+                return true;
+            case "shareitem":
+                ShareItem.showOnChat((Player) commandSender);
                 return true;
         }
 
@@ -351,8 +357,30 @@ public class CommandHandler implements CommandExecutor {
                     QuestCommand.doMainQuestCommand((Player) commandSender);
                     return true;
                 }
-                if (args[1].equalsIgnoreCase("status"))
+                if (args[1].equalsIgnoreCase("status")) {
                     QuestCommand.doQuestTrackCommand((Player) commandSender);
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("cancel") && args[3].equalsIgnoreCase("confirm")) {
+                    PlayerQuest.removePlayersInQuests(Bukkit.getPlayer(args[2]));
+                    if (QuestsMenu.playerHasPendingQuest(Bukkit.getPlayer(args[2]))) {
+                        PlayerQuest playerQuest = QuestsMenu.getPlayerQuestPair(Bukkit.getPlayer(args[2]));
+                        try {
+                            PlayerQuest.addPlayerInQuests(Bukkit.getPlayer(args[2]), playerQuest.clone());
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                        }
+                        playerQuest.getQuestObjective().sendQuestStartMessage(Bukkit.getPlayer(args[2]));
+                        QuestsMenu.removePlayerQuestPair(Bukkit.getPlayer(args[2]));
+                    }
+                    return true;
+                }
+            case "showitem":
+            case "itemshow":
+            case "shareitem":
+            case "itemshare":
+            case "share":
+                ShareItem.showOnChat((Player) commandSender);
                 return true;
             default:
                 validCommands(commandSender);

@@ -1,9 +1,15 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.MenuUtils;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,6 +20,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class QuestsMenu implements Listener {
 
@@ -101,17 +108,45 @@ public class QuestsMenu implements Listener {
 
         QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier - 10);
         PlayerQuest playerQuest = questTierMenu.getPlayerQuests().get(event.getSlot() / 2 - 1);
+
+        if (PlayerQuest.hasPlayerQuest((Player) event.getWhoClicked())) {
+            initializeCancelQuestDialog((Player) event.getWhoClicked(), playerQuest);
+            event.getWhoClicked().closeInventory();
+            return;
+        }
+
         PlayerQuest.addPlayerInQuests((Player) event.getWhoClicked(), playerQuest.clone());
         playerQuest.getQuestObjective().sendQuestStartMessage((Player) event.getWhoClicked());
         event.getWhoClicked().closeInventory();
 
     }
 
-    private static final String ABANDON_MENU_KEY = ObfuscatedStringHandler.obfuscateString("///////");
-    private static final String ABANDON_MENU_NAME = "Abandon Quest" + MAIN_MENU_KEY;
+    private static HashMap<Player, PlayerQuest> questPairs = new HashMap();
 
-//    public void initializeCancelQuestMenu(Player player){
-//        Inventory inventory = Bukkit.createInventory()
-//    }
+    public static boolean playerHasPendingQuest(Player player) {
+        return questPairs.containsKey(player);
+    }
+
+    public static PlayerQuest getPlayerQuestPair(Player player) {
+        return questPairs.get(player);
+    }
+
+    public static void removePlayerQuestPair(Player player) {
+        questPairs.remove(player);
+    }
+
+    private void initializeCancelQuestDialog(Player player, PlayerQuest playerQuest) {
+        player.sendMessage(ChatColorConverter.convert("&c&l&m&o---------------------------------------------"));
+        player.sendMessage(ChatColorConverter.convert("&c" + "You can only have one quest at a time! Cancelling your ongoing quest will reset quest progress!"));
+        TextComponent interactiveMessage = new TextComponent("[Click here to cancel current quest!]");
+        interactiveMessage.setColor(ChatColor.GREEN);
+        interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + player.getName() + " confirm"));
+        interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Cancel!").create()));
+        player.spigot().sendMessage(interactiveMessage);
+        player.sendMessage(ChatColorConverter.convert("&7You can see your quest status with the command &a/em quest status"));
+        player.sendMessage(ChatColorConverter.convert("&c&l&m&o---------------------------------------------"));
+
+        questPairs.put(player, playerQuest);
+    }
 
 }
