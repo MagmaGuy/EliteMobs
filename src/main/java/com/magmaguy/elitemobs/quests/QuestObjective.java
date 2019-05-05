@@ -161,6 +161,7 @@ public class QuestObjective {
         setTurnedIn(true);
         setComplete(true);
         sendQuestCompleteMessage(player);
+
     }
 
 }

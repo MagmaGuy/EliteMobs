@@ -107,4 +107,11 @@ public class QuestsMenu implements Listener {
 
     }
 
+    private static final String ABANDON_MENU_KEY = ObfuscatedStringHandler.obfuscateString("///////");
+    private static final String ABANDON_MENU_NAME = "Abandon Quest" + MAIN_MENU_KEY;
+
+//    public void initializeCancelQuestMenu(Player player){
+//        Inventory inventory = Bukkit.createInventory()
+//    }
+
 }
