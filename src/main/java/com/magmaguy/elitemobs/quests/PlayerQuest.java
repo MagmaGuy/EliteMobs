@@ -40,6 +40,7 @@ public class PlayerQuest implements Cloneable {
     }
 
     public static void removePlayersInQuests(Player player) {
+        player.sendMessage(ChatColorConverter.convert("&cYour ongoing quest has been cancelled!"));
         getPlayersInQuests().remove(player);
     }
 

@@ -151,11 +151,12 @@ public class EliteMobs extends JavaPlugin {
         //WorldGuard hook
         try {
             WORLDGUARD_IS_ENABLED = WorldGuardCompatibility.initialize();
-        } catch (NoClassDefFoundError e) {
+        } catch (NoClassDefFoundError | IllegalStateException ex) {
             Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work." +
                     " Except if you just reloaded the plugin, in which case they will totally work.");
             WORLDGUARD_IS_ENABLED = false;
         }
+
     }
 
     @Override

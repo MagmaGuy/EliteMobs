@@ -54,6 +54,9 @@ public class MergeHandler implements Listener {
 
     private void validateEntityType(Entity eventEntity) {
 
+        if (eventEntity == null) return;
+        if (!(eventEntity instanceof LivingEntity)) return;
+
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) &&
                 EliteMobProperties.isValidEliteMobType(eventEntity))
             EliteMobScanner.scanValidAggressiveLivingEntity((LivingEntity) eventEntity);
