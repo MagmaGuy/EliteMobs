@@ -20,13 +20,15 @@ public class QuestsTracker implements Listener {
 
         for (Player player : eliteMobEntity.getDamagers())
             if (PlayerQuest.hasPlayerQuest(player))
-                if (PlayerQuest.getPlayerQuest(player).processQuestProgression(eliteMobEntity)) {
-                    PlayerQuest playerQuest = PlayerQuest.getPlayerQuest(player);
-                    if (playerQuest.getQuestObjective().isComplete())
-                        playerQuest.getQuestObjective().sendQuestCompleteMessage(player);
-                    else
-                        playerQuest.getQuestObjective().sendQuestProgressionMessage(player);
-                }
+                if (!PlayerQuest.getPlayerQuest(player).getQuestObjective().isTurnedIn())
+                    if (PlayerQuest.getPlayerQuest(player).processQuestProgression(eliteMobEntity)) {
+                        PlayerQuest playerQuest = PlayerQuest.getPlayerQuest(player);
+                        if (playerQuest.getQuestObjective().isComplete()) {
+                            playerQuest.getQuestObjective().doQuestCompletion(player);
+                            playerQuest.getQuestReward().doReward(player);
+                        } else
+                            playerQuest.getQuestObjective().sendQuestProgressionMessage(player);
+                    }
 
     }
 

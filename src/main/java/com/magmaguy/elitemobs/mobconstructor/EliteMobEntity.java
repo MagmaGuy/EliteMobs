@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -14,6 +16,13 @@ import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -69,14 +78,14 @@ public class EliteMobEntity {
      * @return Whether the location is valid
      */
     private static boolean validSpawnLocation(Location location) {
-        //todo: reenable this for 1.14
-        return true;
-//        if (!Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) return true;
-//        com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
-//        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-//        RegionQuery query = container.createQuery();
-//        ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
-//        return set.testState(null, EliteMobs.ELITEMOBS_SPAWN_FLAG);
+        if (!EliteMobs.WORLDGUARD_IS_ENABLED)
+            return true;
+        if (!Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) return true;
+        com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionQuery query = container.createQuery();
+        ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
+        return set.testState(null, (StateFlag) WorldGuardCompatibility.getEliteMobsSpawnFlag());
     }
 
     /**
