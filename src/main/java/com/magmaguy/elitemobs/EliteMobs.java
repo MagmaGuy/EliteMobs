@@ -7,7 +7,6 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
@@ -42,27 +41,10 @@ import java.util.List;
 public class EliteMobs extends JavaPlugin {
 
     public static List<World> validWorldList = new ArrayList();
-    //    public static final StateFlag ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
-    public static boolean VAULT_ENABLED = false;
+    public static boolean WORLDGUARD_IS_ENABLED = false;
 
     @Override
     public void onEnable() {
-
-        //Enable WorldGuard
-//        if (Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) {
-//            Bukkit.getLogger().info("[EliteMobs] WorldGuard detected.");
-//            try {
-//                FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
-//                Bukkit.getLogger().info("[EliteMobs] Enabling flags:");
-//
-//                registry.register(ELITEMOBS_SPAWN_FLAG);
-//                Bukkit.getLogger().info("[EliteMobs] - elitemobspawn");
-//
-//            } catch (Exception e) {
-//                Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work.");
-//            }
-
-//        }
 
         //Enable stats
         Metrics metrics = new Metrics(this);
@@ -74,18 +56,19 @@ public class EliteMobs extends JavaPlugin {
         ConfigValues.intializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
 
-        //Enable Vault
-        if (getServer().getPluginManager().isPluginEnabled("Vault")) {
-            Bukkit.getLogger().info("[EliteMobs] Vault detected.");
-            if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.USE_VAULT)) {
-                Bukkit.getLogger().warning("[EliteMobs] Vault preference detected. This is not the recommended setting. Ask the dev or check the wiki as to why.");
-                VAULT_ENABLED = true;
-                VaultCompatibility.setupEconomy();
-                VaultCompatibility vaultCompatibility = new VaultCompatibility();
-                vaultCompatibility.setupChat();
-                vaultCompatibility.setupPermissions();
-            }
 
+        if (WORLDGUARD_IS_ENABLED)
+            Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is enabled!");
+        else
+            Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is not enabled!");
+
+        //Enable Vault
+        try {
+            VaultCompatibility.vaultSetup();
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[EliteMobs] Something went wrong with the vault configuration - your Vault " +
+                    "version is probably not compatible with this EliteMobs version. Please contact the dev about this error.");
+            VaultCompatibility.VAULT_ENABLED = false;
         }
 
 
@@ -161,6 +144,18 @@ public class EliteMobs extends JavaPlugin {
          */
         QuestRefresher.generateNewQuestMenus();
 
+    }
+
+    @Override
+    public void onLoad() {
+        //WorldGuard hook
+        try {
+            WORLDGUARD_IS_ENABLED = WorldGuardCompatibility.initialize();
+        } catch (NoClassDefFoundError e) {
+            Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work." +
+                    " Except if you just reloaded the plugin, in which case they will totally work.");
+            WORLDGUARD_IS_ENABLED = false;
+        }
     }
 
     @Override

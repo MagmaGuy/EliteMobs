@@ -102,8 +102,7 @@ public class QuestsMenu implements Listener {
         QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier - 10);
         PlayerQuest playerQuest = questTierMenu.getPlayerQuests().get(event.getSlot() / 2 - 1);
         PlayerQuest.addPlayerInQuests((Player) event.getWhoClicked(), playerQuest.clone());
-
-        event.getWhoClicked().sendMessage("[EM] You have accepted a quest!");
+        playerQuest.getQuestObjective().sendQuestStartMessage((Player) event.getWhoClicked());
         event.getWhoClicked().closeInventory();
 
     }

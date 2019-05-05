@@ -55,7 +55,7 @@ public class QuestRandomizer {
 
     private static QuestObjective generateQuestObjective(EntityType entityType, int questTier) {
         return new QuestObjective(
-                ThreadLocalRandom.current().nextInt(10) * questTier + 5
+                ThreadLocalRandom.current().nextInt(4) * questTier + 4
                 , questTier * 10,
                 entityType,
                 questTier);

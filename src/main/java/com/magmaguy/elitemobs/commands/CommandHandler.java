@@ -347,7 +347,12 @@ public class CommandHandler implements CommandExecutor {
                 return true;
             case "quest":
                 if (!userPermCheck("elitemobs.adventurersguild", commandSender)) return true;
-                new QuestCommand((Player) commandSender);
+                if (args.length == 1) {
+                    QuestCommand.doMainQuestCommand((Player) commandSender);
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("status"))
+                    QuestCommand.doQuestTrackCommand((Player) commandSender);
                 return true;
             default:
                 validCommands(commandSender);

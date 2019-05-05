@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.economy;
 
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -9,6 +11,24 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.UUID;
 
 public class VaultCompatibility {
+
+    public static boolean VAULT_ENABLED = false;
+
+    public static void vaultSetup() {
+        if (Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) {
+            Bukkit.getLogger().info("[EliteMobs] Vault detected.");
+            if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.USE_VAULT)) {
+                Bukkit.getLogger().warning("[EliteMobs] Vault preference detected. This is not the recommended setting. " +
+                        "Ask the dev or check the wiki as to why.");
+                VAULT_ENABLED = true;
+                VaultCompatibility.setupEconomy();
+                VaultCompatibility vaultCompatibility = new VaultCompatibility();
+                vaultCompatibility.setupChat();
+                vaultCompatibility.setupPermissions();
+            }
+
+        }
+    }
 
     private static Economy econ = null;
     private static Permission perms = null;
