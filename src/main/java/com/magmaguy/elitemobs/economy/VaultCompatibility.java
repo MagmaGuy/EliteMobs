@@ -71,7 +71,6 @@ public class VaultCompatibility {
     }
 
     public static double checkCurrency(UUID user) {
-        Bukkit.getLogger().warning(Bukkit.getOfflinePlayer(user).toString());
         double currency = 0;
         try {
             currency = econ.getBalance(Bukkit.getOfflinePlayer(user));
