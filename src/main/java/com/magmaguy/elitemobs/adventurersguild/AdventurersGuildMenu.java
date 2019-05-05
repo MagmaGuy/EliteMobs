@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -25,7 +26,7 @@ import java.util.List;
 public class AdventurersGuildMenu implements Listener {
 
     private static ItemStack difficulty = new ItemStack(Material.DIAMOND_SWORD);
-    private static ItemStack quest = skullItemInitializer("MHF_Question", "Quests", Arrays.asList("Coming soon!"));
+    private static ItemStack quest;
 
     public static void mainMenu(Player player) {
 
@@ -38,7 +39,7 @@ public class AdventurersGuildMenu implements Listener {
         difficultyMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         difficulty.setItemMeta(difficultyMeta);
 
-        quest = skullItemInitializer("MHF_Question", "Quests", Arrays.asList("Coming soon!"));
+        quest = skullItemInitializer("MHF_Question", "Quests", Arrays.asList("Get your quests here!"));
 
         mainMenu.setItem(11, difficulty);
         mainMenu.setItem(15, quest);
@@ -152,7 +153,7 @@ public class AdventurersGuildMenu implements Listener {
                         ChatColorConverter.convert("&6This is the next rank you can unlock"),
                         ChatColorConverter.convert("&aSelect it when you're ready!"),
                         ChatColorConverter.convert("&6Costs " + priceString + " &6" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
-                        ChatColorConverter.convert("&fYou have &a" + PlayerData.playerCurrency.get(player.getUniqueId()) + " &f" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
+                        ChatColorConverter.convert("&fYou have &a" + EconomyHandler.checkCurrency(player.getUniqueId()) + " &f" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
                         ChatColorConverter.convert("&f&m-------------------------------"),
                         lootBonus(rank),
                         mobSpawning(rank),
@@ -294,10 +295,8 @@ public class AdventurersGuildMenu implements Listener {
     }
 
     private static void questMenu(Player player) {
-
-        player.closeInventory();
-        player.sendMessage("Coming soon!");
-
+        QuestsMenu questsMenu = new QuestsMenu();
+        questsMenu.initializeMainQuestMenu(player);
     }
 
     private static ItemStack skullItemInitializer(String mhfValue, String title, List<String> lore) {
@@ -329,10 +328,8 @@ public class AdventurersGuildMenu implements Listener {
         if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
         if (event.getCurrentItem().equals(difficulty))
             difficultyMenu((Player) event.getWhoClicked());
-        if (event.getCurrentItem().equals(quest)) {
-            event.getWhoClicked().closeInventory();
-            event.getWhoClicked().sendMessage("Coming soon!");
-        }
+        if (event.getSlot() == 15)
+            questMenu((Player) event.getWhoClicked());
 
         event.setCancelled(true);
 

@@ -12,15 +12,13 @@ import org.bukkit.event.player.PlayerFishEvent;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.magmaguy.elitemobs.utils.VersionChecker.currentVersionIsUnder;
-
 public class KrakenEvent implements Listener {
 
     @EventHandler
     public void onFishingStart(PlayerFishEvent event) {
 
         if (event.isCancelled()) return;
-        if (!currentVersionIsUnder(13, 0)) return;
+        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) return;
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
         if (!event.getPlayer().hasPermission("elitemobs.events.kraken")) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)

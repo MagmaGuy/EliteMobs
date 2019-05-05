@@ -35,6 +35,7 @@ public class PlayerQuest implements Cloneable {
     }
 
     public static PlayerQuest getPlayerQuest(Player player) {
+        if (!playersInQuests.containsKey(player)) return null;
         return playersInQuests.get(player);
     }
 

@@ -115,8 +115,8 @@ public class Kraken implements Listener {
                 }
 
                 for (Entity entity : kraken.getNearbyEntities(16, 16, 16))
-                    if (entity instanceof Player && ((Player) entity).getGameMode().equals(GameMode.ADVENTURE) ||
-                            ((Player) entity).getGameMode().equals(GameMode.SURVIVAL))
+                    if (entity instanceof Player && (((Player) entity).getGameMode().equals(GameMode.ADVENTURE) ||
+                            ((Player) entity).getGameMode().equals(GameMode.SURVIVAL)))
                         fireballInitializer(kraken, (Player) entity);
 
             }

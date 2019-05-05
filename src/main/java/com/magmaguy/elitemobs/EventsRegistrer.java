@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
 import com.magmaguy.elitemobs.adventurersguild.MaxHealthBoost;
 import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
+import com.magmaguy.elitemobs.antiexploit.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combattag.CombatTag;
 import com.magmaguy.elitemobs.combattag.TeleportTag;
@@ -45,7 +46,6 @@ import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
 import com.magmaguy.elitemobs.quests.QuestsTracker;
-import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -173,27 +173,25 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
 
 
-        if (!VersionChecker.currentVersionIsUnder(11, 0)) {
-            //Initialize custom events
-            pluginManager.registerEvents(new SmallTreasureGoblin(), plugin);
-            pluginManager.registerEvents(new TreasureGoblin(), plugin);
-            pluginManager.registerEvents(new DeadMoon(), plugin);
-            pluginManager.registerEvents(new TheReturned(), plugin);
-            pluginManager.registerEvents(new ZombieKing(), plugin);
-            pluginManager.registerEvents(new com.magmaguy.elitemobs.mobpowers.bosspowers.SpiritWalk(), plugin);
+        //Initialize custom events
+        pluginManager.registerEvents(new SmallTreasureGoblin(), plugin);
+        pluginManager.registerEvents(new TreasureGoblin(), plugin);
+        pluginManager.registerEvents(new DeadMoon(), plugin);
+        pluginManager.registerEvents(new TheReturned(), plugin);
+        pluginManager.registerEvents(new ZombieKing(), plugin);
+        pluginManager.registerEvents(new com.magmaguy.elitemobs.mobpowers.bosspowers.SpiritWalk(), plugin);
 
-            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
-                pluginManager.registerEvents(new Kraken(), plugin);
-                pluginManager.registerEvents(new KrakenEvent(), plugin);
-            }
-            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
-                pluginManager.registerEvents(new Balrog(), plugin);
-                pluginManager.registerEvents(new BalrogEvent(), plugin);
-            }
-            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
-                pluginManager.registerEvents(new FaeEvent(), plugin);
-                pluginManager.registerEvents(new Fae(), plugin);
-            }
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
+            pluginManager.registerEvents(new Kraken(), plugin);
+            pluginManager.registerEvents(new KrakenEvent(), plugin);
+        }
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
+            pluginManager.registerEvents(new Balrog(), plugin);
+            pluginManager.registerEvents(new BalrogEvent(), plugin);
+        }
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
+            pluginManager.registerEvents(new FaeEvent(), plugin);
+            pluginManager.registerEvents(new Fae(), plugin);
         }
 
 
