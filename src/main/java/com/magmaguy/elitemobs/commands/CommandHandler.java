@@ -231,7 +231,7 @@ public class CommandHandler implements CommandExecutor {
 
                             boolean validKey = false;
                             for (String key : ConfigValues.npcConfig.getKeys(false)) {
-                                if (!key.equalsIgnoreCase(args[2])) continue;
+                                if (!key.replace(" ", "_").equalsIgnoreCase(args[2])) continue;
                                 validKey = true;
                                 break;
                             }

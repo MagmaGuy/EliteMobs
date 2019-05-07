@@ -14,7 +14,6 @@ public class NonSolidBlockTypes {
 
     public static void initializeNonSolidBlocks() {
         nonSolidBlocks.add(Material.AIR);
-        nonSolidBlocks.add(Material.GRASS);
         nonSolidBlocks.add(Material.TALL_GRASS);
         nonSolidBlocks.add(Material.PAINTING);
         nonSolidBlocks.add(Material.TORCH);
