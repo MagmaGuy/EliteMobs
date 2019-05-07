@@ -87,35 +87,42 @@ public class NPCEntity {
      */
     public NPCEntity(String key) {
 
-        this.key = key;
+        try {
 
-        key += ".";
+            this.key = key;
 
-        Configuration configuration = ConfigValues.npcConfig;
+            key += ".";
 
-        if (!setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION))) return;
-        if (!configuration.getBoolean(key + NPCConfig.ENABLED)) return;
+            Configuration configuration = ConfigValues.npcConfig;
 
-        entityFixer(spawnLocation);
+            if (!setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION))) return;
+            if (!configuration.getBoolean(key + NPCConfig.ENABLED)) return;
 
-        this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+            entityFixer(spawnLocation);
 
-        this.villager.setRemoveWhenFarAway(true);
+            this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
-        setName(configuration.getString(key + NPCConfig.NAME));
-        initializeRole(configuration.getString(key + NPCConfig.ROLE));
-        setProfession(configuration.getString(key + NPCConfig.TYPE));
-        setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
-        setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
-        setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
-        setCanMove(configuration.getBoolean(key + NPCConfig.CAN_MOVE));
-        setCanTalk(configuration.getBoolean(key + NPCConfig.CAN_TALK));
-        setActivationRadius(configuration.getDouble(key + NPCConfig.ACTIVATION_RADIUS));
-        setDisappearsAtNight(configuration.getBoolean(key + NPCConfig.DISAPPEARS_AT_NIGHT));
-        setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
+            this.villager.setRemoveWhenFarAway(true);
 
-        EntityTracker.registerNPCEntity(this);
-        addNPCEntity(this);
+            setName(configuration.getString(key + NPCConfig.NAME));
+            initializeRole(configuration.getString(key + NPCConfig.ROLE));
+            setProfession(configuration.getString(key + NPCConfig.TYPE));
+            setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
+            setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
+            setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
+            setCanMove(configuration.getBoolean(key + NPCConfig.CAN_MOVE));
+            setCanTalk(configuration.getBoolean(key + NPCConfig.CAN_TALK));
+            setActivationRadius(configuration.getDouble(key + NPCConfig.ACTIVATION_RADIUS));
+            setDisappearsAtNight(configuration.getBoolean(key + NPCConfig.DISAPPEARS_AT_NIGHT));
+            setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
+
+            EntityTracker.registerNPCEntity(this);
+            addNPCEntity(this);
+
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[EliteMobs] Error loading " + key);
+            Bukkit.getLogger().warning("[EliteMobs] This is probably caused by a bad configuration entry for the NPCs!");
+        }
 
     }
 

@@ -103,8 +103,8 @@ public class PlayerQuest implements Cloneable {
         this.questReward = questReward;
     }
 
-    public boolean processQuestProgression(EliteMobEntity eliteMobEntity) {
-        return getQuestObjective().processQuestProgression(eliteMobEntity);
+    public boolean processQuestProgression(EliteMobEntity eliteMobEntity, Player player) {
+        return getQuestObjective().processQuestProgression(eliteMobEntity, player);
     }
 
     public String getQuestStatus() {
