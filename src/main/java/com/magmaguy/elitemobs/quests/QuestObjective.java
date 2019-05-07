@@ -1,12 +1,9 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.utils.StringColorAnimator;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -63,18 +60,19 @@ public class QuestObjective {
         return currentKills;
     }
 
-    public boolean processQuestProgression(EliteMobEntity eliteMobEntity) {
+    public boolean processQuestProgression(EliteMobEntity eliteMobEntity, Player player) {
         if (!eliteMobEntity.getHasSpecialLoot()) return false;
         if (!eliteMobEntity.getLivingEntity().getType().equals(getEntityType())) return false;
         if (eliteMobEntity.getLevel() < getMinimumEliteMobTier()) return false;
-        addKill();
+        addKill(player);
         return true;
     }
 
-    public void addKill() {
+    public void addKill(Player player) {
         this.currentKills++;
         if (currentKills >= this.objectiveKills)
-            setComplete(true);
+            doQuestCompletion(player);
+        sendQuestProgressionMessage(player);
     }
 
     public void setCurrentKills(int currentKills) {
@@ -138,13 +136,15 @@ public class QuestObjective {
         StringColorAnimator.startTitleAnimation(player, "Quest complete!",
                 "You have killed " + getObjectiveKills() + " " + getEliteMobName(),
                 ChatColor.GOLD, ChatColor.YELLOW);
-//        player.sendMessage("[EliteMobs] You've completed the a quest!");
     }
 
     public void sendQuestProgressionMessage(Player player) {
         if (!player.isOnline()) return;
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(ChatColorConverter.convert("&7[EM] &aslay " + getCurrentKills() + "&f/&c" + getObjectiveKills() + " &f" + getEliteMobName())));
+        QuestProgressionBar.sendQuestProgression(player, this);
+    }
+
+    public String objectiveString() {
+        return "Kill " + getObjectiveKills() + " " + getEliteMobName();
     }
 
     public boolean isTurnedIn() {
@@ -160,7 +160,7 @@ public class QuestObjective {
         setTurnedIn(true);
         setComplete(true);
         sendQuestCompleteMessage(player);
-
+        PlayerQuest.removePlayersInQuests(player);
     }
 
 }
