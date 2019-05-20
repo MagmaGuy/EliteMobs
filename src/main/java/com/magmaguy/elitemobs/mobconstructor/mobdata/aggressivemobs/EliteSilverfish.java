@@ -13,7 +13,7 @@ public class EliteSilverfish extends EliteMobProperties {
 
         this.entityType = EntityType.SILVERFISH;
 
-        this.defaultMaxHealth = 20;
+        this.defaultMaxHealth = 8;
 
         this.validDefensivePowers.addAll(super.getAllDefensivePowers());
         this.validOffensivePowers.addAll(super.getAllOffensivePowers());

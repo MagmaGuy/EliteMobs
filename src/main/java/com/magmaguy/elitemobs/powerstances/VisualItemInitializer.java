@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 public class VisualItemInitializer {
 
     public static Item intializeItem(ItemStack itemStack, Location location) {
-
         Item item = location.getWorld().dropItem(location, itemStack);
         item.setPickupDelay(Integer.MAX_VALUE);
         EntityTracker.registerItemVisualEffects(item);
@@ -18,7 +17,6 @@ public class VisualItemInitializer {
         item.setInvulnerable(true);
 
         return item;
-
     }
 
 }

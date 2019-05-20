@@ -1,38 +1,23 @@
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
-import com.magmaguy.elitemobs.utils.EntityFinder;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.mobpowers.MinorPower;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
-import java.util.HashSet;
 
 public class AttackVacuum extends MinorPower implements Listener {
 
-    private static HashSet<EliteMobEntity> cooldownList = new HashSet<>();
-
-    @Override
-    public void applyPowers(Entity entity) {
+    public AttackVacuum() {
+        super("AttackVacuum", Material.LEAD);
     }
 
     @EventHandler
-    public void onHit(EntityDamageByEntityEvent event) {
+    public void onHit(PlayerDamagedByEliteMobEvent event) {
+        AttackVacuum attackVacuum = (AttackVacuum) event.getEliteMobEntity().getPower(this);
+        if (attackVacuum == null) return;
 
-        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
-        if (eliteMobEntity == null) return;
-        Player player = EntityFinder.findPlayer(event);
-        if (PowerCooldown.isInCooldown(eliteMobEntity, cooldownList)) return;
-
-        player.setVelocity(eliteMobEntity.getLivingEntity().getLocation().clone().subtract(player.getLocation()).toVector().normalize().multiply(3));
-
-        PowerCooldown.startCooldownTimer(eliteMobEntity, cooldownList, 5 * 20);
-
+        event.getPlayer().setVelocity(event.getEliteMobEntity().getLivingEntity().getLocation().clone().subtract(event.getPlayer().getLocation()).toVector().normalize());
     }
 
 }

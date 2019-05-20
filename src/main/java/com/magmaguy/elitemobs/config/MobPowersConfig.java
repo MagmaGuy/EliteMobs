@@ -39,6 +39,7 @@ public class MobPowersConfig {
     public static final String ATTACK_FIREBALL = OFFENSIVE_POWERS + "AttackFireball";
     public static final String ATTACK_FREEZE = OFFENSIVE_POWERS + "AttackFreeze";
     public static final String ATTACK_GRAVITY = OFFENSIVE_POWERS + "AttackGravity";
+    public static final String ATTACK_LIGHTNING = OFFENSIVE_POWERS + "AttackLightning";
     public static final String ATTACK_POISON = OFFENSIVE_POWERS + "AttackPoison";
     public static final String ATTACK_PUSH = OFFENSIVE_POWERS + "AttackPush";
     public static final String ATTACK_WEAKNESS = OFFENSIVE_POWERS + "AttackWeakness";

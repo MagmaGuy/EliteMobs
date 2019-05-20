@@ -11,15 +11,10 @@ public class ActionDynamicBossLevelConstructor {
 
         int bossLevel = 1;
 
-        for (Entity entity : bossLocation.getWorld().getNearbyEntities(bossLocation, 50, 50, 50)) {
-
-            if (entity instanceof Player) {
-
-                bossLevel += MobLevelCalculator.determineMobLevel((Player) entity);
-
-            }
-
-        }
+        for (Entity entity : bossLocation.getWorld().getNearbyEntities(bossLocation, 50, 50, 50))
+            if (entity instanceof Player)
+                if (MobLevelCalculator.determineMobLevel((Player) entity) > bossLevel)
+                    bossLevel = MobLevelCalculator.determineMobLevel((Player) entity);
 
         return bossLevel;
 

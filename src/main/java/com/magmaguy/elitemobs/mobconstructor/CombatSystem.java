@@ -43,7 +43,11 @@ public class CombatSystem implements Listener {
 
     //TODO: Handle thorns damage and potion effects
 
-    //this event deals with elite mobs damaging players
+    /**
+     * EliteMobs -> player damage handler.
+     *
+     * @param event
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void eliteMobDamageHandler(EntityDamageByEntityEvent event) {
 
@@ -72,7 +76,7 @@ public class CombatSystem implements Listener {
         double eliteTier = MobTierCalculator.findMobTier(eliteMobEntity);
         double playerTier = ItemTierFinder.findArmorSetTier(player);
 
-        double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, event);
+        double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, eliteMobEntity, event);
 
         //Prevent untouchable armor and 1-shots
 
@@ -88,7 +92,17 @@ public class CombatSystem implements Listener {
 
     }
 
-    private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EntityDamageByEntityEvent event) {
+    /**
+     * Calculates EliteMobs -> player damage taking into account tier difference. This has minimum and maximum values,
+     * and is calculated based on the difference between the player's armor tier and the mob's tier.
+     *
+     * @param eliteTier  Tier of the Elite Mob
+     * @param playerTier Player combat tier
+     * @param player     Player involved in combat
+     * @param event      EntityDamageEvent
+     * @return Final value for the damage
+     */
+    private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EliteMobEntity eliteMobEntity, EntityDamageByEntityEvent event) {
 
         double tierDifference = eliteTier - playerTier;
         tierDifference = (Math.abs(tierDifference) < 2) ? tierDifference : tierDifference > 0 ? 2 : -2;
@@ -98,30 +112,29 @@ public class CombatSystem implements Listener {
          */
         double newBaseDamage = BASE_DAMAGE_DEALT_TO_PLAYERS - secondaryEnchantmentDamageReduction(player, event);
 
-        return newBaseDamage + newBaseDamage * (tierDifference);
+        return (newBaseDamage + newBaseDamage * (tierDifference)) * eliteMobEntity.getDamageMultiplier();
 
     }
 
+    /**
+     * Calculates damage reduction from secondary enchantments
+     *
+     * @param player Player for whom the reduction will run
+     * @param event  Damage event
+     * @return
+     */
     private double secondaryEnchantmentDamageReduction(Player player, EntityDamageByEntityEvent event) {
 
         double totalReductionLevel = 0;
 
         for (ItemStack itemStack : player.getInventory().getArmorContents()) {
-
             if (itemStack == null) continue;
-
             for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
-
                 if (enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()) && event.getDamager() instanceof Projectile)
                     totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
-
-
                 if (enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) && event.getCause().equals(EntityDamageByEntityEvent.DamageCause.ENTITY_EXPLOSION))
                     totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
-
-
             }
-
         }
 
         totalReductionLevel = totalReductionLevel / 4;
@@ -131,9 +144,10 @@ public class CombatSystem implements Listener {
 
     }
 
-    /*
-    Deal with elite creeper explosions (visually)
-    Damage is dealt by eliteMobDamageHandler
+    /**
+     * Deals with the block damage from creeper explosions (but not the damage from these explosions)
+     *
+     * @param event Explosion event
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEliteCreeperDetonation(ExplosionPrimeEvent event) {
@@ -163,16 +177,13 @@ public class CombatSystem implements Listener {
 
     }
 
-    /*
-    Elite Mobs have purely cosmetic armor. It doesn't do any actual damage reduction, as that would seriously complicate
-    the underlying math for dealing damage for no real reason.
-     */
-
-    /*
-    This deals with elite mobs being damaged by non-player entities
+    /**
+     * Damage dealt to EliteMobs by entities other than Players.
+     *
+     * @param event Damage event
      */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void eliteMobDamageGeneric(EntityDamageEvent event) {
+    public void eliteMobDamagedGeneric(EntityDamageEvent event) {
 
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof LivingEntity)) return;
@@ -183,8 +194,11 @@ public class CombatSystem implements Listener {
 
     }
 
-    /*
-    This deals with players hitting the elite mob
+
+    /**
+     * Player -> EliteMobs damage. Ignores vanilla armor that Elite Mobs are wearing as that is purely cosmetic.
+     *
+     * @param event
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void eliteMobDamageByPlayer(EntityDamageByEntityEvent event) {
@@ -219,16 +233,17 @@ public class CombatSystem implements Listener {
         eliteMobEntity.addDamager(player);
 
         double playerTier;
-        if (player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType().equals(Material.BOW) && event.getDamager() instanceof Player)
+        if (player.getInventory().getItemInMainHand() == null ||
+                player.getInventory().getItemInMainHand().getType().equals(Material.BOW) && event.getDamager() instanceof Player)
             playerTier = 0;
         else
             playerTier = ItemTierFinder.findBattleTier(player.getInventory().getItemInMainHand());
         double eliteTier = MobTierCalculator.findMobTier(eliteMobEntity);
-        double maxHealth = eliteMobEntity.getMaxHealth();
+        double maxHealth = eliteMobEntity.getLivingEntity().getMaxHealth();
 
-        double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, eliteMobEntity.getLivingEntity());
+        double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, eliteMobEntity);
 
-        if (event.getDamager() instanceof Arrow){
+        if (event.getDamager() instanceof Arrow) {
             double arrowSpeedMultiplier = Math.sqrt(Math.pow(event.getDamager().getVelocity().getX(), 2) +
                     Math.pow(event.getDamager().getVelocity().getY(), 2) +
                     Math.pow(event.getDamager().getVelocity().getZ(), 2)) / 5;
@@ -238,9 +253,28 @@ public class CombatSystem implements Listener {
 
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
+        /*
+        This is a bit of a dirty hack, I may want to tighten it up later
+         */
+        //adjust current plugin health
+        eliteMobEntity.setHealth(eliteMobEntity.getMaxHealth() * eliteMobEntity.getLivingEntity().getHealth() / eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+        double damagePercentOfHealth = newDamage / eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        double pluginDamage = damagePercentOfHealth * eliteMobEntity.getMaxHealth();
+        eliteMobEntity.setHealth(eliteMobEntity.getHealth() - pluginDamage);
+
     }
 
-    private double playerToEliteDamageFormula(double eliteTier, double playerTier, double maxHealth, Player player, LivingEntity eliteMob) {
+    /**
+     * Calculates Player -> EliteMobs damage.
+     *
+     * @param eliteTier  Tier of the EliteMob
+     * @param playerTier Tier of the Player's weapon
+     * @param maxHealth  EliteMob's max health
+     * @param player     Player object
+     * @param eliteMob   EliteMob object
+     * @return
+     */
+    private double playerToEliteDamageFormula(double eliteTier, double playerTier, double maxHealth, Player player, EliteMobEntity eliteMob) {
 
         double tierDifference = playerTier - eliteTier;
 
@@ -254,11 +288,14 @@ public class CombatSystem implements Listener {
         This applies secondary enchantments, that is, it applies enchantments that only affect specific mob types
         such as smite which only works with undead mobs
          */
-        double bonusSecondaryEnchantmentDamage = secondaryEnchantmentDamageIncrease(player.getInventory().getItemInMainHand(), eliteMob);
-        double newTargetHitsToKill = TARGET_HITS_TO_KILL - bonusSecondaryEnchantmentDamage;
+        double bonusSecondaryEnchantmentDamage = secondaryEnchantmentDamageIncrease(player.getInventory().getItemInMainHand(), eliteMob.getLivingEntity());
+        double newTargetHitsToKill = (eliteMob.getDefaultMaxHealth() / 2) - bonusSecondaryEnchantmentDamage;
 
         double finalDamage = getCooledAttackStrength(player) * (maxHealth / newTargetHitsToKill +
                 maxHealth / newTargetHitsToKill * (tierDifference) * TO_ELITE_DAMAGE_TIER_HANDICAP);
+
+        //Apply health multiplier
+        finalDamage /= eliteMob.getHealthMultiplier();
 
         /*
         Make sure that players are dealing at least 1 damage as to not create unkillable bosses
@@ -267,25 +304,25 @@ public class CombatSystem implements Listener {
 
     }
 
-    /*
-    This deals with cooldown damage reduction based on the default cooldown property of minecraft and a custom
-    cooldown penalty on top of it (just linear)
+    /**
+     * Calculates the cooldown debuff following vanilla Minecraft rules and then linearly applies a debuff to attacks
+     *
+     * @param player Player in cooldown
+     * @return Debuff multiplier
      */
     private float getCooledAttackStrength(Player player) {
-
         if (!playerHitCooldownHashMap.containsKey(player)) return 1;
-
         float swingDelay = clock - playerHitCooldownHashMap.get(player);
         float cooldownPeriod = getCooldownPeriod(player);
-
         if (swingDelay > cooldownPeriod) return 1;
-
         return swingDelay / cooldownPeriod;
-
     }
 
-    /*
-    This part is pretty much a copy of how Minecraft does the cooldown check
+    /**
+     * Calculates the cooldown following vanilla rules
+     *
+     * @param player
+     * @return
      */
     private float getCooldownPeriod(Player player) {
         return (float) (1.0D / player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue() * 20.0D);
@@ -294,26 +331,25 @@ public class CombatSystem implements Listener {
     private static int clock = 0;
 
     public static void launchInternalClock() {
-
         new BukkitRunnable() {
 
             @Override
             public void run() {
-
                 if (clock == Integer.MAX_VALUE) clock = 0;
                 clock++;
-
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
-
     }
 
 
-    /*
-    This deals with damage increases specific to specific mob types
-    It returns a percentage where 0 is no relevant enchantment present and 1 is maximum potential level reached for
-    relevant enchantment
+    /**
+     * Calculates the Player -> EliteMobs damage increase from secondary enchantments. Adds to the total as a percentage
+     * of the maximum health.
+     *
+     * @param weapon   Weapon used by the player
+     * @param eliteMob EliteMob instance
+     * @return Value to be added
      */
     private double secondaryEnchantmentDamageIncrease(ItemStack weapon, LivingEntity eliteMob) {
 
@@ -322,26 +358,29 @@ public class CombatSystem implements Listener {
             if (deobfuscatedString.contains(LoreGenerator.OBFUSCATED_ENCHANTMENTS)) {
                 if (eliteMob instanceof Spider || eliteMob instanceof Silverfish)
                     return getDamageIncreasePercentage(Enchantment.DAMAGE_ARTHROPODS, findObfuscatedMainEnchantment(deobfuscatedString, Enchantment.DAMAGE_ARTHROPODS));
-
                 if (eliteMob instanceof Zombie || eliteMob instanceof Skeleton)
                     return getDamageIncreasePercentage(Enchantment.DAMAGE_ARTHROPODS, findObfuscatedMainEnchantment(deobfuscatedString, Enchantment.DAMAGE_UNDEAD));
             }
         }
 
         for (Enchantment enchantment : weapon.getEnchantments().keySet()) {
-
             if (enchantment.getName().equals(Enchantment.DAMAGE_ARTHROPODS.getName()) && (eliteMob instanceof Spider || eliteMob instanceof Silverfish))
                 return getDamageIncreasePercentage(enchantment, weapon);
-
             if (enchantment.getName().equals(Enchantment.DAMAGE_UNDEAD.getName()) && (eliteMob instanceof Zombie || eliteMob instanceof Skeleton))
                 return getDamageIncreasePercentage(enchantment, weapon);
-
         }
 
         return 0;
 
     }
 
+    /**
+     * Gets the obfuscated main enchant in an item's lore
+     *
+     * @param deobfuscatedLore
+     * @param enchantment
+     * @return
+     */
     private static int findObfuscatedMainEnchantment(String deobfuscatedLore, Enchantment enchantment) {
         for (String string : deobfuscatedLore.split(","))
             if (string.contains(enchantment.getName()))
@@ -351,20 +390,14 @@ public class CombatSystem implements Listener {
     }
 
     private double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
-
         double maxEnchantmentLevel = getMaxEnchantmentLevel(enchantment);
         double currentEnchantmentLevel = weapon.getEnchantmentLevel(enchantment);
-
         return currentEnchantmentLevel / maxEnchantmentLevel <= 1 ? currentEnchantmentLevel / maxEnchantmentLevel : 1;
-
     }
 
     private double getDamageIncreasePercentage(Enchantment enchantment, double level) {
-
         double maxEnchantmentLevel = getMaxEnchantmentLevel(enchantment);
-
         return level / maxEnchantmentLevel <= 1 ? level / maxEnchantmentLevel : 1;
-
     }
 
     private int getMaxEnchantmentLevel(Enchantment enchantment) {
@@ -375,10 +408,8 @@ public class CombatSystem implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event) {
-
         if (!(event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK) ||
                 event.getAction().equals(Action.PHYSICAL))) return;
-
         playerHitCooldownHashMap.put(event.getPlayer(), clock);
 
     }

@@ -2,12 +2,12 @@ package com.magmaguy.elitemobs.mobpowers.bosspowers;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobconstructor.BossMobEntity;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobpowers.BossPower;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,9 +21,9 @@ import org.bukkit.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SpiritWalk extends BossPower implements Listener {
-    @Override
-    public void applyPowers(Entity entity) {
 
+    public SpiritWalk() {
+        super("SpiritWalk", null);
     }
 
     @EventHandler
@@ -31,17 +31,17 @@ public class SpiritWalk extends BossPower implements Listener {
 
         EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
         if (eliteMobEntity == null) return;
-        if (!(eliteMobEntity instanceof BossMobEntity)) return;
+        if (!(eliteMobEntity instanceof CustomBossEntity)) return;
 
-        BossMobEntity bossMobEntity = (BossMobEntity) eliteMobEntity;
+        CustomBossEntity bossMobEntity = (CustomBossEntity) eliteMobEntity;
 
         if (event.getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
                 event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)) {
             initializeSpiritWalk(bossMobEntity.getLivingEntity());
-            bossMobEntity.resetHitsCounter();
+            bossMobEntity.incrementHitsCounter();
         }
 
-        if (bossMobEntity.getHitsCounter() != 9) return;
+        if (bossMobEntity.getHitsCounter() < 9) return;
 
         initializeSpiritWalk(bossMobEntity.getLivingEntity());
         bossMobEntity.resetHitsCounter();
@@ -53,9 +53,9 @@ public class SpiritWalk extends BossPower implements Listener {
 
         EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(EntityFinder.getRealDamager(event));
         if (eliteMobEntity == null) return;
-        if (!(eliteMobEntity instanceof BossMobEntity)) return;
+        if (!(eliteMobEntity instanceof CustomBossEntity)) return;
 
-        BossMobEntity bossMobEntity = (BossMobEntity) eliteMobEntity;
+        CustomBossEntity bossMobEntity = (CustomBossEntity) eliteMobEntity;
 
         bossMobEntity.resetHitsCounter();
 
