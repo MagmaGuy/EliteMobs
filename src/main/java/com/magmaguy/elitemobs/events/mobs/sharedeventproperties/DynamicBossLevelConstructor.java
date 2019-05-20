@@ -1,8 +1,6 @@
 package com.magmaguy.elitemobs.events.mobs.sharedeventproperties;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.mobspawning.MobLevelCalculator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -10,16 +8,13 @@ public class DynamicBossLevelConstructor {
 
     public static int findDynamicBossLevel() {
 
-        int mobLevel = 0;
+        int bossLevel = 1;
 
         for (Player player : Bukkit.getServer().getOnlinePlayers())
-            if (ItemTierFinder.findPlayerTier(player) * ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.PER_TIER_LEVEL_INCREASE) > mobLevel)
-                mobLevel = (int) ((ItemTierFinder.findPlayerTier(player) + 2.5) * ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.PER_TIER_LEVEL_INCREASE));
+            if (MobLevelCalculator.determineMobLevel(player) > bossLevel)
+                bossLevel = MobLevelCalculator.determineMobLevel(player);
 
-        if (mobLevel == 0)
-            mobLevel = (int) (2.5 * ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.PER_TIER_LEVEL_INCREASE));
-
-        return mobLevel;
+        return bossLevel;
 
     }
 

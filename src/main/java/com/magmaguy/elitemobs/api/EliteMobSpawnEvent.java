@@ -9,7 +9,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class EliteMobSpawnEvent extends Event implements Cancellable {
 
-    private static final HandlerList handlers = new HandlerList();
+    private final HandlerList handlers = new HandlerList();
     private Entity entity;
     private EliteMobEntity eliteMobEntity;
     private CreatureSpawnEvent.SpawnReason spawnReason;
@@ -28,7 +28,7 @@ public class EliteMobSpawnEvent extends Event implements Cancellable {
         this.spawnReason = spawnReason;
     }
 
-    public static HandlerList getHandlerList() {
+    public HandlerList getHandlerList() {
         return handlers;
     }
 
@@ -48,15 +48,6 @@ public class EliteMobSpawnEvent extends Event implements Cancellable {
      */
     public EliteMobEntity getEliteMobEntity() {
         return this.eliteMobEntity;
-    }
-
-    /**
-     * Sets the EliteMobEntity in the event
-     *
-     * @param eliteMobEntity EliteMobEntity in the event
-     */
-    public void setEliteMobEntity(EliteMobEntity eliteMobEntity) {
-        this.eliteMobEntity = eliteMobEntity;
     }
 
     /**

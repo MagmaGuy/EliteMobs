@@ -1,11 +1,24 @@
 package com.magmaguy.elitemobs.events;
 
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.HashSet;
 
-public class EliteEvent {
+public class EliteEvent extends AbstractEliteEvent implements Listener {
 
     private static HashSet<EliteEvent> activeEvents = new HashSet<>();
 
@@ -17,54 +30,94 @@ public class EliteEvent {
         activeEvents.remove(eliteEvent);
     }
 
-    public static EliteEvent getEliteEvent(EliteMobEntity eliteMobEntity) {
-        for (EliteEvent eliteEvent : activeEvents)
-            if (eliteEvent.eventType.equals(EventType.KILL_BOSS) && eliteEvent.getBossEntity().equals(eliteMobEntity))
-                return eliteEvent;
-        return null;
+    public static HashSet<EliteEvent> getActiveEvents() {
+        return activeEvents;
     }
 
-    public static EliteEvent getEliteEvent(EntityType entityType) {
-        for (EliteEvent eliteEvent : activeEvents)
-            if (eliteEvent.eventType.equals(EventType.KILL_COUNT) && eliteEvent.getEntityType().equals(entityType))
-                return eliteEvent;
-        return null;
+    /**
+     * This method should be defined in the subclasses!
+     *
+     * @param location Location at which the event has activated
+     */
+    @Override
+    public void activateEvent(Location location) {
+
+    }
+
+    /**
+     * This method should be defined in the subclasses!
+     *
+     * @param event
+     */
+    @Override
+    public void spawnEventHandler(CreatureSpawnEvent event) {
+
+    }
+
+    /**
+     * This method should be defined in the subclasses!
+     *
+     * @param event
+     */
+    @Override
+    public void bossDeathEventHandler(EliteMobDeathEvent event) {
+
+    }
+
+    /**
+     * This method should be defined in the subclasses!
+     */
+    @Override
+    public void endEvent() {
+
+    }
+
+    /**
+     * This method should be defined in the subclasses!
+     */
+    @Override
+    public void eventWatchdog() {
+
     }
 
     public enum EventType {
         KILL_BOSS,
+        SURVIVAL,
         KILL_COUNT
     }
 
-    private boolean hasLivingBoss;
-    private EliteMobEntity bossEntity;
+    private World world;
+    private CustomBossEntity bossEntity;
+    private boolean bossIsAlive = false;
     private EntityType entityType;
     private EventType eventType;
+    private boolean isQueued = true;
+    private String eventStartMessage;
+    private String eventEndMessage;
 
-    public EliteEvent(EventType eventType, EliteMobEntity bossEntity) {
-        setEventType(eventType);
-        setBossEntity(bossEntity);
-    }
-
-    public EliteEvent(EventType eventType, EntityType entityType) {
+    public EliteEvent(World world, EventType eventType, EntityType entityType) {
+        this.world = world;
+        if (world == null) return;
         setEventType(eventType);
         setEntityType(entityType);
+        addActiveEvent(this);
     }
 
-    public boolean gethasLivingBoss() {
-        return this.hasLivingBoss;
+    public World getWorld() {
+        return this.world;
     }
 
-    public void setHasLivingBoss(boolean hasLivingBoss) {
-        this.hasLivingBoss = hasLivingBoss;
-    }
-
-    public EliteMobEntity getBossEntity() {
+    public CustomBossEntity getBossEntity() {
         return this.bossEntity;
     }
 
-    public void setBossEntity(EliteMobEntity bossEntity) {
+    public void setBossEntity(CustomBossEntity bossEntity) {
         this.bossEntity = bossEntity;
+        this.bossIsAlive = true;
+    }
+
+    public boolean getBossIsAlive() {
+        return bossIsAlive;
     }
 
     public EntityType getEntityType() {
@@ -83,8 +136,63 @@ public class EliteEvent {
         this.eventType = eventType;
     }
 
-    public void completeEvent() {
+    public void completeEvent(World world) {
         removeActiveEvent(this);
+        if (this.eventEndMessage == null) return;
+        sendEventEndMessage(world);
+    }
+
+    public void setEventStartMessage(String eventStartMessage) {
+        this.eventEndMessage = eventStartMessage;
+    }
+
+    public void sendEventStartMessage(World world) {
+        String sendString = ChatColorConverter.convert(this.eventStartMessage.replace("$world", world.getName().replace("_", " ")));
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY)) {
+            for (Player player : Bukkit.getServer().getOnlinePlayers())
+                if (player.getWorld().equals(world))
+                    player.sendMessage(sendString);
+        } else
+            Bukkit.getServer().broadcastMessage(sendString);
+    }
+
+    private void sendEventEndMessage(World world) {
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY)) {
+            for (Player player : Bukkit.getServer().getOnlinePlayers())
+                if (player.getWorld().equals(world))
+                    player.sendMessage(ChatColorConverter.convert(this.eventEndMessage));
+        } else
+            Bukkit.getServer().broadcastMessage(ChatColorConverter.convert(this.eventEndMessage));
+    }
+
+    public boolean isQueued() {
+        return isQueued;
+    }
+
+    public void unQueue() {
+        this.isQueued = false;
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onSpawn(CreatureSpawnEvent event) {
+        if (event.isCancelled()) return;
+        if (getActiveEvents().isEmpty()) return;
+        if (!EliteMobs.validWorldList.contains(event.getLocation().getWorld())) return;
+        if (!(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
+                event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)))
+            return;
+        for (EliteEvent eliteEvent : getActiveEvents())
+            eliteEvent.spawnEventHandler(event);
+    }
+
+    @EventHandler
+    public void onBossDeath(EliteMobDeathEvent event) {
+        if (getActiveEvents().isEmpty()) return;
+        for (EliteEvent eliteEvent : getActiveEvents())
+            if (!event.getEliteMobEntity().equals(eliteEvent.getBossEntity())) {
+                bossDeathEventHandler(event);
+                return;
+            }
     }
 
 }

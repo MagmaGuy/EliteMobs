@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -47,7 +48,11 @@ public class DamageDisplay implements Listener {
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS)) {
 
             if (EntityTracker.isEliteMob(event.getEntity()) && event.getEntity() instanceof LivingEntity) {
-                if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getFinalDamage());
+                if (event.getDamage() > 0)
+                    displayDamage(event.getEntity(),
+                            event.getFinalDamage() /
+                                    ((LivingEntity) event.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() *
+                                    EntityTracker.getEliteMobEntity(event.getEntity()).getMaxHealth());
             } else if (EntityTracker.isSuperMob(event.getEntity()))
                 displayDamage(event.getEntity(), event.getFinalDamage());
 

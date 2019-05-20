@@ -15,14 +15,22 @@
 
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.events.mobs.*;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.events.mobs.Kraken;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.skeleton.SkeletonPillar;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.skeleton.SkeletonTrackingArrow;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieBloat;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieFriends;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieNecronomicon;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieParents;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import org.bukkit.Location;
@@ -280,9 +288,6 @@ public class SpawnMobCommandHandler {
                     case "zombienecronomicon":
                         elitePowers.add(new ZombieNecronomicon());
                         break;
-                    case "zombieteamrocket":
-                        elitePowers.add(new ZombieTeamRocket());
-                        break;
                     case "zombieparents":
                         elitePowers.add(new ZombieParents());
                         break;
@@ -405,15 +410,12 @@ public class SpawnMobCommandHandler {
         }
 
         if (args[1].equalsIgnoreCase("treasuregoblin")) {
-
-            TreasureGoblin.createGoblin(cursorLocation);
+            CustomBossEntity.constructCustomBoss("treasure_goblin.yml", cursorLocation, DynamicBossLevelConstructor.findDynamicBossLevel());
             player.sendMessage("Spawned treasure goblin");
-
         }
 
         if (args[1].equalsIgnoreCase("zombieking")) {
-
-            ZombieKing.spawnZombieKing(cursorLocation);
+            CustomBossEntity.constructCustomBoss("zombie_king.yml", cursorLocation, DynamicBossLevelConstructor.findDynamicBossLevel());
             player.sendMessage("Spawned zombie king");
 
         }
@@ -429,14 +431,19 @@ public class SpawnMobCommandHandler {
 
         if (args[1].equalsIgnoreCase("balrog")) {
 
-            Balrog.spawnBalrog(cursorLocation);
+            CustomBossEntity.constructCustomBoss("balrog.yml", cursorLocation,
+                    ActionDynamicBossLevelConstructor.determineDynamicBossLevel(cursorLocation));
             player.sendMessage("Spawned Balrog");
 
         }
 
         if (args[1].equalsIgnoreCase("fae")) {
-
-            Fae.spawnFae(cursorLocation);
+            CustomBossEntity.constructCustomBoss("lightning_fae.yml", cursorLocation,
+                    ActionDynamicBossLevelConstructor.determineDynamicBossLevel(cursorLocation));
+            CustomBossEntity.constructCustomBoss("fire_fae.yml", cursorLocation,
+                    ActionDynamicBossLevelConstructor.determineDynamicBossLevel(cursorLocation));
+            CustomBossEntity.constructCustomBoss("ice_fae.yml", cursorLocation,
+                    ActionDynamicBossLevelConstructor.determineDynamicBossLevel(cursorLocation));
             player.sendMessage("Spawned Fae");
 
         }

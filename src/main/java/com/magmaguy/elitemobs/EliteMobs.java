@@ -8,6 +8,8 @@ import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.CustomItemConstructor;
@@ -15,7 +17,6 @@ import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
@@ -32,7 +33,6 @@ import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -56,6 +56,11 @@ public class EliteMobs extends JavaPlugin {
         ConfigValues.intializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
 
+        /*
+        New config loading
+         */
+        CustomBossesConfig.initializeConfigurations();
+        CustomLootConfig.initializeConfigurations();
 
         if (WORLDGUARD_IS_ENABLED)
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is enabled!");
@@ -167,13 +172,6 @@ public class EliteMobs extends JavaPlugin {
         EntityTracker.shutdownPurger();
 
         /*
-        Flush lingering arrows from the arrow tracking power
-         */
-        for (Arrow arrow : SkeletonTrackingArrow.trackingArrowList)
-            arrow.remove();
-        SkeletonTrackingArrow.trackingArrowList.clear();
-
-        /*
         todo: Flush lingering blocks
          */
 
@@ -194,18 +192,15 @@ public class EliteMobs extends JavaPlugin {
     }
 
     public static void worldScanner() {
-
         for (World world : Bukkit.getWorlds())
             if (ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + world.getName()))
                 validWorldList.add(world);
-
     }
 
     /*
     Repeating tasks that run as long as the server is on
      */
     public void launchRunnables() {
-
         int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
 
         new EntityScanner().runTaskTimer(this, 20, 20 * 10);
@@ -216,7 +211,6 @@ public class EliteMobs extends JavaPlugin {
                 ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.CHICKEN) &&
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
-
     }
 
 }

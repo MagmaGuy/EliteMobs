@@ -446,8 +446,6 @@ public class TranslationConfig {
                 "All for one!"
         ));
 
-        configuration.addDefault("ZombieNecronomicon.Summoned zombie", "Summoned Zombie");
-        configuration.addDefault("ZombieNecronomicon.Summoned skeleton", "Summoned Skeleton");
         configuration.addDefault("ZombieNecronomicon.Summoning chant", "Nor is it to be thought..." +
                 "that man is either the oldest " +
                 "or the last of earth's masters, or that the common bulk of life and substance walks alone. The Old Ones" +

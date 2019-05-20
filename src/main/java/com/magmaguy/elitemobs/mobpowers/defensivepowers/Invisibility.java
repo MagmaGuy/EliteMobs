@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.mobpowers.defensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
-import org.bukkit.entity.Entity;
+import com.magmaguy.elitemobs.mobpowers.MinorPower;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -13,12 +13,16 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class Invisibility extends MinorPower {
 
+    public Invisibility() {
+        super("Invisibility", Material.GLASS_PANE);
+    }
+
     @Override
-    public void applyPowers(Entity entity) {
+    public void applyPowers(LivingEntity livingEntity) {
         new BukkitRunnable() {
             @Override
             public void run() {
-                ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
+                livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }

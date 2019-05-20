@@ -48,7 +48,7 @@ public class NPCEntity {
      *
      * @return List of all NPCEntities
      */
-    public static HashSet<NPCEntity> getNPCEntityList() {
+    private static HashSet<NPCEntity> getNPCEntityList() {
         return npcEntityList;
     }
 

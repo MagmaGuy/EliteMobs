@@ -36,11 +36,8 @@ public class BossSpecialAttackDamage {
         damagee.damage(damage);
         damagee.setNoDamageTicks(0);
 
-        if (damagee instanceof Player && damagee.getHealth() <= 0) {
-
+        if (damagee instanceof Player && damagee.getHealth() <= 0)
             PlayerDeathMessageByEliteMob.intializeDeathMessage((Player) damagee, damager);
-
-        }
 
         return true;
 

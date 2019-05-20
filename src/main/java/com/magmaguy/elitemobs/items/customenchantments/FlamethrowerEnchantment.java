@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
-import com.magmaguy.elitemobs.events.mobs.ZombieKing;
-import com.magmaguy.elitemobs.utils.Cooldown;
+import com.magmaguy.elitemobs.utils.CooldownHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,8 +38,8 @@ public class FlamethrowerEnchantment extends CustomEnchantment implements Listen
                 return;
             } else zombieKingAxe.setDurability((short) (zombieKingAxe.getDurability() + 4));
 
-            ZombieKing.initializeFlamethrower(player.getLocation(), player.getLocation().getDirection(), player, true);
-            Cooldown.initialize(playersUsingFlamethrower, player, 3 * 60);
+//            ZombieKing.initializeFlamethrower(player.getLocation(), player.getLocation().getDirection(), player, true);
+            CooldownHandler.initialize(playersUsingFlamethrower, player, 3 * 60);
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 3 * 20, 5));
 
         }

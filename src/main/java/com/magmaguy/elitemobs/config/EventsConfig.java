@@ -51,7 +51,6 @@ public class EventsConfig {
     public static final String ZOMBIE_KING_FLAMETHROWER_INTERVAL = "Time interval between zombie king flamethrower attacks";
     public static final String ZOMBIE_KING_UNHOLY_SMITE_INTERVAL = "Time interval between zombie king unholy smite attacks";
     public static final String ZOMBIE_KING_SUMMON_MINIONS_INTERVAL = "Time interval between zombie king minion summons";
-    public static final String TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL = "Time interval between treasure goblin gold shotgun shots";
     public static final String TREASURE_GOBLIN_RADIAL_EXPLOSION = "Time interval between treasure goblin radial explosions";
     public static final String KRAKEN_CHANCE_ON_FISH = "Kraken on fish chance";
     public static final String KRAKEN_NAME = "Name of mob in Kraken event";
@@ -94,7 +93,6 @@ public class EventsConfig {
         configuration.addDefault(ZOMBIE_KING_FLAMETHROWER_INTERVAL, 20);
         configuration.addDefault(ZOMBIE_KING_UNHOLY_SMITE_INTERVAL, 20);
         configuration.addDefault(ZOMBIE_KING_SUMMON_MINIONS_INTERVAL, 20);
-        configuration.addDefault(TREASURE_GOBLIN_GOLD_SHOTGUN_INTERVAL, 20);
         configuration.addDefault(TREASURE_GOBLIN_RADIAL_EXPLOSION, 20);
         configuration.addDefault(KRAKEN_ENABLED, true);
         configuration.addDefault(BALROG_ENABLED, true);

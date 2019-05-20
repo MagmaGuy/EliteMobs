@@ -1,60 +1,28 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobpowers.offensivepowers;
 
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobpowers.PowerCooldown;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.EventValidator;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
-import com.magmaguy.elitemobs.utils.EntityFinder;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.mobpowers.MinorPower;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.util.Vector;
-
-import java.util.HashSet;
 
 /**
  * Created by MagmaGuy on 05/11/2016.
  */
 public class AttackPush extends MinorPower implements Listener {
 
-    private static HashSet<EliteMobEntity> cooldownList = new HashSet<>();
-
-    @Override
-    public void applyPowers(Entity entity) {
+    public AttackPush() {
+        super("AttackPush", Material.PISTON);
     }
 
     @EventHandler
-    public void attackPush(EntityDamageByEntityEvent event) {
+    public void attackPush(PlayerDamagedByEliteMobEvent event) {
+        AttackPush attackPush = (AttackPush) event.getEliteMobEntity().getPower(this);
+        if (attackPush == null) return;
+        if (attackPush.isCooldown()) return;
 
-        EliteMobEntity eliteMobEntity = EventValidator.getEventEliteMob(this, event);
-        if (eliteMobEntity == null) return;
-        Player player = EntityFinder.findPlayer(event);
-        if (PowerCooldown.isInCooldown(eliteMobEntity, cooldownList)) return;
-
-        Vector pushbackDirection = player.getLocation().subtract(eliteMobEntity.getLivingEntity().getLocation()).toVector();
-        Vector pushbackApplied = pushbackDirection.normalize().multiply(3);
-
-        player.setVelocity(pushbackApplied);
-
-        PowerCooldown.startCooldownTimer(eliteMobEntity, cooldownList, 10 * 20);
-
+        attackPush.doCooldown(20 * 10);
+        event.getPlayer().setVelocity(event.getPlayer().getLocation().clone().subtract(event.getEliteMobEntity().getLivingEntity().getLocation()).toVector().normalize().multiply(3));
     }
 
 }
