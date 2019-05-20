@@ -6,13 +6,15 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
-import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -42,6 +44,11 @@ public class EntityTracker implements Listener {
     cull entities once the server shuts down
      */
     private static HashSet<Entity> cullablePluginEntities = new HashSet<>();
+
+    /*
+    Temporary blocks
+     */
+    private static HashSet<Block> temporaryBlocks = new HashSet<>();
 
     /**
      * Gets all living elite mobs
@@ -279,7 +286,8 @@ public class EntityTracker implements Listener {
 
     /**
      * Checks if an Entity is a registered item visual effect
-     *an
+     * an
+     *
      * @param entity Entity to be checked
      * @return whether the entity is a visual effect
      */
@@ -358,30 +366,34 @@ public class EntityTracker implements Listener {
         return null;
     }
 
-    /**
-     * Returns if the Entity has a certain mob power
-     *
-     * @param mobPower mob power to look up
-     * @param entity   entity to check for powers
-     * @return Whether the entity has that power
-     */
-    public static boolean hasPower(ElitePower mobPower, Entity entity) {
-        EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
-        if (eliteMobEntity == null) return false;
-        return eliteMobEntity.hasPower(mobPower);
+    public static void addTemporaryBlock(Block block, int ticks, Material replacementMaterial) {
+        temporaryBlocks.add(block);
+        block.setType(replacementMaterial);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (block.getType().equals(replacementMaterial))
+                    block.setType(Material.AIR);
+                temporaryBlocks.remove(block);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
 
-    /**
-     * Returns if the EliteMobEntity has a certain mob power
-     *
-     * @param mobPower       mob power to look up
-     * @param eliteMobEntity entity to check for powers
-     * @return Whether the entity has that power
-     */
-    public static boolean hasPower(ElitePower mobPower, EliteMobEntity eliteMobEntity) {
-        if (eliteMobEntity == null) return false;
-        return eliteMobEntity.hasPower(mobPower);
+    public static boolean getIsTemporaryBlock(Block block) {
+        return temporaryBlocks.contains(block);
     }
+
+    public static void removeTemporaryBlock(Block block) {
+        temporaryBlocks.remove(block);
+    }
+
+    @EventHandler
+    public void onMine(BlockBreakEvent event) {
+        if (!getIsTemporaryBlock(event.getBlock())) return;
+        event.setDropItems(false);
+        removeTemporaryBlock(event.getBlock());
+    }
+
 
     /*
     Custom spawn reasons can be considered as natural spawns under specific config options
@@ -404,6 +416,9 @@ public class EntityTracker implements Listener {
         for (Entity entity : cullablePluginEntities)
             entity.remove();
 
+        for (Block block : temporaryBlocks)
+            block.setType(Material.AIR);
+
         eliteMobs.clear();
         eliteMobsLivingEntities.clear();
         superMobs.clear();
@@ -412,6 +427,7 @@ public class EntityTracker implements Listener {
         naturalEntities.clear();
         cullablePluginEntities.clear();
         npcEntities.clear();
+        temporaryBlocks.clear();
 
     }
 
@@ -456,7 +472,6 @@ public class EntityTracker implements Listener {
             public void run() {
 
                 int entitiesCleared = 0;
-
 
                 for (Iterator<LivingEntity> iterator = superMobs.iterator(); iterator.hasNext(); ) {
                     LivingEntity livingEntity = iterator.next();

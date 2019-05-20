@@ -16,11 +16,8 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
-import com.magmaguy.elitemobs.mobscanner.EliteMobScanner;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -56,10 +53,6 @@ public class MergeHandler implements Listener {
 
         if (eventEntity == null) return;
         if (!(eventEntity instanceof LivingEntity)) return;
-
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.AGGRESSIVE_MOB_STACKING) &&
-                EliteMobProperties.isValidEliteMobType(eventEntity))
-            EliteMobScanner.scanValidAggressiveLivingEntity((LivingEntity) eventEntity);
 
         if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
                 SuperMobProperties.isValidSuperMobType(eventEntity))

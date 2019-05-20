@@ -3,7 +3,10 @@ package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieBloat;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieFriends;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieNecronomicon;
+import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieParents;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
@@ -23,8 +26,7 @@ public class EliteZombie extends EliteMobProperties {
         ZombieFriends zombieFriends = new ZombieFriends();
         ZombieNecronomicon zombieNecronomicon = new ZombieNecronomicon();
         ZombieParents zombieParents = new ZombieParents();
-        ZombieTeamRocket zombieTeamRocket = new ZombieTeamRocket();
-        this.validMajorPowers = new HashSet<>(Arrays.asList(zombieBloat, zombieFriends, zombieNecronomicon, zombieParents, zombieTeamRocket));
+        this.validMajorPowers = new HashSet<>(Arrays.asList(zombieBloat, zombieFriends, zombieNecronomicon, zombieParents));
 
         this.validDefensivePowers.addAll(super.getAllDefensivePowers());
         this.validOffensivePowers.addAll(super.getAllOffensivePowers());

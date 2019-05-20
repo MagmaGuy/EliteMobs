@@ -34,7 +34,9 @@ public class ItemStackGenerator {
     }
 
     public static ItemStack generateItemStack(Material material) {
+        if (material == null) material = Material.AIR;
         ItemStack itemStack = new ItemStack(material);
+        if (material.equals(Material.AIR)) return itemStack;
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName("");
         itemStack.setItemMeta(itemMeta);

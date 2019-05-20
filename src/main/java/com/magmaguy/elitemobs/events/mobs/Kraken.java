@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
 import com.magmaguy.elitemobs.items.uniqueitems.DepthsSeeker;
 import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
 import org.bukkit.Bukkit;
@@ -98,7 +97,7 @@ public class Kraken implements Listener {
         krakenDamageLoop(kraken);
         krakenVisualEffectLoop(kraken);
 
-        BossMobDeathCountdown.startDeathCountdown(kraken);
+//        BossMobDeathCountdown.startDeathCountdown(kraken);
 
     }
 

@@ -1,0 +1,74 @@
+package com.magmaguy.elitemobs.mobpowers.bosspowers;
+
+import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Iterator;
+import java.util.List;
+
+public class ProjectileDamage {
+
+    public static void doGoldNuggetDamage(List<Item> goldNuggets, EliteMobEntity eliteMobEntity) {
+
+        new BukkitRunnable() {
+
+            int timer = 0;
+
+            @Override
+            public void run() {
+                timer++;
+                if (goldNuggets.isEmpty()) {
+                    cancel();
+                    return;
+                }
+                Iterator<Item> iterator = goldNuggets.iterator();
+                for (iterator.next(); iterator.hasNext(); ) {
+                    Item goldNugget = iterator.next();
+                    boolean removed = false;
+                    for (Entity entity : goldNugget.getNearbyEntities(0.1, 0.1, 0.1))
+                        if (entity instanceof LivingEntity)
+                            if (entity.getType().equals(EntityType.PLAYER)) {
+                                BossSpecialAttackDamage.dealSpecialDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
+                                iterator.remove();
+                                goldNugget.remove();
+                                removed = true;
+                            }
+                    if (!removed && goldNugget.isOnGround()) {
+                        iterator.remove();
+                        goldNugget.remove();
+                    }
+                }
+
+                if (timer < 5 * 20) return;
+
+                Iterator<Item> endIterator = goldNuggets.iterator();
+
+                for (endIterator.next(); endIterator.hasNext(); ) {
+                    Item goldNugget = endIterator.next();
+                    goldNugget.remove();
+                    endIterator.remove();
+                }
+
+                cancel();
+
+            }
+
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+
+    }
+
+    public static void configureVisualProjectile(Item goldNugget) {
+
+        EntityTracker.registerItemVisualEffects(goldNugget);
+        goldNugget.setPickupDelay(Integer.MAX_VALUE);
+
+    }
+
+}

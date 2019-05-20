@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import com.magmaguy.elitemobs.mobpowers.MajorPower;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -90,30 +90,13 @@ public class MajorPowerPowerStance implements Listener {
 
         ArrayList<Object> effects = new ArrayList<>();
 
-        for (ElitePower elitePower : eliteMobEntity.getPowers()) {
-
-            if (elitePower instanceof SkeletonPillar)
-                effects.add(addEffect(Material.BONE));
-
-            if (elitePower instanceof SkeletonTrackingArrow)
-                effects.add(addEffect(Material.TIPPED_ARROW));
-
-            if (elitePower instanceof ZombieBloat)
-                effects.add(addEffect(Material.RED_MUSHROOM));
-
-            if (elitePower instanceof ZombieFriends)
-                effects.add(addEffect(Material.ZOMBIE_HEAD));
-
-            if (elitePower instanceof ZombieNecronomicon)
-                effects.add(addEffect(Material.WRITTEN_BOOK));
-
-            if (elitePower instanceof ZombieParents)
-                effects.add(addEffect(Material.ZOMBIE_SPAWN_EGG));
-
-            if (elitePower instanceof ZombieTeamRocket)
-                effects.add(addEffect(Material.FIREWORK_ROCKET));
-
-        }
+        for (ElitePower elitePower : eliteMobEntity.getPowers())
+            if (elitePower instanceof MajorPower)
+                if (eliteMobEntity.getPower(elitePower).getTrail() != null)
+                    if (eliteMobEntity.getPower(elitePower).getTrail() instanceof Material)
+                        effects.add(addEffect((Material) eliteMobEntity.getPower(elitePower).getTrail()));
+                    else if (eliteMobEntity.getPower(elitePower).getTrail() instanceof Particle)
+                        effects.add(addEffect((Particle) eliteMobEntity.getPower(elitePower).getTrail()));
 
         return effects;
 
@@ -133,9 +116,7 @@ public class MajorPowerPowerStance implements Listener {
     }
 
     private Object addEffect(Particle particle) {
-
         return particle;
-
     }
 
 }

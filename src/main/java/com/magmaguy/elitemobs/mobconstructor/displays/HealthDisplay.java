@@ -1,66 +1,49 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobconstructor.displays;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class HealthDisplay implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onHit(EntityDamageEvent event) {
+    public void onHit(EliteMobDamagedByPlayerEvent event) {
 
         if (event.isCancelled()) return;
 
-        if (!(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof ArmorStand) return;
-
         if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_HEALTH_FOR_ELITE_MOBS)) {
             if (EntityTracker.isEliteMob(event.getEntity()))
-                displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
+                displayHealth(event.getEliteMobEntity());
             else if (EntityTracker.isSuperMob(event.getEntity()))
-                displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
+                displayHealth(event.getEliteMobEntity());
 
         } else
-            displayHealth((LivingEntity) event.getEntity(), event.getFinalDamage());
+            displayHealth(event.getEliteMobEntity());
 
     }
 
-    public static void displayHealth(LivingEntity livingEntity, double damage) {
+    public static void displayHealth(EliteMobEntity eliteMobEntity) {
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT)) return;
 
-        int maxHealth = (int) livingEntity.getMaxHealth();
-        int currentHealth = (int) (livingEntity.getHealth() - damage);
+        int maxHealth = (int) eliteMobEntity.getMaxHealth();
+        int currentHealth = (int) (eliteMobEntity.getHealth());
 
-        Location entityLocation = new Location(livingEntity.getWorld(), livingEntity.getLocation().getX(),
-                livingEntity.getLocation().getY() + livingEntity.getEyeHeight() + 0.5, livingEntity.getLocation().getZ());
+        Location entityLocation = new Location(eliteMobEntity.getLivingEntity().getWorld(), eliteMobEntity.getLivingEntity().getLocation().getX(),
+                eliteMobEntity.getLivingEntity().getLocation().getY() + eliteMobEntity.getLivingEntity().getEyeHeight() + 0.5, eliteMobEntity.getLivingEntity().getLocation().getZ());
 
         /*
         Dirty fix: armorstands don't render invisibly on their first tick, so it gets moved elsewhere temporarily
@@ -82,8 +65,8 @@ public class HealthDisplay implements Listener {
             @Override
             public void run() {
 
-                Location newLocation = new Location(livingEntity.getWorld(), livingEntity.getLocation().getX(),
-                        livingEntity.getLocation().getY() + livingEntity.getEyeHeight() + 0.5, livingEntity.getLocation().getZ());
+                Location newLocation = new Location(eliteMobEntity.getLivingEntity().getWorld(), eliteMobEntity.getLivingEntity().getLocation().getX(),
+                        eliteMobEntity.getLivingEntity().getLocation().getY() + eliteMobEntity.getLivingEntity().getEyeHeight() + 0.5, eliteMobEntity.getLivingEntity().getLocation().getZ());
 
                 armorStand.teleport(newLocation);
 

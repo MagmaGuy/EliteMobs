@@ -3,9 +3,9 @@ package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobPowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
+import com.magmaguy.elitemobs.mobpowers.MajorPower;
+import com.magmaguy.elitemobs.mobpowers.MinorPower;
 import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
 import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import org.bukkit.entity.Entity;
@@ -76,13 +76,15 @@ public abstract class EliteMobProperties extends PluginMobProperties {
             offensivePowers.add(new AttackFreeze());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_GRAVITY))
             offensivePowers.add(new AttackGravity());
+        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_LIGHTNING))
+            offensivePowers.add(new AttackLightning());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_POISON))
             offensivePowers.add(new AttackPoison());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_PUSH))
             offensivePowers.add(new AttackPush());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WEAKNESS))
             offensivePowers.add(new AttackWeakness());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WEAKNESS))
+        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WEB))
             offensivePowers.add(new AttackWeb());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WITHER))
             offensivePowers.add(new AttackWither());
