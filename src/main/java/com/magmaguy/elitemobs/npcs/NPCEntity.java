@@ -10,10 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -51,7 +48,7 @@ public class NPCEntity {
      *
      * @return List of all NPCEntities
      */
-    public static HashSet<NPCEntity> getNPCEntityList() {
+    private static HashSet<NPCEntity> getNPCEntityList() {
         return npcEntityList;
     }
 
@@ -90,33 +87,42 @@ public class NPCEntity {
      */
     public NPCEntity(String key) {
 
-        this.key = key;
+        try {
 
-        key += ".";
+            this.key = key;
 
-        Configuration configuration = ConfigValues.npcConfig;
+            key += ".";
 
-        if (!setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION))) return;
-        if (!configuration.getBoolean(key + NPCConfig.ENABLED)) return;
+            Configuration configuration = ConfigValues.npcConfig;
 
-        this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+            if (!setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION))) return;
+            if (!configuration.getBoolean(key + NPCConfig.ENABLED)) return;
 
-        this.villager.setRemoveWhenFarAway(true);
+            entityFixer(spawnLocation);
 
-        setName(configuration.getString(key + NPCConfig.NAME));
-        initializeRole(configuration.getString(key + NPCConfig.ROLE));
-        setProfession(configuration.getString(key + NPCConfig.TYPE));
-        setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
-        setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
-        setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
-        setCanMove(configuration.getBoolean(key + NPCConfig.CAN_MOVE));
-        setCanTalk(configuration.getBoolean(key + NPCConfig.CAN_TALK));
-        setActivationRadius(configuration.getDouble(key + NPCConfig.ACTIVATION_RADIUS));
-        setDisappearsAtNight(configuration.getBoolean(key + NPCConfig.DISAPPEARS_AT_NIGHT));
-        setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
+            this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
-        EntityTracker.registerNPCEntity(this);
-        addNPCEntity(this);
+            this.villager.setRemoveWhenFarAway(true);
+
+            setName(configuration.getString(key + NPCConfig.NAME));
+            initializeRole(configuration.getString(key + NPCConfig.ROLE));
+            setProfession(configuration.getString(key + NPCConfig.TYPE));
+            setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
+            setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
+            setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
+            setCanMove(configuration.getBoolean(key + NPCConfig.CAN_MOVE));
+            setCanTalk(configuration.getBoolean(key + NPCConfig.CAN_TALK));
+            setActivationRadius(configuration.getDouble(key + NPCConfig.ACTIVATION_RADIUS));
+            setDisappearsAtNight(configuration.getBoolean(key + NPCConfig.DISAPPEARS_AT_NIGHT));
+            setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
+
+            EntityTracker.registerNPCEntity(this);
+            addNPCEntity(this);
+
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[EliteMobs] Error loading " + key);
+            Bukkit.getLogger().warning("[EliteMobs] This is probably caused by a bad configuration entry for the NPCs!");
+        }
 
     }
 
@@ -127,6 +133,7 @@ public class NPCEntity {
     public void respawnNPC() {
         if (Bukkit.getEntity(villager.getUniqueId()) != null)
             Bukkit.getEntity(villager.getUniqueId()).remove();
+        entityFixer(spawnLocation);
         villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         villager.setCustomName(name);
         villager.setCustomNameVisible(true);
@@ -518,18 +525,35 @@ public class NPCEntity {
 
     /**
      * Sends a farewell message to a player from the list of farewell messages the NPCEntity has
-     *e
+     * e
+     *
      * @param player
      */
     public void sayFarewell(Player player) {
         new NPCChatBubble(selectString(this.farewell), this, player);
     }
 
-    /*
-    Selects a string from a list of strings
+    /**
+     * Selects a string from a list of strings
+     *
+     * @param strings List of string to select from
+     * @return Selected String
      */
     private String selectString(List<String> strings) {
         return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
+    }
+
+    /**
+     * Clears villagers and armor stands standing near the location the villager is at. This is done to fix incorrect
+     * EliteMobs shutdowns, such as those caused by crashes or plugin-halting errors.
+     *
+     * @param location Location of the villager to scan around
+     */
+    private void entityFixer(Location location) {
+        for (Entity entity : location.getWorld().getNearbyEntities(location, 1, 3, 1))
+            if (entity.getType().equals(EntityType.VILLAGER) || entity.getType().equals(EntityType.ARMOR_STAND))
+                if (!EntityTracker.isNPCEntity(entity) && !EntityTracker.isArmorStand(entity))
+                    entity.remove();
     }
 
 }
