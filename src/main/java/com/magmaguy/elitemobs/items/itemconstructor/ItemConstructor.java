@@ -18,21 +18,19 @@ public class ItemConstructor {
     /*
     For custom and unique items
      */
-    public static ItemStack constructItem(String rawName, Material material, HashMap<Enchantment,
-            Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
-                                          List<String> lore, String dropType, String scalabilityType) {
-
+    public static ItemStack constructItem(String rawName,
+                                          Material material,
+                                          HashMap<Enchantment, Integer> enchantments,
+                                          HashMap<String, Integer> customEnchantments,
+                                          List<String> potionEffects,
+                                          List<String> lore,
+                                          String dropType,
+                                          String scalabilityType) {
         ItemStack itemStack;
         ItemMeta itemMeta;
 
-        /*
-        Generate material
-         */
         Material itemMaterial = MaterialGenerator.generateMaterial(material);
 
-        /*
-        Construct initial item
-         */
         itemStack = ItemStackGenerator.generateItemStack(material);
         itemMeta = itemStack.getItemMeta();
 
@@ -44,25 +42,13 @@ public class ItemConstructor {
         if (!enchantments.isEmpty())
             itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantments);
 
-        /*
-        Generate item lore
-         */
         itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore);
 
-        /*
-        Remove vanilla enchantments
-         */
         if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-        /*
-        Generate item name last as it relies on material type and quality
-         */
         itemMeta.setDisplayName(NameGenerator.generateName(rawName));
 
-        /*
-        Colorize with MMO colors
-         */
         itemStack.setItemMeta(itemMeta);
         ItemQualityColorizer.dropQualityColorizer(itemStack);
 
@@ -84,8 +70,11 @@ public class ItemConstructor {
     /*
     For scalable items
      */
-    public static ItemStack constructItem(String rawName, Material material, HashMap<Enchantment,
-            Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
+    public static ItemStack constructItem(String rawName,
+                                          Material material,
+                                          HashMap<Enchantment, Integer> enchantments,
+                                          HashMap<String, Integer> customEnchantments,
+                                          List<String> potionEffects,
                                           List<String> lore) {
 
         ItemStack itemStack;
