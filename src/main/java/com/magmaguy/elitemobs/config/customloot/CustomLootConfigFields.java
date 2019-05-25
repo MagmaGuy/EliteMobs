@@ -3,12 +3,19 @@ package com.magmaguy.elitemobs.config.customloot;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CustomLootConfigFields {
 
+    /**
+     * Used to get a CustomLootConfigFields from an item's filename
+     *
+     * @param fileName
+     * @return
+     */
     public static CustomLootConfigFields getCustomLootConfigFields(String fileName) {
         return new CustomLootConfigFields(CustomLootConfig.getCustomLootConfig(fileName));
     }

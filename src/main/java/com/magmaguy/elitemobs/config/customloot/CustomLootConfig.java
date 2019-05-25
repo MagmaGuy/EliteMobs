@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 public class CustomLootConfig {
 
-    public static HashMap<String, FileConfiguration> customItemsConfigList = new HashMap<>();
+    private static HashMap<String, FileConfiguration> customItemsConfigList = new HashMap<>();
 
     public static HashMap<String, FileConfiguration> getCustomItemsConfigList() {
         return customItemsConfigList;
@@ -25,6 +25,12 @@ public class CustomLootConfig {
 
     public static FileConfiguration getCustomLootConfig(String fileName) {
         return customItemsConfigList.get(fileName);
+    }
+
+    private static ArrayList<CustomLootConfigFields> initializedCustomLootConfigFieldsList = new ArrayList<>();
+
+    public static ArrayList<CustomLootConfigFields> getInitializedCustomLootConfigFieldsList() {
+        return initializedCustomLootConfigFieldsList;
     }
 
     private static ArrayList<CustomLootConfigFields> customLootConfigFieldsList = new ArrayList<>(Arrays.asList(
