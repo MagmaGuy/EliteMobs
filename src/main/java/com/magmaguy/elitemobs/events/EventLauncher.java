@@ -26,7 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
-import static com.magmaguy.elitemobs.utils.WeightedProbablity.pickWeighedProbability;
+import static com.magmaguy.elitemobs.utils.WeightedProbability.pickWeighedProbability;
 
 public class EventLauncher {
 

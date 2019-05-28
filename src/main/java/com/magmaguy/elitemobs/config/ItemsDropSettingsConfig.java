@@ -1,18 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
@@ -29,17 +14,18 @@ public class ItemsDropSettingsConfig {
     public static final String ELITE_ITEM_FLAT_DROP_RATE = "EliteMob base percentual plugin item drop chance";
     public static final String ELITE_ITEM_TIER_DROP_RATE = "EliteMob plugin item percentual drop chance increase per tier";
     public static final String PROCEDURAL_ITEM_WEIGHT = "Procedurally generated item weight";
-    public static final String CUSTOM_ITEM_WEIGHT = "Custom item weight";
-    public static final String CUSTOM_DYNAMIC_ITEM_WEIGHT = "Custom dynamic item weight";
-    public static final String CUSTOM_STATIC_ITEM_WEIGHT = "Custom static item weight";
+    public static final String WEIGHED_ITEM_WEIGHT = "Weighed item weight";
+    public static final String FIXED_ITEM_WEIGHT = "Fixed item weight";
+    public static final String LIMITED_ITEM_WEIGHT = "Limited item weight";
+    public static final String SCALABLE_ITEM_WEIGHT = "Scalable item weight";
     public static final String SPAWNER_DEFAULT_LOOT_MULTIPLIER = "Drop multiplied default loot from elite mobs spawned in spawners";
     public static final String DEFAULT_LOOT_MULTIPLIER = "EliteMob default loot multiplier";
     public static final String MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER = "Maximum level of the Elite Mob default multiplier";
     public static final String EXPERIENCE_LOOT_MULTIPLIER = "EliteMob xp multiplier";
     public static final String MAXIMUM_LOOT_TIER = "Maximum loot tier (REQUIRES INCREASING SHARPNESS AND PROTECTION ENCHANTMENTS TO WORK PROPERLY, READ GITHUB WIKI!)";
-    public static final String ENABLE_CUSTOM_ENCHANTMENT_SYSTEM = "Enable custom echantment system (check the github wiki before changing)";
+    public static final String ENABLE_CUSTOM_ENCHANTMENT_SYSTEM = "Enable visual enchantment system (check the github wiki before changing)";
     public static final String ENCHANTMENT_NAME = "Enchantment name.";
-    public static final String ARROW_DAMAGE_NAME = ENCHANTMENT_NAME +"ARROW_DAMAGE";
+    public static final String ARROW_DAMAGE_NAME = ENCHANTMENT_NAME + "ARROW_DAMAGE";
     public static final String ARROW_FIRE_NAME = ENCHANTMENT_NAME + "ARROW_FIRE";
     public static final String ARROW_INFINITE_NAME = ENCHANTMENT_NAME + "ARROW_INFINITE";
     public static final String ARROW_KNOCKBACK_NAME = ENCHANTMENT_NAME + "ARROW_KNOCKBACK";
@@ -128,9 +114,10 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(ELITE_ITEM_FLAT_DROP_RATE, 025.00);
         configuration.addDefault(ELITE_ITEM_TIER_DROP_RATE, 005.00);
         configuration.addDefault(PROCEDURAL_ITEM_WEIGHT, 90);
-        configuration.addDefault(CUSTOM_ITEM_WEIGHT, 10);
-        configuration.addDefault(CUSTOM_DYNAMIC_ITEM_WEIGHT, 9);
-        configuration.addDefault(CUSTOM_STATIC_ITEM_WEIGHT, 1);
+        configuration.addDefault(WEIGHED_ITEM_WEIGHT, 1);
+        configuration.addDefault(FIXED_ITEM_WEIGHT, 10);
+        configuration.addDefault(LIMITED_ITEM_WEIGHT, 3);
+        configuration.addDefault(SCALABLE_ITEM_WEIGHT, 6);
         configuration.addDefault(SPAWNER_DEFAULT_LOOT_MULTIPLIER, true);
         configuration.addDefault(DEFAULT_LOOT_MULTIPLIER, 1.0);
         configuration.addDefault(MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER, 200);

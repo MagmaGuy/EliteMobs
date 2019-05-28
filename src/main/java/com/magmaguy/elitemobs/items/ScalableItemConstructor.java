@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
-import com.magmaguy.elitemobs.items.itemconstructor.ScalableItemObject;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,34 +14,21 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ScalableItemConstructor {
 
-    public static List<ScalableItemObject> dynamicallyScalableItems = new ArrayList<>();
-    public static HashMap<Integer, List<ScalableItemObject>> limitedScalableItems = new HashMap<>();
-    public static HashMap<Integer, List<ItemStack>> staticItems = new HashMap<>();
-
-    /*
-    Fully dynamic scalable items can be of any item rank all the way up to the maximum valid item tier.
-    As such, there is no sense in trying to sort this by tiers.
-     */
-    public static ItemStack assembleDynamicItems(int itemTier) {
-
-        ScalableItemObject scalableItemObject = dynamicallyScalableItems.get(ThreadLocalRandom.current().nextInt(dynamicallyScalableItems.size()));
-
-        return constructDynamicItem(itemTier, scalableItemObject);
-
+    public static ItemStack randomizeScalableItem(int itemTier) {
+        CustomItem customItem = CustomItem.getScalableItems().get(ThreadLocalRandom.current().nextInt(CustomItem.getScalableItems().size()));
+        return constructScalableItem(itemTier, customItem);
     }
 
-    public static ItemStack constructDynamicItem(int itemTier, ScalableItemObject scalableItemObject) {
-
-        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(scalableItemObject.enchantments, itemTier);
+    public static ItemStack constructScalableItem(int itemTier, CustomItem customItem) {
+        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments(), itemTier);
         return ItemConstructor.constructItem(
-                scalableItemObject.rawName,
-                scalableItemObject.material,
+                customItem.getName(),
+                customItem.getMaterial(),
                 newEnchantmentList,
-                scalableItemObject.customEnchantments,
-                scalableItemObject.potionEffects,
-                scalableItemObject.lore
+                customItem.getCustomEnchantments(),
+                customItem.getPotionEffects(),
+                customItem.getLore()
         );
-
     }
 
     private static HashMap<Enchantment, Integer> updateDynamicEnchantments(HashMap<Enchantment, Integer> enchantmentsList, int itemTier) {
@@ -113,32 +100,32 @@ public class ScalableItemConstructor {
     entry, and every other entry is just a nerfed version of that item. Basically an easy way to limit an item in a
     predictable way.
      */
-    public static ItemStack assembleLimitedItem(int itemTier) {
+    public static ItemStack randomizeLimitedItem(int itemTier) {
 
-        List<ScalableItemObject> localLootList = new ArrayList<>();
+        List<CustomItem> localLootList = new ArrayList<>();
 
         for (int i = 0; i < itemTier; i++)
-            if (limitedScalableItems.containsKey(i))
-                localLootList.addAll(limitedScalableItems.get(i));
+            if (CustomItem.getLimitedItem().containsKey(i))
+                localLootList.addAll(CustomItem.getLimitedItem().get(i));
 
 
-        ScalableItemObject scalableItemObject = localLootList.get(ThreadLocalRandom.current().nextInt(localLootList.size()) - 1);
+        CustomItem customItem = localLootList.get(ThreadLocalRandom.current().nextInt(localLootList.size()));
 
-        return constructLimitedItem(itemTier, scalableItemObject);
+        return constructLimitedItem(itemTier, customItem);
 
     }
 
-    public static ItemStack constructLimitedItem(int itemTier, ScalableItemObject scalableItemObject) {
+    public static ItemStack constructLimitedItem(int itemTier, CustomItem customItem) {
 
-        HashMap<Enchantment, Integer> newEnchantmentList = updateLimitedEnchantments(scalableItemObject.enchantments, itemTier);
+        HashMap<Enchantment, Integer> newEnchantmentList = updateLimitedEnchantments(customItem.getEnchantments(), itemTier);
 
         return ItemConstructor.constructItem(
-                scalableItemObject.rawName,
-                scalableItemObject.material,
+                customItem.getName(),
+                customItem.getMaterial(),
                 newEnchantmentList,
-                scalableItemObject.customEnchantments,
-                scalableItemObject.potionEffects,
-                scalableItemObject.lore
+                customItem.getCustomEnchantments(),
+                customItem.getPotionEffects(),
+                customItem.getLore()
         );
 
     }

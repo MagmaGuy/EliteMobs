@@ -1,18 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -24,9 +9,9 @@ import org.bukkit.configuration.Configuration;
  */
 public class ConfigValues {
 
-    public static Configuration defaultConfig, itemsCustomLootListConfig, mobPowerConfig, translationConfig,
+    public static Configuration defaultConfig, mobPowerConfig, translationConfig,
             itemsProceduralSettingsConfig, economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig,
-            validMobsConfig, validWorldsConfig, itemsUniqueConfig, mobCombatSettingsConfig, itemsDropSettingsConfig,
+            validMobsConfig, validWorldsConfig, mobCombatSettingsConfig, itemsDropSettingsConfig,
             playerMoneyData, playerRankData, playerMaxRankData, combatTagConfig, adventurersGuildConfig,
             customEnchantmentsConfig, npcConfig;
 
@@ -35,9 +20,6 @@ public class ConfigValues {
         CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
         defaultConfig = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
-
-        customConfigLoader = new CustomConfigLoader();
-        itemsCustomLootListConfig = customConfigLoader.getCustomConfig(ItemsCustomLootListConfig.CONFIG_NAME, true);
 
         customConfigLoader = new CustomConfigLoader();
         mobPowerConfig = customConfigLoader.getCustomConfig(MobPowersConfig.CONFIG_NAME);
@@ -76,9 +58,6 @@ public class ConfigValues {
         validWorldsConfig = customConfigLoader.getCustomConfig(ValidWorldsConfig.CONFIG_NAME);
 
         customConfigLoader = new CustomConfigLoader();
-        itemsUniqueConfig = customConfigLoader.getCustomConfig(ItemsUniqueConfig.CONFIG_NAME);
-
-        customConfigLoader = new CustomConfigLoader();
         mobCombatSettingsConfig = customConfigLoader.getCustomConfig(MobCombatSettingsConfig.CONFIG_NAME);
 
         customConfigLoader = new CustomConfigLoader();
@@ -98,16 +77,13 @@ public class ConfigValues {
 
     }
 
-    public static void intializeConfigurations() {
+    public static void initializeConfigurations() {
 
         DefaultConfig defaultConfig = new DefaultConfig();
         defaultConfig.loadConfiguration();
 
         MobPowersConfig mobPowersConfig = new MobPowersConfig();
         mobPowersConfig.initializeConfig();
-
-        ItemsCustomLootListConfig itemsCustomLootListConfig = new ItemsCustomLootListConfig();
-        itemsCustomLootListConfig.intializeConfig();
 
         ItemsCustomLootSettingsConfig itemsCustomLootSettingsConfig = new ItemsCustomLootSettingsConfig();
         itemsCustomLootSettingsConfig.initializeConfig();
@@ -135,9 +111,6 @@ public class ConfigValues {
 
         ValidMobsConfig validMobsConfig = new ValidMobsConfig();
         validMobsConfig.initializeConfig();
-
-        ItemsUniqueConfig itemsUniqueConfig = new ItemsUniqueConfig();
-        itemsUniqueConfig.initializeConfig();
 
         MobCombatSettingsConfig mobCombatSettingsConfig = new MobCombatSettingsConfig();
         mobCombatSettingsConfig.initializeConfig();

@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.config.MobPowersConfig;
 import com.magmaguy.elitemobs.mobpowers.MinorPower;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -27,7 +26,6 @@ public class AttackFreeze extends MinorPower implements Listener {
 
     @EventHandler
     public void attackFreeze(PlayerDamagedByEliteMobEvent event) {
-        Bukkit.getLogger().warning("Launching");
         AttackFreeze attackFreeze = (AttackFreeze) event.getEliteMobEntity().getPower(this);
         if (attackFreeze == null) return;
         if (attackFreeze.isCooldown()) return;

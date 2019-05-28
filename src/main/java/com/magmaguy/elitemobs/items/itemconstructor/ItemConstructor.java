@@ -15,61 +15,6 @@ import java.util.List;
 
 public class ItemConstructor {
 
-    /*
-    For custom and unique items
-     */
-    public static ItemStack constructItem(String rawName,
-                                          Material material,
-                                          HashMap<Enchantment, Integer> enchantments,
-                                          HashMap<String, Integer> customEnchantments,
-                                          List<String> potionEffects,
-                                          List<String> lore,
-                                          String dropType,
-                                          String scalabilityType) {
-        ItemStack itemStack;
-        ItemMeta itemMeta;
-
-        Material itemMaterial = MaterialGenerator.generateMaterial(material);
-
-        itemStack = ItemStackGenerator.generateItemStack(material);
-        itemMeta = itemStack.getItemMeta();
-
-        /*
-        Generate item enchantments
-        Note: This only applies enchantments up to a certain level, above that threshold item enchantments only exist
-        in the item lore and get interpreted by the combat system
-         */
-        if (!enchantments.isEmpty())
-            itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantments);
-
-        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore);
-
-        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-        itemMeta.setDisplayName(NameGenerator.generateName(rawName));
-
-        itemStack.setItemMeta(itemMeta);
-        ItemQualityColorizer.dropQualityColorizer(itemStack);
-
-        /*
-        Add item to relevant loot lists
-         */
-        DropWeightHandler.process(dropType, itemStack);
-
-        /*
-        Handle item scalability
-         */
-        ScalabilityAssigner.assign(itemStack, rawName, material, enchantments, customEnchantments, potionEffects, lore,
-                dropType, scalabilityType);
-
-        return itemStack;
-
-    }
-
-    /*
-    For scalable items
-     */
     public static ItemStack constructItem(String rawName,
                                           Material material,
                                           HashMap<Enchantment, Integer> enchantments,

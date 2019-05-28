@@ -3,9 +3,7 @@ package com.magmaguy.elitemobs.config.custombosses;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CustomBossConfigFields {
 
@@ -98,39 +96,38 @@ public class CustomBossConfigFields {
     /**
      * Generates config defaults to be used by CustomBossesConfig
      */
-    public Map<String, Object> generateConfigDefaults() {
-        Map<String, Object> configDefaults = new HashMap<>();
-        configDefaults.put("isEnabled", isEnabled);
-        configDefaults.put("entityType", entityType);
-        configDefaults.put("name", name);
-        configDefaults.put("level", level);
-        configDefaults.put("timeout", timeout);
-        configDefaults.put("isPersistent", isPersistent);
-        configDefaults.put("healthMultiplier", healthMultiplier);
-        configDefaults.put("damageMultiplier", damageMultiplier);
+    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
+        fileConfiguration.addDefault("isEnabled", isEnabled);
+        fileConfiguration.addDefault("entityType", entityType);
+        fileConfiguration.addDefault("name", name);
+        fileConfiguration.addDefault("level", level);
+        fileConfiguration.addDefault("timeout", timeout);
+        fileConfiguration.addDefault("isPersistent", isPersistent);
+        fileConfiguration.addDefault("healthMultiplier", healthMultiplier);
+        fileConfiguration.addDefault("damageMultiplier", damageMultiplier);
         if (helmet != null)
-            configDefaults.put("helmet", helmet.toString());
+            fileConfiguration.addDefault("helmet", helmet.toString());
         if (chestplate != null)
-            configDefaults.put("chestplate", chestplate.toString());
+            fileConfiguration.addDefault("chestplate", chestplate.toString());
         if (leggings != null)
-            configDefaults.put("leggings", leggings.toString());
+            fileConfiguration.addDefault("leggings", leggings.toString());
         if (boots != null)
-            configDefaults.put("boots", boots.toString());
+            fileConfiguration.addDefault("boots", boots.toString());
         if (mainHand != null)
-            configDefaults.put("mainHand", mainHand.toString());
+            fileConfiguration.addDefault("mainHand", mainHand.toString());
         if (offHand != null)
-            configDefaults.put("offHand", offHand.toString());
-        configDefaults.put("isBaby", isBaby);
-        configDefaults.put("powers", powers);
-        configDefaults.put("spawnMessage", spawnMessage);
-        configDefaults.put("deathMessage", deathMessage);
-        configDefaults.put("escapeMessage", escapeMessage);
-        configDefaults.put("locationMessage", locationMessage);
-        configDefaults.put("uniqueLootList", uniqueLootList);
-        configDefaults.put("dropsEliteMobsLoot", dropsEliteMobsLoot);
-        configDefaults.put("dropsVanillaLoot", dropsVanillaLoot);
-        configDefaults.put("trails", trails);
-        return configDefaults;
+            fileConfiguration.addDefault("offHand", offHand.toString());
+        fileConfiguration.addDefault("isBaby", isBaby);
+        fileConfiguration.addDefault("powers", powers);
+        fileConfiguration.addDefault("spawnMessage", spawnMessage);
+        fileConfiguration.addDefault("deathMessage", deathMessage);
+        fileConfiguration.addDefault("escapeMessage", escapeMessage);
+        fileConfiguration.addDefault("locationMessage", locationMessage);
+        fileConfiguration.addDefault("uniqueLootList", uniqueLootList);
+        fileConfiguration.addDefault("dropsEliteMobsLoot", dropsEliteMobsLoot);
+        fileConfiguration.addDefault("dropsVanillaLoot", dropsVanillaLoot);
+        fileConfiguration.addDefault("trails", trails);
+        return fileConfiguration;
     }
 
     /**

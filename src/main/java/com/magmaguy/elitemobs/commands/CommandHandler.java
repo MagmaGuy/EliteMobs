@@ -151,7 +151,7 @@ public class CommandHandler implements CommandExecutor {
             case "reload":
             case "restart":
                 if (permCheck(RELOAD_CONFIGS, commandSender))
-                    ReloadHandler.reloadCommand(commandSender, args);
+//                    ReloadHandler.reloadCommand(commandSender, args);
                 return true;
             case "killall":
             case "kill":

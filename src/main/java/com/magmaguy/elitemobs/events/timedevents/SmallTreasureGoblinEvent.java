@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.events.timedevents;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.EventWorldFilter;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import org.bukkit.Location;
 import org.bukkit.WorldType;
 import org.bukkit.entity.EntityType;
@@ -12,20 +14,22 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 public class SmallTreasureGoblinEvent extends EliteEvent implements Listener {
 
     public SmallTreasureGoblinEvent() {
-        super(EventWorldFilter.randomizeValidWorld(WorldType.NORMAL), EventType.KILL_BOSS, EntityType.ZOMBIE);
+        super(EventWorldFilter.getValidWorlds(WorldType.NORMAL), EventType.KILL_BOSS, EntityType.ZOMBIE);
     }
 
     @Override
     public void activateEvent(Location location) {
         unQueue();
+        super.setBossEntity(CustomBossEntity.constructCustomBoss("treasure_goblin.yml", location, DynamicBossLevelConstructor.findDynamicBossLevel()));
     }
 
     @Override
     public void spawnEventHandler(CreatureSpawnEvent event) {
         if (!isQueued()) return;
-        if (event.getEntity().equals(super.getEntityType()))
+        if (event.getEntity().getType().equals(super.getEntityType()))
             activateEvent(event.getLocation());
     }
+
 
     @Override
     public void bossDeathEventHandler(EliteMobDeathEvent event) {
@@ -34,7 +38,7 @@ public class SmallTreasureGoblinEvent extends EliteEvent implements Listener {
 
     @Override
     public void endEvent() {
-        this.completeEvent(getWorld());
+        this.completeEvent(getActiveWorld());
     }
 
     @Override

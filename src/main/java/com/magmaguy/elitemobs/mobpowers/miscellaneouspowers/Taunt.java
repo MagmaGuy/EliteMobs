@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobpowers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteMobDamageEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
@@ -53,10 +54,11 @@ public class Taunt extends MinorPower implements Listener {
      * @param event
      */
     @EventHandler
-    public void onDamaged(EntityDamageEvent event) {
+    public void onDamaged(EliteMobDamageEvent event) {
+        if (!event.getEliteMobEntity().hasPower(this)) return;
 
         if (!(event.getEntity() instanceof LivingEntity) ||
-                ((LivingEntity) event.getEntity()).getHealth() - event.getFinalDamage() <= 0 ||
+                ((LivingEntity) event.getEntity()).getHealth() - event.getEntityDamageEvent().getFinalDamage() <= 0 ||
                 !event.getEntity().isValid())
             return;
 
@@ -65,7 +67,7 @@ public class Taunt extends MinorPower implements Listener {
         if (eliteMobEntity.hasPower(this)) {
             Entity entity = event.getEntity();
 
-            if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
+            if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
                 nametagProcessor(entity, DAMAGED_BY_BOW_LIST);
             else
                 nametagProcessor(entity, GENERIC_DAMAGED_LIST);
@@ -80,6 +82,7 @@ public class Taunt extends MinorPower implements Listener {
      */
     @EventHandler
     public void onHit(PlayerDamagedByEliteMobEvent event) {
+        if (!event.getEliteMobEntity().hasPower(this)) return;
         nametagProcessor(event.getEliteMobEntity().getLivingEntity(), HIT_LIST);
     }
 

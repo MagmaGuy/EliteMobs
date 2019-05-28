@@ -15,6 +15,7 @@ import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.actionevents.MiningEvent;
 import com.magmaguy.elitemobs.events.actionevents.TreeChoppingEvent;
@@ -205,6 +206,7 @@ public class EventsRegistrer {
 
 
         //Initialize events
+        pluginManager.registerEvents(new EliteEvent.AbstractEliteEventEvents(), plugin);
         pluginManager.registerEvents(new DeadMoonEvent(), plugin);
         pluginManager.registerEvents(new SmallTreasureGoblinEvent(), plugin);
 

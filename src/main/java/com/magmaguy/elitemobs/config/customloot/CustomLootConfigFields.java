@@ -1,52 +1,45 @@
 package com.magmaguy.elitemobs.config.customloot;
 
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CustomLootConfigFields {
 
-    /**
-     * Used to get a CustomLootConfigFields from an item's filename
-     *
-     * @param fileName
-     * @return
-     */
-    public static CustomLootConfigFields getCustomLootConfigFields(String fileName) {
-        return new CustomLootConfigFields(CustomLootConfig.getCustomLootConfig(fileName));
+    private static List<CustomLootConfigFields> customLootConfigFields = new ArrayList<>();
+
+    public static List<CustomLootConfigFields> getCustomLootConfigFields() {
+        return customLootConfigFields;
     }
 
-    public enum ItemType {
-        CUSTOM,
-        UNIQUE
+    public static void addCustomLootConfigField(String fileName, CustomLootConfigFields customLootConfig) {
+        customLootConfigFields.add(customLootConfig);
     }
 
     private String fileName;
     private boolean isEnabled;
-    private Material material;
+    private String material;
     private String name;
     private List<String> lore;
     private List<String> enchantments;
     private List<String> potionEffects;
     private String dropWeight;
     private String scalability;
-    private ItemType itemType;
+    private String itemType;
 
 
     public CustomLootConfigFields(String fileName,
                                   boolean isEnabled,
-                                  Material material,
+                                  String material,
                                   String name,
                                   List<String> lore,
                                   List<String> enchantments,
                                   List<String> potionEffects,
                                   String dropWeight,
                                   String scalability,
-                                  ItemType itemType) {
+                                  String itemType) {
         this.fileName = fileName + ".yml";
         this.isEnabled = isEnabled;
         this.material = material;
@@ -62,33 +55,33 @@ public class CustomLootConfigFields {
     /**
      * Generates config defaults to be used by CustomBossesConfig
      */
-    public Map<String, Object> generateConfigDefaults() {
-        Map<String, Object> configDefaults = new HashMap<>();
-        configDefaults.put("isEnabled", isEnabled);
-        configDefaults.put("material", material);
-        configDefaults.put("name", name);
-        configDefaults.put("lore", lore);
-        configDefaults.put("enchantments", enchantments);
-        configDefaults.put("potionEffects", potionEffects);
-        configDefaults.put("dropWeight", dropWeight);
-        configDefaults.put("scalability", scalability);
-        configDefaults.put("itemType", itemType);
-        return configDefaults;
+    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
+        fileConfiguration.addDefault("isEnabled", isEnabled);
+        fileConfiguration.addDefault("material", material);
+        fileConfiguration.addDefault("name", name);
+        fileConfiguration.addDefault("lore", lore);
+        fileConfiguration.addDefault("enchantments", enchantments);
+        fileConfiguration.addDefault("potionEffects", potionEffects);
+        fileConfiguration.addDefault("dropWeight", dropWeight);
+        fileConfiguration.addDefault("scalability", scalability);
+        fileConfiguration.addDefault("itemType", itemType);
+        return fileConfiguration;
     }
 
-    public CustomLootConfigFields(FileConfiguration configuration) {
-        this.fileName = configuration.getName();
+    public CustomLootConfigFields(String fileName, FileConfiguration configuration) {
+        this.fileName = fileName;
+        Bukkit.getLogger().warning("Name: " + fileName);
         if (configuration.get("isEnabled") != null)
             this.isEnabled = configuration.getBoolean("isEnabled");
         else this.isEnabled = false;
-        this.material = Material.getMaterial(configuration.getString("material"));
+        this.material = configuration.getString("material");
         this.name = configuration.getString("name");
         this.lore = configuration.getStringList("lore");
         this.enchantments = configuration.getStringList("enchantments");
         this.potionEffects = configuration.getStringList("potionEffects");
         this.dropWeight = configuration.getString("dropWeight");
         this.scalability = configuration.getString("scalability");
-        this.itemType = ItemType.valueOf(configuration.getString("itemType"));
+        this.itemType = configuration.getString("itemType");
     }
 
     public String getFileName() {
@@ -99,7 +92,7 @@ public class CustomLootConfigFields {
         return isEnabled;
     }
 
-    public Material getMaterial() {
+    public String getMaterial() {
         return material;
     }
 
@@ -127,7 +120,7 @@ public class CustomLootConfigFields {
         return scalability;
     }
 
-    public ItemType getItemType() {
+    public String getItemType() {
         return itemType;
     }
 }

@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobpowers.ElitePower;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
@@ -20,11 +21,13 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomBossEntity extends EliteMobEntity implements Listener {
@@ -49,8 +52,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     }
 
     private CustomBossConfigFields customBossConfigFields;
-    private int hitCounter = 0;
-    private List<ItemStack> uniqueLootList = new ArrayList<>();
+    private HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
 
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields, EntityType entityType, Location location, int mobLevel, HashSet<ElitePower> elitePowers) {
         super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
@@ -65,7 +67,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 customBossConfigFields.getBoots(),
                 customBossConfigFields.getMainHand(),
                 customBossConfigFields.getOffHand());
-        if (customBossConfigFields.getTimeout() > 1)
+        if (customBossConfigFields.getTimeout() > 0)
             startEscapeMechanismDelay(customBossConfigFields.getTimeout());
         if (entityType.equals(EntityType.ZOMBIE))
             ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
@@ -74,6 +76,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         super.setPersistent(customBossConfigFields.getIsPersistent());
         if (customBossConfigFields.getTrails() != null) startBossTrails();
         if (customBossConfigFields.getLocationMessage() != null) sendLocation();
+        parseUniqueLootList();
     }
 
     private void startEscapeMechanismDelay(int timeout) {
@@ -172,21 +175,21 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
+    private void parseUniqueLootList() {
+        for (String entry : this.customBossConfigFields.getUniqueLootList()) {
+            try {
+                CustomItem customItem = CustomItem.getCustomItem(entry.split(":")[0]);
+                if (customItem == null)
+                    throw new Exception();
+                this.uniqueLootList.put(customItem, Double.parseDouble(entry.split(":")[1]));
+            } catch (Exception ex) {
+                Bukkit.getLogger().warning("[EliteMobs] Boss " + this.getName() + " has an invalid loot entry - " + entry + " - Skipping it!");
+            }
+        }
+    }
 
-    public List<ItemStack> getUniqueLootList() {
+    public HashMap<CustomItem, Double> getUniqueLootList() {
         return this.uniqueLootList;
-    }
-
-    public int getHitsCounter() {
-        return this.hitCounter;
-    }
-
-    public void resetHitsCounter() {
-        this.hitCounter = 0;
-    }
-
-    public void incrementHitsCounter() {
-        this.hitCounter++;
     }
 
     public void setEquipment(Material helmet, Material chestplate, Material leggings, Material boots, Material mainHand, Material offHand) {
@@ -205,10 +208,11 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
 
             //Do loot
-//            if (!customBossEntity.getUniqueLootList().isEmpty()) {
-//                for (ItemStack itemStack : customBossEntity.getUniqueLootList())
-//                    customBossEntity.getLivingEntity().getWorld().dropItem(customBossEntity.getLivingEntity().getLocation(), itemStack);
-//            }
+            if (!customBossEntity.getUniqueLootList().isEmpty())
+                for (CustomItem customItem : customBossEntity.getUniqueLootList().keySet())
+                    if (ThreadLocalRandom.current().nextDouble() < customBossEntity.getUniqueLootList().get(customItem))
+                        customBossEntity.getLivingEntity().getWorld().dropItem(customBossEntity.getLivingEntity().getLocation(),
+                                customItem.generateItemStack((int) customBossEntity.getTier() + 1));
 
             //Do death message
             String playersList = "";
@@ -233,7 +237,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     cancel();
                     return;
                 }
-                String locationString = getLivingEntity().getLocation().getX() + ", " + getLivingEntity().getLocation().getY() + ", " + +getLivingEntity().getLocation().getZ();
+                String locationString = (int) getLivingEntity().getLocation().getX() +
+                        ", " + (int) getLivingEntity().getLocation().getY() +
+                        ", " + (int) getLivingEntity().getLocation().getZ();
                 BossBar bossBar = Bukkit.createBossBar(ChatColorConverter.convert(customBossConfigFields.getLocationMessage().replace("$location", locationString)),
                         BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
                 bossBar.setProgress(getHealth() / getMaxHealth());

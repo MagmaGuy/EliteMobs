@@ -1,17 +1,13 @@
 package com.magmaguy.elitemobs.mobpowers.bosspowers;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.api.EliteMobDamageEvent;
 import com.magmaguy.elitemobs.mobpowers.BossPower;
-import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -26,38 +22,35 @@ public class SpiritWalk extends BossPower implements Listener {
         super("SpiritWalk", null);
     }
 
-    @EventHandler
-    public void onBossMobGotHit(EntityDamageEvent event) {
+    private int hitCounter = 0;
 
-        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-        if (eliteMobEntity == null) return;
-        if (!(eliteMobEntity instanceof CustomBossEntity)) return;
+    public void incrementHitCounter() {
+        hitCounter++;
+    }
 
-        CustomBossEntity bossMobEntity = (CustomBossEntity) eliteMobEntity;
+    public void resetHitsCounter() {
+        hitCounter = 0;
+    }
 
-        if (event.getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
-                event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)) {
-            initializeSpiritWalk(bossMobEntity.getLivingEntity());
-            bossMobEntity.incrementHitsCounter();
-        }
-
-        if (bossMobEntity.getHitsCounter() < 9) return;
-
-        initializeSpiritWalk(bossMobEntity.getLivingEntity());
-        bossMobEntity.resetHitsCounter();
-
+    public int getHitsCounter() {
+        return hitCounter;
     }
 
     @EventHandler
-    public void onBossMobHit(EntityDamageByEntityEvent event) {
+    public void onBossMobGotHit(EliteMobDamageEvent event) {
+        if (!event.getEliteMobEntity().hasPower(this)) return;
+        SpiritWalk spiritWalk = (SpiritWalk) event.getEliteMobEntity().getPower(this);
 
-        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(EntityFinder.getRealDamager(event));
-        if (eliteMobEntity == null) return;
-        if (!(eliteMobEntity instanceof CustomBossEntity)) return;
+        if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
+                event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)) {
+            initializeSpiritWalk(event.getEliteMobEntity().getLivingEntity());
+            spiritWalk.incrementHitCounter();
+        }
 
-        CustomBossEntity bossMobEntity = (CustomBossEntity) eliteMobEntity;
+        if (spiritWalk.getHitsCounter() < 9) return;
 
-        bossMobEntity.resetHitsCounter();
+        spiritWalk.resetHitsCounter();
+        initializeSpiritWalk(event.getEliteMobEntity().getLivingEntity());
 
     }
 
