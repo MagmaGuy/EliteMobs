@@ -18,6 +18,7 @@ public class TranslationConfig {
     public static final String NAME_HUSK = ELITE_MOB_NAME + "Husk";
     public static final String NAME_IRON_GOLEM = ELITE_MOB_NAME + "IronGolem";
     public static final String NAME_PIG_ZOMBIE = ELITE_MOB_NAME + "PigZombie";
+    public static final String NAME_PHANTOM = ELITE_MOB_NAME + "Phantom";
     public static final String NAME_POLAR_BEAR = ELITE_MOB_NAME + "PolarBear";
     public static final String NAME_SILVERFISH = ELITE_MOB_NAME + "Silverfish";
     public static final String NAME_SKELETON = ELITE_MOB_NAME + "Skeleton";
@@ -93,6 +94,7 @@ public class TranslationConfig {
         configuration.addDefault(NAME_HUSK, "Level $level Elite Husk");
         configuration.addDefault(NAME_IRON_GOLEM, "Level $level Elite Iron Golem");
         configuration.addDefault(NAME_PIG_ZOMBIE, "Level $level Elite Zombie Pigman");
+        configuration.addDefault(NAME_PHANTOM, "Level $level Elite Phantom");
         configuration.addDefault(NAME_POLAR_BEAR, "Level $level Elite Polar Bear");
         configuration.addDefault(NAME_SILVERFISH, "Level $level Elite Silverfish");
         configuration.addDefault(NAME_SKELETON, "Level $level Elite Skeleton");

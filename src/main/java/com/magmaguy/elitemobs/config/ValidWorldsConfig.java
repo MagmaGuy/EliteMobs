@@ -1,43 +1,61 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.config;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.io.File;
+import java.util.List;
 
 public class ValidWorldsConfig {
 
-    public static final String CONFIG_NAME = "ValidWorlds.yml";
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    private static FileConfiguration fileConfiguration;
+    private static File file;
 
-    public void initializeConfig() {
+    public static FileConfiguration getFileConfiguration() {
+        return fileConfiguration;
+    }
 
-        for (World world : Bukkit.getWorlds()) {
+    public static boolean getBoolean(String entry) {
+        return fileConfiguration.getBoolean(entry);
+    }
 
-            configuration.addDefault("Valid worlds." + world.getName(), true);
+    public static String getString(String entry) {
+        return fileConfiguration.getString(entry);
+    }
 
+    public static List<String> getStringList(String entry) {
+        return fileConfiguration.getStringList(entry);
+    }
+
+    public static int getInt(String entry) {
+        return fileConfiguration.getInt(entry);
+    }
+
+    public static double getDouble(String entry) {
+        return fileConfiguration.getDouble(entry);
+    }
+
+    public static File getFile() {
+        return file;
+    }
+
+    public static void saveConfig() {
+        try {
+            fileConfiguration.save(file);
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[EliteMobs] Error saving configuration " + file.getName() + "! Report this to the developer!");
         }
+    }
 
-        customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(configuration);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME);
+    public static void initializeConfig() {
+        file = EliteConfigGenerator.getFile("ValidWorlds.yml");
+        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
 
+        for (World world : Bukkit.getWorlds())
+            fileConfiguration.addDefault("Valid worlds." + world.getName(), true);
+
+        EliteConfigGenerator.saveDefaults(file, fileConfiguration);
     }
 
 }

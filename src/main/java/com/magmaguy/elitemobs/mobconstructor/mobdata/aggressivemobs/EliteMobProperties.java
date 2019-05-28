@@ -114,26 +114,28 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     }
 
     public static void initializeEliteMobValues() {
-        EliteBlaze eliteBlaze = new EliteBlaze();
-        EliteCaveSpider eliteCaveSpider = new EliteCaveSpider();
-        EliteCreeper eliteCreeper = new EliteCreeper();
-        EliteEnderman eliteEnderman = new EliteEnderman();
-        EliteIronGolem eliteIronGolem = new EliteIronGolem();
-        ElitePigZombie elitePigZombie = new ElitePigZombie();
-        EliteSilverfish eliteSilverfish = new EliteSilverfish();
-        EliteSkeleton eliteSkeleton = new EliteSkeleton();
-        EliteSpider eliteSpider = new EliteSpider();
-        EliteWitch eliteWitch = new EliteWitch();
-        EliteWitherSkeleton eliteWitherSkeleton = new EliteWitherSkeleton();
-        EliteZombie eliteZombie = new EliteZombie();
+        new EliteBlaze();
+        new EliteCaveSpider();
+        new EliteCreeper();
+        new EliteDrowned();
+        new EliteEnderman();
+        new EliteIronGolem();
+        new ElitePhantom();
+        new ElitePigZombie();
+        new EliteSilverfish();
+        new EliteSkeleton();
+        new EliteSpider();
+        new EliteWitch();
+        new EliteWitherSkeleton();
+        new EliteZombie();
 
-        EliteEndermite eliteEndermite = new EliteEndermite();
+        new EliteEndermite();
 
-        EliteStray eliteStray = new EliteStray();
-        EliteHusk eliteHusk = new EliteHusk();
-        EliteVex eliteVex = new EliteVex();
-        EliteVindicator eliteVindicator = new EliteVindicator();
-        ElitePolarBear elitePolarBear = new ElitePolarBear();
+        new EliteStray();
+        new EliteHusk();
+        new EliteVex();
+        new EliteVindicator();
+        new ElitePolarBear();
     }
 
     public static boolean isValidEliteMobType(EntityType entityType) {

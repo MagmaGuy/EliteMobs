@@ -19,11 +19,6 @@ public class DefaultConfig {
     public static final String PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS = "Make aggressive named mobs unable to become Elite Mobs";
     public static final String PREVENT_MOUNT_EXPLOIT = "Prevent Minecraft living entity mount exploit for Elite Mobs";
     public static final String STRICT_SPAWNING_RULES = "Strict spawning rules mode for better compatibility with other plugins";
-    public static final String PREVENT_TOWER_EXPLOIT = "Prevent tower exploit";
-    public static final String PREVENT_DARKROOM_EXPLOIT = "Prevent dark room spawner exploit";
-    public static final String PREVENT_LARGE_DARKROOM_EXPLOIT = "Prevent large dark room spawner exploit";
-    public static final String PREVENT_OTHER_EXPLOITS = "Prevent other exploits";
-    public static final String PREVENT_ENDERMAN_HEIGHT_EXPLOIT = "Prevent enderman height exploit";
     public static final String SKULL_SIGNATURE_ITEM = "Use a skull for signature item";
 
     public void loadConfiguration() {
@@ -40,11 +35,6 @@ public class DefaultConfig {
         configuration.addDefault(PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS, true);
         configuration.addDefault(STRICT_SPAWNING_RULES, false);
         configuration.addDefault(PREVENT_MOUNT_EXPLOIT, true);
-        configuration.addDefault(PREVENT_TOWER_EXPLOIT, true);
-        configuration.addDefault(PREVENT_DARKROOM_EXPLOIT, true);
-        configuration.addDefault(PREVENT_LARGE_DARKROOM_EXPLOIT, true);
-        configuration.addDefault(PREVENT_OTHER_EXPLOITS, true);
-        configuration.addDefault(PREVENT_ENDERMAN_HEIGHT_EXPLOIT, true);
         configuration.addDefault(SKULL_SIGNATURE_ITEM, true);
 
         configuration.options().copyDefaults(true);

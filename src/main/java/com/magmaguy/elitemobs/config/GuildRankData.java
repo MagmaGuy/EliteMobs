@@ -6,10 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.io.File;
 import java.util.List;
 
-/**
- * Created by MagmaGuy on 17/06/2017.
- */
-public class PlayerMoneyData {
+public class GuildRankData {
 
     private static FileConfiguration fileConfiguration;
     private static File file;
@@ -51,7 +48,7 @@ public class PlayerMoneyData {
     }
 
     public static void initializeConfig() {
-        file = EliteConfigGenerator.getFile("data", "playerMoneyData.yml");
+        file = EliteConfigGenerator.getFile("data", "playerGuildRank.yml");
         fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
     }
 

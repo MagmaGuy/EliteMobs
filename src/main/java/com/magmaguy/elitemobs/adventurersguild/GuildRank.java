@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.adventurersguild;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -98,45 +97,45 @@ public class GuildRank {
 
         switch (rank) {
             case 1:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_1));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_1));
             case 2:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_2));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_2));
             case 3:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_3));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_3));
             case 4:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_4));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_4));
             case 5:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_5));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_5));
             case 6:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_6));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_6));
             case 7:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_7));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_7));
             case 8:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_8));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_8));
             case 9:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_9));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_9));
             case 10:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_10));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_10));
             case 11:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_11));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_11));
             case 12:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_12));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_12));
             case 13:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_13));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_13));
             case 14:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_14));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_14));
             case 15:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_15));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_15));
             case 16:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_16));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_16));
             case 17:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_17));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_17));
             case 18:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_18));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_18));
             case 19:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_19));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_19));
             case 20:
-                return ChatColorConverter.convert(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_20));
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_20));
             default:
                 Bukkit.getLogger().warning("Warning: Tried to obtain a rank that does no exist. Report this to the dev! Rank: " + rank);
                 return "";

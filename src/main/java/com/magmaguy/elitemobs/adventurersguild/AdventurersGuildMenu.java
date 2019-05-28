@@ -369,7 +369,7 @@ public class AdventurersGuildMenu implements Listener {
                 difficultyMenu((Player) event.getWhoClicked());
                 Bukkit.broadcastMessage(ChatColorConverter.convert(
                         ((Player) event.getWhoClicked()).getDisplayName() + " has reached the " + rankNamer(selectedTier) + " &fguild rank!"));
-                if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
+                if (AdventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
                     event.getWhoClicked().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue((selectedTier - 10) * 2 + 20);
             }
         }
