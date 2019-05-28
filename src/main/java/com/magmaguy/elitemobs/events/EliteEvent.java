@@ -16,9 +16,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
-public class EliteEvent extends AbstractEliteEvent implements Listener {
+public class EliteEvent extends AbstractEliteEvent {
 
     private static HashSet<EliteEvent> activeEvents = new HashSet<>();
 
@@ -86,7 +87,8 @@ public class EliteEvent extends AbstractEliteEvent implements Listener {
         KILL_COUNT
     }
 
-    private World world;
+    private ArrayList<World> worlds;
+    private World activeWorld;
     private CustomBossEntity bossEntity;
     private boolean bossIsAlive = false;
     private EntityType entityType;
@@ -95,16 +97,16 @@ public class EliteEvent extends AbstractEliteEvent implements Listener {
     private String eventStartMessage;
     private String eventEndMessage;
 
-    public EliteEvent(World world, EventType eventType, EntityType entityType) {
-        this.world = world;
-        if (world == null) return;
+    public EliteEvent(ArrayList<World> worlds, EventType eventType, EntityType entityType) {
+        this.worlds = worlds;
+        if (worlds == null || worlds.isEmpty()) return;
         setEventType(eventType);
         setEntityType(entityType);
         addActiveEvent(this);
     }
 
-    public World getWorld() {
-        return this.world;
+    public World getActiveWorld() {
+        return this.activeWorld;
     }
 
     public CustomBossEntity getBossEntity() {
@@ -143,11 +145,11 @@ public class EliteEvent extends AbstractEliteEvent implements Listener {
     }
 
     public void setEventStartMessage(String eventStartMessage) {
-        this.eventEndMessage = eventStartMessage;
+        this.eventStartMessage = eventStartMessage;
     }
 
     public void sendEventStartMessage(World world) {
-        String sendString = ChatColorConverter.convert(this.eventStartMessage.replace("$world", world.getName().replace("_", " ")));
+        String sendString = ChatColorConverter.convert(this.eventStartMessage.replace("$activeWorld", world.getName().replace("_", " ")));
         if (ConfigValues.eventsConfig.getBoolean(EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY)) {
             for (Player player : Bukkit.getServer().getOnlinePlayers())
                 if (player.getWorld().equals(world))
@@ -173,26 +175,32 @@ public class EliteEvent extends AbstractEliteEvent implements Listener {
         this.isQueued = false;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onSpawn(CreatureSpawnEvent event) {
-        if (event.isCancelled()) return;
-        if (getActiveEvents().isEmpty()) return;
-        if (!EliteMobs.validWorldList.contains(event.getLocation().getWorld())) return;
-        if (!(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
-                event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)))
-            return;
-        for (EliteEvent eliteEvent : getActiveEvents())
-            eliteEvent.spawnEventHandler(event);
-    }
-
-    @EventHandler
-    public void onBossDeath(EliteMobDeathEvent event) {
-        if (getActiveEvents().isEmpty()) return;
-        for (EliteEvent eliteEvent : getActiveEvents())
-            if (!event.getEliteMobEntity().equals(eliteEvent.getBossEntity())) {
-                bossDeathEventHandler(event);
+    public static class AbstractEliteEventEvents implements Listener {
+        @EventHandler(priority = EventPriority.HIGH)
+        public void onSpawn(CreatureSpawnEvent event) {
+            if (event.isCancelled()) return;
+            if (getActiveEvents().isEmpty()) return;
+            if (!EliteMobs.validWorldList.contains(event.getLocation().getWorld())) return;
+            if (!(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
+                    event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)))
                 return;
+            for (EliteEvent eliteEvent : getActiveEvents()) {
+                if (eliteEvent.worlds.contains(event.getEntity().getWorld())) {
+                    eliteEvent.activeWorld = event.getEntity().getWorld();
+                    eliteEvent.spawnEventHandler(event);
+                }
             }
+        }
+
+        @EventHandler
+        public void onBossDeath(EliteMobDeathEvent event) {
+            if (getActiveEvents().isEmpty()) return;
+            for (EliteEvent eliteEvent : getActiveEvents())
+                if (!event.getEliteMobEntity().equals(eliteEvent.getBossEntity())) {
+                    eliteEvent.bossDeathEventHandler(event);
+                    return;
+                }
+        }
     }
 
 }

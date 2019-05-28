@@ -5,6 +5,7 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.elitemobs.commands.CommandHandler;
+import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
@@ -12,9 +13,8 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
-import com.magmaguy.elitemobs.items.CustomItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
-import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
@@ -53,14 +53,17 @@ public class EliteMobs extends JavaPlugin {
         CustomEnchantmentCache.initialize();
 
         //Load loot from config
-        ConfigValues.intializeConfigurations();
+        ConfigValues.initializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
+
 
         /*
         New config loading
          */
         CustomBossesConfig.initializeConfigurations();
         CustomLootConfig.initializeConfigurations();
+        CustomItem.initializeCustomItems();
+        AntiExploitConfig.initializeConfig();
 
         if (WORLDGUARD_IS_ENABLED)
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is enabled!");
@@ -75,13 +78,6 @@ public class EliteMobs extends JavaPlugin {
                     "version is probably not compatible with this EliteMobs version. Please contact the dev about this error.");
             VaultCompatibility.VAULT_ENABLED = false;
         }
-
-
-        //Parse loot
-        CustomItemConstructor superDrops = new CustomItemConstructor();
-        superDrops.superDropParser();
-
-        UniqueItemInitializer.initialize();
 
         //Hook up all listeners, some depend on config
         EventsRegistrer.registerEvents();
@@ -171,15 +167,6 @@ public class EliteMobs extends JavaPlugin {
 
         EntityTracker.shutdownPurger();
 
-        /*
-        todo: Flush lingering blocks
-         */
-
-
-        CustomItemConstructor.customItemList.clear();
-        CustomItemConstructor.staticCustomItemHashMap.clear();
-        CustomItemConstructor.dynamicRankedItemStacks.clear();
-        UniqueItemInitializer.uniqueItemsList.clear();
         validWorldList.clear();
 
         //save cached data
