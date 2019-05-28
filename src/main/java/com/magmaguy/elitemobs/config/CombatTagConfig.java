@@ -1,10 +1,11 @@
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.io.File;
+import java.util.List;
 
 public class CombatTagConfig {
-
-    public static final String CONFIG_NAME = "CombatTag.yml";
 
     public static final String ENABLE_COMBAT_TAG = "Enable combat tag";
     public static final String COMBAT_TAG_MESSAGE = "Combat tag message";
@@ -12,21 +13,34 @@ public class CombatTagConfig {
     public static final String ENABLE_TELEPORT_TIMER = "Enable adventurers guild teleport timer";
     public static final String TELEPORT_TIMER_DURATION = "Teleport timer duration";
 
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    private static FileConfiguration fileConfiguration;
 
-    public void initializeConfig(){
+    public static boolean getBoolean(String entry) {
+        return fileConfiguration.getBoolean(entry);
+    }
 
-        configuration.addDefault(ENABLE_COMBAT_TAG, true);
-        configuration.addDefault(COMBAT_TAG_MESSAGE, "&c[EliteMobs] Combat tag activated!");
-        configuration.addDefault(ENABLE_TELEPORT_TIMER, true);
-        configuration.addDefault(TELEPORT_TIMER_DURATION, 5);
+    public static String getString(String entry) {
+        return fileConfiguration.getString(entry);
+    }
 
-        customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(configuration);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME);
+    public static List<String> getStringList(String entry) {
+        return fileConfiguration.getStringList(entry);
+    }
 
+    public static int getInt(String entry) {
+        return fileConfiguration.getInt(entry);
+    }
+
+    public static void initializeConfig() {
+        File file = EliteConfigGenerator.getFile("CombatTag.yml");
+        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
+
+        fileConfiguration.addDefault(ENABLE_COMBAT_TAG, true);
+        fileConfiguration.addDefault(COMBAT_TAG_MESSAGE, "&c[EliteMobs] Combat tag activated!");
+        fileConfiguration.addDefault(ENABLE_TELEPORT_TIMER, true);
+        fileConfiguration.addDefault(TELEPORT_TIMER_DURATION, 5);
+
+        EliteConfigGenerator.saveDefaults(file, fileConfiguration);
     }
 
 }

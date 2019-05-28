@@ -15,8 +15,8 @@ public class SuperCow extends SuperMobProperties {
 
         this.defaultMaxHealth = 10;
 
-        this.isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_SUPERMOBS + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS);
+        this.isEnabled = ValidMobsConfig.getBoolean(ValidMobsConfig.VALID_SUPERMOBS + getEntityType().toString()) &&
+                ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS);
 
         if (this.isEnabled) {
             superMobTypeList.add(this.entityType);

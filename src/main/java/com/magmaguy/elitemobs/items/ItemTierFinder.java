@@ -222,6 +222,8 @@ public class ItemTierFinder {
                     return STONE_CHAIN_TIER + mainEnchantment;
                 if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
                     return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
+            case TRIDENT:
+                return DIAMOND_TIER + mainEnchantment;
             default:
                 return 0;
         }

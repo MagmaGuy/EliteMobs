@@ -1,10 +1,12 @@
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.configuration.Configuration;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.io.File;
+import java.util.List;
 
 public class AdventurersGuildConfig {
-
-    public static final String CONFIG_NAME = "AdventurersGuild.yml";
 
     public static final String ENABLE_ADVENTURERS_GUILD = "Enable adventurer's guild";
     public static final String ADD_MAX_HEALTH = "Add max health when unlocking higher guild ranks";
@@ -33,42 +35,76 @@ public class AdventurersGuildConfig {
     public static final String RANK_NAMES_19 = RANK_NAMES + "19";
     public static final String RANK_NAMES_20 = RANK_NAMES + "20";
 
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    private static FileConfiguration fileConfiguration;
+    private static File file;
 
-    public void initializeConfig() {
+    public static FileConfiguration getFileConfiguration() {
+        return fileConfiguration;
+    }
 
-        configuration.addDefault(ENABLE_ADVENTURERS_GUILD, true);
-        configuration.addDefault(ADD_MAX_HEALTH, true);
-        configuration.addDefault(GUILD_WORLD_NAME, "EliteMobs_adventurers_guild");
-        configuration.addDefault(GUILD_WORLD_LOCATION, "208.5,88,236.5,-80,0");
-        configuration.addDefault(AG_TELEPORT, true);
-        configuration.addDefault(RANK_NAMES_1, "&8Peaceful Villager");
-        configuration.addDefault(RANK_NAMES_2, "&8Commoner");
-        configuration.addDefault(RANK_NAMES_3, "&8Farmer");
-        configuration.addDefault(RANK_NAMES_4, "&8Bard");
-        configuration.addDefault(RANK_NAMES_5, "&8Barkeep");
-        configuration.addDefault(RANK_NAMES_6, "&8Blacksmith");
-        configuration.addDefault(RANK_NAMES_7, "&8Merchant");
-        configuration.addDefault(RANK_NAMES_8, "&8Wanderer");
-        configuration.addDefault(RANK_NAMES_9, "&8Ranger");
-        configuration.addDefault(RANK_NAMES_10, "&fCasual Adventurer");
-        configuration.addDefault(RANK_NAMES_11, "&fAdventurer");
-        configuration.addDefault(RANK_NAMES_12, "&fProfessional Adventurer");
-        configuration.addDefault(RANK_NAMES_13, "&2Elite Adventurer");
-        configuration.addDefault(RANK_NAMES_14, "&2Master Adventurer");
-        configuration.addDefault(RANK_NAMES_15, "&2Bloodhound");
-        configuration.addDefault(RANK_NAMES_16, "&1Slayer");
-        configuration.addDefault(RANK_NAMES_17, "&1Exterminator");
-        configuration.addDefault(RANK_NAMES_18, "&5&lElite Hunter");
-        configuration.addDefault(RANK_NAMES_19, "&5Hero");
-        configuration.addDefault(RANK_NAMES_20, "&6&l&oLegend");
+    public static boolean getBoolean(String entry) {
+        return fileConfiguration.getBoolean(entry);
+    }
 
-        configuration.options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(configuration);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME);
+    public static String getString(String entry) {
+        return fileConfiguration.getString(entry);
+    }
 
+    public static List<String> getStringList(String entry) {
+        return fileConfiguration.getStringList(entry);
+    }
+
+    public static int getInt(String entry) {
+        return fileConfiguration.getInt(entry);
+    }
+
+    public static double getDouble(String entry) {
+        return fileConfiguration.getDouble(entry);
+    }
+
+    public static File getFile() {
+        return file;
+    }
+
+    public static void saveConfig() {
+        try {
+            fileConfiguration.save(file);
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[EliteMobs] Error saving configuration " + file.getName() + "! Report this to the developer!");
+        }
+    }
+
+    public static void initializeConfig() {
+        file = EliteConfigGenerator.getFile("AdventurersGuild.yml");
+        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
+
+        fileConfiguration.addDefault(ENABLE_ADVENTURERS_GUILD, true);
+        fileConfiguration.addDefault(ADD_MAX_HEALTH, true);
+        fileConfiguration.addDefault(GUILD_WORLD_NAME, "elitemobs_adventurers_guild");
+        fileConfiguration.addDefault(GUILD_WORLD_LOCATION, "208.5,88,236.5,-80,0");
+        fileConfiguration.addDefault(AG_TELEPORT, true);
+        fileConfiguration.addDefault(RANK_NAMES_1, "&8Peaceful Villager");
+        fileConfiguration.addDefault(RANK_NAMES_2, "&8Commoner");
+        fileConfiguration.addDefault(RANK_NAMES_3, "&8Farmer");
+        fileConfiguration.addDefault(RANK_NAMES_4, "&8Bard");
+        fileConfiguration.addDefault(RANK_NAMES_5, "&8Barkeep");
+        fileConfiguration.addDefault(RANK_NAMES_6, "&8Blacksmith");
+        fileConfiguration.addDefault(RANK_NAMES_7, "&8Merchant");
+        fileConfiguration.addDefault(RANK_NAMES_8, "&8Wanderer");
+        fileConfiguration.addDefault(RANK_NAMES_9, "&8Ranger");
+        fileConfiguration.addDefault(RANK_NAMES_10, "&fCasual Adventurer");
+        fileConfiguration.addDefault(RANK_NAMES_11, "&fAdventurer");
+        fileConfiguration.addDefault(RANK_NAMES_12, "&fProfessional Adventurer");
+        fileConfiguration.addDefault(RANK_NAMES_13, "&2Elite Adventurer");
+        fileConfiguration.addDefault(RANK_NAMES_14, "&2Master Adventurer");
+        fileConfiguration.addDefault(RANK_NAMES_15, "&2Bloodhound");
+        fileConfiguration.addDefault(RANK_NAMES_16, "&1Slayer");
+        fileConfiguration.addDefault(RANK_NAMES_17, "&1Exterminator");
+        fileConfiguration.addDefault(RANK_NAMES_18, "&5&lElite Hunter");
+        fileConfiguration.addDefault(RANK_NAMES_19, "&5Hero");
+        fileConfiguration.addDefault(RANK_NAMES_20, "&6&l&oLegend");
+
+        EliteConfigGenerator.saveDefaults(file, fileConfiguration);
     }
 
 }

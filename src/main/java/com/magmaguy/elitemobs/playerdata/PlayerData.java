@@ -96,37 +96,25 @@ public class PlayerData {
 
     private static void initializeCurrency() {
 
-        PlayerMoneyData playerMoneyData = new PlayerMoneyData();
-
-        for (String string : playerMoneyData.configuration.getKeys(true)) {
-
-            playerCurrency.put(UUID.fromString(string), ConfigValues.playerMoneyData.getDouble(string));
-
-        }
+        for (String string : PlayerMoneyData.getFileConfiguration().getKeys(true))
+            playerCurrency.put(UUID.fromString(string), PlayerMoneyData.getDouble(string));
 
     }
 
     private static void saveCurrency() {
 
-        PlayerMoneyData playerMoneyData = new PlayerMoneyData();
+        for (UUID uuid : playerCurrency.keySet())
+            PlayerMoneyData.getFileConfiguration().set(uuid.toString(), playerCurrency.get(uuid));
 
-        for (UUID uuid : playerCurrency.keySet()) {
-
-            playerMoneyData.configuration.set(uuid.toString(), playerCurrency.get(uuid));
-
-        }
-
-        playerMoneyData.customConfigLoader.saveCustomConfig(PlayerMoneyData.CONFIG_NAME, true);
-
+        PlayerMoneyData.saveConfig();
         playerCurrencyChanged = false;
-
     }
 
     private static void initializeMaxGuildRank() {
 
         PlayerMaxGuildRank playerMaxGuildRankClass = new PlayerMaxGuildRank();
 
-        for (String string : playerMaxGuildRankClass.configuration.getKeys(true)){
+        for (String string : playerMaxGuildRankClass.configuration.getKeys(true)) {
 
             playerMaxGuildRank.put(UUID.fromString(string), playerMaxGuildRankClass.configuration.getInt(string));
 
@@ -151,31 +139,16 @@ public class PlayerData {
     }
 
     private static void initializeSelectedGuildRank() {
-
-        PlayerGuildRank playerGuildRankClass = new PlayerGuildRank();
-
-        for (String string : playerGuildRankClass.configuration.getKeys(true)){
-
-            playerSelectedGuildRank.put(UUID.fromString(string), playerGuildRankClass.configuration.getInt(string));
-
-        }
-
+        for (String string : GuildRankData.getFileConfiguration().getKeys(true))
+            playerSelectedGuildRank.put(UUID.fromString(string), GuildRankData.getInt(string));
     }
 
     private static void saveSelectedGuildRank() {
+        for (UUID uuid : playerSelectedGuildRank.keySet())
+            GuildRankData.getFileConfiguration().set(uuid.toString(), playerSelectedGuildRank.get(uuid));
 
-        PlayerGuildRank playerGuildRankClass = new PlayerGuildRank();
-
-        for (UUID uuid : playerSelectedGuildRank.keySet()) {
-
-            playerGuildRankClass.configuration.set(uuid.toString(), playerSelectedGuildRank.get(uuid));
-
-        }
-
-        playerGuildRankClass.customConfigLoader.saveCustomConfig(PlayerGuildRank.CONFIG_NAME, true);
-
+        GuildRankData.saveConfig();
         playerSelectedGuildRankChanged = false;
-
     }
 
 }

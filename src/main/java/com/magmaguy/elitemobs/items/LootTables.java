@@ -154,7 +154,6 @@ public class LootTables implements Listener {
     }
 
     private static Item dropProcedurallyGeneratedItem(int tierLevel, EliteMobEntity eliteMobEntity) {
-        Bukkit.getLogger().warning("Running procedural");
 
         ItemStack randomLoot = ItemConstructor.constructItem(tierLevel, eliteMobEntity);
         return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(), randomLoot);
@@ -162,7 +161,6 @@ public class LootTables implements Listener {
     }
 
     private static Item dropScalableItem(EliteMobEntity eliteMobEntity, int itemTier) {
-        Bukkit.getLogger().warning("Running scalable");
 
         return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
                 ScalableItemConstructor.randomizeScalableItem(itemTier));
@@ -170,7 +168,6 @@ public class LootTables implements Listener {
     }
 
     private static Item dropLimitedItem(EliteMobEntity eliteMobEntity, int itemTier) {
-        Bukkit.getLogger().warning("Running limited");
 
         return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
                 ScalableItemConstructor.randomizeLimitedItem(itemTier));
@@ -178,7 +175,6 @@ public class LootTables implements Listener {
     }
 
     private static Item dropFixedItem(EliteMobEntity eliteMobEntity, int itemTier) {
-        Bukkit.getLogger().warning("Running fixed");
 
         return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
                 CustomItem.getFixedItems().get(itemTier).get(ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size())).generateDefaultsItemStack());

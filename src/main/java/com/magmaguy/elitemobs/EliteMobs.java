@@ -5,10 +5,7 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.elitemobs.commands.CommandHandler;
-import com.magmaguy.elitemobs.config.AntiExploitConfig;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
@@ -60,10 +57,18 @@ public class EliteMobs extends JavaPlugin {
         /*
         New config loading
          */
-        CustomBossesConfig.initializeConfigurations();
-        CustomLootConfig.initializeConfigurations();
+        CustomEnchantmentsConfig.initializeConfig();
+        AntiExploitConfig.initializeConfig();
+        CombatTagConfig.initializeConfig();
+        GuildRankData.initializeConfig();
+        PlayerMoneyData.initializeConfig();
+        CustomBossesConfig.initializeConfigs();
+        CustomLootConfig.initializeConfigs();
         CustomItem.initializeCustomItems();
         AntiExploitConfig.initializeConfig();
+        AdventurersGuildConfig.initializeConfig();
+        ValidWorldsConfig.initializeConfig();
+        ValidMobsConfig.initializeConfig();
 
         if (WORLDGUARD_IS_ENABLED)
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is enabled!");
@@ -180,7 +185,7 @@ public class EliteMobs extends JavaPlugin {
 
     public static void worldScanner() {
         for (World world : Bukkit.getWorlds())
-            if (ConfigValues.validWorldsConfig.getBoolean("Valid worlds." + world.getName()))
+            if (ValidWorldsConfig.getBoolean("Valid worlds." + world.getName()))
                 validWorldList.add(world);
     }
 
@@ -194,8 +199,8 @@ public class EliteMobs extends JavaPlugin {
         new PotionEffectApplier().runTaskTimer(this, 20, 20 * 5);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_POWER_SCOREBOARDS))
             new ScoreboardUpdater().runTaskTimer(this, 20, 20);
-        if (ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.CHICKEN) &&
+        if (ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
+                ValidMobsConfig.getBoolean(ValidMobsConfig.CHICKEN) &&
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
     }
