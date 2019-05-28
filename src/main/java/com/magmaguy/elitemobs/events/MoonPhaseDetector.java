@@ -20,7 +20,7 @@ import org.bukkit.World;
 
 public class MoonPhaseDetector {
 
-    public static moonPhase detectMoonPhase(World eventWorld) {
+    public static MoonPhase detectMoonPhase(World eventWorld) {
 
         int days = (int) eventWorld.getFullTime() / 24000;
         int phase = days % 8;
@@ -28,21 +28,21 @@ public class MoonPhaseDetector {
         switch (phase) {
 
             case 0:
-                return moonPhase.FULL_MOON;
+                return MoonPhase.FULL_MOON;
             case 1:
-                return moonPhase.WANING_GIBBOUS;
+                return MoonPhase.WANING_GIBBOUS;
             case 2:
-                return moonPhase.LAST_QUARTER;
+                return MoonPhase.LAST_QUARTER;
             case 3:
-                return moonPhase.WANING_CRESCENT;
+                return MoonPhase.WANING_CRESCENT;
             case 4:
-                return moonPhase.NEW_MOON;
+                return MoonPhase.NEW_MOON;
             case 5:
-                return moonPhase.WAXING_CRESCENT;
+                return MoonPhase.WAXING_CRESCENT;
             case 6:
-                return moonPhase.FIRST_QUARTER;
+                return MoonPhase.FIRST_QUARTER;
             case 7:
-                return moonPhase.WAXING_GIBBOUS;
+                return MoonPhase.WAXING_GIBBOUS;
             default:
                 Bukkit.getLogger().info("Unhandled moon phase.");
                 return null;
@@ -51,7 +51,7 @@ public class MoonPhaseDetector {
 
     }
 
-    public enum moonPhase {
+    public enum MoonPhase {
 
         FULL_MOON,
         WANING_GIBBOUS,

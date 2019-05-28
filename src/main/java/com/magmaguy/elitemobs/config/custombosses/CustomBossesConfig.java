@@ -57,7 +57,6 @@ public class CustomBossesConfig {
 
         //Check if all the defaults exist
         for (File file : (new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/custombosses")).listFiles()) {
-            Bukkit.getLogger().warning("File: " + file.getName());
             boolean isPremade = false;
             for (CustomBossConfigFields customBossConfigFields : customBossConfigFieldsList) {
                 if (file.getName().equalsIgnoreCase(customBossConfigFields.getFileName())) {
@@ -105,7 +104,7 @@ public class CustomBossesConfig {
             }
 
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        fileConfiguration.addDefaults(customBossConfigFields.generateConfigDefaults());
+        fileConfiguration.addDefaults(customBossConfigFields.generateConfigDefaults(fileConfiguration));
         fileConfiguration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(fileConfiguration);
 
@@ -128,8 +127,9 @@ public class CustomBossesConfig {
      */
     private static FileConfiguration initializeConfiguration(File file) {
         //TODO: add actual checks of what people are putting in here
-        FileConfiguration configuration = YamlConfiguration.loadConfiguration(file);
-        return configuration;
+        FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
+        customBossConfigList.put(file.getName(), fileConfiguration);
+        return fileConfiguration;
     }
 
 }

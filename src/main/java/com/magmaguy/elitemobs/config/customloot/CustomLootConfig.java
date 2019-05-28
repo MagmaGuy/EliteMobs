@@ -13,25 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class CustomLootConfig {
-
-    private static HashMap<String, FileConfiguration> customItemsConfigList = new HashMap<>();
-
-    public static HashMap<String, FileConfiguration> getCustomItemsConfigList() {
-        return customItemsConfigList;
-    }
-
-    public static FileConfiguration getCustomLootConfig(String fileName) {
-        return customItemsConfigList.get(fileName);
-    }
-
-    private static ArrayList<CustomLootConfigFields> initializedCustomLootConfigFieldsList = new ArrayList<>();
-
-    public static ArrayList<CustomLootConfigFields> getInitializedCustomLootConfigFieldsList() {
-        return initializedCustomLootConfigFieldsList;
-    }
 
     private static ArrayList<CustomLootConfigFields> customLootConfigFieldsList = new ArrayList<>(Arrays.asList(
             new BerserkerCharmConfig(),
@@ -65,12 +48,11 @@ public class CustomLootConfig {
 
         //Check if all the defaults exist
         for (File file : (new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/customitems")).listFiles()) {
-            Bukkit.getLogger().warning("File: " + file.getName());
             boolean isPremade = false;
             for (CustomLootConfigFields customLootConfigFields : customLootConfigFieldsList) {
                 if (file.getName().equalsIgnoreCase(customLootConfigFields.getFileName())) {
                     customLootConfigFieldsList.remove(customLootConfigFields);
-                    initializeConfiguration(customLootConfigFields);
+                    initializeConfiguration(file.getName(), customLootConfigFields);
                     isPremade = true;
                     break;
                 }
@@ -90,7 +72,7 @@ public class CustomLootConfig {
      */
     private static void generateFreshConfigurations() {
         for (CustomLootConfigFields customLootConfigFields : customLootConfigFieldsList)
-            customItemsConfigList.put(customLootConfigFields.getFileName(), initializeConfiguration(customLootConfigFields));
+            initializeConfiguration(customLootConfigFields.getFileName(), customLootConfigFields);
     }
 
     /**
@@ -99,7 +81,7 @@ public class CustomLootConfig {
      * @param customLootConfigFields
      * @return
      */
-    private static FileConfiguration initializeConfiguration(CustomLootConfigFields customLootConfigFields) {
+    private static FileConfiguration initializeConfiguration(String fileName, CustomLootConfigFields customLootConfigFields) {
 
         File file = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/customitems", customLootConfigFields.getFileName());
 
@@ -112,7 +94,7 @@ public class CustomLootConfig {
             }
 
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        fileConfiguration.addDefaults(customLootConfigFields.generateConfigDefaults());
+        fileConfiguration.addDefaults(customLootConfigFields.generateConfigDefaults(fileConfiguration));
         fileConfiguration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(fileConfiguration);
 
@@ -122,7 +104,7 @@ public class CustomLootConfig {
             e.printStackTrace();
         }
 
-        customItemsConfigList.put(file.getName(), fileConfiguration);
+        CustomLootConfigFields.addCustomLootConfigField(fileName, customLootConfigFields);
 
         return fileConfiguration;
 
@@ -134,9 +116,9 @@ public class CustomLootConfig {
      * @return
      */
     private static FileConfiguration initializeConfiguration(File file) {
-        //TODO: add actual checks of what people are putting in here
-        FileConfiguration configuration = YamlConfiguration.loadConfiguration(file);
-        return configuration;
+        FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
+        CustomLootConfigFields.addCustomLootConfigField(file.getName(), new CustomLootConfigFields(file.getName(), fileConfiguration));
+        return fileConfiguration;
     }
 
 

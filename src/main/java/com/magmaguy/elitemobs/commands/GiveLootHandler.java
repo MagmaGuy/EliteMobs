@@ -1,13 +1,11 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.ThreadLocalRandom;
-
-import static com.magmaguy.elitemobs.items.CustomItemConstructor.customItemList;
 
 public class GiveLootHandler {
 
@@ -18,10 +16,7 @@ public class GiveLootHandler {
             Player receiver = Bukkit.getServer().getPlayer(args[1]);
 
             if (args[2].equalsIgnoreCase("random") || args[2].equalsIgnoreCase("r")) {
-
-                int index = ThreadLocalRandom.current().nextInt(customItemList.size());
-                ItemStack itemStack = new ItemStack(customItemList.get(index));
-                receiver.getInventory().addItem(itemStack);
+                receiver.getInventory().addItem(CustomItem.getCustomItemStackList().get(ThreadLocalRandom.current().nextInt(CustomItem.getCustomItemStackList().size())));
 
             } else
                 GetLootCommandHandler.getLoot(receiver, args[2]);

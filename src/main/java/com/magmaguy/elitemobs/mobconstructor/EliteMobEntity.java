@@ -38,8 +38,8 @@ public class EliteMobEntity {
     Note that a lot of values here are defined by EliteMobProperties.java
      */
     private LivingEntity livingEntity;
-    private int eliteMobLevel;
-    private double eliteMobTier;
+    private int eliteLevel;
+    private double eliteTier;
     private double maxHealth;
     private double health;
     private String name;
@@ -60,7 +60,7 @@ public class EliteMobEntity {
      */
     private boolean hasCustomPowers = false;
     private boolean isPersistent = true;
-    private boolean hasNormalLoot = true;
+    private boolean hasEliteLoot = true;
     private CreatureSpawnEvent.SpawnReason spawnReason;
 
     private HashSet<Player> damagers = new HashSet<>();
@@ -93,9 +93,9 @@ public class EliteMobEntity {
      * This is the generic constructor used in most instances of natural elite mob generation
      *
      * @param livingEntity  Minecraft entity associated to this elite mob
-     * @param eliteMobLevel Level of the mob, can be modified during runtime. Dynamically assigned.
+     * @param eliteLevel Level of the mob, can be modified during runtime. Dynamically assigned.
      */
-    public EliteMobEntity(LivingEntity livingEntity, int eliteMobLevel, CreatureSpawnEvent.SpawnReason spawnReason) {
+    public EliteMobEntity(LivingEntity livingEntity, int eliteLevel, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         /*
         Run a WorldGuard check to see if the entity is allowed to get converted at this location
@@ -109,8 +109,8 @@ public class EliteMobEntity {
         /*
         Register level, this is variable as per stacking rules
          */
-        setEliteMobLevel(eliteMobLevel);
-        eliteMobTier = MobTierCalculator.findMobTier(eliteMobLevel);
+        setEliteLevel(eliteLevel);
+        eliteTier = MobTierCalculator.findMobTier(eliteLevel);
         /*
         Sets the spawn reason
          */
@@ -155,11 +155,11 @@ public class EliteMobEntity {
      *
      * @param entityType    type of mob that this entity is slated to become
      * @param location      location at which the elite mob will spawn
-     * @param eliteMobLevel boss mob level, should be automatically generated based on the highest player tier online
+     * @param eliteLevel boss mob level, should be automatically generated based on the highest player tier online
      * @param name          the name for this boss mob, overrides the usual elite mob name format
      * @see com.magmaguy.elitemobs.custombosses.CustomBossEntity
      */
-    public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, String name, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
+    public EliteMobEntity(EntityType entityType, Location location, int eliteLevel, String name, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         /*
         Run a WorldGuard check to see if the entity is allowed to get converted at this location
@@ -173,8 +173,8 @@ public class EliteMobEntity {
         /*
         Register level, this is variable as per stacking rules
          */
-        setEliteMobLevel(eliteMobLevel);
-        eliteMobTier = MobTierCalculator.findMobTier(eliteMobLevel);
+        setEliteLevel(eliteLevel);
+        eliteTier = MobTierCalculator.findMobTier(eliteLevel);
         /*
         Sets the spawn reason
          */
@@ -221,10 +221,10 @@ public class EliteMobEntity {
      *
      * @param entityType    Type of entity to be spawned
      * @param location      Location at which the entity will spawn
-     * @param eliteMobLevel Level of the Elite Mob
+     * @param eliteLevel Level of the Elite Mob
      * @param mobPowers     HashSet of ElitePower that the entity will have (can be empty)
      */
-    public EliteMobEntity(EntityType entityType, Location location, int eliteMobLevel, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
+    public EliteMobEntity(EntityType entityType, Location location, int eliteLevel, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
 
         /*
         Run a WorldGuard check to see if the entity is allowed to get converted at this location
@@ -238,8 +238,8 @@ public class EliteMobEntity {
         /*
         Register level, this is variable as per stacking rules
          */
-        setEliteMobLevel(eliteMobLevel);
-        eliteMobTier = MobTierCalculator.findMobTier(eliteMobLevel);
+        setEliteLevel(eliteLevel);
+        eliteTier = MobTierCalculator.findMobTier(eliteLevel);
         /*
         Sets the spawn reason
          */
@@ -308,7 +308,7 @@ public class EliteMobEntity {
     private void setName(EliteMobProperties eliteMobProperties) {
         this.name = ChatColorConverter.convert(
                 eliteMobProperties.getName().replace(
-                        "$level", eliteMobLevel + ""));
+                        "$level", eliteLevel + ""));
         livingEntity.setCustomName(this.name);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
             livingEntity.setCustomNameVisible(true);
@@ -331,10 +331,10 @@ public class EliteMobEntity {
      *
      * @param newLevel Level of the Elite Mob
      */
-    private void setEliteMobLevel(int newLevel) {
+    private void setEliteLevel(int newLevel) {
         if (newLevel < 1)
             newLevel = 1;
-        this.eliteMobLevel = newLevel;
+        this.eliteLevel = newLevel;
     }
 
     /**
@@ -344,7 +344,7 @@ public class EliteMobEntity {
      */
     private void setMaxHealth() {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
-        this.maxHealth = (eliteMobLevel * CombatSystem.PER_LEVEL_POWER_INCREASE * this.defaultMaxHealth + this.defaultMaxHealth);
+        this.maxHealth = (eliteLevel * CombatSystem.PER_LEVEL_POWER_INCREASE * this.defaultMaxHealth + this.defaultMaxHealth);
         this.health = this.maxHealth;
         double vanillaValue = maxHealth > 2048 ? 2048 : maxHealth;
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(vanillaValue);
@@ -382,56 +382,56 @@ public class EliteMobEntity {
         livingEntity.getEquipment().setChestplate(new ItemStack(Material.AIR));
         livingEntity.getEquipment().setHelmet(new ItemStack(Material.AIR));
 
-        if (eliteMobLevel >= 12)
+        if (eliteLevel >= 12)
             if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS))
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
 
-        if (eliteMobLevel >= 14)
+        if (eliteLevel >= 14)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
 
-        if (eliteMobLevel >= 16)
+        if (eliteLevel >= 16)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
 
-        if (eliteMobLevel >= 18)
+        if (eliteLevel >= 18)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
 
-        if (eliteMobLevel >= 20)
+        if (eliteLevel >= 20)
             if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS))
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
 
-        if (eliteMobLevel >= 22)
+        if (eliteLevel >= 22)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
 
-        if (eliteMobLevel >= 24)
+        if (eliteLevel >= 24)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
 
-        if (eliteMobLevel >= 26)
+        if (eliteLevel >= 26)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
 
-        if (eliteMobLevel >= 28)
+        if (eliteLevel >= 28)
             if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS))
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
 
-        if (eliteMobLevel >= 30)
+        if (eliteLevel >= 30)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
 
-        if (eliteMobLevel >= 32)
+        if (eliteLevel >= 32)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
 
-        if (eliteMobLevel >= 34)
+        if (eliteLevel >= 34)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
 
-        if (eliteMobLevel >= 36)
+        if (eliteLevel >= 36)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 
-        if (eliteMobLevel >= 38)
+        if (eliteLevel >= 38)
             if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS))
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 
-        if (eliteMobLevel >= 40)
+        if (eliteLevel >= 40)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
 
-        if (eliteMobLevel >= 42)
+        if (eliteLevel >= 42)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 
     }
@@ -445,21 +445,21 @@ public class EliteMobEntity {
     private void randomizePowers(EliteMobProperties eliteMobProperties) {
 
         if (hasCustomPowers) return;
-        if (eliteMobTier < 1) return;
+        if (eliteTier < 1) return;
 
         int availableDefensivePowers = 0;
         int availableOffensivePowers = 0;
         int availableMiscellaneousPowers = 0;
         int availableMajorPowers = 0;
 
-        if (eliteMobTier >= 1) availableDefensivePowers = 1;
-        if (eliteMobTier >= 2) availableOffensivePowers = 1;
-        if (eliteMobTier >= 3) availableMiscellaneousPowers = 1;
-        if (eliteMobTier >= 4) availableMajorPowers = 1;
-        if (eliteMobTier >= 5) availableDefensivePowers = 2;
-        if (eliteMobTier >= 6) availableOffensivePowers = 2;
-        if (eliteMobTier >= 7) availableMiscellaneousPowers = 2;
-        if (eliteMobTier >= 8) availableMajorPowers = 2;
+        if (eliteTier >= 1) availableDefensivePowers = 1;
+        if (eliteTier >= 2) availableOffensivePowers = 1;
+        if (eliteTier >= 3) availableMiscellaneousPowers = 1;
+        if (eliteTier >= 4) availableMajorPowers = 1;
+        if (eliteTier >= 5) availableDefensivePowers = 2;
+        if (eliteTier >= 6) availableOffensivePowers = 2;
+        if (eliteTier >= 7) availableMiscellaneousPowers = 2;
+        if (eliteTier >= 8) availableMajorPowers = 2;
 
         //apply defensive powers
         applyPowers((HashSet<ElitePower>) eliteMobProperties.getValidDefensivePowers().clone(), availableDefensivePowers);
@@ -557,7 +557,11 @@ public class EliteMobEntity {
      * @return Level of the Elite Mob
      */
     public int getLevel() {
-        return eliteMobLevel;
+        return eliteLevel;
+    }
+
+    public double getTier() {
+        return eliteTier;
     }
 
     /**
@@ -672,17 +676,6 @@ public class EliteMobEntity {
     }
 
     /**
-     * Sets whether the ELite Mob is a natural entity. Only natural entities can drop special plugin loot. Additionally,
-     * based on the settings, only natural Elite Mobs tend to only have visual effects if they are natural.
-     *
-     * @param bool Whether the Elite Mob is a natural entity.
-     */
-    public void setIsNaturalEntity(Boolean bool) {
-        this.isNaturalEntity = bool;
-        this.hasNormalLoot = bool;
-    }
-
-    /**
      * Returns whether the Elite Mob will unload when far away.
      *
      * @return Whether the Elite Mob will unload when far away.
@@ -708,7 +701,7 @@ public class EliteMobEntity {
      * @return Whether the Elite Mob can drop special loot.
      */
     public boolean getHasSpecialLoot() {
-        return this.hasNormalLoot;
+        return this.hasEliteLoot;
     }
 
     /**
@@ -719,7 +712,7 @@ public class EliteMobEntity {
      */
     public void setHasSpecialLoot(boolean bool) {
         this.isNaturalEntity = bool;
-        this.hasNormalLoot = bool;
+        this.hasEliteLoot = bool;
     }
 
     /**

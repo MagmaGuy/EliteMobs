@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.utils;
 
 import java.util.HashMap;
 
-public class WeightedProbablity {
+public class WeightedProbability {
 
     public static String pickWeighedProbability(HashMap<String, Double> weighedValues) {
 

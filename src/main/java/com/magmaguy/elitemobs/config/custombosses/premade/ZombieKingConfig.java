@@ -31,7 +31,7 @@ public class ZombieKingConfig extends CustomBossConfigFields {
                 "&aThe Zombie King has been slain by $players!",
                 "&4The Zombie King has escaped!",
                 "&cZombie King: $location",
-                Arrays.asList("zombie_kings_axe.yml"),
+                Arrays.asList("zombie_kings_axe.yml:1"),
                 true,
                 true,
                 Arrays.asList(Particle.FLAME.toString()));
