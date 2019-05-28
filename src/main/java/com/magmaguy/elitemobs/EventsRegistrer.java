@@ -185,24 +185,13 @@ public class EventsRegistrer {
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
 
-        //Prevent exploits
-        //Prevent mount exploit
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_MOUNT_EXPLOIT))
-            pluginManager.registerEvents(new PreventMountExploit(), plugin);
-        //Prevent darkroom exploit
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_DARKROOM_EXPLOIT))
-            pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
-        //Prevent large darkroom exploit
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_LARGE_DARKROOM_EXPLOIT))
-            pluginManager.registerEvents(new PreventLargeDarkroomExploit(), plugin);
-        //Prevent other exploits
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_OTHER_EXPLOITS))
-            pluginManager.registerEvents(new PreventOtherExploits(), plugin);
-        //Prevent tower exploit
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_TOWER_EXPLOIT))
-            pluginManager.registerEvents(new PreventTowerExploit(), plugin);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ENDERMAN_HEIGHT_EXPLOIT))
-            pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
+        //Antiexploits
+        pluginManager.registerEvents(new PreventMountExploit(), plugin);
+        pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
+        pluginManager.registerEvents(new PreventLargeDarkroomExploit(), plugin);
+        pluginManager.registerEvents(new PreventDensityExploit(), plugin);
+        pluginManager.registerEvents(new PreventTowerExploit(), plugin);
+        pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
 
 
         //Initialize events
@@ -232,9 +221,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FlamethrowerEnchantment(), plugin);
 
         //Initialize adventurer's guild
-        if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ENABLE_ADVENTURERS_GUILD))
+        if (AdventurersGuildConfig.getBoolean(AdventurersGuildConfig.ENABLE_ADVENTURERS_GUILD))
             pluginManager.registerEvents(new AdventurersGuildMenu(), plugin);
-        if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
+        if (AdventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
             pluginManager.registerEvents(new MaxHealthBoost(), plugin);
         pluginManager.registerEvents(new SpawnControl(), plugin);
         //register quests
@@ -242,9 +231,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new QuestsTracker(), plugin);
 
         //Combat tag
-        if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
+        if (CombatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
             pluginManager.registerEvents(new CombatTag(), plugin);
-        if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_TELEPORT_TIMER))
+        if (CombatTagConfig.getBoolean(CombatTagConfig.ENABLE_TELEPORT_TIMER))
             pluginManager.registerEvents(new TeleportTag(), plugin);
 
 

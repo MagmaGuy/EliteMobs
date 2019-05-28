@@ -38,7 +38,7 @@ public class CustomLootConfig {
             new ZombieKingsAxeConfig()
     ));
 
-    public static void initializeConfigurations() {
+    public static void initializeConfigs() {
         //Check if the directory doesn't exist
         if (!Files.isDirectory(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/customitems"))) {
             generateFreshConfigurations();

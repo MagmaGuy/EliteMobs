@@ -1,21 +1,10 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.configuration.Configuration;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.io.File;
+import java.util.List;
 
 public class ValidMobsConfig {
 
@@ -32,11 +21,13 @@ public class ValidMobsConfig {
     public static final String BLAZE = VALID_AGGRESSIVE_ELITEMOBS + "BLAZE";
     public static final String CAVE_SPIDER = VALID_AGGRESSIVE_ELITEMOBS + "CAVE_SPIDER";
     public static final String CREEPER = VALID_AGGRESSIVE_ELITEMOBS + "CREEPER";
+    public static final String DROWNED = VALID_AGGRESSIVE_ELITEMOBS + "DROWNED";
     public static final String ENDERMAN = VALID_AGGRESSIVE_ELITEMOBS + "ENDERMAN";
     public static final String ENDERMITE = VALID_AGGRESSIVE_ELITEMOBS + "ENDERMITE";
     public static final String HUSK = VALID_AGGRESSIVE_ELITEMOBS + "HUSK";
     public static final String IRON_GOLEM = VALID_AGGRESSIVE_ELITEMOBS + "IRON_GOLEM";
     public static final String PIG_ZOMBIE = VALID_AGGRESSIVE_ELITEMOBS + "PIG_ZOMBIE";
+    public static final String PHANTOM = VALID_AGGRESSIVE_ELITEMOBS + "PHANTOM";
     public static final String POLAR_BEAR = VALID_AGGRESSIVE_ELITEMOBS + "POLAR_BEAR";
     public static final String SILVERFISH = VALID_AGGRESSIVE_ELITEMOBS + "SILVERFISH";
     public static final String STRAY = VALID_AGGRESSIVE_ELITEMOBS + "STRAY";
@@ -47,43 +38,80 @@ public class ValidMobsConfig {
     public static final String VINDICATOR = VALID_AGGRESSIVE_ELITEMOBS + "VINDICATOR";
     public static final String WITCH = VALID_AGGRESSIVE_ELITEMOBS + "WITCH";
     public static final String ZOMBIE = VALID_AGGRESSIVE_ELITEMOBS + "ZOMBIE";
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
-    public void initializeConfig() {
+    private static FileConfiguration fileConfiguration;
+    private static File file;
 
-        configuration.addDefault(ALLOW_AGGRESSIVE_ELITEMOBS, true);
-        configuration.addDefault(BLAZE, true);
-        configuration.addDefault(CAVE_SPIDER, true);
-        configuration.addDefault(CREEPER, true);
-        configuration.addDefault(ENDERMAN, true);
-        configuration.addDefault(ENDERMITE, true);
-        configuration.addDefault(HUSK, true);
-        configuration.addDefault(IRON_GOLEM, true);
-        configuration.addDefault(PIG_ZOMBIE, true);
-        configuration.addDefault(POLAR_BEAR, true);
-        configuration.addDefault(SILVERFISH, true);
-        configuration.addDefault(SKELETON, true);
-        configuration.addDefault(WITHER_SKELETON, true);
-        configuration.addDefault(SPIDER, true);
-        configuration.addDefault(STRAY, true);
-        configuration.addDefault(VEX, true);
-        configuration.addDefault(VINDICATOR, true);
-        configuration.addDefault(WITCH, true);
-        configuration.addDefault(ZOMBIE, true);
-        configuration.addDefault(ALLOW_PASSIVE_SUPERMOBS, true);
-        configuration.addDefault(CHICKEN, true);
-        configuration.addDefault(COW, true);
-        configuration.addDefault(MUSHROOM_COW, true);
-        configuration.addDefault(PIG, true);
-        configuration.addDefault(SHEEP, true);
+    public static FileConfiguration getFileConfiguration() {
+        return fileConfiguration;
+    }
+
+    public static boolean getBoolean(String entry) {
+        return fileConfiguration.getBoolean(entry);
+    }
+
+    public static String getString(String entry) {
+        return fileConfiguration.getString(entry);
+    }
+
+    public static List<String> getStringList(String entry) {
+        return fileConfiguration.getStringList(entry);
+    }
+
+    public static int getInt(String entry) {
+        return fileConfiguration.getInt(entry);
+    }
+
+    public static double getDouble(String entry) {
+        return fileConfiguration.getDouble(entry);
+    }
+
+    public static File getFile() {
+        return file;
+    }
+
+    public static void saveConfig() {
+        try {
+            fileConfiguration.save(file);
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[EliteMobs] Error saving configuration " + file.getName() + "! Report this to the developer!");
+        }
+    }
 
 
-        customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(configuration);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME);
+    public static void initializeConfig() {
+        file = EliteConfigGenerator.getFile("ValidMobs.yml");
+        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
 
+        fileConfiguration.addDefault(ALLOW_AGGRESSIVE_ELITEMOBS, true);
+        fileConfiguration.addDefault(BLAZE, true);
+        fileConfiguration.addDefault(CAVE_SPIDER, true);
+        fileConfiguration.addDefault(CREEPER, true);
+        fileConfiguration.addDefault(DROWNED, true);
+        fileConfiguration.addDefault(ENDERMAN, true);
+        fileConfiguration.addDefault(ENDERMITE, true);
+        fileConfiguration.addDefault(HUSK, true);
+        fileConfiguration.addDefault(IRON_GOLEM, true);
+        fileConfiguration.addDefault(PIG_ZOMBIE, true);
+        fileConfiguration.addDefault(PHANTOM, true);
+        fileConfiguration.addDefault(POLAR_BEAR, true);
+        fileConfiguration.addDefault(SILVERFISH, true);
+        fileConfiguration.addDefault(SKELETON, true);
+        fileConfiguration.addDefault(WITHER_SKELETON, true);
+        fileConfiguration.addDefault(SPIDER, true);
+        fileConfiguration.addDefault(STRAY, true);
+        fileConfiguration.addDefault(VEX, true);
+        fileConfiguration.addDefault(VINDICATOR, true);
+        fileConfiguration.addDefault(WITCH, true);
+        fileConfiguration.addDefault(ZOMBIE, true);
+        fileConfiguration.addDefault(ALLOW_PASSIVE_SUPERMOBS, true);
+        fileConfiguration.addDefault(CHICKEN, true);
+        fileConfiguration.addDefault(COW, true);
+        fileConfiguration.addDefault(MUSHROOM_COW, true);
+        fileConfiguration.addDefault(PIG, true);
+        fileConfiguration.addDefault(SHEEP, true);
+
+        EliteConfigGenerator.saveDefaults(file, fileConfiguration);
     }
 
 }

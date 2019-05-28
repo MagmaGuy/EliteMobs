@@ -5,13 +5,13 @@ import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import org.bukkit.entity.EntityType;
 
-public class EliteStray extends EliteMobProperties {
+public class EliteDrowned extends EliteMobProperties {
 
-    public EliteStray() {
+    public EliteDrowned() {
 
-        this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_STRAY);
+        this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_DROWNED);
 
-        this.entityType = EntityType.STRAY;
+        this.entityType = EntityType.DROWNED;
 
         this.defaultMaxHealth = 20;
 

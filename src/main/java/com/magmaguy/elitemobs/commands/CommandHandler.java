@@ -334,20 +334,20 @@ public class CommandHandler implements CommandExecutor {
 
                 for (File listOfFile : listOfFiles) {
                     if (listOfFile.isDirectory() &&
-                            listOfFile.getName().equals(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME))) {
-                        commandSender.sendMessage("[EliteMobs] World " + ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " found! Loading it in...");
+                            listOfFile.getName().equals(AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME))) {
+                        commandSender.sendMessage("[EliteMobs] World " + AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " found! Loading it in...");
                         worldFolderExists = true;
                         break;
                     }
                 }
 
                 if (!worldFolderExists) {
-                    commandSender.sendMessage("[EliteMobs] Could not import world " + ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " ! " +
+                    commandSender.sendMessage("[EliteMobs] Could not import world " + AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " ! " +
                             "It is not in your worlds directory. If you wish to use the default world, you can find the link to download it on the resource page over at https://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/");
                     return true;
                 }
 
-                Bukkit.createWorld(new WorldCreator(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME)));
+                Bukkit.createWorld(new WorldCreator(AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME)));
                 commandSender.sendMessage("[EliteMobs] Successfully imported the world!");
                 commandSender.sendMessage("[EliteMobs] Now all you need to do is add the permission elitemobs.user to your users and you're all set!");
                 return true;

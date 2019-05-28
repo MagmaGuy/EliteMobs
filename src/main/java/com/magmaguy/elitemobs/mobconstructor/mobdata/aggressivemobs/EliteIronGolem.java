@@ -19,8 +19,8 @@ public class EliteIronGolem extends EliteMobProperties {
         this.validOffensivePowers.addAll(super.getAllOffensivePowers());
         this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        isEnabled = ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
-                ConfigValues.validMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
+        isEnabled = ValidMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
+                ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
 
         if (this.isEnabled)
             eliteMobData.add(this);

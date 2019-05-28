@@ -14,33 +14,31 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
-import java.util.HashSet;
+import java.util.HashMap;
 
 public class TeleportTag implements Listener {
 
-    private static HashSet<Player> teleportingPlayers = new HashSet<>();
-
-    public static HashSet<Player> getTeleportingPlayers() {
-        return teleportingPlayers;
-    }
+    private static HashMap<Player, Vector> teleportingPlayers = new HashMap<>();
 
     public static boolean isTeleportingPlayer(Player player) {
-        return teleportingPlayers.contains(player);
+        return teleportingPlayers.containsKey(player);
     }
 
-    public static void addTeleportingPlayer(Player player) {
-        teleportingPlayers.add(player);
+    public static void addTeleportingPlayer(Player player, Vector location) {
+        teleportingPlayers.put(player, location);
     }
 
     public static void removeTeleportingPlayer(Player player) {
         teleportingPlayers.remove(player);
     }
 
-    public static void intializePlayerTeleport(Player player, int teleportDuration, Location teleportLocation) {
+    public static void initializePlayerTeleport(Player player, int teleportDuration, Location teleportLocation) {
 
         if (isTeleportingPlayer(player)) return;
-        addTeleportingPlayer(player);
+        Vector vector = new Vector(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
+        addTeleportingPlayer(player, vector);
 
         new BukkitRunnable() {
 
@@ -48,6 +46,13 @@ public class TeleportTag implements Listener {
 
             @Override
             public void run() {
+
+                timerLeft--;
+                if (timerLeft == 0) {
+                    player.teleport(teleportLocation);
+                    removeTeleportingPlayer(player);
+                    return;
+                }
 
                 if (!isTeleportingPlayer(player)) {
                     cancel();
@@ -59,13 +64,6 @@ public class TeleportTag implements Listener {
                                 ConfigValues.translationConfig.getString(
                                         TranslationConfig.TELEPORT_TIME_LEFT
                                 ).replace("$time", timerLeft + ""))));
-
-                timerLeft--;
-                if (timerLeft == 0) {
-                    player.teleport(teleportLocation);
-                    removeTeleportingPlayer(player);
-                    cancel();
-                }
 
             }
 
@@ -84,7 +82,12 @@ public class TeleportTag implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (teleportingPlayers.isEmpty()) return;
-        if (isTeleportingPlayer(event.getPlayer())) cancelPlayerTeleport(event.getPlayer());
+        if (isTeleportingPlayer(event.getPlayer()))
+            if (!teleportingPlayers.get(event.getPlayer()).equals(
+                    new Vector(event.getPlayer().getLocation().getX(),
+                            event.getPlayer().getLocation().getY(),
+                            event.getPlayer().getLocation().getZ())))
+                cancelPlayerTeleport(event.getPlayer());
     }
 
     @EventHandler

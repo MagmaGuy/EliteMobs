@@ -10,10 +10,9 @@ import org.bukkit.configuration.Configuration;
 public class ConfigValues {
 
     public static Configuration defaultConfig, mobPowerConfig, translationConfig,
-            itemsProceduralSettingsConfig, economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig,
-            validMobsConfig, validWorldsConfig, mobCombatSettingsConfig, itemsDropSettingsConfig,
-            playerMoneyData, playerRankData, playerMaxRankData, combatTagConfig, adventurersGuildConfig,
-            customEnchantmentsConfig, npcConfig;
+            itemsProceduralSettingsConfig, economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, mobCombatSettingsConfig, itemsDropSettingsConfig,
+            playerMaxRankData,
+            npcConfig;
 
     public static void initializeCachedConfigurations() {
 
@@ -40,37 +39,16 @@ public class ConfigValues {
         playerCacheConfig = customConfigLoader.getCustomConfig(PlayerCacheData.CONFIG_NAME, true);
 
         customConfigLoader = new CustomConfigLoader();
-        playerMoneyData = customConfigLoader.getCustomConfig(PlayerMoneyData.CONFIG_NAME, true);
-
-        customConfigLoader = new CustomConfigLoader();
-        playerRankData = customConfigLoader.getCustomConfig(PlayerGuildRank.CONFIG_NAME, true);
-
-        customConfigLoader = new CustomConfigLoader();
         playerMaxRankData = customConfigLoader.getCustomConfig(PlayerMaxGuildRank.CONFIG_NAME, true);
 
         customConfigLoader = new CustomConfigLoader();
         eventsConfig = customConfigLoader.getCustomConfig(EventsConfig.CONFIG_NAME);
 
         customConfigLoader = new CustomConfigLoader();
-        validMobsConfig = customConfigLoader.getCustomConfig(ValidMobsConfig.CONFIG_NAME);
-
-        customConfigLoader = new CustomConfigLoader();
-        validWorldsConfig = customConfigLoader.getCustomConfig(ValidWorldsConfig.CONFIG_NAME);
-
-        customConfigLoader = new CustomConfigLoader();
         mobCombatSettingsConfig = customConfigLoader.getCustomConfig(MobCombatSettingsConfig.CONFIG_NAME);
 
         customConfigLoader = new CustomConfigLoader();
         itemsDropSettingsConfig = customConfigLoader.getCustomConfig(ItemsDropSettingsConfig.CONFIG_NAME);
-
-        customConfigLoader = new CustomConfigLoader();
-        combatTagConfig = customConfigLoader.getCustomConfig(CombatTagConfig.CONFIG_NAME);
-
-        customConfigLoader = new CustomConfigLoader();
-        adventurersGuildConfig = customConfigLoader.getCustomConfig(AdventurersGuildConfig.CONFIG_NAME);
-
-        customConfigLoader = new CustomConfigLoader();
-        customEnchantmentsConfig = customConfigLoader.getCustomConfig(CustomEnchantmentsConfig.CONFIG_NAME);
 
         customConfigLoader = new CustomConfigLoader();
         npcConfig = customConfigLoader.getCustomConfig(NPCConfig.CONFIG_NAME);
@@ -97,20 +75,11 @@ public class ConfigValues {
         EconomySettingsConfig economySettingsConfig = new EconomySettingsConfig();
         economySettingsConfig.initializeConfig();
 
-        PlayerMoneyData playerMoneyData = new PlayerMoneyData();
-        playerMoneyData.intializeConfig();
-
         PlayerCacheData playerCacheData = new PlayerCacheData();
         playerCacheData.initializeConfig();
 
         EventsConfig eventsConfig = new EventsConfig();
         eventsConfig.initializeConfig();
-
-        ValidWorldsConfig validWorldsConfig = new ValidWorldsConfig();
-        validWorldsConfig.initializeConfig();
-
-        ValidMobsConfig validMobsConfig = new ValidMobsConfig();
-        validMobsConfig.initializeConfig();
 
         MobCombatSettingsConfig mobCombatSettingsConfig = new MobCombatSettingsConfig();
         mobCombatSettingsConfig.initializeConfig();
@@ -118,20 +87,8 @@ public class ConfigValues {
         ItemsDropSettingsConfig itemsDropSettingsConfig = new ItemsDropSettingsConfig();
         itemsDropSettingsConfig.initializeConfig();
 
-        PlayerGuildRank playerGuildRank = new PlayerGuildRank();
-        playerGuildRank.intializeConfig();
-
         PlayerMaxGuildRank playerMaxGuildRank = new PlayerMaxGuildRank();
         playerMaxGuildRank.intializeConfig();
-
-        CombatTagConfig combatTagConfig = new CombatTagConfig();
-        combatTagConfig.initializeConfig();
-
-        AdventurersGuildConfig adventurersGuildConfig = new AdventurersGuildConfig();
-        adventurersGuildConfig.initializeConfig();
-
-        CustomEnchantmentsConfig customEnchantmentsConfig = new CustomEnchantmentsConfig();
-        customEnchantmentsConfig.initializeConfig();
 
         NPCConfig npcConfig = new NPCConfig();
         npcConfig.initializeConfig();

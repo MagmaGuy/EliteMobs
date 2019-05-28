@@ -47,7 +47,7 @@ public class CustomBossesConfig {
     /**
      * Initializes all configurations and stores them in a static list for later access
      */
-    public static void initializeConfigurations() {
+    public static void initializeConfigs() {
         //Check if the directory doesn't exist
         if (!Files.isDirectory(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/custombosses"))) {
             generateFreshConfigurations();
