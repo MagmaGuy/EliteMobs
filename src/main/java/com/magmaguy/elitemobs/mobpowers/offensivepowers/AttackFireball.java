@@ -25,6 +25,7 @@ public class AttackFireball extends MinorPower implements Listener {
 
     @EventHandler
     public void targetEvent(EliteMobTargetPlayerEvent event) {
+        if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
         AttackFireball attackFireball = (AttackFireball) event.getEliteMobEntity().getPower(this);
         if (attackFireball == null) return;
         if (attackFireball.getIsFiring()) return;
