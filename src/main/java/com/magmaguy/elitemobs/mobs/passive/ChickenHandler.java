@@ -27,7 +27,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -158,31 +157,6 @@ public class ChickenHandler implements Listener {
                 event.getItem().getItemStack().getItemMeta().getLore().equals(lore)) {
 
             event.setCancelled(true);
-
-        }
-
-    }
-
-    @EventHandler
-    public void onSuperEggMerge(ItemMergeEvent event) {
-
-        if (event.getEntity().getItemStack().hasItemMeta() && event.getEntity().getItemStack().getItemMeta().hasLore() &&
-                event.getEntity().getItemStack().getItemMeta().getLore().equals(lore)) {
-
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-
-                    if (event.getTarget().isValid()) {
-
-                        event.getTarget().remove();
-
-                    }
-
-                }
-
-            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
 
         }
 
