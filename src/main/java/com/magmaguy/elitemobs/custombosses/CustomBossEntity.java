@@ -58,6 +58,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
         super.setDamageMultiplier(customBossConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossConfigFields.getHealthMultiplier());
+        super.setHasSpecialLoot(customBossConfigFields.getDropsEliteMobsLoot());
         this.customBossConfigFields = customBossConfigFields;
         if (customBossConfigFields.getSpawnMessage() != null)
             Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
@@ -250,7 +251,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                         public void run() {
                             bossBar.removePlayer(player);
                         }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
+                    }.runTaskLater(MetadataHandler.PLUGIN, 20 * 15);
                 }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 60 * 3);

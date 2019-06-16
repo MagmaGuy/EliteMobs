@@ -80,7 +80,7 @@ public class AdventurersGuildConfig {
 
         fileConfiguration.addDefault(ENABLE_ADVENTURERS_GUILD, true);
         fileConfiguration.addDefault(ADD_MAX_HEALTH, true);
-        fileConfiguration.addDefault(GUILD_WORLD_NAME, "elitemobs_adventurers_guild");
+        fileConfiguration.addDefault(GUILD_WORLD_NAME, "EliteMobs_adventurers_guild");
         fileConfiguration.addDefault(GUILD_WORLD_LOCATION, "208.5,88,236.5,-80,0");
         fileConfiguration.addDefault(AG_TELEPORT, true);
         fileConfiguration.addDefault(RANK_NAMES_1, "&8Peaceful Villager");

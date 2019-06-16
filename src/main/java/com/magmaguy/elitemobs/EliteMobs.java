@@ -27,6 +27,7 @@ import com.magmaguy.elitemobs.runnables.ScoreboardUpdater;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
+import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -149,6 +150,11 @@ public class EliteMobs extends JavaPlugin {
         Launch quests
          */
         QuestRefresher.generateNewQuestMenus();
+
+        /*
+        Load plugin worlds
+         */
+        CustomWorldLoading.startupWorldInitialization();
 
     }
 

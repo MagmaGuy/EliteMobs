@@ -234,7 +234,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 3, 20 * 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 3, 20 * 3);
 
     }
 

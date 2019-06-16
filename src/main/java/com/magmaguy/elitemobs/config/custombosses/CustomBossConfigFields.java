@@ -262,6 +262,14 @@ public class CustomBossConfigFields {
         return this.uniqueLootList;
     }
 
+    public boolean getDropsEliteMobsLoot() {
+        return dropsEliteMobsLoot;
+    }
+
+    public boolean getDropsVanillaLoot() {
+        return dropsVanillaLoot;
+    }
+
     public List<String> getTrails() {
         return this.trails;
     }
