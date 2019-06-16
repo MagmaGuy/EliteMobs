@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.items.MaterialTier;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
@@ -46,6 +47,8 @@ public class EnchantmentGenerator {
     public static HashMap<Enchantment, Integer> generateEnchantments(double itemTier, Material material) {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
+
+        itemTier -= MaterialTier.getMaterialTier(material);
 
         /*
         No enchantments for items too low tier to have one

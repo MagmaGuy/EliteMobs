@@ -217,7 +217,11 @@ public class NPCEntity {
      * @param profession Career to be set
      */
     public void setProfession(String profession) {
-        this.profession = Villager.Profession.valueOf(profession);
+        try {
+            this.profession = Villager.Profession.valueOf(profession);
+        } catch (Exception ex) {
+            this.profession = Villager.Profession.NITWIT;
+        }
         this.villager.setProfession(this.profession);
     }
 

@@ -14,7 +14,7 @@ public class CustomLootConfigFields {
         return customLootConfigFields;
     }
 
-    public static void addCustomLootConfigField(String fileName, CustomLootConfigFields customLootConfig) {
+    public static void addCustomLootConfigField(CustomLootConfigFields customLootConfig) {
         customLootConfigFields.add(customLootConfig);
     }
 

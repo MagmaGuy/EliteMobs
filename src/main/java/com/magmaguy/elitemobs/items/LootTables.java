@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
@@ -129,9 +128,6 @@ public class LootTables implements Listener {
     }
 
     private static Item dropWeighedFixedItem(Location location) {
-
-
-        Bukkit.getLogger().warning("Running weighed");
 
         double totalWeight = 0;
 
