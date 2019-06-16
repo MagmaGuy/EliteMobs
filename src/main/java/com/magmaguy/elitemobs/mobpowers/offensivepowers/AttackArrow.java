@@ -26,6 +26,7 @@ public class AttackArrow extends MinorPower implements Listener {
 
     @EventHandler
     public void targetEvent(EliteMobTargetPlayerEvent event) {
+        if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
         AttackArrow attackArrow = (AttackArrow) event.getEliteMobEntity().getPower(this);
         if (attackArrow == null) return;
         if (attackArrow.getIsFiring()) return;
