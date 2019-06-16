@@ -63,6 +63,8 @@ public class CustomLootConfig {
 
         if (!customLootConfigFieldsList.isEmpty())
             generateFreshConfigurations();
+
+
     }
 
     /**
@@ -104,7 +106,7 @@ public class CustomLootConfig {
             e.printStackTrace();
         }
 
-        CustomLootConfigFields.addCustomLootConfigField(fileName, customLootConfigFields);
+        CustomLootConfigFields.addCustomLootConfigField(new CustomLootConfigFields(file.getName(), fileConfiguration));
 
         return fileConfiguration;
 
@@ -117,7 +119,7 @@ public class CustomLootConfig {
      */
     private static FileConfiguration initializeConfiguration(File file) {
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        CustomLootConfigFields.addCustomLootConfigField(file.getName(), new CustomLootConfigFields(file.getName(), fileConfiguration));
+        CustomLootConfigFields.addCustomLootConfigField(new CustomLootConfigFields(file.getName(), fileConfiguration));
         return fileConfiguration;
     }
 

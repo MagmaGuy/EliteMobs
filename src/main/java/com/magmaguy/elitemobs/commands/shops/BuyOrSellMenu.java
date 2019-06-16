@@ -51,29 +51,26 @@ public class BuyOrSellMenu implements Listener {
 
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
         if (!event.getView().getTitle().equals(SHOP_NAME)) return;
+        event.setCancelled(true);
 
         //reroll loot button
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColorConverter.convert(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName()))) {
-            event.setCancelled(true);
             return;
         }
 
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.BUY_OR_SELL_CUSTOM_ITEMS)))) {
             CustomShopHandler.customShopConstructor((Player) event.getWhoClicked());
-            event.setCancelled(true);
             return;
         }
 
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.BUY_OR_SELL_DYNAMIC_ITEMS)))) {
             ShopHandler.shopConstructor((Player) event.getWhoClicked());
-            event.setCancelled(true);
             return;
         }
 
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.BUY_OR_SELL_SELL_ITEMS)))) {
             SellMenu sellMenu = new SellMenu();
             sellMenu.constructSellMenu((Player) event.getWhoClicked());
-            event.setCancelled(true);
             return;
         }
 

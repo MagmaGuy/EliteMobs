@@ -137,7 +137,7 @@ public class NPCConfig {
         configuration.addDefault(BLACKSMITH_ENABLED, true);
         configuration.addDefault(BLACKSMITH_NAME, "Greg");
         configuration.addDefault(BLACKSMITH_ROLE, "<Blacksmith>");
-        configuration.addDefault(BLACKSMITH_TYPE, "BLACKSMITH");
+        configuration.addDefault(BLACKSMITH_TYPE, "TOOLSMITH");
         configuration.addDefault(BLACKSMITH_LOCATION, "EliteMobs_adventurers_guild,285.5,93,261.5,179,0");
         configuration.addDefault(BLACKSMITH_GREET, Arrays.asList(
                 "Welcome to our shop!",
@@ -175,7 +175,7 @@ public class NPCConfig {
         configuration.addDefault(SPECIAL_BLACKSMITH_ENABLED, true);
         configuration.addDefault(SPECIAL_BLACKSMITH_NAME, "Grog");
         configuration.addDefault(SPECIAL_BLACKSMITH_ROLE, "<Master Blacksmith>");
-        configuration.addDefault(SPECIAL_BLACKSMITH_TYPE, "BLACKSMITH");
+        configuration.addDefault(SPECIAL_BLACKSMITH_TYPE, "WEAPONSMITH");
         configuration.addDefault(SPECIAL_BLACKSMITH_LOCATION, "EliteMobs_adventurers_guild,282.5,93,258.5,-90,0");
         configuration.addDefault(SPECIAL_BLACKSMITH_GREET, Arrays.asList(
                 "Need something?",

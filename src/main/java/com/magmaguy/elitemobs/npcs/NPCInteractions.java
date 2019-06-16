@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
 import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
 import com.magmaguy.elitemobs.commands.shops.ShopHandler;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -28,6 +29,11 @@ public class NPCInteractions implements Listener {
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
+        if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.NAME_TAG)) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage("[EliteMobs] You can't rename NPCs using name tags!");
+            return;
+        }
         if (npcEntity == null) return;
         if (npcEntity.getIsSleeping()) return;
 
