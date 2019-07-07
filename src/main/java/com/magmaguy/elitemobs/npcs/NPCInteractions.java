@@ -3,8 +3,8 @@ package com.magmaguy.elitemobs.npcs;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
-import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
-import com.magmaguy.elitemobs.commands.shops.ShopHandler;
+import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
+import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -57,7 +57,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            CustomShopHandler.customShopInitializer(event.getPlayer());
+                            CustomShopMenu.customShopInitializer(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
 
@@ -67,7 +67,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            ShopHandler.shopInitializer(event.getPlayer());
+                            ProceduralShopMenu.shopInitializer(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;

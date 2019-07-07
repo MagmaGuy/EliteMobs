@@ -2,9 +2,6 @@ package com.magmaguy.elitemobs.npcs.chatter;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.NPCConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Entity;
@@ -59,33 +56,10 @@ public class NPCProximitySensor implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getView().getTitle().equals("Guild rank selector"))
-            for (Entity entity : event.getPlayer().getNearbyEntities(ConfigValues.npcConfig.getDouble(NPCConfig.GUILD_GREETER_ACTIVATION_RADIUS),
-                    ConfigValues.npcConfig.getDouble(NPCConfig.GUILD_GREETER_ACTIVATION_RADIUS),
-                    ConfigValues.npcConfig.getDouble(NPCConfig.GUILD_GREETER_ACTIVATION_RADIUS))) {
+        if (event.getView().getTitle().length() > 0)
+            for (Entity entity : event.getPlayer().getNearbyEntities(5, 5, 5))
                 if (EntityTracker.isNPCEntity(entity))
                     EntityTracker.getNPCEntity(entity).sayFarewell((Player) event.getPlayer());
-
-            }
-
-        if (event.getView().getTitle().equals(ConfigValues.economyConfig.getString(EconomySettingsConfig.SHOP_NAME)))
-            for (Entity entity : event.getPlayer().getNearbyEntities(ConfigValues.npcConfig.getDouble(NPCConfig.BLACKSMITH_ACTIVATION_RADIUS),
-                    ConfigValues.npcConfig.getDouble(NPCConfig.BLACKSMITH_ACTIVATION_RADIUS),
-                    ConfigValues.npcConfig.getDouble(NPCConfig.BLACKSMITH_ACTIVATION_RADIUS))) {
-                if (EntityTracker.isNPCEntity(entity))
-                    EntityTracker.getNPCEntity(entity).sayFarewell((Player) event.getPlayer());
-
-            }
-
-        if (event.getView().getTitle().equals(ConfigValues.economyConfig.getString(EconomySettingsConfig.CUSTOM_SHOP_NAME)))
-            for (Entity entity : event.getPlayer().getNearbyEntities(ConfigValues.npcConfig.getDouble(NPCConfig.SPECIAL_BLACKSMITH_ACTIVATION_RADIUS),
-                    ConfigValues.npcConfig.getDouble(NPCConfig.SPECIAL_BLACKSMITH_ACTIVATION_RADIUS),
-                    ConfigValues.npcConfig.getDouble(NPCConfig.SPECIAL_BLACKSMITH_ACTIVATION_RADIUS))) {
-                if (EntityTracker.isNPCEntity(entity))
-                    EntityTracker.getNPCEntity(entity).sayFarewell((Player) event.getPlayer());
-
-            }
-
     }
 
 }

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
+import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 
 public class ItemsDropSettingsConfig {
@@ -92,6 +93,10 @@ public class ItemsDropSettingsConfig {
     public static final String WITHER_NAME = POTION_EFFECT_NAME + "WITHER";
     public static final String ENABLE_RARE_DROP_EFFECT = "Enable rare drop visual effect";
     public static final String HOES_AS_WEAPONS = "Enable hoes as weapons";
+    public static final String LOOT_SHOWER_ITEM_ONE = "Loot shower material 1";
+    public static final String LOOT_SHOWER_ITEM_FIVE = "Loot shower material 5";
+    public static final String LOOT_SHOWER_ITEM_TEN = "Loot shower material 10";
+    public static final String LOOT_SHOWER_ITEM_TWENTY = "Loot shower material 20";
 
     /*
     Custom enchantments
@@ -188,6 +193,10 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(WATER_BREATHING_NAME, "Water Breathing");
         configuration.addDefault(WEAKNESS_NAME, "Weakness");
         configuration.addDefault(WITHER_NAME, "Wither");
+        configuration.addDefault(LOOT_SHOWER_ITEM_ONE, Material.GOLD_NUGGET.toString());
+        configuration.addDefault(LOOT_SHOWER_ITEM_FIVE, Material.GOLD_INGOT.toString());
+        configuration.addDefault(LOOT_SHOWER_ITEM_TEN, Material.EMERALD.toString());
+        configuration.addDefault(LOOT_SHOWER_ITEM_ONE, Material.EMERALD_BLOCK.toString());
 
 
         configuration.addDefault(FLAMETHROWER_NAME, "Flamethrower");

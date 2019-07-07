@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -11,7 +10,6 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,17 +53,12 @@ public class SuperMobScanner {
 
     private static void checkLostSuperMob(LivingEntity livingEntity) {
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() !=
-                        SuperMobProperties.getSuperMobMaxHealth(livingEntity))
-                    return;
+        if (livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() !=
+                SuperMobProperties.getSuperMobMaxHealth(livingEntity))
+            return;
 
-                if (!EntityTracker.isSuperMob(livingEntity))
-                    EntityTracker.registerSuperMob(livingEntity);
-            }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+        if (!EntityTracker.isSuperMob(livingEntity))
+            EntityTracker.registerSuperMob(livingEntity);
 
     }
 

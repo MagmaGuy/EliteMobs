@@ -11,8 +11,7 @@ public class ConfigValues {
 
     public static Configuration defaultConfig, mobPowerConfig, translationConfig,
             itemsProceduralSettingsConfig, economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, mobCombatSettingsConfig, itemsDropSettingsConfig,
-            playerMaxRankData,
-            npcConfig;
+            playerMaxRankData;
 
     public static void initializeCachedConfigurations() {
 
@@ -49,10 +48,6 @@ public class ConfigValues {
 
         customConfigLoader = new CustomConfigLoader();
         itemsDropSettingsConfig = customConfigLoader.getCustomConfig(ItemsDropSettingsConfig.CONFIG_NAME);
-
-        customConfigLoader = new CustomConfigLoader();
-        npcConfig = customConfigLoader.getCustomConfig(NPCConfig.CONFIG_NAME);
-
     }
 
     public static void initializeConfigurations() {
@@ -89,9 +84,6 @@ public class ConfigValues {
 
         PlayerMaxGuildRank playerMaxGuildRank = new PlayerMaxGuildRank();
         playerMaxGuildRank.intializeConfig();
-
-        NPCConfig npcConfig = new NPCConfig();
-        npcConfig.initializeConfig();
 
     }
 

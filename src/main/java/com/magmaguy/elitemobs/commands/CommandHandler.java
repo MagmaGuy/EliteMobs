@@ -1,9 +1,14 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
-import com.magmaguy.elitemobs.commands.shops.ShopHandler;
-import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
+import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.TranslationConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.quests.PlayerQuest;
@@ -105,7 +110,7 @@ public class CommandHandler implements CommandExecutor {
             case "shop":
             case "store":
                 if (userPermCheck("elitemobs.shop.command", commandSender)) {
-                    ShopHandler.shopInitializer((Player) commandSender);
+                    ProceduralShopMenu.shopInitializer((Player) commandSender);
                 }
                 return true;
             case "customshop":
@@ -113,7 +118,7 @@ public class CommandHandler implements CommandExecutor {
             case "customstore":
             case "cstore":
                 if (userPermCheck("elitemobs.customshop.command", commandSender)) {
-                    CustomShopHandler.customShopInitializer((Player) commandSender);
+                    CustomShopMenu.customShopInitializer((Player) commandSender);
                 }
                 return true;
             case "wallet":
@@ -152,7 +157,7 @@ public class CommandHandler implements CommandExecutor {
             case "restart":
                 if (permCheck(RELOAD_CONFIGS, commandSender))
 //                    ReloadHandler.reloadCommand(commandSender, args);
-                return true;
+                    return true;
             case "killall":
             case "kill":
                 KillHandler.killCommand(commandSender, args);
@@ -177,11 +182,6 @@ public class CommandHandler implements CommandExecutor {
             case "startevent":
             case "triggerevent":
                 TriggerEventHandler.triggerEventCommand(commandSender, args);
-                return true;
-            case "spawnbossmob":
-            case "spawnboss":
-                if (userPermCheck(SPAWNMOB, commandSender))
-                    SpawnMobCommandHandler.spawnBossMob((Player) commandSender, args);
                 return true;
             case "gettier":
             case "spawntier":
@@ -214,29 +214,29 @@ public class CommandHandler implements CommandExecutor {
             case ("npc"):
                 if (args.length <= 1) {
                     commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                    commandSender.sendMessage("/em npc set [npc key]");
-                    commandSender.sendMessage("/em npc remove [npc key]");
+                    commandSender.sendMessage("/em npc set [npc filename]");
+                    commandSender.sendMessage("/em npc remove [npc filename]");
                     return true;
                 } else {
+
                     if (args[1].equalsIgnoreCase("set")) {
 
                         if (permCheck("elitemobs.npc.set", commandSender)) {
 
                             if (args.length == 2) {
                                 commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                                commandSender.sendMessage("/em npc set [npc key]");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
+                                commandSender.sendMessage("/em npc set [filename]");
+                                commandSender.sendMessage("Valid keys: ");
+                                for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList())
+                                    commandSender.sendMessage(npCsConfigFields.getFileName());
                                 return true;
                             }
 
-                            boolean validKey = false;
-                            for (String key : ConfigValues.npcConfig.getKeys(false)) {
-                                if (!key.replace(" ", "_").equalsIgnoreCase(args[2])) continue;
-                                validKey = true;
-                                break;
+                            NPCsConfigFields npCsConfigFields = NPCsConfigFields.getNPCsConfigFields(args[2]);
+                            if (npCsConfigFields == null) {
+                                commandSender.sendMessage("[EliteMobs] Invalid NPC filename.");
+                                return true;
                             }
-
-                            if (!validKey) return true;
 
                             Location playerLocation = ((Player) commandSender).getLocation();
 
@@ -248,22 +248,14 @@ public class CommandHandler implements CommandExecutor {
                                     + Round.twoDecimalPlaces(playerLocation.getPitch());
 
                             try {
-                                try {
-                                    NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromKey(args[2]));
-                                } catch (Exception e) {
-                                }
-                                NPCConfig npcConfig = new NPCConfig();
-                                npcConfig.configuration.set(args[2] + "." + NPCConfig.ENABLED, true);
-                                npcConfig.configuration.set(args[2] + "." + NPCConfig.LOCATION, location);
-                                npcConfig.customConfigLoader.saveCustomConfig(NPCConfig.CONFIG_NAME);
-                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.ENABLED, true);
-                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.LOCATION, location);
-                                new NPCEntity(args[2]);
+                                NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromFields(npCsConfigFields));
+                                npCsConfigFields.setEnabled(true);
+                                npCsConfigFields.setLocation(location);
+                                new NPCEntity(npCsConfigFields);
                             } catch (Exception e) {
-                                commandSender.sendMessage("[EliteMobs] Invalid key. Valid options:");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
+                                commandSender.sendMessage("[EliteMobs] Invalid NPC filename.");
                             }
+
                         }
 
                         return true;
@@ -275,21 +267,25 @@ public class CommandHandler implements CommandExecutor {
 
                             if (args.length == 2) {
                                 commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                                commandSender.sendMessage("/em npc remove [npc key]");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
+                                commandSender.sendMessage("/em npc remove [filename]");
+                                commandSender.sendMessage("Valid keys: ");
+                                for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList())
+                                    commandSender.sendMessage(npCsConfigFields.getFileName());
+                                return true;
+                            }
+
+                            NPCsConfigFields npCsConfigFields = NPCsConfigFields.getNPCsConfigFields(args[2]);
+                            if (npCsConfigFields == null) {
+                                commandSender.sendMessage("[EliteMobs] Invalid NPC filename.");
                                 return true;
                             }
 
                             try {
-                                NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromKey(args[2]));
-                                NPCConfig npcConfig = new NPCConfig();
-                                npcConfig.configuration.set(args[2] + "." + NPCConfig.ENABLED, false);
-                                npcConfig.customConfigLoader.saveCustomConfig(NPCConfig.CONFIG_NAME);
-                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.ENABLED, false);
-                                new NPCEntity(args[2]);
+                                NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromFields(npCsConfigFields));
+                                npCsConfigFields.setEnabled(false);
+                                new NPCEntity(npCsConfigFields);
                             } catch (Exception e) {
-                                commandSender.sendMessage("[EliteMobs] Invalid key. Valid options:");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
+                                commandSender.sendMessage("[EliteMobs] Invalid NPC filename.");
                                 return true;
                             }
                         }
@@ -297,33 +293,6 @@ public class CommandHandler implements CommandExecutor {
                         return true;
                     }
 
-                    if (args[1].equalsIgnoreCase("add")) {
-
-                        if (permCheck("elitemobs.npc.add", commandSender)) {
-
-                            if (args.length == 2) {
-                                commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                                commandSender.sendMessage("/em npc add [npc key]");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
-                            }
-
-                            try {
-                                if (!ConfigValues.npcConfig.getKeys(false).contains(args[2])) throw new Exception();
-                                NPCConfig npcConfig = new NPCConfig();
-                                npcConfig.configuration.set(args[2] + "." + NPCConfig.ENABLED, true);
-                                npcConfig.customConfigLoader.saveCustomConfig(NPCConfig.CONFIG_NAME);
-                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.ENABLED, true);
-                                new NPCEntity(args[2]);
-                            } catch (Exception e) {
-                                commandSender.sendMessage("[EliteMobs] Invalid key. Valid options:");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
-                            }
-                        }
-
-                        return true;
-                    }
                 }
                 return true;
             case "autosetup":

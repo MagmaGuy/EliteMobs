@@ -36,27 +36,23 @@ public class QuestsMenu implements Listener {
 
         Inventory inventory = Bukkit.createInventory(player, 18, MAIN_MENU_NAME);
 
-        for (int i = 11; i < 21; i++) {
+        for (int index = 0; index < 12; index++) {
 
-            int itemIndex = i;
-            if (i == 20)
-                itemIndex = 24;
-
-            if (GuildRank.isWithinActiveRank(player, i)) {
-                inventory.setItem(itemIndex - 11,
+            if (GuildRank.isWithinActiveRank(player, index)) {
+                inventory.setItem(index,
                         ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
-                                "&aAccept a " + GuildRank.getRankName(i) + " &aquest!",
-                                Arrays.asList("&aAccept a " + GuildRank.getRankName(i) + " &aquest and", "&aget special rewards!")));
+                                "&aAccept a " + GuildRank.getRankName(index) + " &aquest!",
+                                Arrays.asList("&aAccept a " + GuildRank.getRankName(index) + " &aquest and", "&aget special rewards!")));
 
-            } else if (GuildRank.isWithinRank(player, i)) {
-                inventory.setItem(itemIndex - 11, ItemStackGenerator.generateItemStack(Material.YELLOW_STAINED_GLASS_PANE,
-                        "&eYou can get a " + GuildRank.getRankName(i) + " &equest!",
-                        Arrays.asList("&eDo /ag and set your", "&eguild rank to " + GuildRank.getRankName(i), "&eto accept these quests!")));
+            } else if (GuildRank.isWithinRank(player, index)) {
+                inventory.setItem(index, ItemStackGenerator.generateItemStack(Material.YELLOW_STAINED_GLASS_PANE,
+                        "&eYou can get a " + GuildRank.getRankName(index) + " &equest!",
+                        Arrays.asList("&eDo /ag and set your", "&eguild rank to " + GuildRank.getRankName(index), "&eto accept these quests!")));
 
             } else {
-                inventory.setItem(itemIndex - 11, ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
-                        "&cYou can't get a " + GuildRank.getRankName(i) + " &cquest yet!",
-                        Arrays.asList("&cYou must first unlock the", GuildRank.getRankName(i) + " &cguild rank at /ag", "&cto accept these quests!")));
+                inventory.setItem(index, ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
+                        "&cYou can't get a " + GuildRank.getRankName(index) + " &cquest yet!",
+                        Arrays.asList("&cYou must first unlock the", GuildRank.getRankName(index) + " &cguild rank at /ag", "&cto accept these quests!")));
 
             }
 
@@ -100,7 +96,7 @@ public class QuestsMenu implements Listener {
 
         int tier = 0;
 
-        for (int i = 11; i < 21; i++)
+        for (int i = 0; i < 11; i++)
             if (event.getView().getTitle().contains(GuildRank.getRankName(i))) {
                 tier = i;
                 break;

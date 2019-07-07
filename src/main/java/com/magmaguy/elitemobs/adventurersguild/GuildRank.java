@@ -10,13 +10,13 @@ import java.util.UUID;
 
 public class GuildRank {
 
-    private static void intializeGuildRank(UUID uuid) {
+    private static void initializeGuildRank(UUID uuid) {
         if (!PlayerData.playerSelectedGuildRank.containsKey(uuid)) {
-            PlayerData.playerSelectedGuildRank.put(uuid, 10);
+            PlayerData.playerSelectedGuildRank.put(uuid, 1);
             PlayerData.playerSelectedGuildRankChanged = true;
         }
         if (!PlayerData.playerMaxGuildRank.containsKey(uuid)) {
-            PlayerData.playerMaxGuildRank.put(uuid, 10);
+            PlayerData.playerMaxGuildRank.put(uuid, 1);
             PlayerData.playerMaxGuildRankChanged = true;
         }
     }
@@ -29,7 +29,7 @@ public class GuildRank {
      * @return Whether the player's guild rank is below or equal to the target
      */
     public static boolean isWithinRank(Player player, int rank) {
-        intializeGuildRank(player.getUniqueId());
+        initializeGuildRank(player.getUniqueId());
         return PlayerData.playerMaxGuildRank.get(player.getUniqueId()) >= rank;
     }
 
@@ -40,7 +40,7 @@ public class GuildRank {
      * @return Guild rank between 1-20
      */
     public static int getRank(Player player) {
-        intializeGuildRank(player.getUniqueId());
+        initializeGuildRank(player.getUniqueId());
         return PlayerData.playerSelectedGuildRank.get(player.getUniqueId());
     }
 
@@ -61,7 +61,7 @@ public class GuildRank {
      * @return Guild rank between 1 and 20
      */
     public static int getActiveRank(Player player) {
-        intializeGuildRank(player.getUniqueId());
+        initializeGuildRank(player.getUniqueId());
         return PlayerData.playerSelectedGuildRank.get(player.getUniqueId());
     }
 
@@ -84,7 +84,7 @@ public class GuildRank {
      * @return Whether the target rank is equal to or higher than the player's active guild rank
      */
     public static boolean isWithinActiveRank(Player player, int rank) {
-        intializeGuildRank(player.getUniqueId());
+        initializeGuildRank(player.getUniqueId());
         return getActiveRank(player) >= rank;
     }
 
@@ -96,6 +96,8 @@ public class GuildRank {
     public static String getRankName(int rank) {
 
         switch (rank) {
+            case 0:
+                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_0));
             case 1:
                 return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_1));
             case 2:
@@ -118,24 +120,6 @@ public class GuildRank {
                 return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_10));
             case 11:
                 return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_11));
-            case 12:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_12));
-            case 13:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_13));
-            case 14:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_14));
-            case 15:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_15));
-            case 16:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_16));
-            case 17:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_17));
-            case 18:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_18));
-            case 19:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_19));
-            case 20:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_20));
             default:
                 Bukkit.getLogger().warning("Warning: Tried to obtain a rank that does no exist. Report this to the dev! Rank: " + rank);
                 return "";

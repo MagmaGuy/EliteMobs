@@ -33,7 +33,7 @@ public class QuestTierMenu {
     }
 
     private void setInventory() {
-        this.inventory = Bukkit.createInventory(null, 9, TIER_MENU_NAME + " " + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier() + 10)));
+        this.inventory = Bukkit.createInventory(null, 9, TIER_MENU_NAME + " " + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier())));
         for (int i = 1; i < 4; i++) {
             PlayerQuest playerQuest = QuestRandomizer.generateQuest(questTier);
             this.inventory.setItem(2 * i, playerQuest.generateQuestItemStack());
@@ -42,7 +42,7 @@ public class QuestTierMenu {
     }
 
     private Inventory generatePlayerInventory(List<PlayerQuest> localPlayerQuests) {
-        Inventory localInventory = Bukkit.createInventory(null, 9, TIER_MENU_NAME + " " + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier() + 10)));
+        Inventory localInventory = Bukkit.createInventory(null, 9, TIER_MENU_NAME + " " + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier())));
         for (int i = 1; i < 4; i++)
             localInventory.setItem(2 * i, localPlayerQuests.get(i - 1).generateQuestItemStack());
         return localInventory;
