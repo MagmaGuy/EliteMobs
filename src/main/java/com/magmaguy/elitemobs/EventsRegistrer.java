@@ -10,9 +10,9 @@ import com.magmaguy.elitemobs.combattag.CombatTag;
 import com.magmaguy.elitemobs.combattag.TeleportTag;
 import com.magmaguy.elitemobs.commands.LootGUI;
 import com.magmaguy.elitemobs.commands.shops.BuyOrSellMenu;
-import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
+import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
+import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.commands.shops.SellMenu;
-import com.magmaguy.elitemobs.commands.shops.ShopHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
@@ -174,8 +174,8 @@ public class EventsRegistrer {
         }
 
         //Shops
-        pluginManager.registerEvents(new ShopHandler(), plugin);
-        pluginManager.registerEvents(new CustomShopHandler(), plugin);
+        pluginManager.registerEvents(new ProceduralShopMenu(), plugin);
+        pluginManager.registerEvents(new CustomShopMenu(), plugin);
         pluginManager.registerEvents(new BuyOrSellMenu(), plugin);
         pluginManager.registerEvents(new SellMenu(), plugin);
 

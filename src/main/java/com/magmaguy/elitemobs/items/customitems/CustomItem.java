@@ -291,20 +291,25 @@ public class CustomItem {
         switch (this.customLootConfigFields.getScalability()) {
             case "fixed":
                 this.scalability = Scalability.FIXED;
-                addFixedItem(this);
+                if (!itemType.equals(ItemType.UNIQUE))
+                    addFixedItem(this);
                 break;
             case "limited":
                 this.scalability = Scalability.LIMITED;
-                addLimitedItem(this);
+                if (!itemType.equals(ItemType.UNIQUE))
+                    addLimitedItem(this);
                 break;
             case "scalable":
                 this.scalability = Scalability.SCALABLE;
-                scalableItems.add(this);
+                if (!itemType.equals(ItemType.UNIQUE))
+                    scalableItems.add(this);
                 break;
             default:
                 this.scalability = Scalability.SCALABLE;
-                scalableItems.add(this);
+                if (!itemType.equals(ItemType.UNIQUE))
+                    scalableItems.add(this);
                 Bukkit.getLogger().warning("Item " + this.fileName + " does not have a valid scalability type! Defaulting to scalable.");
+
         }
     }
 

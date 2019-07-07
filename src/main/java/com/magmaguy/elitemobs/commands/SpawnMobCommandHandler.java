@@ -1,24 +1,7 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.events.mobs.Kraken;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
@@ -41,9 +24,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Squid;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,20 +41,68 @@ public class SpawnMobCommandHandler {
         Location location = getLocation(commandSender, args);
         if (location == null) return;
 
-        EntityType entityType = getEntityType(commandSender, args);
-        if (entityType == null) return;
-
-        if (SuperMobProperties.isValidSuperMobType(entityType)) {
-            spawnSuperMob(entityType, location);
-            return;
+        String name = "";
+        try {
+            if (commandSender instanceof Player) {
+                name = args[1].toLowerCase();
+            } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
+                name = args[5].toLowerCase();
+            }
+        } catch (Exception e) {
+            commandSender.sendMessage("[EliteMobs] Error trying to obtain mob type or name.");
+            String validEntities = "";
+            for (EntityType entities : EliteMobProperties.getValidMobTypes())
+                validEntities += entities + ", ";
+            commandSender.sendMessage("[EliteMobs] Valid mob types:" + validEntities);
+            String validNames = "";
+            for (String fileName : CustomBossesConfig.getCustomBossConfigList().keySet())
+                validNames += fileName + ", ";
+            commandSender.sendMessage("[EliteMobs] Valid custom mob names: " + validNames);
         }
+
+        boolean isCustomBoss = false;
+        EntityType entityType = getEntityType(commandSender, name);
+
+        if (entityType == null) {
+            String configName = name;
+            if (!configName.contains(".yml"))
+                configName += ".yml";
+
+            if (!CustomBossesConfig.getCustomBossConfigList().containsKey(configName)) {
+                commandSender.sendMessage("[EliteMobs] Error trying to obtain mob type or name.");
+                String validEntities = "";
+                for (EntityType entities : EliteMobProperties.getValidMobTypes())
+                    validEntities += entities + ", ";
+                commandSender.sendMessage("[EliteMobs] Valid mob types:" + validEntities);
+                String validNames = "";
+                for (String fileName : CustomBossesConfig.getCustomBossConfigList().keySet())
+                    validNames += fileName + ", ";
+                commandSender.sendMessage("[EliteMobs] Valid custom mob names: " + validNames);
+                return;
+            } else
+                isCustomBoss = true;
+        }
+
+        if (entityType != null)
+            if (SuperMobProperties.isValidSuperMobType(entityType)) {
+                spawnSuperMob(entityType, location);
+                return;
+            }
 
         Integer mobLevel = getLevel(commandSender, args);
         if (mobLevel == null) return;
 
+        if (isCustomBoss) {
+            String configName = name;
+            if (!configName.contains(".yml"))
+                configName += ".yml";
+            CustomBossEntity.constructCustomBoss(configName, location, mobLevel);
+            return;
+        }
+
         HashSet<ElitePower> mobPowers = getPowers(commandSender, args);
 
-        EliteMobEntity eliteMobEntity = new EliteMobEntity(entityType, location, mobLevel, mobPowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        new EliteMobEntity(entityType, location, mobLevel, mobPowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
 
     }
 
@@ -132,51 +161,11 @@ public class SpawnMobCommandHandler {
     }
 
 
-    private static EntityType getEntityType(CommandSender commandSender, String[] args) {
-
-        String entityInput = "";
-
-        if (commandSender instanceof Player) {
-
-            try {
-
-                entityInput = args[1].toLowerCase();
-
-            } catch (Exception e) {
-
-                commandSender.sendMessage("[EliteMobs] Error trying to obtain mob type.");
-                String validEntities = "";
-                for (EntityType entities : EliteMobProperties.getValidMobTypes())
-                    validEntities += entities + ", ";
-                commandSender.sendMessage("[EliteMobs] Valid mob types:" + validEntities);
-
-            }
-
-
-        } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
-
-
-            try {
-
-                entityInput = args[5].toLowerCase();
-
-            } catch (Exception e) {
-
-                commandSender.sendMessage("[EliteMobs] Error trying to obtain mob type.");
-                String validEntities = "";
-                for (EntityType entities : EliteMobProperties.getValidMobTypes())
-                    validEntities += entities + ", ";
-                commandSender.sendMessage("[EliteMobs] Valid mob types:" + validEntities);
-
-            }
-
-        }
+    private static EntityType getEntityType(CommandSender commandSender, String name) {
 
         try {
-            return EntityType.valueOf(entityInput.toUpperCase());
+            return EntityType.valueOf(name.toUpperCase());
         } catch (Exception ex) {
-            commandSender.sendMessage("[EliteMobs] Could not spawn mob type " + entityInput +
-                    " If this is incorrect, please contact the dev.");
             return null;
         }
 
@@ -188,7 +177,7 @@ public class SpawnMobCommandHandler {
 
         if (args.length < 3) {
             commandSender.sendMessage("[EliteMobs] Missing Elite Mob level.");
-            commandSender.sendMessage("[EliteMobs] Command syntax: /em spawn [mobType] [level]");
+            commandSender.sendMessage("[EliteMobs] Command syntax: /em spawn [mobType/mobName] [level]");
             return null;
         }
 
@@ -395,59 +384,6 @@ public class SpawnMobCommandHandler {
 
     private static void spawnSuperMob(EntityType entityType, Location location) {
         SuperMobConstructor.constructSuperMob((LivingEntity) location.getWorld().spawnEntity(location, entityType));
-    }
-
-    public static void spawnBossMob(Player player, String[] args) {
-
-        Location cursorLocation = player.getTargetBlock(null, 5).getLocation().add(new Vector(0.5, 2, 0.5));
-
-        if (args.length < 2) {
-
-            player.sendMessage("Valid arguments:");
-            player.sendMessage("treasuregoblin, zombieking, kraken, balrog");
-            return;
-
-        }
-
-        if (args[1].equalsIgnoreCase("treasuregoblin")) {
-            CustomBossEntity.constructCustomBoss("treasure_goblin.yml", cursorLocation, DynamicBossLevelConstructor.findDynamicBossLevel());
-            player.sendMessage("Spawned treasure goblin");
-        }
-
-        if (args[1].equalsIgnoreCase("zombieking")) {
-            CustomBossEntity.constructCustomBoss("zombie_king.yml", cursorLocation, DynamicBossLevelConstructor.findDynamicBossLevel());
-            player.sendMessage("Spawned zombie king");
-
-        }
-
-        if (args[1].equalsIgnoreCase("kraken")) {
-
-            Squid squid = (Squid) cursorLocation.getWorld().spawnEntity(cursorLocation, EntityType.SQUID);
-            Kraken.spawnKraken(squid.getLocation());
-            squid.remove();
-            player.sendMessage("Spawned Kraken");
-
-        }
-
-        if (args[1].equalsIgnoreCase("balrog")) {
-
-            CustomBossEntity.constructCustomBoss("balrog.yml", cursorLocation,
-                    ActionDynamicBossLevelConstructor.determineDynamicBossLevel(cursorLocation));
-            player.sendMessage("Spawned Balrog");
-
-        }
-
-        if (args[1].equalsIgnoreCase("fae")) {
-            CustomBossEntity.constructCustomBoss("lightning_fae.yml", cursorLocation,
-                    ActionDynamicBossLevelConstructor.determineDynamicBossLevel(cursorLocation));
-            CustomBossEntity.constructCustomBoss("fire_fae.yml", cursorLocation,
-                    ActionDynamicBossLevelConstructor.determineDynamicBossLevel(cursorLocation));
-            CustomBossEntity.constructCustomBoss("ice_fae.yml", cursorLocation,
-                    ActionDynamicBossLevelConstructor.determineDynamicBossLevel(cursorLocation));
-            player.sendMessage("Spawned Fae");
-
-        }
-
     }
 
 }

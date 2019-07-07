@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config.customloot;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -70,7 +69,6 @@ public class CustomLootConfigFields {
 
     public CustomLootConfigFields(String fileName, FileConfiguration configuration) {
         this.fileName = fileName;
-        Bukkit.getLogger().warning("Name: " + fileName);
         if (configuration.get("isEnabled") != null)
             this.isEnabled = configuration.getBoolean("isEnabled");
         else this.isEnabled = false;

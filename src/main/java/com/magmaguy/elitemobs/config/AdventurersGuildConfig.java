@@ -14,6 +14,7 @@ public class AdventurersGuildConfig {
     public static final String GUILD_WORLD_LOCATION = "Guild world coordinates";
     public static final String AG_TELEPORT = "Teleport players to the adventurers guild using /ag";
     private static final String RANK_NAMES = "Adventurers Guild Rank Names";
+    public static final String RANK_NAMES_0 = RANK_NAMES + "0";
     public static final String RANK_NAMES_1 = RANK_NAMES + "1";
     public static final String RANK_NAMES_2 = RANK_NAMES + "2";
     public static final String RANK_NAMES_3 = RANK_NAMES + "3";
@@ -25,15 +26,6 @@ public class AdventurersGuildConfig {
     public static final String RANK_NAMES_9 = RANK_NAMES + "9";
     public static final String RANK_NAMES_10 = RANK_NAMES + "10";
     public static final String RANK_NAMES_11 = RANK_NAMES + "11";
-    public static final String RANK_NAMES_12 = RANK_NAMES + "12";
-    public static final String RANK_NAMES_13 = RANK_NAMES + "13";
-    public static final String RANK_NAMES_14 = RANK_NAMES + "14";
-    public static final String RANK_NAMES_15 = RANK_NAMES + "15";
-    public static final String RANK_NAMES_16 = RANK_NAMES + "16";
-    public static final String RANK_NAMES_17 = RANK_NAMES + "17";
-    public static final String RANK_NAMES_18 = RANK_NAMES + "18";
-    public static final String RANK_NAMES_19 = RANK_NAMES + "19";
-    public static final String RANK_NAMES_20 = RANK_NAMES + "20";
 
     private static FileConfiguration fileConfiguration;
     private static File file;
@@ -83,26 +75,18 @@ public class AdventurersGuildConfig {
         fileConfiguration.addDefault(GUILD_WORLD_NAME, "EliteMobs_adventurers_guild");
         fileConfiguration.addDefault(GUILD_WORLD_LOCATION, "208.5,88,236.5,-80,0");
         fileConfiguration.addDefault(AG_TELEPORT, true);
-        fileConfiguration.addDefault(RANK_NAMES_1, "&8Peaceful Villager");
-        fileConfiguration.addDefault(RANK_NAMES_2, "&8Commoner");
-        fileConfiguration.addDefault(RANK_NAMES_3, "&8Farmer");
-        fileConfiguration.addDefault(RANK_NAMES_4, "&8Bard");
-        fileConfiguration.addDefault(RANK_NAMES_5, "&8Barkeep");
-        fileConfiguration.addDefault(RANK_NAMES_6, "&8Blacksmith");
-        fileConfiguration.addDefault(RANK_NAMES_7, "&8Merchant");
-        fileConfiguration.addDefault(RANK_NAMES_8, "&8Wanderer");
-        fileConfiguration.addDefault(RANK_NAMES_9, "&8Ranger");
-        fileConfiguration.addDefault(RANK_NAMES_10, "&fCasual Adventurer");
-        fileConfiguration.addDefault(RANK_NAMES_11, "&fAdventurer");
-        fileConfiguration.addDefault(RANK_NAMES_12, "&fProfessional Adventurer");
-        fileConfiguration.addDefault(RANK_NAMES_13, "&2Elite Adventurer");
-        fileConfiguration.addDefault(RANK_NAMES_14, "&2Master Adventurer");
-        fileConfiguration.addDefault(RANK_NAMES_15, "&2Bloodhound");
-        fileConfiguration.addDefault(RANK_NAMES_16, "&1Slayer");
-        fileConfiguration.addDefault(RANK_NAMES_17, "&1Exterminator");
-        fileConfiguration.addDefault(RANK_NAMES_18, "&5&lElite Hunter");
-        fileConfiguration.addDefault(RANK_NAMES_19, "&5Hero");
-        fileConfiguration.addDefault(RANK_NAMES_20, "&6&l&oLegend");
+        fileConfiguration.addDefault(RANK_NAMES_0, "&8Peaceful Villager");
+        fileConfiguration.addDefault(RANK_NAMES_1, "&fCasual Adventurer");
+        fileConfiguration.addDefault(RANK_NAMES_2, "&fAdventurer");
+        fileConfiguration.addDefault(RANK_NAMES_3, "&fProfessional Adventurer");
+        fileConfiguration.addDefault(RANK_NAMES_4, "&2Elite Adventurer");
+        fileConfiguration.addDefault(RANK_NAMES_5, "&2Master Adventurer");
+        fileConfiguration.addDefault(RANK_NAMES_6, "&2Bloodhound");
+        fileConfiguration.addDefault(RANK_NAMES_7, "&1Slayer");
+        fileConfiguration.addDefault(RANK_NAMES_8, "&1Exterminator");
+        fileConfiguration.addDefault(RANK_NAMES_9, "&5&lElite Hunter");
+        fileConfiguration.addDefault(RANK_NAMES_10, "&5Hero");
+        fileConfiguration.addDefault(RANK_NAMES_11, "&6&l&oLegend");
 
         EliteConfigGenerator.saveDefaults(file, fileConfiguration);
     }

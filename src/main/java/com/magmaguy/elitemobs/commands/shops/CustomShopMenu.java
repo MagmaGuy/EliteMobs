@@ -1,10 +1,9 @@
 package com.magmaguy.elitemobs.commands.shops;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
+import com.magmaguy.elitemobs.config.menus.BuyOrSellMenuConfig;
+import com.magmaguy.elitemobs.config.menus.CustomShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
@@ -16,35 +15,40 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Random;
 
 /**
  * Created by MagmaGuy on 20/06/2017.
  */
-public class CustomShopHandler implements Listener {
+public class CustomShopMenu implements Listener {
 
     /**
      * Fixed shop name, used to track if an event is happening within it
      */
     private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("//");
-    public static final String SHOP_NAME = ConfigValues.economyConfig.getString(EconomySettingsConfig.CUSTOM_SHOP_NAME) + SHOP_KEY;
+    public static final String SHOP_NAME = CustomShopMenuConfig.SHOP_NAME + SHOP_KEY;
 
     /**
-     * Generates a new custom item shop menu for a player
+     * Creates a new instance of a BuyOrSellMenu
      *
-     * @param player Player for whom the shop menu will pop up
+     * @param player Player for whom the new menu will show up
      */
     public static void customShopInitializer(Player player) {
 
         if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return;
-        BuyOrSellMenu.constructBuyOrSellMenu(player, ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.BUY_OR_SELL_CUSTOM_ITEMS)));
+        BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_CUSTOM_ITEM);
 
     }
 
+    /**
+     * Creates a new instance of a custom shop
+     *
+     * @param player Player for whom the new menu will show up
+     */
     public static void customShopConstructor(Player player) {
 
         Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
@@ -53,21 +57,29 @@ public class CustomShopHandler implements Listener {
 
     }
 
+    /**
+     * Preliminary shop fill
+     *
+     * @param shopInventory Inventory to be filled
+     */
     private static void populateShop(Inventory shopInventory) {
 
-        SharedShopElements.shopHeader(shopInventory);
+        shopInventory.setItem(CustomShopMenuConfig.REROLL_SLOT, CustomShopMenuConfig.REROLL_ITEM);
         shopContents(shopInventory);
 
     }
 
-    private static List<Integer> validSlots = (List<Integer>) ConfigValues.economyConfig.getList(EconomySettingsConfig.CUSTOM_SHOP_VALID_SLOTS);
-
+    /**
+     * Fills with the items to be sold in the shop
+     *
+     * @param shopInventory Inventory to be filled
+     */
     private static void shopContents(Inventory shopInventory) {
 
         //Anything after 8 is populated
         Random random = new Random();
 
-        for (int i : validSlots) {
+        for (int i : CustomShopMenuConfig.STORE_SLOTS) {
 
             int itemEntryIndex = random.nextInt(CustomItem.getCustomItemStackList().size());
 
@@ -81,11 +93,15 @@ public class CustomShopHandler implements Listener {
     public void onClick(InventoryClickEvent event) {
 
         if (!event.getView().getTitle().equals(SHOP_NAME)) return;
+        if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
+            event.setCancelled(true);
+            return;
+        }
         event.setCancelled(true);
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
 
         //reroll loot button
-        if (event.getCurrentItem().getItemMeta().getDisplayName().equals(SignatureItem.SIGNATURE_ITEMSTACK.getItemMeta().getDisplayName())) {
+        if (event.getCurrentItem().equals(CustomShopMenuConfig.REROLL_ITEM)) {
 
             populateShop(event.getInventory());
             event.setCancelled(true);
@@ -105,7 +121,7 @@ public class CustomShopHandler implements Listener {
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
         //These slots are for buying items
-        if (validSlots.contains(event.getSlot()) && event.getView().getTitle().equalsIgnoreCase(SHOP_NAME)) {
+        if (CustomShopMenuConfig.STORE_SLOTS.contains(event.getSlot()) && event.getView().getTitle().equalsIgnoreCase(SHOP_NAME)) {
 
             boolean inventoryHasFreeSlots = false;
             for (ItemStack iteratedStack : player.getInventory()) {
@@ -121,7 +137,7 @@ public class CustomShopHandler implements Listener {
 
             if (!inventoryHasFreeSlots) {
 
-                player.sendMessage(ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.INVENTORY_FULL_MESSAGE)));
+                player.sendMessage(CustomShopMenuConfig.MESSAGE_FULL_INVENTORY);
                 player.closeInventory();
 
             } else if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
