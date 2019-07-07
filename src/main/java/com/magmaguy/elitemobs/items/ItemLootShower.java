@@ -5,7 +5,9 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
@@ -125,26 +127,57 @@ public class ItemLootShower implements Listener {
 
     private static void dropOne(Location location) {
 
-        Item currencyItem = generateCurrencyItem(Material.GOLD_NUGGET, location);
+        Item currencyItem;
+        try {
+            currencyItem = generateCurrencyItem(Material.valueOf(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LOOT_SHOWER_ITEM_ONE)), location);
+        } catch (Exception ex) {
+            new WarningMessage("Material for EliteMob shower 1 is invalid. Defaulting to gold nugget.");
+            currencyItem = generateCurrencyItem(Material.GOLD_NUGGET, location);
+        }
+
         currencyItem.setCustomName(ChatColorConverter.convert("&7" + 1 + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
         currencyItem.setCustomNameVisible(true);
 
     }
 
     private static void dropFive(Location location) {
-        Item currencyItem = generateCurrencyItem(Material.GOLD_INGOT, location);
+
+        Item currencyItem;
+        try {
+            currencyItem = generateCurrencyItem(Material.valueOf(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LOOT_SHOWER_ITEM_FIVE)), location);
+        } catch (Exception ex) {
+            new WarningMessage("Material for EliteMob shower 5 is invalid. Defaulting to gold ingot.");
+            currencyItem = generateCurrencyItem(Material.GOLD_INGOT, location);
+        }
+
         currencyItem.setCustomName(ChatColorConverter.convert("&f" + 5 + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
         currencyItem.setCustomNameVisible(true);
     }
 
     private static void dropTen(Location location) {
-        Item currencyItem = generateCurrencyItem(Material.EMERALD, location);
+
+        Item currencyItem;
+        try {
+            currencyItem = generateCurrencyItem(Material.valueOf(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LOOT_SHOWER_ITEM_TEN)), location);
+        } catch (Exception ex) {
+            new WarningMessage("Material for EliteMob shower 1 is invalid. Defaulting to emerald.");
+            currencyItem = generateCurrencyItem(Material.EMERALD, location);
+        }
+
         currencyItem.setCustomName(ChatColorConverter.convert("&a" + 10 + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
         currencyItem.setCustomNameVisible(true);
     }
 
     private static void dropTwenty(Location location) {
-        Item currencyItem = generateCurrencyItem(Material.EMERALD_BLOCK, location);
+
+        Item currencyItem;
+        try {
+            currencyItem = generateCurrencyItem(Material.valueOf(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LOOT_SHOWER_ITEM_TWENTY)), location);
+        } catch (Exception ex) {
+            new WarningMessage("Material for EliteMob shower 1 is invalid. Defaulting to emerald block.");
+            currencyItem = generateCurrencyItem(Material.EMERALD_BLOCK, location);
+        }
+
         currencyItem.setCustomName(ChatColorConverter.convert("&2" + 20 + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
         currencyItem.setCustomNameVisible(true);
     }

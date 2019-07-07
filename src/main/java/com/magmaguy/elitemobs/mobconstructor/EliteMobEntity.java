@@ -60,6 +60,7 @@ public class EliteMobEntity {
      */
     private boolean hasCustomPowers = false;
     private boolean isPersistent = true;
+    private boolean hasVanillaLoot = true;
     private boolean hasEliteLoot = true;
     private CreatureSpawnEvent.SpawnReason spawnReason;
 
@@ -92,8 +93,8 @@ public class EliteMobEntity {
     /**
      * This is the generic constructor used in most instances of natural elite mob generation
      *
-     * @param livingEntity  Minecraft entity associated to this elite mob
-     * @param eliteLevel Level of the mob, can be modified during runtime. Dynamically assigned.
+     * @param livingEntity Minecraft entity associated to this elite mob
+     * @param eliteLevel   Level of the mob, can be modified during runtime. Dynamically assigned.
      */
     public EliteMobEntity(LivingEntity livingEntity, int eliteLevel, CreatureSpawnEvent.SpawnReason spawnReason) {
 
@@ -153,10 +154,10 @@ public class EliteMobEntity {
      * Spawning method for boss mobs.
      * Assumes custom powers and custom names.
      *
-     * @param entityType    type of mob that this entity is slated to become
-     * @param location      location at which the elite mob will spawn
+     * @param entityType type of mob that this entity is slated to become
+     * @param location   location at which the elite mob will spawn
      * @param eliteLevel boss mob level, should be automatically generated based on the highest player tier online
-     * @param name          the name for this boss mob, overrides the usual elite mob name format
+     * @param name       the name for this boss mob, overrides the usual elite mob name format
      * @see com.magmaguy.elitemobs.custombosses.CustomBossEntity
      */
     public EliteMobEntity(EntityType entityType, Location location, int eliteLevel, String name, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
@@ -219,10 +220,10 @@ public class EliteMobEntity {
     /**
      * Constructor for Elite Mobs spawned via command
      *
-     * @param entityType    Type of entity to be spawned
-     * @param location      Location at which the entity will spawn
+     * @param entityType Type of entity to be spawned
+     * @param location   Location at which the entity will spawn
      * @param eliteLevel Level of the Elite Mob
-     * @param mobPowers     HashSet of ElitePower that the entity will have (can be empty)
+     * @param mobPowers  HashSet of ElitePower that the entity will have (can be empty)
      */
     public EliteMobEntity(EntityType entityType, Location location, int eliteLevel, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
 
@@ -340,7 +341,6 @@ public class EliteMobEntity {
     /**
      * Sets the max health of the Elite Mob. This is calculated based on the Elite Mob level. Maxes out at 2000 due to
      * Minecraft restrictions
-     *
      */
     private void setMaxHealth() {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
@@ -713,6 +713,7 @@ public class EliteMobEntity {
     public void setHasSpecialLoot(boolean bool) {
         this.isNaturalEntity = bool;
         this.hasEliteLoot = bool;
+        this.hasVanillaLoot = bool;
     }
 
     /**
@@ -804,6 +805,10 @@ public class EliteMobEntity {
     public void remove() {
         this.getLivingEntity().remove();
         EntityTracker.unregisterEliteMob(this);
+    }
+
+    public void setHasVanillaLoot(boolean hasVanillaLoot) {
+        this.hasVanillaLoot = hasVanillaLoot;
     }
 
 }

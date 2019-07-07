@@ -8,6 +8,8 @@ import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
+import com.magmaguy.elitemobs.config.menus.MenusConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
@@ -70,6 +72,8 @@ public class EliteMobs extends JavaPlugin {
         AdventurersGuildConfig.initializeConfig();
         ValidWorldsConfig.initializeConfig();
         ValidMobsConfig.initializeConfig();
+        NPCsConfig.initializeConfigs();
+        MenusConfig.initializeConfigs();
 
         if (WORLDGUARD_IS_ENABLED)
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is enabled!");

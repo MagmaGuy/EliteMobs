@@ -77,6 +77,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         super.setPersistent(customBossConfigFields.getIsPersistent());
         if (customBossConfigFields.getTrails() != null) startBossTrails();
         if (customBossConfigFields.getLocationMessage() != null) sendLocation();
+        if (customBossConfigFields.getDropsVanillaLoot())
+            super.setHasVanillaLoot(customBossConfigFields.getDropsVanillaLoot());
         parseUniqueLootList();
     }
 

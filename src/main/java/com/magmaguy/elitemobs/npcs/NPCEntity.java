@@ -3,14 +3,15 @@ package com.magmaguy.elitemobs.npcs;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.NPCConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -26,7 +27,7 @@ public class NPCEntity {
 
     private Villager villager;
 
-    private String key;
+    private NPCsConfigFields npCsConfigFields;
     private String name;
     private String role;
     private ArmorStand roleDisplay;
@@ -68,59 +69,49 @@ public class NPCEntity {
     }
 
     /**
-     * Gets a specific NPCEntity based on the config key they have
+     * Gets a specific NPCEntity based on the config npCsConfigFields they have
      *
-     * @param key Key of the NPCEntity to get
-     * @return NPCEntity associated to this key
+     * @param npCsConfigFields Fields to compare
+     * @return NPCEntity associated to this npCsConfigFields
      */
-    public static NPCEntity getNPCEntityFromKey(String key) {
+    public static NPCEntity getNPCEntityFromFields(NPCsConfigFields npCsConfigFields) {
         for (NPCEntity npcEntity : npcEntityList)
-            if (npcEntity.key.equalsIgnoreCase(key))
+            if (npcEntity.npCsConfigFields == (npCsConfigFields))
                 return npcEntity;
         return null;
     }
 
     /**
-     * Spawns NPC based off of the values in the NPCConfig config file. Runs at startup and on reload.
-     *
-     * @param key Name of the config key for this NPC
+     * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
      */
-    public NPCEntity(String key) {
+    public NPCEntity(NPCsConfigFields npCsConfigFields) {
 
         try {
 
-            this.key = key;
-
-            key += ".";
-
-            Configuration configuration = ConfigValues.npcConfig;
-
-            if (!setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION))) return;
-            if (!configuration.getBoolean(key + NPCConfig.ENABLED)) return;
-
-            entityFixer(spawnLocation);
+            if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
+            if (!npCsConfigFields.isEnabled()) return;
 
             this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
             this.villager.setRemoveWhenFarAway(true);
 
-            setName(configuration.getString(key + NPCConfig.NAME));
-            initializeRole(configuration.getString(key + NPCConfig.ROLE));
-            setProfession(configuration.getString(key + NPCConfig.TYPE));
-            setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
-            setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
-            setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
-            setCanMove(configuration.getBoolean(key + NPCConfig.CAN_MOVE));
-            setCanTalk(configuration.getBoolean(key + NPCConfig.CAN_TALK));
-            setActivationRadius(configuration.getDouble(key + NPCConfig.ACTIVATION_RADIUS));
-            setDisappearsAtNight(configuration.getBoolean(key + NPCConfig.DISAPPEARS_AT_NIGHT));
-            setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
+            setName(npCsConfigFields.getName());
+            initializeRole(npCsConfigFields.getRole());
+            setProfession(npCsConfigFields.getProfession());
+            setGreetings(npCsConfigFields.getGreetings());
+            setDialog(npCsConfigFields.getDialog());
+            setFarewell(npCsConfigFields.getFarewell());
+            setCanMove(npCsConfigFields.isCanMove());
+            setCanTalk(npCsConfigFields.isCanTalk());
+            setActivationRadius(npCsConfigFields.getActivationRadius());
+            setDisappearsAtNight(npCsConfigFields.isCanSleep());
+            setNpcInteractionType(npCsConfigFields.getInteractionType());
 
             EntityTracker.registerNPCEntity(this);
             addNPCEntity(this);
 
         } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Error loading " + key);
+            Bukkit.getLogger().warning("[EliteMobs] Error loading " + this.npCsConfigFields);
             Bukkit.getLogger().warning("[EliteMobs] This is probably caused by a bad configuration entry for the NPCs!");
         }
 
@@ -133,7 +124,6 @@ public class NPCEntity {
     public void respawnNPC() {
         if (Bukkit.getEntity(villager.getUniqueId()) != null)
             Bukkit.getEntity(villager.getUniqueId()).remove();
-        entityFixer(spawnLocation);
         villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         villager.setCustomName(name);
         villager.setCustomNameVisible(true);
@@ -545,19 +535,6 @@ public class NPCEntity {
      */
     private String selectString(List<String> strings) {
         return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
-    }
-
-    /**
-     * Clears villagers and armor stands standing near the location the villager is at. This is done to fix incorrect
-     * EliteMobs shutdowns, such as those caused by crashes or plugin-halting errors.
-     *
-     * @param location Location of the villager to scan around
-     */
-    private void entityFixer(Location location) {
-        for (Entity entity : location.getWorld().getNearbyEntities(location, 1, 3, 1))
-            if (entity.getType().equals(EntityType.VILLAGER) || entity.getType().equals(EntityType.ARMOR_STAND))
-                if (!EntityTracker.isNPCEntity(entity) && !EntityTracker.isArmorStand(entity))
-                    entity.remove();
     }
 
 }
