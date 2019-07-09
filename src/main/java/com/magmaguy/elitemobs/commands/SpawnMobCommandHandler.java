@@ -55,7 +55,7 @@ public class SpawnMobCommandHandler {
                 validEntities += entities + ", ";
             commandSender.sendMessage("[EliteMobs] Valid mob types:" + validEntities);
             String validNames = "";
-            for (String fileName : CustomBossesConfig.getCustomBossConfigList().keySet())
+            for (String fileName : CustomBossesConfig.getCustomBosses().keySet())
                 validNames += fileName + ", ";
             commandSender.sendMessage("[EliteMobs] Valid custom mob names: " + validNames);
         }
@@ -68,14 +68,14 @@ public class SpawnMobCommandHandler {
             if (!configName.contains(".yml"))
                 configName += ".yml";
 
-            if (!CustomBossesConfig.getCustomBossConfigList().containsKey(configName)) {
+            if (!CustomBossesConfig.getCustomBosses().containsKey(configName)) {
                 commandSender.sendMessage("[EliteMobs] Error trying to obtain mob type or name.");
                 String validEntities = "";
                 for (EntityType entities : EliteMobProperties.getValidMobTypes())
                     validEntities += entities + ", ";
                 commandSender.sendMessage("[EliteMobs] Valid mob types:" + validEntities);
                 String validNames = "";
-                for (String fileName : CustomBossesConfig.getCustomBossConfigList().keySet())
+                for (String fileName : CustomBossesConfig.getCustomBosses().keySet())
                     validNames += fileName + ", ";
                 commandSender.sendMessage("[EliteMobs] Valid custom mob names: " + validNames);
                 return;

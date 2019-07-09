@@ -16,14 +16,14 @@ import java.util.HashMap;
 
 public class CustomBossesConfig {
 
-    private static HashMap<String, FileConfiguration> customBossConfigList = new HashMap<>();
+    private static HashMap<String, CustomBossConfigFields> customBosses = new HashMap<>();
 
-    public static HashMap<String, FileConfiguration> getCustomBossConfigList() {
-        return customBossConfigList;
+    public static HashMap<String, CustomBossConfigFields> getCustomBosses() {
+        return customBosses;
     }
 
-    public static FileConfiguration getCustomBossConfig(String fileName) {
-        return customBossConfigList.get(fileName);
+    public static CustomBossConfigFields getCustomBoss(String fileName) {
+        return customBosses.get(fileName);
     }
 
     private static ArrayList<CustomBossConfigFields> customBossConfigFieldsList = new ArrayList<>(Arrays.asList(
@@ -80,7 +80,7 @@ public class CustomBossesConfig {
      */
     private static void generateFreshConfigurations() {
         for (CustomBossConfigFields customBossConfigFields : customBossConfigFieldsList)
-            customBossConfigList.put(customBossConfigFields.getFileName(), initializeConfiguration(customBossConfigFields));
+            initializeConfiguration(customBossConfigFields);
     }
 
     /**
@@ -96,7 +96,7 @@ public class CustomBossesConfig {
         customBossConfigFields.generateConfigDefaults(fileConfiguration);
         ConfigurationEngine.fileSaver(fileConfiguration, file);
 
-        customBossConfigList.put(file.getName(), fileConfiguration);
+        customBosses.put(file.getName(), new CustomBossConfigFields(fileConfiguration, file));
 
         return fileConfiguration;
 
@@ -110,7 +110,7 @@ public class CustomBossesConfig {
     private static FileConfiguration initializeConfiguration(File file) {
         //TODO: add actual checks of what people are putting in here
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        customBossConfigList.put(file.getName(), fileConfiguration);
+        customBosses.put(file.getName(), new CustomBossConfigFields(fileConfiguration, file));
         return fileConfiguration;
     }
 
