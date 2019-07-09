@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
@@ -33,7 +34,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     public static CustomBossEntity constructCustomBoss(String fileName, Location location, int mobLevel) {
-        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossConfigFields.getCustomBossMobConfigFields(fileName);
+        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
         if (!customBossMobsConfigAttributes.isEnabled()) return null;
 
         HashSet<ElitePower> elitePowers = new HashSet<>();

@@ -3,13 +3,10 @@ package com.magmaguy.elitemobs.config.custombosses;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.util.List;
 
 public class CustomBossConfigFields {
-
-    public static CustomBossConfigFields getCustomBossMobConfigFields(String fileName) {
-        return new CustomBossConfigFields(CustomBossesConfig.getCustomBossConfig(fileName));
-    }
 
     private String fileName;
     private String entityType;
@@ -132,9 +129,9 @@ public class CustomBossConfigFields {
     /**
      * Pulls from the config so it can be used in other spots
      */
-    public CustomBossConfigFields(FileConfiguration configuration) {
+    public CustomBossConfigFields(FileConfiguration configuration, File file) {
 
-        this.fileName = configuration.getName();
+        this.fileName = file.getName();
         this.entityType = configuration.getString("entityType");
         if (configuration.get("isEnabled") != null)
             this.isEnabled = configuration.getBoolean("isEnabled");
