@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -23,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity {
 
-    private static HashSet<NPCEntity> npcEntityList = new HashSet<>();
+    private static HashSet<NPCEntity> npcEntityHashSet = new HashSet<>();
 
     private Villager villager;
 
@@ -50,11 +51,11 @@ public class NPCEntity {
      * @return List of all NPCEntities
      */
     private static HashSet<NPCEntity> getNPCEntityList() {
-        return npcEntityList;
+        return npcEntityHashSet;
     }
 
     public static void addNPCEntity(NPCEntity npcEntity) {
-        npcEntityList.add(npcEntity);
+        npcEntityHashSet.add(npcEntity);
     }
 
     /**
@@ -65,7 +66,7 @@ public class NPCEntity {
     public static void removeNPCEntity(NPCEntity npcEntity) {
         npcEntity.villager.remove();
         npcEntity.roleDisplay.remove();
-        npcEntityList.remove(npcEntity);
+        npcEntityHashSet.remove(npcEntity);
     }
 
     /**
@@ -75,9 +76,10 @@ public class NPCEntity {
      * @return NPCEntity associated to this npCsConfigFields
      */
     public static NPCEntity getNPCEntityFromFields(NPCsConfigFields npCsConfigFields) {
-        for (NPCEntity npcEntity : npcEntityList)
-            if (npcEntity.npCsConfigFields == (npCsConfigFields))
+        for (NPCEntity npcEntity : npcEntityHashSet)
+            if (npcEntity.npCsConfigFields.getFileName().equals(npCsConfigFields.getFileName()))
                 return npcEntity;
+
         return null;
     }
 
@@ -86,34 +88,29 @@ public class NPCEntity {
      */
     public NPCEntity(NPCsConfigFields npCsConfigFields) {
 
-        try {
+        this.npCsConfigFields = npCsConfigFields;
 
-            if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
-            if (!npCsConfigFields.isEnabled()) return;
+        if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
+        if (!npCsConfigFields.isEnabled()) return;
 
-            this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+        this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
-            this.villager.setRemoveWhenFarAway(true);
+        this.villager.setRemoveWhenFarAway(true);
 
-            setName(npCsConfigFields.getName());
-            initializeRole(npCsConfigFields.getRole());
-            setProfession(npCsConfigFields.getProfession());
-            setGreetings(npCsConfigFields.getGreetings());
-            setDialog(npCsConfigFields.getDialog());
-            setFarewell(npCsConfigFields.getFarewell());
-            setCanMove(npCsConfigFields.isCanMove());
-            setCanTalk(npCsConfigFields.isCanTalk());
-            setActivationRadius(npCsConfigFields.getActivationRadius());
-            setDisappearsAtNight(npCsConfigFields.isCanSleep());
-            setNpcInteractionType(npCsConfigFields.getInteractionType());
+        setName(npCsConfigFields.getName());
+        initializeRole(npCsConfigFields.getRole());
+        setProfession(npCsConfigFields.getProfession());
+        setGreetings(npCsConfigFields.getGreetings());
+        setDialog(npCsConfigFields.getDialog());
+        setFarewell(npCsConfigFields.getFarewell());
+        setCanMove(npCsConfigFields.isCanMove());
+        setCanTalk(npCsConfigFields.isCanTalk());
+        setActivationRadius(npCsConfigFields.getActivationRadius());
+        setDisappearsAtNight(npCsConfigFields.isCanSleep());
+        setNpcInteractionType(npCsConfigFields.getInteractionType());
 
-            EntityTracker.registerNPCEntity(this);
-            addNPCEntity(this);
-
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Error loading " + this.npCsConfigFields);
-            Bukkit.getLogger().warning("[EliteMobs] This is probably caused by a bad configuration entry for the NPCs!");
-        }
+        EntityTracker.registerNPCEntity(this);
+        addNPCEntity(this);
 
     }
 
@@ -134,6 +131,7 @@ public class NPCEntity {
             Bukkit.getEntity(roleDisplay.getUniqueId()).remove();
         initializeRole(role);
         EntityTracker.registerNPCEntity(this);
+        addNPCEntity(this);
     }
 
     /**
@@ -476,7 +474,12 @@ public class NPCEntity {
      * @param npcInteractionType Type of interaction enum to be set
      */
     public void setNpcInteractionType(String npcInteractionType) {
-        this.npcInteractionType = NPCInteractions.NPCInteractionType.valueOf(npcInteractionType);
+        try {
+            this.npcInteractionType = NPCInteractions.NPCInteractionType.valueOf(npcInteractionType);
+        } catch (Exception ex) {
+            new WarningMessage("NPC " + this.npCsConfigFields.getFileName() + " does not have a valid interaction type.");
+            this.npcInteractionType = NPCInteractions.NPCInteractionType.NONE;
+        }
     }
 
     /**

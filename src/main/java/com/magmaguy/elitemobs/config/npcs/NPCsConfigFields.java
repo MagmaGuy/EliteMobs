@@ -3,17 +3,10 @@ package com.magmaguy.elitemobs.config.npcs;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.util.List;
 
 public class NPCsConfigFields {
-
-    public static NPCsConfigFields getNPCsConfigFields(String fileName) {
-        if (!fileName.contains(".yml")) fileName += ".yml";
-        for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList())
-            if (npCsConfigFields.fileConfiguration.equals(fileName))
-                return npCsConfigFields;
-        return null;
-    }
 
     private String fileName;
     private boolean isEnabled;
@@ -61,7 +54,7 @@ public class NPCsConfigFields {
         this.interactionType = interactionType;
     }
 
-    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
         fileConfiguration.addDefault("isEnabled", isEnabled);
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("role", role);
@@ -75,12 +68,11 @@ public class NPCsConfigFields {
         fileConfiguration.addDefault("activationRadius", activationRadius);
         fileConfiguration.addDefault("canSleep", canSleep);
         fileConfiguration.addDefault("interactionType", interactionType);
-        return fileConfiguration;
     }
 
-    public NPCsConfigFields(FileConfiguration fileConfiguration) {
+    public NPCsConfigFields(FileConfiguration fileConfiguration, File file) {
         this.fileConfiguration = fileConfiguration;
-        this.fileName = fileConfiguration.getName();
+        this.fileName = file.getName();
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
         this.name = fileConfiguration.getString("name");
         this.role = fileConfiguration.getString("role");

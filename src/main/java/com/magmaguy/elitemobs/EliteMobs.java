@@ -9,7 +9,9 @@ import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
@@ -33,6 +35,7 @@ import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -60,20 +63,7 @@ public class EliteMobs extends JavaPlugin {
         /*
         New config loading
          */
-        CustomEnchantmentsConfig.initializeConfig();
-        AntiExploitConfig.initializeConfig();
-        CombatTagConfig.initializeConfig();
-        GuildRankData.initializeConfig();
-        PlayerMoneyData.initializeConfig();
-        CustomBossesConfig.initializeConfigs();
-        CustomLootConfig.initializeConfigs();
-        CustomItem.initializeCustomItems();
-        AntiExploitConfig.initializeConfig();
-        AdventurersGuildConfig.initializeConfig();
-        ValidWorldsConfig.initializeConfig();
-        ValidMobsConfig.initializeConfig();
-        NPCsConfig.initializeConfigs();
-        MenusConfig.initializeConfigs();
+        initializeConfigs();
 
         if (WORLDGUARD_IS_ENABLED)
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is enabled!");
@@ -193,6 +183,25 @@ public class EliteMobs extends JavaPlugin {
 
     }
 
+    public static void initializeConfigs() {
+        CustomEnchantmentsConfig.initializeConfig();
+        AntiExploitConfig.initializeConfig();
+        CombatTagConfig.initializeConfig();
+        GuildRankData.initializeConfig();
+        PlayerMoneyData.initializeConfig();
+        CustomBossesConfig.initializeConfigs();
+        CustomLootConfig.initializeConfigs();
+        CustomItem.initializeCustomItems();
+        AntiExploitConfig.initializeConfig();
+        AdventurersGuildConfig.initializeConfig();
+        ValidWorldsConfig.initializeConfig();
+        ValidMobsConfig.initializeConfig();
+        NPCsConfig.initializeConfigs();
+        MenusConfig.initializeConfigs();
+        PowersConfig.initializeConfigs();
+        MobPropertiesConfig.initializeConfigs();
+    }
+
     public static void worldScanner() {
         for (World world : Bukkit.getWorlds())
             if (ValidWorldsConfig.getBoolean("Valid worlds." + world.getName()))
@@ -209,8 +218,7 @@ public class EliteMobs extends JavaPlugin {
         new PotionEffectApplier().runTaskTimer(this, 20, 20 * 5);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_POWER_SCOREBOARDS))
             new ScoreboardUpdater().runTaskTimer(this, 20, 20);
-        if (ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
-                ValidMobsConfig.getBoolean(ValidMobsConfig.CHICKEN) &&
+        if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() &&
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
     }

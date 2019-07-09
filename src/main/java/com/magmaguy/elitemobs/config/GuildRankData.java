@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.List;
 
 public class GuildRankData {
 
@@ -15,28 +14,8 @@ public class GuildRankData {
         return fileConfiguration;
     }
 
-    public static boolean getBoolean(String entry) {
-        return fileConfiguration.getBoolean(entry);
-    }
-
-    public static String getString(String entry) {
-        return fileConfiguration.getString(entry);
-    }
-
-    public static List<String> getStringList(String entry) {
-        return fileConfiguration.getStringList(entry);
-    }
-
     public static int getInt(String entry) {
         return fileConfiguration.getInt(entry);
-    }
-
-    public static double getDouble(String entry) {
-        return fileConfiguration.getDouble(entry);
-    }
-
-    public static File getFile() {
-        return file;
     }
 
     public static void saveConfig() {
@@ -48,8 +27,8 @@ public class GuildRankData {
     }
 
     public static void initializeConfig() {
-        file = EliteConfigGenerator.getFile("data", "playerGuildRank.yml");
-        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
+        file = ConfigurationEngine.fileCreator("data", "playerGuildRank.yml");
+        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
     }
 
 }

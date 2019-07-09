@@ -4,8 +4,8 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobpowers.ElitePower;
-import com.magmaguy.elitemobs.mobpowers.MajorPower;
+import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -93,13 +93,23 @@ public class MajorPowerPowerStance implements Listener {
         for (ElitePower elitePower : eliteMobEntity.getPowers())
             if (elitePower instanceof MajorPower)
                 if (eliteMobEntity.getPower(elitePower).getTrail() != null)
-                    if (eliteMobEntity.getPower(elitePower).getTrail() instanceof Material)
-                        effects.add(addEffect((Material) eliteMobEntity.getPower(elitePower).getTrail()));
-                    else if (eliteMobEntity.getPower(elitePower).getTrail() instanceof Particle)
-                        effects.add(addEffect((Particle) eliteMobEntity.getPower(elitePower).getTrail()));
+                    effectParser(eliteMobEntity.getPower(elitePower).getTrail());
 
         return effects;
 
+    }
+
+    private void effectParser(String powerString) {
+        try {
+            Material material = Material.valueOf(powerString);
+            addEffect(material);
+        } catch (Exception ex) {
+        }
+        try {
+            Particle particle = Particle.valueOf(powerString);
+            addEffect(particle);
+        } catch (Exception ex) {
+        }
     }
 
     private Object addEffect(Material material) {
