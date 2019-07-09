@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.mobproperties;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
+import java.io.File;
 import java.util.List;
 
 public class MobPropertiesConfigFields {
@@ -27,8 +28,17 @@ public class MobPropertiesConfigFields {
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
         fileConfiguration.addDefault("isEnabled", isEnabled);
+        fileConfiguration.addDefault("entityType", entityType.toString());
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("deathMessages", deathMessages);
+    }
+
+    public MobPropertiesConfigFields(FileConfiguration configuration, File file) {
+        this.fileName = file.getName();
+        this.entityType = EntityType.valueOf(configuration.getString("entityType"));
+        this.isEnabled = configuration.getBoolean("isEnabled");
+        this.name = configuration.getString("name");
+        this.deathMessages = configuration.getStringList("deathMessages");
     }
 
     public String getFileName() {
