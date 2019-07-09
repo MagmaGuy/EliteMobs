@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobPowersConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.config.ValidMobsConfig;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.skeleton.SkeletonPillar;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.skeleton.SkeletonTrackingArrow;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
+import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
+import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
 import org.bukkit.entity.EntityType;
 
 import java.util.HashSet;
@@ -14,7 +14,7 @@ public class EliteSkeleton extends EliteMobProperties {
 
     public EliteSkeleton() {
 
-        this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_SKELETON);
+        this.name = ChatColorConverter.convert(MobPropertiesConfig.getMobProperties().get(EntityType.SKELETON).getName());
 
         this.entityType = EntityType.SKELETON;
 
@@ -30,8 +30,7 @@ public class EliteSkeleton extends EliteMobProperties {
         this.validOffensivePowers.addAll(super.getAllOffensivePowers());
         this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        this.isEnabled = ValidMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
-                ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
+        this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.SKELETON).isEnabled();
 
         if (this.isEnabled)
             eliteMobData.add(this);

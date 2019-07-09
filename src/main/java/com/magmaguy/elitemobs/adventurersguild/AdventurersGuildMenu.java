@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.adventurersguild.guildattributes.RankName;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
@@ -10,7 +9,6 @@ import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -164,7 +162,7 @@ public class AdventurersGuildMenu implements Listener {
         }
 
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(RankName.getNameFromRank(rank) + " rank");
+        itemMeta.setDisplayName(GuildRank.getRankName(rank) + " rank");
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
@@ -302,6 +300,8 @@ public class AdventurersGuildMenu implements Listener {
         if (selectedTier < maxTier + 1) {
             PlayerData.playerSelectedGuildRank.put(event.getWhoClicked().getUniqueId(), selectedTier);
             difficultyMenu((Player) event.getWhoClicked());
+            if (AdventurersGuildConfig.addMaxHealth)
+                MaxHealthHandler.adjustMaxHealth((Player) event.getWhoClicked());
         }
 
         if (selectedTier == maxTier + 1) {
@@ -311,13 +311,13 @@ public class AdventurersGuildMenu implements Listener {
                 EconomyHandler.subtractCurrency(event.getWhoClicked().getUniqueId(), tierPriceCalculator(selectedTier));
                 GuildRank.setRank((Player) event.getWhoClicked(), selectedTier);
                 GuildRank.setActiveRank((Player) event.getWhoClicked(), selectedTier);
-                event.getWhoClicked().sendMessage(ChatColorConverter.convert("&aYou have unlocked the " + RankName.getNameFromRank(selectedTier) + " &arank for " +
+                event.getWhoClicked().sendMessage(ChatColorConverter.convert("&aYou have unlocked the " + GuildRank.getRankName(selectedTier) + " &arank for " +
                         tierPriceCalculator(selectedTier) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + ". \n&6Happy hunting!"));
                 difficultyMenu((Player) event.getWhoClicked());
                 Bukkit.broadcastMessage(ChatColorConverter.convert(
-                        ((Player) event.getWhoClicked()).getDisplayName() + " has reached the " + RankName.getNameFromRank(selectedTier) + " &fguild rank!"));
-                if (AdventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
-                    event.getWhoClicked().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue((selectedTier - 10) * 2 + 20);
+                        ((Player) event.getWhoClicked()).getDisplayName() + " has reached the " + GuildRank.getRankName(selectedTier) + " &fguild rank!"));
+                if (AdventurersGuildConfig.addMaxHealth)
+                    MaxHealthHandler.adjustMaxHealth((Player) event.getWhoClicked());
             }
         }
 

@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 public class TheReturnedConfig extends CustomBossConfigFields {
     public TheReturnedConfig() {
         super("the_returned",
-                EntityType.ZOMBIE.toString(),
+                EntityType.HUSK.toString(),
                 true,
                 "&6The Returned",
                 "dynamic",

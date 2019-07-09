@@ -12,7 +12,7 @@ public class NPCInitializer {
      */
     public NPCInitializer() {
 
-        for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList())
+        for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList().values())
             new NPCEntity(npCsConfigFields);
 
         Bukkit.getPluginManager().registerEvents(new NPCChunkLoad(), MetadataHandler.PLUGIN);

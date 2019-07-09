@@ -54,7 +54,7 @@ public class CustomLootConfigFields {
     /**
      * Generates config defaults to be used by CustomBossesConfig
      */
-    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
         fileConfiguration.addDefault("isEnabled", isEnabled);
         fileConfiguration.addDefault("material", material);
         fileConfiguration.addDefault("name", name);
@@ -64,7 +64,6 @@ public class CustomLootConfigFields {
         fileConfiguration.addDefault("dropWeight", dropWeight);
         fileConfiguration.addDefault("scalability", scalability);
         fileConfiguration.addDefault("itemType", itemType);
-        return fileConfiguration;
     }
 
     public CustomLootConfigFields(String fileName, FileConfiguration configuration) {

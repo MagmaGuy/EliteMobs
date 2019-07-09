@@ -1,13 +1,13 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobPowersConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.config.ValidMobsConfig;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieBloat;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieFriends;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieNecronomicon;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieParents;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieFriends;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
 import org.bukkit.entity.EntityType;
 
 import java.util.HashSet;
@@ -16,7 +16,7 @@ public class EliteZombie extends EliteMobProperties {
 
     public EliteZombie() {
 
-        this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_ZOMBIE);
+        this.name = ChatColorConverter.convert(MobPropertiesConfig.getMobProperties().get(EntityType.ZOMBIE).getName());
 
         this.entityType = EntityType.ZOMBIE;
 
@@ -36,8 +36,7 @@ public class EliteZombie extends EliteMobProperties {
         this.validOffensivePowers.addAll(super.getAllOffensivePowers());
         this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        this.isEnabled = ValidMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
-                ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
+        this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.ZOMBIE).isEnabled();
 
         if (this.isEnabled)
             eliteMobData.add(this);

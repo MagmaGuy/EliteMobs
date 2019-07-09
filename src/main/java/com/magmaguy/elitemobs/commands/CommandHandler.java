@@ -1,22 +1,18 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.commands.npc.NPCCommands;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
-import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.items.ShareItem;
-import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.quests.PlayerQuest;
 import com.magmaguy.elitemobs.quests.QuestCommand;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
-import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -156,8 +152,8 @@ public class CommandHandler implements CommandExecutor {
             case "reload":
             case "restart":
                 if (permCheck(RELOAD_CONFIGS, commandSender))
-//                    ReloadHandler.reloadCommand(commandSender, args);
-                    return true;
+                    ReloadHandler.reload(commandSender);
+                return true;
             case "killall":
             case "kill":
                 KillHandler.killCommand(commandSender, args);
@@ -212,88 +208,7 @@ public class CommandHandler implements CommandExecutor {
                 if (permCheck(CURRENCY_SET, commandSender))
                     CurrencyCommandsHandler.setCommand(commandSender, args);
             case ("npc"):
-                if (args.length <= 1) {
-                    commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                    commandSender.sendMessage("/em npc set [npc filename]");
-                    commandSender.sendMessage("/em npc remove [npc filename]");
-                    return true;
-                } else {
-
-                    if (args[1].equalsIgnoreCase("set")) {
-
-                        if (permCheck("elitemobs.npc.set", commandSender)) {
-
-                            if (args.length == 2) {
-                                commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                                commandSender.sendMessage("/em npc set [filename]");
-                                commandSender.sendMessage("Valid keys: ");
-                                for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList())
-                                    commandSender.sendMessage(npCsConfigFields.getFileName());
-                                return true;
-                            }
-
-                            NPCsConfigFields npCsConfigFields = NPCsConfigFields.getNPCsConfigFields(args[2]);
-                            if (npCsConfigFields == null) {
-                                commandSender.sendMessage("[EliteMobs] Invalid NPC filename.");
-                                return true;
-                            }
-
-                            Location playerLocation = ((Player) commandSender).getLocation();
-
-                            String location = playerLocation.getWorld().getName() + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getX()) + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getY()) + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getZ()) + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getYaw()) + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getPitch());
-
-                            try {
-                                NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromFields(npCsConfigFields));
-                                npCsConfigFields.setEnabled(true);
-                                npCsConfigFields.setLocation(location);
-                                new NPCEntity(npCsConfigFields);
-                            } catch (Exception e) {
-                                commandSender.sendMessage("[EliteMobs] Invalid NPC filename.");
-                            }
-
-                        }
-
-                        return true;
-
-                    }
-                    if (args[1].equalsIgnoreCase("remove")) {
-
-                        if (permCheck("elitemobs.npc.remove", commandSender)) {
-
-                            if (args.length == 2) {
-                                commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                                commandSender.sendMessage("/em npc remove [filename]");
-                                commandSender.sendMessage("Valid keys: ");
-                                for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList())
-                                    commandSender.sendMessage(npCsConfigFields.getFileName());
-                                return true;
-                            }
-
-                            NPCsConfigFields npCsConfigFields = NPCsConfigFields.getNPCsConfigFields(args[2]);
-                            if (npCsConfigFields == null) {
-                                commandSender.sendMessage("[EliteMobs] Invalid NPC filename.");
-                                return true;
-                            }
-
-                            try {
-                                NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromFields(npCsConfigFields));
-                                npCsConfigFields.setEnabled(false);
-                                new NPCEntity(npCsConfigFields);
-                            } catch (Exception e) {
-                                commandSender.sendMessage("[EliteMobs] Invalid NPC filename.");
-                                return true;
-                            }
-                        }
-
-                        return true;
-                    }
-
-                }
+                NPCCommands.parseNPCCommand(commandSender, args);
                 return true;
             case "autosetup":
                 if (!permCheck("elitemobs.autosetup", commandSender)) return true;
@@ -303,20 +218,20 @@ public class CommandHandler implements CommandExecutor {
 
                 for (File listOfFile : listOfFiles) {
                     if (listOfFile.isDirectory() &&
-                            listOfFile.getName().equals(AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME))) {
-                        commandSender.sendMessage("[EliteMobs] World " + AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " found! Loading it in...");
+                            listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName)) {
+                        commandSender.sendMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " found! Loading it in...");
                         worldFolderExists = true;
                         break;
                     }
                 }
 
                 if (!worldFolderExists) {
-                    commandSender.sendMessage("[EliteMobs] Could not import world " + AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " ! " +
+                    commandSender.sendMessage("[EliteMobs] Could not import world " + AdventurersGuildConfig.guildWorldName + " ! " +
                             "It is not in your worlds directory. If you wish to use the default world, you can find the link to download it on the resource page over at https://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/");
                     return true;
                 }
 
-                Bukkit.createWorld(new WorldCreator(AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME)));
+                Bukkit.createWorld(new WorldCreator(AdventurersGuildConfig.guildWorldName));
                 commandSender.sendMessage("[EliteMobs] Successfully imported the world!");
                 commandSender.sendMessage("[EliteMobs] Now all you need to do is add the permission elitemobs.user to your users and you're all set!");
                 return true;

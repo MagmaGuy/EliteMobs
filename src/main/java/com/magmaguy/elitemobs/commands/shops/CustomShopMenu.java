@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.commands.shops;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.menus.BuyOrSellMenuConfig;
-import com.magmaguy.elitemobs.config.menus.CustomShopMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.CustomShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;

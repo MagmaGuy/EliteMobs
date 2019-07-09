@@ -11,7 +11,7 @@ public class SpawnControl implements Listener {
     public void onSpawn(CreatureSpawnEvent event) {
 
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)) return;
-        if (!event.getLocation().getWorld().getName().equals(AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME)))
+        if (!event.getLocation().getWorld().getName().equals(AdventurersGuildConfig.guildWorldName))
             return;
 
         event.setCancelled(true);

@@ -1,15 +1,14 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.config.ValidMobsConfig;
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import org.bukkit.entity.EntityType;
 
 public class ElitePigZombie extends EliteMobProperties {
 
     public ElitePigZombie() {
 
-        this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_PIG_ZOMBIE);
+        this.name = ChatColorConverter.convert(MobPropertiesConfig.getMobProperties().get(EntityType.PIG_ZOMBIE).getName());
 
         this.entityType = EntityType.PIG_ZOMBIE;
 
@@ -19,8 +18,7 @@ public class ElitePigZombie extends EliteMobProperties {
         this.validOffensivePowers.addAll(super.getAllOffensivePowers());
         this.validMiscellaneousPowers.addAll(super.getAllMiscellaneousPowers());
 
-        this.isEnabled = ValidMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
-                ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
+        this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.PIG_ZOMBIE).isEnabled();
 
         if (this.isEnabled)
             eliteMobData.add(this);

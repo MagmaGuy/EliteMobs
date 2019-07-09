@@ -1,94 +1,53 @@
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.List;
 
 public class AdventurersGuildConfig {
 
-    public static final String ENABLE_ADVENTURERS_GUILD = "Enable adventurer's guild";
-    public static final String ADD_MAX_HEALTH = "Add max health when unlocking higher guild ranks";
-    public static final String GUILD_WORLD_NAME = "Adventurer's Guild world name";
-    public static final String GUILD_WORLD_LOCATION = "Guild world coordinates";
-    public static final String AG_TELEPORT = "Teleport players to the adventurers guild using /ag";
-    private static final String RANK_NAMES = "Adventurers Guild Rank Names";
-    public static final String RANK_NAMES_0 = RANK_NAMES + "0";
-    public static final String RANK_NAMES_1 = RANK_NAMES + "1";
-    public static final String RANK_NAMES_2 = RANK_NAMES + "2";
-    public static final String RANK_NAMES_3 = RANK_NAMES + "3";
-    public static final String RANK_NAMES_4 = RANK_NAMES + "4";
-    public static final String RANK_NAMES_5 = RANK_NAMES + "5";
-    public static final String RANK_NAMES_6 = RANK_NAMES + "6";
-    public static final String RANK_NAMES_7 = RANK_NAMES + "7";
-    public static final String RANK_NAMES_8 = RANK_NAMES + "8";
-    public static final String RANK_NAMES_9 = RANK_NAMES + "9";
-    public static final String RANK_NAMES_10 = RANK_NAMES + "10";
-    public static final String RANK_NAMES_11 = RANK_NAMES + "11";
-
-    private static FileConfiguration fileConfiguration;
-    private static File file;
-
-    public static FileConfiguration getFileConfiguration() {
-        return fileConfiguration;
-    }
-
-    public static boolean getBoolean(String entry) {
-        return fileConfiguration.getBoolean(entry);
-    }
-
-    public static String getString(String entry) {
-        return fileConfiguration.getString(entry);
-    }
-
-    public static List<String> getStringList(String entry) {
-        return fileConfiguration.getStringList(entry);
-    }
-
-    public static int getInt(String entry) {
-        return fileConfiguration.getInt(entry);
-    }
-
-    public static double getDouble(String entry) {
-        return fileConfiguration.getDouble(entry);
-    }
-
-    public static File getFile() {
-        return file;
-    }
-
-    public static void saveConfig() {
-        try {
-            fileConfiguration.save(file);
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Error saving configuration " + file.getName() + "! Report this to the developer!");
-        }
-    }
+    public static boolean enableAdventurersGuild;
+    public static boolean addMaxHealth;
+    public static String guildWorldName;
+    public static String guildWorldLocation;
+    public static boolean agTeleport;
+    private static String RANK_NAMES = "Adventurers Guild Rank Names";
+    public static String rankNames0 = RANK_NAMES + "0";
+    public static String rankNames1 = RANK_NAMES + "1";
+    public static String rankNames2 = RANK_NAMES + "2";
+    public static String rankNames3 = RANK_NAMES + "3";
+    public static String rankNames4 = RANK_NAMES + "4";
+    public static String rankNames5 = RANK_NAMES + "5";
+    public static String rankNames6 = RANK_NAMES + "6";
+    public static String rankNames7 = RANK_NAMES + "7";
+    public static String rankNames8 = RANK_NAMES + "8";
+    public static String rankNames9 = RANK_NAMES + "9";
+    public static String rankNames10 = RANK_NAMES + "10";
+    public static String rankNames11 = RANK_NAMES + "11";
 
     public static void initializeConfig() {
-        file = EliteConfigGenerator.getFile("AdventurersGuild.yml");
-        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
+        File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        fileConfiguration.addDefault(ENABLE_ADVENTURERS_GUILD, true);
-        fileConfiguration.addDefault(ADD_MAX_HEALTH, true);
-        fileConfiguration.addDefault(GUILD_WORLD_NAME, "EliteMobs_adventurers_guild");
-        fileConfiguration.addDefault(GUILD_WORLD_LOCATION, "208.5,88,236.5,-80,0");
-        fileConfiguration.addDefault(AG_TELEPORT, true);
-        fileConfiguration.addDefault(RANK_NAMES_0, "&8Peaceful Villager");
-        fileConfiguration.addDefault(RANK_NAMES_1, "&fCasual Adventurer");
-        fileConfiguration.addDefault(RANK_NAMES_2, "&fAdventurer");
-        fileConfiguration.addDefault(RANK_NAMES_3, "&fProfessional Adventurer");
-        fileConfiguration.addDefault(RANK_NAMES_4, "&2Elite Adventurer");
-        fileConfiguration.addDefault(RANK_NAMES_5, "&2Master Adventurer");
-        fileConfiguration.addDefault(RANK_NAMES_6, "&2Bloodhound");
-        fileConfiguration.addDefault(RANK_NAMES_7, "&1Slayer");
-        fileConfiguration.addDefault(RANK_NAMES_8, "&1Exterminator");
-        fileConfiguration.addDefault(RANK_NAMES_9, "&5&lElite Hunter");
-        fileConfiguration.addDefault(RANK_NAMES_10, "&5Hero");
-        fileConfiguration.addDefault(RANK_NAMES_11, "&6&l&oLegend");
+        enableAdventurersGuild = ConfigurationEngine.setBoolean(fileConfiguration, "Enable adventurer's guild", true);
+        addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
+        guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name", "EliteMobs_adventurers_guild");
+        guildWorldLocation = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
+        agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);
+        rankNames0 = ConfigurationEngine.setString(fileConfiguration, "0", "&8Peaceful Villager");
+        rankNames1 = ConfigurationEngine.setString(fileConfiguration, "1", "&fCasual Adventurer");
+        rankNames2 = ConfigurationEngine.setString(fileConfiguration, "2", "&fAdventurer");
+        rankNames3 = ConfigurationEngine.setString(fileConfiguration, "3", "&fProfessional Adventurer");
+        rankNames4 = ConfigurationEngine.setString(fileConfiguration, "4", "&2Elite Adventurer");
+        rankNames5 = ConfigurationEngine.setString(fileConfiguration, "5", "&2Master Adventurer");
+        rankNames6 = ConfigurationEngine.setString(fileConfiguration, "6", "&2Bloodhound");
+        rankNames7 = ConfigurationEngine.setString(fileConfiguration, "7", "&1Slayer");
+        rankNames8 = ConfigurationEngine.setString(fileConfiguration, "8", "&1Exterminator");
+        rankNames9 = ConfigurationEngine.setString(fileConfiguration, "9", "&5&lElite Hunter");
+        rankNames10 = ConfigurationEngine.setString(fileConfiguration, "10", "&5Hero");
+        rankNames11 = ConfigurationEngine.setString(fileConfiguration, "11", "&6&l&oLegend");
 
-        EliteConfigGenerator.saveDefaults(file, fileConfiguration);
+        ConfigurationEngine.fileSaver(fileConfiguration, file);
     }
 
 }

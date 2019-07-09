@@ -36,23 +36,23 @@ public class QuestsMenu implements Listener {
 
         Inventory inventory = Bukkit.createInventory(player, 18, MAIN_MENU_NAME);
 
-        for (int index = 0; index < 12; index++) {
+        for (int index = 0; index < 11; index++) {
 
             if (GuildRank.isWithinActiveRank(player, index)) {
                 inventory.setItem(index,
                         ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
-                                "&aAccept a " + GuildRank.getRankName(index) + " &aquest!",
-                                Arrays.asList("&aAccept a " + GuildRank.getRankName(index) + " &aquest and", "&aget special rewards!")));
+                                "&aAccept a " + GuildRank.getRankName(index + 1) + " &aquest!",
+                                Arrays.asList("&aAccept a " + GuildRank.getRankName(index + 1) + " &aquest and", "&aget special rewards!")));
 
-            } else if (GuildRank.isWithinRank(player, index)) {
+            } else if (GuildRank.isWithinRank(player, index + 1)) {
                 inventory.setItem(index, ItemStackGenerator.generateItemStack(Material.YELLOW_STAINED_GLASS_PANE,
-                        "&eYou can get a " + GuildRank.getRankName(index) + " &equest!",
+                        "&eYou can get a " + GuildRank.getRankName(index + 1) + " &equest!",
                         Arrays.asList("&eDo /ag and set your", "&eguild rank to " + GuildRank.getRankName(index), "&eto accept these quests!")));
 
             } else {
                 inventory.setItem(index, ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
-                        "&cYou can't get a " + GuildRank.getRankName(index) + " &cquest yet!",
-                        Arrays.asList("&cYou must first unlock the", GuildRank.getRankName(index) + " &cguild rank at /ag", "&cto accept these quests!")));
+                        "&cYou can't get a " + GuildRank.getRankName(index + 1) + " &cquest yet!",
+                        Arrays.asList("&cYou must first unlock the", GuildRank.getRankName(index + 1) + " &cguild rank at /ag", "&cto accept these quests!")));
 
             }
 
@@ -102,7 +102,7 @@ public class QuestsMenu implements Listener {
                 break;
             }
 
-        QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier - 10);
+        QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier);
         PlayerQuest playerQuest = questTierMenu.getPlayerQuests().get(event.getSlot() / 2 - 1);
 
         if (PlayerQuest.hasPlayerQuest((Player) event.getWhoClicked())) {

@@ -1,14 +1,11 @@
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.List;
 
 public class ValidMobsConfig {
 
-    public static final String CONFIG_NAME = "ValidMobs.yml";
     public static final String ALLOW_AGGRESSIVE_ELITEMOBS = "Allow aggressive EliteMobs";
     public static final String ALLOW_PASSIVE_SUPERMOBS = "Allow Passive SuperMobs";
     public static final String VALID_SUPERMOBS = "Valid Super Mobs.";
@@ -39,49 +36,9 @@ public class ValidMobsConfig {
     public static final String WITCH = VALID_AGGRESSIVE_ELITEMOBS + "WITCH";
     public static final String ZOMBIE = VALID_AGGRESSIVE_ELITEMOBS + "ZOMBIE";
 
-    private static FileConfiguration fileConfiguration;
-    private static File file;
-
-    public static FileConfiguration getFileConfiguration() {
-        return fileConfiguration;
-    }
-
-    public static boolean getBoolean(String entry) {
-        return fileConfiguration.getBoolean(entry);
-    }
-
-    public static String getString(String entry) {
-        return fileConfiguration.getString(entry);
-    }
-
-    public static List<String> getStringList(String entry) {
-        return fileConfiguration.getStringList(entry);
-    }
-
-    public static int getInt(String entry) {
-        return fileConfiguration.getInt(entry);
-    }
-
-    public static double getDouble(String entry) {
-        return fileConfiguration.getDouble(entry);
-    }
-
-    public static File getFile() {
-        return file;
-    }
-
-    public static void saveConfig() {
-        try {
-            fileConfiguration.save(file);
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Error saving configuration " + file.getName() + "! Report this to the developer!");
-        }
-    }
-
-
     public static void initializeConfig() {
-        file = EliteConfigGenerator.getFile("ValidMobs.yml");
-        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
+        File file = ConfigurationEngine.fileCreator("ValidMobs.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         fileConfiguration.addDefault(ALLOW_AGGRESSIVE_ELITEMOBS, true);
         fileConfiguration.addDefault(BLAZE, true);
@@ -111,7 +68,7 @@ public class ValidMobsConfig {
         fileConfiguration.addDefault(PIG, true);
         fileConfiguration.addDefault(SHEEP, true);
 
-        EliteConfigGenerator.saveDefaults(file, fileConfiguration);
+        ConfigurationEngine.fileSaver(fileConfiguration, file);
     }
 
 }

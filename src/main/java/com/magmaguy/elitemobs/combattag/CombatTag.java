@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.combattag;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
@@ -32,9 +31,7 @@ public class CombatTag implements Listener {
         if (player.isFlying()) {
             player.setFlying(false);
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    TextComponent.fromLegacyText(
-                            ChatColorConverter.convert(
-                                    CombatTagConfig.getString(CombatTagConfig.COMBAT_TAG_MESSAGE))));
+                    TextComponent.fromLegacyText(CombatTagConfig.combatTagMessage));
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 60, 0));
             new BukkitRunnable() {
                 @Override

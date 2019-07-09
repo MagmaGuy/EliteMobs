@@ -26,7 +26,7 @@ public class ZombieKingConfig extends CustomBossConfigFields {
                 Material.GOLDEN_AXE,
                 null,
                 false,
-                Arrays.asList("FlamePyre", "Flamethrower", "SummonTheReturned", "SpiritWalk"),
+                Arrays.asList("FlamePyreConfig", "Flamethrower", "SummonTheReturned", "SpiritWalk"),
                 "&cThe Zombie King has been sighted!",
                 "&aThe Zombie King has been slain by $players!",
                 "&4The Zombie King has escaped!",

@@ -3,41 +3,24 @@ package com.magmaguy.elitemobs.config;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.List;
 
 public class CustomEnchantmentsConfig {
 
-    public static String HUNTER_NAME = "HunterEnchantment enchantment name";
-    public static String HUNTER_SPAWN_BONUS = "Percentual elite mob increase in spawn rate around the player per hunter enchantment level";
-    public static String FLAMETHROWER_NAME = "FlamethrowerEnchantment enchantment name";
+    public static String hunterName;
+    public static int hunterSpawnBonus;
+    public static String flamethrowerName;
 
-    private static FileConfiguration fileConfiguration;
-
-    public static boolean getBoolean(String entry) {
-        return fileConfiguration.getBoolean(entry);
-    }
-
-    public static String getString(String entry) {
-        return fileConfiguration.getString(entry);
-    }
-
-    public static List<String> getStringList(String entry) {
-        return fileConfiguration.getStringList(entry);
-    }
-
-    public static int getInt(String entry) {
-        return fileConfiguration.getInt(entry);
-    }
 
     public static void initializeConfig() {
-        File file = EliteConfigGenerator.getFile("CustomEnchantments.yml");
-        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
+        File file = ConfigurationEngine.fileCreator("CustomEnchantments.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        fileConfiguration.addDefault(HUNTER_NAME, "HunterEnchantment");
-        fileConfiguration.addDefault(HUNTER_SPAWN_BONUS, 2);
-        fileConfiguration.addDefault(FLAMETHROWER_NAME, "FlamethrowerEnchantment");
+        hunterName = ConfigurationEngine.setString(fileConfiguration, "HunterEnchantment enchantment name", "HunterEnchantment");
+        hunterSpawnBonus = ConfigurationEngine.setInt(fileConfiguration,
+                "Percentual elite mob increase in spawn rate around the player per hunter enchantment level", 2);
+        flamethrowerName = ConfigurationEngine.setString(fileConfiguration, "FlamethrowerEnchantment enchantment name", "FlamethrowerEnchantment");
 
-        EliteConfigGenerator.saveDefaults(file, fileConfiguration);
+        ConfigurationEngine.fileSaver(fileConfiguration, file);
     }
 
 }
