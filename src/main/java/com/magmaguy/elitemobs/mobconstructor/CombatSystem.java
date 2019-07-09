@@ -88,7 +88,7 @@ public class CombatSystem implements Listener {
 
         //Deal with the player getting killed
         if (player.getHealth() - event.getDamage() <= 0)
-            PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.intializeDeathMessage(player, damager));
+            PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, damager));
 
     }
 

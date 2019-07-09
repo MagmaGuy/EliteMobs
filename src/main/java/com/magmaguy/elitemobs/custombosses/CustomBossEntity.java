@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobpowers.ElitePower;
+import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
@@ -191,17 +191,21 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         }
     }
 
-    public HashMap<CustomItem, Double> getUniqueLootList() {
+    private HashMap<CustomItem, Double> getUniqueLootList() {
         return this.uniqueLootList;
     }
 
-    public void setEquipment(Material helmet, Material chestplate, Material leggings, Material boots, Material mainHand, Material offHand) {
-        super.getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(helmet));
-        super.getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(chestplate));
-        super.getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(leggings));
-        super.getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(boots));
-        super.getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(mainHand));
-        super.getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(offHand));
+    private void setEquipment(Material helmet, Material chestplate, Material leggings, Material boots, Material mainHand, Material offHand) {
+        try {
+            super.getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(helmet));
+            super.getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(chestplate));
+            super.getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(leggings));
+            super.getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(boots));
+            super.getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(mainHand));
+            super.getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(offHand));
+        } catch (Exception ex) {
+
+        }
     }
 
     public static class CustomBossEntityEvents implements Listener {

@@ -96,7 +96,7 @@ public class CustomBossConfigFields {
     /**
      * Generates config defaults to be used by CustomBossesConfig
      */
-    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
         fileConfiguration.addDefault("isEnabled", isEnabled);
         fileConfiguration.addDefault("entityType", entityType);
         fileConfiguration.addDefault("name", name);
@@ -127,7 +127,6 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("dropsEliteMobsLoot", dropsEliteMobsLoot);
         fileConfiguration.addDefault("dropsVanillaLoot", dropsVanillaLoot);
         fileConfiguration.addDefault("trails", trails);
-        return fileConfiguration;
     }
 
     /**

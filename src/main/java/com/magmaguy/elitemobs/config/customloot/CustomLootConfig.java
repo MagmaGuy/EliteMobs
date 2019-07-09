@@ -1,14 +1,12 @@
 package com.magmaguy.elitemobs.config.customloot;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.UnusedNodeHandler;
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.customloot.premade.*;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -52,7 +50,7 @@ public class CustomLootConfig {
             for (CustomLootConfigFields customLootConfigFields : customLootConfigFieldsList) {
                 if (file.getName().equalsIgnoreCase(customLootConfigFields.getFileName())) {
                     customLootConfigFieldsList.remove(customLootConfigFields);
-                    initializeConfiguration(file.getName(), customLootConfigFields);
+                    initializeConfiguration(customLootConfigFields);
                     isPremade = true;
                     break;
                 }
@@ -74,7 +72,7 @@ public class CustomLootConfig {
      */
     private static void generateFreshConfigurations() {
         for (CustomLootConfigFields customLootConfigFields : customLootConfigFieldsList)
-            initializeConfiguration(customLootConfigFields.getFileName(), customLootConfigFields);
+            initializeConfiguration(customLootConfigFields);
     }
 
     /**
@@ -83,28 +81,12 @@ public class CustomLootConfig {
      * @param customLootConfigFields
      * @return
      */
-    private static FileConfiguration initializeConfiguration(String fileName, CustomLootConfigFields customLootConfigFields) {
+    private static FileConfiguration initializeConfiguration(CustomLootConfigFields customLootConfigFields) {
 
-        File file = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/customitems", customLootConfigFields.getFileName());
-
-        if (!file.exists())
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (IOException ex) {
-                Bukkit.getLogger().warning("[EliteMobs] Error generating the plugin file: " + file.getName());
-            }
-
-        FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        fileConfiguration.addDefaults(customLootConfigFields.generateConfigDefaults(fileConfiguration));
-        fileConfiguration.options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(fileConfiguration);
-
-        try {
-            fileConfiguration.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        File file = ConfigurationEngine.fileCreator("customitems", customLootConfigFields.getFileName());
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+        customLootConfigFields.generateConfigDefaults(fileConfiguration);
+        ConfigurationEngine.fileSaver(fileConfiguration, file);
 
         CustomLootConfigFields.addCustomLootConfigField(new CustomLootConfigFields(file.getName(), fileConfiguration));
 

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
-import com.magmaguy.elitemobs.config.ValidMobsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
@@ -39,8 +38,7 @@ public class MergeHandler implements Listener {
         if (eventEntity == null) return;
         if (!(eventEntity instanceof LivingEntity)) return;
 
-        if (ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_PASSIVE_SUPERMOBS) &&
-                SuperMobProperties.isValidSuperMobType(eventEntity))
+        if (SuperMobProperties.isValidSuperMobType(eventEntity))
             SuperMobScanner.newSuperMobScan((LivingEntity) eventEntity);
 
     }

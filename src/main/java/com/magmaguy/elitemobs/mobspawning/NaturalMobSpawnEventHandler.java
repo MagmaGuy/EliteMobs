@@ -67,8 +67,6 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING))
             return;
-        if (!ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS))
-            return;
         if (!ValidWorldsConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
             return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && !ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.SPAWNERS_SPAWN_ELITE_MOBS))
@@ -133,7 +131,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         }
 
-        huntingGearChanceAdder = huntingGearChanceAdder * CombatTagConfig.getInt(CustomEnchantmentsConfig.HUNTER_SPAWN_BONUS);
+        huntingGearChanceAdder = huntingGearChanceAdder * CustomEnchantmentsConfig.hunterSpawnBonus;
 
         return huntingGearChanceAdder;
 

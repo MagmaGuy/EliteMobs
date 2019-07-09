@@ -1,25 +1,28 @@
 package com.magmaguy.elitemobs.config.npcs;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.UnusedNodeHandler;
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.npcs.premade.*;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class NPCsConfig {
 
-    private static ArrayList<NPCsConfigFields> NPCsList = new ArrayList<>();
+    private static HashMap<String, NPCsConfigFields> NPCsList = new HashMap<>();
 
-    public static ArrayList<NPCsConfigFields> getNPCsList() {
+    public static HashMap<String, NPCsConfigFields> getNPCsList() {
         return NPCsList;
+    }
+
+    private static void addNPC(String fileName, NPCsConfigFields npCsConfigFields) {
+        NPCsList.put(fileName, npCsConfigFields);
     }
 
     private static ArrayList<NPCsConfigFields> NPCsConfigFieldsList = new ArrayList<NPCsConfigFields>(Arrays.asList(
@@ -75,29 +78,11 @@ public class NPCsConfig {
      */
     private static FileConfiguration initializeConfiguration(NPCsConfigFields npCsConfigFields) {
 
-        File file = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/npcs", npCsConfigFields.getFileName());
-
-        if (!file.exists())
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (IOException ex) {
-                Bukkit.getLogger().warning("[EliteMobs] Error generating the plugin file: " + file.getName());
-            }
-
-        FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        fileConfiguration.addDefaults(npCsConfigFields.generateConfigDefaults(fileConfiguration));
-        fileConfiguration.options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(fileConfiguration);
-
-        try {
-            fileConfiguration.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        NPCsList.add(new NPCsConfigFields(fileConfiguration));
-
+        File file = ConfigurationEngine.fileCreator("npcs", npCsConfigFields.getFileName());
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+        npCsConfigFields.generateConfigDefaults(fileConfiguration);
+        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        addNPC(file.getName(), new NPCsConfigFields(fileConfiguration, file));
         return fileConfiguration;
 
     }
@@ -108,9 +93,8 @@ public class NPCsConfig {
      * @return
      */
     private static FileConfiguration initializeConfiguration(File file) {
-        //TODO: add actual checks of what people are putting in here
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        NPCsList.add(new NPCsConfigFields(fileConfiguration));
+        addNPC(file.getName(), new NPCsConfigFields(fileConfiguration, file));
         return fileConfiguration;
     }
 

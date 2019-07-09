@@ -12,7 +12,7 @@ public class FindNewWorlds implements Listener {
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         ValidWorldsConfig.initializeConfig();
-        if (event.getWorld().getName().equals(AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME)))
+        if (event.getWorld().getName().equals(AdventurersGuildConfig.guildWorldName))
             new NPCInitializer();
     }
 

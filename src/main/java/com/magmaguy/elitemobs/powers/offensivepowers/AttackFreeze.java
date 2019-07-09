@@ -1,0 +1,59 @@
+package com.magmaguy.elitemobs.powers.offensivepowers;
+
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.MobPowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.powers.MinorPower;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+/**
+ * Created by MagmaGuy on 28/04/2017.
+ */
+public class AttackFreeze extends MinorPower implements Listener {
+
+    public AttackFreeze() {
+        super(PowersConfig.getPower("attack_freeze.yml").getName(), PowersConfig.getPower("attack_freeze.yml").getEffect());
+    }
+
+    @EventHandler
+    public void attackFreeze(PlayerDamagedByEliteMobEvent event) {
+        AttackFreeze attackFreeze = (AttackFreeze) event.getEliteMobEntity().getPower(this);
+        if (attackFreeze == null) return;
+        if (attackFreeze.isCooldown()) return;
+
+        attackFreeze.doCooldown(20 * 15);
+
+        /*
+        Slow player down
+         */
+        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 10));
+        event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(
+                        ChatColorConverter.convert(
+                                ConfigValues.mobPowerConfig.getString(
+                                        MobPowersConfig.FROZEN_MESSAGE))));
+
+        /*
+        Add block effect
+         */
+        Block block = event.getPlayer().getLocation().getBlock();
+        Material originalMaterial = block.getType();
+
+        if (!originalMaterial.equals(Material.AIR))
+            return;
+
+        EntityTracker.addTemporaryBlock(block, 20 * 3, Material.PACKED_ICE);
+
+    }
+
+}

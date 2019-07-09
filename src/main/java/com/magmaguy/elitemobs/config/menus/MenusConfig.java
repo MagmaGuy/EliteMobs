@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.config.menus;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.UnusedNodeHandler;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.CustomShopMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -33,26 +32,10 @@ public class MenusConfig {
      */
     private static FileConfiguration initializeConfiguration(MenusConfigFields menusConfigFields) {
 
-        File file = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/menus", menusConfigFields.getFileName());
-
-        if (!file.exists())
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (IOException ex) {
-                Bukkit.getLogger().warning("[EliteMobs] Error generating the plugin file: " + file.getName());
-            }
-
-        FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
+        File file = ConfigurationEngine.fileCreator("menus", menusConfigFields.getFileName());
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         menusConfigFields.generateConfigDefaults(fileConfiguration);
-        fileConfiguration.options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(fileConfiguration);
-
-        try {
-            fileConfiguration.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ConfigurationEngine.fileSaver(fileConfiguration, file);
 
         return fileConfiguration;
 

@@ -14,14 +14,13 @@ public class CustomWorldLoading {
 
         for (File listOfFile : listOfFiles) {
             if (listOfFile.isDirectory() &&
-                    listOfFile.getName().equals(AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME))) {
-                Bukkit.getLogger().warning("[EliteMobs] World " + AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " found! Loading it in...");
-                Bukkit.createWorld(new WorldCreator(AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME)));
-                Bukkit.getLogger().warning("[EliteMobs] World " + AdventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME) + " has been successfully loaded! It can be accessed through the '/ag' command, unless you changed that config option!");
+                    listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName)) {
+                Bukkit.getLogger().warning("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " found! Loading it in...");
+                Bukkit.createWorld(new WorldCreator(AdventurersGuildConfig.guildWorldName));
+                Bukkit.getLogger().warning("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " has been successfully loaded! It can be accessed through the '/ag' command, unless you changed that config option!");
                 break;
             }
         }
-
 
     }
 

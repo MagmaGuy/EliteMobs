@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerDeathMessageByEliteMob implements Listener {
 
@@ -38,65 +39,15 @@ public class PlayerDeathMessageByEliteMob implements Listener {
 
     }
 
-    public static String intializeDeathMessage(Player player, LivingEntity livingEntity) {
+    public static String initializeDeathMessage(Player player, LivingEntity livingEntity) {
 
-        String deathMessage;
+        String deathMessage = "";
 
-        /*
-        Deal with players dying from Elite Mobs
-        */
-
-        switch (livingEntity.getType()) {
-
-            case BLAZE:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.BLAZE_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case CREEPER:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.CREEPER_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case ENDERMAN:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.ENDERMAN_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case ENDERMITE:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.ENDERMITE_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case IRON_GOLEM:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.IRONGOLEM_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case POLAR_BEAR:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.POLARBEAR_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case SILVERFISH:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.SILVERFISH_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case SKELETON:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.SKELETON_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case SPIDER:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.SPIDER_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case WITCH:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.WITCH_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case ZOMBIE:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.ZOMBIE_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case HUSK:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.HUSK_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case PIG_ZOMBIE:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.ZOMBIE_PIGMAN_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case STRAY:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.STRAY_DEATH_MESSAGE, player, livingEntity);
-                break;
-            case WITHER_SKELETON:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.WITHER_SKELETON_DEATH_MESSAGE, player, livingEntity);
-                break;
-            default:
-                deathMessage = deathMessageSender(MobCombatSettingsConfig.DEFAULT_DEATH_MESSAGE, player, livingEntity);
-                break;
-        }
+        if (MobPropertiesConfig.getMobProperties().containsKey(livingEntity.getType()))
+            deathMessage = deathMessageSender
+                    (MobPropertiesConfig.getMobProperties().get(livingEntity.getType()).getDeathMessages().get(
+                            ThreadLocalRandom.current().nextInt(MobPropertiesConfig.getMobProperties().get(livingEntity.getType()).getDeathMessages().size()))
+                            , player, livingEntity);
 
         return deathMessage;
 

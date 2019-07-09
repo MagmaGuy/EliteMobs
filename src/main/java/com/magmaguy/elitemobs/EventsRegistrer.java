@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
-import com.magmaguy.elitemobs.adventurersguild.MaxHealthBoost;
+import com.magmaguy.elitemobs.adventurersguild.MaxHealthHandler;
 import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.antiexploit.*;
 import com.magmaguy.elitemobs.api.*;
@@ -29,28 +29,28 @@ import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobconstructor.displays.DamageDisplay;
 import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobconstructor.displays.HealthDisplay;
-import com.magmaguy.elitemobs.mobpowers.AggroPrevention;
-import com.magmaguy.elitemobs.mobpowers.bosspowers.*;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityArrow;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFallDamage;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFire;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityKnockback;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.skeleton.SkeletonPillar;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.skeleton.SkeletonTrackingArrow;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieBloat;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieFriends;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieNecronomicon;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.zombie.ZombieParents;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Corpse;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Implosion;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
-import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
+import com.magmaguy.elitemobs.powers.AggroPrevention;
+import com.magmaguy.elitemobs.powers.bosspowers.*;
+import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
+import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFallDamage;
+import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFire;
+import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityKnockback;
+import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
+import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieFriends;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.BonusLoot;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.Corpse;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.Implosion;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
@@ -221,19 +221,19 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FlamethrowerEnchantment(), plugin);
 
         //Initialize adventurer's guild
-        if (AdventurersGuildConfig.getBoolean(AdventurersGuildConfig.ENABLE_ADVENTURERS_GUILD))
+        if (AdventurersGuildConfig.enableAdventurersGuild)
             pluginManager.registerEvents(new AdventurersGuildMenu(), plugin);
-        if (AdventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
-            pluginManager.registerEvents(new MaxHealthBoost(), plugin);
+        if (AdventurersGuildConfig.addMaxHealth)
+            pluginManager.registerEvents(new MaxHealthHandler(), plugin);
         pluginManager.registerEvents(new SpawnControl(), plugin);
         //register quests
         pluginManager.registerEvents(new QuestsMenu(), plugin);
         pluginManager.registerEvents(new QuestsTracker(), plugin);
 
         //Combat tag
-        if (CombatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
+        if (CombatTagConfig.enableCombatTag)
             pluginManager.registerEvents(new CombatTag(), plugin);
-        if (CombatTagConfig.getBoolean(CombatTagConfig.ENABLE_TELEPORT_TIMER))
+        if (CombatTagConfig.enableTeleportTimer)
             pluginManager.registerEvents(new TeleportTag(), plugin);
 
 

@@ -49,13 +49,13 @@ public class ValidWorldsConfig {
     }
 
     public static void initializeConfig() {
-        file = EliteConfigGenerator.getFile("ValidWorlds.yml");
-        fileConfiguration = EliteConfigGenerator.getFileConfiguration(file);
+        file = ConfigurationEngine.fileCreator("ValidWorlds.yml");
+        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         for (World world : Bukkit.getWorlds())
             fileConfiguration.addDefault("Valid worlds." + world.getName(), true);
 
-        EliteConfigGenerator.saveDefaults(file, fileConfiguration);
+        ConfigurationEngine.fileSaver(fileConfiguration, file);
     }
 
 }

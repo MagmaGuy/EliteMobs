@@ -10,7 +10,7 @@ public class VersionHandler {
     public static void versionCommand(CommandSender commandSender, String[] args){
 
         commandSender.sendMessage(ChatColor.DARK_GREEN + "[EliteMobs]" + ChatColor.WHITE + " version " + ChatColor.GREEN +
-                Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion() + " (1.14 edition)");
+                Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion());
 
     }
 

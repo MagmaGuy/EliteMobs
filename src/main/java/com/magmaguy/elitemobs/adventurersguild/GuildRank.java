@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
@@ -97,29 +96,29 @@ public class GuildRank {
 
         switch (rank) {
             case 0:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_0));
+                return AdventurersGuildConfig.rankNames0;
             case 1:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_1));
+                return AdventurersGuildConfig.rankNames1;
             case 2:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_2));
+                return AdventurersGuildConfig.rankNames2;
             case 3:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_3));
+                return AdventurersGuildConfig.rankNames3;
             case 4:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_4));
+                return AdventurersGuildConfig.rankNames4;
             case 5:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_5));
+                return AdventurersGuildConfig.rankNames5;
             case 6:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_6));
+                return AdventurersGuildConfig.rankNames6;
             case 7:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_7));
+                return AdventurersGuildConfig.rankNames7;
             case 8:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_8));
+                return AdventurersGuildConfig.rankNames8;
             case 9:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_9));
+                return AdventurersGuildConfig.rankNames9;
             case 10:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_10));
+                return AdventurersGuildConfig.rankNames10;
             case 11:
-                return ChatColorConverter.convert(AdventurersGuildConfig.getString(AdventurersGuildConfig.RANK_NAMES_11));
+                return AdventurersGuildConfig.rankNames11;
             default:
                 Bukkit.getLogger().warning("Warning: Tried to obtain a rank that does no exist. Report this to the dev! Rank: " + rank);
                 return "";

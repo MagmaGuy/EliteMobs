@@ -1,17 +1,16 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.config.ValidMobsConfig;
-import com.magmaguy.elitemobs.mobpowers.ElitePower;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.Invisibility;
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
+import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.defensivepowers.Invisibility;
 import org.bukkit.entity.EntityType;
 
 public class EliteCreeper extends EliteMobProperties {
 
     public EliteCreeper() {
 
-        this.name = ConfigValues.translationConfig.getString(TranslationConfig.NAME_CREEPER);
+        this.name = ChatColorConverter.convert(MobPropertiesConfig.getMobProperties().get(EntityType.CREEPER).getName());
 
         this.entityType = EntityType.CREEPER;
 
@@ -30,8 +29,7 @@ public class EliteCreeper extends EliteMobProperties {
         if (elitePower != null)
             this.validDefensivePowers.remove(elitePower);
 
-        isEnabled = ValidMobsConfig.getBoolean(ValidMobsConfig.VALID_AGGRESSIVE_ELITEMOBS + getEntityType().toString()) &&
-                ValidMobsConfig.getBoolean(ValidMobsConfig.ALLOW_AGGRESSIVE_ELITEMOBS);
+        isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.CREEPER).isEnabled();
 
         if (this.isEnabled)
             eliteMobData.add(this);
