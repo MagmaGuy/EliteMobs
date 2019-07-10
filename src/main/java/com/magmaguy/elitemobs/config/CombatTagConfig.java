@@ -20,7 +20,7 @@ public class CombatTagConfig {
         enableTeleportTimer = ConfigurationEngine.setBoolean(fileConfiguration, "Enable adventurers guild teleport timer", true);
         teleportTimerDuration = ConfigurationEngine.setInt(fileConfiguration, "Teleport timer duration", 5);
 
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
 }

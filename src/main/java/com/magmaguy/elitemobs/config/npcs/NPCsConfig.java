@@ -81,7 +81,7 @@ public class NPCsConfig {
         File file = ConfigurationEngine.fileCreator("npcs", npCsConfigFields.getFileName());
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         npCsConfigFields.generateConfigDefaults(fileConfiguration);
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
         addNPC(file.getName(), new NPCsConfigFields(fileConfiguration, file));
         return fileConfiguration;
 

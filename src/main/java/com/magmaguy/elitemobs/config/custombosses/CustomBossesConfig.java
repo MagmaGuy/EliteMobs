@@ -94,7 +94,7 @@ public class CustomBossesConfig {
         File file = ConfigurationEngine.fileCreator("custombosses", customBossConfigFields.getFileName());
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         customBossConfigFields.generateConfigDefaults(fileConfiguration);
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
         customBosses.put(file.getName(), new CustomBossConfigFields(fileConfiguration, file));
 

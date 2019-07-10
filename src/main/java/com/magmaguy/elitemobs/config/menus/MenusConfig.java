@@ -35,7 +35,7 @@ public class MenusConfig {
         File file = ConfigurationEngine.fileCreator("menus", menusConfigFields.getFileName());
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         menusConfigFields.generateConfigDefaults(fileConfiguration);
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 
         return fileConfiguration;
 
