@@ -65,7 +65,7 @@ public class MobPropertiesConfig {
         File file = ConfigurationEngine.fileCreator("mobproperties", mobPropertiesConfigFields.getFileName());
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         mobPropertiesConfigFields.generateConfigDefaults(fileConfiguration);
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 
         addMobProperties(mobPropertiesConfigFields.getEntityType(), new MobPropertiesConfigFields(fileConfiguration, file));
 

@@ -47,7 +47,7 @@ public class AdventurersGuildConfig {
         rankNames10 = ConfigurationEngine.setString(fileConfiguration, "10", "&5Hero");
         rankNames11 = ConfigurationEngine.setString(fileConfiguration, "11", "&6&l&oLegend");
 
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
 }

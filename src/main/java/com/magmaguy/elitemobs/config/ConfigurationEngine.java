@@ -40,7 +40,18 @@ public class ConfigurationEngine {
         return YamlConfiguration.loadConfiguration(file);
     }
 
-    public static void fileSaver(FileConfiguration fileConfiguration, File file) {
+    public static void fileSaverCustomValues(FileConfiguration fileConfiguration, File file) {
+        fileConfiguration.options().copyDefaults(true);
+
+        try {
+            fileConfiguration.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void fileSaverOnlyDefaults(FileConfiguration fileConfiguration, File file) {
         fileConfiguration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(fileConfiguration);
 

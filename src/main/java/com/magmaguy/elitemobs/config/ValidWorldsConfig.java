@@ -55,7 +55,7 @@ public class ValidWorldsConfig {
         for (World world : Bukkit.getWorlds())
             fileConfiguration.addDefault("Valid worlds." + world.getName(), true);
 
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
 }

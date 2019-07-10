@@ -20,7 +20,7 @@ public class CustomEnchantmentsConfig {
                 "Percentual elite mob increase in spawn rate around the player per hunter enchantment level", 2);
         flamethrowerName = ConfigurationEngine.setString(fileConfiguration, "FlamethrowerEnchantment enchantment name", "FlamethrowerEnchantment");
 
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
 }

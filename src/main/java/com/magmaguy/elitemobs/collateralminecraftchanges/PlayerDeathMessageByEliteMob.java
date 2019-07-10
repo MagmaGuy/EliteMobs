@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,24 +45,24 @@ public class PlayerDeathMessageByEliteMob implements Listener {
 
         if (MobPropertiesConfig.getMobProperties().containsKey(livingEntity.getType()))
             deathMessage = deathMessageSender
-                    (MobPropertiesConfig.getMobProperties().get(livingEntity.getType()).getDeathMessages().get(
-                            ThreadLocalRandom.current().nextInt(MobPropertiesConfig.getMobProperties().get(livingEntity.getType()).getDeathMessages().size()))
+                    (MobPropertiesConfig.getMobProperties().get(livingEntity.getType()).getDeathMessages()
+                                    .get(ThreadLocalRandom.current().nextInt(MobPropertiesConfig.getMobProperties().get(livingEntity.getType()).getDeathMessages().size()))
                             , player, livingEntity);
 
         return deathMessage;
 
     }
 
-    private static String deathMessageSender(String configNode, Player player, LivingEntity livingEntity) {
+    private static String deathMessageSender(String deathMessage, Player player, LivingEntity livingEntity) {
 
-        String deathMessage = ConfigValues.mobCombatSettingsConfig.getString(configNode);
         deathMessage = deathMessagePlaceholderConversion(deathMessage, player, livingEntity);
-
         return deathMessage;
 
     }
 
     private static String deathMessagePlaceholderConversion(String deathMessage, Player player, LivingEntity livingEntity) {
+
+        new DebugMessage(deathMessage);
 
         String livingEntityName = EntityTracker.getEliteMobEntity(livingEntity).getName();
 
