@@ -34,7 +34,7 @@ import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
 /**
  * Created by MagmaGuy on 01/05/2017.
  */
-public class SpawnMobCommandHandler {
+public class SpawnCommand {
 
     public static void spawnMob(CommandSender commandSender, String[] args) {
 

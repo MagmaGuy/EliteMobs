@@ -25,15 +25,15 @@ public class SpiritWalk extends BossPower implements Listener {
 
     private int hitCounter = 0;
 
-    public void incrementHitCounter() {
+    private void incrementHitCounter() {
         hitCounter++;
     }
 
-    public void resetHitsCounter() {
+    private void resetHitsCounter() {
         hitCounter = 0;
     }
 
-    public int getHitsCounter() {
+    private int getHitsCounter() {
         return hitCounter;
     }
 
@@ -43,10 +43,11 @@ public class SpiritWalk extends BossPower implements Listener {
         SpiritWalk spiritWalk = (SpiritWalk) event.getEliteMobEntity().getPower(this);
 
         if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
-                event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)) {
+                event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION))
             initializeSpiritWalk(event.getEliteMobEntity().getLivingEntity());
-            spiritWalk.incrementHitCounter();
-        }
+
+
+        spiritWalk.incrementHitCounter();
 
         if (spiritWalk.getHitsCounter() < 9) return;
 
