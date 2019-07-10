@@ -80,7 +80,7 @@ public class CommandHandler implements CommandExecutor {
             case "spawn":
             case "spawnmob":
                 if (permCheck(SPAWNMOB, commandSender))
-                    SpawnMobCommandHandler.spawnMob(commandSender, args);
+                    SpawnCommand.spawnMob(commandSender, args);
                 return true;
             case "ag":
             case "adventurersguild":
