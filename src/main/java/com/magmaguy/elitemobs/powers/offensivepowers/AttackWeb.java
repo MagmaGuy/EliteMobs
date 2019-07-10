@@ -15,7 +15,7 @@ import org.bukkit.event.Listener;
 public class AttackWeb extends MinorPower implements Listener {
 
     public AttackWeb() {
-        super(PowersConfig.getPower("attack_web.yml").getName(), PowersConfig.getPower("attack_web.yml").getEffect());
+        super(PowersConfig.getPower("attack_web.yml"));
     }
 
     @EventHandler

@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Implosion extends MinorPower implements Listener {
 
     public Implosion() {
-        super(PowersConfig.getPower("implosion.yml").getName(), PowersConfig.getPower("implosion.yml").getEffect());
+        super(PowersConfig.getPower("implosion.yml"));
     }
 
     @EventHandler

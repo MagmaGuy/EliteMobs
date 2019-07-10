@@ -12,7 +12,7 @@ import org.bukkit.event.Listener;
 public class AttackPush extends MinorPower implements Listener {
 
     public AttackPush() {
-        super(PowersConfig.getPower("attack_push.yml").getName(), PowersConfig.getPower("attack_push.yml").getEffect());
+        super(PowersConfig.getPower("attack_push.yml"));
     }
 
     @EventHandler

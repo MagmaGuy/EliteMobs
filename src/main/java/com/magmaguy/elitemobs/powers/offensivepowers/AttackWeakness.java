@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AttackWeakness extends MinorPower implements Listener {
 
     public AttackWeakness() {
-        super(PowersConfig.getPower("attack_weakness.yml").getName(), PowersConfig.getPower("attack_weakness.yml").getEffect());
+        super(PowersConfig.getPower("attack_weakness.yml"));
     }
 
     @EventHandler

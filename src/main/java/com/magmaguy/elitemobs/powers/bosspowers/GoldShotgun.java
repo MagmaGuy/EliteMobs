@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GoldShotgun extends BossPower implements Listener {
 
     public GoldShotgun() {
-        super(PowersConfig.getPower("gold_shotgun.yml").getName(), PowersConfig.getPower("gold_shotgun.yml").getEffect());
+        super(PowersConfig.getPower("gold_shotgun.yml"));
     }
 
     @EventHandler

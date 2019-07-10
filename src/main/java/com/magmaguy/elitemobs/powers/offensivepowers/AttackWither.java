@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AttackWither extends MinorPower implements Listener {
 
     public AttackWither() {
-        super(PowersConfig.getPower("attack_wither.yml").getName(), PowersConfig.getPower("attack_wither.yml").getEffect());
+        super(PowersConfig.getPower("attack_wither.yml"));
     }
 
     @EventHandler

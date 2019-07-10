@@ -25,7 +25,7 @@ public class TreasureGoblinConfig extends CustomBossConfigFields {
                 null,
                 null,
                 true,
-                Arrays.asList("GoldExplosion", "GoldShotgun", "HyperLoot", "SpiritWalk"),
+                Arrays.asList("gold_explosion.yml", "gold_shotgun.yml", "hyper_loot.yml", "spirit_walk.yml"),
                 "&cA Treasure Goblin has been sighted!",
                 "&aA Treasure Goblin has been slain by $players!",
                 "&4A Treasure Goblin has escaped!",

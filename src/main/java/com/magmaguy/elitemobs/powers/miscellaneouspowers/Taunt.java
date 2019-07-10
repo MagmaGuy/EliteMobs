@@ -34,7 +34,7 @@ public class Taunt extends MinorPower implements Listener {
     private final static List<String> DEATH_LIST = ConfigValues.translationConfig.getStringList("Taunts.Death");
 
     public Taunt() {
-        super(PowersConfig.getPower("taunt.yml").getName(), PowersConfig.getPower("taunt.yml").getEffect());
+        super(PowersConfig.getPower("taunt.yml"));
     }
 
     /**

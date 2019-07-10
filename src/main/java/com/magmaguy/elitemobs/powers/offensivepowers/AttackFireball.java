@@ -20,7 +20,7 @@ import org.bukkit.util.Vector;
 public class AttackFireball extends MinorPower implements Listener {
 
     public AttackFireball() {
-        super(PowersConfig.getPower("attack_fireball.yml").getName(), PowersConfig.getPower("attack_fireball.yml").getEffect());
+        super(PowersConfig.getPower("attack_fireball.yml"));
     }
 
     @EventHandler

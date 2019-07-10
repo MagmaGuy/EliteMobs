@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.*;
@@ -79,13 +80,14 @@ public class ElitePower {
 
     public static ElitePower getElitePower(String elitePowerName) {
         for (ElitePower elitePower : getElitePowers())
-            if (elitePower.getName().equalsIgnoreCase(elitePowerName)) {
+            if (elitePower.getFileName().equalsIgnoreCase(elitePowerName)) {
                 return elitePower;
             }
         return null;
     }
 
     private boolean cooldown = false;
+    private String fileName;
     private String trail;
     private String name;
     private boolean isFiring = false;
@@ -98,9 +100,14 @@ public class ElitePower {
     public void applyPowers(LivingEntity livingEntity) {
     }
 
-    public ElitePower(String name, String trail) {
-        this.name = name;
-        this.trail = trail;
+    public ElitePower(PowersConfigFields powersConfigFields) {
+        this.fileName = powersConfigFields.getFileName();
+        this.name = powersConfigFields.getName();
+        this.trail = powersConfigFields.getEffect();
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public String getTrail() {
