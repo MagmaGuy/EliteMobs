@@ -17,7 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SkeletonPillar extends MajorPower implements Listener {
 
     public SkeletonPillar() {
-        super(PowersConfig.getPower("skeleton_pillar.yml").getName(), PowersConfig.getPower("skeleton_pillar.yml").getEffect());
+        super(PowersConfig.getPower("skeleton_pillar.yml"));
     }
 
     @EventHandler

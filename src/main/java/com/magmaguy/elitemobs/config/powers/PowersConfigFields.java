@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.config.powers;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
+
 public class PowersConfigFields {
 
     private String fileName;
@@ -25,7 +27,8 @@ public class PowersConfigFields {
         fileConfiguration.addDefault("effect", effect);
     }
 
-    public PowersConfigFields(FileConfiguration fileConfiguration) {
+    public PowersConfigFields(FileConfiguration fileConfiguration, File file) {
+        this.fileName = file.getName();
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
         this.name = fileConfiguration.getString("name");
         this.effect = fileConfiguration.getString("effect");

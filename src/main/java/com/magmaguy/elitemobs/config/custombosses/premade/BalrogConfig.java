@@ -24,7 +24,7 @@ public class BalrogConfig extends CustomBossConfigFields {
                 null,
                 null,
                 false,
-                Arrays.asList("SummonRaug"),
+                Arrays.asList("summon_raug.yml"),
                 null,
                 null,
                 null,

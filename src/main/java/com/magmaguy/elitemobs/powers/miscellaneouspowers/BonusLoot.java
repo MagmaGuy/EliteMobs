@@ -13,7 +13,7 @@ import org.bukkit.event.Listener;
 public class BonusLoot extends MinorPower implements Listener {
 
     public BonusLoot() {
-        super(PowersConfig.getPower("bonus_loot.yml").getName(), PowersConfig.getPower("bonus_loot.yml").getEffect());
+        super(PowersConfig.getPower("bonus_loot.yml"));
     }
 
     @EventHandler

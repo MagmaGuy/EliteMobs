@@ -22,7 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AttackFreeze extends MinorPower implements Listener {
 
     public AttackFreeze() {
-        super(PowersConfig.getPower("attack_freeze.yml").getName(), PowersConfig.getPower("attack_freeze.yml").getEffect());
+        super(PowersConfig.getPower("attack_freeze.yml"));
     }
 
     @EventHandler

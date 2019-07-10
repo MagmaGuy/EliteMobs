@@ -24,7 +24,7 @@ public class LightningFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 false,
-                Arrays.asList("AttackLightning"),
+                Arrays.asList("attack_lightning.yml"),
                 null,
                 null,
                 null,

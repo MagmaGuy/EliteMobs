@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
 public class Corpse extends MinorPower implements Listener {
 
     public Corpse() {
-        super(PowersConfig.getPower("corpse.yml").getName(), PowersConfig.getPower("corpse.yml").getEffect());
+        super(PowersConfig.getPower("corpse.yml"));
     }
 
     @EventHandler

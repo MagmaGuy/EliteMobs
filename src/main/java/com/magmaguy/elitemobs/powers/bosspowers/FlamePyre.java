@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FlamePyre extends BossPower implements Listener {
 
     public FlamePyre() {
-        super(PowersConfig.getPower("flame_pyre.yml").getName(), PowersConfig.getPower("flame_pyre.yml").getEffect());
+        super(PowersConfig.getPower("flame_pyre.yml"));
     }
 
     @EventHandler

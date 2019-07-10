@@ -43,7 +43,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
     //todo: Shouldn't this be static?
 
     public ZombieNecronomicon() {
-        super(PowersConfig.getPower("zombie_necronomicon.yml").getName(), PowersConfig.getPower("zombie_necronomicon.yml").getEffect());
+        super(PowersConfig.getPower("zombie_necronomicon.yml"));
     }
 
     @EventHandler

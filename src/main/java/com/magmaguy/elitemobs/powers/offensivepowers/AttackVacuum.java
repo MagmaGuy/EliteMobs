@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 public class AttackVacuum extends MinorPower implements Listener {
 
     public AttackVacuum() {
-        super(PowersConfig.getPower("attack_vacuum.yml").getName(), PowersConfig.getPower("attack_vacuum.yml").getEffect());
+        super(PowersConfig.getPower("attack_vacuum.yml"));
     }
 
     @EventHandler

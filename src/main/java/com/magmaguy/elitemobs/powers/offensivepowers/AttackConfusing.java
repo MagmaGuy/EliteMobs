@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AttackConfusing extends MinorPower implements Listener {
 
     public AttackConfusing() {
-        super(PowersConfig.getPower("attack_confusing.yml").getName(), PowersConfig.getPower("attack_confusing.yml").getEffect());
+        super(PowersConfig.getPower("attack_confusing.yml"));
     }
 
     @EventHandler

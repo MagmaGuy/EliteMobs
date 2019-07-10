@@ -82,7 +82,7 @@ public class PowersConfig {
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         powersConfigFields.generateConfigDefaults(fileConfiguration);
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
-        addPowers(file.getName(), new PowersConfigFields(fileConfiguration));
+        addPowers(file.getName(), new PowersConfigFields(fileConfiguration, file));
         return fileConfiguration;
 
     }
