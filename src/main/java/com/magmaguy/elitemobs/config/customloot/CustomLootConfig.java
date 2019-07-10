@@ -86,7 +86,7 @@ public class CustomLootConfig {
         File file = ConfigurationEngine.fileCreator("customitems", customLootConfigFields.getFileName());
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         customLootConfigFields.generateConfigDefaults(fileConfiguration);
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
         CustomLootConfigFields.addCustomLootConfigField(new CustomLootConfigFields(file.getName(), fileConfiguration));
 

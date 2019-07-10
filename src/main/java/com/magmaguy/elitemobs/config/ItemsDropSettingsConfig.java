@@ -196,7 +196,7 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(LOOT_SHOWER_ITEM_ONE, Material.GOLD_NUGGET.toString());
         configuration.addDefault(LOOT_SHOWER_ITEM_FIVE, Material.GOLD_INGOT.toString());
         configuration.addDefault(LOOT_SHOWER_ITEM_TEN, Material.EMERALD.toString());
-        configuration.addDefault(LOOT_SHOWER_ITEM_ONE, Material.EMERALD_BLOCK.toString());
+        configuration.addDefault(LOOT_SHOWER_ITEM_TWENTY, Material.EMERALD_BLOCK.toString());
 
 
         configuration.addDefault(FLAMETHROWER_NAME, "Flamethrower");

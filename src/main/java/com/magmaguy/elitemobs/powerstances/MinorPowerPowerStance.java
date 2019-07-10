@@ -93,23 +93,24 @@ public class MinorPowerPowerStance implements Listener {
         for (ElitePower elitePower : eliteMobEntity.getPowers())
             if (elitePower instanceof MinorPower)
                 if (eliteMobEntity.getPower(elitePower).getTrail() != null)
-                    effectParser(eliteMobEntity.getPower(elitePower).getTrail());
+                    effects.add(effectParser(eliteMobEntity.getPower(elitePower).getTrail()));
 
         return effects;
 
     }
 
-    private void effectParser(String powerString) {
+    private Object effectParser(String powerString) {
         try {
             Material material = Material.valueOf(powerString);
-            addEffect(material);
+            return addEffect(material);
         } catch (Exception ex) {
         }
         try {
             Particle particle = Particle.valueOf(powerString);
-            addEffect(particle);
+            return addEffect(particle);
         } catch (Exception ex) {
         }
+        return null;
     }
 
     private Object addEffect(Material material) {

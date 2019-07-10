@@ -68,7 +68,7 @@ public class ValidMobsConfig {
         fileConfiguration.addDefault(PIG, true);
         fileConfiguration.addDefault(SHEEP, true);
 
-        ConfigurationEngine.fileSaver(fileConfiguration, file);
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
 }
