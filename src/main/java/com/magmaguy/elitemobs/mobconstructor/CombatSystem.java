@@ -27,19 +27,36 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class CombatSystem implements Listener {
 
     public static final double PER_LEVEL_POWER_INCREASE = 0.1;
-    public static final double TARGET_HITS_TO_KILL = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.TARGET_HITS_TO_KILL);
     public static final double BASE_DAMAGE_DEALT_TO_PLAYERS = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.BASE_DAMAGE_DEALT_TO_PLAYER);
-    //    public static final double TO_PLAYER_DAMAGE_TIER_HANDICAP = 0.75;
     public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.5;
 
     public static final double DIAMOND_TIER_LEVEL = 3;
     public static final double IRON_TIER_LEVEL = 2;
     public static final double STONE_CHAIN_TIER_LEVEL = 1;
     public static final double GOLD_WOOD_LEATHER_TIER_LEVEL = 0;
+
+    private static HashSet<LivingEntity> customDamageEntity = new HashSet<>();
+
+    public static HashSet<LivingEntity> getCustomDamageEntities() {
+        return customDamageEntity;
+    }
+
+    public static boolean isCustomDamageEntity(LivingEntity livingEntity) {
+        return customDamageEntity.contains(livingEntity);
+    }
+
+    public static void addCustomEntity(LivingEntity livingEntity) {
+        customDamageEntity.add(livingEntity);
+    }
+
+    public static void removeCustomEntity(LivingEntity livingEntity) {
+        customDamageEntity.remove(livingEntity);
+    }
 
     //TODO: Handle thorns damage and potion effects
 
@@ -57,13 +74,12 @@ public class CombatSystem implements Listener {
         LivingEntity damager = EntityFinder.getRealDamager(event);
         if (damager == null) return;
 
-        if (!EntityTracker.isEliteMob(event.getDamager()))
-            return;
-
         EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(damager);
         if (eliteMobEntity == null) return;
 
         //From this point on, the damage event is fully altered by Elite Mobs
+
+        double rawDamage = event.getDamage();
 
         //Get rid of all vanilla armor reduction
         for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
@@ -71,6 +87,16 @@ public class CombatSystem implements Listener {
                 event.setDamage(modifier, 0);
 
         Player player = (Player) event.getEntity();
+
+        //if the damage source is custom , the damage is final
+        if (isCustomDamageEntity(eliteMobEntity.getLivingEntity())) {
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, rawDamage);
+            //Deal with the player getting killed
+            if (player.getHealth() - event.getDamage() <= 0)
+                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, damager));
+            removeCustomEntity(eliteMobEntity.getLivingEntity());
+            return;
+        }
 
         //Determine tiers
         double eliteTier = MobTierCalculator.findMobTier(eliteMobEntity);
@@ -220,6 +246,8 @@ public class CombatSystem implements Listener {
             return;
         }
 
+        double rawDamage = event.getDamage();
+
         for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
             if (event.isApplicable(modifier))
                 event.setDamage(modifier, 0);
@@ -231,6 +259,24 @@ public class CombatSystem implements Listener {
         if (!damager.getType().equals(EntityType.PLAYER)) return;
         Player player = (Player) damager;
         eliteMobEntity.addDamager(player);
+
+        //if the damage source is custom , the damage is final
+        if (isCustomDamageEntity(eliteMobEntity.getLivingEntity())) {
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, rawDamage);
+            //Deal with the player getting killed
+            if (player.getHealth() - rawDamage <= 0)
+                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, damager));
+            removeCustomEntity(eliteMobEntity.getLivingEntity());
+            /*
+        This is a bit of a dirty hack, I may want to tighten it up later
+         */
+            //adjust current plugin health
+            eliteMobEntity.setHealth(eliteMobEntity.getMaxHealth() * eliteMobEntity.getLivingEntity().getHealth() / eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+            double damagePercentOfHealth = rawDamage / eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+            double pluginDamage = damagePercentOfHealth * eliteMobEntity.getMaxHealth();
+            eliteMobEntity.setHealth(eliteMobEntity.getHealth() - pluginDamage);
+            return;
+        }
 
         double playerTier;
         if (player.getInventory().getItemInMainHand() == null ||

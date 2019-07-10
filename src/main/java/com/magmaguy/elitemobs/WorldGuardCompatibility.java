@@ -23,7 +23,7 @@ public class WorldGuardCompatibility {
                 Bukkit.getLogger().info("[EliteMobs] - elitemob-spawning");
                 return true;
             } catch (FlagConflictException | IllegalStateException e) {
-                Bukkit.getLogger().info("[EliteMobs] - Error: flag elitemob-spawning already exists!");
+                Bukkit.getLogger().info("[EliteMobs] Warning: flag elitemob-spawning already exists! This is normal if you've just now reloaded EliteMobs.");
                 return false;
             }
 

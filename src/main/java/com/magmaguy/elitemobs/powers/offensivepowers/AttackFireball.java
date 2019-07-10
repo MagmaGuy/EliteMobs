@@ -63,8 +63,9 @@ public class AttackFireball extends MinorPower implements Listener {
         Location fireballLocation = ProjectileLocationGenerator.generateLocation((LivingEntity) entity, player);
         Fireball repeatingFireball = (Fireball) entity.getWorld().spawnEntity(fireballLocation, EntityType.FIREBALL);
         Vector targetterToTargetted = player.getLocation().toVector().subtract(repeatingFireball.getLocation().toVector()).normalize();
+        repeatingFireball.setShooter((ProjectileSource) entity);
         repeatingFireball.setVelocity(targetterToTargetted);
-        repeatingFireball.setYield(4F);
+        repeatingFireball.setYield(3F);
         repeatingFireball.setIsIncendiary(true);
         repeatingFireball.setShooter((ProjectileSource) entity);
     }
