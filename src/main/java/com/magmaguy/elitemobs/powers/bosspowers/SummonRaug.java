@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 public class SummonRaug extends BossPower implements Listener {
 
     public SummonRaug() {
-        super(PowersConfig.getPower("summon_raug.yml").getName(), PowersConfig.getPower("summon_raug.yml").getEffect());
+        super(PowersConfig.getPower("summon_raug.yml"));
     }
 
     @EventHandler

@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Invisibility extends MinorPower {
 
     public Invisibility() {
-        super(PowersConfig.getPower("invisibility.yml").getName(), PowersConfig.getPower("invisibility.yml").getEffect());
+        super(PowersConfig.getPower("invisibility.yml"));
     }
 
     @Override

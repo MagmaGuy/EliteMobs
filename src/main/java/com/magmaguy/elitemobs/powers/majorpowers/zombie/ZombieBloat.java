@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ZombieBloat extends MajorPower implements Listener {
 
     public ZombieBloat() {
-        super(PowersConfig.getPower("zombie_bloat.yml").getName(), PowersConfig.getPower("zombie_bloat.yml").getEffect());
+        super(PowersConfig.getPower("zombie_bloat.yml"));
     }
 
     @EventHandler

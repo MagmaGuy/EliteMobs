@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class AttackLightning extends MinorPower implements Listener {
     public AttackLightning() {
-        super(PowersConfig.getPower("attack_lightning.yml").getName(), PowersConfig.getPower("attack_lightning.yml").getEffect());
+        super(PowersConfig.getPower("attack_lightning.yml"));
     }
 
     @EventHandler

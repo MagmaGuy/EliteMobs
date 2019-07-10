@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class MovementSpeed extends MinorPower {
 
     public MovementSpeed() {
-        super(PowersConfig.getPower("movement_speed.yml").getName(), PowersConfig.getPower("movement_speed.yml").getEffect());
+        super(PowersConfig.getPower("movement_speed.yml"));
     }
 
     @Override

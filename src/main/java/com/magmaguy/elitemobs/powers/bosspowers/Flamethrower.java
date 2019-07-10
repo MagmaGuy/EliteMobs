@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Flamethrower extends BossPower implements Listener {
 
     public Flamethrower() {
-        super(PowersConfig.getPower("flamethrower.yml").getName(), PowersConfig.getPower("flamethrower.yml").getEffect());
+        super(PowersConfig.getPower("flamethrower.yml"));
     }
 
     /**

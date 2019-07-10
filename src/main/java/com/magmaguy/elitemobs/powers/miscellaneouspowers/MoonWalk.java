@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class MoonWalk extends MinorPower {
 
     public MoonWalk() {
-        super(PowersConfig.getPower("moonwalk.yml").getName(), PowersConfig.getPower("moonwalk.yml").getEffect());
+        super(PowersConfig.getPower("moonwalk.yml"));
     }
 
     @Override

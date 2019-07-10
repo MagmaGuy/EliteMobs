@@ -20,7 +20,7 @@ import org.bukkit.util.Vector;
 public class SkeletonTrackingArrow extends MajorPower implements Listener {
 
     public SkeletonTrackingArrow() {
-        super(PowersConfig.getPower("skeleton_tracking_arrow.yml").getName(), PowersConfig.getPower("skeleton_tracking_arrow.yml").getEffect());
+        super(PowersConfig.getPower("skeleton_tracking_arrow.yml"));
     }
 
     @EventHandler

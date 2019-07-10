@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SpiritWalk extends BossPower implements Listener {
 
     public SpiritWalk() {
-        super(PowersConfig.getPower("spirit_walk.yml").getName(), PowersConfig.getPower("spirit_walk.yml").getEffect());
+        super(PowersConfig.getPower("spirit_walk.yml"));
     }
 
     private int hitCounter = 0;

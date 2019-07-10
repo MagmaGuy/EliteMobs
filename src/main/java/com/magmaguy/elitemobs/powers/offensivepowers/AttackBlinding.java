@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AttackBlinding extends MinorPower implements Listener {
 
     public AttackBlinding() {
-        super(PowersConfig.getPower("attack_blinding.yml").getName(), PowersConfig.getPower("attack_blinding.yml").getEffect());
+        super(PowersConfig.getPower("attack_blinding.yml"));
     }
 
     @EventHandler

@@ -24,7 +24,7 @@ public class FireFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 false,
-                Arrays.asList("AttackFire"),
+                Arrays.asList("attack_fire.yml"),
                 null,
                 null,
                 null,

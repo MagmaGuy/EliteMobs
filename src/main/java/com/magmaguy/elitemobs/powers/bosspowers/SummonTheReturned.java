@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SummonTheReturned extends BossPower implements Listener {
 
     public SummonTheReturned() {
-        super(PowersConfig.getPower("summon_the_returned.yml").getName(), PowersConfig.getPower("summon_the_returned.yml").getEffect());
+        super(PowersConfig.getPower("summon_the_returned.yml"));
     }
 
     @EventHandler

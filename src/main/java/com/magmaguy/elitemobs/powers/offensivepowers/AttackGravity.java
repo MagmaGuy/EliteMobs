@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AttackGravity extends MinorPower implements Listener {
 
     public AttackGravity() {
-        super(PowersConfig.getPower("attack_gravity.yml").getName(), PowersConfig.getPower("attack_gravity.yml").getEffect());
+        super(PowersConfig.getPower("attack_gravity.yml"));
     }
 
     @EventHandler

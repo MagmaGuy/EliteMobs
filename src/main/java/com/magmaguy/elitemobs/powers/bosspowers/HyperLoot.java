@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 public class HyperLoot extends BossPower implements Listener {
 
     public HyperLoot() {
-        super(PowersConfig.getPower("hyper_loot.yml").getName(), PowersConfig.getPower("hyper_loot.yml").getEffect());
+        super(PowersConfig.getPower("hyper_loot.yml"));
     }
 
     @EventHandler

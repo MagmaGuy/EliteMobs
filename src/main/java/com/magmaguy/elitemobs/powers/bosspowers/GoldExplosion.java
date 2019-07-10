@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GoldExplosion extends BossPower implements Listener {
 
     public GoldExplosion() {
-        super(PowersConfig.getPower("gold_explosion.yml").getName(), PowersConfig.getPower("gold_explosion.yml").getEffect());
+        super(PowersConfig.getPower("gold_explosion.yml"));
     }
 
     @EventHandler

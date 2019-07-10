@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ZombieFriends extends MajorPower implements Listener {
 
     public ZombieFriends() {
-        super(PowersConfig.getPower("zombie_friends.yml").getName(), PowersConfig.getPower("zombie_friends.yml").getEffect());
+        super(PowersConfig.getPower("zombie_friends.yml"));
     }
 
     @EventHandler

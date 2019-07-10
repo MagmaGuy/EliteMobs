@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AttackPoison extends MinorPower implements Listener {
 
     public AttackPoison() {
-        super(PowersConfig.getPower("attack_poison.yml").getName(), PowersConfig.getPower("attack_poison.yml").getEffect());
+        super(PowersConfig.getPower("attack_poison.yml"));
     }
 
     @EventHandler

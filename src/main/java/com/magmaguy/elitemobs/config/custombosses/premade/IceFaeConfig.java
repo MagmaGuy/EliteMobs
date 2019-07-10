@@ -24,7 +24,7 @@ public class IceFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 false,
-                Arrays.asList("AttackFreeze"),
+                Arrays.asList("attack_freeze.yml"),
                 null,
                 null,
                 null,

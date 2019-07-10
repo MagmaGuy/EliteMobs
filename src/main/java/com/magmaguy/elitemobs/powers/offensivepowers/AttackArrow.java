@@ -21,7 +21,7 @@ import org.bukkit.util.Vector;
 public class AttackArrow extends MinorPower implements Listener {
 
     public AttackArrow() {
-        super(PowersConfig.getPower("attack_arrow.yml").getName(), PowersConfig.getPower("attack_arrow.yml").getEffect());
+        super(PowersConfig.getPower("attack_arrow.yml"));
     }
 
     @EventHandler
