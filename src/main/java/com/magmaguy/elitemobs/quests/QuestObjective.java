@@ -63,7 +63,7 @@ public class QuestObjective {
     public boolean processQuestProgression(EliteMobEntity eliteMobEntity, Player player) {
         if (!eliteMobEntity.getHasSpecialLoot()) return false;
         if (!eliteMobEntity.getLivingEntity().getType().equals(getEntityType())) return false;
-        if (eliteMobEntity.getLevel() < getMinimumEliteMobTier()) return false;
+        if (eliteMobEntity.getLevel() < getMinimumEliteMobLevel()) return false;
         addKill(player);
         return true;
     }
