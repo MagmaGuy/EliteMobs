@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs;
+package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import org.bukkit.entity.EntityType;
@@ -29,6 +29,8 @@ public class TheReturnedConfig extends CustomBossConfigFields {
                 null,
                 false,
                 true,
+                null,
+                null,
                 null);
     }
 }

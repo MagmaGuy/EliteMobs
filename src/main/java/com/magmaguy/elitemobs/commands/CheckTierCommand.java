@@ -9,11 +9,16 @@ public class CheckTierCommand {
     public static void checkTier(Player player) {
 
         double gearTier = ItemTierFinder.findPlayerTier(player);
-        double guildTier = (GuildRank.getRank(player) - 10) * 0.2;
+        double guildRank = GuildRank.getActiveRank(player);
+        if (guildRank == 0)
+            guildRank = -10;
+        else
+            guildRank--;
+        guildRank = (guildRank * 0.2);
 
         player.sendMessage("Your combat tier is " + gearTier);
-        player.sendMessage("Your guild tier bonus is " + guildTier);
-        player.sendMessage("Your threat tier is " + (gearTier + guildTier));
+        player.sendMessage("Your guild tier bonus is " + guildRank);
+        player.sendMessage("Your threat tier is " + (gearTier + guildRank));
 
     }
 

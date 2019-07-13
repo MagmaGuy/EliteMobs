@@ -124,7 +124,7 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(LIMITED_ITEM_WEIGHT, 3);
         configuration.addDefault(SCALABLE_ITEM_WEIGHT, 6);
         configuration.addDefault(SPAWNER_DEFAULT_LOOT_MULTIPLIER, true);
-        configuration.addDefault(DEFAULT_LOOT_MULTIPLIER, 1.0);
+        configuration.addDefault(DEFAULT_LOOT_MULTIPLIER, 0.0);
         configuration.addDefault(MAXIMUM_LEVEL_FOR_LOOT_MULTIPLIER, 200);
         configuration.addDefault(EXPERIENCE_LOOT_MULTIPLIER, 1.0);
         configuration.addDefault(MAXIMUM_LOOT_TIER, 5);

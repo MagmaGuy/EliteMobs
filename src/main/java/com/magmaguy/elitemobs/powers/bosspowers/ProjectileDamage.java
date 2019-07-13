@@ -23,13 +23,14 @@ public class ProjectileDamage {
 
             @Override
             public void run() {
+
                 timer++;
                 if (goldNuggets.isEmpty()) {
                     cancel();
                     return;
                 }
-                Iterator<Item> iterator = goldNuggets.iterator();
-                for (iterator.next(); iterator.hasNext(); ) {
+
+                for (Iterator<Item> iterator = goldNuggets.iterator(); iterator.hasNext(); ) {
                     Item goldNugget = iterator.next();
                     boolean removed = false;
                     for (Entity entity : goldNugget.getNearbyEntities(0.1, 0.1, 0.1))
@@ -48,9 +49,7 @@ public class ProjectileDamage {
 
                 if (timer < 5 * 20) return;
 
-                Iterator<Item> endIterator = goldNuggets.iterator();
-
-                for (endIterator.next(); endIterator.hasNext(); ) {
+                for (Iterator<Item> endIterator = goldNuggets.iterator(); endIterator.hasNext(); ) {
                     Item goldNugget = endIterator.next();
                     goldNugget.remove();
                     endIterator.remove();

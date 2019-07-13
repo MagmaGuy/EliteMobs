@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
@@ -184,6 +185,7 @@ public class EliteMobs extends JavaPlugin {
     }
 
     public static void initializeConfigs() {
+        EnchantmentsConfig.initializeConfigs();
         CustomEnchantmentsConfig.initializeConfig();
         AntiExploitConfig.initializeConfig();
         CombatTagConfig.initializeConfig();
