@@ -91,7 +91,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                         List<Item> itemList = new ArrayList<>();
                         for (int j = 0; j < 4; j++) {
                             ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
-                            Item item = VisualItemInitializer.intializeItem(itemStack, zombie.getLocation());
+                            Item item = VisualItemInitializer.initializeItem(itemStack, zombie.getLocation());
                             itemList.add(item);
                         }
                         fourTrack.put(i, itemList);

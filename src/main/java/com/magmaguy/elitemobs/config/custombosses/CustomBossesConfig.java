@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.TheReturnedConfig;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.custombosses.premade.*;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -27,6 +26,7 @@ public class CustomBossesConfig {
     }
 
     private static ArrayList<CustomBossConfigFields> customBossConfigFieldsList = new ArrayList<>(Arrays.asList(
+            new TestCustomBossConfig(),
             new ZombieKingConfig(),
             new TreasureGoblinConfig(),
             new NecronomiconZombieConfig(),

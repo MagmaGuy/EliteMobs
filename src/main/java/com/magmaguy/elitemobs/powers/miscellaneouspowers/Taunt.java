@@ -97,7 +97,8 @@ public class Taunt extends MinorPower implements Listener {
         nametagProcessor(event.getEntity(), DEATH_LIST);
     }
 
-    private void nametagProcessor(Entity entity, List<String> list) {
+    //Also used by the custom bosses
+    public static void nametagProcessor(Entity entity, List<String> list) {
         int randomizedKey = ThreadLocalRandom.current().nextInt(list.size());
         String tempName = list.get(randomizedKey);
         entity.setCustomName(convert(tempName));

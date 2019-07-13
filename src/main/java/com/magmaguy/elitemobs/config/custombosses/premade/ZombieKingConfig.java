@@ -34,7 +34,9 @@ public class ZombieKingConfig extends CustomBossConfigFields {
                 Arrays.asList("zombie_kings_axe.yml:1"),
                 true,
                 true,
-                Arrays.asList(Particle.FLAME.toString()));
+                Arrays.asList(Particle.FLAME.toString()),
+                null,
+                null);
     }
 
 }

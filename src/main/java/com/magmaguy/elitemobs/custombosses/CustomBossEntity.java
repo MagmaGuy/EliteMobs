@@ -2,14 +2,18 @@ package com.magmaguy.elitemobs.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteMobDamageEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,7 +46,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             if (ElitePower.getElitePower(powerName) != null)
                 elitePowers.add(ElitePower.getElitePower(powerName));
             else
-                Bukkit.getLogger().warning("[EliteMobs] Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
+                new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
 
         return new CustomBossEntity(
                 customBossMobsConfigAttributes,
@@ -75,7 +79,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         else if (entityType.equals(EntityType.DROWNED))
             ((Drowned) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        super.setPersistent(customBossConfigFields.getIsPersistent());
+        if (customBossConfigFields.getIsPersistent() != null)
+            super.setPersistent(customBossConfigFields.getIsPersistent());
         if (customBossConfigFields.getTrails() != null) startBossTrails();
         if (customBossConfigFields.getLocationMessage() != null) sendLocation();
         if (customBossConfigFields.getDropsVanillaLoot())
@@ -162,7 +167,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 }
                 //All conditions cleared, do the boss flair effect
                 Location entityCenter = getLivingEntity().getLocation().clone().add(0, getLivingEntity().getHeight() / 2, 0);
-                Item item = VisualItemInitializer.intializeItem(ItemStackGenerator.generateItemStack
+                Item item = VisualItemInitializer.initializeItem(ItemStackGenerator.generateItemStack
                         (material, "visualItem", Arrays.asList(ThreadLocalRandom.current().nextDouble() + "")), entityCenter);
                 item.setVelocity(new Vector(
                         ThreadLocalRandom.current().nextDouble() / 5 - 0.10,
@@ -187,7 +192,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     throw new Exception();
                 this.uniqueLootList.put(customItem, Double.parseDouble(entry.split(":")[1]));
             } catch (Exception ex) {
-                Bukkit.getLogger().warning("[EliteMobs] Boss " + this.getName() + " has an invalid loot entry - " + entry + " - Skipping it!");
+                new WarningMessage("Boss " + this.getName() + " has an invalid loot entry - " + entry + " - Skipping it!");
             }
         }
     }
@@ -205,35 +210,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             super.getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(mainHand));
             super.getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(offHand));
         } catch (Exception ex) {
-
-        }
-    }
-
-    public static class CustomBossEntityEvents implements Listener {
-        @EventHandler
-        public void onEliteMobDeath(EliteMobDeathEvent event) {
-            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
-
-            //Do loot
-            if (!customBossEntity.getUniqueLootList().isEmpty())
-                for (CustomItem customItem : customBossEntity.getUniqueLootList().keySet())
-                    if (ThreadLocalRandom.current().nextDouble() < customBossEntity.getUniqueLootList().get(customItem))
-                        customBossEntity.getLivingEntity().getWorld().dropItem(customBossEntity.getLivingEntity().getLocation(),
-                                customItem.generateItemStack((int) customBossEntity.getTier() + 1));
-
-            //Do death message
-            String playersList = "";
-            for (Player player : event.getEliteMobEntity().getDamagers()) {
-                if (playersList.isEmpty())
-                    playersList += player.getDisplayName();
-                else
-                    playersList += ", " + player.getDisplayName();
-            }
-
-            if (customBossEntity.customBossConfigFields.getDeathMessage() != null)
-                Bukkit.broadcastMessage(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
-
         }
     }
 
@@ -262,6 +238,52 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 60 * 3);
+
+    }
+
+    public static class CustomBossEntityEvents implements Listener {
+
+        @EventHandler
+        public void onEliteMobDeath(EliteMobDeathEvent event) {
+            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
+            CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
+
+            //Do loot
+            if (!customBossEntity.getUniqueLootList().isEmpty())
+                for (CustomItem customItem : customBossEntity.getUniqueLootList().keySet())
+                    if (ThreadLocalRandom.current().nextDouble() < customBossEntity.getUniqueLootList().get(customItem))
+                        customBossEntity.getLivingEntity().getWorld().dropItem(customBossEntity.getLivingEntity().getLocation(),
+                                customItem.generateItemStack((int) customBossEntity.getTier() + 1));
+
+            //Do death message
+            String playersList = "";
+            for (Player player : event.getEliteMobEntity().getDamagers()) {
+                if (playersList.isEmpty())
+                    playersList += player.getDisplayName();
+                else
+                    playersList += ", " + player.getDisplayName();
+            }
+
+            if (customBossEntity.customBossConfigFields.getDeathMessage() != null)
+                Bukkit.broadcastMessage(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
+
+        }
+
+        @EventHandler
+        public void onDamagedMessages(EliteMobDamageEvent eliteMobDamageEvent) {
+            if (!(eliteMobDamageEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
+            CustomBossEntity customBossEntity = (CustomBossEntity) eliteMobDamageEvent.getEliteMobEntity();
+            if (customBossEntity.customBossConfigFields.getOnDamagedMessages().isEmpty()) return;
+            Taunt.nametagProcessor(customBossEntity.getLivingEntity(), customBossEntity.customBossConfigFields.getOnDamagedMessages());
+        }
+
+        @EventHandler
+        public void onDamageMessages(PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent) {
+            if (!(playerDamagedByEliteMobEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
+            CustomBossEntity customBossEntity = (CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity();
+            if (customBossEntity.customBossConfigFields.getOnDamageMessages().isEmpty()) return;
+            Taunt.nametagProcessor(customBossEntity.getLivingEntity(), customBossEntity.customBossConfigFields.getOnDamageMessages());
+        }
 
     }
 

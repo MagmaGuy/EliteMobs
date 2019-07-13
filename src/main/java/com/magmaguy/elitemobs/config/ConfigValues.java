@@ -9,8 +9,16 @@ import org.bukkit.configuration.Configuration;
  */
 public class ConfigValues {
 
-    public static Configuration defaultConfig, mobPowerConfig, translationConfig,
-            itemsProceduralSettingsConfig, economyConfig, playerCacheConfig, eventsConfig, itemsCustomLootSettingsConfig, mobCombatSettingsConfig, itemsDropSettingsConfig,
+    public static Configuration defaultConfig,
+            mobPowerConfig,
+            translationConfig,
+            itemsProceduralSettingsConfig,
+            economyConfig,
+            playerCacheConfig,
+            eventsConfig,
+            itemsCustomLootSettingsConfig,
+            mobCombatSettingsConfig,
+            itemsDropSettingsConfig,
             playerMaxRankData;
 
     public static void initializeCachedConfigurations() {
