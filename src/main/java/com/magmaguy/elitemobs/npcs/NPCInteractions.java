@@ -29,12 +29,12 @@ public class NPCInteractions implements Listener {
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
+        if (npcEntity == null) return;
         if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.NAME_TAG)) {
             event.setCancelled(true);
             event.getPlayer().sendMessage("[EliteMobs] You can't rename NPCs using name tags!");
             return;
         }
-        if (npcEntity == null) return;
         if (npcEntity.getIsSleeping()) return;
 
         event.setCancelled(true);

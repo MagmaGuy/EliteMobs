@@ -32,6 +32,8 @@ public class FireFaeConfig extends CustomBossConfigFields {
                 null,
                 true,
                 true,
-                Arrays.asList(Particle.FLAME.toString()));
+                Arrays.asList(Particle.FLAME.toString()),
+                null,
+                null);
     }
 }

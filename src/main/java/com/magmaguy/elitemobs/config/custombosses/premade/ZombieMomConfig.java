@@ -29,6 +29,8 @@ public class ZombieMomConfig extends CustomBossConfigFields {
                 null,
                 false,
                 false,
+                null,
+                null,
                 null);
     }
 }

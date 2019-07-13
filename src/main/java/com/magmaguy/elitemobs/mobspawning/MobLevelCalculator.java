@@ -14,11 +14,14 @@ public class MobLevelCalculator {
         //Add selected player gear tier modifier
         double perPlayerEliteMobLevel = ItemTierFinder.findPlayerTier(player);
         //Add selected guild rank modifier
-        perPlayerEliteMobLevel += (GuildRank.getActiveRank(player) - 10) * 0.2;
+        double guildRank = GuildRank.getActiveRank(player);
+        if (guildRank == 0)
+            guildRank = -10;
+        else
+            guildRank--;
+        perPlayerEliteMobLevel += (guildRank * 0.2);
 
-        int finalTieredMobLevel = (int) (perPlayerEliteMobLevel * MobTierCalculator.PER_TIER_LEVEL_INCREASE);
-
-        return finalTieredMobLevel;
+        return (int) (perPlayerEliteMobLevel * MobTierCalculator.PER_TIER_LEVEL_INCREASE);
 
     }
 

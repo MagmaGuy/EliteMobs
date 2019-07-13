@@ -14,7 +14,7 @@ public class CustomBossConfigFields {
     private String name;
     private String level;
     private int timeout;
-    private boolean isPersistent;
+    private Boolean isPersistent;
     private double healthMultiplier;
     private double damageMultiplier;
     private Material helmet;
@@ -33,6 +33,7 @@ public class CustomBossConfigFields {
     private boolean dropsEliteMobsLoot;
     private boolean dropsVanillaLoot;
     private List<String> trails;
+    private List<String> onDamageMessages, onDamagedMessages;
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -43,7 +44,7 @@ public class CustomBossConfigFields {
                                   String name,
                                   String level,
                                   int timeout,
-                                  boolean isPersistent,
+                                  Boolean isPersistent,
                                   double healthMultiplier,
                                   double damageMultiplier,
                                   Material helmet,
@@ -61,7 +62,9 @@ public class CustomBossConfigFields {
                                   List<String> uniqueLootList,
                                   boolean dropsEliteMobsLoot,
                                   boolean dropsVanillaLoot,
-                                  List<String> trails) {
+                                  List<String> trails,
+                                  List<String> onDamageMessages,
+                                  List<String> onDamagedMessages) {
         this.fileName = fileName + ".yml";
         this.entityType = entityType;
         this.isEnabled = isEnabled;
@@ -87,6 +90,8 @@ public class CustomBossConfigFields {
         this.dropsEliteMobsLoot = dropsEliteMobsLoot;
         this.dropsVanillaLoot = dropsVanillaLoot;
         this.trails = trails;
+        this.onDamageMessages = onDamageMessages;
+        this.onDamagedMessages = onDamagedMessages;
     }
 
 
@@ -124,6 +129,8 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("dropsEliteMobsLoot", dropsEliteMobsLoot);
         fileConfiguration.addDefault("dropsVanillaLoot", dropsVanillaLoot);
         fileConfiguration.addDefault("trails", trails);
+        fileConfiguration.addDefault("onDamageMessages", onDamageMessages);
+        fileConfiguration.addDefault("onDamagedMessages", onDamagedMessages);
     }
 
     /**
@@ -168,6 +175,8 @@ public class CustomBossConfigFields {
             this.dropsVanillaLoot = configuration.getBoolean("dropsVanillaLoot");
         else this.dropsVanillaLoot = true;
         this.trails = configuration.getStringList("trails");
+        this.onDamageMessages = configuration.getStringList("onDamageMessages");
+        this.onDamagedMessages = configuration.getStringList("onDamagedMessages");
     }
 
     public String getFileName() {
@@ -194,7 +203,7 @@ public class CustomBossConfigFields {
         return this.timeout;
     }
 
-    public boolean getIsPersistent() {
+    public Boolean getIsPersistent() {
         return this.isPersistent;
     }
 
@@ -268,5 +277,13 @@ public class CustomBossConfigFields {
 
     public List<String> getTrails() {
         return this.trails;
+    }
+
+    public List<String> getOnDamageMessages() {
+        return onDamageMessages;
+    }
+
+    public List<String> getOnDamagedMessages() {
+        return onDamagedMessages;
     }
 }
