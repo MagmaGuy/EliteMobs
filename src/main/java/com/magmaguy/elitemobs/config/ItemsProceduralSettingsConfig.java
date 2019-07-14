@@ -1,18 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
@@ -26,43 +11,11 @@ import java.util.Arrays;
 public class ItemsProceduralSettingsConfig {
 
     public static final String CONFIG_NAME = "ItemsProceduralSettings.yml";
-    public static final String LORE_MOB_LEVEL_SOURCE = "Item source (mob)";
-    public static final String LORE_SHOP_SOURCE = "Item source (shop)";
+    public static final String LORE_MOB_LEVEL_SOURCE = "Item source - mob";
+    public static final String LORE_SHOP_SOURCE = "Item source - shop";
     public static final String LORE_STRUCTURE = "Lore structure";
     public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
-    public static final String MONITOR_ITEMS_ON_CONSOLE = "Monitor procedurally generated items on console";
     public static final String PROCEDURAL_ITEM_VALID_MATERIALS = "Valid material list for random items";
-    public static String ARROW_DAMAGE_BOOL, ARROW_DAMAGE_MAX_LEVEL,
-            ARROW_FIRE_BOOL, ARROW_FIRE_MAX_LEVEL,
-            ARROW_INFINITE_BOOL,
-            ARROW_KNOCKBACK_BOOL, ARROW_KNOCKBACK_MAX_LEVEL,
-            BINDING_CURSE_BOOL,
-            DAMAGE_ALL_BOOL, DAMAGE_ALL_MAX_LEVEL,
-            DAMAGE_ARTHROPODS_BOOL, DAMAGE_ARTHROPODS_MAX_LEVEL,
-            DAMAGE_UNDEAD_BOOL, DAMAGE_UNDEAD_MAX_LEVEL,
-            DEPTH_STRIDER_BOOL, DEPTH_STRIDER_MAX_LEVEL,
-            DIG_SPEED_BOOL, DIG_SPEED_MAX_LEVEL,
-            DURABILITY_BOOL, DURABILITY_MAX_LEVEL,
-            FIRE_ASPECT_BOOL, FIRE_ASPECT_MAX_LEVEL,
-            FROST_WALKER_BOOL, FROST_WALKER_MAX_LEVEL,
-            KNOCKBACK_BOOL, KNOCKBACK_MAX_LEVEL,
-            LOOT_BONUS_BLOCKS_BOOL, LOOT_BONUS_BLOCKS_MAX_LEVEL,
-            LOOT_BONUS_MOBS_BOOL, LOOT_BONUS_MOBS_MAX_LEVEL,
-            LUCK_BOOL, LUCK_MAX_LEVEL,
-            LURE_BOOL, LURE_MAX_LEVEL,
-            MENDING_BOOL,
-            OXYGEN_BOOL, OXYGEN_MAX_LEVEL,
-            PROTECTION_ENVIRONMENTAL_BOOL, PROTECTION_ENVIRONMENTAL_MAX_LEVEL,
-            PROTECTION_EXPLOSIONS_BOOL, PROTECTION_EXPLOSIONS_MAX_LEVEL,
-            PROTECTION_FALL_BOOL, PROTECTION_FALL_MAX_LEVEL,
-            PROTECTION_FIRE_BOOL, PROTECTION_FIRE_MAX_LEVEL,
-            PROTECTION_PROJECTILE_BOOL, PROTECTION_PROJECTILE_MAX_LEVEL,
-            SILK_TOUCH_BOOL,
-            SWEEPING_EDGE_BOOL, SWEEPING_EDGE_MAX_LEVEL,
-            THORNS_BOOL, THORNS_MAX_LEVEL,
-            VANISHING_CURSE_BOOL,
-            WATER_WORKER_BOOL, WATER_WORKER_MAX_LEVEL;
-    public static String HUNTER_BOOL, HUNTER_MAX_LEVEL;
     public static final String ITEM_NAME_FORMAT = "Procedurally generated item name format";
     private static final String MATERIAL_NAME = "Material name.";
     public static final String SWORD_MATERIAL_NAME = MATERIAL_NAME + "Sword";
@@ -83,11 +36,10 @@ public class ItemsProceduralSettingsConfig {
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
-    public void intializeConfig() {
+    public void initializeConfig() {
 
         configuration.addDefault(DROP_ITEMS_ON_DEATH, true);
-        configuration.addDefault(MONITOR_ITEMS_ON_CONSOLE, false);
-        configuration.addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from a level $level Elite $mob");
+        configuration.addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from &o$mob");
         configuration.addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
         configuration.addDefault(LORE_STRUCTURE, Arrays.asList(
                 ChatColorConverter.convert("$enchantments"),
@@ -150,186 +102,6 @@ public class ItemsProceduralSettingsConfig {
                 "IRON_BOOTS",
                 "LEATHER_BOOTS"
         ));
-
-        ARROW_DAMAGE_BOOL = boolValidEnchantmentConstructor("ARROW_DAMAGE");
-        ARROW_DAMAGE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("ARROW_DAMAGE");
-
-        ARROW_FIRE_BOOL = boolValidEnchantmentConstructor("ARROW_FIRE");
-        ARROW_FIRE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("ARROW_FIRE");
-
-        ARROW_INFINITE_BOOL = boolValidEnchantmentConstructor("ARROW_INFINITE");
-
-        ARROW_KNOCKBACK_BOOL = boolValidEnchantmentConstructor("ARROW_KNOCKBACK");
-        ARROW_KNOCKBACK_MAX_LEVEL = maxLevelValidEnchantmentConstructor("ARROW_KNOCKBACK");
-
-        BINDING_CURSE_BOOL = boolValidEnchantmentConstructor("BINDING_CURSE");
-
-        DAMAGE_ALL_BOOL = boolValidEnchantmentConstructor("DAMAGE_ALL");
-        DAMAGE_ALL_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DAMAGE_ALL");
-
-        DAMAGE_ARTHROPODS_BOOL = boolValidEnchantmentConstructor("DAMAGE_ARTHROPODS");
-        DAMAGE_ARTHROPODS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DAMAGE_ARTHROPODS");
-
-        DAMAGE_UNDEAD_BOOL = boolValidEnchantmentConstructor("DAMAGE_UNDEAD");
-        DAMAGE_UNDEAD_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DAMAGE_UNDEAD");
-
-        DEPTH_STRIDER_BOOL = boolValidEnchantmentConstructor("DEPTH_STRIDER");
-        DEPTH_STRIDER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DEPTH_STRIDER");
-
-        DIG_SPEED_BOOL = boolValidEnchantmentConstructor("DIG_SPEED");
-        DIG_SPEED_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DIG_SPEED");
-
-        DURABILITY_BOOL = boolValidEnchantmentConstructor("DURABILITY");
-        DURABILITY_MAX_LEVEL = maxLevelValidEnchantmentConstructor("DURABILITY");
-
-        FIRE_ASPECT_BOOL = boolValidEnchantmentConstructor("FIRE_ASPECT");
-        FIRE_ASPECT_MAX_LEVEL = maxLevelValidEnchantmentConstructor("FIRE_ASPECT");
-
-        FROST_WALKER_BOOL = boolValidEnchantmentConstructor("FROST_WALKER");
-        FROST_WALKER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("FROST_WALKER");
-
-        KNOCKBACK_BOOL = boolValidEnchantmentConstructor("KNOCKBACK");
-        KNOCKBACK_MAX_LEVEL = maxLevelValidEnchantmentConstructor("KNOCKBACK");
-
-        LOOT_BONUS_BLOCKS_BOOL = boolValidEnchantmentConstructor("LOOT_BONUS_BLOCKS");
-        LOOT_BONUS_BLOCKS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("LOOT_BONUS_BLOCKS");
-
-        LOOT_BONUS_MOBS_BOOL = boolValidEnchantmentConstructor("LOOT_BONUS_MOBS");
-        LOOT_BONUS_MOBS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("LOOT_BONUS_MOBS");
-
-        LUCK_BOOL = boolValidEnchantmentConstructor("LUCK");
-        LUCK_MAX_LEVEL = maxLevelValidEnchantmentConstructor("LUCK");
-
-        LURE_BOOL = boolValidEnchantmentConstructor("LURE");
-        LURE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("LURE");
-
-        MENDING_BOOL = boolValidEnchantmentConstructor("MENDING");
-
-        OXYGEN_BOOL = boolValidEnchantmentConstructor("OXYGEN");
-        OXYGEN_MAX_LEVEL = maxLevelValidEnchantmentConstructor("OXYGEN");
-
-        PROTECTION_ENVIRONMENTAL_BOOL = boolValidEnchantmentConstructor("PROTECTION_ENVIRONMENTAL");
-        PROTECTION_ENVIRONMENTAL_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_ENVIRONMENTAL");
-
-        PROTECTION_EXPLOSIONS_BOOL = boolValidEnchantmentConstructor("PROTECTION_EXPLOSIONS");
-        PROTECTION_EXPLOSIONS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_EXPLOSIONS");
-
-        PROTECTION_FALL_BOOL = boolValidEnchantmentConstructor("PROTECTION_FALL");
-        PROTECTION_FALL_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_FALL");
-
-        PROTECTION_FIRE_BOOL = boolValidEnchantmentConstructor("PROTECTION_FIRE");
-        PROTECTION_FIRE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_FIRE");
-
-        PROTECTION_PROJECTILE_BOOL = boolValidEnchantmentConstructor("PROTECTION_PROJECTILE");
-        PROTECTION_PROJECTILE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("PROTECTION_PROJECTILE");
-
-        SILK_TOUCH_BOOL = boolValidEnchantmentConstructor("SILK_TOUCH");
-
-        SWEEPING_EDGE_BOOL = boolValidEnchantmentConstructor("SWEEPING_EDGE");
-        SWEEPING_EDGE_MAX_LEVEL = maxLevelValidEnchantmentConstructor("SWEEPING_EDGE");
-
-        THORNS_BOOL = boolValidEnchantmentConstructor("THORNS");
-        THORNS_MAX_LEVEL = maxLevelValidEnchantmentConstructor("THORNS");
-
-        VANISHING_CURSE_BOOL = boolValidEnchantmentConstructor("VANISHING");
-
-        WATER_WORKER_BOOL = boolValidEnchantmentConstructor("WATER_WORKER");
-        WATER_WORKER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("WATER_WORKER");
-
-        /*
-        Custom enchantments
-         */
-        HUNTER_BOOL = boolValidEnchantmentConstructor("HUNTER");
-        HUNTER_MAX_LEVEL = maxLevelValidEnchantmentConstructor("HUNTER");
-
-
-        configuration.addDefault(ARROW_DAMAGE_BOOL, true);
-        configuration.addDefault(ARROW_DAMAGE_MAX_LEVEL, 100);
-
-        configuration.addDefault(ARROW_FIRE_BOOL, true);
-        configuration.addDefault(ARROW_FIRE_MAX_LEVEL, 1);
-
-        configuration.addDefault(ARROW_INFINITE_BOOL, true);
-
-        configuration.addDefault(ARROW_KNOCKBACK_BOOL, true);
-        configuration.addDefault(ARROW_KNOCKBACK_MAX_LEVEL, 2);
-
-        configuration.addDefault(BINDING_CURSE_BOOL, true);
-
-        configuration.addDefault(DAMAGE_ALL_BOOL, true);
-        configuration.addDefault(DAMAGE_ALL_MAX_LEVEL, 100);
-
-        configuration.addDefault(DAMAGE_ARTHROPODS_BOOL, true);
-        configuration.addDefault(DAMAGE_ARTHROPODS_MAX_LEVEL, 50);
-
-        configuration.addDefault(DAMAGE_UNDEAD_BOOL, true);
-        configuration.addDefault(DAMAGE_UNDEAD_MAX_LEVEL, 50);
-
-        configuration.addDefault(DEPTH_STRIDER_BOOL, true);
-        configuration.addDefault(DEPTH_STRIDER_MAX_LEVEL, 3);
-
-        configuration.addDefault(DIG_SPEED_BOOL, true);
-        configuration.addDefault(DIG_SPEED_MAX_LEVEL, 5);
-
-        configuration.addDefault(DURABILITY_BOOL, true);
-        configuration.addDefault(DURABILITY_MAX_LEVEL, 3);
-
-        configuration.addDefault(FIRE_ASPECT_BOOL, true);
-        configuration.addDefault(FIRE_ASPECT_MAX_LEVEL, 2);
-
-        configuration.addDefault(FROST_WALKER_BOOL, true);
-        configuration.addDefault(FROST_WALKER_MAX_LEVEL, 2);
-
-        configuration.addDefault(KNOCKBACK_BOOL, true);
-        configuration.addDefault(KNOCKBACK_MAX_LEVEL, 2);
-
-        configuration.addDefault(LOOT_BONUS_BLOCKS_BOOL, true);
-        configuration.addDefault(LOOT_BONUS_BLOCKS_MAX_LEVEL, 3);
-
-        configuration.addDefault(LOOT_BONUS_MOBS_BOOL, true);
-        configuration.addDefault(LOOT_BONUS_MOBS_MAX_LEVEL, 3);
-
-        configuration.addDefault(LUCK_BOOL, true);
-        configuration.addDefault(LUCK_MAX_LEVEL, 3);
-
-        configuration.addDefault(LURE_BOOL, true);
-        configuration.addDefault(LURE_MAX_LEVEL, 3);
-
-        configuration.addDefault(MENDING_BOOL, false);
-
-        configuration.addDefault(OXYGEN_BOOL, true);
-        configuration.addDefault(OXYGEN_MAX_LEVEL, 3);
-
-        configuration.addDefault(PROTECTION_ENVIRONMENTAL_BOOL, true);
-        configuration.addDefault(PROTECTION_ENVIRONMENTAL_MAX_LEVEL, 100);
-
-        configuration.addDefault(PROTECTION_EXPLOSIONS_BOOL, true);
-        configuration.addDefault(PROTECTION_EXPLOSIONS_MAX_LEVEL, 50);
-
-        configuration.addDefault(PROTECTION_FALL_BOOL, true);
-        configuration.addDefault(PROTECTION_FALL_MAX_LEVEL, 4);
-
-        configuration.addDefault(PROTECTION_FIRE_BOOL, true);
-        configuration.addDefault(PROTECTION_FIRE_MAX_LEVEL, 4);
-
-        configuration.addDefault(PROTECTION_PROJECTILE_BOOL, true);
-        configuration.addDefault(PROTECTION_PROJECTILE_MAX_LEVEL, 50);
-
-        configuration.addDefault(SILK_TOUCH_BOOL, true);
-
-        configuration.addDefault(SWEEPING_EDGE_BOOL, true);
-        configuration.addDefault(SWEEPING_EDGE_MAX_LEVEL, 3);
-
-        configuration.addDefault(THORNS_BOOL, true);
-        configuration.addDefault(THORNS_MAX_LEVEL, 3);
-
-        configuration.addDefault(VANISHING_CURSE_BOOL, true);
-
-        configuration.addDefault(WATER_WORKER_BOOL, true);
-        configuration.addDefault(WATER_WORKER_MAX_LEVEL, 1);
-
-        configuration.addDefault(HUNTER_BOOL, true);
-        configuration.addDefault(HUNTER_MAX_LEVEL, 3);
 
         configuration.addDefault(SWORD_MATERIAL_NAME, "Sword");
         configuration.addDefault(BOW_MATERIAL_NAME, "Bow");
@@ -558,7 +330,7 @@ public class ItemsProceduralSettingsConfig {
                 "Pirate",
                 "Vanguard",
                 "Voidblade",
-                "Whisp",
+                "Wisp",
                 "Peasant",
                 "Footman",
                 "Swordsman",
@@ -1565,27 +1337,6 @@ public class ItemsProceduralSettingsConfig {
         customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
         customConfigLoader.saveCustomConfig(CONFIG_NAME);
 
-    }
-
-    private String boolValidEnchantmentConstructor(String string) {
-
-        String validEnchantmentsprefix = "Valid Enchantments.";
-        String allowSuffix = ".Allow";
-
-        String finalString = validEnchantmentsprefix + string + allowSuffix;
-
-        return finalString;
-
-    }
-
-    private String maxLevelValidEnchantmentConstructor(String string) {
-
-        String validEnchantmentsprefix = "Valid Enchantments.";
-        String maxLevelSuffix = ".Max Level";
-
-        String finalString = validEnchantmentsprefix + string + maxLevelSuffix;
-
-        return finalString;
     }
 
 }

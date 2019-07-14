@@ -9,5 +9,6 @@ public class AttackFreezeConfig extends PowersConfigFields {
                 true,
                 "Cryomancer",
                 Material.PACKED_ICE.toString());
+        super.getAdditionalConfigOptions().put("freezeMessage", "&8[EM] &9You've been frozen!");
     }
 }

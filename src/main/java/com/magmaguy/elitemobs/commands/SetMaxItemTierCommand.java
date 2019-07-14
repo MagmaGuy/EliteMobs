@@ -2,8 +2,10 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.enchantments.Enchantment;
 
 public class SetMaxItemTierCommand {
 
@@ -18,9 +20,9 @@ public class SetMaxItemTierCommand {
         CustomConfigLoader customConfigLoader1 = new CustomConfigLoader();
         Configuration itemsProceduralSettingsConfig = customConfigLoader1.getCustomConfig(ItemsProceduralSettingsConfig.CONFIG_NAME);
 
-        itemsProceduralSettingsConfig.set(ItemsProceduralSettingsConfig.ARROW_DAMAGE_MAX_LEVEL, tier-1);
-        itemsProceduralSettingsConfig.set(ItemsProceduralSettingsConfig.DAMAGE_ALL_MAX_LEVEL, tier-1);
-        itemsProceduralSettingsConfig.set(ItemsProceduralSettingsConfig.PROTECTION_ENVIRONMENTAL_MAX_LEVEL, tier-1);
+        itemsProceduralSettingsConfig.set(EnchantmentsConfig.getEnchantment(Enchantment.ARROW_DAMAGE).getMaxLevel() + "", tier - 1);
+        itemsProceduralSettingsConfig.set(EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ALL).getMaxLevel() + "", tier - 1);
+        itemsProceduralSettingsConfig.set(EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel() + "", tier - 1);
         customConfigLoader1.saveCustomConfig(ItemsProceduralSettingsConfig.CONFIG_NAME);
 
 
@@ -38,7 +40,7 @@ public class SetMaxItemTierCommand {
         commandSender.sendMessage(ChatColorConverter.convert(
                 "The max protection enchantment has been increased to " + (tier - 1)));
         commandSender.sendMessage(ChatColorConverter.convert(
-                "The max sharpness enchantment has been increased to " + (tier- 1)));
+                "The max sharpness enchantment has been increased to " + (tier - 1)));
         commandSender.sendMessage(ChatColorConverter.convert(
                 "The max power enchantment has been increased to " + (tier - 1)));
         commandSender.sendMessage(ChatColorConverter.convert(

@@ -1,26 +1,10 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -40,39 +24,9 @@ public class ItemQualityColorizer {
         GRAY
     }
 
-    /*
-    item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
-     */
-    private static final int ARROW_DAMAGE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_DAMAGE_BOOL, ItemsProceduralSettingsConfig.ARROW_DAMAGE_MAX_LEVEL);
-    private static final int ARROW_FIRE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_FIRE_BOOL, ItemsProceduralSettingsConfig.ARROW_FIRE_MAX_LEVEL);
-    private static final int ARROW_INFINITE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_INFINITE_BOOL);
-    private static final int ARROW_KNOCKBACK = enchantMaxValueGetter(ItemsProceduralSettingsConfig.ARROW_KNOCKBACK_BOOL, ItemsProceduralSettingsConfig.ARROW_KNOCKBACK_MAX_LEVEL);
-    private static final int BINDING_CURSE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.BINDING_CURSE_BOOL);
-    private static final int DAMAGE_ALL = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DAMAGE_ALL_BOOL, ItemsProceduralSettingsConfig.DAMAGE_ALL_MAX_LEVEL);
-    private static final int DAMAGE_ARTHROPODS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DAMAGE_ARTHROPODS_BOOL, ItemsProceduralSettingsConfig.DAMAGE_ARTHROPODS_MAX_LEVEL);
-    private static final int DAMAGE_UNDEAD = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DAMAGE_UNDEAD_BOOL, ItemsProceduralSettingsConfig.DAMAGE_UNDEAD_MAX_LEVEL);
-    private static final int DEPTH_STRIDER = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DEPTH_STRIDER_BOOL, ItemsProceduralSettingsConfig.DEPTH_STRIDER_MAX_LEVEL);
-    private static final int DIG_SPEED = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DIG_SPEED_BOOL, ItemsProceduralSettingsConfig.DIG_SPEED_MAX_LEVEL);
-    private static final int DURABILITY = enchantMaxValueGetter(ItemsProceduralSettingsConfig.DURABILITY_BOOL, ItemsProceduralSettingsConfig.DURABILITY_MAX_LEVEL);
-    private static final int FIRE_ASPECT = enchantMaxValueGetter(ItemsProceduralSettingsConfig.FIRE_ASPECT_BOOL, ItemsProceduralSettingsConfig.FIRE_ASPECT_MAX_LEVEL);
-    private static final int FROST_WALKER = enchantMaxValueGetter(ItemsProceduralSettingsConfig.FROST_WALKER_BOOL, ItemsProceduralSettingsConfig.FROST_WALKER_MAX_LEVEL);
-    private static final int KNOCKBACK = enchantMaxValueGetter(ItemsProceduralSettingsConfig.KNOCKBACK_BOOL, ItemsProceduralSettingsConfig.KNOCKBACK_MAX_LEVEL);
-    private static final int LOOT_BONUS_BLOCKS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.LOOT_BONUS_BLOCKS_BOOL, ItemsProceduralSettingsConfig.LOOT_BONUS_BLOCKS_MAX_LEVEL);
-    private static final int LOOT_BONUS_MOBS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.LOOT_BONUS_MOBS_BOOL, ItemsProceduralSettingsConfig.LOOT_BONUS_MOBS_MAX_LEVEL);
-    private static final int LUCK = enchantMaxValueGetter(ItemsProceduralSettingsConfig.LUCK_BOOL, ItemsProceduralSettingsConfig.LUCK_MAX_LEVEL);
-    private static final int LURE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.LURE_BOOL, ItemsProceduralSettingsConfig.LURE_MAX_LEVEL);
-    private static final int MENDING = enchantMaxValueGetter(ItemsProceduralSettingsConfig.MENDING_BOOL);
-    private static final int OXYGEN = enchantMaxValueGetter(ItemsProceduralSettingsConfig.OXYGEN_BOOL, ItemsProceduralSettingsConfig.OXYGEN_MAX_LEVEL);
-    private static final int PROTECTION_ENVIRONMENTAL = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_ENVIRONMENTAL_BOOL, ItemsProceduralSettingsConfig.PROTECTION_ENVIRONMENTAL_MAX_LEVEL);
-    private static final int PROTECTION_EXPLOSIONS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_EXPLOSIONS_BOOL, ItemsProceduralSettingsConfig.PROTECTION_EXPLOSIONS_MAX_LEVEL);
-    private static final int PROTECTION_FALL = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_FALL_BOOL, ItemsProceduralSettingsConfig.PROTECTION_FALL_MAX_LEVEL);
-    private static final int PROTECTION_FIRE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_FIRE_BOOL, ItemsProceduralSettingsConfig.PROTECTION_FIRE_MAX_LEVEL);
-    private static final int PROTECTION_PROJECTILE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.PROTECTION_PROJECTILE_BOOL, ItemsProceduralSettingsConfig.PROTECTION_PROJECTILE_MAX_LEVEL);
-    private static final int SILK_TOUCH = enchantMaxValueGetter(ItemsProceduralSettingsConfig.SILK_TOUCH_BOOL);
-    private static final int SWEEPING_EDGE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.SWEEPING_EDGE_BOOL, ItemsProceduralSettingsConfig.SWEEPING_EDGE_MAX_LEVEL);
-    private static final int THORNS = enchantMaxValueGetter(ItemsProceduralSettingsConfig.THORNS_BOOL, ItemsProceduralSettingsConfig.THORNS_MAX_LEVEL);
-    private static final int VANISHING_CURSE = enchantMaxValueGetter(ItemsProceduralSettingsConfig.VANISHING_CURSE_BOOL);
-    private static final int WATER_WORKER = enchantMaxValueGetter(ItemsProceduralSettingsConfig.WATER_WORKER_BOOL, ItemsProceduralSettingsConfig.WATER_WORKER_MAX_LEVEL);
+//    /*
+//    item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
+//     */
 
     public static ItemQuality getItemQuality(ItemStack itemStack) {
 
@@ -247,184 +201,141 @@ public class ItemQualityColorizer {
                 material.equals(Material.IRON_SWORD) || material.equals(Material.STONE_SWORD) ||
                 material.equals(Material.WOODEN_SWORD)) {
 
-            maxRank += DAMAGE_ARTHROPODS;
-            maxRank += VANISHING_CURSE;
-            maxRank += FIRE_ASPECT;
-            maxRank += KNOCKBACK;
-            maxRank += LOOT_BONUS_MOBS;
-            maxRank += MENDING;
-            maxRank += DAMAGE_ALL;
-            maxRank += DAMAGE_UNDEAD;
-            maxRank += SWEEPING_EDGE;
-            maxRank += DURABILITY;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ARTHROPODS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FIRE_ASPECT).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.KNOCKBACK).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LOOT_BONUS_BLOCKS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ALL).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_UNDEAD).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SWEEPING_EDGE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
 
         } else if (material.equals(Material.BOW)) {
 
-            maxRank += VANISHING_CURSE;
-            maxRank += ARROW_FIRE;
-            maxRank += ARROW_INFINITE;
-            maxRank += MENDING;
-            maxRank += ARROW_DAMAGE;
-            maxRank += ARROW_KNOCKBACK;
-            maxRank += DURABILITY;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.ARROW_FIRE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.ARROW_INFINITE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.ARROW_DAMAGE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.ARROW_KNOCKBACK).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
 
         } else if (material.equals(Material.DIAMOND_PICKAXE) || material.equals(Material.GOLDEN_SWORD) ||
                 material.equals(Material.IRON_PICKAXE) || material.equals(Material.STONE_PICKAXE) ||
                 material.equals(Material.WOODEN_SWORD)) {
 
-            maxRank += VANISHING_CURSE;
-            maxRank += DIG_SPEED;
-            maxRank += LOOT_BONUS_BLOCKS;
-            maxRank += MENDING;
-            maxRank += SILK_TOUCH;
-            maxRank += DURABILITY;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DIG_SPEED).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LOOT_BONUS_BLOCKS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SILK_TOUCH).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
 
         } else if (material.equals(Material.DIAMOND_SHOVEL) || material.equals(Material.GOLDEN_SHOVEL) ||
                 material.equals(Material.IRON_SHOVEL) || material.equals(Material.STONE_SHOVEL) ||
                 material.equals(Material.WOODEN_SHOVEL)) {
 
-            maxRank += VANISHING_CURSE;
-            maxRank += DIG_SPEED;
-            maxRank += LOOT_BONUS_BLOCKS;
-            maxRank += MENDING;
-            maxRank += SILK_TOUCH;
-            maxRank += DURABILITY;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DIG_SPEED).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LOOT_BONUS_BLOCKS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SILK_TOUCH).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+
 
         } else if (material.equals(Material.DIAMOND_HOE) || material.equals(Material.GOLDEN_HOE) ||
                 material.equals(Material.IRON_HOE) || material.equals(Material.STONE_HOE) ||
                 material.equals(Material.WOODEN_HOE)) {
 
-            maxRank += VANISHING_CURSE;
-            maxRank += MENDING;
-            maxRank += DURABILITY;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
 
         } else if (material.equals(Material.DIAMOND_AXE) || material.equals(Material.GOLDEN_AXE) ||
                 material.equals(Material.IRON_AXE) || material.equals(Material.STONE_AXE) ||
                 material.equals(Material.WOODEN_AXE)) {
 
-            maxRank += DAMAGE_ARTHROPODS;
-            maxRank += VANISHING_CURSE;
-            maxRank += DIG_SPEED;
-            maxRank += LOOT_BONUS_BLOCKS;
-            maxRank += MENDING;
-            maxRank += DAMAGE_ALL;
-            maxRank += SILK_TOUCH;
-            maxRank += DAMAGE_UNDEAD;
-            maxRank += DURABILITY;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ARTHROPODS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DIG_SPEED).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LOOT_BONUS_BLOCKS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ALL).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.SILK_TOUCH).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_UNDEAD).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+
 
         } else if (material.equals(Material.CHAINMAIL_HELMET) || material.equals(Material.DIAMOND_HELMET) ||
                 material.equals(Material.GOLDEN_HELMET) || material.equals(Material.IRON_HELMET) ||
                 material.equals(Material.LEATHER_HELMET)) {
 
-            maxRank += BINDING_CURSE;
-            maxRank += DURABILITY;
-            maxRank += MENDING;
-            maxRank += OXYGEN;
-            maxRank += PROTECTION_ENVIRONMENTAL;
-            maxRank += PROTECTION_EXPLOSIONS;
-            maxRank += PROTECTION_FIRE;
-            maxRank += PROTECTION_PROJECTILE;
-            maxRank += THORNS;
-            maxRank += VANISHING_CURSE;
-            maxRank += WATER_WORKER;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.OXYGEN).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_EXPLOSIONS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FIRE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_PROJECTILE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.THORNS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.WATER_WORKER).getMaxLevel();
 
         } else if (material.equals(Material.CHAINMAIL_CHESTPLATE) || material.equals(Material.DIAMOND_CHESTPLATE) ||
                 material.equals(Material.GOLDEN_CHESTPLATE) || material.equals(Material.IRON_CHESTPLATE) ||
                 material.equals(Material.LEATHER_CHESTPLATE)) {
 
-            maxRank += BINDING_CURSE;
-            maxRank += DURABILITY;
-            maxRank += MENDING;
-            maxRank += PROTECTION_ENVIRONMENTAL;
-            maxRank += PROTECTION_EXPLOSIONS;
-            maxRank += PROTECTION_FIRE;
-            maxRank += PROTECTION_PROJECTILE;
-            maxRank += THORNS;
-            maxRank += VANISHING_CURSE;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_EXPLOSIONS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FIRE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_PROJECTILE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.THORNS).getMaxLevel();
 
         } else if (material.equals(Material.CHAINMAIL_LEGGINGS) || material.equals(Material.DIAMOND_LEGGINGS) ||
                 material.equals(Material.GOLDEN_LEGGINGS) || material.equals(Material.IRON_LEGGINGS) ||
                 material.equals(Material.LEATHER_LEGGINGS)) {
 
-            maxRank += BINDING_CURSE;
-            maxRank += DURABILITY;
-            maxRank += MENDING;
-            maxRank += PROTECTION_ENVIRONMENTAL;
-            maxRank += PROTECTION_EXPLOSIONS;
-            maxRank += PROTECTION_FIRE;
-            maxRank += PROTECTION_PROJECTILE;
-            maxRank += THORNS;
-            maxRank += VANISHING_CURSE;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_EXPLOSIONS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FIRE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_PROJECTILE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.THORNS).getMaxLevel();
 
         } else if (material.equals(Material.CHAINMAIL_BOOTS) || material.equals(Material.DIAMOND_BOOTS) ||
                 material.equals(Material.GOLDEN_BOOTS) || material.equals(Material.IRON_BOOTS) ||
                 material.equals(Material.LEATHER_BOOTS)) {
 
-            maxRank += BINDING_CURSE;
-            maxRank += DURABILITY;
-            maxRank += MENDING;
-            maxRank += PROTECTION_ENVIRONMENTAL;
-            maxRank += PROTECTION_EXPLOSIONS;
-            maxRank += PROTECTION_FALL;
-            maxRank += PROTECTION_FIRE;
-            maxRank += PROTECTION_PROJECTILE;
-            maxRank += THORNS;
-            maxRank += VANISHING_CURSE;
-            maxRank += DEPTH_STRIDER;
-            maxRank += FROST_WALKER;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_EXPLOSIONS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FALL).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_FIRE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_PROJECTILE).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.THORNS).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DEPTH_STRIDER).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.FROST_WALKER).getMaxLevel();
 
         } else if (material.equals(Material.SHEARS)) {
 
-            maxRank += VANISHING_CURSE;
-            maxRank += DIG_SPEED;
-            maxRank += MENDING;
-            maxRank += DURABILITY;
+            EnchantmentsConfig.getEnchantment(Enchantment.DIG_SPEED).getMaxLevel();
+            EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
 
         } else if (material.equals(Material.FISHING_ROD)) {
 
-            maxRank += VANISHING_CURSE;
-            maxRank += DURABILITY;
-            maxRank += MENDING;
-            maxRank += LUCK;
-            maxRank += LURE;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LUCK).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.LURE).getMaxLevel();
 
         } else if (material.equals(Material.SHIELD)) {
 
-            maxRank += VANISHING_CURSE;
-            maxRank += DURABILITY;
-            maxRank += MENDING;
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.DURABILITY).getMaxLevel();
+            maxRank += EnchantmentsConfig.getEnchantment(Enchantment.MENDING).getMaxLevel();
 
         }
 
         return maxRank;
-
-    }
-
-    private static int enchantMaxValueGetter(String boolString) {
-
-        Configuration configuration = ConfigValues.itemsProceduralSettingsConfig;
-
-        if (configuration.getBoolean(boolString)) {
-
-            return 1;
-
-        }
-
-        return 0;
-
-    }
-
-    private static int enchantMaxValueGetter(String boolString, String maxLevelString) {
-
-        Configuration configuration = ConfigValues.itemsProceduralSettingsConfig;
-
-        if (configuration.getBoolean(boolString)) {
-
-            return configuration.getInt(maxLevelString);
-
-        }
-
-        return 0;
 
     }
 
