@@ -71,6 +71,8 @@ public class EnchantmentsConfig {
             new ThornsConfig(),
             new VanishingCurseConfig(),
             new WaterWorkerConfig(),
+            new ProtectionEnvironmentalConfig(),
+            new LureConfig(),
 
             new FlamethrowerConfig(),
             new HunterConfig()

@@ -59,8 +59,13 @@ public class NPCCommands {
                 + Round.twoDecimalPlaces(playerLocation.getYaw()) + ","
                 + Round.twoDecimalPlaces(playerLocation.getPitch());
 
+
         try {
             NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromFields(npCsConfigFields));
+        } catch (Exception ex) {
+        }
+
+        try {
             npCsConfigFields.setEnabled(true);
             npCsConfigFields.setLocation(location);
             new NPCEntity(npCsConfigFields);
@@ -70,7 +75,7 @@ public class NPCCommands {
 
     }
 
-    public static void removeNPC(Player player, String[] args) {
+    private static void removeNPC(Player player, String[] args) {
         if (args.length == 2) {
             player.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
             player.sendMessage("/em npc remove [filename]");

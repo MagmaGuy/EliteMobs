@@ -10,7 +10,6 @@ import org.bukkit.configuration.Configuration;
 public class ConfigValues {
 
     public static Configuration defaultConfig,
-            mobPowerConfig,
             translationConfig,
             itemsProceduralSettingsConfig,
             economyConfig,
@@ -26,9 +25,6 @@ public class ConfigValues {
         CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
         defaultConfig = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
-
-        customConfigLoader = new CustomConfigLoader();
-        mobPowerConfig = customConfigLoader.getCustomConfig(MobPowersConfig.CONFIG_NAME);
 
         customConfigLoader = new CustomConfigLoader();
         itemsCustomLootSettingsConfig = customConfigLoader.getCustomConfig(ItemsCustomLootSettingsConfig.CONFIG_NAME);
@@ -63,9 +59,6 @@ public class ConfigValues {
         DefaultConfig defaultConfig = new DefaultConfig();
         defaultConfig.loadConfiguration();
 
-        MobPowersConfig mobPowersConfig = new MobPowersConfig();
-        mobPowersConfig.initializeConfig();
-
         ItemsCustomLootSettingsConfig itemsCustomLootSettingsConfig = new ItemsCustomLootSettingsConfig();
         itemsCustomLootSettingsConfig.initializeConfig();
 
@@ -73,7 +66,7 @@ public class ConfigValues {
         translationConfig.initializeConfig();
 
         ItemsProceduralSettingsConfig itemsProceduralSettingsConfig = new ItemsProceduralSettingsConfig();
-        itemsProceduralSettingsConfig.intializeConfig();
+        itemsProceduralSettingsConfig.initializeConfig();
 
         EconomySettingsConfig economySettingsConfig = new EconomySettingsConfig();
         economySettingsConfig.initializeConfig();
@@ -91,7 +84,7 @@ public class ConfigValues {
         itemsDropSettingsConfig.initializeConfig();
 
         PlayerMaxGuildRank playerMaxGuildRank = new PlayerMaxGuildRank();
-        playerMaxGuildRank.intializeConfig();
+        playerMaxGuildRank.initializeConfig();
 
     }
 

@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -61,8 +60,6 @@ public class PlayerDeathMessageByEliteMob implements Listener {
     }
 
     private static String deathMessagePlaceholderConversion(String deathMessage, Player player, LivingEntity livingEntity) {
-
-        new DebugMessage(deathMessage);
 
         String livingEntityName = EntityTracker.getEliteMobEntity(livingEntity).getName();
 

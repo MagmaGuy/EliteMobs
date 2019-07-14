@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.*;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
@@ -30,6 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EliteMobEntity {
@@ -485,6 +487,12 @@ public class EliteMobEntity {
      * @param availablePowerAmount Amount of powers to pick
      */
     private void applyPowers(HashSet<ElitePower> elitePowers, int availablePowerAmount) {
+        //TODO: this may not be amazingly efficient
+        for (Iterator<ElitePower> elitePowerIterator = elitePowers.iterator(); elitePowerIterator.hasNext(); ) {
+            ElitePower elitePower = elitePowerIterator.next();
+            if (!PowersConfig.getPower(elitePower.getFileName()).isEnabled())
+                elitePowerIterator.remove();
+        }
 
         if (availablePowerAmount < 1) return;
 

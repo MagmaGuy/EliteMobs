@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.MaterialTier;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -375,30 +377,14 @@ public class EnchantmentGenerator {
 
     private static HashMap<Enchantment, Integer> validateAndApplyPrimaryEnchantment(String string, double itemTier) {
 
+        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
+
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
-        String mainString = "Valid Enchantments." + string;
-
-        if (ConfigValues.itemsProceduralSettingsConfig.getBoolean(mainString + ".Allow")) {
-
-            int maxEnchantmentLevel;
-
-            if (ConfigValues.itemsProceduralSettingsConfig.contains(mainString + ".Max Level")) {
-
-                maxEnchantmentLevel = ConfigValues.itemsProceduralSettingsConfig.getInt(mainString + ".Max Level");
-
-            } else {
-
-                maxEnchantmentLevel = 1;
-
-            }
-
-            int enchantmentLevel = (maxEnchantmentLevel < itemTier) ? maxEnchantmentLevel : (int) itemTier;
-
-            //index for random getting
-
-            enchantmentMap.put(Enchantment.getByName(string), enchantmentLevel);
-
+        if (enchantmentsConfigFields.isEnabled()) {
+            Enchantment enchantment = enchantmentsConfigFields.getEnchantment();
+            int enchantmentLevel = (enchantmentsConfigFields.getMaxLevel() < itemTier) ? enchantmentsConfigFields.getMaxLevel() : (int) itemTier;
+            enchantmentMap.put(enchantment, enchantmentLevel);
         }
 
         return enchantmentMap;
@@ -407,67 +393,29 @@ public class EnchantmentGenerator {
 
     private static HashMap<Enchantment, Integer> validateSecondaryEnchantments(String string) {
 
-        HashMap<Enchantment, Integer> hashMap = new HashMap();
+        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
 
-        if (enchantmentBackwardsCompatibility(7, 0, string, "LURE")) return hashMap;
-        if (enchantmentBackwardsCompatibility(7, 0, string, "LUCK")) return hashMap;
-        if (enchantmentBackwardsCompatibility(8, 0, string, "DEPTH_STRIDER")) return hashMap;
-        if (enchantmentBackwardsCompatibility(9, 0, string, "MENDING")) return hashMap;
-        if (enchantmentBackwardsCompatibility(9, 0, string, "FROST_WALKER")) return hashMap;
-        if (enchantmentBackwardsCompatibility(11, 0, string, "VANISHING_CURSE")) return hashMap;
-        if (enchantmentBackwardsCompatibility(11, 0, string, "BINDING_CURSE")) return hashMap;
-        if (enchantmentBackwardsCompatibility(11, 1, string, "SWEEP")) return hashMap;
+        HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
-        String mainString = "Valid Enchantments." + string;
-
-        if (ConfigValues.itemsProceduralSettingsConfig.getBoolean(mainString + ".Allow")) {
-
-            int enchantmentLevel;
-
-            if (ConfigValues.itemsProceduralSettingsConfig.contains(mainString + ".Max Level")) {
-
-                enchantmentLevel = ConfigValues.itemsProceduralSettingsConfig.getInt(mainString + ".Max Level");
-
-            } else {
-
-                enchantmentLevel = 1;
-
-            }
-
-            hashMap.put(Enchantment.getByName(string), enchantmentLevel);
-
+        if (enchantmentsConfigFields.isEnabled()) {
+            Enchantment enchantment = enchantmentsConfigFields.getEnchantment();
+            enchantmentMap.put(enchantment, enchantmentsConfigFields.getMaxLevel());
         }
 
-        return hashMap;
+        return enchantmentMap;
 
     }
 
     private static HashMap<String, Integer> validateSecondaryCustomEnchantments(String string) {
 
-        HashMap<String, Integer> hashMap = new HashMap();
+        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase() + ".yml");
 
-        String mainString = "Valid Enchantments." + string;
+        HashMap<String, Integer> enchantmentMap = new HashMap<>();
 
-        if (ConfigValues.itemsProceduralSettingsConfig.getBoolean(mainString + ".Allow")) {
+        if (enchantmentsConfigFields.isEnabled())
+            enchantmentMap.put(string, ThreadLocalRandom.current().nextInt(enchantmentsConfigFields.getMaxLevel()) + 1);
 
-            int enchantmentLevel;
-
-            if (ConfigValues.itemsProceduralSettingsConfig.contains(mainString + ".Max Level")) {
-
-                //TODO: actually implement this properly
-                enchantmentLevel = ThreadLocalRandom.current().nextInt(ConfigValues.itemsProceduralSettingsConfig.getInt(mainString + ".Max Level")) + 1;
-
-            } else {
-
-                enchantmentLevel = 1;
-
-            }
-
-            hashMap.put(string, enchantmentLevel);
-
-        }
-
-        return hashMap;
+        return enchantmentMap;
 
     }
 

@@ -3,8 +3,6 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobPowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import net.md_5.bungee.api.ChatMessageType;
@@ -36,12 +34,10 @@ public class AttackFreeze extends MinorPower implements Listener {
         /*
         Slow player down
          */
-        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 10));
+        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 20));
         event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
                 TextComponent.fromLegacyText(
-                        ChatColorConverter.convert(
-                                ConfigValues.mobPowerConfig.getString(
-                                        MobPowersConfig.FROZEN_MESSAGE))));
+                        ChatColorConverter.convert(super.getConfiguration().getString("freezeMessage"))));
 
         /*
         Add block effect

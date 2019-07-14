@@ -68,7 +68,7 @@ public class QuestReward {
     public void doReward(Player player) {
         if (rewardType.equals(RewardType.MONETARY)) {
             EconomyHandler.addCurrency(player.getUniqueId(), questReward);
-            player.sendMessage("[EM] You have completed a quest! You reward is " + questReward + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+            player.sendMessage("[EM] You have completed a quest! You reward is " + questReward + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
         }
     }
 

@@ -38,8 +38,9 @@ public class EnchantmentsConfigFields {
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
         this.name = fileConfiguration.getString("name");
         this.maxLevel = fileConfiguration.getInt("maxLevel");
+        String cleanName = this.fileName.replace(".yml", "").toUpperCase();
         try {
-            this.enchantment = Enchantment.getByName(this.fileName.replace(".yml", ""));
+            this.enchantment = Enchantment.getByName(cleanName);
         } catch (Exception ex) {
             this.enchantment = null;
         }

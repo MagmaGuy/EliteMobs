@@ -12,7 +12,7 @@ public class PlayerMaxGuildRank {
     public CustomConfigLoader customConfigLoader = new CustomConfigLoader();
     public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME, true);
 
-    public void intializeConfig() {
+    public void initializeConfig() {
 
         File file = new File(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDataFolder().getAbsolutePath() + "/data/" + CONFIG_NAME);
         if (!file.exists())

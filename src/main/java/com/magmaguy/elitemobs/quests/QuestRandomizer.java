@@ -19,6 +19,7 @@ public class QuestRandomizer {
         PlayerQuest.QuestType questType = PlayerQuest.QuestType.DYNAMIC_KILL_AMOUNT_QUEST;
         QuestObjective questObjective = generateQuestObjective(generateEntityType(), questTier);
         QuestReward questReward = generateQuestReward(questObjective);
+        questObjective.setQuestReward(questReward);
         return new KillAmountQuest(questType, questObjective, questReward);
     }
 

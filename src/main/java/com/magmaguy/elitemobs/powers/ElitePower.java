@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -86,11 +87,55 @@ public class ElitePower {
         return null;
     }
 
+    private static HashSet<MinorPower> defensivePowers = new HashSet<>(Arrays.asList(
+            new Invisibility(),
+            new InvulnerabilityArrow(),
+            new InvulnerabilityFallDamage(),
+            new InvulnerabilityFire(),
+            new InvulnerabilityKnockback()));
+
+    public static HashSet<MinorPower> getDefensivePowers() {
+        return defensivePowers;
+    }
+
+    private static HashSet<MinorPower> miscellaneousPowers = new HashSet<>(Arrays.asList(
+            new BonusLoot(),
+            new Corpse(),
+            new Implosion(),
+            new MoonWalk(),
+            new MovementSpeed(),
+            new Taunt()));
+
+    public static HashSet<MinorPower> getMiscellaneousPowers() {
+        return miscellaneousPowers;
+    }
+
+    private static HashSet<MinorPower> offensivePowers = new HashSet<>(Arrays.asList(
+            new AttackArrow(),
+            new AttackBlinding(),
+            new AttackConfusing(),
+            new AttackFire(),
+            new AttackFireball(),
+            new AttackFreeze(),
+            new AttackGravity(),
+            new AttackLightning(),
+            new AttackPoison(),
+            new AttackPush(),
+            new AttackVacuum(),
+            new AttackWeakness(),
+            new AttackWeb(),
+            new AttackWither()));
+
+    public static HashSet<MinorPower> getOffensivePowers() {
+        return offensivePowers;
+    }
+
     private boolean cooldown = false;
     private String fileName;
     private String trail;
     private String name;
     private boolean isFiring = false;
+    private FileConfiguration configuration;
 
     /**
      * This is overwritten by certain classes to apply powers to a living entity upon activation
@@ -104,6 +149,7 @@ public class ElitePower {
         this.fileName = powersConfigFields.getFileName();
         this.name = powersConfigFields.getName();
         this.trail = powersConfigFields.getEffect();
+        this.configuration = powersConfigFields.getConfiguration();
     }
 
     public String getFileName() {
@@ -116,6 +162,10 @@ public class ElitePower {
 
     public String getName() {
         return name;
+    }
+
+    public FileConfiguration getConfiguration() {
+        return configuration;
     }
 
     public boolean isCooldown() {
