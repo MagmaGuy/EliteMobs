@@ -1,18 +1,16 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.MobPowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
+import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powers.MinorPower;
-import com.magmaguy.elitemobs.powers.defensivepowers.*;
-import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
-import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.HashSet;
+import java.util.Iterator;
 
 public abstract class EliteMobProperties extends PluginMobProperties {
 
@@ -21,10 +19,23 @@ public abstract class EliteMobProperties extends PluginMobProperties {
      */
 
     public static HashSet<EliteMobProperties> eliteMobData = new HashSet<>();
-    public HashSet<MajorPower> validMajorPowers = new HashSet<>();
-    public HashSet<MinorPower> validDefensivePowers = new HashSet<>();
-    public HashSet<MinorPower> validOffensivePowers = new HashSet<>();
-    public HashSet<MinorPower> validMiscellaneousPowers = new HashSet<>();
+    private HashSet<MajorPower> validMajorPowers = new HashSet<>();
+    private HashSet<MinorPower> validDefensivePowers = (HashSet<MinorPower>) ElitePower.getDefensivePowers().clone();
+    private HashSet<MinorPower> validOffensivePowers = (HashSet<MinorPower>) ElitePower.getOffensivePowers().clone();
+    private HashSet<MinorPower> validMiscellaneousPowers = (HashSet<MinorPower>) ElitePower.getMiscellaneousPowers().clone();
+
+    public void addMajorPower(String powerName) {
+        if (PowersConfig.getPower(powerName).isEnabled())
+            validMajorPowers.add((MajorPower) ElitePower.getElitePower(powerName));
+    }
+
+    public void removeDefensivePower(MinorPower minorPower) {
+        for (Iterator<MinorPower> iterator = validDefensivePowers.iterator(); iterator.hasNext(); ) {
+            MinorPower minorPower1 = iterator.next();
+            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName()))
+                iterator.remove();
+        }
+    }
 
     public HashSet<MajorPower> getValidMajorPowers() {
         return validMajorPowers;
@@ -42,77 +53,6 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         return validMiscellaneousPowers;
     }
 
-    public HashSet<MinorPower> getAllDefensivePowers() {
-        HashSet<MinorPower> defensivePowers = new HashSet<>();
-
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.INVISIBILITY))
-            defensivePowers.add(new Invisibility());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.INVULNERABILITY_ARROW))
-            defensivePowers.add(new InvulnerabilityArrow());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.INVULNERABILITY_FALL_DAMAGE))
-            defensivePowers.add(new InvulnerabilityFallDamage());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.INVULNERABILITY_FIRE))
-            defensivePowers.add(new InvulnerabilityFire());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.INVULNERABILITY_KNOCKBACK))
-            defensivePowers.add(new InvulnerabilityKnockback());
-
-        return defensivePowers;
-    }
-
-    public HashSet<MinorPower> getAllOffensivePowers() {
-        HashSet<MinorPower> offensivePowers = new HashSet<>();
-
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_ARROW))
-            offensivePowers.add(new AttackArrow());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_BLINDING))
-            offensivePowers.add(new AttackBlinding());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_CONFUSING))
-            offensivePowers.add(new AttackConfusing());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_FIRE))
-            offensivePowers.add(new AttackFire());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_FIREBALL))
-            offensivePowers.add(new AttackFireball());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_FREEZE))
-            offensivePowers.add(new AttackFreeze());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_GRAVITY))
-            offensivePowers.add(new AttackGravity());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_LIGHTNING))
-            offensivePowers.add(new AttackLightning());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_POISON))
-            offensivePowers.add(new AttackPoison());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_PUSH))
-            offensivePowers.add(new AttackPush());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WEAKNESS))
-            offensivePowers.add(new AttackWeakness());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WEB))
-            offensivePowers.add(new AttackWeb());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WITHER))
-            offensivePowers.add(new AttackWither());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_VACUUM))
-            offensivePowers.add(new AttackVacuum());
-
-        return offensivePowers;
-    }
-
-    public HashSet<MinorPower> getAllMiscellaneousPowers() {
-        HashSet<MinorPower> miscellaneousPowers = new HashSet<>();
-
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.BONUS_LOOT))
-            miscellaneousPowers.add(new BonusLoot());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.MOVEMENT_SPEED))
-            miscellaneousPowers.add(new MovementSpeed());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.TAUNT))
-            miscellaneousPowers.add(new Taunt());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.CORPSE))
-            miscellaneousPowers.add(new Corpse());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.MOON_WALK))
-            miscellaneousPowers.add(new MoonWalk());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.IMPLOSION))
-            miscellaneousPowers.add(new Implosion());
-
-        return miscellaneousPowers;
-    }
-
     public static void initializeEliteMobValues() {
         new EliteBlaze();
         new EliteCaveSpider();
@@ -128,9 +68,7 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new EliteWitch();
         new EliteWitherSkeleton();
         new EliteZombie();
-
         new EliteEndermite();
-
         new EliteStray();
         new EliteHusk();
         new EliteVex();
@@ -138,20 +76,21 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new ElitePolarBear();
     }
 
-    public static boolean isValidEliteMobType(EntityType entityType) {
-
-        for (EliteMobProperties eliteMobProperties : eliteMobData)
-            if (eliteMobProperties.getEntityType().equals(entityType))
-                return true;
-
-        return false;
-
-    }
-
     public static boolean isValidEliteMobType(Entity entity) {
         if (entity instanceof LivingEntity)
             return isValidEliteMobType(entity.getType());
         return false;
+    }
+
+    public static boolean isValidEliteMobType(EntityType entityType) {
+
+        for (EliteMobProperties eliteMobProperties : eliteMobData)
+            if (eliteMobProperties.getEntityType().equals(entityType))
+                if (eliteMobProperties.isEnabled)
+                    return true;
+
+        return false;
+
     }
 
     public static EliteMobProperties getPluginData(EntityType entityType) {

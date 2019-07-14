@@ -10,7 +10,6 @@ import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -317,35 +316,12 @@ public class LoreGenerator {
 
     private static String itemSource(EliteMobEntity eliteMobEntity) {
 
-        LivingEntity livingEntity = eliteMobEntity.getLivingEntity();
-
         String itemSource;
 
-        if (livingEntity != null) {
-
-            itemSource = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_MOB_LEVEL_SOURCE)
-                    .replace("$level", eliteMobEntity.getLevel() + "");
-
-            String newName = "";
-
-            if (livingEntity.getType().name().contains("_")) {
-
-                String[] tempSubList = livingEntity.getType().name().split("_");
-
-                for (String string : tempSubList) {
-
-                    string = string.toLowerCase().substring(0, 1).toUpperCase() + " ";
-                    newName += string;
-
-                }
-
-            } else
-                newName = livingEntity.getType().name().substring(0, 1) + livingEntity.getType().name().substring(1).toLowerCase();
-
-
-            itemSource = itemSource.replace("$mob", newName);
-
-
+        if (eliteMobEntity.getLivingEntity() != null) {
+            String uncoloredString = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_MOB_LEVEL_SOURCE)
+                    .replace("$mob", eliteMobEntity.getName());
+            itemSource = ChatColorConverter.convert(uncoloredString);
         } else
             itemSource = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_SHOP_SOURCE);
 

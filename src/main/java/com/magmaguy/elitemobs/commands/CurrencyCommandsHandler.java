@@ -22,6 +22,7 @@ import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -118,6 +119,23 @@ public class CurrencyCommandsHandler {
         } catch (Exception e) {
 
             commandSender.sendMessage("Input not valid. Command format: /em add [playerName] [amount]");
+
+        }
+
+    }
+
+    public static void addAllCommand(CommandSender commandSender, String[] args) {
+
+        try {
+
+            for (Player player : Bukkit.getOnlinePlayers())
+                addCommand(player.getName(), Integer.parseInt(args[1]));
+
+            commandSender.sendMessage("You have added " + args[2] + " to all online players.");
+
+        } catch (Exception e) {
+
+            commandSender.sendMessage("Input not valid. Command format: /em addall [amount]");
 
         }
 

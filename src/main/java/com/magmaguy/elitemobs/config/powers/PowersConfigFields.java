@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.config.powers;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PowersConfigFields {
 
@@ -10,6 +12,8 @@ public class PowersConfigFields {
     private boolean isEnabled;
     private String name;
     private String effect;
+    private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
+    private FileConfiguration configuration;
 
     public PowersConfigFields(String fileName,
                               boolean isEnabled,
@@ -25,6 +29,8 @@ public class PowersConfigFields {
         fileConfiguration.addDefault("isEnabled", isEnabled);
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("effect", effect);
+        if (additionalConfigOptions != null)
+            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     public PowersConfigFields(FileConfiguration fileConfiguration, File file) {
@@ -32,6 +38,7 @@ public class PowersConfigFields {
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
         this.name = fileConfiguration.getString("name");
         this.effect = fileConfiguration.getString("effect");
+        this.configuration = fileConfiguration;
     }
 
     public String getFileName() {
@@ -50,4 +57,11 @@ public class PowersConfigFields {
         return effect;
     }
 
+    public Map<String, Object> getAdditionalConfigOptions() {
+        return additionalConfigOptions;
+    }
+
+    public FileConfiguration getConfiguration() {
+        return configuration;
+    }
 }

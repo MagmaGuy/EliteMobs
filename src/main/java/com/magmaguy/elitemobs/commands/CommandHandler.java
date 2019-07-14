@@ -200,6 +200,10 @@ public class CommandHandler implements CommandExecutor {
                 if (permCheck(CURRENCY_ADD, commandSender))
                     CurrencyCommandsHandler.addCommand(commandSender, args);
                 return true;
+            case "addall":
+                if (permCheck(CURRENCY_ADD, commandSender))
+                    CurrencyCommandsHandler.addAllCommand(commandSender, args);
+                return true;
             case ("subtract"):
                 if (permCheck(CURRENCY_SUBTRACT, commandSender))
                     CurrencyCommandsHandler.subtractCommand(commandSender, args);
@@ -246,7 +250,7 @@ public class CommandHandler implements CommandExecutor {
                     return true;
                 }
                 if (args[1].equalsIgnoreCase("cancel") && args[3].equalsIgnoreCase("confirm")) {
-                    PlayerQuest.removePlayersInQuests(Bukkit.getPlayer(args[2]));
+                    PlayerQuest.cancelPlayerQuest(Bukkit.getPlayer(args[2]));
                     if (QuestsMenu.playerHasPendingQuest(Bukkit.getPlayer(args[2]))) {
                         PlayerQuest playerQuest = QuestsMenu.getPlayerQuestPair(Bukkit.getPlayer(args[2]));
                         try {

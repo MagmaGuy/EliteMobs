@@ -22,6 +22,7 @@ public class QuestObjective {
     private EntityType entityType;
     private boolean isComplete = false;
     private boolean isTurnedIn = false;
+    private QuestReward questReward;
 
     public QuestObjective(int objectiveKills, int minimumEliteMobTier, EntityType entityType, int questTier) {
         setQuestTier(questTier);
@@ -37,6 +38,10 @@ public class QuestObjective {
 
     public void setQuestUUID(UUID questUUID) {
         this.questUUID = UUID.randomUUID();
+    }
+
+    public void setQuestReward(QuestReward questReward) {
+        this.questReward = questReward;
     }
 
     private void setQuestTier(int questTier) {
@@ -70,8 +75,10 @@ public class QuestObjective {
 
     public void addKill(Player player) {
         this.currentKills++;
-        if (currentKills >= this.objectiveKills)
+        if (currentKills >= this.objectiveKills) {
             doQuestCompletion(player);
+            questReward.doReward(player);
+        }
         sendQuestProgressionMessage(player);
     }
 

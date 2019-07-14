@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.mobproperties;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
@@ -54,7 +55,7 @@ public class MobPropertiesConfigFields {
     }
 
     public String getName() {
-        return name;
+        return ChatColorConverter.convert(name);
     }
 
     public List<String> getDeathMessages() {
