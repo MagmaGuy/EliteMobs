@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.CustomShopMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -15,7 +16,8 @@ public class MenusConfig {
     private static ArrayList<MenusConfigFields> menusConfigFieldsList = new ArrayList<>(Arrays.asList(
             new ProceduralShopMenuConfig(),
             new CustomShopMenuConfig(),
-            new BuyOrSellMenuConfig()
+            new BuyOrSellMenuConfig(),
+            new SellMenuConfig()
     ));
 
     public static void initializeConfigs() {

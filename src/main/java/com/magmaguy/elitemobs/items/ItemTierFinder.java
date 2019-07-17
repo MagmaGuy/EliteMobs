@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
-import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -12,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ItemTierFinder {
 
@@ -243,30 +241,13 @@ public class ItemTierFinder {
     }
 
     private static int findMainEnchantment(ItemStack itemStack, Enchantment enchantment) {
-
-        int enchantments = 0;
-
-        if (ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(itemStack)) {
-            String deobfuscatedString = itemStack.getItemMeta().getLore().get(0).replace("§", "");
-            if (deobfuscatedString.contains(LoreGenerator.OBFUSCATED_ENCHANTMENTS))
-                return findObfuscatedMainEnchantment(deobfuscatedString, enchantment);
-        }
-
-        if (!itemStack.getEnchantments().isEmpty())
-            for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet())
-                if (entry.getKey().equals(enchantment))
-                    enchantments += entry.getValue();
-
-        return enchantments;
-
-    }
-
-    private static int findObfuscatedMainEnchantment(String deobfuscatedLore, Enchantment enchantment) {
-        for (String string : deobfuscatedLore.split(","))
-            if (string.contains(enchantment.getName()))
-                return Integer.parseInt(string.split(":")[1]);
-
-        return 0;
+        if (itemStack == null)
+            return 0;
+        int enchantLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), enchantment.getKey());
+        if (enchantLevel == 0)
+            if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasEnchant(enchantment))
+                enchantLevel = itemStack.getItemMeta().getEnchantLevel(enchantment);
+        return enchantLevel;
     }
 
 }

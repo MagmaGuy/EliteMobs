@@ -10,12 +10,18 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashSet;
+import java.util.UUID;
 
 public class AttackLightning extends MinorPower implements Listener {
     public AttackLightning() {
         super(PowersConfig.getPower("attack_lightning.yml"));
     }
+
+    private static HashSet<UUID> lightningUUIDs = new HashSet<>();
 
     @EventHandler
     public void onTarget(EliteMobTargetPlayerEvent event) {
@@ -38,9 +44,16 @@ public class AttackLightning extends MinorPower implements Listener {
                 }
                 for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
                     if (entity instanceof Player)
-                        entity.getWorld().strikeLightning(entity.getLocation());
+                        lightningUUIDs.add(entity.getWorld().strikeLightning(entity.getLocation()).getUniqueId());
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 10);
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if (!lightningUUIDs.contains(event.getDamager().getUniqueId())) return;
+        lightningUUIDs.remove(event.getDamager().getUniqueId());
+        event.setDamage(1);
     }
 
 }

@@ -5,10 +5,10 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
-import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
-import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -32,7 +32,7 @@ import java.util.HashSet;
 public class CombatSystem implements Listener {
 
     public static final double PER_LEVEL_POWER_INCREASE = 0.1;
-    public static final double BASE_DAMAGE_DEALT_TO_PLAYERS = ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.BASE_DAMAGE_DEALT_TO_PLAYER);
+    public static final double BASE_DAMAGE_DEALT_TO_PLAYERS = 2;
     public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.5;
 
     public static final double DIAMOND_TIER_LEVEL = 3;
@@ -105,9 +105,8 @@ public class CombatSystem implements Listener {
         double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, eliteMobEntity, event);
 
         //Prevent untouchable armor and 1-shots
-
-        if (newDamage < 1) newDamage = 1;
-        if (newDamage > 19) newDamage = 19;
+        newDamage = newDamage < 1 ? 1 : newDamage;
+        newDamage = newDamage > 19 ? 19 : newDamage;
 
         //Set the final damage value
         event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
@@ -131,14 +130,15 @@ public class CombatSystem implements Listener {
     private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EliteMobEntity eliteMobEntity, EntityDamageByEntityEvent event) {
 
         double tierDifference = eliteTier - playerTier;
+
         tierDifference = (Math.abs(tierDifference) < 2) ? tierDifference : tierDifference > 0 ? 2 : -2;
 
         /*
         Apply secondary enchantment damage reduction
          */
-        double newBaseDamage = BASE_DAMAGE_DEALT_TO_PLAYERS - secondaryEnchantmentDamageReduction(player, event);
+        double newBaseDamage = 4 - secondaryEnchantmentDamageReduction(player, event);
 
-        return (newBaseDamage + newBaseDamage * (tierDifference)) * eliteMobEntity.getDamageMultiplier();
+        return (newBaseDamage + newBaseDamage * tierDifference) * eliteMobEntity.getDamageMultiplier();
 
     }
 
@@ -327,7 +327,7 @@ public class CombatSystem implements Listener {
         /*
         This caps the tier difference between mobs and players to prevent insurmountable boss fights
          */
-        double maxTierDifference = 1;
+        double maxTierDifference = 2.5;
         tierDifference = Math.abs(tierDifference) > maxTierDifference ? (tierDifference > 0 ? maxTierDifference : -maxTierDifference) : tierDifference;
 
         /*
@@ -344,9 +344,10 @@ public class CombatSystem implements Listener {
         finalDamage /= eliteMob.getHealthMultiplier();
 
         /*
-        Make sure that players are dealing at least 1 damage as to not create unkillable bosses
+        Make sure that players are dealing at least 1% damage as to not create unkillable bosses
          */
-        return finalDamage < 1 ? 1 : finalDamage;
+        finalDamage = finalDamage < 1 ? 1 : finalDamage;
+        return finalDamage < maxHealth / 100 ? maxHealth / 100 : finalDamage;
 
     }
 
@@ -399,55 +400,24 @@ public class CombatSystem implements Listener {
      */
     private double secondaryEnchantmentDamageIncrease(ItemStack weapon, LivingEntity eliteMob) {
 
-        if (ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(weapon)) {
-            String deobfuscatedString = weapon.getItemMeta().getLore().get(0).replace("§", "");
-            if (deobfuscatedString.contains(LoreGenerator.OBFUSCATED_ENCHANTMENTS)) {
-                if (eliteMob instanceof Spider || eliteMob instanceof Silverfish)
-                    return getDamageIncreasePercentage(Enchantment.DAMAGE_ARTHROPODS, findObfuscatedMainEnchantment(deobfuscatedString, Enchantment.DAMAGE_ARTHROPODS));
-                if (eliteMob instanceof Zombie || eliteMob instanceof Skeleton)
-                    return getDamageIncreasePercentage(Enchantment.DAMAGE_ARTHROPODS, findObfuscatedMainEnchantment(deobfuscatedString, Enchantment.DAMAGE_UNDEAD));
-            }
-        }
-
-        for (Enchantment enchantment : weapon.getEnchantments().keySet()) {
-            if (enchantment.getName().equals(Enchantment.DAMAGE_ARTHROPODS.getName()) && (eliteMob instanceof Spider || eliteMob instanceof Silverfish))
-                return getDamageIncreasePercentage(enchantment, weapon);
-            if (enchantment.getName().equals(Enchantment.DAMAGE_UNDEAD.getName()) && (eliteMob instanceof Zombie || eliteMob instanceof Skeleton))
-                return getDamageIncreasePercentage(enchantment, weapon);
-        }
+        if (eliteMob instanceof Spider || eliteMob instanceof Silverfish)
+            return getDamageIncreasePercentage(Enchantment.DAMAGE_ARTHROPODS, ItemTagger.getEnchantment(weapon.getItemMeta(), Enchantment.DAMAGE_ARTHROPODS.getKey()));
+        if (eliteMob instanceof Zombie || eliteMob instanceof Skeleton)
+            return getDamageIncreasePercentage(Enchantment.DAMAGE_UNDEAD, ItemTagger.getEnchantment(weapon.getItemMeta(), Enchantment.DAMAGE_UNDEAD.getKey()));
 
         return 0;
 
-    }
-
-    /**
-     * Gets the obfuscated main enchant in an item's lore
-     *
-     * @param deobfuscatedLore
-     * @param enchantment
-     * @return
-     */
-    private static int findObfuscatedMainEnchantment(String deobfuscatedLore, Enchantment enchantment) {
-        for (String string : deobfuscatedLore.split(","))
-            if (string.contains(enchantment.getName()))
-                return Integer.parseInt(string.split(":")[1]);
-
-        return 0;
     }
 
     private double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
-        double maxEnchantmentLevel = getMaxEnchantmentLevel(enchantment);
+        double maxEnchantmentLevel = EnchantmentsConfig.getEnchantment(enchantment).getMaxLevel();
         double currentEnchantmentLevel = weapon.getEnchantmentLevel(enchantment);
         return currentEnchantmentLevel / maxEnchantmentLevel <= 1 ? currentEnchantmentLevel / maxEnchantmentLevel : 1;
     }
 
-    private double getDamageIncreasePercentage(Enchantment enchantment, double level) {
-        double maxEnchantmentLevel = getMaxEnchantmentLevel(enchantment);
+    private double getDamageIncreasePercentage(Enchantment enchantment, int level) {
+        double maxEnchantmentLevel = EnchantmentsConfig.getEnchantment(enchantment).getMaxLevel();
         return level / maxEnchantmentLevel <= 1 ? level / maxEnchantmentLevel : 1;
-    }
-
-    private int getMaxEnchantmentLevel(Enchantment enchantment) {
-        return ConfigValues.itemsProceduralSettingsConfig.getInt("Valid Enchantments." + enchantment.getName() + ".Max Level");
     }
 
     private HashMap<Player, Integer> playerHitCooldownHashMap = new HashMap<>();

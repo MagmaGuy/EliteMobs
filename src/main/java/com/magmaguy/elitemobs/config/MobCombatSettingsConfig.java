@@ -18,7 +18,7 @@ public class MobCombatSettingsConfig {
     public static final String PASSIVE_STACK_RANGE = "Range to stack passive mobs";
     public static final String NATURAL_ELITEMOB_LEVEL_CAP = "Natural elite mob level cap";
     //    public final static String TARGET_HITS_TO_KILL = "Target hits to kill Elite Mobs";
-    public final static String BASE_DAMAGE_DEALT_TO_PLAYER = "Base damage dealt to players from Elite Mobs";
+//    public final static String BASE_DAMAGE_DEALT_TO_PLAYER = "Base damage dealt to players from Elite Mobs";
     public static final String ELITE_CREEPER_EXPLOSION_MULTIPLIER = "SuperCreeper explosion nerf multiplier";
     public static final String ELITE_ARMOR = "Elite Mobs wear armor";
     public static final String ELITE_HELMETS = "Elite Mobs wear helmets";
@@ -68,7 +68,7 @@ public class MobCombatSettingsConfig {
         configuration.addDefault(PASSIVE_STACK_RANGE, 15);
         configuration.addDefault(NATURAL_ELITEMOB_LEVEL_CAP, 3000);
 //        configuration.addDefault(TARGET_HITS_TO_KILL, 10);
-        configuration.addDefault(BASE_DAMAGE_DEALT_TO_PLAYER, 2);
+//        configuration.addDefault(BASE_DAMAGE_DEALT_TO_PLAYER, 2);
         configuration.addDefault(ELITE_CREEPER_EXPLOSION_MULTIPLIER, 1.0);
         configuration.addDefault(ELITE_ARMOR, true);
         configuration.addDefault(ELITE_HELMETS, true);

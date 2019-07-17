@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
@@ -26,9 +27,6 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.QuestRefresher;
 import com.magmaguy.elitemobs.runnables.EggRunnable;
-import com.magmaguy.elitemobs.runnables.EntityScanner;
-import com.magmaguy.elitemobs.runnables.PotionEffectApplier;
-import com.magmaguy.elitemobs.runnables.ScoreboardUpdater;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
@@ -52,14 +50,6 @@ public class EliteMobs extends JavaPlugin {
 
         //Enable stats
         Metrics metrics = new Metrics(this);
-
-        //Initialize custom enchantments
-        CustomEnchantmentCache.initialize();
-
-        //Load loot from config
-        ConfigValues.initializeConfigurations();
-        ConfigValues.initializeCachedConfigurations();
-
 
         /*
         New config loading
@@ -185,6 +175,10 @@ public class EliteMobs extends JavaPlugin {
     }
 
     public static void initializeConfigs() {
+        CustomEnchantmentCache.initialize();
+        ConfigValues.initializeConfigurations();
+        ConfigValues.initializeCachedConfigurations();
+        EconomySettingsConfig.initializeConfig();
         EnchantmentsConfig.initializeConfigs();
         CustomEnchantmentsConfig.initializeConfig();
         AntiExploitConfig.initializeConfig();
@@ -192,16 +186,15 @@ public class EliteMobs extends JavaPlugin {
         GuildRankData.initializeConfig();
         PlayerMoneyData.initializeConfig();
         CustomBossesConfig.initializeConfigs();
-        CustomLootConfig.initializeConfigs();
-        CustomItem.initializeCustomItems();
         AntiExploitConfig.initializeConfig();
         AdventurersGuildConfig.initializeConfig();
         ValidWorldsConfig.initializeConfig();
-        ValidMobsConfig.initializeConfig();
         NPCsConfig.initializeConfigs();
         MenusConfig.initializeConfigs();
         PowersConfig.initializeConfigs();
         MobPropertiesConfig.initializeConfigs();
+        CustomLootConfig.initializeConfigs();
+        CustomItem.initializeCustomItems();
     }
 
     public static void worldScanner() {
@@ -215,11 +208,7 @@ public class EliteMobs extends JavaPlugin {
      */
     public void launchRunnables() {
         int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
-
-        new EntityScanner().runTaskTimer(this, 20, 20 * 10);
-        new PotionEffectApplier().runTaskTimer(this, 20, 20 * 5);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ENABLE_POWER_SCOREBOARDS))
-            new ScoreboardUpdater().runTaskTimer(this, 20, 20);
+        PotionEffectApplier.potionEffectApplier();
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() &&
                 ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);

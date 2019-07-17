@@ -12,18 +12,19 @@ public class AdventurersGuildConfig {
     public static String guildWorldLocation;
     public static boolean agTeleport;
     private static String RANK_NAMES = "Adventurers Guild Rank Names";
-    public static String rankNames0 = RANK_NAMES + "0";
-    public static String rankNames1 = RANK_NAMES + "1";
-    public static String rankNames2 = RANK_NAMES + "2";
-    public static String rankNames3 = RANK_NAMES + "3";
-    public static String rankNames4 = RANK_NAMES + "4";
-    public static String rankNames5 = RANK_NAMES + "5";
-    public static String rankNames6 = RANK_NAMES + "6";
-    public static String rankNames7 = RANK_NAMES + "7";
-    public static String rankNames8 = RANK_NAMES + "8";
-    public static String rankNames9 = RANK_NAMES + "9";
-    public static String rankNames10 = RANK_NAMES + "10";
-    public static String rankNames11 = RANK_NAMES + "11";
+    private static String guildRank = "Guild Rank ";
+    public static String rankNames0 = guildRank + RANK_NAMES + "0";
+    public static String rankNames1 = guildRank + RANK_NAMES + "1";
+    public static String rankNames2 = guildRank + RANK_NAMES + "2";
+    public static String rankNames3 = guildRank + RANK_NAMES + "3";
+    public static String rankNames4 = guildRank + RANK_NAMES + "4";
+    public static String rankNames5 = guildRank + RANK_NAMES + "5";
+    public static String rankNames6 = guildRank + RANK_NAMES + "6";
+    public static String rankNames7 = guildRank + RANK_NAMES + "7";
+    public static String rankNames8 = guildRank + RANK_NAMES + "8";
+    public static String rankNames9 = guildRank + RANK_NAMES + "9";
+    public static String rankNames10 = guildRank + RANK_NAMES + "10";
+    public static String rankNames11 = guildRank + RANK_NAMES + "11";
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");

@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.commands.shops;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.CustomShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
-import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
@@ -30,7 +29,7 @@ public class CustomShopMenu implements Listener {
      * Fixed shop name, used to track if an event is happening within it
      */
     private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("//");
-    public static final String SHOP_NAME = CustomShopMenuConfig.SHOP_NAME + SHOP_KEY;
+    public static final String SHOP_NAME = CustomShopMenuConfig.shopName + SHOP_KEY;
 
     /**
      * Creates a new instance of a BuyOrSellMenu
@@ -39,7 +38,7 @@ public class CustomShopMenu implements Listener {
      */
     public static void customShopInitializer(Player player) {
 
-        if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return;
+        if (!EconomySettingsConfig.enableEconomy) return;
         BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_CUSTOM_ITEM);
 
     }
@@ -64,7 +63,7 @@ public class CustomShopMenu implements Listener {
      */
     private static void populateShop(Inventory shopInventory) {
 
-        shopInventory.setItem(CustomShopMenuConfig.REROLL_SLOT, CustomShopMenuConfig.REROLL_ITEM);
+        shopInventory.setItem(CustomShopMenuConfig.rerollSlot, CustomShopMenuConfig.rerollItem);
         shopContents(shopInventory);
 
     }
@@ -79,7 +78,7 @@ public class CustomShopMenu implements Listener {
         //Anything after 8 is populated
         Random random = new Random();
 
-        for (int i : CustomShopMenuConfig.STORE_SLOTS) {
+        for (int i : CustomShopMenuConfig.storeSlots) {
 
             int itemEntryIndex = random.nextInt(CustomItem.getCustomItemStackList().size());
 
@@ -101,7 +100,7 @@ public class CustomShopMenu implements Listener {
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
 
         //reroll loot button
-        if (event.getCurrentItem().equals(CustomShopMenuConfig.REROLL_ITEM)) {
+        if (event.getCurrentItem().equals(CustomShopMenuConfig.rerollItem)) {
 
             populateShop(event.getInventory());
             event.setCancelled(true);
@@ -109,7 +108,7 @@ public class CustomShopMenu implements Listener {
 
         }
 
-        if (!ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(event.getCurrentItem())) {
+        if (ItemTagger.isEliteItem(event.getCurrentItem())) {
             event.setCancelled(true);
             return;
         }
@@ -121,7 +120,7 @@ public class CustomShopMenu implements Listener {
         double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
 
         //These slots are for buying items
-        if (CustomShopMenuConfig.STORE_SLOTS.contains(event.getSlot()) && event.getView().getTitle().equalsIgnoreCase(SHOP_NAME)) {
+        if (CustomShopMenuConfig.storeSlots.contains(event.getSlot()) && event.getView().getTitle().equalsIgnoreCase(SHOP_NAME)) {
 
             boolean inventoryHasFreeSlots = false;
             for (ItemStack iteratedStack : player.getInventory()) {
@@ -137,7 +136,7 @@ public class CustomShopMenu implements Listener {
 
             if (!inventoryHasFreeSlots) {
 
-                player.sendMessage(CustomShopMenuConfig.MESSAGE_FULL_INVENTORY);
+                player.sendMessage(CustomShopMenuConfig.messageFullInventory);
                 player.closeInventory();
 
             } else if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {

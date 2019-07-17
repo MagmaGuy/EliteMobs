@@ -59,14 +59,14 @@ public class CurrencyCommandsHandler {
                                 ConfigValues.translationConfig
                                         .getString(TranslationConfig.ECONOMY_PAY_MESSAGE)
                                         .replace("$amount_sent", args[2])
-                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))
+                                        .replace("$currency_name", EconomySettingsConfig.currencyName)
                                         .replace("$receiver", args[1])));
                 commandSender.sendMessage(
                         ChatColorConverter.convert(
                                 ConfigValues.translationConfig
                                         .getString(TranslationConfig.ECONOMY_CURRENCY_LEFT_MESSAGE)
                                         .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))))
-                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
+                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
                 Player recipient = getServer().getPlayer(args[1]);
                 recipient.sendMessage(
@@ -75,7 +75,7 @@ public class CurrencyCommandsHandler {
                                         .getString(TranslationConfig.ECONOMY_PAYMENT_RECIEVED_MESSAGE)
                                         .replace("$amount_sent", args[2])
                                         .replace("$sender", commandSender.getDisplayName())
-                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
+                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
             } else if (Double.parseDouble(args[2]) < 0)
                 commandSender.sendMessage(
@@ -87,7 +87,7 @@ public class CurrencyCommandsHandler {
                         ChatColorConverter.convert(
                                 ConfigValues.translationConfig
                                         .getString(TranslationConfig.ECONOMY_PAYMENT_INSUFICIENT_CURRENCY)
-                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
+                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
 
         } catch (Exception e) {
@@ -175,7 +175,7 @@ public class CurrencyCommandsHandler {
         try {
 
             CurrencyCommandsHandler.setCommand(args[1], Integer.parseInt(args[2]));
-            commandSender.sendMessage("You set " + args[1] + "'s " + ConfigValues.economyConfig.get("Currency name") + " to " + args[2]);
+            commandSender.sendMessage("You set " + args[1] + "'s " + EconomySettingsConfig.currencyName + " to " + args[2]);
 
         } catch (Exception e) {
 
@@ -195,7 +195,7 @@ public class CurrencyCommandsHandler {
 
         try {
             Double money = CurrencyCommandsHandler.checkCommand(args[1]);
-            commandSender.sendMessage(args[1] + " has " + money + " " + ConfigValues.economyConfig.get("Currency name"));
+            commandSender.sendMessage(args[1] + " has " + money + " " + EconomySettingsConfig.currencyName);
         } catch (Exception e) {
             commandSender.sendMessage("Input not valid. Command format: /em check [playerName]");
         }
@@ -215,7 +215,7 @@ public class CurrencyCommandsHandler {
                         ConfigValues.translationConfig
                                 .getString(TranslationConfig.ECONOMY_WALLET_COMMAND)
                                 .replace("$balance", String.valueOf(CurrencyCommandsHandler.walletCommand(commandSender.getName())))
-                                .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
+                                .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
     }
 
@@ -253,7 +253,7 @@ public class CurrencyCommandsHandler {
 
         }
 
-        commandSender.sendMessage(ChatColor.RED + "[EliteMobs] " + ChatColor.DARK_GREEN + ConfigValues.economyConfig.get(EconomySettingsConfig.CURRENCY_NAME) + " High Score:");
+        commandSender.sendMessage(ChatColor.RED + "[EliteMobs] " + ChatColor.DARK_GREEN + EconomySettingsConfig.currencyName + " High Score:");
 
         int iterationAmount = 10;
 
@@ -271,7 +271,7 @@ public class CurrencyCommandsHandler {
             int place = i + 1;
 
             commandSender.sendMessage(ChatColor.GREEN + "#" + place + " " + ChatColor.WHITE + name + " with " +
-                    ChatColor.DARK_GREEN + amount + " " + ChatColor.GREEN + ConfigValues.economyConfig.get(EconomySettingsConfig.CURRENCY_NAME));
+                    ChatColor.DARK_GREEN + amount + " " + ChatColor.GREEN + EconomySettingsConfig.currencyName);
 
         }
 

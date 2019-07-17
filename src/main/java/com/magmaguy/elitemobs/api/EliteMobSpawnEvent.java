@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -9,7 +10,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class EliteMobSpawnEvent extends Event implements Cancellable {
 
-    private final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
     private Entity entity;
     private EliteMobEntity eliteMobEntity;
     private CreatureSpawnEvent.SpawnReason spawnReason;
@@ -26,9 +27,10 @@ public class EliteMobSpawnEvent extends Event implements Cancellable {
         this.entity = entity;
         this.eliteMobEntity = eliteMobEntity;
         this.spawnReason = spawnReason;
+        Bukkit.getServer().getPluginManager().callEvent(this);
     }
 
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 

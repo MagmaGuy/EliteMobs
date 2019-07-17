@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FlamethrowerEnchantment extends CustomEnchantment implements Listener {
 
     public String setKey() {
-        return "FLAMETHROWER";
+        return "flamethrower";
     }
 
     private static ArrayList<Player> playersUsingFlamethrower = new ArrayList<>();
