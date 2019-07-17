@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.adventurersguild;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
@@ -150,8 +149,8 @@ public class AdventurersGuildMenu implements Listener {
                         ChatColorConverter.convert("&f&m-------------------------------"),
                         ChatColorConverter.convert("&6This is the next rank you can unlock"),
                         ChatColorConverter.convert("&aSelect it when you're ready!"),
-                        ChatColorConverter.convert("&6Costs " + priceString + " &6" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
-                        ChatColorConverter.convert("&fYou have &a" + EconomyHandler.checkCurrency(player.getUniqueId()) + " &f" + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)),
+                        ChatColorConverter.convert("&6Costs " + priceString + " &6" + EconomySettingsConfig.currencyName),
+                        ChatColorConverter.convert("&fYou have &a" + EconomyHandler.checkCurrency(player.getUniqueId()) + " &f" + EconomySettingsConfig.currencyName),
                         ChatColorConverter.convert("&f&m-------------------------------"),
                         lootBonus(rank),
                         mobSpawning(rank),
@@ -312,7 +311,7 @@ public class AdventurersGuildMenu implements Listener {
                 GuildRank.setRank((Player) event.getWhoClicked(), selectedTier);
                 GuildRank.setActiveRank((Player) event.getWhoClicked(), selectedTier);
                 event.getWhoClicked().sendMessage(ChatColorConverter.convert("&aYou have unlocked the " + GuildRank.getRankName(selectedTier) + " &arank for " +
-                        tierPriceCalculator(selectedTier) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + ". \n&6Happy hunting!"));
+                        tierPriceCalculator(selectedTier) + " " + EconomySettingsConfig.currencyName + ". \n&6Happy hunting!"));
                 difficultyMenu((Player) event.getWhoClicked());
                 Bukkit.broadcastMessage(ChatColorConverter.convert(
                         ((Player) event.getWhoClicked()).getDisplayName() + " has reached the " + GuildRank.getRankName(selectedTier) + " &fguild rank!"));

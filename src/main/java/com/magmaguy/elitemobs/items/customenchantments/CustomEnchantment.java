@@ -1,7 +1,11 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
@@ -47,11 +51,11 @@ public abstract class CustomEnchantment {
         if (itemStack == null || itemStack.getType().equals(Material.AIR)) return false;
         if (!itemStack.hasItemMeta()) return false;
         if (!itemStack.getItemMeta().hasLore()) return false;
-        return hasCustomEnchantment(itemStack.getItemMeta().getLore());
+        return hasCustomEnchantment(itemStack.getItemMeta());
     }
 
-    public boolean hasCustomEnchantment(List<String> lore) {
-        return (lore.get(0).replace("§", "").contains(key));
+    public boolean hasCustomEnchantment(ItemMeta itemMeta) {
+        return ItemTagger.getEnchantment(itemMeta, new NamespacedKey(MetadataHandler.PLUGIN, getKey())) != 0;
     }
 
     /*

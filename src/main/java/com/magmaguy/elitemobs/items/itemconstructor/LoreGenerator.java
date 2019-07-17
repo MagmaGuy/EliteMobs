@@ -2,11 +2,13 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.items.EliteEnchantments;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
-import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
+import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -38,7 +40,7 @@ public class LoreGenerator {
                     }
                 }
             } else if (string.contains("$potionEffect"))
-                lore.addAll(potionsLore(potionList));
+                lore.addAll(setPotionsLore(potionList));
             else if (string.contains("$itemValue"))
                 lore.add(itemWorth(material, enchantmentMap, customEnchantments, potionList));
             else if (string.contains("$tier"))
@@ -51,10 +53,12 @@ public class LoreGenerator {
 
         }
 
-        /*
-        Obfuscate potion and enchantment info
-         */
-        lore = generateObfuscatedLore(lore, generateObfuscatedLoreString(enchantmentMap, customEnchantments, potionList));
+        //Tag the item
+        ItemTagger.registerEnchantments(itemMeta, enchantmentMap);
+        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
+        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
+        //Tag the potion effects
+        new ElitePotionEffectContainer(itemMeta, potionList);
         itemMeta.setLore(lore);
 
         return itemMeta;
@@ -95,94 +99,12 @@ public class LoreGenerator {
 
         }
 
-        /*
-        Obfuscate potion and enchantment info
-         */
-        lore = generateObfuscatedLore(lore, generateObfuscatedLoreString(enchantmentMap, customEnchantments));
         itemMeta.setLore(lore);
 
+        ItemTagger.registerEnchantments(itemMeta, enchantmentMap);
+        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
+
         return itemMeta;
-
-    }
-
-
-    private static List<String> generateObfuscatedLore(List<String> loreList, String obfuscatedLoreString) {
-
-        List<String> newList = new ArrayList<>();
-
-        int counter = 0;
-
-        for (String string : loreList) {
-
-            if (counter == 0)
-                newList.add(string + obfuscatedLoreString);
-            else
-                newList.add(string);
-
-            counter++;
-
-        }
-
-        return newList;
-
-    }
-
-    public static final String OBFUSCATED_ENCHANTMENTS = "EliteEnchantments";
-    public static final String OBFUSCATED_CUSTOM_ENCHANTMENTS = "EliteCustomEnchantments";
-    public static final String OBFUSCATED_POTIONS = "ElitePotions";
-
-    private static String generateObfuscatedLoreString(HashMap<Enchantment, Integer> enchantmentMap, HashMap<String, Integer> customEnchantments, List<String> potionList) {
-
-        StringBuilder obfuscatedString = new StringBuilder();
-
-        obfuscatedString.append(ObfuscatedSignatureLoreData.ITEM_SIGNATURE).append(",");
-
-        if (!enchantmentMap.isEmpty()) {
-            obfuscatedString.append(OBFUSCATED_ENCHANTMENTS).append(",");
-            for (Enchantment enchantment : enchantmentMap.keySet())
-                if (enchantment != null)
-                    obfuscatedString.append(enchantment.getName()).append(":").append(enchantmentMap.get(enchantment)).append(",");
-        }
-
-        if (!customEnchantments.isEmpty()) {
-            obfuscatedString.append(OBFUSCATED_CUSTOM_ENCHANTMENTS).append(",");
-            for (String string : customEnchantments.keySet())
-                obfuscatedString.append(string).append(":").append(customEnchantments.get(string)).append(",");
-        }
-
-        if (potionList != null && !potionList.isEmpty() && potionList.get(0) != null) {
-            obfuscatedString.append(OBFUSCATED_POTIONS).append(",");
-            for (String string : potionList)
-                obfuscatedString.append(string.replace(",", ":")).append(",");
-        }
-
-        String finalString = ObfuscatedStringHandler.obfuscateString(obfuscatedString.toString());
-
-        return finalString;
-
-    }
-
-    private static String generateObfuscatedLoreString(HashMap<Enchantment, Integer> enchantmentMap, HashMap<String, Integer> customEnchantments) {
-
-        StringBuilder obfuscatedString = new StringBuilder();
-
-        obfuscatedString.append(ObfuscatedSignatureLoreData.ITEM_SIGNATURE);
-
-        if (!enchantmentMap.isEmpty()) {
-            obfuscatedString.append(OBFUSCATED_ENCHANTMENTS).append(",");
-            for (Enchantment enchantment : enchantmentMap.keySet())
-                obfuscatedString.append(enchantment.getName()).append(":").append(enchantmentMap.get(enchantment)).append(",");
-        }
-
-        if (!customEnchantments.isEmpty()) {
-            obfuscatedString.append(OBFUSCATED_CUSTOM_ENCHANTMENTS).append(",");
-            for (String string : customEnchantments.keySet())
-                obfuscatedString.append(string).append(":").append(customEnchantments.get(string)).append(",");
-        }
-
-        String finalString = ObfuscatedStringHandler.obfuscateString(obfuscatedString.toString());
-
-        return finalString;
 
     }
 
@@ -199,14 +121,7 @@ public class LoreGenerator {
             }
 
             if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() &&
-                    (enchantment.getName().equals(Enchantment.DAMAGE_ALL.getName()) ||
-                            enchantment.getName().equals(Enchantment.ARROW_DAMAGE.getName()) ||
-                            enchantment.getName().equals(Enchantment.PROTECTION_ENVIRONMENTAL.getName()) ||
-                            enchantment.getName().equals(Enchantment.DAMAGE_ARTHROPODS.getName()) ||
-                            enchantment.getName().equals(Enchantment.DAMAGE_UNDEAD.getName()) ||
-                            enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) ||
-                            enchantment.getName().equals(Enchantment.PROTECTION_FIRE.getName()) ||
-                            enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()))) {
+                    EliteEnchantments.isPotentialEliteEnchantment(enchantment)) {
 
                 String loreLine1 = ChatColorConverter.convert("&7" + getEnchantmentName(enchantment) + " " + enchantment.getMaxLevel());
                 String loreLine2 = ChatColorConverter.convert("&7" + ChatColorConverter.convert(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.ELITE_ENCHANTMENT_NAME)) + " " + getEnchantmentName(enchantment) + " " + (enchantmentMap.get(enchantment) - enchantment.getMaxLevel()));
@@ -226,13 +141,7 @@ public class LoreGenerator {
 
     private static String getEnchantmentName(Enchantment enchantment) {
 
-        if (!ConfigValues.itemsDropSettingsConfig.getKeys(true).contains(ItemsDropSettingsConfig.ENCHANTMENT_NAME + enchantment.getName())) {
-            Bukkit.getLogger().warning("[EliteMobs] Missing enchantment name " + enchantment.getName());
-            Bukkit.getLogger().warning("[EliteMobs] Report this to the dev!");
-            return enchantment.getName();
-        }
-
-        return ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.ENCHANTMENT_NAME + enchantment.getName());
+        return EnchantmentsConfig.getEnchantment(enchantment).getName();
 
     }
 
@@ -254,7 +163,7 @@ public class LoreGenerator {
 
     private static String getCustomEnchantmentName(String customEnchantmentKey) {
 
-        if (!ConfigValues.itemsDropSettingsConfig.getKeys(true).contains(ItemsDropSettingsConfig.CUSTOM_ENCHANTMENT_NAME + customEnchantmentKey)) {
+        if (EnchantmentsConfig.getEnchantment(customEnchantmentKey.toLowerCase() + ".yml") == null) {
 
             Bukkit.getLogger().warning("[EliteMobs] Missing enchantment name " + customEnchantmentKey);
             Bukkit.getLogger().warning("[EliteMobs] Report this to the dev!");
@@ -262,24 +171,21 @@ public class LoreGenerator {
 
         }
 
-        return ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.CUSTOM_ENCHANTMENT_NAME + customEnchantmentKey);
+        return EnchantmentsConfig.getEnchantment(customEnchantmentKey.toLowerCase() + ".yml").getName();
 
     }
 
     private static ItemMeta applyVanillaEnchantments(HashMap<Enchantment, Integer> enchantmentMap, ItemMeta itemMeta) {
 
-        for (Enchantment enchantment : enchantmentMap.keySet()) {
-            if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel())
-                itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
-            else
-                itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
-        }
+        for (Enchantment enchantment : enchantmentMap.keySet())
+            itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
+
 
         return itemMeta;
 
     }
 
-    private static List<String> potionsLore(List<String> potionList) {
+    private static List<String> setPotionsLore(List<String> potionList) {
 
         List<String> potionsLore = new ArrayList<>();
 
@@ -310,7 +216,7 @@ public class LoreGenerator {
 
         return ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LORE_WORTH)
                 .replace("$worth", ItemWorthCalculator.determineItemWorth(material, enchantmentMap, potionList, customEnchantments) + "")
-                .replace("$currencyName", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+                .replace("$currencyName", EconomySettingsConfig.currencyName);
 
     }
 
@@ -324,7 +230,6 @@ public class LoreGenerator {
             itemSource = ChatColorConverter.convert(uncoloredString);
         } else
             itemSource = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_SHOP_SOURCE);
-
 
         return itemSource;
 

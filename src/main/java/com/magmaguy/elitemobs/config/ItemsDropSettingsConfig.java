@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
-import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 
 public class ItemsDropSettingsConfig {
@@ -25,41 +24,6 @@ public class ItemsDropSettingsConfig {
     public static final String EXPERIENCE_LOOT_MULTIPLIER = "EliteMob xp multiplier";
     public static final String MAXIMUM_LOOT_TIER = "Maximum loot tier (REQUIRES INCREASING SHARPNESS AND PROTECTION ENCHANTMENTS TO WORK PROPERLY, READ GITHUB WIKI!)";
     public static final String ENABLE_CUSTOM_ENCHANTMENT_SYSTEM = "Enable visual enchantment system (check the github wiki before changing)";
-    public static final String ENCHANTMENT_NAME = "Enchantment name.";
-    public static final String ARROW_DAMAGE_NAME = ENCHANTMENT_NAME + "ARROW_DAMAGE";
-    public static final String ARROW_FIRE_NAME = ENCHANTMENT_NAME + "ARROW_FIRE";
-    public static final String ARROW_INFINITE_NAME = ENCHANTMENT_NAME + "ARROW_INFINITE";
-    public static final String ARROW_KNOCKBACK_NAME = ENCHANTMENT_NAME + "ARROW_KNOCKBACK";
-    public static final String BINDING_CURSE_NAME = ENCHANTMENT_NAME + "BINDING_CURSE";
-    public static final String CHANNELING_NAME = ENCHANTMENT_NAME + "CHANNELING";
-    public static final String DAMAGE_ALL_NAME = ENCHANTMENT_NAME + "DAMAGE_ALL";
-    public static final String DAMAGE_ARTHROPODS_NAME = ENCHANTMENT_NAME + "DAMAGE_ARTHROPODS";
-    public static final String DAMAGE_UNDEAD_NAME = ENCHANTMENT_NAME + "DAMAGE_UNDEAD";
-    public static final String DEPTH_STRIDER_NAME = ENCHANTMENT_NAME + "DEPTH_STRIDER";
-    public static final String DIG_SPEED_NAME = ENCHANTMENT_NAME + "DIG_SPEED";
-    public static final String DURABILITY_NAME = ENCHANTMENT_NAME + "DURABILITY";
-    public static final String FIRE_ASPECT_NAME = ENCHANTMENT_NAME + "FIRE_ASPECT";
-    public static final String FROST_WALKER_NAME = ENCHANTMENT_NAME + "FROST_WALKER";
-    public static final String IMPALING_NAME = ENCHANTMENT_NAME + "IMPALING";
-    public static final String KNOCKBACK_NAME = ENCHANTMENT_NAME + "KNOCKBACK";
-    public static final String LOOT_BONUS_BLOCKS_NAME = ENCHANTMENT_NAME + "LOOT_BONUS_BLOCKS";
-    public static final String LOOT_BONUS_MOBS_NAME = ENCHANTMENT_NAME + "LOOT_BONUS_MOBS";
-    public static final String LOYALTY_NAME = ENCHANTMENT_NAME + "LOYALTY";
-    public static final String LUCK_ENCHANTMENT_NAME = ENCHANTMENT_NAME + "LUCK";
-    public static final String LURE_NAME = ENCHANTMENT_NAME + "LURE";
-    public static final String MENDING_NAME = ENCHANTMENT_NAME + "MENDING";
-    public static final String OXYGEN_NAME = ENCHANTMENT_NAME + "OXYGEN";
-    public static final String PROTECTION_ENVIRONMENTAL_NAME = ENCHANTMENT_NAME + "PROTECTION_ENVIRONMENTAL";
-    public static final String PROTECTION_EXPLOSIONS_NAME = ENCHANTMENT_NAME + "PROTECTION_EXPLOSIONS";
-    public static final String PROTECTION_FALL_NAME = ENCHANTMENT_NAME + "PROTECTION_FALL";
-    public static final String PROTECTION_FIRE_NAME = ENCHANTMENT_NAME + "PROTECTION_FIRE";
-    public static final String PROTECTION_PROJECTILE_NAME = ENCHANTMENT_NAME + "PROTECTION_PROJECTILE";
-    public static final String RIPTIDE_NAME = ENCHANTMENT_NAME + "RIPTIDE";
-    public static final String SILK_TOUCH_NAME = ENCHANTMENT_NAME + "SILK_TOUCH";
-    public static final String SWEEPING_EDGE_NAME = ENCHANTMENT_NAME + "SWEEPING_EDGE";
-    public static final String THORNS_NAME = ENCHANTMENT_NAME + "THORNS";
-    public static final String VANISHING_CURSE_NAME = ENCHANTMENT_NAME + "VANISHING_CURSE";
-    public static final String WATER_WORKER_NAME = ENCHANTMENT_NAME + "WATER_WORKER";
     public static final String POTION_EFFECT_NAME = "Potion effect name.";
     public static final String ABSORPTION_NAME = POTION_EFFECT_NAME + "ABSORPTION";
     public static final String BLINDNESS_NAME = POTION_EFFECT_NAME + "BLINDNESS";
@@ -93,10 +57,7 @@ public class ItemsDropSettingsConfig {
     public static final String WITHER_NAME = POTION_EFFECT_NAME + "WITHER";
     public static final String ENABLE_RARE_DROP_EFFECT = "Enable rare drop visual effect";
     public static final String HOES_AS_WEAPONS = "Enable hoes as weapons";
-    public static final String LOOT_SHOWER_ITEM_ONE = "Loot shower material 1";
-    public static final String LOOT_SHOWER_ITEM_FIVE = "Loot shower material 5";
-    public static final String LOOT_SHOWER_ITEM_TEN = "Loot shower material 10";
-    public static final String LOOT_SHOWER_ITEM_TWENTY = "Loot shower material 20";
+
 
     /*
     Custom enchantments
@@ -129,40 +90,6 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(EXPERIENCE_LOOT_MULTIPLIER, 1.0);
         configuration.addDefault(MAXIMUM_LOOT_TIER, 5);
         configuration.addDefault(ENABLE_CUSTOM_ENCHANTMENT_SYSTEM, true);
-        configuration.addDefault(ARROW_DAMAGE_NAME, "Power");
-        configuration.addDefault(ARROW_FIRE_NAME, "Flame");
-        configuration.addDefault(ARROW_INFINITE_NAME, "Infinity");
-        configuration.addDefault(ARROW_KNOCKBACK_NAME, "Punch");
-        configuration.addDefault(BINDING_CURSE_NAME, "Curse of Binding");
-        configuration.addDefault(CHANNELING_NAME, "Channeling");
-        configuration.addDefault(DAMAGE_ALL_NAME, "Sharpness");
-        configuration.addDefault(DAMAGE_ARTHROPODS_NAME, "Bane of Arthropods");
-        configuration.addDefault(DAMAGE_UNDEAD_NAME, "Smite");
-        configuration.addDefault(DEPTH_STRIDER_NAME, "Depth Strider");
-        configuration.addDefault(DIG_SPEED_NAME, "Efficiency");
-        configuration.addDefault(DURABILITY_NAME, "Unbreaking");
-        configuration.addDefault(FIRE_ASPECT_NAME, "Fire Aspect");
-        configuration.addDefault(FROST_WALKER_NAME, "Frost Walker");
-        configuration.addDefault(IMPALING_NAME, "Impaling");
-        configuration.addDefault(KNOCKBACK_NAME, "Knockback");
-        configuration.addDefault(LOOT_BONUS_BLOCKS_NAME, "Fortune");
-        configuration.addDefault(LOOT_BONUS_MOBS_NAME, "Looting");
-        configuration.addDefault(LOYALTY_NAME, "Loyalty");
-        configuration.addDefault(LUCK_ENCHANTMENT_NAME, "Luck of the Sea");
-        configuration.addDefault(LURE_NAME, "Lure");
-        configuration.addDefault(MENDING_NAME, "Mending");
-        configuration.addDefault(OXYGEN_NAME, "Respiration");
-        configuration.addDefault(PROTECTION_ENVIRONMENTAL_NAME, "Protection");
-        configuration.addDefault(PROTECTION_EXPLOSIONS_NAME, "Blast Protection");
-        configuration.addDefault(PROTECTION_FALL_NAME, "Feather Falling");
-        configuration.addDefault(PROTECTION_FIRE_NAME, "Fire Protection");
-        configuration.addDefault(PROTECTION_PROJECTILE_NAME, "Projectile Protection");
-        configuration.addDefault(RIPTIDE_NAME, "Riptide");
-        configuration.addDefault(SILK_TOUCH_NAME, "Silk Touch");
-        configuration.addDefault(SWEEPING_EDGE_NAME, "Sweeping Edge");
-        configuration.addDefault(THORNS_NAME, "Thorns");
-        configuration.addDefault(VANISHING_CURSE_NAME, "Curse of Vanishing");
-        configuration.addDefault(WATER_WORKER_NAME, "Aqua Affinity");
         configuration.addDefault(ABSORPTION_NAME, "Absorption");
         configuration.addDefault(BLINDNESS_NAME, "Blindness");
         configuration.addDefault(CONDUIT_POWER_NAME, "Conduit Power");
@@ -193,11 +120,6 @@ public class ItemsDropSettingsConfig {
         configuration.addDefault(WATER_BREATHING_NAME, "Water Breathing");
         configuration.addDefault(WEAKNESS_NAME, "Weakness");
         configuration.addDefault(WITHER_NAME, "Wither");
-        configuration.addDefault(LOOT_SHOWER_ITEM_ONE, Material.GOLD_NUGGET.toString());
-        configuration.addDefault(LOOT_SHOWER_ITEM_FIVE, Material.GOLD_INGOT.toString());
-        configuration.addDefault(LOOT_SHOWER_ITEM_TEN, Material.EMERALD.toString());
-        configuration.addDefault(LOOT_SHOWER_ITEM_TWENTY, Material.EMERALD_BLOCK.toString());
-
 
         configuration.addDefault(FLAMETHROWER_NAME, "Flamethrower");
         configuration.addDefault(HUNTER_NAME, "Hunter");

@@ -51,11 +51,8 @@ public class RareDropEffect implements Listener {
 
     @EventHandler
     public void onItemDrop(ItemSpawnEvent event) {
-
-        if (!ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(event.getEntity().getItemStack())) return;
-
+        if (!ItemTagger.isEliteItem(event.getEntity().getItemStack())) return;
         runEffect(event.getEntity());
-
     }
 
 }

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import org.bukkit.entity.Player;
@@ -62,13 +61,13 @@ public class QuestReward {
     }
 
     private void setRewardMessage() {
-        this.rewardMessage = this.questReward + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME);
+        this.rewardMessage = this.questReward + " " + EconomySettingsConfig.currencyName;
     }
 
     public void doReward(Player player) {
         if (rewardType.equals(RewardType.MONETARY)) {
             EconomyHandler.addCurrency(player.getUniqueId(), questReward);
-            player.sendMessage("[EM] You have completed a quest! You reward is " + questReward + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+            player.sendMessage("[EM] You have completed a quest! You reward is " + questReward + " " + EconomySettingsConfig.currencyName);
         }
     }
 

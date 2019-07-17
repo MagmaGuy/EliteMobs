@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.commands.shops;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
-import com.magmaguy.elitemobs.items.ObfuscatedSignatureLoreData;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
@@ -32,7 +31,7 @@ public class ProceduralShopMenu implements Listener {
 
     public static void shopInitializer(Player player) {
 
-        if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_ECONOMY)) return;
+        if (!EconomySettingsConfig.enableEconomy) return;
         BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_PROCEDURAL_ITEM);
 
     }
@@ -89,7 +88,7 @@ public class ProceduralShopMenu implements Listener {
             return;
         }
 
-        if (!ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(event.getCurrentItem())) {
+        if (!ItemTagger.isEliteItem(event.getCurrentItem())) {
             event.setCancelled(true);
             return;
         }

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
@@ -66,6 +67,8 @@ public class ItemConstructor {
         itemStack.setItemMeta(itemMeta);
         ItemQualityColorizer.dropQualityColorizer(itemStack);
 
+        ItemTagger.registerEliteItem(itemStack);
+
         return itemStack;
     }
 
@@ -121,6 +124,8 @@ public class ItemConstructor {
          */
         itemStack.setItemMeta(itemMeta);
         ItemQualityColorizer.dropQualityColorizer(itemStack);
+
+        ItemTagger.registerEliteItem(itemStack);
 
         return itemStack;
 

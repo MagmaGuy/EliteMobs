@@ -33,8 +33,6 @@ public class SetMaxItemTierCommand {
         mobCombatSettingsConfig.set(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP, maxMobLevel);
         customConfigLoader2.saveCustomConfig(MobCombatSettingsConfig.CONFIG_NAME);
 
-        ConfigValues.initializeCachedConfigurations();
-
         commandSender.sendMessage(ChatColorConverter.convert(
                 "Warning: You have set the max tier to " + tier + "!"));
         commandSender.sendMessage(ChatColorConverter.convert(

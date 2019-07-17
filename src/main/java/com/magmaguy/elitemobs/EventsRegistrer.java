@@ -24,6 +24,7 @@ import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
+import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobconstructor.displays.DamageDisplay;

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.economy;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -17,7 +16,7 @@ public class VaultCompatibility {
     public static void vaultSetup() {
         if (Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) {
             Bukkit.getLogger().info("[EliteMobs] Vault detected.");
-            if (ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.USE_VAULT)) {
+            if (EconomySettingsConfig.useVault) {
                 Bukkit.getLogger().warning("[EliteMobs] Vault preference detected. This is not the recommended setting. " +
                         "Ask the dev or check the wiki as to why.");
                 VAULT_ENABLED = true;
