@@ -226,9 +226,11 @@ public class CustomItem {
 
                 try {
                     enchantment = Enchantment.getByName(name);
+                    if (enchantment == null)
+                        throw new Exception("Null enchantment");
                 } catch (Exception ex) {
                     Bukkit.getLogger().warning("[EliteMobs] Custom Item Entry " + this.fileName + " has an invalid enchantment entry.");
-                    Bukkit.getLogger().warning("[EliteMobs} Enchantment " + name + " is not a valid enchantment. Check the Spigot API for the correct names!");
+                    Bukkit.getLogger().warning("[EliteMobs] Enchantment " + name + " is not a valid enchantment. Check the Spigot API for the correct names!");
                     Bukkit.getLogger().warning("[EliteMobs] The invalid entry will be skipped.");
                     continue;
                 }

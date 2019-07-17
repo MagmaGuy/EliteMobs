@@ -3,10 +3,10 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -19,7 +19,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -31,11 +30,11 @@ public class ItemLootShower implements Listener {
 
     public static void runShower(double eliteMobTier, Location location) {
 
-        if (!ConfigValues.economyConfig.getBoolean(EconomySettingsConfig.ENABLE_CURRENCY_SHOWER))
+        if (!EconomySettingsConfig.enableCurrencyShower)
             return;
 
         new BukkitRunnable() {
-            int currencyAmount = (int) (eliteMobTier / 2 * ConfigValues.economyConfig.getDouble(EconomySettingsConfig.CURRENCY_SHOWER_MULTIPLIER));
+            int currencyAmount = (int) (eliteMobTier / 2 * EconomySettingsConfig.currencyShowerMultiplier);
 
             @Override
             public void run() {
@@ -107,12 +106,10 @@ public class ItemLootShower implements Listener {
 
     }
 
-    private static Item generateCurrencyItem(Material material, Location location) {
+    private static Item generateCurrencyItem(Material material, Location location, double value) {
 
-        ItemStack currencyItemStack = new ItemStack(material, 1);
-        ItemMeta itemMeta = currencyItemStack.getItemMeta();
-        itemMeta.setLore(Arrays.asList("EliteMobsCurrencyItem", ThreadLocalRandom.current().nextDouble() + ""));
-        currencyItemStack.setItemMeta(itemMeta);
+        ItemStack currencyItemStack = ItemStackGenerator.generateItemStack(material, "",
+                Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + ""));
         Item currencyItem = location.getWorld().dropItem(location, currencyItemStack);
         EntityTracker.registerItemVisualEffects(currencyItem);
 
@@ -129,13 +126,13 @@ public class ItemLootShower implements Listener {
 
         Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.valueOf(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LOOT_SHOWER_ITEM_ONE)), location);
+            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.lootShowerMaterial1), location, 1);
         } catch (Exception ex) {
             new WarningMessage("Material for EliteMob shower 1 is invalid. Defaulting to gold nugget.");
-            currencyItem = generateCurrencyItem(Material.GOLD_NUGGET, location);
+            currencyItem = generateCurrencyItem(Material.GOLD_NUGGET, location, 1);
         }
 
-        currencyItem.setCustomName(ChatColorConverter.convert("&7" + 1 + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
+        currencyItem.setCustomName(ChatColorConverter.convert("&7" + 1 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
 
     }
@@ -144,13 +141,13 @@ public class ItemLootShower implements Listener {
 
         Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.valueOf(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LOOT_SHOWER_ITEM_FIVE)), location);
+            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.lootShowerMaterial5), location, 5);
         } catch (Exception ex) {
             new WarningMessage("Material for EliteMob shower 5 is invalid. Defaulting to gold ingot.");
-            currencyItem = generateCurrencyItem(Material.GOLD_INGOT, location);
+            currencyItem = generateCurrencyItem(Material.GOLD_INGOT, location, 5);
         }
 
-        currencyItem.setCustomName(ChatColorConverter.convert("&f" + 5 + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
+        currencyItem.setCustomName(ChatColorConverter.convert("&f" + 5 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
     }
 
@@ -158,13 +155,13 @@ public class ItemLootShower implements Listener {
 
         Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.valueOf(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LOOT_SHOWER_ITEM_TEN)), location);
+            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.lootShowerMaterial10), location, 10);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 1 is invalid. Defaulting to emerald.");
-            currencyItem = generateCurrencyItem(Material.EMERALD, location);
+            new WarningMessage("Material for EliteMob shower 10 is invalid. Defaulting to Gold block.");
+            currencyItem = generateCurrencyItem(Material.GOLD_BLOCK, location, 10);
         }
 
-        currencyItem.setCustomName(ChatColorConverter.convert("&a" + 10 + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
+        currencyItem.setCustomName(ChatColorConverter.convert("&a" + 10 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
     }
 
@@ -172,13 +169,13 @@ public class ItemLootShower implements Listener {
 
         Item currencyItem;
         try {
-            currencyItem = generateCurrencyItem(Material.valueOf(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LOOT_SHOWER_ITEM_TWENTY)), location);
+            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.lootShowerMaterial20), location, 20);
         } catch (Exception ex) {
-            new WarningMessage("Material for EliteMob shower 1 is invalid. Defaulting to emerald block.");
-            currencyItem = generateCurrencyItem(Material.EMERALD_BLOCK, location);
+            new WarningMessage("Material for EliteMob shower 20 is invalid. Defaulting to emerald.");
+            currencyItem = generateCurrencyItem(Material.EMERALD, location, 20);
         }
 
-        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 20 + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)));
+        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 20 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
     }
 
@@ -195,57 +192,36 @@ public class ItemLootShower implements Listener {
                 !event.getItem().getItemStack().getItemMeta().getLore().get(0).equalsIgnoreCase("EliteMobsCurrencyItem"))
             return;
 
+        event.setCancelled(true);
+
         Player player = event.getPlayer();
 
-        if (event.getItem().getItemStack().getType().equals(Material.GOLD_NUGGET)) {
-            sendCurrencyNotification(player);
-            EconomyHandler.addCurrency(player.getUniqueId(), 1);
-            sendActionBarMessage(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_SHOWER_MESSAGE_1), player);
-            event.setCancelled(true);
-            event.getItem().remove();
-            return;
-        }
+        double amountIncremented = Double.valueOf(event.getItem().getItemStack().getItemMeta().getLore().get(1));
 
-        if (event.getItem().getItemStack().getType().equals(Material.GOLD_INGOT)) {
-            sendCurrencyNotification(player);
-            EconomyHandler.addCurrency(player.getUniqueId(), 5);
-            sendActionBarMessage(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_SHOWER_MESSAGE_5), player);
-            event.setCancelled(true);
-            event.getItem().remove();
-            return;
-        }
+        sendCurrencyNotification(player);
 
-        if (event.getItem().getItemStack().getType().equals(Material.EMERALD)) {
-            sendCurrencyNotification(player);
-            EconomyHandler.addCurrency(player.getUniqueId(), 10);
-            sendActionBarMessage(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_SHOWER_MESSAGE_10), player);
-            event.setCancelled(true);
-            event.getItem().remove();
-            return;
-        }
+        EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
 
-        if (event.getItem().getItemStack().getType().equals(Material.EMERALD_BLOCK)) {
-            sendCurrencyNotification(player);
-            EconomyHandler.addCurrency(player.getUniqueId(), 20);
-            sendActionBarMessage(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_SHOWER_MESSAGE_20), player);
-            event.setCancelled(true);
-            event.getItem().remove();
-            return;
-        }
+        if (playerCurrencyPickup.containsKey(player))
+            playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + amountIncremented);
+        else
+            playerCurrencyPickup.put(player, amountIncremented);
 
-    }
-
-    private static void sendActionBarMessage(String string, Player player) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                 TextComponent.fromLegacyText(
-                        ChatColorConverter.convert(string.replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME)))));
+                        ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
+                                .replace("$currency_name", EconomySettingsConfig.currencyName)
+                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
+
+        event.getItem().remove();
+
     }
 
     private static void sendCurrencyNotification(Player player) {
         if (playerCurrencyPickup.containsKey(player)) return;
 
         new BukkitRunnable() {
-            double originalAmount = EconomyHandler.checkCurrency(player.getUniqueId());
+            double oldAmount = 0;
 
             @Override
             public void run() {
@@ -255,15 +231,13 @@ public class ItemLootShower implements Listener {
                     return;
                 }
 
-                if (originalAmount + playerCurrencyPickup.get(player) != EconomyHandler.checkCurrency(player.getUniqueId())) {
-
-                    playerCurrencyPickup.put(player, EconomyHandler.checkCurrency(player.getUniqueId()) - originalAmount);
+                if (oldAmount != playerCurrencyPickup.get(player)) {
+                    oldAmount = playerCurrencyPickup.get(player);
                     return;
-
                 }
 
-                player.sendMessage(ChatColorConverter.convert(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_LOOT_MESSAGE)
-                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))
+                player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.chatCurrencyShowerMessage
+                        .replace("$currency_name", EconomySettingsConfig.currencyName)
                         .replace("$amount", playerCurrencyPickup.get(player) + "")));
 
                 playerCurrencyPickup.remove(player);
@@ -273,13 +247,13 @@ public class ItemLootShower implements Listener {
 
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 40);
 
     }
 
     private static void sendAdventurersGuildNotification(Player player) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(ChatColorConverter.convert(ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_AG_NOTIFICATION))));
+                TextComponent.fromLegacyText(ChatColorConverter.convert(EconomySettingsConfig.adventurersGuildNotificationMessage)));
     }
 
 }

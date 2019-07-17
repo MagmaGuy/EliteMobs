@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ProceduralShopMenuConfig extends MenusConfigFields {
     public ProceduralShopMenuConfig() {
-        super("procedural_shop_menu.yml");
+        super("procedural_shop_menu");
     }
 
     public static String SHOP_NAME;

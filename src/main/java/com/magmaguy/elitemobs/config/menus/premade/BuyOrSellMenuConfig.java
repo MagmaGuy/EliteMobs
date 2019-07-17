@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class BuyOrSellMenuConfig extends MenusConfigFields {
     public BuyOrSellMenuConfig() {
-        super("buy_or_sell_menu.yml");
+        super("buy_or_sell_menu");
     }
 
     public static String SHOP_NAME;
@@ -46,8 +46,8 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
         ItemStackSerializer.serialize("Sell items",
                 ItemStackGenerator.generateItemStack(Material.REDSTONE, "Sell items"), fileConfiguration);
         SELL_ITEM = ItemStackSerializer.deserialize("Sell items", fileConfiguration);
-        BUY_SLOT = ConfigurationEngine.setInt(fileConfiguration, "&a&lBuy slot", 11);
-        SELL_SLOT = ConfigurationEngine.setInt(fileConfiguration, "&c&lSell slot", 15);
+        BUY_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Buy slot", 11);
+        SELL_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Sell slot", 15);
 
         return fileConfiguration;
     }

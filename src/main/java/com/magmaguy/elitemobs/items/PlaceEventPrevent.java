@@ -21,7 +21,7 @@ public class PlaceEventPrevent implements Listener {
 
         if (event.getItem() == null || event.getItem().getItemMeta() == null) return;
 
-        if (ObfuscatedSignatureLoreData.obfuscatedSignatureDetector(event.getItem()))
+        if (ItemTagger.isEliteItem(event.getItem()))
             event.setCancelled(true);
 
     }

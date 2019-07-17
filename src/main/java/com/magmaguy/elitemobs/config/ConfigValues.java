@@ -1,7 +1,5 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 
 /**
@@ -12,7 +10,6 @@ public class ConfigValues {
     public static Configuration defaultConfig,
             translationConfig,
             itemsProceduralSettingsConfig,
-            economyConfig,
             playerCacheConfig,
             eventsConfig,
             itemsCustomLootSettingsConfig,
@@ -24,7 +21,7 @@ public class ConfigValues {
 
         CustomConfigLoader customConfigLoader = new CustomConfigLoader();
 
-        defaultConfig = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig();
+        defaultConfig = DefaultConfig.fileConfiguration;
 
         customConfigLoader = new CustomConfigLoader();
         itemsCustomLootSettingsConfig = customConfigLoader.getCustomConfig(ItemsCustomLootSettingsConfig.CONFIG_NAME);
@@ -34,9 +31,6 @@ public class ConfigValues {
 
         customConfigLoader = new CustomConfigLoader();
         itemsProceduralSettingsConfig = customConfigLoader.getCustomConfig(ItemsProceduralSettingsConfig.CONFIG_NAME);
-
-        customConfigLoader = new CustomConfigLoader();
-        economyConfig = customConfigLoader.getCustomConfig(EconomySettingsConfig.CONFIG_NAME);
 
         customConfigLoader = new CustomConfigLoader();
         playerCacheConfig = customConfigLoader.getCustomConfig(PlayerCacheData.CONFIG_NAME, true);
@@ -67,9 +61,6 @@ public class ConfigValues {
 
         ItemsProceduralSettingsConfig itemsProceduralSettingsConfig = new ItemsProceduralSettingsConfig();
         itemsProceduralSettingsConfig.initializeConfig();
-
-        EconomySettingsConfig economySettingsConfig = new EconomySettingsConfig();
-        economySettingsConfig.initializeConfig();
 
         PlayerCacheData playerCacheData = new PlayerCacheData();
         playerCacheData.initializeConfig();

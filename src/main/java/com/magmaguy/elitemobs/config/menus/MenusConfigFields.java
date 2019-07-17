@@ -7,7 +7,7 @@ public class MenusConfigFields {
     private String fileName;
 
     public MenusConfigFields(String fileName) {
-        this.fileName = fileName;
+        this.fileName = fileName + ".yml";
     }
 
     public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {

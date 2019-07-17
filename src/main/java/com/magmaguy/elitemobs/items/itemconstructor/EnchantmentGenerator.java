@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
+import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.MaterialTier;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -21,23 +22,20 @@ public class EnchantmentGenerator {
 
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
 
-        for (Enchantment enchantment : enchantmentMap.keySet())
-            if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() && ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
-                if (enchantment.getName().equals(Enchantment.DAMAGE_ALL.getName()) ||
-                        enchantment.getName().equals(Enchantment.ARROW_DAMAGE.getName()) ||
-                        enchantment.getName().equals(Enchantment.PROTECTION_ENVIRONMENTAL.getName()) ||
-                        enchantment.getName().equals(Enchantment.DAMAGE_ARTHROPODS.getName()) ||
-                        enchantment.getName().equals(Enchantment.DAMAGE_UNDEAD.getName()) ||
-                        enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) ||
-                        enchantment.getName().equals(Enchantment.PROTECTION_FIRE.getName()) ||
-                        enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName())) {
+        for (Enchantment enchantment : enchantmentMap.keySet()) {
+            if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() &&
+                    ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
+                if (EliteEnchantments.isPotentialEliteEnchantment(enchantment)) {
                     itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
                 } else
                     itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
 
-            } else
+            } else {
                 itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
+            }
 
+
+        }
         return itemMeta;
 
     }
@@ -442,7 +440,8 @@ public class EnchantmentGenerator {
     }
 
     //Version and subVersion should be set to the update at which the enchantment was introduced
-    private static boolean enchantmentBackwardsCompatibility(int version, int subVersion, String actualEnchantement, String enchantmentToAvoid) {
+    private static boolean enchantmentBackwardsCompatibility(int version, int subVersion, String
+            actualEnchantement, String enchantmentToAvoid) {
 
         return !VersionChecker.currentVersionIsUnder(version, subVersion) && actualEnchantement.equalsIgnoreCase(enchantmentToAvoid);
 
