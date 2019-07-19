@@ -40,8 +40,6 @@ public class DefaultConfig {
         Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).saveConfig();
         Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).saveDefaultConfig();
 
-        Bukkit.getLogger().info("EliteMobs config loaded!");
-
         fileConfiguration = configuration;
 
     }

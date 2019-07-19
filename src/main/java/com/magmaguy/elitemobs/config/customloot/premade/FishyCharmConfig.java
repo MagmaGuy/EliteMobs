@@ -13,7 +13,7 @@ public class FishyCharmConfig extends CustomLootConfigFields {
                 "&bFishy Charm",
                 Arrays.asList("&aThere's just something not", "&aquite right with this one..."),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("WATER_BREATHING,1,self,continuous"),
+                Arrays.asList("WATER_BREATHING,0,self,continuous"),
                 "1",
                 null,
                 "custom");

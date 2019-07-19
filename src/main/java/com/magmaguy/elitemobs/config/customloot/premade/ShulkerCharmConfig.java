@@ -13,7 +13,7 @@ public class ShulkerCharmConfig extends CustomLootConfigFields {
                 "&bShulker Charm",
                 Arrays.asList("&aI believe I can fly", "&aI believe I can touch the sky", "&aAnd you're coming with me!"),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("LEVITATION,1,self,onHit", "LEVITATION,2,target,onHit"),
+                Arrays.asList("LEVITATION,0,self,onHit", "LEVITATION,1,target,onHit"),
                 "1",
                 null,
                 "custom");

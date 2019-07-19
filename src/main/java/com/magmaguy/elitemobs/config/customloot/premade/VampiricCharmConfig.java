@@ -13,7 +13,7 @@ public class VampiricCharmConfig extends CustomLootConfigFields {
                 "&bVampiric Charm",
                 Arrays.asList("&aNo one can remember where this", "&acame from, and no one can,", "&aforget how dangerous it is..."),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("HEAL,1,self,onHit", "BLINDNESS,1,self,onHit", "SLOW,1,self,onHit"),
+                Arrays.asList("HEAL,0,self,onHit", "BLINDNESS,0,self,onHit", "SLOW,0,self,onHit"),
                 "1",
                 null,
                 "custom");

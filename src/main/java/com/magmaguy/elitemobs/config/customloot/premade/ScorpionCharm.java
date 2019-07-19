@@ -13,7 +13,7 @@ public class ScorpionCharm extends CustomLootConfigFields {
                 "&bScorpion Charm",
                 Arrays.asList("&aFloat like a butterfly,", "&asting like a bee,", "&apoison like a potato!"),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("POISON,1,target,onHit"),
+                Arrays.asList("POISON,0,target,onHit"),
                 "1",
                 null,
                 "custom");
