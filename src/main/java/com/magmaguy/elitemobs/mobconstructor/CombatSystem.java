@@ -32,7 +32,6 @@ import java.util.HashSet;
 public class CombatSystem implements Listener {
 
     public static final double PER_LEVEL_POWER_INCREASE = 0.1;
-    public static final double BASE_DAMAGE_DEALT_TO_PLAYERS = 2;
     public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.5;
 
     public static final double DIAMOND_TIER_LEVEL = 3;
@@ -327,7 +326,7 @@ public class CombatSystem implements Listener {
         /*
         This caps the tier difference between mobs and players to prevent insurmountable boss fights
          */
-        double maxTierDifference = 2.5;
+        double maxTierDifference = 2;
         tierDifference = Math.abs(tierDifference) > maxTierDifference ? (tierDifference > 0 ? maxTierDifference : -maxTierDifference) : tierDifference;
 
         /*

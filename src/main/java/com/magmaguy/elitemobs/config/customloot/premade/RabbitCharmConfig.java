@@ -13,7 +13,7 @@ public class RabbitCharmConfig extends CustomLootConfigFields {
                 "&bRabbit Charm",
                 Arrays.asList("&aWith this charm, just about", "&aany destination is only a hop,", "&askip and a jump away!"),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("JUMP,3,self,continuous"),
+                Arrays.asList("JUMP,2,self,continuous"),
                 "1",
                 null,
                 "custom");

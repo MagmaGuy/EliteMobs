@@ -192,7 +192,7 @@ public class LoreGenerator {
         if (potionList == null || potionList.isEmpty() || potionList.get(0) == null) return potionsLore;
 
         for (String string : potionList) {
-            String loreLine = ChatColorConverter.convert("&2" + getPotionName(string.split(",")[0]) + " " + string.split(",")[1]);
+            String loreLine = ChatColorConverter.convert("&2" + getPotionName(string.split(",")[0]) + " " + (Integer.valueOf(string.split(",")[1]) + 1));
             potionsLore.add(loreLine);
         }
 
