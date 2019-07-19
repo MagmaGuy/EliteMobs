@@ -13,7 +13,7 @@ public class OwlCharmConfig extends CustomLootConfigFields {
                 "&bOwl Charm",
                 Arrays.asList("&aBecome the ultimate nocturnal", "&apredator!"),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("GLOWING,1,target,onHit", "JUMP,3,self,continuous", "NIGHT_VISION,1,self,continuous", "WEAKNESS,1,self,continuous"),
+                Arrays.asList("GLOWING,0,target,onHit", "JUMP,2,self,continuous", "NIGHT_VISION,0,self,continuous", "WEAKNESS,0,self,continuous"),
                 "1",
                 null,
                 "custom");

@@ -13,7 +13,7 @@ public class FireflyCharmConfig extends CustomLootConfigFields {
                 "&bFirefly Charm",
                 Arrays.asList("&aLight up the night!"),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("NIGHT_VISION,1,self,continuous", "GLOWING,1,target,onHit"),
+                Arrays.asList("NIGHT_VISION,0,self,continuous", "GLOWING,0,target,onHit"),
                 "1",
                 null,
                 "custom");

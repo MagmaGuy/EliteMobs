@@ -13,7 +13,7 @@ public class LuckyCharmsConfig extends CustomLootConfigFields {
                 "&bLucky Charms",
                 Arrays.asList("&aPart of a complete breakfast!", "&cNote: Absolutely not a part of", "&ca complete breakfast."),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("LUCK,1,self,continuous"),
+                Arrays.asList("LUCK,0,self,continuous"),
                 "1",
                 null,
                 "custom");

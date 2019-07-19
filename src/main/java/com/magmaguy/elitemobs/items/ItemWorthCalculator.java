@@ -85,8 +85,9 @@ public class ItemWorthCalculator {
     private static double getAllPotionEffectValues(ItemMeta itemMeta) {
         double value = 0;
         for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffects(itemMeta, ElitePotionEffect.ApplicationMethod.CONTINUOUS))
-            value += (elitePotionEffect.getValue() + (elitePotionEffect.getPotionEffect().getAmplifier() + 1));
-
+            value += (elitePotionEffect.getValue() * (elitePotionEffect.getPotionEffect().getAmplifier() + 1));
+        for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffects(itemMeta, ElitePotionEffect.ApplicationMethod.ONHIT))
+            value += (elitePotionEffect.getValue() * (elitePotionEffect.getPotionEffect().getAmplifier() + 1));
         return value;
     }
 

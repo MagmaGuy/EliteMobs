@@ -94,8 +94,9 @@ public class NPCEntity {
         if (!npCsConfigFields.isEnabled()) return;
 
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
-
         this.villager.setRemoveWhenFarAway(true);
+
+        if (!villager.isValid()) return;
 
         setName(npCsConfigFields.getName());
         initializeRole(npCsConfigFields.getRole());

@@ -14,8 +14,8 @@ public class ZombieKingsAxeConfig extends CustomLootConfigFields {
                 Arrays.asList("The axe of the one Zombies", "call their king.", "The bloodlust is palpable."),
                 Arrays.asList("DAMAGE_ALL,10", "DAMAGE_UNDEAD,5", "DIG_SPEED,5", "DURABILITY,5", "KNOCKBACK,3",
                         "FIRE_ASPECT,4", "LOOT_BONUS_MOBS,5", "WATER_WORKER,5", "FLAMETHROWER,1"),
-                Arrays.asList("FAST_DIGGING,1,self,onHit", "POISON,1,target,onHit", "GLOWING,1,target,onHit",
-                        "NIGHT_VISION,1,target,continuous", "WITHER,1,target,onHit"),
+                Arrays.asList("FAST_DIGGING,0,self,onHit", "POISON,0,target,onHit", "GLOWING,0,target,onHit",
+                        "NIGHT_VISION,0,target,continuous", "WITHER,0,target,onHit"),
                 "dynamic",
                 "scalable",
                 "unique");

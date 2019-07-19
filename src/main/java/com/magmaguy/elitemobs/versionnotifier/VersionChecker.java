@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.versionnotifier;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ public class VersionChecker {
 
     public static boolean pluginIsUpToDate = true;
 
-    public static void updateComparer(){
+    public static void updateComparer() {
 
         String currentVersion = MetadataHandler.PLUGIN.getDescription().getVersion();
         String publicVersion = "";
@@ -33,19 +34,19 @@ public class VersionChecker {
         if (Double.parseDouble(currentVersion.split("\\.")[0]) > Double.parseDouble(publicVersion.split("\\.")[0])) {
             return;
         }
-        if (Double.parseDouble(currentVersion.split("\\.")[1]) < Double.parseDouble(publicVersion.split("\\.")[1])){
+        if (Double.parseDouble(currentVersion.split("\\.")[1]) < Double.parseDouble(publicVersion.split("\\.")[1])) {
             outOfDateHandler();
             return;
         }
         if (Double.parseDouble(currentVersion.split("\\.")[1]) > Double.parseDouble(publicVersion.split("\\.")[0])) {
             return;
         }
-        if (Double.parseDouble(currentVersion.split("\\.")[2]) < Double.parseDouble(publicVersion.split("\\.")[2])){
+        if (Double.parseDouble(currentVersion.split("\\.")[2]) < Double.parseDouble(publicVersion.split("\\.")[2])) {
             outOfDateHandler();
             return;
         }
 
-        Bukkit.getLogger().warning("[EliteMobs] You are running the latest version!");
+        Bukkit.getLogger().info("[EliteMobs] You are running the latest version!");
 
         pluginIsUpToDate = true;
 
@@ -61,9 +62,9 @@ public class VersionChecker {
 
     }
 
-    private static void outOfDateHandler(){
+    private static void outOfDateHandler() {
 
-        Bukkit.getLogger().warning("[EliteMobs] A newer version of this plugin is available for download!");
+        new WarningMessage("[EliteMobs] A newer version of this plugin is available for download!");
         pluginIsUpToDate = false;
 
     }

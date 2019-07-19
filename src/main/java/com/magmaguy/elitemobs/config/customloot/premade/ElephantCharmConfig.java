@@ -13,7 +13,7 @@ public class ElephantCharmConfig extends CustomLootConfigFields {
                 "&bElephant Charm",
                 Arrays.asList("&aGain the power of an elephant", "&astampede, for the cost of the", "&aspeed of an elephant stampede!"),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("INCREASE_DAMAGE,2,self,onHit", "SLOW,4,self,onHit"),
+                Arrays.asList("INCREASE_DAMAGE,1,self,onHit", "SLOW,3,self,onHit"),
                 "1",
                 null,
                 "custom");

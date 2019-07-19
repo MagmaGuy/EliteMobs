@@ -127,7 +127,6 @@ public class CustomShopMenu implements Listener {
                     break;
                 }
 
-
             if (!inventoryHasFreeSlots) {
 
                 player.sendMessage(CustomShopMenuConfig.messageFullInventory);

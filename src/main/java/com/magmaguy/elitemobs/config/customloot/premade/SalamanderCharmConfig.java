@@ -13,7 +13,7 @@ public class SalamanderCharmConfig extends CustomLootConfigFields {
                 "&bSalamander Charm",
                 Arrays.asList("&aAlmost as hot as MagmaGuy's", "&anew mixtape!"),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("LUCK,1,self,continuous"),
+                Arrays.asList("FIRE_RESISTANCE,0,self,continuous"),
                 "1",
                 null,
                 "custom");

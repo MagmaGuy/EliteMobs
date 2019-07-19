@@ -13,7 +13,7 @@ public class ChameleonCharmConfig extends CustomLootConfigFields {
                 "&bChameleon Charm",
                 Arrays.asList("&aThe colorful Chameleon can", "&ablend in just about anywhere,", "&aslowly creeping around..."),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("INVISIBILITY,1,self,onHit", "SLOW,2,self,onHit", "BLINDNESS,1,self,onHit"),
+                Arrays.asList("INVISIBILITY,0,self,onHit", "SLOW,0,self,onHit", "BLINDNESS,0,self,onHit"),
                 "1",
                 null,
                 "custom");

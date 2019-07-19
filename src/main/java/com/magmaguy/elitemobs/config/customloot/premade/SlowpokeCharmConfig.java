@@ -13,7 +13,7 @@ public class SlowpokeCharmConfig extends CustomLootConfigFields {
                 "&bSlowpoke Charm",
                 Arrays.asList("&aLet's just hope it doesn't hit", "&aitself in its confusion..."),
                 Arrays.asList("VANISHING_CURSE,1"),
-                Arrays.asList("SLOW,1,self,onHit", "CONFUSION,1,target,onHit"),
+                Arrays.asList("SLOW,0,self,onHit", "CONFUSION,0,target,onHit"),
                 "1",
                 null,
                 "custom");

@@ -51,6 +51,14 @@ public class EliteMobs extends JavaPlugin {
         //Enable stats
         Metrics metrics = new Metrics(this);
 
+        Bukkit.getLogger().info(" _____ _     _____ _____ ________  ______________  _____");
+        Bukkit.getLogger().info("|  ___| |   |_   _|_   _|  ___|  \\/  |  _  | ___ \\/  ___|");
+        Bukkit.getLogger().info("| |__ | |     | |   | | | |__ | .  . | | | | |_/ /\\ `--.");
+        Bukkit.getLogger().info("|  __|| |     | |   | | |  __|| |\\/| | | | | ___ \\ `--. \\");
+        Bukkit.getLogger().info("| |___| |_____| |_  | | | |___| |  | \\ \\_/ / |_/ //\\__/ /");
+        Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
+        Bukkit.getLogger().info("By MagmaGuy");
+
         /*
         New config loading
          */
