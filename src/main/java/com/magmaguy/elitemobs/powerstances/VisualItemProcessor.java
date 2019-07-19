@@ -117,8 +117,8 @@ public class VisualItemProcessor {
 
         Item item = (Item) itemObject;
 
-        if (!item.isValid())
-            return;
+//        if (!item.isValid())
+//            return;
 
         Location currentLocation = item.getLocation().clone();
         Location newLocation = eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 1, 0)).add(vector);
