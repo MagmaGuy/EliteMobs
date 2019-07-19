@@ -44,7 +44,11 @@ public class NPCCommands {
             return;
         }
 
-        NPCsConfigFields npCsConfigFields = NPCsConfig.getNPCsList().get(args[2]);
+        String key = args[2].toLowerCase();
+        if (!key.contains(".yml"))
+            key += ".yml";
+
+        NPCsConfigFields npCsConfigFields = NPCsConfig.getNPCsList().get(key);
         if (npCsConfigFields == null) {
             player.sendMessage("[EliteMobs] Invalid NPC filename.");
             return;
@@ -58,7 +62,6 @@ public class NPCCommands {
                 + Round.twoDecimalPlaces(playerLocation.getZ()) + ","
                 + Round.twoDecimalPlaces(playerLocation.getYaw()) + ","
                 + Round.twoDecimalPlaces(playerLocation.getPitch());
-
 
         try {
             NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromFields(npCsConfigFields));
@@ -83,7 +86,11 @@ public class NPCCommands {
             return;
         }
 
-        NPCsConfigFields npCsConfigFields = NPCsConfig.getNPCsList().get(args[2]);
+        String key = args[2].toLowerCase();
+        if (!key.contains(".yml"))
+            key += ".yml";
+
+        NPCsConfigFields npCsConfigFields = NPCsConfig.getNPCsList().get(key);
         if (npCsConfigFields == null) {
             player.sendMessage("[EliteMobs] Invalid NPC filename.");
             return;

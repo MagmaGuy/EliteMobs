@@ -17,8 +17,7 @@ public class SharedShopElements {
 
     public static boolean inventoryNullPointerPreventer(InventoryClickEvent event) {
 
-        if (!sellMenuNullPointPreventer(event)) return false;
-        return event.getCurrentItem().getItemMeta().hasLore();
+        return sellMenuNullPointPreventer(event);
 
     }
 

@@ -101,14 +101,12 @@ public class CustomShopMenu implements Listener {
 
         //reroll loot button
         if (event.getCurrentItem().equals(CustomShopMenuConfig.rerollItem)) {
-
             populateShop(event.getInventory());
             event.setCancelled(true);
             return;
-
         }
 
-        if (ItemTagger.isEliteItem(event.getCurrentItem())) {
+        if (!ItemTagger.isEliteItem(event.getCurrentItem())) {
             event.setCancelled(true);
             return;
         }
@@ -123,16 +121,12 @@ public class CustomShopMenu implements Listener {
         if (CustomShopMenuConfig.storeSlots.contains(event.getSlot()) && event.getView().getTitle().equalsIgnoreCase(SHOP_NAME)) {
 
             boolean inventoryHasFreeSlots = false;
-            for (ItemStack iteratedStack : player.getInventory()) {
-
+            for (ItemStack iteratedStack : player.getInventory())
                 if (iteratedStack == null) {
-
                     inventoryHasFreeSlots = true;
                     break;
-
                 }
 
-            }
 
             if (!inventoryHasFreeSlots) {
 
