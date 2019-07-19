@@ -54,17 +54,19 @@ public class ElitePotionEffectContainer {
     }
 
     public static ArrayList<ElitePotionEffect> getElitePotionEffects(ItemMeta itemMeta, ElitePotionEffect.ApplicationMethod applicationMethod) {
-        String enchantmentsString = "";
+        String elitePotionEfects = "";
         switch (applicationMethod) {
             case CONTINUOUS:
-                enchantmentsString = itemMeta.getCustomTagContainer().getCustomTag(ItemTagger.continuousPotionEffectKey, ItemTagType.STRING);
+                elitePotionEfects = itemMeta.getCustomTagContainer().getCustomTag(ItemTagger.continuousPotionEffectKey, ItemTagType.STRING);
                 break;
             case ONHIT:
-                enchantmentsString = itemMeta.getCustomTagContainer().getCustomTag(ItemTagger.onHitPotionEffectKey, ItemTagType.STRING);
+                elitePotionEfects = itemMeta.getCustomTagContainer().getCustomTag(ItemTagger.onHitPotionEffectKey, ItemTagType.STRING);
                 break;
         }
         ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
-        for (String subString : enchantmentsString.split(":"))
+        if (elitePotionEfects == null || elitePotionEfects.isEmpty())
+            return elitePotionEffects;
+        for (String subString : elitePotionEfects.split(":"))
             elitePotionEffects.add(new ElitePotionEffect(subString));
         return elitePotionEffects;
     }

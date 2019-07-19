@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.npcs;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -23,6 +24,7 @@ public class NPCsConfigFields {
     private boolean canSleep;
     private String interactionType;
     private FileConfiguration fileConfiguration = null;
+    private File file;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -72,6 +74,7 @@ public class NPCsConfigFields {
 
     public NPCsConfigFields(FileConfiguration fileConfiguration, File file) {
         this.fileConfiguration = fileConfiguration;
+        this.file = file;
         this.fileName = file.getName();
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
         this.name = fileConfiguration.getString("name");
@@ -144,11 +147,15 @@ public class NPCsConfigFields {
         return interactionType;
     }
 
+    public File getFile() {
+        return file;
+    }
+
     public void setEnabled(boolean enabled) {
         this.isEnabled = enabled;
         this.fileConfiguration.set("isEnabled", enabled);
         try {
-            fileConfiguration.save(fileName);
+            ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, NPCsConfig.getNPCsList().get(this.fileName).getFile());
         } catch (Exception e) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the enabled status for an NPC with no config file! Did you delete it during runtime?");
         }
@@ -159,7 +166,7 @@ public class NPCsConfigFields {
         this.location = location;
         this.fileConfiguration.set("location", location);
         try {
-            fileConfiguration.save(fileName);
+            ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, NPCsConfig.getNPCsList().get(this.fileName).getFile());
         } catch (Exception ex) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }

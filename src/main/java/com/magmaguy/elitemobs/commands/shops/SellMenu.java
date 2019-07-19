@@ -21,6 +21,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +90,7 @@ public class SellMenu implements Listener {
         if (!event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
 
             //Signature item
-            if (!event.getCurrentItem().getItemMeta().hasDisplayName() || event.getCurrentItem().equals(SellMenuConfig.infoButton))
+            if (event.getCurrentItem().equals(SellMenuConfig.infoButton))
                 return;
 
             //sell
@@ -189,7 +190,7 @@ public class SellMenu implements Listener {
             positionCounter++;
         }
 
-        ItemStack clonedConfirmButton = (ItemStack) SellMenuConfig.confirmButton.getItemMeta().clone();
+        ItemStack clonedConfirmButton = SellMenuConfig.confirmButton.clone();
 
         List<String> lore = new ArrayList<>();
         for (String string : clonedConfirmButton.getItemMeta().getLore())
@@ -197,6 +198,9 @@ public class SellMenu implements Listener {
                     .replace("$currency_amount", itemWorth + "")
                     .replace("$currency_name", EconomySettingsConfig.currencyName));
 
+        ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
+        clonedMeta.setLore(lore);
+        clonedConfirmButton.setItemMeta(clonedMeta);
 
         event.getInventory().setItem(SellMenuConfig.confirmSlot, clonedConfirmButton);
 

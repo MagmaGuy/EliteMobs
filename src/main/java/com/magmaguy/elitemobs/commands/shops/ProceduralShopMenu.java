@@ -46,7 +46,7 @@ public class ProceduralShopMenu implements Listener {
 
     private static void populateShop(Inventory shopInventory) {
 
-        shopInventory.setItem(ProceduralShopMenuConfig.REROLL_SLOT, ProceduralShopMenuConfig.REROLL_ITEM);
+        shopInventory.setItem(ProceduralShopMenuConfig.REROLL_SLOT, ProceduralShopMenuConfig.rerollItem);
         shopContents(shopInventory);
 
     }
@@ -82,7 +82,7 @@ public class ProceduralShopMenu implements Listener {
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
 
         //reroll loot button
-        if (event.getCurrentItem().equals(ProceduralShopMenuConfig.REROLL_ITEM)) {
+        if (event.getCurrentItem().equals(ProceduralShopMenuConfig.rerollItem)) {
             populateShop(event.getInventory());
             event.setCancelled(true);
             return;
@@ -111,7 +111,7 @@ public class ProceduralShopMenu implements Listener {
 
             if (!inventoryHasFreeSlots) {
 
-                player.sendMessage(ProceduralShopMenuConfig.MESSAGE_FULL_INVENTORY);
+                player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
                 player.closeInventory();
 
             } else if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {

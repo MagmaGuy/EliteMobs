@@ -98,6 +98,10 @@ public class EliteEvent extends AbstractEliteEvent {
     private String eventEndMessage;
 
     public EliteEvent(ArrayList<World> worlds, EventType eventType, EntityType entityType) {
+        //TODO: This won't work in later versions
+        for (EliteEvent eliteEvent : activeEvents)
+            if (eliteEvent.getEventType().equals(eventType))
+                return;
         this.worlds = worlds;
         if (worlds == null || worlds.isEmpty()) return;
         setEventType(eventType);
