@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
@@ -24,6 +25,7 @@ import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
@@ -83,7 +85,7 @@ public class EventsRegistrer {
 
         //Mob loot
         pluginManager.registerEvents(new DefaultDropsHandler(), plugin);
-        pluginManager.registerEvents(new ItemLootShower(), plugin);
+        pluginManager.registerEvents(new ItemLootShower.ItemLootShowerEvents(), plugin);
 
         //potion effects
         pluginManager.registerEvents(new PotionEffectApplier(), plugin);
@@ -140,6 +142,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new GoldShotgun(), plugin);
         pluginManager.registerEvents(new GoldExplosion(), plugin);
         pluginManager.registerEvents(new Flamethrower(), plugin);
+        if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
+            pluginManager.registerEvents(new SoulbindEnchantment.SoulbindEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new FlamePyre(), plugin);
         pluginManager.registerEvents(new SummonTheReturned(), plugin);
         pluginManager.registerEvents(new HyperLoot(), plugin);
@@ -219,7 +223,7 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new DamageDisplay(), plugin);
 
         //Initialize items from custom events
-        pluginManager.registerEvents(new FlamethrowerEnchantment(), plugin);
+        pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);
 
         //Initialize adventurer's guild
         if (AdventurersGuildConfig.enableAdventurersGuild)

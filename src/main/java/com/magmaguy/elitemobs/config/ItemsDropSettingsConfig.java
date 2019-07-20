@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
+import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import org.bukkit.configuration.Configuration;
 
 public class ItemsDropSettingsConfig {
@@ -63,8 +64,8 @@ public class ItemsDropSettingsConfig {
     Custom enchantments
      */
     public static final String CUSTOM_ENCHANTMENT_NAME = "Custom Enchantment name.";
-    public static final String FLAMETHROWER_NAME = CUSTOM_ENCHANTMENT_NAME + CustomEnchantmentCache.flamethrowerEnchantment.getKey();
-    public static final String HUNTER_NAME = CUSTOM_ENCHANTMENT_NAME + CustomEnchantmentCache.hunterEnchantment.getKey();
+    public static final String FLAMETHROWER_NAME = CUSTOM_ENCHANTMENT_NAME + FlamethrowerEnchantment.key;
+    public static final String HUNTER_NAME = CUSTOM_ENCHANTMENT_NAME + HunterEnchantment.key;
 
     public static final String ELITE_ENCHANTMENT_NAME = "Elite Enchantment name";
 

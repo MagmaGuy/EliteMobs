@@ -15,7 +15,8 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
@@ -183,7 +184,6 @@ public class EliteMobs extends JavaPlugin {
     }
 
     public static void initializeConfigs() {
-        CustomEnchantmentCache.initialize();
         ConfigValues.initializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
         EconomySettingsConfig.initializeConfig();
@@ -203,6 +203,7 @@ public class EliteMobs extends JavaPlugin {
         MobPropertiesConfig.initializeConfigs();
         CustomLootConfig.initializeConfigs();
         CustomItem.initializeCustomItems();
+        CustomEnchantment.initializeCustomEnchantments();
     }
 
     public static void worldScanner() {
@@ -218,8 +219,11 @@ public class EliteMobs extends JavaPlugin {
         int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
         PotionEffectApplier.potionEffectApplier();
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() &&
-                ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0)
+                ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
+            if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
+                SoulbindEnchantment.soulbindWatchdog();
+        }
     }
 
 }

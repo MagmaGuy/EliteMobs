@@ -75,7 +75,8 @@ public class EnchantmentsConfig {
             new LureConfig(),
 
             new FlamethrowerConfig(),
-            new HunterConfig()
+            new HunterConfig(),
+            new SoulbindConfig()
     ));
 
     public static void initializeConfigs() {
