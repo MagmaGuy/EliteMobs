@@ -13,6 +13,7 @@ public class EnchantmentsConfigFields {
     private int maxLevel;
     private Enchantment enchantment;
     private double value;
+    private FileConfiguration fileConfiguration;
 
     public EnchantmentsConfigFields(String fileName,
                                     boolean isEnabled,
@@ -35,6 +36,7 @@ public class EnchantmentsConfigFields {
 
     public EnchantmentsConfigFields(FileConfiguration fileConfiguration, File file) {
         this.fileName = file.getName();
+        this.fileConfiguration = fileConfiguration;
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
         this.name = fileConfiguration.getString("name");
         this.maxLevel = fileConfiguration.getInt("maxLevel");

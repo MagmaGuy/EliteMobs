@@ -1,19 +1,17 @@
 package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.*;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.ValidWorldsConfig;
+import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -25,7 +23,6 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
  */
 public class NaturalMobSpawnEventHandler implements Listener {
 
-    private static int range = Bukkit.getServer().getViewDistance() * 16;
     private static boolean ignoreMob = false;
 
     public static void setIgnoreMob(boolean bool) {
@@ -67,7 +64,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         LivingEntity livingEntity = event.getEntity();
 
-        int huntingGearChanceAdder = getHuntingGearBonus(livingEntity);
+        int huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(livingEntity);
 
         double validChance = (ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
                 huntingGearChanceAdder) / 100;
@@ -76,50 +73,6 @@ public class NaturalMobSpawnEventHandler implements Listener {
             return;
 
         NaturalEliteMobSpawnEventHandler.naturalMobProcessor(livingEntity, event.getSpawnReason());
-
-    }
-
-    private static int getHuntingGearBonus(Entity entity) {
-
-        int huntingGearChanceAdder = 0;
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-
-            if (player.getWorld().equals(entity.getWorld()) &&
-                    (!player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) ||
-                            player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) && !player.getMetadata(MetadataHandler.VANISH_NO_PACKET).get(0).asBoolean())) {
-
-                if (player.getLocation().distance(entity.getLocation()) < range) {
-
-                    ItemStack helmet = player.getInventory().getHelmet();
-                    ItemStack chestplate = player.getInventory().getChestplate();
-                    ItemStack leggings = player.getInventory().getLeggings();
-                    ItemStack boots = player.getInventory().getBoots();
-                    ItemStack heldItem = player.getInventory().getItemInMainHand();
-                    ItemStack offHandItem = player.getInventory().getItemInOffHand();
-
-                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(helmet))
-                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(helmet);
-                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(chestplate))
-                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(chestplate);
-                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(leggings))
-                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(leggings);
-                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(boots))
-                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(boots);
-                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(heldItem))
-                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(heldItem);
-                    if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(offHandItem))
-                        huntingGearChanceAdder += CustomEnchantmentCache.hunterEnchantment.getCustomEnchantmentLevel(offHandItem);
-
-                }
-
-            }
-
-        }
-
-        huntingGearChanceAdder = huntingGearChanceAdder * CustomEnchantmentsConfig.hunterSpawnBonus;
-
-        return huntingGearChanceAdder;
 
     }
 

@@ -29,6 +29,14 @@ public abstract class EliteMobProperties extends PluginMobProperties {
             validMajorPowers.add((MajorPower) ElitePower.getElitePower(powerName));
     }
 
+    public void removeOffensivePower(MinorPower minorPower) {
+        for (Iterator<MinorPower> iterator = validOffensivePowers.iterator(); iterator.hasNext(); ) {
+            MinorPower minorPower1 = iterator.next();
+            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName()))
+                iterator.remove();
+        }
+    }
+
     public void removeDefensivePower(MinorPower minorPower) {
         for (Iterator<MinorPower> iterator = validDefensivePowers.iterator(); iterator.hasNext(); ) {
             MinorPower minorPower1 = iterator.next();

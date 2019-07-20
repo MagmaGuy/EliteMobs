@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -28,7 +29,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemLootShower implements Listener {
 
-    public static void runShower(double eliteMobTier, Location location) {
+    private Player player;
+
+    public ItemLootShower(double eliteMobTier, Location location, Player player) {
+
+        this.player = player;
 
         if (!EconomySettingsConfig.enableCurrencyShower)
             return;
@@ -106,7 +111,7 @@ public class ItemLootShower implements Listener {
 
     }
 
-    private static Item generateCurrencyItem(Material material, Location location, double value) {
+    private Item generateCurrencyItem(Material material, Location location, double value) {
 
         ItemStack currencyItemStack = ItemStackGenerator.generateItemStack(material, "",
                 Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + ""));
@@ -118,11 +123,13 @@ public class ItemLootShower implements Listener {
                 0.5,
                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 2));
 
+        SoulbindEnchantment.addEnchantment(currencyItem, this.player);
+
         return currencyItem;
 
     }
 
-    private static void dropOne(Location location) {
+    private void dropOne(Location location) {
 
         Item currencyItem;
         try {
@@ -137,7 +144,7 @@ public class ItemLootShower implements Listener {
 
     }
 
-    private static void dropFive(Location location) {
+    private void dropFive(Location location) {
 
         Item currencyItem;
         try {
@@ -151,7 +158,7 @@ public class ItemLootShower implements Listener {
         currencyItem.setCustomNameVisible(true);
     }
 
-    private static void dropTen(Location location) {
+    private void dropTen(Location location) {
 
         Item currencyItem;
         try {
@@ -165,7 +172,7 @@ public class ItemLootShower implements Listener {
         currencyItem.setCustomNameVisible(true);
     }
 
-    private static void dropTwenty(Location location) {
+    private void dropTwenty(Location location) {
 
         Item currencyItem;
         try {
@@ -181,41 +188,47 @@ public class ItemLootShower implements Listener {
 
     private static HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public static void onItemPickup(PlayerPickupItemEvent event) {
 
-        if (event.getItem() == null ||
-                !event.getItem().getItemStack().hasItemMeta() ||
-                !event.getItem().getItemStack().getItemMeta().hasLore() ||
-                event.getItem().getItemStack().getItemMeta().getLore().get(0) == null ||
-                event.getItem().getItemStack().getItemMeta().getLore().get(0).isEmpty() ||
-                !event.getItem().getItemStack().getItemMeta().getLore().get(0).equalsIgnoreCase("EliteMobsCurrencyItem"))
-            return;
+    public static class ItemLootShowerEvents implements Listener {
+        @EventHandler(priority = EventPriority.LOW)
+        public static void onItemPickup(PlayerPickupItemEvent event) {
+            if (event.isCancelled()) return;
 
-        event.setCancelled(true);
+            if (event.getItem() == null ||
+                    !event.getItem().getItemStack().hasItemMeta() ||
+                    !event.getItem().getItemStack().getItemMeta().hasLore() ||
+                    event.getItem().getItemStack().getItemMeta().getLore().get(0) == null ||
+                    event.getItem().getItemStack().getItemMeta().getLore().get(0).isEmpty() ||
+                    !event.getItem().getItemStack().getItemMeta().getLore().get(0).equalsIgnoreCase("EliteMobsCurrencyItem"))
+                return;
 
-        Player player = event.getPlayer();
+            event.setCancelled(true);
 
-        double amountIncremented = Double.valueOf(event.getItem().getItemStack().getItemMeta().getLore().get(1));
+            Player player = event.getPlayer();
 
-        sendCurrencyNotification(player);
+            double amountIncremented = Double.valueOf(event.getItem().getItemStack().getItemMeta().getLore().get(1));
 
-        EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
+            sendCurrencyNotification(player);
 
-        if (playerCurrencyPickup.containsKey(player))
-            playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + amountIncremented);
-        else
-            playerCurrencyPickup.put(player, amountIncremented);
+            EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(
-                        ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
-                                .replace("$currency_name", EconomySettingsConfig.currencyName)
-                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
+            if (playerCurrencyPickup.containsKey(player))
+                playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + amountIncremented);
+            else
+                playerCurrencyPickup.put(player, amountIncremented);
 
-        event.getItem().remove();
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    TextComponent.fromLegacyText(
+                            ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
+                                    .replace("$currency_name", EconomySettingsConfig.currencyName)
+                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
 
+            event.getItem().remove();
+
+        }
     }
+
+
 
     private static void sendCurrencyNotification(Player player) {
         if (playerCurrencyPickup.containsKey(player)) return;

@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.MaterialTier;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
+import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -326,28 +326,28 @@ public class EnchantmentGenerator {
             case GOLDEN_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(HunterEnchantment.key));
                 break;
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(HunterEnchantment.key));
                 break;
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
             case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(HunterEnchantment.key));
                 break;
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
             case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CustomEnchantmentCache.hunterEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(HunterEnchantment.key));
                 break;
             case FISHING_ROD:
                 break;
