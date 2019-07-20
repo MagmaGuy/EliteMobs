@@ -3,7 +3,8 @@ package com.magmaguy.elitemobs.items.customitems;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfigFields;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
+import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -216,8 +217,8 @@ public class CustomItem {
                     Bukkit.getLogger().warning("[EliteMobs] Defaulting " + name + " to level 1.");
                 }
 
-                if (name.equalsIgnoreCase(CustomEnchantmentCache.hunterEnchantment.getKey()) ||
-                        name.equalsIgnoreCase(CustomEnchantmentCache.flamethrowerEnchantment.getKey())) {
+                if (name.equalsIgnoreCase(HunterEnchantment.key) ||
+                        name.equalsIgnoreCase(FlamethrowerEnchantment.key)) {
                     customEnchantments.put(name, level);
                     continue;
                 }

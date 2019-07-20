@@ -1,80 +1,73 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.List;
+import java.util.HashMap;
 
 public abstract class CustomEnchantment {
 
     /*
-    Code here has been maintained as static because the key value is frequently accessed and stores a static value
-    setKey() and setName() need to be rewritten in every class
+    Store key + custom enchantment
      */
+    private static HashMap<String, CustomEnchantment> customEnchantments = new HashMap<>();
 
-    public void initialize() {
-
-        setKey();
-
+    public static HashMap<String, CustomEnchantment> getCustomEnchantments() {
+        return customEnchantments;
     }
 
-    /*
-    Key is used to hide the enchantment in the lore to later ID the item, is independent from name to avoid issues with
-    config changes invalidating old enchantment names
-    It's also used as the value to write in for the configuration file
-     */
-    public String key = setKey();
+    public static CustomEnchantment getCustomEnchantment(String key) {
+        return customEnchantments.get(key);
+    }
 
-    public String setKey() {
-        return "placeholder key";
+    private String key;
+    private EnchantmentsConfigFields enchantmentsConfigFields;
+
+    public CustomEnchantment(String key) {
+        this.key = key;
+        this.enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(key + ".yml");
+        customEnchantments.put(key, this);
     }
 
     public String getKey() {
         return key;
     }
 
-    /*
-    Get the enchantment string for assembling configurations
-     */
-    public String assembleConfigString(int enchantmentLevel) {
-        return key + "," + enchantmentLevel;
+    public EnchantmentsConfigFields getEnchantmentsConfigFields() {
+        return enchantmentsConfigFields;
+    }
+
+    public static void initializeCustomEnchantments() {
+        new FlamethrowerEnchantment();
+        new HunterEnchantment();
     }
 
     /*
     Check an itemstack has this enchantment
      */
-    public boolean hasCustomEnchantment(ItemStack itemStack) {
+    public static boolean hasCustomEnchantment(ItemStack itemStack, String key) {
         if (itemStack == null || itemStack.getType().equals(Material.AIR)) return false;
         if (!itemStack.hasItemMeta()) return false;
         if (!itemStack.getItemMeta().hasLore()) return false;
-        return hasCustomEnchantment(itemStack.getItemMeta());
+        return hasCustomEnchantment(itemStack.getItemMeta(), key);
     }
 
-    public boolean hasCustomEnchantment(ItemMeta itemMeta) {
-        return ItemTagger.getEnchantment(itemMeta, new NamespacedKey(MetadataHandler.PLUGIN, getKey())) != 0;
+    public static boolean hasCustomEnchantment(ItemMeta itemMeta, String key) {
+        return ItemTagger.getEnchantment(itemMeta, new NamespacedKey(MetadataHandler.PLUGIN, key)) != 0;
     }
 
     /*
     Get a custom enchantment's level
      */
-    public int getCustomEnchantmentLevel(ItemStack itemStack) {
-        if (!itemStack.hasItemMeta()) return 0;
-        if (!itemStack.getItemMeta().hasLore()) return 0;
-        return getCustomEnchantmentLevel(itemStack.getItemMeta().getLore());
-    }
-
-    public int getCustomEnchantmentLevel(List<String> lore) {
-
-        for (String string : lore.get(0).replace("§", "").split(","))
-            if (string.contains(key))
-                return Integer.parseInt(string.split(":")[1]);
-
-        return 0;
-
+    public static int getCustomEnchantmentLevel(ItemStack itemStack, String key) {
+        if (itemStack == null) return 0;
+        return ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, key));
     }
 
 }

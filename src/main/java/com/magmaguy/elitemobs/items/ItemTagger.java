@@ -67,6 +67,11 @@ public class ItemTagger {
                 ItemTagType.INTEGER, enchantmentLevel);
     }
 
+    public static void registerCustomEnchantment(ItemMeta itemMeta, String enchantmentKey, String uuid) {
+        itemMeta.getCustomTagContainer().setCustomTag(new NamespacedKey(MetadataHandler.PLUGIN, enchantmentKey),
+                ItemTagType.STRING, uuid);
+    }
+
     /**
      * Returns the level of that enchantment on the item. 0 means the enchantment is not present.
      *

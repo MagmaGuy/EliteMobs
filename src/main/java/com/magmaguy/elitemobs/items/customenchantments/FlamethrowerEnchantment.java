@@ -22,97 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class FlamethrowerEnchantment extends CustomEnchantment implements Listener {
+public class FlamethrowerEnchantment extends CustomEnchantment {
 
-    public String setKey() {
-        return "flamethrower";
+    public static String key = "flamethrower";
+
+    public FlamethrowerEnchantment() {
+        super(key);
     }
 
     private static ArrayList<Player> playersUsingFlamethrower = new ArrayList<>();
-
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-
-        Player player = event.getPlayer();
-
-        if (!(event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.RIGHT_CLICK_AIR)))
-            return;
-
-        if (playersUsingFlamethrower.contains(player)) return;
-
-        ItemStack zombieKingAxe = player.getInventory().getItemInMainHand();
-
-        if (hasCustomEnchantment(zombieKingAxe)) {
-
-            if (zombieKingAxe.getDurability() + 4 > zombieKingAxe.getType().getMaxDurability()) {
-                return;
-            } else zombieKingAxe.setDurability((short) (zombieKingAxe.getDurability() + 4));
-
-
-            doFlamethrowerPhase1(player, player.getTargetBlock(null, 30).getLocation().clone().add(0.5, 1, 0.5));
-            CooldownHandler.initialize(playersUsingFlamethrower, player, 3 * 60);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5 * 20, 20));
-
-        }
-
-    }
-
-    private void doFlamethrowerPhase1(Player player, Location targetLocation) {
-
-        new BukkitRunnable() {
-            int counter = 0;
-
-            @Override
-            public void run() {
-
-                doParticleEffect(player, targetLocation, Particle.SMOKE_NORMAL);
-                counter++;
-
-                if (counter < 20) return;
-                doFlamethrowerPhase2(player, targetLocation);
-                cancel();
-
-            }
-
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-
-    }
-
-    private void doParticleEffect(Player player, Location target, Particle particle) {
-        Vector directionVector = target.clone().subtract(player.getLocation()).toVector().normalize();
-        for (int i = 0; i < 5; i++) {
-            player.getWorld().spawnParticle(
-                    particle,
-                    player.getEyeLocation().clone().add(directionVector.getX(), -0.5, directionVector.getZ()),
-                    0,
-                    (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getX(),
-                    (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getY(),
-                    (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getZ(),
-                    ThreadLocalRandom.current().nextDouble() + 0.05);
-        }
-    }
-
-    /**
-     * Damage phase
-     *
-     * @param player
-     */
-    private void doFlamethrowerPhase2(Player player, Location target) {
-        List<Location> damagePoints = generateDamagePoints(player, target);
-        new BukkitRunnable() {
-            int timer = 0;
-
-            @Override
-            public void run() {
-                doParticleEffect(player, target, Particle.FLAME);
-                doDamage(damagePoints, player);
-                timer++;
-                if (timer < 20 * 3) return;
-                doFlamethrowerPhase3(player, target);
-                cancel();
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-    }
 
     private static List<Location> generateDamagePoints(Player player, Location fixedPlayerLocation) {
         List<Location> locations = new ArrayList<>();
@@ -134,24 +52,112 @@ public class FlamethrowerEnchantment extends CustomEnchantment implements Listen
 
     }
 
-    /**
-     * Cooldown phase
-     *
-     * @param player
-     */
-    private void doFlamethrowerPhase3(Player player, Location fixedPlayerLocation) {
-        new BukkitRunnable() {
-            int timer = 0;
+    public static class FlamethrowerEnchantmentEvents implements Listener {
 
-            @Override
-            public void run() {
-                timer++;
-                doParticleEffect(player, fixedPlayerLocation, Particle.SMOKE_NORMAL);
-                if (timer < 20) return;
-                cancel();
+
+        @EventHandler
+        public void onInteract(PlayerInteractEvent event) {
+
+            Player player = event.getPlayer();
+
+            if (!(event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.RIGHT_CLICK_AIR)))
+                return;
+
+            if (playersUsingFlamethrower.contains(player)) return;
+
+            ItemStack zombieKingAxe = player.getInventory().getItemInMainHand();
+
+            if (hasCustomEnchantment(zombieKingAxe, "flamethrower")) {
+
+                if (zombieKingAxe.getDurability() + 4 > zombieKingAxe.getType().getMaxDurability()) {
+                    return;
+                } else zombieKingAxe.setDurability((short) (zombieKingAxe.getDurability() + 4));
+
+
+                doFlamethrowerPhase1(player, player.getTargetBlock(null, 30).getLocation().clone().add(0.5, 1, 0.5));
+                CooldownHandler.initialize(playersUsingFlamethrower, player, 3 * 60);
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5 * 20, 20));
+
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-    }
 
+        }
+
+        private void doFlamethrowerPhase1(Player player, Location targetLocation) {
+
+            new BukkitRunnable() {
+                int counter = 0;
+
+                @Override
+                public void run() {
+
+                    doParticleEffect(player, targetLocation, Particle.SMOKE_NORMAL);
+                    counter++;
+
+                    if (counter < 20) return;
+                    doFlamethrowerPhase2(player, targetLocation);
+                    cancel();
+
+                }
+
+            }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+
+        }
+
+        private void doParticleEffect(Player player, Location target, Particle particle) {
+            Vector directionVector = target.clone().subtract(player.getLocation()).toVector().normalize();
+            for (int i = 0; i < 5; i++) {
+                player.getWorld().spawnParticle(
+                        particle,
+                        player.getEyeLocation().clone().add(directionVector.getX(), -0.5, directionVector.getZ()),
+                        0,
+                        (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getX(),
+                        (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getY(),
+                        (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getZ(),
+                        ThreadLocalRandom.current().nextDouble() + 0.05);
+            }
+        }
+
+        /**
+         * Damage phase
+         *
+         * @param player
+         */
+        private void doFlamethrowerPhase2(Player player, Location target) {
+            List<Location> damagePoints = generateDamagePoints(player, target);
+            new BukkitRunnable() {
+                int timer = 0;
+
+                @Override
+                public void run() {
+                    doParticleEffect(player, target, Particle.FLAME);
+                    doDamage(damagePoints, player);
+                    timer++;
+                    if (timer < 20 * 3) return;
+                    doFlamethrowerPhase3(player, target);
+                    cancel();
+                }
+            }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        }
+
+
+        /**
+         * Cooldown phase
+         *
+         * @param player
+         */
+        private void doFlamethrowerPhase3(Player player, Location fixedPlayerLocation) {
+            new BukkitRunnable() {
+                int timer = 0;
+
+                @Override
+                public void run() {
+                    timer++;
+                    doParticleEffect(player, fixedPlayerLocation, Particle.SMOKE_NORMAL);
+                    if (timer < 20) return;
+                    cancel();
+                }
+            }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        }
+    }
 
 }

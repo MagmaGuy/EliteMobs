@@ -4,11 +4,13 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -31,13 +33,25 @@ public class LootTables implements Listener {
         if (event.getEliteMobEntity().getLevel() < 2) return;
         if (event.getEliteMobEntity().getDamagers().isEmpty()) return;
 
-        ItemLootShower.runShower(event.getEliteMobEntity().getTier(), event.getEliteMobEntity().getLivingEntity().getLocation());
-        Item item = generateLoot(event.getEliteMobEntity());
+        for (Player player : event.getEliteMobEntity().getDamagers()) {
 
-        if (item == null) return;
+            new ItemLootShower(event.getEliteMobEntity().getTier(), event.getEliteMobEntity().getLivingEntity().getLocation(), player);
+            Item item = generateLoot(event.getEliteMobEntity());
 
-        RareDropEffect.runEffect(item);
+            if (item != null &&
+                    item.getItemStack() != null &&
+                    item.getItemStack().hasItemMeta() &&
+                    item.getItemStack().getItemMeta().hasDisplayName()) {
+                item.setCustomName(item.getItemStack().getItemMeta().getDisplayName());
+                item.setCustomNameVisible(true);
+            }
 
+            SoulbindEnchantment.addEnchantment(item, player);
+
+            if (item == null) return;
+
+            RareDropEffect.runEffect(item);
+        }
     }
 
     private static boolean proceduralItemsOn = ConfigValues.itemsProceduralSettingsConfig.getBoolean(ItemsProceduralSettingsConfig.DROP_ITEMS_ON_DEATH);
