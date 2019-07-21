@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -25,6 +26,8 @@ public class AdventurersGuildConfig {
     public static String rankNames9 = guildRank + RANK_NAMES + "9";
     public static String rankNames10 = guildRank + RANK_NAMES + "10";
     public static String rankNames11 = guildRank + RANK_NAMES + "11";
+    public static boolean guildLootLimiter;
+    public static String lootLimiterMessage;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
@@ -47,6 +50,8 @@ public class AdventurersGuildConfig {
         rankNames9 = ConfigurationEngine.setString(fileConfiguration, "9", "&5&lElite Hunter");
         rankNames10 = ConfigurationEngine.setString(fileConfiguration, "10", "&5Hero");
         rankNames11 = ConfigurationEngine.setString(fileConfiguration, "11", "&6&l&oLegend");
+        guildLootLimiter = ConfigurationEngine.setBoolean(fileConfiguration, "limitLootBasedOnGuildTier", true);
+        lootLimiterMessage = ChatColorConverter.convert(ConfigurationEngine.setString(fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!"));
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

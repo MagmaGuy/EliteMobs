@@ -1,6 +1,9 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
@@ -8,6 +11,8 @@ import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -15,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,7 +42,23 @@ public class LootTables implements Listener {
         for (Player player : event.getEliteMobEntity().getDamagers()) {
 
             new ItemLootShower(event.getEliteMobEntity().getTier(), event.getEliteMobEntity().getLivingEntity().getLocation(), player);
-            Item item = generateLoot(event.getEliteMobEntity());
+
+            Item item = null;
+
+            if (AdventurersGuildConfig.guildLootLimiter) {
+                double itemTier = setItemTier((int) event.getEliteMobEntity().getTier());
+                if (itemTier > GuildRank.getRank(player) * 10) {
+                    itemTier = GuildRank.getRank(player) * 10;
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(AdventurersGuildConfig.lootLimiterMessage));
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
+                }
+                item = generateLoot((int) Math.floor(itemTier), event.getEliteMobEntity());
+            } else
+                item = generateLoot(event.getEliteMobEntity());
 
             if (item != null &&
                     item.getItemStack() != null &&
@@ -70,6 +92,12 @@ public class LootTables implements Listener {
         Add some wiggle room to avoid making obtaining loot too linear
          */
         int itemTier = (int) setItemTier(mobTier);
+
+        return generateLoot(itemTier, eliteMobEntity);
+
+    }
+
+    public static Item generateLoot(int itemTier, EliteMobEntity eliteMobEntity) {
 
          /*
         Handle the odds of an item dropping
@@ -140,6 +168,7 @@ public class LootTables implements Listener {
         return mobTier;
 
     }
+
 
     private static Item dropWeighedFixedItem(Location location) {
 
