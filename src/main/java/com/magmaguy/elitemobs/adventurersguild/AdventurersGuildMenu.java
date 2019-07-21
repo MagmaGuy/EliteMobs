@@ -259,7 +259,13 @@ public class AdventurersGuildMenu implements Listener {
     }
 
     private static int tierPriceCalculator(int tier) {
-        return tier * tier * 100;
+        /*Logic:
+        tier * 10 = max mob tier
+        max mob tier / 2 = loot shower payout for killing 1 em at max level for that player
+        payout * 1000 = amount of elite mobs to kill before going up a rank
+         */
+        double eliteMobsToKillBeforeGuildRankup = 500 + 500 * tier * 0.1;
+        return (int) (tier * 10 / 2 * eliteMobsToKillBeforeGuildRankup);
     }
 
     @EventHandler
@@ -305,7 +311,8 @@ public class AdventurersGuildMenu implements Listener {
 
         if (selectedTier == maxTier + 1) {
             if (EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) < tierPriceCalculator(selectedTier))
-                event.getWhoClicked().sendMessage("[EliteMobs] You don't have enough Elite Coins! Sell some Elite Mob loot to [/em shop]!");
+                event.getWhoClicked().sendMessage("[EliteMobs] You don't have enough Elite Coins! Sell some Elite Mob loot to [/em shop]! You have "
+                        + EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + " " + EconomySettingsConfig.currencyName + ". You need " + tierPriceCalculator(selectedTier));
             else {
                 EconomyHandler.subtractCurrency(event.getWhoClicked().getUniqueId(), tierPriceCalculator(selectedTier));
                 GuildRank.setRank((Player) event.getWhoClicked(), selectedTier);
