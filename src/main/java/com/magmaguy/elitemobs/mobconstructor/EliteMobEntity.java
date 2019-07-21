@@ -454,14 +454,14 @@ public class EliteMobEntity {
         int availableMiscellaneousPowers = 0;
         int availableMajorPowers = 0;
 
-        if (eliteTier >= 1) availableDefensivePowers = 1;
-        if (eliteTier >= 2) availableOffensivePowers = 1;
-        if (eliteTier >= 3) availableMiscellaneousPowers = 1;
-        if (eliteTier >= 4) availableMajorPowers = 1;
-        if (eliteTier >= 5) availableDefensivePowers = 2;
-        if (eliteTier >= 6) availableOffensivePowers = 2;
-        if (eliteTier >= 7) availableMiscellaneousPowers = 2;
-        if (eliteTier >= 8) availableMajorPowers = 2;
+        if (eliteTier >= 10) availableDefensivePowers = 1;
+        if (eliteTier >= 20) availableOffensivePowers = 1;
+        if (eliteTier >= 30) availableMiscellaneousPowers = 1;
+        if (eliteTier >= 40) availableMajorPowers = 1;
+        if (eliteTier >= 50) availableDefensivePowers = 2;
+        if (eliteTier >= 60) availableOffensivePowers = 2;
+        if (eliteTier >= 70) availableMiscellaneousPowers = 2;
+        if (eliteTier >= 80) availableMajorPowers = 2;
 
         //apply defensive powers
         applyPowers((HashSet<ElitePower>) eliteMobProperties.getValidDefensivePowers().clone(), availableDefensivePowers);

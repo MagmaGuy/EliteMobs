@@ -115,7 +115,7 @@ public class ItemLootShower implements Listener {
 
         ItemStack currencyItemStack = ItemStackGenerator.generateItemStack(material, "",
                 Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + ""));
-        Item currencyItem = location.getWorld().dropItem(location, currencyItemStack);
+        Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
         EntityTracker.registerItemVisualEffects(currencyItem);
 
         currencyItem.setVelocity(new Vector(
@@ -227,7 +227,6 @@ public class ItemLootShower implements Listener {
 
         }
     }
-
 
 
     private static void sendCurrencyNotification(Player player) {
