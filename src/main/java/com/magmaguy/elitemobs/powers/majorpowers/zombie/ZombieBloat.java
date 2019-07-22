@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.powers.majorpowers.zombie;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MajorPower;
@@ -53,7 +52,7 @@ public class ZombieBloat extends MajorPower implements Listener {
                     eventZombie.setAI(false);
 
 
-                if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS))
+                if (MobCombatSettingsConfig.enableWarningVisualEffects)
                     eventZombie.getWorld().spawnParticle(Particle.TOTEM, new Location(eventZombie.getWorld(),
                                     eventZombie.getLocation().getX(), eventZombie.getLocation().getY() +
                                     eventZombie.getHeight(), eventZombie.getLocation().getZ()), 20, timer / 24,
@@ -122,7 +121,7 @@ public class ZombieBloat extends MajorPower implements Listener {
 
     private void livingEntityEffect(List<LivingEntity> livingEntities) {
         if (livingEntities.size() == 0) return;
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS))
+        if (!MobCombatSettingsConfig.enableWarningVisualEffects)
             return;
 
         new BukkitRunnable() {

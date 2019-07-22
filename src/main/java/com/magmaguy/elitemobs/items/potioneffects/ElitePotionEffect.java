@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.items.potioneffects;
 
-import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -29,7 +29,7 @@ public class ElitePotionEffect {
             if (PotionEffectType.getByName(stringObject[0].toLowerCase()).equals(PotionEffectType.NIGHT_VISION))
                 duration = 15 * 20;
             this.potionEffect = new PotionEffect(PotionEffectType.getByName(stringObject[0].toLowerCase()), duration, Integer.parseInt(stringObject[1]));
-            this.value = EconomySettingsConfig.getPotionEffectWorth(potionEffect.getType());
+            this.value = PotionEffectsConfig.getPotionEffect(potionEffect.getType().getName()).getValue();
             if (stringObject.length < 3) {
                 this.target = Target.SELF;
                 this.applicationMethod = ApplicationMethod.CONTINUOUS;

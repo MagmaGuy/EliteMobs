@@ -1,7 +1,10 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.GuildRankData;
+import com.magmaguy.elitemobs.config.PlayerCacheDataConfig;
+import com.magmaguy.elitemobs.config.PlayerMaxGuildRankConfig;
+import com.magmaguy.elitemobs.config.PlayerMoneyData;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -67,38 +70,20 @@ public class PlayerData {
     }
 
     private static void initializeDisplayName() {
-
-        PlayerCacheData playerCacheData = new PlayerCacheData();
-
-        for (String string : playerCacheData.configuration.getKeys(true)) {
-
-            playerDisplayName.put(UUID.fromString(string), ConfigValues.playerCacheConfig.getString(string));
-
-        }
-
+        for (String string : PlayerCacheDataConfig.fileConfiguration.getKeys(true))
+            playerDisplayName.put(UUID.fromString(string), PlayerCacheDataConfig.fileConfiguration.getString(string));
     }
 
     private static void saveDisplayName() {
-
-        PlayerCacheData playerCacheData = new PlayerCacheData();
-
-        for (UUID uuid : playerDisplayName.keySet()) {
-
-            playerCacheData.configuration.set(uuid.toString(), playerDisplayName.get(uuid));
-
-        }
-
-        playerCacheData.customConfigLoader.saveCustomConfig(PlayerCacheData.CONFIG_NAME, true);
-
+        for (UUID uuid : playerDisplayName.keySet())
+            PlayerCacheDataConfig.fileConfiguration.set(uuid.toString(), playerDisplayName.get(uuid));
+        PlayerCacheDataConfig.saveConfig();
         playerCacheChanged = false;
-
     }
 
     private static void initializeCurrency() {
-
         for (String string : PlayerMoneyData.getFileConfiguration().getKeys(true))
             playerCurrency.put(UUID.fromString(string), PlayerMoneyData.getDouble(string));
-
     }
 
     private static void saveCurrency() {
@@ -111,31 +96,15 @@ public class PlayerData {
     }
 
     private static void initializeMaxGuildRank() {
-
-        PlayerMaxGuildRank playerMaxGuildRankClass = new PlayerMaxGuildRank();
-
-        for (String string : playerMaxGuildRankClass.configuration.getKeys(true)) {
-
-            playerMaxGuildRank.put(UUID.fromString(string), playerMaxGuildRankClass.configuration.getInt(string));
-
-        }
-
+        for (String string : PlayerMaxGuildRankConfig.fileConfiguration.getKeys(true))
+            playerMaxGuildRank.put(UUID.fromString(string), PlayerMaxGuildRankConfig.fileConfiguration.getInt(string));
     }
 
     private static void saveMaxGuildRank() {
-
-        PlayerMaxGuildRank playerMaxGuildRankClass = new PlayerMaxGuildRank();
-
-        for (UUID uuid : playerMaxGuildRank.keySet()) {
-
-            playerMaxGuildRankClass.configuration.set(uuid.toString(), playerMaxGuildRank.get(uuid));
-
-        }
-
-        playerMaxGuildRankClass.customConfigLoader.saveCustomConfig(PlayerMaxGuildRank.CONFIG_NAME, true);
-
+        for (UUID uuid : playerMaxGuildRank.keySet())
+            PlayerMaxGuildRankConfig.fileConfiguration.set(uuid.toString(), playerMaxGuildRank.get(uuid));
+        PlayerMaxGuildRankConfig.saveConfig();
         playerMaxGuildRankChanged = false;
-
     }
 
     private static void initializeSelectedGuildRank() {

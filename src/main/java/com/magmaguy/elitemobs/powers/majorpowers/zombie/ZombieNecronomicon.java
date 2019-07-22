@@ -64,7 +64,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
         zombieNecronomicon.setIsFiring(true);
         nameScroller(zombie, zombieNecronomicon);
 
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS))
+        if (!MobCombatSettingsConfig.enableWarningVisualEffects)
             return;
 
         new BukkitRunnable() {

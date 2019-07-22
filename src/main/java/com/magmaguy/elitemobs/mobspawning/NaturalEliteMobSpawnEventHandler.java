@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -36,6 +35,9 @@ public class NaturalEliteMobSpawnEventHandler {
 
         int eliteMobLevel = getNaturalMobLevel(entity.getLocation());
         if (eliteMobLevel < 0) return;
+
+        if (eliteMobLevel > MobCombatSettingsConfig.naturalElitemobLevelCap)
+            eliteMobLevel = MobCombatSettingsConfig.naturalElitemobLevelCap;
 
         EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel, spawnReason);
 
@@ -80,11 +82,9 @@ public class NaturalEliteMobSpawnEventHandler {
          */
         eliteMobLevel += playerCount * 0.2 * MobTierCalculator.PER_TIER_LEVEL_INCREASE;
 
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.INCREASE_DIFFICULTY_WITH_SPAWN_DISTANCE)) {
-
+        if (MobCombatSettingsConfig.increaseDifficultyWithSpawnDistance) {
             int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease(spawnLocation);
             eliteMobLevel += levelIncrement;
-
         }
 
         if (playerCount == 0 || eliteMobLevel < 1) return 0;

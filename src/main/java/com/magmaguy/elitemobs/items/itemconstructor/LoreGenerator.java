@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
@@ -23,12 +24,12 @@ public class LoreGenerator {
     public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
                                         HashMap<String, Integer> customEnchantments, List<String> potionList, List<String> loreList) {
 
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
+        if (DefaultConfig.hideEnchantmentsAttribute)
             return itemMeta;
 
         List<String> lore = new ArrayList<>();
 
-        for (Object object : ConfigValues.itemsCustomLootSettingsConfig.getList(ItemsCustomLootSettingsConfig.LORE_STRUCTURE)) {
+        for (Object object : ItemSettingsConfig.loreStructure) {
 
             String string = (String) object;
 
@@ -41,8 +42,8 @@ public class LoreGenerator {
                 }
             } else if (string.contains("$potionEffect"))
                 lore.addAll(setPotionsLore(potionList));
-            else if (string.contains("$itemValue"))
-                lore.add(itemWorth(material, enchantmentMap, customEnchantments, potionList));
+            else if (string.contains("$loreResaleValue"))
+                lore.add(itemResaleWorth(material, enchantmentMap, customEnchantments, potionList));
             else if (string.contains("$tier"))
                 lore.add(string.replace("$tier", ItemTierFinder.findGenericTier(material, enchantmentMap) + ""));
             else if (string.contains("$customLore")) {
@@ -68,14 +69,14 @@ public class LoreGenerator {
     public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
                                         HashMap<String, Integer> customEnchantments, EliteMobEntity eliteMobEntity) {
 
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.HIDE_ENCHANTMENTS_ATTRIBUTE))
+        if (DefaultConfig.hideEnchantmentsAttribute)
             return itemMeta;
 
         List<String> lore = new ArrayList<>();
 
         itemMeta = applyVanillaEnchantments(enchantmentMap, itemMeta);
 
-        for (Object object : ConfigValues.itemsProceduralSettingsConfig.getList(ItemsProceduralSettingsConfig.LORE_STRUCTURE)) {
+        for (Object object : ItemSettingsConfig.loreStructure) {
 
             String string = (String) object;
 
@@ -86,14 +87,16 @@ public class LoreGenerator {
                     lore.addAll(enchantmentLore(enchantmentMap));
                     lore.addAll(customEnchantmentLore(customEnchantments));
                 }
-            } else if (string.contains("$itemValue"))
-                lore.add(itemWorth(material, enchantmentMap, customEnchantments, new ArrayList<>()));
+            } else if (string.contains("$loreResaleValue"))
+                lore.add(itemResaleWorth(material, enchantmentMap, customEnchantments, new ArrayList<>()));
             else if (string.contains("$tier"))
                 lore.add(string.replace("$tier", ItemTierFinder.findGenericTier(material, enchantmentMap) + ""));
             else if (string.equals("$itemSource")) {
                 if (eliteMobEntity != null) {
                     lore.add(itemSource(eliteMobEntity));
                 }
+            } else if (string.equalsIgnoreCase("$customLore")) {
+                //has none
             } else
                 lore.add(string);
 
@@ -202,20 +205,20 @@ public class LoreGenerator {
 
     private static String getPotionName(String string) {
 
-        if (!ConfigValues.itemsDropSettingsConfig.getKeys(true).contains(ItemsDropSettingsConfig.POTION_EFFECT_NAME + string)) {
+        if (PotionEffectsConfig.getPotionEffect(string + ".yml") == null) {
             Bukkit.getLogger().warning("[EliteMobs] Missing potion name " + string);
             Bukkit.getLogger().warning("[EliteMobs] Report this to the dev!");
             return string;
         }
 
-        return ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.POTION_EFFECT_NAME + string);
+        return PotionEffectsConfig.getPotionEffect(string + ".yml").getName();
 
     }
 
-    private static String itemWorth(Material material, HashMap<Enchantment, Integer> enchantmentMap, HashMap<String, Integer> customEnchantments, List<String> potionList) {
+    private static String itemResaleWorth(Material material, HashMap<Enchantment, Integer> enchantmentMap, HashMap<String, Integer> customEnchantments, List<String> potionList) {
 
-        return ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.LORE_WORTH)
-                .replace("$worth", ItemWorthCalculator.determineItemWorth(material, enchantmentMap, potionList, customEnchantments) + "")
+        return ItemSettingsConfig.loreResale
+                .replace("$resale", ItemWorthCalculator.determineResaleWorth(material, enchantmentMap, potionList, customEnchantments) + "")
                 .replace("$currencyName", EconomySettingsConfig.currencyName);
 
     }
@@ -225,11 +228,10 @@ public class LoreGenerator {
         String itemSource;
 
         if (eliteMobEntity.getLivingEntity() != null) {
-            String uncoloredString = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_MOB_LEVEL_SOURCE)
-                    .replace("$mob", eliteMobEntity.getName());
+            String uncoloredString = ItemSettingsConfig.mobItemSource.replace("$mob", eliteMobEntity.getName());
             itemSource = ChatColorConverter.convert(uncoloredString);
         } else
-            itemSource = ConfigValues.itemsProceduralSettingsConfig.getString(ItemsProceduralSettingsConfig.LORE_SHOP_SOURCE);
+            itemSource = ItemSettingsConfig.shopItemSource;
 
         return itemSource;
 

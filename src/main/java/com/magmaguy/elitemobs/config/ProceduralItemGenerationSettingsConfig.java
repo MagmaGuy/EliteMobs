@@ -1,124 +1,126 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
-import org.bukkit.configuration.Configuration;
+import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-/**
- * Created by MagmaGuy on 04/06/2017.
- */
-public class ItemsProceduralSettingsConfig {
+public class ProceduralItemGenerationSettingsConfig {
 
-    public static final String CONFIG_NAME = "ItemsProceduralSettings.yml";
-    public static final String LORE_MOB_LEVEL_SOURCE = "Item source - mob";
-    public static final String LORE_SHOP_SOURCE = "Item source - shop";
-    public static final String LORE_STRUCTURE = "Lore structure";
-    public static final String DROP_ITEMS_ON_DEATH = "Drop procedurally generated items on Elite Mob death";
-    public static final String PROCEDURAL_ITEM_VALID_MATERIALS = "Valid material list for random items";
-    public static final String ITEM_NAME_FORMAT = "Procedurally generated item name format";
-    private static final String MATERIAL_NAME = "Material name.";
-    public static final String SWORD_MATERIAL_NAME = MATERIAL_NAME + "Sword";
-    public static final String BOW_MATERIAL_NAME = MATERIAL_NAME + "Bow";
-    public static final String PICKAXE_MATERIAL_NAME = MATERIAL_NAME + "Pickaxe";
-    public static final String SPADE_MATERIAL_NAME = MATERIAL_NAME + "Spade";
-    public static final String HOE_MATERIAL_NAME = MATERIAL_NAME + "Hoe";
-    public static final String AXE_MATERIAL_NAME = MATERIAL_NAME + "Axe";
-    public static final String HELMET_MATERIAL_NAME = MATERIAL_NAME + "Helmet";
-    public static final String CHESTPLATE_MATERIAL_NAME = MATERIAL_NAME + "Chestplate";
-    public static final String LEGGINGS_MATERIAL_NAME = MATERIAL_NAME + "Leggings";
-    public static final String BOOTS_MATERIAL_NAME = MATERIAL_NAME + "Boots";
-    public static final String SHEARS_MATERIAL_NAME = MATERIAL_NAME + "Shears";
-    public static final String FISHING_ROD_MATERIAL_NAME = MATERIAL_NAME + "Fishing Rod";
-    public static final String SHIELD_MATERIAL_NAME = MATERIAL_NAME + "Shield";
-    public static final String CUSTOM_ENCHANTMENT_CHANCE = "Chance of getting a custom enchantment";
+    private static FileConfiguration fileConfiguration;
 
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    public Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    public static boolean doProceduralItemDrops;
+    public static double customEnchantmentChance;
+    public static List<String> validMaterials = new ArrayList<>();
+    public static String swordName, bowName, pickaxeName, spadeName, hoeName, axeName, helmetName, chestplateName,
+            leggingsName, bootsName, shearsName, fishingRodName, shieldName, trident;
+    public static List<String> nameFormat;
+    public static List<String> nouns;
+    public static List<String> adjectives;
+    public static List<String> verbs;
+    public static List<String> verbers;
 
-    public void initializeConfig() {
 
-        configuration.addDefault(DROP_ITEMS_ON_DEATH, true);
-        configuration.addDefault(LORE_MOB_LEVEL_SOURCE, "Looted from &o$mob");
-        configuration.addDefault(LORE_SHOP_SOURCE, "Purchased from a store");
-        configuration.addDefault(LORE_STRUCTURE, Arrays.asList(
-                ChatColorConverter.convert("$enchantments"),
-                ChatColorConverter.convert("$potionEffects"),
-                ChatColorConverter.convert("&m----------------------"),
-                ChatColorConverter.convert("$itemSource"),
-                ChatColorConverter.convert( "$itemValue"),
-                ChatColorConverter.convert("Elite Mobs drop"),
-                ChatColorConverter.convert("&m----------------------"),
-                ChatColorConverter.convert("Tier $tier")
-        ));
-        configuration.addDefault(PROCEDURAL_ITEM_VALID_MATERIALS, Arrays.asList(
-                "DIAMOND_SWORD",
-                "GOLDEN_SWORD",
-                "IRON_SWORD",
-                "STONE_SWORD",
-                "WOODEN_SWORD",
-                "BOW",
-                "DIAMOND_PICKAXE",
-                "GOLDEN_PICKAXE",
-                "IRON_PICKAXE",
-                "STONE_PICKAXE",
-                "WOODEN_PICKAXE",
-                "DIAMOND_SHOVEL",
-                "GOLDEN_SHOVEL",
-                "IRON_SHOVEL",
-                "STONE_SHOVEL",
-                "WOODEN_SHOVEL",
-                "DIAMOND_HOE",
-                "GOLDEN_HOE",
-                "IRON_HOE",
-                "STONE_HOE",
-                "WOODEN_HOE",
-                "DIAMOND_AXE",
-                "GOLDEN_AXE",
-                "IRON_AXE",
-                "STONE_AXE",
-                "WOODEN_AXE",
-                "SHEARS",
-                "SHIELD",
-                "FISHING_ROD",
-                "CHAINMAIL_HELMET",
-                "DIAMOND_HELMET",
-                "GOLDEN_HELMET",
-                "IRON_HELMET",
-                "LEATHER_HELMET",
-                "CHAINMAIL_CHESTPLATE",
-                "DIAMOND_CHESTPLATE",
-                "GOLDEN_CHESTPLATE",
-                "IRON_CHESTPLATE",
-                "LEATHER_CHESTPLATE",
-                "CHAINMAIL_LEGGINGS",
-                "DIAMOND_LEGGINGS",
-                "GOLDEN_LEGGINGS",
-                "IRON_LEGGINGS",
-                "LEATHER_LEGGINGS",
-                "CHAINMAIL_BOOTS",
-                "DIAMOND_BOOTS",
-                "GOLDEN_BOOTS",
-                "IRON_BOOTS",
-                "LEATHER_BOOTS"
-        ));
+    public static void initializeConfig() {
+        File file = ConfigurationEngine.fileCreator("ProceduralItemGenerationSettings.yml");
+        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        configuration.addDefault(SWORD_MATERIAL_NAME, "Sword");
-        configuration.addDefault(BOW_MATERIAL_NAME, "Bow");
-        configuration.addDefault(PICKAXE_MATERIAL_NAME, "Pickaxe");
-        configuration.addDefault(SPADE_MATERIAL_NAME, "Shovel");
-        configuration.addDefault(HOE_MATERIAL_NAME, "Hoe");
-        configuration.addDefault(AXE_MATERIAL_NAME, "Axe");
-        configuration.addDefault(FISHING_ROD_MATERIAL_NAME, "Fishing Rod");
-        configuration.addDefault(SHIELD_MATERIAL_NAME, "Shield");
-        configuration.addDefault(SHEARS_MATERIAL_NAME, "Shears");
-        configuration.addDefault(HELMET_MATERIAL_NAME, "Helmet");
-        configuration.addDefault(CHESTPLATE_MATERIAL_NAME, "Chestplate");
-        configuration.addDefault(LEGGINGS_MATERIAL_NAME, "Leggings");
-        configuration.addDefault(BOOTS_MATERIAL_NAME, "Boots");
-        configuration.addDefault(CUSTOM_ENCHANTMENT_CHANCE, 0.1);
+        doProceduralItemDrops = ConfigurationEngine.setBoolean(fileConfiguration, "dropProcedurallyGeneratedItems", true);
+        customEnchantmentChance = ConfigurationEngine.setDouble(fileConfiguration, "customEnchantmentChance", 0.1);
 
-        configuration.addDefault(ITEM_NAME_FORMAT, Arrays.asList(
+        addMaterial(Material.DIAMOND_HELMET);
+        addMaterial(Material.DIAMOND_CHESTPLATE);
+        addMaterial(Material.DIAMOND_LEGGINGS);
+        addMaterial(Material.DIAMOND_BOOTS);
+
+        addMaterial(Material.DIAMOND_SWORD);
+        addMaterial(Material.DIAMOND_AXE);
+        addMaterial(Material.DIAMOND_HOE);
+        addMaterial(Material.DIAMOND_PICKAXE);
+        addMaterial(Material.DIAMOND_SHOVEL);
+
+
+        addMaterial(Material.IRON_HELMET);
+        addMaterial(Material.IRON_CHESTPLATE);
+        addMaterial(Material.IRON_LEGGINGS);
+        addMaterial(Material.IRON_BOOTS);
+
+        addMaterial(Material.IRON_SWORD);
+        addMaterial(Material.IRON_AXE);
+        addMaterial(Material.IRON_HOE);
+        addMaterial(Material.IRON_PICKAXE);
+        addMaterial(Material.IRON_SHOVEL);
+
+
+        addMaterial(Material.GOLDEN_HELMET);
+        addMaterial(Material.GOLDEN_CHESTPLATE);
+        addMaterial(Material.GOLDEN_LEGGINGS);
+        addMaterial(Material.GOLDEN_BOOTS);
+
+        addMaterial(Material.GOLDEN_SWORD);
+        addMaterial(Material.GOLDEN_AXE);
+        addMaterial(Material.GOLDEN_HOE);
+        addMaterial(Material.GOLDEN_PICKAXE);
+        addMaterial(Material.GOLDEN_SHOVEL);
+
+
+        addMaterial(Material.CHAINMAIL_HELMET);
+        addMaterial(Material.CHAINMAIL_CHESTPLATE);
+        addMaterial(Material.CHAINMAIL_LEGGINGS);
+        addMaterial(Material.CHAINMAIL_BOOTS);
+
+
+        addMaterial(Material.LEATHER_HELMET);
+        addMaterial(Material.LEATHER_CHESTPLATE);
+        addMaterial(Material.LEATHER_LEGGINGS);
+        addMaterial(Material.LEATHER_BOOTS);
+
+
+        addMaterial(Material.STONE_SWORD);
+        addMaterial(Material.STONE_AXE);
+        addMaterial(Material.STONE_HOE);
+        addMaterial(Material.STONE_PICKAXE);
+        addMaterial(Material.STONE_SHOVEL);
+
+
+        addMaterial(Material.WOODEN_SWORD);
+        addMaterial(Material.WOODEN_AXE);
+        addMaterial(Material.WOODEN_HOE);
+        addMaterial(Material.WOODEN_PICKAXE);
+        addMaterial(Material.STONE_SHOVEL);
+
+
+        addMaterial(Material.SHIELD);
+        addMaterial(Material.SHEARS);
+        addMaterial(Material.TURTLE_HELMET);
+        addMaterial(Material.TRIDENT);
+        addMaterial(Material.FISHING_ROD);
+        addMaterial(Material.BOW);
+        addMaterial(Material.SHEARS);
+
+        for (String material : fileConfiguration.getConfigurationSection("validMaterials").getKeys(false))
+            if (fileConfiguration.getConfigurationSection("validMaterials").getBoolean(material))
+                validMaterials.add(material);
+
+        swordName = ConfigurationEngine.setString(fileConfiguration, "materialNames.swordName", "Sword");
+        bowName = ConfigurationEngine.setString(fileConfiguration, "materialNames.bowName", "Bow");
+        pickaxeName = ConfigurationEngine.setString(fileConfiguration, "materialNames.pickaxe", "Pickaxe");
+        spadeName = ConfigurationEngine.setString(fileConfiguration, "materialNames.spade", "Spade");
+        hoeName = ConfigurationEngine.setString(fileConfiguration, "materialNames.hoe", "Hoe");
+        axeName = ConfigurationEngine.setString(fileConfiguration, "materialNames.axe", "Axe");
+        helmetName = ConfigurationEngine.setString(fileConfiguration, "materialNames.helmet", "Helmet");
+        chestplateName = ConfigurationEngine.setString(fileConfiguration, "materialNames.chestplate", "Chestplate");
+        leggingsName = ConfigurationEngine.setString(fileConfiguration, "materialNames.leggings", "Leggings");
+        bootsName = ConfigurationEngine.setString(fileConfiguration, "materialNames.boots", "Boots");
+        shearsName = ConfigurationEngine.setString(fileConfiguration, "materialNames.shears", "Shears");
+        fishingRodName = ConfigurationEngine.setString(fileConfiguration, "materialNames.fishingRod", "Fishing Rod");
+        shieldName = ConfigurationEngine.setString(fileConfiguration, "materialNames.shield", "Shield");
+        trident = ConfigurationEngine.setString(fileConfiguration, "materialNames.trident", "Trident");
+
+        nameFormat = ConfigurationEngine.setList(fileConfiguration, "nameFormats", Arrays.asList(
                 "$verb $itemType of the $adjective $noun",
                 "$itemType of the $adjective $noun",
                 "$noun's $adjective $verb $itemType",
@@ -128,7 +130,7 @@ public class ItemsProceduralSettingsConfig {
                 "The $adjective $verb-er"
         ));
 
-        configuration.addDefault("Valid nouns", Arrays.asList(
+        nouns = ConfigurationEngine.setList(fileConfiguration, "nouns", Arrays.asList(
                 "MagmaGuy",
                 "Dawn",
                 "Sunset",
@@ -260,7 +262,7 @@ public class ItemsProceduralSettingsConfig {
                 "Monk",
                 "Sorcerer",
                 "Warlock",
-                "Demon HunterEnchantment",
+                "Demon Hunter",
                 "Death Knight",
                 "Priest",
                 "Shaman",
@@ -337,212 +339,91 @@ public class ItemsProceduralSettingsConfig {
                 "Thrall",
                 "Felhound",
                 "Huntress",
-                "HunterEnchantment"
+                "Hunter",
+                "Aarakorcra",
+                "Aboleth",
+                "Deva",
+                "Planetar",
+                "Solar",
+                "Ankheg",
+                "Azer",
+                "Behir",
+                "Death Tyrant",
+                "Blight",
+                "Bugbear",
+                "Hugbear",
+                "Bullywug",
+                "Cambion",
+                "Chuul",
+                "Lich King",
+                "Cockatrice",
+                "Couatl",
+                "Cyclops",
+                "Titan",
+                "Darkmantle",
+                "Ancient One",
+                "Demilich",
+                "Balor",
+                "Barlgura",
+                "Chasme",
+                "Dretch",
+                "Glabrezu",
+                "Goristro",
+                "Hezrou",
+                "Manes",
+                "Marilith",
+                "Nalfeshnee",
+                "Quasit",
+                "Vrock",
+                "Yochlol",
+                "Pit Fiend",
+                "Lemure",
+                "Dracolich",
+                "Doppleganger",
+                "Chromatic Dragon",
+                "Drider",
+                "Air Elemental",
+                "Earth Elemental",
+                "Fire Elemental",
+                "Water Elemental",
+                "Rohirrim",
+                "Gondorian",
+                "Empyrean",
+                "Faerie Dragon",
+                "Ettin",
+                "Flumph",
+                "Fomorian",
+                "Dao",
+                "Gnoll",
+                "Parshendi",
+                "Listener",
+                "Spren",
+                "Stormfather",
+                "Rosharian",
+                "Brightlord",
+                "Highprince",
+                "King",
+                "Emperor",
+                "Shardbearer",
+                "Surgebinder",
+                "Bondsmith",
+                "Golem",
+                "Gorgon",
+                "Hag",
+                "Harpy",
+                "Hippogriff",
+                "Homunculus",
+                "State Alchemist",
+                "Undying Soldier",
+                "Jackalwere",
+                "Nothic",
+                "Oni",
+                "Rakshasa",
+                "Revenant",
+                "Cultist"
         ));
 
-        configuration.addDefault("Valid verb-er (noun)", Arrays.asList(
-                "World Breaker",
-                "World Shatterer",
-                "Avenger",
-                "Ashbringer",
-                "Windseeker",
-                "Defiler",
-                "Thunderfury",
-                "Slicer",
-                "Slasher",
-                "Cutter",
-                "Stabber",
-                "Scratcher",
-                "Killer",
-                "Slayer",
-                "Destroyer",
-                "Hugger",
-                "Murderer",
-                "Slapper",
-                "Traveller",
-                "Teleporter",
-                "Blinker",
-                "Wrecker",
-                "Materializer",
-                "Spawner",
-                "Demander",
-                "Assaulter",
-                "Striker",
-                "Ambusher",
-                "Rusher",
-                "Stormer",
-                "Bombarder",
-                "Barrager",
-                "Smiter",
-                "Charger",
-                "Battler",
-                "Hammerer",
-                "Beater",
-                "Combater",
-                "Overwhelmer",
-                "Raider",
-                "Tackler",
-                "Shooter",
-                "Venturer",
-                "Cracker",
-                "Smasher",
-                "Shatterer",
-                "Fracturer",
-                "Splinterer",
-                "Pulverizer",
-                "Tearer",
-                "Renderer",
-                "Snapper",
-                "Burster",
-                "Exploder",
-                "Damager",
-                "Fragmenter",
-                "Splitter",
-                "Fortifier",
-                "Nudger",
-                "Tapper",
-                "Thumper",
-                "Butter",
-                "Clatterer",
-                "Striker",
-                "Whacker",
-                "Slammer",
-                "Summoner",
-                "Screamer",
-                "Shifter",
-                "Transformer",
-                "Modifyer",
-                "Twister",
-                "Blurrer",
-                "Warper",
-                "Alterer",
-                "Adapter",
-                "Evolver",
-                "HunterEnchantment",
-                "Trailer",
-                "Follower",
-                "Stalker",
-                "Shadower",
-                "Hounder",
-                "Caser",
-                "Mounter",
-                "Ascender",
-                "Riser",
-                "Springer",
-                "Hoarder",
-                "Reaper",
-                "Harvester",
-                "Saver",
-                "Shelterer",
-                "Cloaker",
-                "Shrouder",
-                "Encloser",
-                "Hider",
-                "Masker",
-                "Buryer",
-                "Clouder",
-                "Shader",
-                "Sealer",
-                "Enveloper",
-                "Veiler",
-                "Traverser",
-                "Forder",
-                "Glider",
-                "Howler",
-                "Whimperer",
-                "Screamer",
-                "Squealer",
-                "Bawler",
-                "Screecher",
-                "Chopper",
-                "Chipper",
-                "Snipper",
-                "Splitter",
-                "Axer",
-                "Slasher",
-                "Renderer",
-                "Tearer",
-                "Thinner",
-                "Cropper",
-                "Carver",
-                "Hacker",
-                "Piercer",
-                "Sawer",
-                "Shaver",
-                "Shearer",
-                "Miner",
-                "Excavater",
-                "Burrower",
-                "Driller",
-                "Tunneler",
-                "Invader",
-                "Boarder",
-                "Wanderer",
-                "Intruder",
-                "Evader",
-                "Runner",
-                "Dodger",
-                "Crasher",
-                "Battler",
-                "Wrestler",
-                "Scuffler",
-                "Dueler",
-                "Brawler",
-                "Clasher",
-                "Grappler",
-                "Scrapper",
-                "Attacker",
-                "Feuder",
-                "Catcher",
-                "Solver",
-                "Revealer",
-                "Leaper",
-                "Bouncer",
-                "Vaulter",
-                "Hopper",
-                "Surger",
-                "Punter",
-                "Dropkicker",
-                "Perceiver",
-                "Fader",
-                "Bleeder",
-                "Weakener",
-                "Forger",
-                "Releaser",
-                "Gatherer",
-                "Crusher",
-                "Propeller",
-                "Jogger",
-                "Sprinter",
-                "Scouter",
-                "Explorer",
-                "Digger",
-                "Trembler",
-                "Parter",
-                "Hacker",
-                "Carver",
-                "Divider",
-                "Halver",
-                "Breaker",
-                "Renderer",
-                "Ripper",
-                "Grazer",
-                "Imprisoner",
-                "Cornerer",
-                "Pinner",
-                "Catcher",
-                "Restrainer",
-                "Binder",
-                "Snagger",
-                "Snatcher",
-                "Cager",
-                "Capturer",
-                "Haunter",
-                "Creeper",
-                "Sneaker"
-        ));
-
-        configuration.addDefault("Valid adjectives", Arrays.asList(
+        adjectives = ConfigurationEngine.setList(fileConfiguration, "adjectives", Arrays.asList(
                 "Adorable",
                 "Beautiful",
                 "Clean",
@@ -1065,10 +946,13 @@ public class ItemsProceduralSettingsConfig {
                 "Worried",
                 "Worthless",
                 "Wrong",
-                "Menacing"
+                "Menacing",
+                "Trusting",
+                "Unassuming",
+                "Threatening"
         ));
 
-        configuration.addDefault("Valid verbs", Arrays.asList(
+        verbs = ConfigurationEngine.setList(fileConfiguration, "verbs", Arrays.asList(
                 "Slashing",
                 "Cutting",
                 "Stabbing",
@@ -1328,15 +1212,227 @@ public class ItemsProceduralSettingsConfig {
                 "Creeping",
                 "Sneaking",
                 "Spying",
-                "Avenging"
-
+                "Avenging",
+                "Storming"
         ));
 
-        configuration.options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(configuration);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME);
+        verbers = ConfigurationEngine.setList(fileConfiguration, "verb-ers (noun)", Arrays.asList(
+                "World Breaker",
+                "World Shatterer",
+                "Avenger",
+                "Ashbringer",
+                "Windseeker",
+                "Defiler",
+                "Thunderfury",
+                "Slicer",
+                "Slasher",
+                "Cutter",
+                "Stabber",
+                "Scratcher",
+                "Killer",
+                "Slayer",
+                "Destroyer",
+                "Hugger",
+                "Murderer",
+                "Slapper",
+                "Traveller",
+                "Teleporter",
+                "Blinker",
+                "Wrecker",
+                "Materializer",
+                "Spawner",
+                "Demander",
+                "Assaulter",
+                "Striker",
+                "Ambusher",
+                "Rusher",
+                "Stormer",
+                "Bombarder",
+                "Barrager",
+                "Smiter",
+                "Charger",
+                "Battler",
+                "Hammerer",
+                "Beater",
+                "Combater",
+                "Overwhelmer",
+                "Raider",
+                "Tackler",
+                "Shooter",
+                "Venturer",
+                "Cracker",
+                "Smasher",
+                "Shatterer",
+                "Fracturer",
+                "Splinterer",
+                "Pulverizer",
+                "Tearer",
+                "Renderer",
+                "Snapper",
+                "Burster",
+                "Exploder",
+                "Damager",
+                "Fragmenter",
+                "Splitter",
+                "Fortifier",
+                "Nudger",
+                "Tapper",
+                "Thumper",
+                "Butter",
+                "Clatterer",
+                "Striker",
+                "Whacker",
+                "Slammer",
+                "Summoner",
+                "Screamer",
+                "Shifter",
+                "Transformer",
+                "Modifyer",
+                "Twister",
+                "Blurrer",
+                "Warper",
+                "Alterer",
+                "Adapter",
+                "Evolver",
+                "HunterEnchantment",
+                "Trailer",
+                "Follower",
+                "Stalker",
+                "Shadower",
+                "Hounder",
+                "Caser",
+                "Mounter",
+                "Ascender",
+                "Riser",
+                "Springer",
+                "Hoarder",
+                "Reaper",
+                "Harvester",
+                "Saver",
+                "Shelterer",
+                "Cloaker",
+                "Shrouder",
+                "Encloser",
+                "Hider",
+                "Masker",
+                "Buryer",
+                "Clouder",
+                "Shader",
+                "Sealer",
+                "Enveloper",
+                "Veiler",
+                "Traverser",
+                "Forder",
+                "Glider",
+                "Howler",
+                "Whimperer",
+                "Screamer",
+                "Squealer",
+                "Bawler",
+                "Screecher",
+                "Chopper",
+                "Chipper",
+                "Snipper",
+                "Splitter",
+                "Axer",
+                "Slasher",
+                "Renderer",
+                "Tearer",
+                "Thinner",
+                "Cropper",
+                "Carver",
+                "Hacker",
+                "Piercer",
+                "Sawer",
+                "Shaver",
+                "Shearer",
+                "Miner",
+                "Excavater",
+                "Burrower",
+                "Driller",
+                "Tunneler",
+                "Invader",
+                "Boarder",
+                "Wanderer",
+                "Intruder",
+                "Evader",
+                "Runner",
+                "Dodger",
+                "Crasher",
+                "Battler",
+                "Wrestler",
+                "Scuffler",
+                "Dueler",
+                "Brawler",
+                "Clasher",
+                "Grappler",
+                "Scrapper",
+                "Attacker",
+                "Feuder",
+                "Catcher",
+                "Solver",
+                "Revealer",
+                "Leaper",
+                "Bouncer",
+                "Vaulter",
+                "Hopper",
+                "Surger",
+                "Punter",
+                "Dropkicker",
+                "Perceiver",
+                "Fader",
+                "Bleeder",
+                "Weakener",
+                "Forger",
+                "Releaser",
+                "Gatherer",
+                "Crusher",
+                "Propeller",
+                "Jogger",
+                "Sprinter",
+                "Scouter",
+                "Explorer",
+                "Digger",
+                "Trembler",
+                "Parter",
+                "Hacker",
+                "Carver",
+                "Divider",
+                "Halver",
+                "Breaker",
+                "Renderer",
+                "Ripper",
+                "Grazer",
+                "Imprisoner",
+                "Cornerer",
+                "Pinner",
+                "Catcher",
+                "Restrainer",
+                "Binder",
+                "Snagger",
+                "Snatcher",
+                "Cager",
+                "Capturer",
+                "Haunter",
+                "Creeper",
+                "Sneaker",
+                "Binder",
+                "Jailer",
+                "Seducer",
+                "Dancer",
+                "Blasphemer",
+                "Eater",
+                "Snorer",
+                "Thruster",
+                "Slapper"
+        ));
 
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
+
+    private static void addMaterial(Material material) {
+        ConfigurationEngine.setBoolean(fileConfiguration, "validMaterials." + material.name(), true);
+    }
+
 
 }

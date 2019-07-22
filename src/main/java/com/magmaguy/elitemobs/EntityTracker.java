@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
@@ -404,7 +403,7 @@ public class EntityTracker implements Listener {
         if (event.isCancelled()) return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
                 event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) &&
-                        !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES))
+                        !DefaultConfig.doStrictSpawningRules)
             registerNaturalEntity(event.getEntity());
     }
 

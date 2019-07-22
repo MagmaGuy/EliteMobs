@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.config;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 
@@ -106,39 +105,6 @@ public class EconomySettingsConfig {
 
         defaultMaterialWorth = ConfigurationEngine.setDouble(fileConfiguration, "materialWorth.defaultMaterialWorth", 1);
 
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.ABSORPTION, diamondLevel * 10);
-//        addPotionEffectWorth(fileConfiguration, PotionEffectType.BAD_OMEN, diamondLevel);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.BLINDNESS, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.CONDUIT_POWER, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.CONFUSION, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.DAMAGE_RESISTANCE, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.DOLPHINS_GRACE, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.FAST_DIGGING, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.FIRE_RESISTANCE, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.GLOWING, 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.HARM, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.HEAL, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.HEALTH_BOOST, diamondLevel * 10);
-//        addPotionEffectWorth(fileConfiguration, PotionEffectType.HERO_OF_THE_VILLAGE, 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.HUNGER, 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.INCREASE_DAMAGE, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.INVISIBILITY, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.JUMP, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.LEVITATION, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.LUCK, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.NIGHT_VISION, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.POISON, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.REGENERATION, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.SATURATION, diamondLevel * 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.SLOW, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.SLOW_DIGGING, 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.SLOW_FALLING, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.SPEED, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.UNLUCK, 10);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.WATER_BREATHING, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.WEAKNESS, diamondLevel * 5);
-        addPotionEffectWorth(fileConfiguration, PotionEffectType.WITHER, diamondLevel * 10);
-
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
         thisConfiguration = fileConfiguration;
 
@@ -151,18 +117,6 @@ public class EconomySettingsConfig {
     public static double getMaterialWorth(Material material) {
         try {
             return thisConfiguration.getDouble("materialWorth." + material.name());
-        } catch (Exception ex) {
-            return defaultMaterialWorth;
-        }
-    }
-
-    private static void addPotionEffectWorth(FileConfiguration fileConfiguration, PotionEffectType potionEffectType, double value) {
-        ConfigurationEngine.setDouble(fileConfiguration, "potionEffectWorth." + potionEffectType.getName(), value);
-    }
-
-    public static double getPotionEffectWorth(PotionEffectType potionEffectType) {
-        try {
-            return thisConfiguration.getDouble("potionEffectWorth." + potionEffectType.getName());
         } catch (Exception ex) {
             return defaultMaterialWorth;
         }

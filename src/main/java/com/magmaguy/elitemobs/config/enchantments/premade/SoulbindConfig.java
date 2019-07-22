@@ -9,5 +9,7 @@ public class SoulbindConfig extends EnchantmentsConfigFields {
                 "Soulbind",
                 1,
                 10);
+        super.getAdditionalConfigOptions().put("loreString", "&6Soulbound to &f$player");
+        super.getAdditionalConfigOptions().put("hologramString", "$player&f's");
     }
 }
