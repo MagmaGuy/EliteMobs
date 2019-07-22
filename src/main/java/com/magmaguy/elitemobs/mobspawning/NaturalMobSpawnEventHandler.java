@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
@@ -47,17 +46,17 @@ public class NaturalMobSpawnEventHandler implements Listener {
          */
         if (EntityTracker.isEliteMob(event.getEntity())) return;
 
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING))
+        if (!MobCombatSettingsConfig.doNaturalMobSpawning)
             return;
-        if (!ValidWorldsConfig.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
+        if (!ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
             return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
-                !ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.SPAWNERS_SPAWN_ELITE_MOBS))
+                !MobCombatSettingsConfig.doSpawnersSpawnEliteMobs)
             return;
-        if (event.getEntity().getCustomName() != null && ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS))
+        if (event.getEntity().getCustomName() != null && DefaultConfig.preventEliteMobConversionOfNamedMobs)
             return;
 
-        if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !ConfigValues.defaultConfig.getBoolean(DefaultConfig.STRICT_SPAWNING_RULES)))
+        if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !DefaultConfig.doStrictSpawningRules))
             return;
         if (!EliteMobProperties.isValidEliteMobType(event.getEntityType()))
             return;
@@ -66,8 +65,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         int huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(livingEntity);
 
-        double validChance = (ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.AGGRESSIVE_MOB_CONVERSION_PERCENTAGE) +
-                huntingGearChanceAdder) / 100;
+        double validChance = MobCombatSettingsConfig.aggressiveMobConversionPercentage + huntingGearChanceAdder;
 
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;

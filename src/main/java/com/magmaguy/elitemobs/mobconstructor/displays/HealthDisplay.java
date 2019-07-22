@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor.displays;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
@@ -24,7 +23,7 @@ public class HealthDisplay implements Listener {
 
         if (event.isCancelled()) return;
 
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_HEALTH_FOR_ELITE_MOBS)) {
+        if (MobCombatSettingsConfig.onlyShowHealthForEliteMobs) {
             if (EntityTracker.isEliteMob(event.getEntity()))
                 displayHealth(event.getEliteMobEntity());
             else if (EntityTracker.isSuperMob(event.getEntity()))
@@ -37,7 +36,7 @@ public class HealthDisplay implements Listener {
 
     public static void displayHealth(EliteMobEntity eliteMobEntity) {
 
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT)) return;
+        if (!MobCombatSettingsConfig.displayHealthOnHit) return;
 
         int maxHealth = (int) eliteMobEntity.getMaxHealth();
         int currentHealth = (int) (eliteMobEntity.getHealth());

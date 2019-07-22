@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,13 +13,13 @@ import static org.bukkit.Material.*;
 
 public class MaterialGenerator {
 
-    public static Material generateMaterial(Material material){
+    public static Material generateMaterial(Material material) {
 
         return material;
 
     }
 
-    public static Material generateMaterial(double itemTier){
+    public static Material generateMaterial(double itemTier) {
 
         List<Material> localValidMaterials = initializeValidProceduralMaterials();
 
@@ -81,19 +80,16 @@ public class MaterialGenerator {
 
         List<Material> validMaterials = new ArrayList<>();
 
-        for (Object object : ConfigValues.itemsProceduralSettingsConfig.getList(ItemsProceduralSettingsConfig.PROCEDURAL_ITEM_VALID_MATERIALS)) {
+        for (String string : ProceduralItemGenerationSettingsConfig.validMaterials) {
 
             try {
 
-                Material parsedMaterial = getMaterial(object.toString());
+                Material parsedMaterial = getMaterial(string);
                 validMaterials.add(parsedMaterial);
 
             } catch (Exception e) {
-
-                Bukkit.getLogger().info("Invalid material type detected: " + object.toString());
-
+                Bukkit.getLogger().info("Invalid material type detected: " + string);
             }
-
 
         }
 

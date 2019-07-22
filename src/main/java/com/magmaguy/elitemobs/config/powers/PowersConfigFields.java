@@ -29,7 +29,7 @@ public class PowersConfigFields {
         fileConfiguration.addDefault("isEnabled", isEnabled);
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("effect", effect);
-        if (additionalConfigOptions != null)
+        if (!additionalConfigOptions.isEmpty())
             fileConfiguration.addDefaults(additionalConfigOptions);
     }
 

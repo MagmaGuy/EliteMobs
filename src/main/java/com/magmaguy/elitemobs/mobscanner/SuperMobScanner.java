@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobscanner;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
@@ -19,7 +18,7 @@ import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
 
 public class SuperMobScanner {
 
-    private static int passiveRange = ConfigValues.mobCombatSettingsConfig.getInt(MobCombatSettingsConfig.PASSIVE_STACK_RANGE);
+    private static int passiveRange = MobCombatSettingsConfig.superMobsStackRange;
 
     public static void scanSuperMobs() {
 
@@ -68,7 +67,7 @@ public class SuperMobScanner {
                 SuperMobProperties.getSuperMobMaxHealth(livingEntity))
             return;
 
-        if (ThreadLocalRandom.current().nextDouble() < 1 / ConfigValues.defaultConfig.getDouble(DefaultConfig.SUPERMOB_STACK_AMOUNT))
+        if (ThreadLocalRandom.current().nextDouble() < 1 / DefaultConfig.superMobStackAmount)
             return;
 
         ArrayList<LivingEntity> livingEntities = new ArrayList<>();
@@ -78,12 +77,12 @@ public class SuperMobScanner {
             if (!entity.getType().equals(livingEntity.getType())) continue;
             if (EntityTracker.isSuperMob(entity)) continue;
             livingEntities.add((LivingEntity) entity);
-            if (livingEntities.size() >= ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT))
+            if (livingEntities.size() >= DefaultConfig.superMobStackAmount)
                 break;
 
         }
 
-        if (livingEntities.size() < ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT))
+        if (livingEntities.size() < DefaultConfig.superMobStackAmount)
             return;
 
         SuperMobConstructor.constructSuperMob(livingEntity);

@@ -22,7 +22,7 @@ public class MoonPhaseDetector {
 
     public static MoonPhase detectMoonPhase(World eventWorld) {
 
-        int days = (int) eventWorld.getFullTime() / 24000;
+        int days = (int) Math.abs(eventWorld.getFullTime()) / 24000;
         int phase = days % 8;
 
         switch (phase) {

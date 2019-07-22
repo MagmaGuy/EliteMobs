@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -50,7 +49,7 @@ public class GoldExplosion extends BossPower implements Listener {
             @Override
             public void run() {
                 counter++;
-                if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_WARNING_VISUAL_EFFECTS))
+                if (MobCombatSettingsConfig.enableWarningVisualEffects)
                     eliteMobEntity.getLivingEntity().getWorld().spawnParticle(Particle.SMOKE_NORMAL, eliteMobEntity.getLivingEntity().getLocation(), counter, 1, 1, 1, 0);
 
                 if (counter < 20 * 1.5) return;

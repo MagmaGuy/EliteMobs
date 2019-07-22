@@ -70,7 +70,6 @@ public class PowersConfig {
     public static void initializeConfigs() {
         for (PowersConfigFields powersConfigFields : powersConfigFieldsList)
             initializeConfiguration(powersConfigFields);
-
     }
 
     /**

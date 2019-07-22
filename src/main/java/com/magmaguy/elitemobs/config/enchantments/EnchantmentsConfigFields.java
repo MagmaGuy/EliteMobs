@@ -4,6 +4,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EnchantmentsConfigFields {
 
@@ -13,6 +15,7 @@ public class EnchantmentsConfigFields {
     private int maxLevel;
     private Enchantment enchantment;
     private double value;
+    private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
     private FileConfiguration fileConfiguration;
 
     public EnchantmentsConfigFields(String fileName,
@@ -32,6 +35,8 @@ public class EnchantmentsConfigFields {
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("maxLevel", maxLevel);
         fileConfiguration.addDefault("value", value);
+        if (!additionalConfigOptions.isEmpty())
+            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     public EnchantmentsConfigFields(FileConfiguration fileConfiguration, File file) {
@@ -72,4 +77,13 @@ public class EnchantmentsConfigFields {
     public double getValue() {
         return value;
     }
+
+    public FileConfiguration getFileConfiguration() {
+        return fileConfiguration;
+    }
+
+    public Map<String, Object> getAdditionalConfigOptions() {
+        return additionalConfigOptions;
+    }
+
 }

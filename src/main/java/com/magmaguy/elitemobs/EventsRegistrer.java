@@ -80,7 +80,7 @@ public class EventsRegistrer {
 
         //Mob damage
         pluginManager.registerEvents(new CombatSystem(), plugin);
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_DEATH_MESSAGES))
+        if (MobCombatSettingsConfig.enableDeathMessages)
             pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
 
         //Mob loot
@@ -160,7 +160,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new MergeHandler(), plugin);
 
         //Natural EliteMobs Spawning
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.NATURAL_MOB_SPAWNING)) {
+        if (MobCombatSettingsConfig.doNaturalMobSpawning) {
             pluginManager.registerEvents(new EntityTracker(), plugin);
         }
 
@@ -169,11 +169,11 @@ public class EventsRegistrer {
 
         //Visual effects
         pluginManager.registerEvents(new EffectEventHandlers(), plugin);
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.OBFUSCATE_MOB_POWERS))
+        if (MobCombatSettingsConfig.obfuscateMobPowers)
             pluginManager.registerEvents(new VisualEffectObfuscator(), plugin);
 
         //Loot
-        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_PLUGIN_LOOT)) {
+        if (ItemSettingsConfig.doEliteMobsLoot) {
             pluginManager.registerEvents(new LootTables(), plugin);
             pluginManager.registerEvents(new PlaceEventPrevent(), plugin);
         }
@@ -187,7 +187,7 @@ public class EventsRegistrer {
         //Minecraft behavior canceller
         pluginManager.registerEvents(new ChunkUnloadMetadataPurge(), plugin);
         pluginManager.registerEvents(new EntityDeathDataFlusher(), plugin);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
+        if (DefaultConfig.preventCreeperDamageToPassiveMobs)
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
 
         //Antiexploits
@@ -217,9 +217,9 @@ public class EventsRegistrer {
 
 
         //Set up health and damage displays
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_HEALTH_ON_HIT))
+        if (MobCombatSettingsConfig.displayHealthOnHit)
             pluginManager.registerEvents(new HealthDisplay(), plugin);
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_DAMAGE_ON_HIT))
+        if (MobCombatSettingsConfig.displayDamageOnHit)
             pluginManager.registerEvents(new DamageDisplay(), plugin);
 
         //Initialize items from custom events

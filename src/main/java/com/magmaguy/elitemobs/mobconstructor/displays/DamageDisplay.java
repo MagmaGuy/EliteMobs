@@ -1,23 +1,7 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobconstructor.displays;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -45,7 +29,7 @@ public class DamageDisplay implements Listener {
 
         if (!(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof ArmorStand) return;
 
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ONLY_SHOW_DAMAGE_FOR_ELITE_MOBS)) {
+        if (MobCombatSettingsConfig.onlyShowDamageForEliteMobs) {
 
             if (EntityTracker.isEliteMob(event.getEntity()) && event.getEntity() instanceof LivingEntity) {
                 if (event.getDamage() > 0)
@@ -66,7 +50,7 @@ public class DamageDisplay implements Listener {
 
     public static void displayDamage(Entity entity, double damage) {
 
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISPLAY_DAMAGE_ON_HIT)) return;
+        if (!MobCombatSettingsConfig.displayDamageOnHit) return;
 
         Location entityLocation = entity.getLocation();
 

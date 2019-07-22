@@ -3,10 +3,7 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
-import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
@@ -76,9 +73,8 @@ public class LootTables implements Listener {
         }
     }
 
-    private static boolean proceduralItemsOn = ConfigValues.itemsProceduralSettingsConfig.getBoolean(ItemsProceduralSettingsConfig.DROP_ITEMS_ON_DEATH);
-    private static boolean customItemsOn = ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.DROP_CUSTOM_ITEMS) &&
-            !CustomItem.getCustomItemStackList().isEmpty();
+    private static boolean proceduralItemsOn = ProceduralItemGenerationSettingsConfig.doProceduralItemDrops;
+    private static boolean customItemsOn = ItemSettingsConfig.doEliteMobsLoot && !CustomItem.getCustomItemStackList().isEmpty();
     private static boolean weighedItemsExist = CustomItem.getWeighedFixedItems() != null && !CustomItem.getWeighedFixedItems().isEmpty();
     private static boolean fixedItemsExist = CustomItem.getFixedItems() != null && !CustomItem.getFixedItems().isEmpty();
     private static boolean limitedItemsExist = CustomItem.getLimitedItem() != null && !CustomItem.getLimitedItem().isEmpty();

@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
@@ -28,10 +27,9 @@ public class MinorPowerPowerStance implements Listener {
     //Secondary effect item processing
     public MinorPowerPowerStance(EliteMobEntity eliteMobEntity) {
 
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ENABLE_VISUAL_EFFECTS_FOR_NATURAL_MOBS))
+        if (!MobCombatSettingsConfig.enableVisualEffectsForNaturalMobs)
             return;
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.DISABLE_VISUAL_EFFECTS_FOR_SPAWNER_MOBS)
-                && !eliteMobEntity.isNaturalEntity())
+        if (MobCombatSettingsConfig.disableVisualEffectsForSpawnerMobs && !eliteMobEntity.isNaturalEntity())
             return;
 
         this.eliteMobEntity = eliteMobEntity;
@@ -44,7 +42,7 @@ public class MinorPowerPowerStance implements Listener {
         /*
         Obfuscate powers to prevent TPS loss
          */
-        if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.OBFUSCATE_MOB_POWERS))
+        if (MobCombatSettingsConfig.obfuscateMobPowers)
             if (eliteMobEntity.getHasVisualEffectObfuscated()) {
                 Object[][] multiDimensionalTrailTracker = new Object[trackAmount][individualEffectsPerTrack];
 

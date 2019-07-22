@@ -39,7 +39,7 @@ public class RareDropEffect implements Listener {
                     double randomizedZ = (ThreadLocalRandom.current().nextDouble() * 2 - 1) / randomizedY;
                     location.add(new Vector(randomizedX, randomizedY, randomizedZ));
 
-                    location.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, location, 1, 0, 0, 0, 0);
+                    location.getWorld().spawnParticle(Particle.DRAGON_BREATH, location, 1, 0, 0, 0, 0);
 
                 }
 

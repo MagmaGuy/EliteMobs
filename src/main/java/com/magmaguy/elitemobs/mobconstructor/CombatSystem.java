@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -34,9 +33,9 @@ public class CombatSystem implements Listener {
     public static final double PER_LEVEL_POWER_INCREASE = 0.1;
     public static final double TO_ELITE_DAMAGE_TIER_HANDICAP = 0.5;
 
-    public static final double DIAMOND_TIER_LEVEL = 3;
-    public static final double IRON_TIER_LEVEL = 2;
-    public static final double STONE_CHAIN_TIER_LEVEL = 1;
+    public static final double DIAMOND_TIER_LEVEL = 10;
+    public static final double IRON_TIER_LEVEL = 6;
+    public static final double STONE_CHAIN_TIER_LEVEL = 3;
     public static final double GOLD_WOOD_LEATHER_TIER_LEVEL = 0;
 
     private static HashSet<LivingEntity> customDamageEntity = new HashSet<>();
@@ -192,7 +191,7 @@ public class CombatSystem implements Listener {
         int mobLevel = eliteMobEntity.getLevel() < 1 ? 1 : eliteMobEntity.getLevel();
 
         float newExplosionRange = (float) (event.getRadius() + Math.ceil(0.01 * mobLevel * event.getRadius() *
-                ConfigValues.mobCombatSettingsConfig.getDouble(MobCombatSettingsConfig.ELITE_CREEPER_EXPLOSION_MULTIPLIER)));
+                MobCombatSettingsConfig.eliteCreeperExplosionMultiplier));
 
         if (newExplosionRange > 20)
             newExplosionRange = 20;

@@ -15,7 +15,7 @@ public class CheckMaxItemTierCommand {
         commandSender.sendMessage("The current maximum power enchantment is " + EnchantmentsConfig.getEnchantment(Enchantment.ARROW_DAMAGE).getMaxLevel());
         commandSender.sendMessage("The current maximum sharpness enchantment is " + EnchantmentsConfig.getEnchantment(Enchantment.DAMAGE_ALL).getMaxLevel());
         commandSender.sendMessage("The current maximum protection enchantment is " + EnchantmentsConfig.getEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL).getMaxLevel());
-        commandSender.sendMessage("The current maximum natural mob level is " + ConfigValues.mobCombatSettingsConfig.getString(MobCombatSettingsConfig.NATURAL_ELITEMOB_LEVEL_CAP));
+        commandSender.sendMessage("The current maximum natural mob level is " + MobCombatSettingsConfig.naturalElitemobLevelCap);
 
     }
 
