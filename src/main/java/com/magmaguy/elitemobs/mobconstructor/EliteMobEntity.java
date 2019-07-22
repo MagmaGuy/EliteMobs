@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.*;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
@@ -313,7 +312,7 @@ public class EliteMobEntity {
                 eliteMobProperties.getName().replace(
                         "$level", eliteLevel + ""));
         livingEntity.setCustomName(this.name);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
+        if (DefaultConfig.alwaysShowNametags)
             livingEntity.setCustomNameVisible(true);
     }
 
@@ -325,7 +324,7 @@ public class EliteMobEntity {
     public void setName(String name) {
         this.name = ChatColorConverter.convert(name);
         this.getLivingEntity().setCustomName(this.name);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.ALWAYS_SHOW_NAMETAGS))
+        if (DefaultConfig.alwaysShowNametags)
             livingEntity.setCustomNameVisible(true);
     }
 
@@ -368,7 +367,7 @@ public class EliteMobEntity {
     private void setArmor() {
 
         if (VersionChecker.currentVersionIsUnder(12, 2)) return;
-        if (!ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_ARMOR)) return;
+        if (!MobCombatSettingsConfig.doEliteArmor) return;
 
         livingEntity.getEquipment().setItemInMainHandDropChance(0);
         livingEntity.getEquipment().setHelmetDropChance(0);
@@ -385,7 +384,7 @@ public class EliteMobEntity {
         livingEntity.getEquipment().setHelmet(new ItemStack(Material.AIR));
 
         if (eliteLevel >= 12)
-            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS))
+            if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
 
         if (eliteLevel >= 14)
@@ -398,7 +397,7 @@ public class EliteMobEntity {
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
 
         if (eliteLevel >= 20)
-            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS))
+            if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
 
         if (eliteLevel >= 22)
@@ -411,7 +410,7 @@ public class EliteMobEntity {
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
 
         if (eliteLevel >= 28)
-            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS))
+            if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
 
         if (eliteLevel >= 30)
@@ -427,7 +426,7 @@ public class EliteMobEntity {
             livingEntity.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 
         if (eliteLevel >= 38)
-            if (ConfigValues.mobCombatSettingsConfig.getBoolean(MobCombatSettingsConfig.ELITE_HELMETS))
+            if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 
         if (eliteLevel >= 40)

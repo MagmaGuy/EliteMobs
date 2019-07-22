@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -19,16 +18,13 @@ public class GuildRankData {
     }
 
     public static void saveConfig() {
-        try {
-            fileConfiguration.save(file);
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Error saving configuration " + file.getName() + "! Report this to the developer!");
-        }
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
 
     public static void initializeConfig() {
         file = ConfigurationEngine.fileCreator("data", "playerGuildRank.yml");
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
 
 }

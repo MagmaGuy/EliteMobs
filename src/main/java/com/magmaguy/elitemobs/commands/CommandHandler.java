@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.npc.NPCCommands;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
@@ -282,8 +281,7 @@ public class CommandHandler implements CommandExecutor {
 
         if (commandSender.hasPermission(permission)) return true;
 
-        if (commandSender instanceof Player &&
-                Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getConfig().getBoolean(DefaultConfig.ENABLE_PERMISSION_TITLES)) {
+        if (commandSender instanceof Player && DefaultConfig.doPermissionTitles) {
 
             Player player = (Player) commandSender;
 

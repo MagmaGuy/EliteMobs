@@ -49,7 +49,10 @@ public class SoulbindEnchantment extends CustomEnchantment {
                 EntityTracker.registerArmorStands(soulboundPlayer);
                 soulboundPlayer.setVisible(false);
                 soulboundPlayer.setMarker(true);
-                soulboundPlayer.setCustomName(player.getDisplayName() + "'s");
+                soulboundPlayer.setCustomName(
+                        ChatColorConverter.convert(
+                                EnchantmentsConfig.getEnchantment("soulbind.yml")
+                                        .getFileConfiguration().getString("hologramString").replace("$player", player.getDisplayName())));
                 soulboundPlayer.setCustomNameVisible(true);
                 soulboundPlayer.setGravity(false);
                 new BukkitRunnable() {
@@ -59,7 +62,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
                     @Override
                     public void run() {
                         counter++;
-                        if (counter > 20 * 60 * 3 || !item.isValid()) {
+                        if (counter > 20 * 60 * 5 || !item.isValid()) {
                             cancel();
                             EntityTracker.unregisterArmorStand(soulboundPlayer);
                             return;
@@ -77,13 +80,16 @@ public class SoulbindEnchantment extends CustomEnchantment {
 
     private static NamespacedKey namespacedKey = new NamespacedKey(MetadataHandler.PLUGIN, key);
 
-    public static void addEnchantment(ItemStack itemStack, Player player) {
+    private static void addEnchantment(ItemStack itemStack, Player player) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getCustomTagContainer().setCustomTag(namespacedKey, ItemTagType.STRING, player.getUniqueId().toString());
         List<String> lore = itemStack.getItemMeta().getLore();
         if (lore == null)
             lore = new ArrayList<>();
-        lore.add(ChatColorConverter.convert("&6Soulbound to &f" + player.getDisplayName()));
+        lore.add(
+                ChatColorConverter.convert(
+                        EnchantmentsConfig.getEnchantment("soulbind.yml")
+                                .getFileConfiguration().getString("loreString").replace("$player", player.getDisplayName())));
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
     }

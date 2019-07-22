@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,7 +26,6 @@ public class ItemQualityColorizer {
 //    /*
 //    item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
 //     */
-
     public static ItemQuality getItemQuality(ItemStack itemStack) {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -72,7 +70,7 @@ public class ItemQualityColorizer {
 
     public static void dropQualityColorizer(ItemStack itemStack) {
 
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.MMORPG_COLORS)) {
+        if (ItemSettingsConfig.doMmorpgColors) {
 
             ItemMeta itemMeta = itemStack.getItemMeta();
 

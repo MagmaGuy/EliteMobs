@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
@@ -184,11 +185,16 @@ public class EliteMobs extends JavaPlugin {
     }
 
     public static void initializeConfigs() {
+        DefaultConfig.initializeConfig();
+        ItemSettingsConfig.initializeConfig();
+        ProceduralItemGenerationSettingsConfig.initializeConfig();
+        PlayerCacheDataConfig.initializeConfig();
+        PlayerMaxGuildRankConfig.initializeConfig();
+        PotionEffectsConfig.initializeConfigs();
         ConfigValues.initializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
         EconomySettingsConfig.initializeConfig();
         EnchantmentsConfig.initializeConfigs();
-        CustomEnchantmentsConfig.initializeConfig();
         AntiExploitConfig.initializeConfig();
         CombatTagConfig.initializeConfig();
         GuildRankData.initializeConfig();
@@ -204,22 +210,22 @@ public class EliteMobs extends JavaPlugin {
         CustomLootConfig.initializeConfigs();
         CustomItem.initializeCustomItems();
         CustomEnchantment.initializeCustomEnchantments();
+        MobCombatSettingsConfig.initializeConfig();
     }
 
     public static void worldScanner() {
         for (World world : Bukkit.getWorlds())
-            if (ValidWorldsConfig.getBoolean("Valid worlds." + world.getName()))
+            if (ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + world.getName()))
                 validWorldList.add(world);
     }
 
     /*
     Repeating tasks that run as long as the server is on
      */
-    public void launchRunnables() {
-        int eggTimerInterval = 20 * 60 * 10 / ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
+    private void launchRunnables() {
+        int eggTimerInterval = 20 * 60 * 10 / DefaultConfig.superMobStackAmount;
         PotionEffectApplier.potionEffectApplier();
-        if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() &&
-                ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT) > 0) {
+        if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.superMobStackAmount > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
             if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
                 SoulbindEnchantment.soulbindWatchdog();

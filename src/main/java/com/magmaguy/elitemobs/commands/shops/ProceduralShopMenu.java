@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
+import com.magmaguy.elitemobs.items.ItemWorthSwitcher;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
@@ -64,7 +65,10 @@ public class ProceduralShopMenu implements Listener {
 
             int randomTier = random.nextInt(balancedMax) + balancedMin;
 
-            shopInventory.setItem(i, ItemConstructor.constructItem(randomTier, null));
+            ItemStack itemStack = ItemConstructor.constructItem(randomTier, null);
+            ItemWorthSwitcher.switchToWorth(itemStack);
+
+            shopInventory.setItem(i, itemStack);
 
         }
 
@@ -117,9 +121,9 @@ public class ProceduralShopMenu implements Listener {
             } else if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
                 //player has enough money
                 EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(player.getName()), itemValue);
+                ItemWorthSwitcher.switchToResaleValue(itemStack);
                 player.getInventory().addItem(itemStack);
                 populateShop(event.getInventory());
-
                 SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
 
             } else {

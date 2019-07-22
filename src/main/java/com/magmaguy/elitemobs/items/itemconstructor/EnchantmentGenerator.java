@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
-import com.magmaguy.elitemobs.config.ItemsProceduralSettingsConfig;
+import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
@@ -363,7 +363,7 @@ public class EnchantmentGenerator {
         if (itemTier < 2 || secondaryEnchantmentTotalParsedLevel < 1 || validSecondaryEnchantments.size() == 0)
             return enchantmentMap;
 
-        if (ThreadLocalRandom.current().nextDouble() > ConfigValues.itemsProceduralSettingsConfig.getDouble(ItemsProceduralSettingsConfig.CUSTOM_ENCHANTMENT_CHANCE))
+        if (ThreadLocalRandom.current().nextDouble() > ProceduralItemGenerationSettingsConfig.customEnchantmentChance)
             return enchantmentMap;
 
         /*

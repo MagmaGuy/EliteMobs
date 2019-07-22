@@ -188,7 +188,9 @@ public class ItemLootShower implements Listener {
 
     private static HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
 
-
+    /**
+     * Currency pickup event
+     */
     public static class ItemLootShowerEvents implements Listener {
         @EventHandler(priority = EventPriority.LOW)
         public static void onItemPickup(PlayerPickupItemEvent event) {
@@ -208,9 +210,10 @@ public class ItemLootShower implements Listener {
 
             double amountIncremented = Double.valueOf(event.getItem().getItemStack().getItemMeta().getLore().get(1));
 
-            sendCurrencyNotification(player);
+            event.getItem().remove();
 
             EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
+            sendCurrencyNotification(player);
 
             if (playerCurrencyPickup.containsKey(player))
                 playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + amountIncremented);
@@ -222,8 +225,6 @@ public class ItemLootShower implements Listener {
                             ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
                                     .replace("$currency_name", EconomySettingsConfig.currencyName)
                                     .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
-
-            event.getItem().remove();
 
         }
     }

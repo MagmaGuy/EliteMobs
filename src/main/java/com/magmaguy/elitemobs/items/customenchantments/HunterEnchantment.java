@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.CustomEnchantmentsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -49,7 +49,7 @@ public class HunterEnchantment extends CustomEnchantment {
 
         }
 
-        huntingGearChanceAdder = huntingGearChanceAdder * CustomEnchantmentsConfig.hunterSpawnBonus;
+        huntingGearChanceAdder = (int) (huntingGearChanceAdder * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus"));
 
         return huntingGearChanceAdder;
 

@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import org.bukkit.Bukkit;
@@ -23,7 +22,7 @@ public class SuperMobConstructor {
         }
 
         String name = ChatColorConverter.convert(SuperMobProperties.getDataInstance(livingEntity).getName());
-        double newMaxHealth = SuperMobProperties.getDataInstance(livingEntity).getDefaultMaxHealth() * ConfigValues.defaultConfig.getInt(DefaultConfig.SUPERMOB_STACK_AMOUNT);
+        double newMaxHealth = SuperMobProperties.getDataInstance(livingEntity).getDefaultMaxHealth() * DefaultConfig.superMobStackAmount;
 
         livingEntity.setCustomName(name);
         livingEntity.setCustomNameVisible(true);
