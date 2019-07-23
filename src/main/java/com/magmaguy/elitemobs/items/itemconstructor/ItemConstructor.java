@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -53,7 +52,7 @@ public class ItemConstructor {
         /*
         Remove vanilla enchantments
          */
-        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
+        if (ItemSettingsConfig.useEliteEnchantments)
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         /*
@@ -111,7 +110,7 @@ public class ItemConstructor {
         /*
         Remove vanilla enchantments
          */
-        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
+        if (ItemSettingsConfig.useEliteEnchantments)
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         /*

@@ -3,7 +3,9 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
@@ -98,25 +100,25 @@ public class LootTables implements Listener {
          /*
         Handle the odds of an item dropping
          */
-        double baseChance = ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.ELITE_ITEM_FLAT_DROP_RATE) / 100;
-        double dropChanceBonus = ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.ELITE_ITEM_TIER_DROP_RATE) / 100 * itemTier;
+        double baseChance = ItemSettingsConfig.flatDropRate;
+        double dropChanceBonus = ItemSettingsConfig.tierIncreaseDropRate * itemTier;
 
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus)
             return null;
 
         HashMap<String, Double> weightedProbability = new HashMap<>();
         if (proceduralItemsOn)
-            weightedProbability.put("procedural", ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.PROCEDURAL_ITEM_WEIGHT));
+            weightedProbability.put("procedural", ItemSettingsConfig.proceduralItemWeight);
         if (customItemsOn) {
             if (weighedItemsExist)
-                weightedProbability.put("weighed", ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.WEIGHED_ITEM_WEIGHT));
+                weightedProbability.put("weighed", ItemSettingsConfig.weighedItemWeight);
             if (fixedItemsExist)
                 if (CustomItem.getFixedItems().keySet().contains(itemTier))
-                    weightedProbability.put("fixed", ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.FIXED_ITEM_WEIGHT));
+                    weightedProbability.put("fixed", ItemSettingsConfig.fixedItemWeight);
             if (limitedItemsExist)
-                weightedProbability.put("limited", ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.LIMITED_ITEM_WEIGHT));
+                weightedProbability.put("limited", ItemSettingsConfig.limitedItemWeight);
             if (scalableItemsExist)
-                weightedProbability.put("scalable", ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.SCALABLE_ITEM_WEIGHT));
+                weightedProbability.put("scalable", ItemSettingsConfig.scalableItemWeight);
         }
 
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
@@ -140,7 +142,7 @@ public class LootTables implements Listener {
 
     public static double setItemTier(int mobTier) {
 
-        double chanceToUpgradeTier = 10 / (double) mobTier * ConfigValues.itemsDropSettingsConfig.getDouble(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER);
+        double chanceToUpgradeTier = 10 / (double) mobTier * ItemSettingsConfig.maximumLootTier;
 
         if (ThreadLocalRandom.current().nextDouble() * 100 < chanceToUpgradeTier)
             return mobTier + 1;

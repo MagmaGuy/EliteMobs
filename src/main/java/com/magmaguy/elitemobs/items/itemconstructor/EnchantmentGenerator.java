@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
@@ -23,8 +22,7 @@ public class EnchantmentGenerator {
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
 
         for (Enchantment enchantment : enchantmentMap.keySet()) {
-            if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() &&
-                    ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
+            if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() && ItemSettingsConfig.useEliteEnchantments) {
                 if (EliteEnchantments.isPotentialEliteEnchantment(enchantment)) {
                     itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
                 } else
@@ -123,7 +121,7 @@ public class EnchantmentGenerator {
             case IRON_HOE:
             case STONE_HOE:
             case WOODEN_HOE:
-                if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.HOES_AS_WEAPONS))
+                if (ItemSettingsConfig.useHoesAsWeapons)
                     enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
             case SHIELD:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DURABILITY", itemTier));

@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
@@ -34,7 +36,8 @@ public class LoreGenerator {
             String string = (String) object;
 
             if (string.contains("$enchantments")) {
-                if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
+
+                if (ItemSettingsConfig.useEliteEnchantments) {
                     if (!enchantmentMap.isEmpty()) {
                         lore.addAll(enchantmentLore(enchantmentMap));
                         lore.addAll(customEnchantmentLore(customEnchantments));
@@ -83,7 +86,7 @@ public class LoreGenerator {
             if (string.contains("$potionEffect")) {
                 //TODO: Add potion effects to dynamic items
             } else if (string.contains("$enchantments")) {
-                if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM)) {
+                if (ItemSettingsConfig.useEliteEnchantments) {
                     lore.addAll(enchantmentLore(enchantmentMap));
                     lore.addAll(customEnchantmentLore(customEnchantments));
                 }
@@ -127,7 +130,7 @@ public class LoreGenerator {
                     EliteEnchantments.isPotentialEliteEnchantment(enchantment)) {
 
                 String loreLine1 = ChatColorConverter.convert("&7" + getEnchantmentName(enchantment) + " " + enchantment.getMaxLevel());
-                String loreLine2 = ChatColorConverter.convert("&7" + ChatColorConverter.convert(ConfigValues.itemsDropSettingsConfig.getString(ItemsDropSettingsConfig.ELITE_ENCHANTMENT_NAME)) + " " + getEnchantmentName(enchantment) + " " + (enchantmentMap.get(enchantment) - enchantment.getMaxLevel()));
+                String loreLine2 = ChatColorConverter.convert("&7" + ItemSettingsConfig.eliteEnchantLoreString + " " + getEnchantmentName(enchantment) + " " + (enchantmentMap.get(enchantment) - enchantment.getMaxLevel()));
                 enchantmentsLore.add(loreLine1);
                 enchantmentsLore.add(loreLine2);
 

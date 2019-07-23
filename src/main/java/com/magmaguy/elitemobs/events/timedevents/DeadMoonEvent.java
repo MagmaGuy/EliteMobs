@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.events.timedevents;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
@@ -30,6 +31,18 @@ public class DeadMoonEvent extends EliteEvent implements Listener {
         super.setBossEntity(CustomBossEntity.constructCustomBoss("zombie_king.yml", location, DynamicBossLevelConstructor.findDynamicBossLevel()));
         super.setEventStartMessage(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_ANNOUNCEMENT_MESSAGE)));
         super.sendEventStartMessage(getActiveWorld());
+        DeadMoonEvent deadMoonEvent = this;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!EliteEvent.getActiveEvents().contains(deadMoonEvent)) {
+                    cancel();
+                    return;
+                }
+                if (deadMoonEvent.getActiveWorld().getTime() > 24000)
+                    completeEvent(deadMoonEvent.getActiveWorld());
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
     }
 
     @Override
@@ -70,6 +83,11 @@ public class DeadMoonEvent extends EliteEvent implements Listener {
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
 
+    }
+
+    @Override
+    public void bossDeathEventHandler(EliteMobDeathEvent event) {
+        super.completeEvent(super.getActiveWorld());
     }
 
 }
