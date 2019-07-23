@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -211,7 +210,7 @@ public class ItemTierFinder {
             case STONE_HOE:
             case GOLDEN_HOE:
             case WOODEN_HOE:
-                if (!ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.HOES_AS_WEAPONS)) return 0;
+                if (!ItemSettingsConfig.useHoesAsWeapons) return 0;
                 if (material.equals(Material.DIAMOND_HOE))
                     return DIAMOND_TIER + mainEnchantment;
                 if (material.equals(Material.IRON_HOE))

@@ -27,6 +27,7 @@ public class MobCombatSettingsConfig {
     public static double distanceToIncrement;
     public static double levelToIncrement;
     public static boolean obfuscateMobPowers;
+    public static double damageToEliteMultiplier, damageToPlayerMultiplier;
 
     public static void initializeConfig() {
 
@@ -54,6 +55,8 @@ public class MobCombatSettingsConfig {
         distanceToIncrement = ConfigurationEngine.setDouble(fileConfiguration, "distanceBetweenIncrements", 100);
         levelToIncrement = ConfigurationEngine.setDouble(fileConfiguration, "levelIncreaseAtIncrements", 1);
         obfuscateMobPowers = ConfigurationEngine.setBoolean(fileConfiguration, "hideEliteMobPowersUntilAggro", true);
+        damageToEliteMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "damageToEliteMobMultiplier", 1);
+        damageToPlayerMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "damageToPlayerMultiplier", 1);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

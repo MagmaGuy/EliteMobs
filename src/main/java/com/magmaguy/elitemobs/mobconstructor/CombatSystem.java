@@ -136,7 +136,7 @@ public class CombatSystem implements Listener {
          */
         double newBaseDamage = 4 - secondaryEnchantmentDamageReduction(player, event);
 
-        return (newBaseDamage + newBaseDamage * tierDifference) * eliteMobEntity.getDamageMultiplier();
+        return ((newBaseDamage + newBaseDamage * tierDifference) * eliteMobEntity.getDamageMultiplier()) * MobCombatSettingsConfig.damageToPlayerMultiplier;
 
     }
 
@@ -337,6 +337,9 @@ public class CombatSystem implements Listener {
 
         double finalDamage = getCooledAttackStrength(player) * (maxHealth / newTargetHitsToKill +
                 maxHealth / newTargetHitsToKill * (tierDifference) * TO_ELITE_DAMAGE_TIER_HANDICAP);
+
+        //apply config multiplier
+        finalDamage *= MobCombatSettingsConfig.damageToEliteMultiplier;
 
         //Apply health multiplier
         finalDamage /= eliteMob.getHealthMultiplier();

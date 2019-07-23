@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.enchantments.Enchantment;
@@ -34,19 +33,16 @@ public class ScalableItemConstructor {
     private static HashMap<Enchantment, Integer> updateDynamicEnchantments(HashMap<Enchantment, Integer> enchantmentsList, int itemTier) {
 
         if (enchantmentsList.containsKey(Enchantment.PROTECTION_ENVIRONMENTAL) &&
-                enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL) >
-                        ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER))
-            itemTier = ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER);
+                enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL) > ItemSettingsConfig.maximumLootTier)
+            itemTier = ItemSettingsConfig.maximumLootTier;
 
         if (enchantmentsList.containsKey(Enchantment.DAMAGE_ALL) &&
-                enchantmentsList.get(Enchantment.DAMAGE_ALL) >
-                        ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER))
-            itemTier = ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER);
+                enchantmentsList.get(Enchantment.DAMAGE_ALL) > ItemSettingsConfig.maximumLootTier)
+            itemTier = ItemSettingsConfig.maximumLootTier;
 
         if (enchantmentsList.containsKey(Enchantment.ARROW_DAMAGE) &&
-                enchantmentsList.get(Enchantment.ARROW_DAMAGE) >
-                        ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER))
-            itemTier = ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER);
+                enchantmentsList.get(Enchantment.ARROW_DAMAGE) > ItemSettingsConfig.maximumLootTier)
+            itemTier = ItemSettingsConfig.maximumLootTier;
 
         HashMap<Enchantment, Integer> newEnchantmentList = new HashMap<>();
         HashMap<Enchantment, Integer> secondaryEnchantmentList = new HashMap<>();
@@ -137,13 +133,11 @@ public class ScalableItemConstructor {
             itemTier = enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL);
 
         if (enchantmentsList.containsKey(Enchantment.DAMAGE_ALL) &&
-                enchantmentsList.get(Enchantment.DAMAGE_ALL) >
-                        ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER))
+                enchantmentsList.get(Enchantment.DAMAGE_ALL) > ItemSettingsConfig.maximumLootTier)
             itemTier = enchantmentsList.get(Enchantment.DAMAGE_ALL);
 
         if (enchantmentsList.containsKey(Enchantment.ARROW_DAMAGE) &&
-                enchantmentsList.get(Enchantment.ARROW_DAMAGE) >
-                        ConfigValues.itemsDropSettingsConfig.getInt(ItemsDropSettingsConfig.MAXIMUM_LOOT_TIER))
+                enchantmentsList.get(Enchantment.ARROW_DAMAGE) > ItemSettingsConfig.maximumLootTier)
             itemTier = enchantmentsList.get(Enchantment.ARROW_DAMAGE);
 
 
