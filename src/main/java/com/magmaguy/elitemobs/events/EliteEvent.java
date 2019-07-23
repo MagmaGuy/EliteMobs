@@ -122,6 +122,10 @@ public class EliteEvent extends AbstractEliteEvent {
         this.bossIsAlive = true;
     }
 
+    public void setBossIsAlive(boolean bossIsAlive) {
+        this.bossIsAlive = bossIsAlive;
+    }
+
     public boolean getBossIsAlive() {
         return bossIsAlive;
     }

@@ -818,4 +818,8 @@ public class EliteMobEntity {
         this.hasVanillaLoot = hasVanillaLoot;
     }
 
+    public boolean hasVanillaLoot() {
+        return this.hasVanillaLoot;
+    }
+
 }

@@ -249,7 +249,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new DisplayMob(), plugin);
 
         //Player effect when a rare item is on the ground
-        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_RARE_DROP_EFFECT))
+        if (ItemSettingsConfig.doRareDropsEffect)
             pluginManager.registerEvents(new RareDropEffect(), plugin);
 
         //NPCs
