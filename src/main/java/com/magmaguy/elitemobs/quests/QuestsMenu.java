@@ -80,7 +80,7 @@ public class QuestsMenu implements Listener {
      */
     public void initializeTierQuestMenu(Player player, int menuSlot) {
 
-        int questTier = menuSlot + 1;
+        int questTier = menuSlot;
 
         player.openInventory(QuestRefresher.getQuestTierInventory(questTier).getInventory(player));
 

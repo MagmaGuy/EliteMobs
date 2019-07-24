@@ -103,6 +103,10 @@ public class EconomySettingsConfig {
         addMaterial(fileConfiguration, Material.WOODEN_HOE, goldWoodLeatherLevel);
         addMaterial(fileConfiguration, Material.WOODEN_PICKAXE, goldWoodLeatherLevel);
 
+        addMaterial(fileConfiguration, Material.TRIDENT, diamondLevel);
+        addMaterial(fileConfiguration, Material.ELYTRA, diamondLevel);
+        addMaterial(fileConfiguration, Material.TURTLE_HELMET, goldWoodLeatherLevel);
+
         defaultMaterialWorth = ConfigurationEngine.setDouble(fileConfiguration, "materialWorth.defaultMaterialWorth", 1);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);

@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.EntityTracker;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
@@ -30,13 +29,6 @@ public class EffectEventHandlers implements Listener {
     public void portalPickupSafeguard(EntityPortalEvent event) {
         if (EntityTracker.isItemVisualEffect(event.getEntity()) || EntityTracker.isEliteMob(event.getEntity()))
             event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void itemDespawnPrevention(ItemDespawnEvent event) {
-        if (EntityTracker.isItemVisualEffect(event.getEntity()))
-            event.setCancelled(true);
-
     }
 
 }

@@ -258,6 +258,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new NPCProximitySensor(), plugin);
         pluginManager.registerEvents(new FindNewWorlds(), plugin);
 
+        pluginManager.registerEvents(new EntityTransformPreventer(), plugin);
+
     }
 
 }

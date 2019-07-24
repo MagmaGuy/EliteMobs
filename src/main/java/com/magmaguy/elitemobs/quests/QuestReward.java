@@ -53,7 +53,10 @@ public class QuestReward {
     }
 
     private void setQuestReward() {
-        this.questReward = getQuestTier() * getQuestDifficulty() * 10;
+        if (getQuestTier() == 0)
+            this.questReward = getQuestDifficulty() * 5;
+        else
+            this.questReward = getQuestTier() * getQuestDifficulty() * 10;
     }
 
     public String getRewardMessage() {

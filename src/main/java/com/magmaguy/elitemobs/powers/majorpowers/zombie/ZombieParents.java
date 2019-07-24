@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.powers.majorpowers.zombie;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -46,8 +45,8 @@ public class ZombieParents extends MajorPower implements Listener {
 
                         nameClearer(reinforcementDad);
 
-                        reinforcementDad.getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieParents.DeathMessage").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.DeathMessage")
+                        reinforcementDad.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("deathMessage").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("deathMessage")
                                         .size()))));
 
                     }
@@ -56,8 +55,8 @@ public class ZombieParents extends MajorPower implements Listener {
 
                         nameClearer(reinforcementMom);
 
-                        reinforcementMom.getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieParents.DeathMessage").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.DeathMessage")
+                        reinforcementMom.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("deathMessage").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("deathMessage")
                                         .size()))));
 
                     }
@@ -70,8 +69,8 @@ public class ZombieParents extends MajorPower implements Listener {
 
                         nameClearer(event.getEliteMobEntity());
 
-                        event.getEliteMobEntity().getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieDialog").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieDialog")
+                        event.getEliteMobEntity().getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("bossEntityDialog").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("bossEntityDialog")
                                         .size()))));
 
                     }
@@ -80,8 +79,8 @@ public class ZombieParents extends MajorPower implements Listener {
 
                         nameClearer(reinforcementDad);
 
-                        reinforcementDad.getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieDadDialog").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieDadDialog")
+                        reinforcementDad.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("zombieDad").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("zombieDad")
                                         .size()))));
 
                     }
@@ -90,8 +89,8 @@ public class ZombieParents extends MajorPower implements Listener {
 
                         nameClearer(reinforcementMom);
 
-                        reinforcementMom.getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieMomDialog").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieParents.ZombieMomDialog")
+                        reinforcementMom.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("zombieMom").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_parents.yml").getConfiguration().getStringList("zombieMom")
                                         .size()))));
 
                     }
