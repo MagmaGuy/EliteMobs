@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.powers.majorpowers.zombie;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
@@ -19,7 +18,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -39,7 +37,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
     private int chantIndex = 0;
 
-    private HashSet<EliteMobEntity> chantingMobs = new HashSet<>();
+    private static HashSet<EliteMobEntity> chantingMobs = new HashSet<>();
     //todo: Shouldn't this be static?
 
     public ZombieNecronomicon() {
@@ -152,7 +150,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
     private void nameScroller(Zombie zombie, ZombieNecronomicon zombieNecronomicon) {
 
         new BukkitRunnable() {
-            String fullChant = convert(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoning chant"));
+            String fullChant = convert(PowersConfig.getPower("zombie_necronomicon.yml").getConfiguration().getString("summoningChant"));
 
             @Override
             public void run() {
@@ -238,14 +236,6 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 3, 20 * 3);
 
-    }
-
-    @EventHandler
-    public void onSummonedCreatureDeath(EntityDeathEvent event) {
-        if (event.getEntity() instanceof Zombie && EntityTracker.isEliteMob(event.getEntity()) && event.getEntity().getCustomName() != null &&
-                (event.getEntity().getCustomName().equals(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned zombie")) ||
-                        event.getEntity().getCustomName().equals(ConfigValues.translationConfig.getString("ZombieNecronomicon.Summoned skeleton"))))
-            event.getDrops().clear();
     }
 
 }
