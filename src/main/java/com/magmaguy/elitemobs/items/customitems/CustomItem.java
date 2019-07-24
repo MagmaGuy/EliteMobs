@@ -49,6 +49,7 @@ public class CustomItem {
 
     // Adds custom items to the list used by the getloot GUI
     private static void addCustomItem(CustomItem customItem) {
+        if (customItem.getItemType().equals(ItemType.UNIQUE)) return;
         customItemStackList.add(customItem.generateDefaultsItemStack());
     }
 

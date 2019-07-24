@@ -24,7 +24,7 @@ public class QuestRefresher {
             @Override
             public void run() {
 
-                for (int i = 1; i < 11; i++)
+                for (int i = 0; i < 11; i++)
                     addQuestTierInventories(i, new QuestTierMenu(i));
 
             }

@@ -14,8 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -110,17 +108,17 @@ public class SoulbindEnchantment extends CustomEnchantment {
             event.setCancelled(true);
         }
 
-        @EventHandler
-        public void onInventoryPickup(InventoryClickEvent inventoryClickEvent) {
-            if (inventoryClickEvent.getClickedInventory() == null) return;
-            if (inventoryClickEvent.getClickedInventory().getType().equals(InventoryType.PLAYER)) return;
-            if (!inventoryClickEvent.getWhoClicked().getType().equals(EntityType.PLAYER)) return;
-            if (inventoryClickEvent.getCurrentItem() == null) return;
-            if (inventoryClickEvent.getCurrentItem().getItemMeta() == null) return;
-            if (isValidSoulbindUser(inventoryClickEvent.getCurrentItem().getItemMeta(), (Player) inventoryClickEvent.getWhoClicked()))
-                return;
-            inventoryClickEvent.setCancelled(true);
-        }
+//        @EventHandler
+//        public void onInventoryPickup(InventoryClickEvent inventoryClickEvent) {
+//            if (inventoryClickEvent.getClickedInventory() == null) return;
+//            if (inventoryClickEvent.getClickedInventory().getType().equals(InventoryType.PLAYER)) return;
+//            if (!inventoryClickEvent.getWhoClicked().getType().equals(EntityType.PLAYER)) return;
+//            if (inventoryClickEvent.getCurrentItem() == null) return;
+//            if (inventoryClickEvent.getCurrentItem().getItemMeta() == null) return;
+//            if (isValidSoulbindUser(inventoryClickEvent.getCurrentItem().getItemMeta(), (Player) inventoryClickEvent.getWhoClicked()))
+//                return;
+//            inventoryClickEvent.setCancelled(true);
+//        }
     }
 
     public static void soulbindWatchdog() {

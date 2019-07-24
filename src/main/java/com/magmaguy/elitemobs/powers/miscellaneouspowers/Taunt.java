@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.api.EliteMobDamageEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
@@ -27,11 +26,11 @@ import static com.magmaguy.elitemobs.ChatColorConverter.convert;
  */
 public class Taunt extends MinorPower implements Listener {
 
-    private final static List<String> TARGET_TAUNT_LIST = ConfigValues.translationConfig.getStringList("Taunts.Target");
-    private final static List<String> GENERIC_DAMAGED_LIST = ConfigValues.translationConfig.getStringList("Taunts.Damaged");
-    private final static List<String> DAMAGED_BY_BOW_LIST = ConfigValues.translationConfig.getStringList("Taunts.BowDamaged");
-    private final static List<String> HIT_LIST = ConfigValues.translationConfig.getStringList("Taunts.Hit");
-    private final static List<String> DEATH_LIST = ConfigValues.translationConfig.getStringList("Taunts.Death");
+    private final static List<String> TARGET_TAUNT_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onTarget");
+    private final static List<String> GENERIC_DAMAGED_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onDamaged");
+    private final static List<String> DAMAGED_BY_BOW_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onDamagedByBow");
+    private final static List<String> HIT_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onDamage");
+    private final static List<String> DEATH_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onDeath");
 
     public Taunt() {
         super(PowersConfig.getPower("taunt.yml"));
