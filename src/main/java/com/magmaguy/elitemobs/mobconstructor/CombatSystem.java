@@ -77,14 +77,17 @@ public class CombatSystem implements Listener {
 
         //From this point on, the damage event is fully altered by Elite Mobs
 
+        Player player = (Player) event.getEntity();
+
+        if (player.isBlocking())
+            return;
+
         double rawDamage = event.getDamage();
 
         //Get rid of all vanilla armor reduction
         for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
             if (event.isApplicable(modifier))
                 event.setDamage(modifier, 0);
-
-        Player player = (Player) event.getEntity();
 
         //if the damage source is custom , the damage is final
         if (isCustomDamageEntity(eliteMobEntity.getLivingEntity())) {

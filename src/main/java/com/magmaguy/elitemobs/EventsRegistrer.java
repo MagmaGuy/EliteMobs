@@ -197,6 +197,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PreventDensityExploit(), plugin);
         pluginManager.registerEvents(new PreventTowerExploit(), plugin);
         pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
+        if (AntiExploitConfig.noItemPickup)
+            pluginManager.registerEvents(new PreventItemPickupByMobs(), plugin);
 
 
         //Initialize events
