@@ -56,7 +56,7 @@ public class SpiritWalk extends BossPower implements Listener {
 
     }
 
-    private void initializeSpiritWalk(LivingEntity bossMob) {
+    public void initializeSpiritWalk(LivingEntity bossMob) {
 
         new BukkitRunnable() {
 

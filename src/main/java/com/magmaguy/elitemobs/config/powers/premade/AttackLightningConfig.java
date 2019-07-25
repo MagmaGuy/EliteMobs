@@ -9,5 +9,6 @@ public class AttackLightningConfig extends PowersConfigFields {
                 true,
                 "Thunderous",
                 Material.HORN_CORAL.toString());
+        super.getAdditionalConfigOptions().put("delayBetweenStrikes", 15);
     }
 }

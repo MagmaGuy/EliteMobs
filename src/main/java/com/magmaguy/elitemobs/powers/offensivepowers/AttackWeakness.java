@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.powers.offensivepowers;
 
-import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.event.EventHandler;
@@ -18,7 +18,7 @@ public class AttackWeakness extends MinorPower implements Listener {
     }
 
     @EventHandler
-    public void attackWeakness(EliteMobTargetPlayerEvent event) {
+    public void attackWeakness(PlayerDamagedByEliteMobEvent event) {
         AttackWeakness attackWeakness = (AttackWeakness) event.getEliteMobEntity().getPower(this);
         if (attackWeakness == null) return;
         if (attackWeakness.isCooldown()) return;
