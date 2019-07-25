@@ -46,7 +46,7 @@ public class AttackLightning extends MinorPower implements Listener {
                     if (entity instanceof Player)
                         lightningUUIDs.add(entity.getWorld().strikeLightning(entity.getLocation()).getUniqueId());
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 10);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * PowersConfig.getPower("attack_lightning.yml").getConfiguration().getInt("delayBetweenStrikes"));
     }
 
     @EventHandler
