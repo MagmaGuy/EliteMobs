@@ -9,10 +9,7 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -120,16 +117,20 @@ public class NPCEntity {
      * as it makes sure the former Villager is slain.
      */
     public void respawnNPC() {
-        if (Bukkit.getEntity(villager.getUniqueId()) != null)
-            Bukkit.getEntity(villager.getUniqueId()).remove();
+//        if (Bukkit.getEntity(villager.getUniqueId()) != null)
+//            Bukkit.getEntity(villager.getUniqueId()).remove();
+        for (Entity entity : this.getSpawnLocation().getWorld().getNearbyEntities(this.getSpawnLocation(), 1.5, 3, 1.5))
+            if (entity instanceof ArmorStand || entity instanceof Villager)
+                if (entity.getCustomName() != null)
+                    entity.remove();
         villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         villager.setCustomName(name);
         villager.setCustomNameVisible(true);
         villager.setProfession(profession);
         villager.setAI(canMove);
         villager.setRemoveWhenFarAway(true);
-        if (Bukkit.getEntity(roleDisplay.getUniqueId()) != null)
-            Bukkit.getEntity(roleDisplay.getUniqueId()).remove();
+//        if (Bukkit.getEntity(roleDisplay.getUniqueId()) != null)
+//            Bukkit.getEntity(roleDisplay.getUniqueId()).remove();
         initializeRole(role);
         EntityTracker.registerNPCEntity(this);
         addNPCEntity(this);
