@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.mobconstructor.displays;
+package com.magmaguy.elitemobs.combatsystem.displays;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;

@@ -26,7 +26,8 @@ public class ScalableItemConstructor {
                 newEnchantmentList,
                 customItem.getCustomEnchantments(),
                 customItem.getPotionEffects(),
-                customItem.getLore()
+                customItem.getLore(),
+                null
         );
     }
 
@@ -121,7 +122,8 @@ public class ScalableItemConstructor {
                 newEnchantmentList,
                 customItem.getCustomEnchantments(),
                 customItem.getPotionEffects(),
-                customItem.getLore()
+                customItem.getLore(),
+                null
         );
 
     }

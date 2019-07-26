@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
+import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 

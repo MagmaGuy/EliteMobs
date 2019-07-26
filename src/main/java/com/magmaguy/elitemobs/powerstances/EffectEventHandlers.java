@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
@@ -13,12 +14,13 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 public class EffectEventHandlers implements Listener {
 
     @EventHandler
+
     public void playerPickupSafeguard(PlayerPickupItemEvent event) {
         if (EntityTracker.isItemVisualEffect(event.getItem()))
             event.setCancelled(true);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void hopperPickupSafeguard(InventoryPickupItemEvent event) {
         if (EntityTracker.isItemVisualEffect(event.getItem()))
             event.setCancelled(true);

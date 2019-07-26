@@ -150,7 +150,7 @@ public class SellMenu implements Listener {
                     positionCounter++;
                 }
 
-                ItemStack clonedConfirmButton = (ItemStack) SellMenuConfig.confirmButton.getItemMeta().clone();
+                ItemStack clonedConfirmButton = SellMenuConfig.confirmButton.clone();
 
                 List<String> lore = new ArrayList<>();
                 for (String string : clonedConfirmButton.getItemMeta().getLore())

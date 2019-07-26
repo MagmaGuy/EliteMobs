@@ -328,7 +328,8 @@ public class CustomItem {
                 getEnchantments(),
                 getCustomEnchantments(),
                 getPotionEffects(),
-                getLore());
+                getLore(),
+                null);
     }
 
     public ItemStack generateItemStack(int itemTier) {

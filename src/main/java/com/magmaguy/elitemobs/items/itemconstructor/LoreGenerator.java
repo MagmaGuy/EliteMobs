@@ -24,7 +24,8 @@ import java.util.List;
 public class LoreGenerator {
 
     public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
-                                        HashMap<String, Integer> customEnchantments, List<String> potionList, List<String> loreList) {
+                                        HashMap<String, Integer> customEnchantments, List<String> potionList, List<String> loreList,
+                                        EliteMobEntity eliteMobEntity) {
 
         if (DefaultConfig.hideEnchantmentsAttribute)
             return itemMeta;
@@ -43,6 +44,9 @@ public class LoreGenerator {
                         lore.addAll(customEnchantmentLore(customEnchantments));
                     }
                 }
+            } else if (string.equals("$itemSource")) {
+                if (eliteMobEntity != null)
+                    lore.add(itemSource(eliteMobEntity));
             } else if (string.contains("$potionEffect"))
                 lore.addAll(setPotionsLore(potionList));
             else if (string.contains("$loreResaleValue"))
@@ -69,7 +73,8 @@ public class LoreGenerator {
 
     }
 
-    public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
+    public static ItemMeta generateLore(ItemMeta itemMeta, Material
+            material, HashMap<Enchantment, Integer> enchantmentMap,
                                         HashMap<String, Integer> customEnchantments, EliteMobEntity eliteMobEntity) {
 
         if (DefaultConfig.hideEnchantmentsAttribute)
@@ -181,10 +186,14 @@ public class LoreGenerator {
 
     }
 
-    private static ItemMeta applyVanillaEnchantments(HashMap<Enchantment, Integer> enchantmentMap, ItemMeta itemMeta) {
+    private static ItemMeta applyVanillaEnchantments(HashMap<Enchantment, Integer> enchantmentMap, ItemMeta
+            itemMeta) {
 
         for (Enchantment enchantment : enchantmentMap.keySet())
-            itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
+            if (EliteEnchantments.isPotentialEliteEnchantment(enchantment) && enchantmentMap.get(enchantment) > enchantment.getMaxLevel())
+                itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
+            else
+                itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
 
 
         return itemMeta;
@@ -218,7 +227,8 @@ public class LoreGenerator {
 
     }
 
-    private static String itemResaleWorth(Material material, HashMap<Enchantment, Integer> enchantmentMap, HashMap<String, Integer> customEnchantments, List<String> potionList) {
+    private static String itemResaleWorth(Material
+                                                  material, HashMap<Enchantment, Integer> enchantmentMap, HashMap<String, Integer> customEnchantments, List<String> potionList) {
 
         return ItemSettingsConfig.loreResale
                 .replace("$resale", ItemWorthCalculator.determineResaleWorth(material, enchantmentMap, potionList, customEnchantments) + "")

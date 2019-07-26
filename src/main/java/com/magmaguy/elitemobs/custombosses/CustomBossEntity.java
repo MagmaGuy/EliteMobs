@@ -257,7 +257,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
             //Do death message
             String playersList = "";
-            for (Player player : event.getEliteMobEntity().getDamagers()) {
+            for (Player player : event.getEliteMobEntity().getDamagers().keySet()) {
                 if (playersList.isEmpty())
                     playersList += player.getDisplayName();
                 else

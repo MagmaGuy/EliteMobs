@@ -38,7 +38,10 @@ public class LootTables implements Listener {
         if (event.getEliteMobEntity().getLevel() < 2) return;
         if (event.getEliteMobEntity().getDamagers().isEmpty()) return;
 
-        for (Player player : event.getEliteMobEntity().getDamagers()) {
+        for (Player player : event.getEliteMobEntity().getDamagers().keySet()) {
+
+            if (event.getEliteMobEntity().getDamagers().get(player) / event.getEliteMobEntity().getMaxHealth() < 0.1)
+                return;
 
             new ItemLootShower(event.getEliteMobEntity().getTier(), event.getEliteMobEntity().getLivingEntity().getLocation(), player);
 
