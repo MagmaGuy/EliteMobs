@@ -194,11 +194,8 @@ public class getLootMenu implements Listener {
 
             }
 
-            if (lootSlots.contains(event.getSlot())) {
-
+            if (lootSlots.contains(event.getSlot()))
                 player.getInventory().addItem(event.getCurrentItem());
-
-            }
 
             event.setCancelled(true);
 
