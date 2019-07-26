@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.*;
+import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
@@ -12,7 +13,6 @@ import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
-import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
@@ -65,7 +66,7 @@ public class EliteMobEntity {
     private boolean hasEliteLoot = true;
     private CreatureSpawnEvent.SpawnReason spawnReason;
 
-    private HashSet<Player> damagers = new HashSet<>();
+    private HashMap<Player, Double> damagers = new HashMap<>();
 
     private double healthMultiplier = 1.0;
     private double damageMultiplier = 1.0;
@@ -366,7 +367,6 @@ public class EliteMobEntity {
      */
     private void setArmor() {
 
-        if (VersionChecker.currentVersionIsUnder(12, 2)) return;
         if (!MobCombatSettingsConfig.doEliteArmor) return;
 
         livingEntity.getEquipment().setItemInMainHandDropChance(0);
@@ -383,56 +383,56 @@ public class EliteMobEntity {
         livingEntity.getEquipment().setChestplate(new ItemStack(Material.AIR));
         livingEntity.getEquipment().setHelmet(new ItemStack(Material.AIR));
 
-        if (eliteLevel >= 12)
+        if (eliteLevel >= 50)
             if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
 
-        if (eliteLevel >= 14)
+        if (eliteLevel >= 100)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
 
-        if (eliteLevel >= 16)
+        if (eliteLevel >= 150)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
 
-        if (eliteLevel >= 18)
+        if (eliteLevel >= 200)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
 
-        if (eliteLevel >= 20)
+        if (eliteLevel >= 250)
             if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
 
-        if (eliteLevel >= 22)
+        if (eliteLevel >= 300)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
 
-        if (eliteLevel >= 24)
+        if (eliteLevel >= 350)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
 
-        if (eliteLevel >= 26)
+        if (eliteLevel >= 400)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
 
-        if (eliteLevel >= 28)
+        if (eliteLevel >= 450)
             if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
 
-        if (eliteLevel >= 30)
+        if (eliteLevel >= 500)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
 
-        if (eliteLevel >= 32)
+        if (eliteLevel >= 550)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
 
-        if (eliteLevel >= 34)
+        if (eliteLevel >= 600)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
 
-        if (eliteLevel >= 36)
+        if (eliteLevel >= 650)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 
-        if (eliteLevel >= 38)
+        if (eliteLevel >= 700)
             if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 
-        if (eliteLevel >= 40)
+        if (eliteLevel >= 750)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
 
-        if (eliteLevel >= 42)
+        if (eliteLevel >= 800)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 
     }
@@ -759,12 +759,15 @@ public class EliteMobEntity {
         this.spawnReason = spawnReason;
     }
 
-    public HashSet<Player> getDamagers() {
+    public HashMap<Player, Double> getDamagers() {
         return this.damagers;
     }
 
-    public void addDamager(Player player) {
-        this.damagers.add(player);
+    public void addDamager(Player player, double damage) {
+        if (!this.damagers.containsKey(player))
+            this.damagers.put(player, damage);
+        else
+            this.damagers.put(player, this.damagers.get(player) + damage);
     }
 
     public boolean hasDamagers() {

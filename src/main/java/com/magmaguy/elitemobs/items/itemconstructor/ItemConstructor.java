@@ -20,7 +20,8 @@ public class ItemConstructor {
                                           HashMap<Enchantment, Integer> enchantments,
                                           HashMap<String, Integer> customEnchantments,
                                           List<String> potionEffects,
-                                          List<String> lore) {
+                                          List<String> lore,
+                                          EliteMobEntity eliteMobEntity) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;
@@ -47,7 +48,7 @@ public class ItemConstructor {
         /*
         Generate item lore
          */
-        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore);
+        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore, eliteMobEntity);
 
         /*
         Remove vanilla enchantments

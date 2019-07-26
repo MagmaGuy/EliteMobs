@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
-import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
+import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

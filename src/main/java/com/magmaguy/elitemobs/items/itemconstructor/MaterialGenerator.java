@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
+import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
-import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 

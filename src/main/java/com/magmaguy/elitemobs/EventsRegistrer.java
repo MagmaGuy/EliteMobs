@@ -6,9 +6,16 @@ import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.antiexploit.*;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
+import com.magmaguy.elitemobs.combatsystem.EliteCreeperExplosionHandler;
+import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByPlayerHandler;
+import com.magmaguy.elitemobs.combatsystem.EliteMobGenericDamageHandler;
+import com.magmaguy.elitemobs.combatsystem.PlayerDamagedByEliteMobHandler;
+import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
+import com.magmaguy.elitemobs.combatsystem.displays.DisplayMob;
+import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
 import com.magmaguy.elitemobs.combattag.CombatTag;
 import com.magmaguy.elitemobs.combattag.TeleportTag;
-import com.magmaguy.elitemobs.commands.LootGUI;
+import com.magmaguy.elitemobs.commands.getLootMenu;
 import com.magmaguy.elitemobs.commands.shops.BuyOrSellMenu;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
@@ -27,11 +34,7 @@ import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
-import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
-import com.magmaguy.elitemobs.mobconstructor.displays.DamageDisplay;
-import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
-import com.magmaguy.elitemobs.mobconstructor.displays.HealthDisplay;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
@@ -79,7 +82,10 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FindSuperMobs(), plugin);
 
         //Mob damage
-        pluginManager.registerEvents(new CombatSystem(), plugin);
+        pluginManager.registerEvents(new PlayerDamagedByEliteMobHandler(), plugin);
+        pluginManager.registerEvents(new EliteMobDamagedByPlayerHandler(), plugin);
+        pluginManager.registerEvents(new EliteCreeperExplosionHandler(), plugin);
+        pluginManager.registerEvents(new EliteMobGenericDamageHandler(), plugin);
         if (MobCombatSettingsConfig.enableDeathMessages)
             pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
 
@@ -91,7 +97,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PotionEffectApplier(), plugin);
 
         //getloot AdventurersGuildMenu
-        pluginManager.registerEvents(new LootGUI(), plugin);
+        pluginManager.registerEvents(new getLootMenu(), plugin);
 
         /*
         Register API events

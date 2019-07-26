@@ -40,7 +40,7 @@ public class PlayerDamagedByEliteMobEvent extends Event {
         return this.player;
     }
 
-    public EntityDamageByEntityEvent entityDamageByEntityEvent() {
+    public EntityDamageByEntityEvent getEntityDamageByEntityEvent() {
         return this.entityDamageByEntityEvent;
     }
 
