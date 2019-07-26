@@ -118,7 +118,7 @@ public class EntityTracker implements Listener {
      * @param entity Entity to be unregistered
      */
     private static void unregisterEliteMob(Entity entity) {
-        if (!isEliteMob(entity)) return;
+//        if (!isEliteMob(entity)) return;
         EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
         if (eliteMobEntity == null) return;
         eliteMobEntity.getLivingEntity().remove();

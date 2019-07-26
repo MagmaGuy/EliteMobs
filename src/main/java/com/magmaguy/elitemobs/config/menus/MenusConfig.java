@@ -1,10 +1,7 @@
 package com.magmaguy.elitemobs.config.menus;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
-import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
-import com.magmaguy.elitemobs.config.menus.premade.CustomShopMenuConfig;
-import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
-import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
+import com.magmaguy.elitemobs.config.menus.premade.*;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -17,7 +14,8 @@ public class MenusConfig {
             new ProceduralShopMenuConfig(),
             new CustomShopMenuConfig(),
             new BuyOrSellMenuConfig(),
-            new SellMenuConfig()
+            new SellMenuConfig(),
+            new GetLootMenuConfig()
     ));
 
     public static void initializeConfigs() {

@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.mobconstructor.displays;
+package com.magmaguy.elitemobs.combatsystem.displays;
 
 import org.bukkit.event.Listener;
 

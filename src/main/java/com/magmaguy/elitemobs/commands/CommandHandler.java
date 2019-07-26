@@ -93,8 +93,8 @@ public class CommandHandler implements CommandExecutor {
             case "getloot":
             case "gl":
                 if (userPermCheck(GETLOOT, commandSender) && args.length == 1) {
-                    LootGUI lootGUI = new LootGUI();
-                    lootGUI.lootGUI((Player) commandSender);
+                    getLootMenu getLootMenu = new getLootMenu();
+                    getLootMenu.lootGUI((Player) commandSender);
                 } else {
                     if (GetLootCommandHandler.getLoot(((Player) commandSender), args[1]))
                         return true;
@@ -262,6 +262,11 @@ public class CommandHandler implements CommandExecutor {
                     }
                     return true;
                 }
+                commandSender.sendMessage("[EliteMobs] Invalid command.");
+                commandSender.sendMessage("[EliteMobs] Valid quest-related commands:");
+                commandSender.sendMessage("[EliteMobs] /em quest");
+                commandSender.sendMessage("[EliteMobs] /em quest status");
+                return true;
             case "showitem":
             case "itemshow":
             case "shareitem":

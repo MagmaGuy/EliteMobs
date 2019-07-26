@@ -4,6 +4,7 @@ package com.magmaguy.elitemobs;
  * Created by MagmaGuy on 07/10/2016.
  */
 
+import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByPlayerHandler;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -20,7 +21,6 @@ import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
-import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
@@ -101,7 +101,7 @@ public class EliteMobs extends JavaPlugin {
         eventLauncher.eventRepeatingTask();
 
         //launch internal clock for attack cooldown
-        CombatSystem.launchInternalClock();
+        EliteMobDamagedByPlayerHandler.launchInternalClock();
 
         /*
         Initialize mob values

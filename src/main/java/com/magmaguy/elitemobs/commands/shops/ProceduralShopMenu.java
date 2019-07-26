@@ -86,7 +86,7 @@ public class ProceduralShopMenu implements Listener {
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
 
         //reroll loot button
-        if (event.getCurrentItem().equals(ProceduralShopMenuConfig.rerollItem)) {
+        if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ProceduralShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
             populateShop(event.getInventory());
             event.setCancelled(true);
             return;
