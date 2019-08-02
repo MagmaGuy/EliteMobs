@@ -1,15 +1,11 @@
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
 import com.magmaguy.elitemobs.adventurersguild.MaxHealthHandler;
 import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.antiexploit.*;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
-import com.magmaguy.elitemobs.combatsystem.EliteCreeperExplosionHandler;
-import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByPlayerHandler;
-import com.magmaguy.elitemobs.combatsystem.EliteMobGenericDamageHandler;
-import com.magmaguy.elitemobs.combatsystem.PlayerDamagedByEliteMobHandler;
+import com.magmaguy.elitemobs.combatsystem.*;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
 import com.magmaguy.elitemobs.combatsystem.displays.DisplayMob;
 import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
@@ -85,7 +81,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PlayerDamagedByEliteMobHandler(), plugin);
         pluginManager.registerEvents(new EliteMobDamagedByPlayerHandler(), plugin);
         pluginManager.registerEvents(new EliteCreeperExplosionHandler(), plugin);
-        pluginManager.registerEvents(new EliteMobGenericDamageHandler(), plugin);
+        pluginManager.registerEvents(new EliteMobGenericDamagedHandler(), plugin);
+        pluginManager.registerEvents(new EliteMobDamagedByEliteMobHandler(), plugin);
         if (MobCombatSettingsConfig.enableDeathMessages)
             pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
 
@@ -105,8 +102,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new EliteMobDamagedByPlayerEvent.EntityDamagedByEntityFilter(), plugin);
         pluginManager.registerEvents(new EliteMobDeathEvent.EliteMobDeathEventFilter(), plugin);
         pluginManager.registerEvents(new EliteMobTargetPlayerEvent.EliteMobTargetPlayerEventFilter(), plugin);
-        pluginManager.registerEvents(new EliteMobDamageEvent.EliteMobDamageEventFilter(), plugin);
+        pluginManager.registerEvents(new EliteMobDamagedEvent.EliteMobDamageEventFilter(), plugin);
         pluginManager.registerEvents(new PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter(), plugin);
+        pluginManager.registerEvents(new EliteMobDamagedByEliteMobEvent.EliteMobDamagedByEliteMobFilter(), plugin);
 
         /*
         While these powers could be registered in a more automated way, I realized that it's also a bad way of getting
@@ -166,9 +164,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new MergeHandler(), plugin);
 
         //Natural EliteMobs Spawning
-        if (MobCombatSettingsConfig.doNaturalMobSpawning) {
+        if (MobCombatSettingsConfig.doNaturalMobSpawning)
             pluginManager.registerEvents(new EntityTracker(), plugin);
-        }
 
         //Natural Mob Metadata Assigner
         pluginManager.registerEvents(new NaturalMobSpawnEventHandler(), plugin);
@@ -234,8 +231,6 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);
 
         //Initialize adventurer's guild
-        if (AdventurersGuildConfig.enableAdventurersGuild)
-            pluginManager.registerEvents(new AdventurersGuildMenu(), plugin);
         if (AdventurersGuildConfig.addMaxHealth)
             pluginManager.registerEvents(new MaxHealthHandler(), plugin);
         pluginManager.registerEvents(new SpawnControl(), plugin);

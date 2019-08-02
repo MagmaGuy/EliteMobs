@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.EliteMobDamageEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
@@ -270,9 +270,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         }
 
         @EventHandler
-        public void onDamagedMessages(EliteMobDamageEvent eliteMobDamageEvent) {
-            if (!(eliteMobDamageEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            CustomBossEntity customBossEntity = (CustomBossEntity) eliteMobDamageEvent.getEliteMobEntity();
+        public void onDamagedMessages(EliteMobDamagedEvent eliteMobDamagedEvent) {
+            if (!(eliteMobDamagedEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
+            CustomBossEntity customBossEntity = (CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity();
             if (customBossEntity.customBossConfigFields.getOnDamagedMessages().isEmpty()) return;
             Taunt.nametagProcessor(customBossEntity.getLivingEntity(), customBossEntity.customBossConfigFields.getOnDamagedMessages());
         }

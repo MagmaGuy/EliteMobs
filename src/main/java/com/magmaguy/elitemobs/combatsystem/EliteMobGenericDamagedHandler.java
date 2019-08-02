@@ -1,15 +1,15 @@
 package com.magmaguy.elitemobs.combatsystem;
 
-import com.magmaguy.elitemobs.api.EliteMobDamageEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class EliteMobGenericDamageHandler implements Listener {
+public class EliteMobGenericDamagedHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void eliteMobDamagedGeneric(EliteMobDamageEvent event) {
+    public void eliteMobDamagedGeneric(EliteMobDamagedEvent event) {
 
         if (event.isCancelled()) return;
         if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;

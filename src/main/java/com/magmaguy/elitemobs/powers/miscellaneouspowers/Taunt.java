@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.EliteMobDamageEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
@@ -53,7 +53,7 @@ public class Taunt extends MinorPower implements Listener {
      * @param event
      */
     @EventHandler
-    public void onDamaged(EliteMobDamageEvent event) {
+    public void onDamaged(EliteMobDamagedEvent event) {
         if (!event.getEliteMobEntity().hasPower(this)) return;
 
         if (!(event.getEntity() instanceof LivingEntity) ||

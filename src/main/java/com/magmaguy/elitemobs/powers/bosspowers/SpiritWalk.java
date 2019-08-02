@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.EliteMobDamageEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
@@ -38,7 +38,7 @@ public class SpiritWalk extends BossPower implements Listener {
     }
 
     @EventHandler
-    public void onBossMobGotHit(EliteMobDamageEvent event) {
+    public void onBossMobGotHit(EliteMobDamagedEvent event) {
         if (!event.getEliteMobEntity().hasPower(this)) return;
         SpiritWalk spiritWalk = (SpiritWalk) event.getEliteMobEntity().getPower(this);
 

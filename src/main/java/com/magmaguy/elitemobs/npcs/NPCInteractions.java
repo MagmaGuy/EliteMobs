@@ -2,9 +2,10 @@ package com.magmaguy.elitemobs.npcs;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
+import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
+import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,7 @@ public class NPCInteractions implements Listener {
         PROCEDURALLY_GENERATED_SHOP,
         BAR,
         ARENA,
+        QUEST_GIVER,
         NONE
     }
 
@@ -41,11 +43,11 @@ public class NPCInteractions implements Listener {
 
         switch (npcEntity.getInteractionType()) {
             case GUILD_GREETER:
-                if (event.getPlayer().hasPermission("elitemobs.adventurersguild.menu"))
+                if (event.getPlayer().hasPermission("elitemobs.guild.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            AdventurersGuildMenu.mainMenu(event.getPlayer());
+                            GuildRankMenuHandler.initializeGuildRankMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
@@ -70,6 +72,15 @@ public class NPCInteractions implements Listener {
                             ProceduralShopMenu.shopInitializer(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
+            case QUEST_GIVER:
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        QuestsMenu questsMenu = new QuestsMenu();
+                        questsMenu.initializeMainQuestMenu(event.getPlayer());
+                    }
+                }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case BAR:
                 break;
