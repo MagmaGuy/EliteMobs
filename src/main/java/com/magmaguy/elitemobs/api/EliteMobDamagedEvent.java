@@ -7,7 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class EliteMobDamageEvent extends Event implements Cancellable {
+public class EliteMobDamagedEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private Entity entity;
@@ -15,7 +15,7 @@ public class EliteMobDamageEvent extends Event implements Cancellable {
     private boolean isCancelled = false;
     private EntityDamageEvent entityDamageEvent;
 
-    public EliteMobDamageEvent(EliteMobEntity eliteMobEntity, EntityDamageEvent event) {
+    public EliteMobDamagedEvent(EliteMobEntity eliteMobEntity, EntityDamageEvent event) {
         this.entity = eliteMobEntity.getLivingEntity();
         this.eliteMobEntity = eliteMobEntity;
         this.entityDamageEvent = event;
@@ -62,7 +62,7 @@ public class EliteMobDamageEvent extends Event implements Cancellable {
             EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteMobEntity == null) return;
 
-            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamageEvent(eliteMobEntity, event));
+            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedEvent(eliteMobEntity, event));
 
         }
 

@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.0.18
+version: 7.0.18.1
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.13
@@ -58,6 +58,7 @@ permissions:
         elitemobs.checktier: true
         elitemobs.adventurersguild: true
         elitemobs.currency.user: true
+        elitemobs.guild: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -176,7 +177,7 @@ permissions:
     description: Allows players to get notified about plugin updates
     default: op
   elitemobs.adventurersguild:
-    description: Allows players to use the /ag command to set their difficulty level and get quests
+    description: Allows players to use the /ag command to set their difficultyTranslation level and get quests
     children:
       elitemobs.adventurersguild.teleport: true
       elitemobs.adventurersguild.menu: true
@@ -198,4 +199,16 @@ permissions:
     default: op
   elitemobs.autosetup:
     description: Allows players to run /em autosetup. This is used for setting up the adventurer's guild map
+    default: op
+  elitemobs.guild:
+    description:  Allows players to run /em guild. This is used to set the difficulty level.
+    default: op
+    children:
+      elitemobs.guild.menu: true
+      elitemobs.guild.npc: true
+  elitemobs.guild.menu:
+    description: Allows players to access the /em guild menu through a command.
+    default: op
+  elitemobs.guild.npc:
+    description: Allows players to access the /em guild menu through NPCs
     default: op

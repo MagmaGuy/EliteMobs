@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.combatsystem;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
@@ -10,7 +9,6 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -40,21 +38,13 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
     public void eliteMobDamageByPlayer(EliteMobDamagedByPlayerEvent event) {
 
         if (event.isCancelled()) return;
-        LivingEntity damager = EntityFinder.getRealDamager(event.getEntityDamageByEntityEvent());
-        if (damager == null) return;
+        Player player = event.getPlayer();
+        if (player == null) return;
 
-        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        EliteMobEntity eliteMobEntity = event.getEliteMobEntity();
         if (eliteMobEntity == null) return;
 
         //From this point on, the event damage is handled by Elite Mobs
-
-        /*
-        Case in which the player is not the entity dealing damage, just deal raw damage
-         */
-        if (!damager.getType().equals(EntityType.PLAYER) && EntityTracker.isEliteMob(damager)) {
-            event.getEntityDamageByEntityEvent().setDamage(event.getEntityDamageByEntityEvent().getDamage());
-            return;
-        }
 
         double rawDamage = event.getEntityDamageByEntityEvent().getDamage();
 
@@ -62,19 +52,13 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
             if (event.getEntityDamageByEntityEvent().isApplicable(modifier))
                 event.getEntityDamageByEntityEvent().setDamage(modifier, 0);
 
-        /*
-        Case in which a player has hit the Elite Mob
-         */
-
-        if (!damager.getType().equals(EntityType.PLAYER)) return;
-        Player player = (Player) damager;
 
         //if the damage source is custom , the damage is final
         if (isCustomDamageEntity(eliteMobEntity.getLivingEntity())) {
             event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, rawDamage);
             //Deal with the player getting killed
             if (player.getHealth() - rawDamage <= 0)
-                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, damager));
+                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, player));
             removeCustomDamageEntity(eliteMobEntity.getLivingEntity());
             /*
         This is a bit of a dirty hack, I may want to tighten it up later

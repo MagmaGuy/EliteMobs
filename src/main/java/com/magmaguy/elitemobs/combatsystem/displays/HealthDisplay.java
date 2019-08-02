@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.combatsystem.displays;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -31,6 +32,16 @@ public class HealthDisplay implements Listener {
 
         } else
             displayHealth(event.getEliteMobEntity());
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onHit(EliteMobDamagedByEliteMobEvent event) {
+
+        if (event.isCancelled()) return;
+
+        if (MobCombatSettingsConfig.onlyShowHealthForEliteMobs)
+            displayHealth(event.getDamagee());
 
     }
 

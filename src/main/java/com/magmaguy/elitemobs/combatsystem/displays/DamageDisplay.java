@@ -40,11 +40,8 @@ public class DamageDisplay implements Listener {
             } else if (EntityTracker.isSuperMob(event.getEntity()))
                 displayDamage(event.getEntity(), event.getFinalDamage());
 
-        } else {
+        } else if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getFinalDamage());
 
-            if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getFinalDamage());
-
-        }
 
     }
 
