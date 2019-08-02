@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.adventurersguild.MaxHealthHandler;
 import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.antiexploit.*;
@@ -231,6 +232,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);
 
         //Initialize adventurer's guild
+        pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);
         if (AdventurersGuildConfig.addMaxHealth)
             pluginManager.registerEvents(new MaxHealthHandler(), plugin);
         pluginManager.registerEvents(new SpawnControl(), plugin);
