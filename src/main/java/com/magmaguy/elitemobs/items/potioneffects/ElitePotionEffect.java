@@ -45,6 +45,11 @@ public class ElitePotionEffect {
 
             this.applicationMethod = ApplicationMethod.valueOf(stringObject[3].toUpperCase());
 
+            if (this.applicationMethod.equals(ApplicationMethod.ONHIT))
+                this.potionEffect = new PotionEffect(PotionEffectType.getByName(stringObject[0].toLowerCase()),
+                        PotionEffectsConfig.getPotionEffect(potionEffect.getType().getName()).getOnHitDuration() * 20,
+                        Integer.parseInt(stringObject[1]));
+
         } catch (Exception ex) {
             new WarningMessage("Detected invalid potion effect entry: " + string);
         }

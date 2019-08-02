@@ -114,7 +114,7 @@ public class CurrencyCommandsHandler {
             addCommand(args[1], Integer.parseInt(args[2]));
 
             commandSender.sendMessage("You have added " + args[2] + " to " + args[1]);
-            commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
+            commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(args[2])));
 
         } catch (Exception e) {
 

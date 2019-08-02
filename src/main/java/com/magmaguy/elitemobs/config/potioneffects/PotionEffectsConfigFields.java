@@ -76,4 +76,8 @@ public class PotionEffectsConfigFields {
     public double getValue() {
         return value;
     }
+
+    public int getOnHitDuration() {
+        return onHitDuration;
+    }
 }
