@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
+import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.combattag.TeleportTag;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
@@ -51,8 +51,8 @@ public class AdventurersGuildCommand {
                     return;
                 }
 
-        if (!player.hasPermission("elitemobs.adventurersguild.menu")) return;
-        AdventurersGuildMenu.mainMenu(player);
+        if (!player.hasPermission("elitemobs.guild.menu")) return;
+        GuildRankMenuHandler.initializeGuildRankMenu(player);
 
     }
 

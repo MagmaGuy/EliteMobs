@@ -30,7 +30,8 @@ public class NPCsConfig {
             new BlacksmithConfig(),
             new GuildAttendantConfig(),
             new QuestGiverConfig(),
-            new SpecialBlacksmithConfig()
+            new SpecialBlacksmithConfig(),
+            new CombatInstructorConfig()
     ));
 
     public static void initializeConfigs() {

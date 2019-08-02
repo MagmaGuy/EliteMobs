@@ -51,6 +51,7 @@ public class GuildRank {
      */
     public static void setRank(Player player, int rank) {
         PlayerData.playerMaxGuildRank.put(player.getUniqueId(), rank);
+        PlayerData.playerMaxGuildRankChanged = true;
     }
 
     /**
@@ -72,7 +73,7 @@ public class GuildRank {
      */
     public static void setActiveRank(Player player, int rank) {
         PlayerData.playerSelectedGuildRank.put(player.getUniqueId(), rank);
-        PlayerData.playerCurrencyChanged = true;
+        PlayerData.playerSelectedGuildRankChanged = true;
     }
 
     /**

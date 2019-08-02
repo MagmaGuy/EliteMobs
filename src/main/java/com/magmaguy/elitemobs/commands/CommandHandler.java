@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.commands.npc.NPCCommands;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
@@ -274,6 +275,11 @@ public class CommandHandler implements CommandExecutor {
             case "share":
                 ShareItem.showOnChat((Player) commandSender);
                 return true;
+            case "guild":
+            case "rank":
+            case "guildrank":
+                if (!userPermCheck("elitemobs.guild.menu", commandSender)) return true;
+                GuildRankMenuHandler.initializeGuildRankMenu((Player) commandSender);
             default:
                 validCommands(commandSender);
                 return true;

@@ -15,7 +15,8 @@ public class MenusConfig {
             new CustomShopMenuConfig(),
             new BuyOrSellMenuConfig(),
             new SellMenuConfig(),
-            new GetLootMenuConfig()
+            new GetLootMenuConfig(),
+            new GuildRankMenuConfig()
     ));
 
     public static void initializeConfigs() {
