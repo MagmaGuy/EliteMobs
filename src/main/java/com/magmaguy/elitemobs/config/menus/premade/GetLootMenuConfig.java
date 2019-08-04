@@ -20,7 +20,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
     public static String tierTranslation, itemFilterTranslation;
 
     @Override
-    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
 
         menuName = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Procedural Item Shop");
 
@@ -66,8 +66,6 @@ public class GetLootMenuConfig extends MenusConfigFields {
                         Arrays.asList("")),
                 fileConfiguration);
         nextLootItem = ItemStackSerializer.deserialize("nextLoot", fileConfiguration);
-
-        return fileConfiguration;
 
     }
 

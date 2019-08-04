@@ -9,11 +9,8 @@ public class NPCDamageEvent implements Listener {
 
     @EventHandler
     public void onNPCDamage(EntityDamageEvent event) {
-
         if (!EntityTracker.isNPCEntity(event.getEntity())) return;
-
         event.setCancelled(true);
-
     }
 
 }

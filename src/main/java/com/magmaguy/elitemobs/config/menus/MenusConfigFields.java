@@ -10,8 +10,7 @@ public class MenusConfigFields {
         this.fileName = fileName + ".yml";
     }
 
-    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
-        return fileConfiguration;
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
     }
 
     public MenusConfigFields(FileConfiguration configuration) {

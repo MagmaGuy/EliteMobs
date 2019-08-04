@@ -78,7 +78,7 @@ public class NPCInteractions implements Listener {
                     @Override
                     public void run() {
                         QuestsMenu questsMenu = new QuestsMenu();
-                        questsMenu.initializeMainQuestMenu(event.getPlayer());
+                        questsMenu.initializeQuestTierSelectorMenu(event.getPlayer());
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
