@@ -164,7 +164,7 @@ public class GuildRankMenuHandler implements Listener {
                 default:
                     if (string.contains("$previousRank")) {
                         newLore.add(string.replace("$previousRank",
-                                (PlayerData.playerMaxGuildRank.get(player.getUniqueId()) + 1) + ""));
+                                (GuildRank.getRankName(PlayerData.playerMaxGuildRank.get(player.getUniqueId()) + 1)) + ""));
                         continue;
                     }
                     if (string.contains("$price")) {
@@ -247,7 +247,7 @@ public class GuildRankMenuHandler implements Listener {
         if (rank == 10) difficultyBonus = 190;
         if (rank == 11) difficultyBonus = 200;
 
-        return ChatColorConverter.convert("&fElite Mob difficultyTranslation modifier: &4" + difficultyBonus + "%");
+        return ChatColorConverter.convert("&fElite Mob difficulty modifier: &4" + difficultyBonus + "%");
 
     }
 

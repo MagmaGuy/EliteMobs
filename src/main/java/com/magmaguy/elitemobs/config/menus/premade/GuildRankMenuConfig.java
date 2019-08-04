@@ -21,8 +21,8 @@ public class GuildRankMenuConfig extends MenusConfigFields {
     public static String notEnoughCurrencyMessage, unlockMessage, broadcastMessage, failedMessage;
 
     @Override
-    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
-        menuName = ConfigurationEngine.setString(fileConfiguration, "menuName", "[EM] Guild Rank Selection");
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+        menuName = ConfigurationEngine.setString(fileConfiguration, "questTierSelectorMenuTitle", "[EM] Guild Rank Selection");
         lowTierWarning = ConfigurationEngine.setString(fileConfiguration, "lowTierWarning", "&cElites can't drop better loot!");
         normalTierWarning = ConfigurationEngine.setString(fileConfiguration, "normalTierWarning", "&aElite can drop better loot!");
 
@@ -46,7 +46,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                         "$rankName",
                         Arrays.asList("&f&m-------------------------------",
                                 "&aThis rank is locked!",
-                                "&cYou need rank $previousRank first!",
+                                "&cYou need the $previousRank rank first!",
                                 "$tierWarning",
                                 "&f&m-------------------------------",
                                 "$lootBonus",
@@ -89,11 +89,9 @@ public class GuildRankMenuConfig extends MenusConfigFields {
 
         unlockMessage = ConfigurationEngine.setString(fileConfiguration, "unlockMessage", "&7[EliteMobs] &aYou have unlocked the $rankName &arank for $price $currencyName. \n&6Happy hunting!");
 
-        broadcastMessage = ConfigurationEngine.setString(fileConfiguration, "broadcastMessage", "&7[EliteMobs] &a$player &ahas reached the $rankName &aguild rank!");
+        broadcastMessage = ConfigurationEngine.setString(fileConfiguration, "questCompleteBroadcastMessage", "&7[EliteMobs] &a$player &ahas reached the $rankName &aguild rank!");
 
         failedMessage = ConfigurationEngine.setString(fileConfiguration, "failedMessage", "&7[EliteMobs] &cYou need to unlock other ranks first!");
-
-        return fileConfiguration;
 
     }
 

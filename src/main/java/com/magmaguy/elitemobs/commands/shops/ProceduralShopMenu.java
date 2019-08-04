@@ -28,7 +28,7 @@ import java.util.Random;
 public class ProceduralShopMenu implements Listener {
 
     private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("/");
-    private static final String SHOP_NAME = ProceduralShopMenuConfig.SHOP_NAME + SHOP_KEY;
+    private static final String SHOP_NAME = ProceduralShopMenuConfig.shopName + SHOP_KEY;
 
     public static void shopInitializer(Player player) {
 
@@ -47,12 +47,12 @@ public class ProceduralShopMenu implements Listener {
 
     private static void populateShop(Inventory shopInventory) {
 
-        shopInventory.setItem(ProceduralShopMenuConfig.REROLL_SLOT, ProceduralShopMenuConfig.rerollItem);
+        shopInventory.setItem(ProceduralShopMenuConfig.rerollSlot, ProceduralShopMenuConfig.rerollItem);
         shopContents(shopInventory);
 
     }
 
-    private static List<Integer> validSlots = ProceduralShopMenuConfig.STORE_SLOTS;
+    private static List<Integer> validSlots = ProceduralShopMenuConfig.storeSlots;
 
     private static void shopContents(Inventory shopInventory) {
 
@@ -60,8 +60,8 @@ public class ProceduralShopMenu implements Listener {
 
         for (int i : validSlots) {
 
-            int balancedMax = ProceduralShopMenuConfig.MAX_TIER - ProceduralShopMenuConfig.MIN_TIER;
-            int balancedMin = ProceduralShopMenuConfig.MIN_TIER;
+            int balancedMax = ProceduralShopMenuConfig.maxTier - ProceduralShopMenuConfig.minTier;
+            int balancedMin = ProceduralShopMenuConfig.minTier;
 
             int randomTier = random.nextInt(balancedMax) + balancedMin;
 

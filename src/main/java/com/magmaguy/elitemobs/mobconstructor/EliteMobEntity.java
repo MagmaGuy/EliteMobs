@@ -696,9 +696,14 @@ public class EliteMobEntity {
      *
      * @param bool Whether the Elite Mob will unload when far away.
      */
-    public void setPersistent(boolean bool) {
-        this.isPersistent = bool;
-        this.getLivingEntity().setRemoveWhenFarAway(!bool);
+    public void setPersistent(Boolean bool) {
+        if (bool != null) {
+            this.isPersistent = bool;
+            this.getLivingEntity().setRemoveWhenFarAway(!bool);
+        } else {
+            this.isPersistent = false;
+            this.getLivingEntity().setRemoveWhenFarAway(true);
+        }
     }
 
     /**

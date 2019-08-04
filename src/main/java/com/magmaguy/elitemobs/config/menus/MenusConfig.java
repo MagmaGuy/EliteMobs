@@ -16,7 +16,8 @@ public class MenusConfig {
             new BuyOrSellMenuConfig(),
             new SellMenuConfig(),
             new GetLootMenuConfig(),
-            new GuildRankMenuConfig()
+            new GuildRankMenuConfig(),
+            new QuestMenuConfig()
     ));
 
     public static void initializeConfigs() {

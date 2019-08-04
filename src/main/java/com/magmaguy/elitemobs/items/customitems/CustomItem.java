@@ -291,7 +291,10 @@ public class CustomItem {
     }
 
     private void parseScalability() {
-        if (this.customLootConfigFields.getScalability() == null) this.scalability = Scalability.SCALABLE;
+        if (this.customLootConfigFields.getScalability() == null) {
+            this.scalability = Scalability.SCALABLE;
+            return;
+        }
         switch (this.customLootConfigFields.getScalability()) {
             case "fixed":
                 this.scalability = Scalability.FIXED;

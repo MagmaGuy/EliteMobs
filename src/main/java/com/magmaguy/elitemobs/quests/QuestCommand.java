@@ -6,7 +6,7 @@ public class QuestCommand {
 
     public static void doMainQuestCommand(Player player) {
         QuestsMenu questsMenu = new QuestsMenu();
-        questsMenu.initializeMainQuestMenu(player);
+        questsMenu.initializeQuestTierSelectorMenu(player);
     }
 
     public static void doQuestTrackCommand(Player player) {
@@ -15,7 +15,7 @@ public class QuestCommand {
             return;
         }
 
-        PlayerQuest.getPlayerQuest(player).getQuestObjective().sendQuestProgressionMessage(player);
+        player.sendMessage(PlayerQuest.getPlayerQuest(player).getQuestStatus());
 
     }
 

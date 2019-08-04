@@ -25,7 +25,7 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
     public static int SELL_SLOT;
 
     @Override
-    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
         SHOP_NAME = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Custom Item Shop");
         ItemStackSerializer.serialize(
                 "Information button",
@@ -48,8 +48,6 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
         SELL_ITEM = ItemStackSerializer.deserialize("Sell items", fileConfiguration);
         BUY_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Buy slot", 11);
         SELL_SLOT = ConfigurationEngine.setInt(fileConfiguration, "Sell slot", 15);
-
-        return fileConfiguration;
     }
 
 }
