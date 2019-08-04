@@ -1,11 +1,9 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
+import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import com.magmaguy.elitemobs.utils.MenuUtils;
-import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -19,40 +17,38 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class QuestsMenu implements Listener {
-
-    private static final String MAIN_MENU_KEY = ObfuscatedStringHandler.obfuscateString("/////");
-    private static final String MAIN_MENU_NAME = "EliteMobs Quests" + MAIN_MENU_KEY;
 
     /**
      * Opens the main quest menu for a player. This contains all the ranks.
      *
      * @param player Player for whom the quest menu will open
      */
-    public void initializeMainQuestMenu(Player player) {
+    public void initializeQuestTierSelectorMenu(Player player) {
 
-        Inventory inventory = Bukkit.createInventory(player, 18, MAIN_MENU_NAME);
+        Inventory inventory = Bukkit.createInventory(player, 18, QuestMenuConfig.questTierSelectorMenuTitle);
 
-        for (int index = 0; index < 11; index++) {
+        for (int index = 0; index < 12; index++) {
 
             if (GuildRank.isWithinActiveRank(player, index)) {
-                inventory.setItem(index,
-                        ItemStackGenerator.generateItemStack(Material.GREEN_STAINED_GLASS_PANE,
-                                "&aAccept a " + GuildRank.getRankName(index + 1) + " &aquest!",
-                                Arrays.asList("&aAccept a " + GuildRank.getRankName(index + 1) + " &aquest and", "&aget special rewards!")));
 
-            } else if (GuildRank.isWithinRank(player, index + 1)) {
-                inventory.setItem(index, ItemStackGenerator.generateItemStack(Material.YELLOW_STAINED_GLASS_PANE,
-                        "&eYou can get a " + GuildRank.getRankName(index + 1) + " &equest!",
-                        Arrays.asList("&eDo /ag and set your", "&eguild rank to " + GuildRank.getRankName(index), "&eto accept these quests!")));
+                HashMap<String, String> replacementItemStack = new HashMap<>();
+                replacementItemStack.put("$rank", GuildRank.getRankName(index));
+                inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.validTierButton, replacementItemStack));
+
+            } else if (GuildRank.isWithinRank(player, index)) {
+
+                HashMap<String, String> replacementItemStack = new HashMap<>();
+                replacementItemStack.put("$rank", GuildRank.getRankName(index));
+                inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.inactiveTierButton, replacementItemStack));
 
             } else {
-                inventory.setItem(index, ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
-                        "&cYou can't get a " + GuildRank.getRankName(index + 1) + " &cquest yet!",
-                        Arrays.asList("&cYou must first unlock the", GuildRank.getRankName(index + 1) + " &cguild rank at /ag", "&cto accept these quests!")));
+
+                HashMap<String, String> replacementItemStack = new HashMap<>();
+                replacementItemStack.put("$rank", GuildRank.getRankName(index));
+                inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.invalidTierButton, replacementItemStack));
 
             }
 
@@ -64,7 +60,7 @@ public class QuestsMenu implements Listener {
 
     @EventHandler
     public void onMainQuestClick(InventoryClickEvent event) {
-        if (!MenuUtils.isValidMenu(event, MAIN_MENU_NAME)) return;
+        if (!MenuUtils.isValidMenu(event, QuestMenuConfig.questTierSelectorMenuTitle)) return;
         event.setCancelled(true);
         if (event.getInventory().getType().equals(InventoryType.PLAYER)) return;
         if (!event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE)) return;
@@ -88,7 +84,7 @@ public class QuestsMenu implements Listener {
 
     @EventHandler
     public void onTierQuestClick(InventoryClickEvent event) throws CloneNotSupportedException {
-        if (!event.getView().getTitle().contains(QuestTierMenu.TIER_MENU_NAME)) return;
+        if (!event.getView().getTitle().contains(QuestMenuConfig.questSelectorMenuTitle)) return;
         if (!MenuUtils.isValidMenu(event)) return;
         event.setCancelled(true);
         if (event.getInventory().getType().equals(InventoryType.PLAYER)) return;
@@ -131,15 +127,12 @@ public class QuestsMenu implements Listener {
     }
 
     private void initializeCancelQuestDialog(Player player, PlayerQuest playerQuest) {
-        player.sendMessage(ChatColorConverter.convert("&c&l&m&o---------------------------------------------"));
-        player.sendMessage(ChatColorConverter.convert("&c" + "You can only have one quest at a time! Cancelling your ongoing quest will reset quest progress!"));
-        TextComponent interactiveMessage = new TextComponent("[Click here to cancel current quest!]");
-        interactiveMessage.setColor(ChatColor.GREEN);
+        player.sendMessage(QuestMenuConfig.cancelMessagePart1);
+        TextComponent interactiveMessage = new TextComponent(QuestMenuConfig.cancelMessagePart2);
         interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + player.getName() + " confirm"));
         interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Cancel!").create()));
         player.spigot().sendMessage(interactiveMessage);
-        player.sendMessage(ChatColorConverter.convert("&7You can see your quest status with the command &a/em quest status"));
-        player.sendMessage(ChatColorConverter.convert("&c&l&m&o---------------------------------------------"));
+        player.sendMessage(QuestMenuConfig.cancelMessagePart3);
 
         questPairs.put(player, playerQuest);
     }

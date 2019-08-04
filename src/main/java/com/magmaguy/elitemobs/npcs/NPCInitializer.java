@@ -11,14 +11,10 @@ public class NPCInitializer {
      * Initializes all NPCs in the NPCs.yml config file
      */
     public NPCInitializer() {
-
         for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList().values())
             new NPCEntity(npCsConfigFields);
-
         Bukkit.getPluginManager().registerEvents(new NPCChunkLoad(), MetadataHandler.PLUGIN);
-
         new NPCWorkingHours();
-
     }
 
 }

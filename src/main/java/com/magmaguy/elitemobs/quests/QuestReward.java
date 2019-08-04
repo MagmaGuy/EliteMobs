@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import org.bukkit.entity.Player;
 
@@ -56,7 +57,7 @@ public class QuestReward {
         if (getQuestTier() == 0)
             this.questReward = getQuestDifficulty() * 5;
         else
-            this.questReward = getQuestTier() * getQuestDifficulty() * 10;
+            this.questReward = getQuestDifficulty();
     }
 
     public String getRewardMessage() {
@@ -70,7 +71,9 @@ public class QuestReward {
     public void doReward(Player player) {
         if (rewardType.equals(RewardType.MONETARY)) {
             EconomyHandler.addCurrency(player.getUniqueId(), questReward);
-            player.sendMessage("[EM] You have completed a quest! You reward is " + questReward + " " + EconomySettingsConfig.currencyName);
+            player.sendMessage(QuestMenuConfig.rewardMessage
+                    .replace("$reward", questReward + "")
+                    .replace("$currencyName", EconomySettingsConfig.currencyName));
         }
     }
 

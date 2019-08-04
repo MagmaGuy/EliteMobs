@@ -26,7 +26,7 @@ public class SellMenuConfig extends MenusConfigFields {
     public static int confirmSlot;
 
     @Override
-    public FileConfiguration generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
         shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Sell Shop");
         ItemStackSerializer.serialize(
                 "infoButton",
@@ -51,7 +51,6 @@ public class SellMenuConfig extends MenusConfigFields {
                 "&2Confirm Sale", Arrays.asList("&aSell item for", "&a$currency_amount $currency_name")), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);
         confirmSlot = ConfigurationEngine.setInt(fileConfiguration, "confirmSaleSlot", 35);
-        return fileConfiguration;
     }
 
 }

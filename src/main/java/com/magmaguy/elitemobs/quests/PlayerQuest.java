@@ -1,16 +1,14 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.quests.dynamic.KillAmountQuest;
-import com.magmaguy.elitemobs.utils.ItemStackGenerator;
-import com.magmaguy.elitemobs.utils.PlayerHeads;
+import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class PlayerQuest implements Cloneable {
@@ -44,7 +42,7 @@ public class PlayerQuest implements Cloneable {
     }
 
     public static void cancelPlayerQuest(Player player) {
-        player.sendMessage(ChatColorConverter.convert("&cYour ongoing quest has been cancelled!"));
+        player.sendMessage(QuestMenuConfig.questCancelMessage);
         removePlayersInQuests(player);
     }
 
@@ -67,15 +65,16 @@ public class PlayerQuest implements Cloneable {
     }
 
     public ItemStack generateQuestItemStack() {
-        return ItemStackGenerator.generateItemStack(
-                PlayerHeads.exclamation(),
-                "&aKill " + getQuestObjective().getObjectiveKills() + " " +
-                        EliteMobProperties.getPluginData(getQuestObjective().getEntityType()).getName()
-                                .replace("$level", MobTierCalculator.findMobLevel(getQuestObjective().getMinimumEliteMobTier()) + ""),
-                Arrays.asList("&fYou must kill &a" + getQuestObjective().getObjectiveKills() + " &flevel &a",
-                        "&a" + MobTierCalculator.findMobLevel(getQuestObjective().getMinimumEliteMobTier()) + "&e+ &fmobs.",
-                        ("&fProgress: &a" + getQuestObjective().getCurrentKills() + "&f/&c" + getQuestObjective().getObjectiveKills()),
-                        "&aReward: &e" + getQuestReward().getRewardMessage()));
+        HashMap<String, String> placeholderReplacementPairs = new HashMap<>();
+        String objectiveName = EliteMobProperties.getPluginData(getQuestObjective().getEntityType()).getName()
+                .replace("$level", MobTierCalculator.findMobLevel(getQuestObjective().getMinimumEliteMobTier()) + "");
+        placeholderReplacementPairs.put("$objectiveAmount", getQuestObjective().getObjectiveKills() + "");
+        placeholderReplacementPairs.put("$currentAmount", getQuestObjective().getCurrentKills() + "");
+        placeholderReplacementPairs.put("$objectiveName", objectiveName);
+        placeholderReplacementPairs.put("$rewardAmount", getQuestReward().getRewardMessage());
+
+        return ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.killObjectiveButton, placeholderReplacementPairs);
+
     }
 
     public boolean isKillAmountQuest() {
@@ -112,8 +111,10 @@ public class PlayerQuest implements Cloneable {
     }
 
     public String getQuestStatus() {
-        return ChatColorConverter.convert("&lYou have killed &a" + getQuestObjective().getCurrentKills() + " &f/ &c"
-                + questObjective.getObjectiveKills() + " &a" + getQuestObjective().getEliteMobName());
+        return QuestMenuConfig.questStatusMessage
+                .replace("$currentAmount", getQuestObjective().getCurrentKills() + "")
+                .replace("$objectiveAmount", questObjective.getObjectiveKills() + "")
+                .replace("$objectiveName", questObjective.getEliteMobName());
     }
 
 }

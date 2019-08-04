@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.utils.StringColorAnimator;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -116,7 +118,10 @@ public class QuestObjective {
     }
 
     public void setQuestDifficulty() {
-        this.questDifficulty = getObjectiveKills() / 10 * questTier + 5;
+        if (questTier == 0)
+            this.questDifficulty = getObjectiveKills();
+        else
+            this.questDifficulty = questTier * 10 * getObjectiveKills();
 
     }
 
@@ -134,15 +139,21 @@ public class QuestObjective {
     }
 
     public void sendQuestStartMessage(Player player) {
-        StringColorAnimator.startTitleAnimation(player, "You have accepted a quest!",
-                "Kill " + getObjectiveKills() + " " + getEliteMobName(), ChatColor.DARK_GREEN, ChatColor.GREEN);
+        StringColorAnimator.startTitleAnimation(player, QuestMenuConfig.questStartTitle,
+                QuestMenuConfig.questStartSubtitle
+                        .replace("$objectiveAmount", getObjectiveKills() + "")
+                        .replace("$objectiveName", getEliteMobName())
+                , ChatColor.DARK_GREEN, ChatColor.GREEN);
     }
 
     public void sendQuestCompleteMessage(Player player) {
         if (!player.isOnline()) return;
-        StringColorAnimator.startTitleAnimation(player, "Quest complete!",
-                "You have killed " + getObjectiveKills() + " " + getEliteMobName(),
+        StringColorAnimator.startTitleAnimation(player, QuestMenuConfig.questCompleteTitle,
+                QuestMenuConfig.questCompleteSubtitle
+                        .replace("$objectiveAmount", getObjectiveKills() + "")
+                        .replace("$objectiveName", getEliteMobName()),
                 ChatColor.GOLD, ChatColor.YELLOW);
+        Bukkit.broadcastMessage(QuestMenuConfig.questCompleteBroadcastMessage);
     }
 
     public void sendQuestProgressionMessage(Player player) {
@@ -151,7 +162,9 @@ public class QuestObjective {
     }
 
     public String objectiveString() {
-        return "Kill " + getObjectiveKills() + " " + getEliteMobName();
+        return QuestMenuConfig.objectiveString
+                .replace("$objectiveAmount", getObjectiveKills() + "")
+                .replace("$objectiveName", getEliteMobName());
     }
 
     public boolean isTurnedIn() {

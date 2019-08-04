@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.quests.PlayerQuest;
 import com.magmaguy.elitemobs.quests.QuestCommand;
@@ -21,6 +22,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.UUID;
 
 /**
  * Created by MagmaGuy on 21/01/2017.
@@ -280,6 +282,11 @@ public class CommandHandler implements CommandExecutor {
             case "guildrank":
                 if (!userPermCheck("elitemobs.guild.menu", commandSender)) return true;
                 GuildRankMenuHandler.initializeGuildRankMenu((Player) commandSender);
+                return true;
+            case "trackcustomboss":
+                CustomBossEntity.getCustomBoss(UUID.fromString(args[2]))
+                        .realTimeTracking((Player) commandSender);
+                return true;
             default:
                 validCommands(commandSender);
                 return true;

@@ -10,12 +10,15 @@ public class StringColorAnimator {
 
     public static void startTitleAnimation(Player player, String title, String subtitle, ChatColor primaryColor, ChatColor secondaryColor) {
 
+        subtitle = ChatColor.stripColor(subtitle);
+
+        String finalSubtitle = subtitle;
         new BukkitRunnable() {
             int counter = 0;
             int titleIndex = 0;
             int subtitleIndex = 0;
             int titleSize = title.length();
-            int subtitleSize = subtitle.length();
+            int subtitleSize = finalSubtitle.length();
 
             @Override
             public void run() {
@@ -28,7 +31,7 @@ public class StringColorAnimator {
                         newTitle.insert(titleIndex - 2, secondaryColor);
                     titleIndex++;
                     player.sendTitle(primaryColor + ChatColorConverter.convert(newTitle.toString()),
-                            secondaryColor + ChatColorConverter.convert(subtitle), 0, 5, 0);
+                            secondaryColor + ChatColorConverter.convert(finalSubtitle), 0, 5, 0);
                     return;
                 }
 
@@ -37,7 +40,7 @@ public class StringColorAnimator {
                     return;
                 }
 
-                StringBuilder newSubtitle = new StringBuilder(subtitle).insert(subtitleIndex, secondaryColor);
+                StringBuilder newSubtitle = new StringBuilder(finalSubtitle).insert(subtitleIndex, secondaryColor);
                 if (subtitleIndex > 1)
                     newSubtitle.insert(subtitleIndex - 2, primaryColor);
                 subtitleIndex++;

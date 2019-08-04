@@ -23,7 +23,8 @@ public class NPCWorkingHours {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (NPCEntity npcEntity : sleepEnabledNPCs)
+                for (NPCEntity npcEntity : sleepEnabledNPCs) {
+                    if (!npcEntity.getVillager().isValid()) continue;
                     if (npcEntity.getVillager().getWorld().getTime() < 24000 &&
                             npcEntity.getVillager().getWorld().getTime() > 12000) {
                         npcEntity.getVillager().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 12000, 1));
@@ -40,6 +41,7 @@ public class NPCWorkingHours {
                             npcEntity.getVillager().removePotionEffect(PotionEffectType.INVISIBILITY);
                         }
                     }
+                }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
     }

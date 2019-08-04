@@ -28,6 +28,8 @@ public class MobCombatSettingsConfig {
     public static double levelToIncrement;
     public static boolean obfuscateMobPowers;
     public static double damageToEliteMultiplier, damageToPlayerMultiplier;
+    public static boolean showCustomBossLocation;
+    public static String bossLocationMessage;
 
     public static void initializeConfig() {
 
@@ -57,6 +59,8 @@ public class MobCombatSettingsConfig {
         obfuscateMobPowers = ConfigurationEngine.setBoolean(fileConfiguration, "hideEliteMobPowersUntilAggro", true);
         damageToEliteMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "damageToEliteMobMultiplier", 1);
         damageToPlayerMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "damageToPlayerMultiplier", 1);
+        showCustomBossLocation = ConfigurationEngine.setBoolean(fileConfiguration, "showCustomBossLocation", true);
+        bossLocationMessage = ConfigurationEngine.setString(fileConfiguration, "bossLocationMessage", "&7[EM] &2[Click to track!]");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

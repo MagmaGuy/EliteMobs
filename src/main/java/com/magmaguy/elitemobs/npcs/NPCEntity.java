@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,7 +48,7 @@ public class NPCEntity {
      *
      * @return List of all NPCEntities
      */
-    private static HashSet<NPCEntity> getNPCEntityList() {
+    public static HashSet<NPCEntity> getNPCEntityList() {
         return npcEntityHashSet;
     }
 
@@ -109,6 +110,7 @@ public class NPCEntity {
 
         EntityTracker.registerNPCEntity(this);
         addNPCEntity(this);
+        dupeBuster();
 
     }
 
@@ -117,9 +119,7 @@ public class NPCEntity {
      * as it makes sure the former Villager is slain.
      */
     public void respawnNPC() {
-//        if (Bukkit.getEntity(villager.getUniqueId()) != null)
-//            Bukkit.getEntity(villager.getUniqueId()).remove();
-        for (Entity entity : this.getSpawnLocation().getWorld().getNearbyEntities(this.getSpawnLocation(), 1.5, 3, 1.5))
+        for (Entity entity : getSpawnLocation().getWorld().getNearbyEntities(getSpawnLocation(), 1.5, 3, 1.5))
             if (entity instanceof ArmorStand || entity instanceof Villager)
                 if (entity.getCustomName() != null)
                     entity.remove();
@@ -129,12 +129,11 @@ public class NPCEntity {
         villager.setProfession(profession);
         villager.setAI(canMove);
         villager.setRemoveWhenFarAway(true);
-//        if (Bukkit.getEntity(roleDisplay.getUniqueId()) != null)
-//            Bukkit.getEntity(roleDisplay.getUniqueId()).remove();
         initializeRole(role);
-        EntityTracker.registerNPCEntity(this);
-        addNPCEntity(this);
+        dupeBuster();
+        new DebugMessage("Respawning npc " + getName());
     }
+
 
     /**
      * Returns the Villager associated to this NPCEntity
@@ -540,6 +539,23 @@ public class NPCEntity {
      */
     private String selectString(List<String> strings) {
         return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
+    }
+
+    /**
+     * Busting makes me feel good!
+     */
+    private void dupeBuster() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!villager.isValid())
+                    return;
+                for (Entity entity : villager.getNearbyEntities(1.5, 3, 1.5))
+                    if ((entity instanceof Villager && entity.getCustomName() != null) ||
+                            (entity instanceof ArmorStand && !entity.equals(roleDisplay)))
+                        entity.remove();
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20);
     }
 
 }
