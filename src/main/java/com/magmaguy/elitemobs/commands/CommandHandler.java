@@ -1,6 +1,9 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
+import com.magmaguy.elitemobs.commands.admin.CheckTierOthersCommand;
+import com.magmaguy.elitemobs.commands.admin.StatsCommand;
+import com.magmaguy.elitemobs.commands.combat.CheckTierCommand;
 import com.magmaguy.elitemobs.commands.npc.NPCCommands;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
@@ -52,7 +55,6 @@ public class CommandHandler implements CommandExecutor {
     private final static String VERSION = "elitemobs.version";
     public final static String EVENT_LAUNCH_SMALLTREASUREGOBLIN = "elitemobs.events.smalltreasuregoblin";
     public final static String EVENT_LAUNCH_DEADMOON = "elitemobs.events.smalltreasuregoblin";
-    private final static String CHECK_TIER = "elitemobs.checktier";
     private final static String SET_MAX_TIER = "elitemobs.config.setmaxtier";
     private final static String GET_TIER = "elitemobs.gettier";
     private final static String CHECK_MAX_TIER = "elitemobs.checkmaxtier";
@@ -91,7 +93,7 @@ public class CommandHandler implements CommandExecutor {
                 return true;
             case "stats":
                 if (permCheck(STATS, commandSender))
-                    StatsCommandHandler.statsHandler(commandSender);
+                    StatsCommand.statsHandler(commandSender);
                 return true;
             case "getloot":
             case "gl":
@@ -143,8 +145,11 @@ public class CommandHandler implements CommandExecutor {
             case "checktier":
             case "tiercheck":
             case "tier":
-                if (permCheck(CHECK_TIER, commandSender))
-                    CheckTierCommand.checkTier(((Player) commandSender));
+                if (args.length == 1) {
+                    if (userPermCheck("elitemobs.checktier", commandSender))
+                        new CheckTierCommand((Player) commandSender);
+                } else if (permCheck("elitemobs.checktier.others", commandSender))
+                    new CheckTierOthersCommand(commandSender, args);
                 return true;
             case "checkmaxtier":
             case "maxtier":
@@ -374,8 +379,6 @@ public class CommandHandler implements CommandExecutor {
                 player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
             if (silentPermCheck(SPAWN_BOSS_MOB, commandSender))
                 commandSender.sendMessage("/elitemobs spawnBossMob [bossName]");
-            if (silentPermCheck(CHECK_TIER, commandSender))
-                commandSender.sendMessage("/elitemobs checktier");
             if (silentPermCheck(CHECK_MAX_TIER, commandSender))
                 commandSender.sendMessage("/elitemobs checkmaxtier");
             if (silentPermCheck(SET_MAX_TIER, commandSender))
