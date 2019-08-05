@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.0.18.4
+version: 7.0.18.5
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.13
@@ -33,6 +33,8 @@ permissions:
       elitemobs.currency.cointop: true
       elitemobs.scoreboard: false
       elitemobs.events.*: true
+      elitemobs.checktier: true
+      elitemobs.checktier.others: true
     default: op
   elitemobs.currency.user:
     description: Gives access to the commands users need to use the economy features (shops, paying other players)
@@ -166,6 +168,9 @@ permissions:
     default: op
   elitemobs.checktier:
     description: Allows players to run /elitemobs checktier
+    default: op
+  elitemobs.checktier.others:
+    description: Allows players to run /elitemobs checktier [player]
     default: op
   elitemobs.checkmaxtier:
     description: Allows players to run /elitemobs checkmaxtier

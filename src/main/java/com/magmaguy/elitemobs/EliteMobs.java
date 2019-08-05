@@ -7,6 +7,7 @@ package com.magmaguy.elitemobs;
 import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByPlayerHandler;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
@@ -211,6 +212,7 @@ public class EliteMobs extends JavaPlugin {
         CustomItem.initializeCustomItems();
         CustomEnchantment.initializeCustomEnchantments();
         MobCombatSettingsConfig.initializeConfig();
+        CommandsConfig.initializeConfigs();
     }
 
     public static void worldScanner() {

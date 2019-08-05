@@ -3,9 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
@@ -72,7 +70,9 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             Player player = null;
             if (event.getDamager() instanceof Player)
                 player = (Player) event.getDamager();
-            if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player)
+            if (event.getDamager() instanceof Projectile &&
+                    (event.getDamager() instanceof Arrow || event.getDamager() instanceof Trident) &&
+                    ((Projectile) event.getDamager()).getShooter() instanceof Player)
                 player = (Player) ((Projectile) event.getDamager()).getShooter();
             if (player == null) return;
 
