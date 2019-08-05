@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -153,7 +154,9 @@ public class QuestObjective {
                         .replace("$objectiveAmount", getObjectiveKills() + "")
                         .replace("$objectiveName", getEliteMobName()),
                 ChatColor.GOLD, ChatColor.YELLOW);
-        Bukkit.broadcastMessage(QuestMenuConfig.questCompleteBroadcastMessage);
+        Bukkit.broadcastMessage(QuestMenuConfig.questCompleteBroadcastMessage
+                .replace("$player", player.getDisplayName())
+                .replace("$rank", GuildRank.getRankName(getQuestTier())));
     }
 
     public void sendQuestProgressionMessage(Player player) {
