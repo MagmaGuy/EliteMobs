@@ -1,6 +1,9 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
-import com.magmaguy.elitemobs.*;
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -13,6 +16,7 @@ import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -82,7 +86,7 @@ public class EliteMobEntity {
      * @return Whether the location is valid
      */
     private static boolean validSpawnLocation(Location location) {
-        if (!EliteMobs.WORLDGUARD_IS_ENABLED)
+        if (!EliteMobs.worldguardIsEnabled)
             return true;
         if (!Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) return true;
         com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
@@ -172,7 +176,7 @@ public class EliteMobEntity {
         /*
         Register living entity to keep track of which entity this object is tied to
          */
-        this.livingEntity = spawnBossMobLivingEntity(entityType, location);
+        this.livingEntity = spawnBossMobLivingEntity(entityType, location, this);
         /*
         Register level, this is variable as per stacking rules
          */
@@ -237,7 +241,7 @@ public class EliteMobEntity {
         /*
         Register living entity to keep track of which entity this object is tied to
          */
-        this.livingEntity = spawnBossMobLivingEntity(entityType, location);
+        this.livingEntity = spawnBossMobLivingEntity(entityType, location, this);
         /*
         Register level, this is variable as per stacking rules
          */
@@ -298,8 +302,8 @@ public class EliteMobEntity {
     /**
      * This avoids accidentally assigning an elite mob to an entity spawned specifically to be a boss mob or reinforcement
      */
-    private static LivingEntity spawnBossMobLivingEntity(EntityType entityType, Location location) {
-        NaturalMobSpawnEventHandler.setIgnoreMob(true);
+    private static LivingEntity spawnBossMobLivingEntity(EntityType entityType, Location location, EliteMobEntity eliteMobEntity) {
+        NaturalMobSpawnEventHandler.setIgnoreMob(true, eliteMobEntity);
         return (LivingEntity) location.getWorld().spawnEntity(location, entityType);
     }
 

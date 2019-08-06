@@ -340,6 +340,7 @@ public class EntityTracker implements Listener {
         for (NPCEntity npcEntity : npcEntities)
             if (npcEntity.getVillager().equals(entity)) {
                 entity.remove();
+                entity.removeMetadata(MetadataHandler.NPC_METADATA, MetadataHandler.PLUGIN);
                 return;
             }
     }

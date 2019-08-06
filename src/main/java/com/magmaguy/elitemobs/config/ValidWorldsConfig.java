@@ -18,7 +18,14 @@ public class ValidWorldsConfig {
         for (World world : Bukkit.getWorlds())
             fileConfiguration.addDefault("Valid worlds." + world.getName(), true);
 
+        for (World world : Bukkit.getWorlds())
+            fileConfiguration.addDefault("Zone-based elitemob spawning worlds." + world.getName(), false);
+
+        for (World world : Bukkit.getWorlds())
+            fileConfiguration.addDefault("Nightmare mode worlds." + world.getName(), false);
+
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+
     }
 
 }

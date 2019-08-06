@@ -3,8 +3,9 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.commands.admin.CheckTierOthersCommand;
 import com.magmaguy.elitemobs.commands.admin.StatsCommand;
+import com.magmaguy.elitemobs.commands.admin.npc.NPCCommands;
 import com.magmaguy.elitemobs.commands.combat.CheckTierCommand;
-import com.magmaguy.elitemobs.commands.npc.NPCCommands;
+import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
@@ -13,9 +14,6 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.items.ShareItem;
-import com.magmaguy.elitemobs.quests.PlayerQuest;
-import com.magmaguy.elitemobs.quests.QuestCommand;
-import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
@@ -248,32 +246,7 @@ public class CommandHandler implements CommandExecutor {
                 return true;
             case "quest":
                 if (!userPermCheck("elitemobs.adventurersguild", commandSender)) return true;
-                if (args.length == 1) {
-                    QuestCommand.doMainQuestCommand((Player) commandSender);
-                    return true;
-                }
-                if (args[1].equalsIgnoreCase("status")) {
-                    QuestCommand.doQuestTrackCommand((Player) commandSender);
-                    return true;
-                }
-                if (args[1].equalsIgnoreCase("cancel") && args[3].equalsIgnoreCase("confirm")) {
-                    PlayerQuest.cancelPlayerQuest(Bukkit.getPlayer(args[2]));
-                    if (QuestsMenu.playerHasPendingQuest(Bukkit.getPlayer(args[2]))) {
-                        PlayerQuest playerQuest = QuestsMenu.getPlayerQuestPair(Bukkit.getPlayer(args[2]));
-                        try {
-                            PlayerQuest.addPlayerInQuests(Bukkit.getPlayer(args[2]), playerQuest.clone());
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();
-                        }
-                        playerQuest.getQuestObjective().sendQuestStartMessage(Bukkit.getPlayer(args[2]));
-                        QuestsMenu.removePlayerQuestPair(Bukkit.getPlayer(args[2]));
-                    }
-                    return true;
-                }
-                commandSender.sendMessage("[EliteMobs] Invalid command.");
-                commandSender.sendMessage("[EliteMobs] Valid quest-related commands:");
-                commandSender.sendMessage("[EliteMobs] /em quest");
-                commandSender.sendMessage("[EliteMobs] /em quest status");
+                new com.magmaguy.elitemobs.commands.quest.QuestCommand((Player) commandSender, args);
                 return true;
             case "showitem":
             case "itemshow":

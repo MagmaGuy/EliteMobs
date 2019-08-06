@@ -16,6 +16,7 @@ public class DefaultConfig {
     public static boolean hideEnchantmentsAttribute;
     public static boolean preventEliteMobConversionOfNamedMobs;
     public static boolean doStrictSpawningRules;
+    public static double nightmareWorldSpawnBonus;
 
     public static void initializeConfig() {
 
@@ -29,6 +30,7 @@ public class DefaultConfig {
         hideEnchantmentsAttribute = ConfigurationEngine.setBoolean(fileConfiguration, "hideEnchantmentAttributes", false);
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);
         doStrictSpawningRules = ConfigurationEngine.setBoolean(fileConfiguration, "enableHighCompatibilityMode", false);
+        nightmareWorldSpawnBonus = ConfigurationEngine.setDouble(fileConfiguration, "nightmareWorldSpawnBonus", 0.5);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

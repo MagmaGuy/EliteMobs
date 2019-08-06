@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.commands.npc;
+package com.magmaguy.elitemobs.commands.admin.npc;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
