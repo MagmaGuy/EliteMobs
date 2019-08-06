@@ -24,6 +24,7 @@ import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
+import com.magmaguy.elitemobs.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
@@ -33,7 +34,9 @@ import com.magmaguy.elitemobs.runnables.EggRunnable;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
+import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
+import com.magmaguy.elitemobs.zoneworld.Grid;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -46,10 +49,14 @@ import java.util.List;
 public class EliteMobs extends JavaPlugin {
 
     public static List<World> validWorldList = new ArrayList();
-    public static boolean WORLDGUARD_IS_ENABLED = false;
+    public static boolean worldguardIsEnabled = false;
+    public static List<World> zoneBasedSpawningWorlds = new ArrayList<>();
+    public static List<World> nightmareWorlds = new ArrayList<>();
 
     @Override
     public void onEnable() {
+
+        worldguardIsEnabled = false;
 
         //Enable stats
         Metrics metrics = new Metrics(this);
@@ -67,7 +74,7 @@ public class EliteMobs extends JavaPlugin {
          */
         initializeConfigs();
 
-        if (WORLDGUARD_IS_ENABLED)
+        if (worldguardIsEnabled)
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is enabled!");
         else
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is not enabled!");
@@ -158,11 +165,11 @@ public class EliteMobs extends JavaPlugin {
     public void onLoad() {
         //WorldGuard hook
         try {
-            WORLDGUARD_IS_ENABLED = WorldGuardCompatibility.initialize();
+            worldguardIsEnabled = WorldGuardCompatibility.initialize();
         } catch (NoClassDefFoundError | IllegalStateException ex) {
             Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work." +
                     " Except if you just reloaded the plugin, in which case they will totally work.");
-            WORLDGUARD_IS_ENABLED = false;
+            worldguardIsEnabled = false;
         }
 
     }
@@ -175,6 +182,7 @@ public class EliteMobs extends JavaPlugin {
         EntityTracker.shutdownPurger();
 
         validWorldList.clear();
+        zoneBasedSpawningWorlds.clear();
 
         //save cached data
         Bukkit.getScheduler().cancelTask(PlayerData.databaseSyncTaskID);
@@ -217,14 +225,24 @@ public class EliteMobs extends JavaPlugin {
 
     public static void worldScanner() {
         for (World world : Bukkit.getWorlds())
-            if (ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + world.getName()))
+            if (ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + world.getName())) {
                 validWorldList.add(world);
+                if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + world.getName()))
+                    zoneBasedSpawningWorlds.add(world);
+                if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + world.getName())) {
+                    nightmareWorlds.add(world);
+                    DaylightWatchdog.preventDaylight(world);
+                }
+            }
+
     }
 
     /*
     Repeating tasks that run as long as the server is on
      */
     private void launchRunnables() {
+        if (!zoneBasedSpawningWorlds.isEmpty())
+            Grid.initializeGrid();
         int eggTimerInterval = 20 * 60 * 10 / DefaultConfig.superMobStackAmount;
         PotionEffectApplier.potionEffectApplier();
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.superMobStackAmount > 0) {

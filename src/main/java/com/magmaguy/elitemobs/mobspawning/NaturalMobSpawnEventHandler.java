@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -23,20 +24,24 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 public class NaturalMobSpawnEventHandler implements Listener {
 
     private static boolean ignoreMob = false;
+    private static EliteMobEntity storedEliteMobEntity = null;
 
-    public static void setIgnoreMob(boolean bool) {
+    public static void setIgnoreMob(boolean bool, EliteMobEntity eliteMobEntity) {
         ignoreMob = bool;
+        storedEliteMobEntity = eliteMobEntity;
     }
 
     private static boolean getIgnoreMob() {
         return ignoreMob;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onSpawn(CreatureSpawnEvent event) {
 
         if (getIgnoreMob()) {
-            setIgnoreMob(false);
+            ignoreMob = false;
+            storedEliteMobEntity.setLivingEntity(event.getEntity());
+            EntityTracker.registerEliteMob(storedEliteMobEntity);
             return;
         }
 
@@ -66,6 +71,9 @@ public class NaturalMobSpawnEventHandler implements Listener {
         int huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(livingEntity);
 
         double validChance = MobCombatSettingsConfig.aggressiveMobConversionPercentage + huntingGearChanceAdder;
+
+        if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + event.getEntity().getWorld().getName()))
+            validChance += DefaultConfig.nightmareWorldSpawnBonus;
 
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;

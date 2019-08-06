@@ -5,8 +5,8 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.worldguard.WorldGuardSpawnEventBypasser;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -91,6 +91,7 @@ public class NPCEntity {
         if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
         if (!npCsConfigFields.isEnabled()) return;
 
+        WorldGuardSpawnEventBypasser.forceSpawn();
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         this.villager.setRemoveWhenFarAway(true);
 
@@ -123,6 +124,7 @@ public class NPCEntity {
             if (entity instanceof ArmorStand || entity instanceof Villager)
                 if (entity.getCustomName() != null)
                     entity.remove();
+        WorldGuardSpawnEventBypasser.forceSpawn();
         villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         villager.setCustomName(name);
         villager.setCustomNameVisible(true);
@@ -131,7 +133,6 @@ public class NPCEntity {
         villager.setRemoveWhenFarAway(true);
         initializeRole(role);
         dupeBuster();
-        new DebugMessage("Respawning npc " + getName());
     }
 
 
