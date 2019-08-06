@@ -2,8 +2,10 @@ package com.magmaguy.elitemobs.mobspawning;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.zoneworld.Grid;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -32,6 +34,15 @@ public class NaturalEliteMobSpawnEventHandler {
      * @param spawnReason Reason for the mob spawning
      */
     public static void naturalMobProcessor(Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
+
+        if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + entity.getWorld().getName())) {
+            int eliteMobLevel = (int) (Grid.getMobTierFromLocation(entity.getLocation()) * MobCombatSettingsConfig.perTierLevelIncrease);
+            EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel, spawnReason);
+            if (spawnReason.equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
+                eliteMobEntity.setHasSpecialLoot(false);
+            return;
+        }
+
 
         int eliteMobLevel = getNaturalMobLevel(entity.getLocation());
         if (eliteMobLevel < 0) return;

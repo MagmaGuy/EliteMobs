@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.commands;
+package com.magmaguy.elitemobs.commands.guild;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.combattag.TeleportTag;
