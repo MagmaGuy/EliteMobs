@@ -1,9 +1,7 @@
 package com.magmaguy.elitemobs.events.mobs;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.config.events.premade.KrakenEventConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.powers.ProjectileLocationGenerator;
 import org.bukkit.Bukkit;
@@ -89,7 +87,7 @@ public class Kraken implements Listener {
         kraken.setMaxHealth(100);
         kraken.setHealth(100);
 
-        kraken.setCustomName(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.KRAKEN_NAME)));
+        kraken.setCustomName(KrakenEventConfig.krakenName);
         kraken.setCustomNameVisible(true);
 
         krakenDamageLoop(kraken);

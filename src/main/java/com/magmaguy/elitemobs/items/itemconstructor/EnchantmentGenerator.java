@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.MaterialTier;
+import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
@@ -235,21 +236,15 @@ public class EnchantmentGenerator {
 
         while (secondaryEnchantmentCount != 0) {
 
-            if (validSecondaryEnchantments.size() < 1) {
-
+            if (validSecondaryEnchantments.size() < 1)
                 break;
-
-            }
 
             int randomIndex = ThreadLocalRandom.current().nextInt(validSecondaryEnchantments.size());
 
             List<Enchantment> enchantmentList = new ArrayList();
 
-            for (Enchantment enchantment : validSecondaryEnchantments.keySet()) {
-
+            for (Enchantment enchantment : validSecondaryEnchantments.keySet())
                 enchantmentList.add(enchantment);
-
-            }
 
             Enchantment enchantment = enchantmentList.get(randomIndex);
 
@@ -291,8 +286,11 @@ public class EnchantmentGenerator {
             case IRON_SWORD:
             case STONE_SWORD:
             case WOODEN_SWORD:
+            case TRIDENT:
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
                 break;
             case BOW:
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
                 break;
             case DIAMOND_PICKAXE:
             case GOLDEN_PICKAXE:
@@ -318,6 +316,7 @@ public class EnchantmentGenerator {
             case IRON_AXE:
             case STONE_AXE:
             case WOODEN_AXE:
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
                 break;
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:

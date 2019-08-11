@@ -33,7 +33,8 @@ public class CustomLootConfig {
             new SlowpokeCharmConfig(),
             new TheFellerConfig(),
             new VampiricCharmConfig(),
-            new ZombieKingsAxeConfig()
+            new ZombieKingsAxeConfig(),
+            new MeteorShowerScrollConfig()
     ));
 
     public static void initializeConfigs() {

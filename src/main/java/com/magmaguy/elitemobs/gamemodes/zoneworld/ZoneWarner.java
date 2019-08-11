@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.zoneworld;
+package com.magmaguy.elitemobs.gamemodes.zoneworld;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;

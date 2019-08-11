@@ -3,8 +3,7 @@ package com.magmaguy.elitemobs.items.customitems;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfigFields;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
-import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -219,8 +218,11 @@ public class CustomItem {
                 }
 
                 if (name.equalsIgnoreCase(HunterEnchantment.key) ||
-                        name.equalsIgnoreCase(FlamethrowerEnchantment.key)) {
-                    customEnchantments.put(name, level);
+                        name.equalsIgnoreCase(FlamethrowerEnchantment.key) ||
+                        name.equalsIgnoreCase(CriticalStrikesEnchantment.key) ||
+                        name.equalsIgnoreCase(MeteorShowerEnchantment.key) ||
+                        name.equalsIgnoreCase(SoulbindEnchantment.key)) {
+                    customEnchantments.put(name.toLowerCase(), level);
                     continue;
                 }
 

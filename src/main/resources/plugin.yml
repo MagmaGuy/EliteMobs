@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.0.20
+version: 7.0.20.2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.13
@@ -15,7 +15,6 @@ permissions:
     description: Gives access to all elitemobs commands
     children:
       elitemobs.stats: true
-      elitemobs.shop: true
       elitemobs.getloot: true
       elitemobs.simloot: true
       elitemobs.reload.configs: true
@@ -26,15 +25,13 @@ permissions:
       elitemobs.killall.passiveelites: true
       elitemobs.killall.specificentity: true
       elitemobs.currency.user: true
-      elitemobs.currency.subtract: true
-      elitemobs.currency.set: true
-      elitemobs.currency.check: true
-      elitemobs.currency.add: true
+      elitemobs.currency.admin: true
       elitemobs.currency.cointop: true
       elitemobs.scoreboard: false
       elitemobs.events.*: true
       elitemobs.checktier: true
       elitemobs.checktier.others: true
+      elitemobs.user: true
     default: op
   elitemobs.currency.user:
     description: Gives access to the commands users need to use the economy features (shops, paying other players)
@@ -44,6 +41,13 @@ permissions:
       elitemobs.currency.pay: true
       elitemobs.currency.wallet: true
       elitemobs.currency.cointop: true
+  elitemobs.currency.admin:
+    description: Gives access to the commands admins need to set economy values
+    children:
+      elitemobs.currency.subtract: true
+      elitemobs.currency.set: true
+      elitemobs.currency.check: true
+      elitemobs.currency.add: true
   elitemobs.killall.*:
       description: Allows players to run all /elitemobs kill variations
       children:
@@ -61,6 +65,7 @@ permissions:
         elitemobs.adventurersguild: true
         elitemobs.currency.user: true
         elitemobs.guild: true
+        elitemobs.quest: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -81,9 +86,6 @@ permissions:
     default: op
   elitemobs.spawnmob:
     description: Allow players to run /elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower(just keep adding until done)]
-    default: op
-  elitemobs.spawnbossmob:
-    description: Allows players to run /elitemobs spawnbossmob [bossmob]
     default: op
   elitemobs.scoreboard:
     description: Shows a scoreboard with info about the elite mob a player might be standing next to
@@ -216,4 +218,7 @@ permissions:
     default: op
   elitemobs.guild.npc:
     description: Allows players to access the /em guild menu through NPCs
+    default: op
+  elitemobs.quest:
+    description: Allows players to take on do quests
     default: op

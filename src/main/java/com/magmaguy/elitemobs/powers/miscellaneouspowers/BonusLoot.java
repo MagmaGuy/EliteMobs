@@ -19,7 +19,7 @@ public class BonusLoot extends MinorPower implements Listener {
     @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
         if (!event.getEliteMobEntity().hasPower(this)) return;
-        LootTables.generateLoot(event.getEliteMobEntity());
+        LootTables.generatePlayerLoot(event.getEliteMobEntity());
     }
 
 }

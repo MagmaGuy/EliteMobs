@@ -39,7 +39,9 @@ public class CustomBossesConfig {
             new ZombieDadConfig(),
             new FireFaeConfig(),
             new IceFaeConfig(),
-            new LightningFaeConfig()
+            new LightningFaeConfig(),
+            new BlayyzeConfig(),
+            new EmberConfig()
     ));
 
     /**

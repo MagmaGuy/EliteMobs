@@ -23,6 +23,7 @@ public class SummonTheReturned extends BossPower implements Listener {
 
     @EventHandler
     public void onDamage(EliteMobDamagedByPlayerEvent event) {
+        if (event.isCancelled()) return;
         SummonTheReturned summonTheReturned = (SummonTheReturned) event.getEliteMobEntity().getPower(this);
         if (summonTheReturned == null) return;
         if (!eventIsValid(event, summonTheReturned)) return;

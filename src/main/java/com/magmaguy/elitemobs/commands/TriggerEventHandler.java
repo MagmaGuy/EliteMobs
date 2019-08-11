@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
+import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import org.bukkit.command.CommandSender;
 
@@ -15,6 +16,11 @@ public class TriggerEventHandler {
         if (CommandHandler.permCheck(CommandHandler.EVENT_LAUNCH_DEADMOON, commandSender) && args[1].equalsIgnoreCase("deadmoon")) {
             new DeadMoonEvent();
             commandSender.sendMessage("Queued deadmoon event for next new moon");
+        }
+
+        if (CommandHandler.permCheck(CommandHandler.EVENT_LAUNCH_DEADMOON, commandSender) && args[1].equalsIgnoreCase("meteor")) {
+            new MeteorEvent();
+            commandSender.sendMessage("Queued meteor event for next spawn");
         }
 
     }

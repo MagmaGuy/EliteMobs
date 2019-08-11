@@ -26,15 +26,18 @@ import com.magmaguy.elitemobs.events.actionevents.MiningEvent;
 import com.magmaguy.elitemobs.events.actionevents.TreeChoppingEvent;
 import com.magmaguy.elitemobs.events.mobs.Kraken;
 import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
+import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
+import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
+import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.MeteorShowerEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
-import com.magmaguy.elitemobs.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
@@ -61,7 +64,6 @@ import com.magmaguy.elitemobs.quests.QuestsMenu;
 import com.magmaguy.elitemobs.quests.QuestsTracker;
 import com.magmaguy.elitemobs.worldguard.WorldGuardEliteMobOnlyFlag;
 import com.magmaguy.elitemobs.worldguard.WorldGuardSpawnEventBypasser;
-import com.magmaguy.elitemobs.zoneworld.ZoneWarner;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -158,6 +160,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new HyperLoot(), plugin);
         pluginManager.registerEvents(new SummonRaug(), plugin);
         pluginManager.registerEvents(new SummonTheReturned(), plugin);
+        pluginManager.registerEvents(new SummonEmbers(), plugin);
+        pluginManager.registerEvents(new MeteorShower(), plugin);
+        pluginManager.registerEvents(new BulletHell(), plugin);
 
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
@@ -213,15 +218,16 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new EliteEvent.AbstractEliteEventEvents(), plugin);
         pluginManager.registerEvents(new DeadMoonEvent(), plugin);
         pluginManager.registerEvents(new SmallTreasureGoblinEvent(), plugin);
+        pluginManager.registerEvents(new MeteorEvent(), plugin);
 
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
+        if (com.magmaguy.elitemobs.config.events.EventsConfig.getEventFields("kraken.yml").isEnabled()) {
             pluginManager.registerEvents(new Kraken(), plugin);
             pluginManager.registerEvents(new KrakenEvent(), plugin);
         }
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
+        if (com.magmaguy.elitemobs.config.events.EventsConfig.getEventFields("balrog.yml").isEnabled()) {
             pluginManager.registerEvents(new MiningEvent(), plugin);
         }
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
+        if (com.magmaguy.elitemobs.config.events.EventsConfig.getEventFields("fae.yml").isEnabled()) {
             pluginManager.registerEvents(new TreeChoppingEvent(), plugin);
         }
 
@@ -234,6 +240,7 @@ public class EventsRegistrer {
 
         //Initialize items from custom events
         pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);
+        pluginManager.registerEvents(new MeteorShowerEnchantment.MeteorShowerEvents(), plugin);
 
         //Initialize adventurer's guild
         pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);

@@ -1,8 +1,7 @@
 package com.magmaguy.elitemobs.events.actionevents;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.config.events.premade.FaeEventConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import org.bukkit.GameMode;
@@ -22,6 +21,7 @@ public class TreeChoppingEvent implements Listener {
 
         if (event.isCancelled()) return;
         if (!event.getPlayer().hasPermission("elitemobs.events.fae")) return;
+        if (!FaeEventConfig.isEnabled) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
             return;
         if (!(event.getBlock().getType().equals(Material.ACACIA_WOOD)
@@ -32,7 +32,7 @@ public class TreeChoppingEvent implements Listener {
                 || event.getBlock().getType().equals(Material.SPRUCE_WOOD)))
             return;
 
-        if (ThreadLocalRandom.current().nextDouble() > ConfigValues.eventsConfig.getDouble(EventsConfig.FAE_CHANCE_ON_CHOP))
+        if (ThreadLocalRandom.current().nextDouble() > FaeEventConfig.chanceOnChop)
             return;
 
         new BukkitRunnable() {
