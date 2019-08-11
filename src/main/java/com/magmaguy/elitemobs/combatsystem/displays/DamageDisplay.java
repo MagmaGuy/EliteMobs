@@ -1,26 +1,28 @@
 package com.magmaguy.elitemobs.combatsystem.displays;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
+import com.magmaguy.elitemobs.utils.DialogArmorStand;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
 
 public class DamageDisplay implements Listener {
+
+    public static boolean isCriticalHit = false;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHit(EntityDamageEvent event) {
@@ -55,50 +57,19 @@ public class DamageDisplay implements Listener {
         double randomCoordX = (random.nextDouble() * 2) - 1 + entityLocation.getX();
         double randomCoordZ = (random.nextDouble() * 2) - 1 + entityLocation.getZ();
 
-        Location newLocation = new Location(entityLocation.getWorld(), randomCoordX, entityLocation.getY() + 1.7, randomCoordZ);
+        Location newLocation = new Location(entityLocation.getWorld(), randomCoordX, entityLocation.getY() + 1.5, randomCoordZ);
 
-         /*
-        Dirty fix: armorstands don't render invisibly on their first tick, so it gets moved elsewhere temporarily
-         */
-        ArmorStand armorStand = (ArmorStand) newLocation.getWorld().spawnEntity(newLocation.add(new Vector(0, -50, 0)), EntityType.ARMOR_STAND);
+        if (isCriticalHit) {
+            isCriticalHit = false;
+            DialogArmorStand.createDialogArmorStand(
+                    newLocation.clone(),
+                    ChatColorConverter.convert(EnchantmentsConfig.getEnchantment("critical_strikes.yml").getFileConfiguration()
+                            .getString("criticalHitColor") + "" + ChatColor.BOLD + "" + (int) damage + ""));
+            CriticalStrikesEnchantment.criticalStrikePopupMessage(newLocation.clone().add(new Vector(0, 0.2, 0)));
+            return;
+        }
 
-        armorStand.setVisible(false);
-        armorStand.setMarker(true);
-        int newDisplayDamage = (int) damage;
-        armorStand.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + "" + newDisplayDamage + "");
-        armorStand.setGravity(false);
-        EntityTracker.registerArmorStands(armorStand);
-        armorStand.setCustomNameVisible(false);
-
-        new BukkitRunnable() {
-
-            int taskTimer = 0;
-
-            @Override
-            public void run() {
-
-                if (taskTimer == 0) {
-                    armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
-                            armorStand.getLocation().getY() + 50, armorStand.getLocation().getZ()));
-                } else
-                    armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
-                            armorStand.getLocation().getY() + 0.1, armorStand.getLocation().getZ()));
-
-                if (taskTimer == 1)
-                    armorStand.setCustomNameVisible(true);
-
-                taskTimer++;
-
-                if (taskTimer > 15) {
-
-                    EntityTracker.unregisterArmorStand(armorStand);
-                    cancel();
-
-                }
-
-            }
-
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 0, 1);
+        DialogArmorStand.createDialogArmorStand(newLocation, ChatColor.RED + "" + ChatColor.BOLD + "" + (int) damage + "");
 
     }
 

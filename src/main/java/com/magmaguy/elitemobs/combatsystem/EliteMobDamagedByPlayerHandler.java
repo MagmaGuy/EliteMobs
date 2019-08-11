@@ -3,13 +3,16 @@ package com.magmaguy.elitemobs.combatsystem;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
+import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
+import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -23,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.combatsystem.CombatSystem.isCustomDamageEntity;
 import static com.magmaguy.elitemobs.combatsystem.CombatSystem.removeCustomDamageEntity;
@@ -88,6 +92,11 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
                     Math.pow(event.getEntityDamageByEntityEvent().getDamager().getVelocity().getZ(), 2)) / 5;
             arrowSpeedMultiplier = (arrowSpeedMultiplier < 1) ? arrowSpeedMultiplier : 1;
             newDamage *= arrowSpeedMultiplier;
+        }
+
+        if (isCriticalHit(player)) {
+            newDamage *= 2;
+            DamageDisplay.isCriticalHit = true;
         }
 
         event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
@@ -208,6 +217,11 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         return level / maxEnchantmentLevel <= 1 ? level / maxEnchantmentLevel : 1;
     }
 
+    private boolean isCriticalHit(Player player) {
+        int criticalStrike = ItemTagger.getEnchantment(player.getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key));
+        return ThreadLocalRandom.current().nextDouble() < criticalStrike / 10.0;
+    }
+
     private HashMap<Player, Integer> playerHitCooldownHashMap = new HashMap<>();
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -217,6 +231,5 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         playerHitCooldownHashMap.put(event.getPlayer(), clock);
 
     }
-
 
 }

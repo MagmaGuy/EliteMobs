@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.nightmaremodeworld;
+package com.magmaguy.elitemobs.gamemodes.nightmaremodeworld;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;

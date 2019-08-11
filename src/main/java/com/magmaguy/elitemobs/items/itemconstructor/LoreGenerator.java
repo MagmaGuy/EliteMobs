@@ -23,8 +23,10 @@ import java.util.List;
 
 public class LoreGenerator {
 
-    public static ItemMeta generateLore(ItemMeta itemMeta, Material material, HashMap<Enchantment, Integer> enchantmentMap,
-                                        HashMap<String, Integer> customEnchantments, List<String> potionList, List<String> loreList,
+    public static ItemMeta generateLore(ItemMeta itemMeta, Material material,
+                                        HashMap<Enchantment, Integer> enchantmentMap,
+                                        HashMap<String, Integer> customEnchantments,
+                                        List<String> potionList, List<String> loreList,
                                         EliteMobEntity eliteMobEntity) {
 
         if (DefaultConfig.hideEnchantmentsAttribute)
@@ -64,7 +66,6 @@ public class LoreGenerator {
         //Tag the item
         ItemTagger.registerEnchantments(itemMeta, enchantmentMap);
         ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
-        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
         //Tag the potion effects
         new ElitePotionEffectContainer(itemMeta, potionList);
         itemMeta.setLore(lore);
@@ -73,9 +74,11 @@ public class LoreGenerator {
 
     }
 
-    public static ItemMeta generateLore(ItemMeta itemMeta, Material
-            material, HashMap<Enchantment, Integer> enchantmentMap,
-                                        HashMap<String, Integer> customEnchantments, EliteMobEntity eliteMobEntity) {
+    public static ItemMeta generateLore(ItemMeta itemMeta,
+                                        Material material,
+                                        HashMap<Enchantment, Integer> enchantmentMap,
+                                        HashMap<String, Integer> customEnchantments,
+                                        EliteMobEntity eliteMobEntity) {
 
         if (DefaultConfig.hideEnchantmentsAttribute)
             return itemMeta;

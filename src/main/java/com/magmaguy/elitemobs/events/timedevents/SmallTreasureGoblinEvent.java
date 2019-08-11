@@ -11,10 +11,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import java.util.Arrays;
+
 public class SmallTreasureGoblinEvent extends EliteEvent implements Listener {
 
     public SmallTreasureGoblinEvent() {
-        super(EventWorldFilter.getValidWorlds(WorldType.NORMAL), EventType.KILL_BOSS, EntityType.ZOMBIE);
+        super(EventWorldFilter.getValidWorlds(Arrays.asList(WorldType.NORMAL, WorldType.AMPLIFIED)), EventType.KILL_BOSS, EntityType.ZOMBIE);
     }
 
     @Override

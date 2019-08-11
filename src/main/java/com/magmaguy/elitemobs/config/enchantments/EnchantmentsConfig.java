@@ -76,7 +76,9 @@ public class EnchantmentsConfig {
 
             new FlamethrowerConfig(),
             new HunterConfig(),
-            new SoulbindConfig()
+            new SoulbindConfig(),
+            new CriticalStrikesConfig(),
+            new MeteorShowerConfig()
     ));
 
     public static void initializeConfigs() {

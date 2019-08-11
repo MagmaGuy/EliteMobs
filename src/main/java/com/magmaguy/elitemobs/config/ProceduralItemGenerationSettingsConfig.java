@@ -29,7 +29,7 @@ public class ProceduralItemGenerationSettingsConfig {
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         doProceduralItemDrops = ConfigurationEngine.setBoolean(fileConfiguration, "dropProcedurallyGeneratedItems", true);
-        customEnchantmentChance = ConfigurationEngine.setDouble(fileConfiguration, "customEnchantmentChance", 0.1);
+        customEnchantmentChance = ConfigurationEngine.setDouble(fileConfiguration, "customEnchantmentsChance", 0.5);
 
         addMaterial(Material.DIAMOND_HELMET);
         addMaterial(Material.DIAMOND_CHESTPLATE);

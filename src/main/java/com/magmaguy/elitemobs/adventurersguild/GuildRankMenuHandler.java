@@ -205,7 +205,7 @@ public class GuildRankMenuHandler implements Listener {
         if (rank == 10) mobSpawning = 280;
         if (rank == 11) mobSpawning = 300;
 
-        return ChatColorConverter.convert("&fElite Mob spawn rate modifier: &c" + mobSpawning + "%");
+        return GuildRankMenuConfig.spawnRateModifierMessage.replace("$modifier", mobSpawning + "");
 
     }
 
@@ -226,7 +226,7 @@ public class GuildRankMenuHandler implements Listener {
         if (rank == 10) lootBonus = 280;
         if (rank == 11) lootBonus = 300;
 
-        return ChatColorConverter.convert("&fElite Mob loot modifier: &a" + lootBonus + "%");
+        return GuildRankMenuConfig.lootModifierMessage.replace("$modifier", lootBonus + "");
 
     }
 
@@ -247,7 +247,7 @@ public class GuildRankMenuHandler implements Listener {
         if (rank == 10) difficultyBonus = 190;
         if (rank == 11) difficultyBonus = 200;
 
-        return ChatColorConverter.convert("&fElite Mob difficulty modifier: &4" + difficultyBonus + "%");
+        return GuildRankMenuConfig.spawnRateModifierMessage.replace("$modifier", difficultyBonus + "");
 
     }
 

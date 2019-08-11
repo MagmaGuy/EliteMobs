@@ -56,14 +56,18 @@ public class SellMenu implements Listener {
 
             if (i == SellMenuConfig.confirmSlot) {
 
+                ItemStack clonedConfirmButton = SellMenuConfig.confirmButton.clone();
+
                 List<String> lore = new ArrayList<>();
                 for (String string : SellMenuConfig.confirmButton.getItemMeta().getLore())
                     lore.add(string
                             .replace("$currency_amount", 0 + "")
                             .replace("$currency_name", EconomySettingsConfig.currencyName));
                 SellMenuConfig.confirmButton.getItemMeta().setLore(lore);
-
-                sellInventory.setItem(i, SellMenuConfig.confirmButton);
+                ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
+                clonedMeta.setLore(lore);
+                clonedConfirmButton.setItemMeta(clonedMeta);
+                sellInventory.setItem(i, clonedConfirmButton);
                 continue;
 
             }

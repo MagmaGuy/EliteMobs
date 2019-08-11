@@ -1,21 +1,16 @@
 package com.magmaguy.elitemobs.combatsystem.displays;
 
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.utils.DialogArmorStand;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class HealthDisplay implements Listener {
 
@@ -55,46 +50,7 @@ public class HealthDisplay implements Listener {
         Location entityLocation = new Location(eliteMobEntity.getLivingEntity().getWorld(), eliteMobEntity.getLivingEntity().getLocation().getX(),
                 eliteMobEntity.getLivingEntity().getLocation().getY() + eliteMobEntity.getLivingEntity().getEyeHeight() + 0.5, eliteMobEntity.getLivingEntity().getLocation().getZ());
 
-        /*
-        Dirty fix: armorstands don't render invisibly on their first tick, so it gets moved elsewhere temporarily
-         */
-        ArmorStand armorStand = (ArmorStand) entityLocation.getWorld().spawnEntity(entityLocation.add(new Vector(0, -50, 0)), EntityType.ARMOR_STAND);
-
-        armorStand.setVisible(false);
-        armorStand.setMarker(true);
-        armorStand.setCustomName(setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
-        armorStand.setGravity(false);
-        EntityTracker.registerArmorStands(armorStand);
-        armorStand.setCustomNameVisible(false);
-
-
-        new BukkitRunnable() {
-
-            int taskTimer = 0;
-
-            @Override
-            public void run() {
-
-                Location newLocation = new Location(eliteMobEntity.getLivingEntity().getWorld(), eliteMobEntity.getLivingEntity().getLocation().getX(),
-                        eliteMobEntity.getLivingEntity().getLocation().getY() + eliteMobEntity.getLivingEntity().getEyeHeight() + 0.5, eliteMobEntity.getLivingEntity().getLocation().getZ());
-
-                armorStand.teleport(newLocation);
-
-                if (taskTimer == 1)
-                    armorStand.setCustomNameVisible(true);
-
-                taskTimer++;
-
-                if (taskTimer > 15) {
-
-                    EntityTracker.unregisterArmorStand(armorStand);
-                    cancel();
-
-                }
-
-            }
-
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 0, 1L);
+        DialogArmorStand.createDialogArmorStand(entityLocation, setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
 
     }
 
@@ -105,29 +61,17 @@ public class HealthDisplay implements Listener {
 
         double healthPercentage = currentHealth * 100 / maxHealth;
 
-        if (healthPercentage > 75) {
-
+        if (healthPercentage > 75)
             return ChatColor.DARK_GREEN;
 
-        }
-
-        if (healthPercentage > 50) {
-
+        if (healthPercentage > 50)
             return ChatColor.GREEN;
 
-        }
-
-        if (healthPercentage > 25) {
-
+        if (healthPercentage > 25)
             return ChatColor.RED;
 
-        }
-
-        if (healthPercentage > 0) {
-
+        if (healthPercentage > 0)
             return ChatColor.DARK_RED;
-
-        }
 
         return ChatColor.DARK_RED;
 

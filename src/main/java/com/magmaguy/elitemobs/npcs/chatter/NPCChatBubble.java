@@ -44,7 +44,7 @@ public class NPCChatBubble {
 
                 @Override
                 public void run() {
-                    if (counter > 20 * 3) {
+                    if (counter > 20 * 5) {
                         messageBubble.remove();
                         cancel();
                         return;
@@ -54,7 +54,7 @@ public class NPCChatBubble {
                         messageBubble.teleport(messageBubble.getLocation().add(new Vector(0, 49.2, 0)));
 
                     if (counter > 1)
-                        messageBubble.teleport(messageBubble.getLocation().clone().add(new Vector(0, 0.01, 0)));
+                        messageBubble.teleport(messageBubble.getLocation().clone().add(new Vector(0, 0.005, 0)));
 
                     counter++;
                 }

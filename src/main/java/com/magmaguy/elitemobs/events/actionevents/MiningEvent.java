@@ -2,8 +2,7 @@ package com.magmaguy.elitemobs.events.actionevents;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.config.events.premade.BalrogEventConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import org.bukkit.GameMode;
@@ -23,7 +22,7 @@ public class MiningEvent implements Listener {
     public void onMine(BlockBreakEvent event) {
 
         if (event.isCancelled()) return;
-        if (!ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) return;
+        if (!BalrogEventConfig.isEnabled) return;
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
             return;
@@ -35,7 +34,7 @@ public class MiningEvent implements Listener {
                 event.getBlock().getType().equals(Material.COAL_ORE) || event.getBlock().getType().equals(Material.REDSTONE_ORE) ||
                 event.getBlock().getType().equals(Material.LAPIS_ORE) || event.getBlock().getType().equals(Material.GOLD_ORE)))
             return;
-        if (ThreadLocalRandom.current().nextDouble() > ConfigValues.eventsConfig.getDouble(EventsConfig.BALROG_CHANCE_ON_MINE))
+        if (ThreadLocalRandom.current().nextDouble() > BalrogEventConfig.chanceOnMine)
             return;
 
         new BukkitRunnable() {

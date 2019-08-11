@@ -6,6 +6,8 @@ import com.magmaguy.elitemobs.commands.admin.StatsCommand;
 import com.magmaguy.elitemobs.commands.admin.npc.NPCCommands;
 import com.magmaguy.elitemobs.commands.combat.CheckTierCommand;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.commands.quest.QuestCommand;
+import com.magmaguy.elitemobs.commands.quest.QuestStatusCommand;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
@@ -107,17 +109,17 @@ public class CommandHandler implements CommandExecutor {
                 return true;
             case "shop":
             case "store":
-                if (userPermCheck("elitemobs.shop.command", commandSender)) {
-                    ProceduralShopMenu.shopInitializer((Player) commandSender);
-                }
+                if (userPermCheck("elitemobs.shop.command", commandSender))
+                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandSender))
+                        ProceduralShopMenu.shopInitializer((Player) commandSender);
                 return true;
             case "customshop":
             case "cshop":
             case "customstore":
             case "cstore":
-                if (userPermCheck("elitemobs.customshop.command", commandSender)) {
-                    CustomShopMenu.customShopInitializer((Player) commandSender);
-                }
+                if (userPermCheck("elitemobs.customshop.command", commandSender))
+                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandSender))
+                        CustomShopMenu.customShopInitializer((Player) commandSender);
                 return true;
             case "wallet":
             case "bal":
@@ -245,8 +247,12 @@ public class CommandHandler implements CommandExecutor {
                 commandSender.sendMessage("[EliteMobs] Now all you need to do is add the permission elitemobs.user to your users and you're all set!");
                 return true;
             case "quest":
-                if (!userPermCheck("elitemobs.adventurersguild", commandSender)) return true;
-                new com.magmaguy.elitemobs.commands.quest.QuestCommand((Player) commandSender, args);
+                if (userPermCheck("elitemobs.quest", commandSender)) {
+                    if (args.length == 1) {
+                        if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandSender))
+                            new QuestCommand((Player) commandSender);
+                    } else new QuestStatusCommand((Player) commandSender, args);
+                }
                 return true;
             case "showitem":
             case "itemshow":
@@ -350,14 +356,16 @@ public class CommandHandler implements CommandExecutor {
                 player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
             if (silentPermCheck(SPAWNMOB, commandSender))
                 player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
-            if (silentPermCheck(SPAWN_BOSS_MOB, commandSender))
-                commandSender.sendMessage("/elitemobs spawnBossMob [bossName]");
             if (silentPermCheck(CHECK_MAX_TIER, commandSender))
                 commandSender.sendMessage("/elitemobs checkmaxtier");
             if (silentPermCheck(SET_MAX_TIER, commandSender))
                 commandSender.sendMessage("/elitemobs setmaxtier [tier]");
             if (silentPermCheck(GET_TIER, commandSender))
                 commandSender.sendMessage("/elitemobs gettier [tier]");
+            if (silentPermCheck("elitemobs.quest", commandSender)) {
+                commandSender.sendMessage("/elitemobs quest");
+                commandSender.sendMessage("/elitemobs quest status");
+            }
 
 
         } else if (commandSender instanceof ConsoleCommandSender) {

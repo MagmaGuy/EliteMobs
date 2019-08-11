@@ -38,17 +38,22 @@ public class LootTables implements Listener {
         if (event.getEliteMobEntity().getLevel() < 2) return;
         if (event.getEliteMobEntity().getDamagers().isEmpty()) return;
 
-        for (Player player : event.getEliteMobEntity().getDamagers().keySet()) {
+        generatePlayerLoot(event.getEliteMobEntity());
 
-            if (event.getEliteMobEntity().getDamagers().get(player) / event.getEliteMobEntity().getMaxHealth() < 0.1)
+    }
+
+    public static void generatePlayerLoot(EliteMobEntity eliteMobEntity) {
+        for (Player player : eliteMobEntity.getDamagers().keySet()) {
+
+            if (eliteMobEntity.getDamagers().get(player) / eliteMobEntity.getMaxHealth() < 0.1)
                 return;
 
-            new ItemLootShower(event.getEliteMobEntity().getTier(), event.getEliteMobEntity().getLivingEntity().getLocation(), player);
+            new ItemLootShower(eliteMobEntity.getTier(), eliteMobEntity.getLivingEntity().getLocation(), player);
 
             Item item = null;
 
             if (AdventurersGuildConfig.guildLootLimiter) {
-                double itemTier = setItemTier((int) event.getEliteMobEntity().getTier());
+                double itemTier = setItemTier((int) eliteMobEntity.getTier());
                 if (itemTier > GuildRank.getRank(player) * 10) {
                     itemTier = GuildRank.getRank(player) * 10;
                     new BukkitRunnable() {
@@ -58,9 +63,9 @@ public class LootTables implements Listener {
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
                 }
-                item = generateLoot((int) Math.floor(itemTier), event.getEliteMobEntity());
+                item = generateLoot((int) Math.floor(itemTier), eliteMobEntity);
             } else
-                item = generateLoot(event.getEliteMobEntity());
+                item = generateLoot(eliteMobEntity);
 
             if (item != null &&
                     item.getItemStack() != null &&
@@ -85,7 +90,7 @@ public class LootTables implements Listener {
     private static boolean limitedItemsExist = CustomItem.getLimitedItem() != null && !CustomItem.getLimitedItem().isEmpty();
     private static boolean scalableItemsExist = CustomItem.getScalableItems() != null && !CustomItem.getScalableItems().isEmpty();
 
-    public static Item generateLoot(EliteMobEntity eliteMobEntity) {
+    private static Item generateLoot(EliteMobEntity eliteMobEntity) {
 
         int mobTier = (int) MobTierCalculator.findMobTier(eliteMobEntity);
 
@@ -98,7 +103,7 @@ public class LootTables implements Listener {
 
     }
 
-    public static Item generateLoot(int itemTier, EliteMobEntity eliteMobEntity) {
+    private static Item generateLoot(int itemTier, EliteMobEntity eliteMobEntity) {
 
          /*
         Handle the odds of an item dropping

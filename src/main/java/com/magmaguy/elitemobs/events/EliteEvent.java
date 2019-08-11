@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -100,8 +101,11 @@ public class EliteEvent extends AbstractEliteEvent {
     public EliteEvent(ArrayList<World> worlds, EventType eventType, EntityType entityType) {
         //TODO: This won't work in later versions
         for (EliteEvent eliteEvent : activeEvents)
-            if (eliteEvent.getEventType().equals(eventType))
+            if (eliteEvent.getEventType().equals(eventType)) {
+                new DebugMessage("Same type found");
                 return;
+
+            }
         this.worlds = worlds;
         if (worlds == null || worlds.isEmpty()) return;
         setEventType(eventType);
@@ -150,6 +154,10 @@ public class EliteEvent extends AbstractEliteEvent {
         removeActiveEvent(this);
         if (this.eventEndMessage == null) return;
         sendEventEndMessage(world);
+    }
+
+    public void silentCompleteEvent() {
+        removeActiveEvent(this);
     }
 
     public void setEventStartMessage(String eventStartMessage) {
@@ -204,7 +212,7 @@ public class EliteEvent extends AbstractEliteEvent {
         public void onBossDeath(EliteMobDeathEvent event) {
             if (getActiveEvents().isEmpty()) return;
             for (EliteEvent eliteEvent : getActiveEvents())
-                if (!event.getEliteMobEntity().equals(eliteEvent.getBossEntity())) {
+                if (event.getEliteMobEntity().equals(eliteEvent.getBossEntity())) {
                     eliteEvent.bossDeathEventHandler(event);
                     return;
                 }

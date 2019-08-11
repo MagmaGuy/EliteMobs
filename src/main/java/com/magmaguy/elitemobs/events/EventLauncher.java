@@ -3,7 +3,11 @@ package com.magmaguy.elitemobs.events;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.config.events.premade.DeadMoonEventConfig;
+import com.magmaguy.elitemobs.config.events.premade.MeteorEventConfig;
+import com.magmaguy.elitemobs.config.events.premade.SmallTreasureGoblinEventConfig;
 import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
+import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -85,23 +89,28 @@ public class EventLauncher {
 
         //todo: once more events are added, randomize which one gets picked in a weighed fashion
         HashMap<String, Double> weighedConfigValues = new HashMap<>();
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.TREASURE_GOBLIN_SMALL_ENABLED))
-            weighedConfigValues.put(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT, ConfigValues.eventsConfig.getDouble(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT));
+        if (SmallTreasureGoblinEventConfig.isEnabled)
+            weighedConfigValues.put("smalltreasuregoblin", SmallTreasureGoblinEventConfig.weight);
 
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.DEAD_MOON_ENABLED))
-            weighedConfigValues.put(EventsConfig.DEAD_MOON_EVENT_WEIGHT, ConfigValues.eventsConfig.getDouble(EventsConfig.DEAD_MOON_EVENT_WEIGHT));
+        if (DeadMoonEventConfig.isEnabled)
+            weighedConfigValues.put("deadmoon", DeadMoonEventConfig.weight);
+
+        if (MeteorEventConfig.isEnabled)
+            weighedConfigValues.put("meteor", MeteorEventConfig.weight);
 
         if (weighedConfigValues.isEmpty()) return;
 
         switch (pickWeighedProbability(weighedConfigValues)) {
 
-            case EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT:
+            case "smalltreasuregoblin":
                 new SmallTreasureGoblinEvent();
                 return;
-            case EventsConfig.DEAD_MOON_EVENT_WEIGHT:
+            case "deadmoon":
                 new DeadMoonEvent();
                 return;
-
+            case "meteor":
+                new MeteorEvent();
+                return;
         }
 
     }

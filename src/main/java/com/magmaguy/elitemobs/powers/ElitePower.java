@@ -33,7 +33,9 @@ public class ElitePower {
             new SpiritWalk(),
             new SummonRaug(),
             new SummonTheReturned(),
-
+            new MeteorShower(),
+            new BulletHell(),
+            new SummonEmbers(),
 
             //major powers
             new SkeletonPillar(),
