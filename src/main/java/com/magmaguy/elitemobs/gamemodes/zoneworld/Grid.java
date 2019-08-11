@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.zoneworld;
+package com.magmaguy.elitemobs.gamemodes.zoneworld;
 
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Location;
@@ -49,6 +49,15 @@ public class Grid {
         //Assuming the chunks increment in 100
         int chunkX = (int) Math.floor((location.getX() - customSpawnLocation.getX()) / EliteChunk.getGridSize());
         int chunkZ = (int) Math.floor((location.getZ() - customSpawnLocation.getZ()) / EliteChunk.getGridSize());
+
+        if (chunkX > 100)
+            chunkX = 100;
+        if (chunkX < -100)
+            chunkX = -100;
+        if (chunkZ > 100)
+            chunkZ = 100;
+        if (chunkZ < -100)
+            chunkZ = -100;
 
         return EliteChunk.getEliteChunk(chunkX, chunkZ);
     }

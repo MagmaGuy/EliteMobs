@@ -64,7 +64,10 @@ public class PowersConfig {
             new AttackVacuumConfig(),
             new AttackWeaknessConfig(),
             new AttackWebConfig(),
-            new AttackWitherConfig()
+            new AttackWitherConfig(),
+            new SummonEmbersConfig(),
+            new MeteorShowerConfig(),
+            new BulletHellConfig()
     ));
 
     public static void initializeConfigs() {

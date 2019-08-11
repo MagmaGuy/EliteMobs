@@ -1,5 +1,8 @@
 package com.magmaguy.elitemobs.config;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -9,7 +12,7 @@ public class AdventurersGuildConfig {
     public static boolean enableAdventurersGuild;
     public static boolean addMaxHealth;
     public static String guildWorldName;
-    public static String guildWorldLocation;
+    public static Location guildWorldLocation;
     public static boolean agTeleport;
     private static String RANK_NAMES = "Adventurers Guild Rank Names";
     private static String guildRank = "Guild Rank ";
@@ -36,7 +39,42 @@ public class AdventurersGuildConfig {
         enableAdventurersGuild = ConfigurationEngine.setBoolean(fileConfiguration, "Enable adventurer's guild", true);
         addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
         guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name", "EliteMobs_adventurers_guild");
-        guildWorldLocation = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
+        String locationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
+
+        guildWorldLocation = null;
+
+        for (World world : Bukkit.getWorlds())
+            if (world.getName().equals(AdventurersGuildConfig.guildWorldName)) {
+                double x = 0, y = 0, z = 0;
+                float yaw = 0, pitch = 0;
+                int counter = 0;
+
+                for (String substring : locationString.split(",")) {
+                    switch (counter) {
+                        case 0:
+                            x = Double.parseDouble(substring);
+                            break;
+                        case 1:
+                            y = Double.parseDouble(substring);
+                            break;
+                        case 2:
+                            z = Double.parseDouble(substring);
+                            break;
+                        case 3:
+                            yaw = Float.parseFloat(substring);
+                            break;
+                        case 4:
+                            pitch = Float.parseFloat(substring);
+                            break;
+                    }
+                    counter++;
+
+                }
+
+                guildWorldLocation = new Location(world, x, y, z, yaw, pitch);
+
+            }
+
         agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);
         rankNames0 = ConfigurationEngine.setString(fileConfiguration, "0", "&8Commoner");
         rankNames1 = ConfigurationEngine.setString(fileConfiguration, "1", "&fFresh Meat");

@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
@@ -18,13 +19,14 @@ import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
+import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
+import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
-import com.magmaguy.elitemobs.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
@@ -36,7 +38,6 @@ import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
-import com.magmaguy.elitemobs.zoneworld.Grid;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -221,6 +222,7 @@ public class EliteMobs extends JavaPlugin {
         CustomEnchantment.initializeCustomEnchantments();
         MobCombatSettingsConfig.initializeConfig();
         CommandsConfig.initializeConfigs();
+        EventsConfig.initializeConfigs();
     }
 
     public static void worldScanner() {

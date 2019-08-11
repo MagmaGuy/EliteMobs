@@ -1,11 +1,9 @@
 package com.magmaguy.elitemobs.events.timedevents;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.config.events.premade.DeadMoonEventConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.EventWorldFilter;
@@ -19,17 +17,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Arrays;
+
 public class DeadMoonEvent extends EliteEvent implements Listener {
 
     public DeadMoonEvent() {
-        super(EventWorldFilter.getValidWorlds(WorldType.NORMAL), EventType.SURVIVAL, EntityType.ZOMBIE);
+        super(EventWorldFilter.getValidWorlds(Arrays.asList(WorldType.NORMAL, WorldType.AMPLIFIED)), EventType.SURVIVAL, EntityType.ZOMBIE);
     }
 
     @Override
     public void activateEvent(Location location) {
         unQueue();
         super.setBossEntity(CustomBossEntity.constructCustomBoss("zombie_king.yml", location, DynamicBossLevelConstructor.findDynamicBossLevel()));
-        super.setEventStartMessage(ChatColorConverter.convert(ConfigValues.eventsConfig.getString(EventsConfig.DEADMOON_ANNOUNCEMENT_MESSAGE)));
+        super.setEventStartMessage(DeadMoonEventConfig.eventAnnouncementMessage);
         super.sendEventStartMessage(getActiveWorld());
         DeadMoonEvent deadMoonEvent = this;
         new BukkitRunnable() {

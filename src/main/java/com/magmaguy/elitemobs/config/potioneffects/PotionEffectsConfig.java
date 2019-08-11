@@ -17,10 +17,6 @@ public class PotionEffectsConfig {
         potionEffects.put(fileName, powersConfigFields);
     }
 
-    public static HashMap<String, PotionEffectsConfigFields> getPotionEffects() {
-        return potionEffects;
-    }
-
     public static PotionEffectsConfigFields getPotionEffect(String fileName) {
         fileName = fileName.toLowerCase();
         if (!fileName.contains(".yml"))

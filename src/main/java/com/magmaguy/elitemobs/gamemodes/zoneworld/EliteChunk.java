@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.zoneworld;
+package com.magmaguy.elitemobs.gamemodes.zoneworld;
 
 import java.util.HashMap;
 

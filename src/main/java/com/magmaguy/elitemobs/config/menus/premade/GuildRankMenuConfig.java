@@ -19,6 +19,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
     public static String lowTierWarning, normalTierWarning;
     public static ItemStack unlockedButton, lockedButton, currentButton, nextButton;
     public static String notEnoughCurrencyMessage, unlockMessage, broadcastMessage, failedMessage;
+    public static String spawnRateModifierMessage, lootModifierMessage, difficultyModifierMessage;
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -92,6 +93,10 @@ public class GuildRankMenuConfig extends MenusConfigFields {
         broadcastMessage = ConfigurationEngine.setString(fileConfiguration, "questCompleteBroadcastMessage", "&7[EliteMobs] &a$player &ahas reached the $rankName &aguild rank!");
 
         failedMessage = ConfigurationEngine.setString(fileConfiguration, "failedMessage", "&7[EliteMobs] &cYou need to unlock other ranks first!");
+
+        spawnRateModifierMessage = ConfigurationEngine.setString(fileConfiguration, "spawnRateModifierMessage", "&fElite Mob spawn rate modifier: &c$modifier%");
+        lootModifierMessage = ConfigurationEngine.setString(fileConfiguration, "lootModifierMessage", "&fElite Mob loot modifier: &a$modifier%");
+        difficultyModifierMessage = ConfigurationEngine.setString(fileConfiguration, "difficultyModifierMessage", "&fElite Mob difficulty modifier: &c$modifier%");
 
     }
 

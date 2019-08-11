@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
+import com.magmaguy.elitemobs.config.enchantments.premade.CriticalStrikesConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -46,6 +47,7 @@ public abstract class CustomEnchantment {
     public static void initializeCustomEnchantments() {
         new FlamethrowerEnchantment();
         new HunterEnchantment();
+        new CriticalStrikesConfig();
     }
 
     /*
