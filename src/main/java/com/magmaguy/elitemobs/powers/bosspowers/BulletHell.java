@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import com.magmaguy.elitemobs.powers.offensivepowers.AttackArrow;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -39,7 +38,6 @@ public class BulletHell extends BossPower implements Listener {
     }
 
     public void doBulletHell(EliteMobEntity eliteMobEntity) {
-        new DebugMessage("running");
         eliteMobEntity.getLivingEntity().setAI(false);
         if (eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)).getBlock().getType().equals(Material.AIR))
             eliteMobEntity.getLivingEntity().teleport(eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));

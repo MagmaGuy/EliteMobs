@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
@@ -313,12 +314,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
             CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
 
-            //Do loot
-            if (!customBossEntity.getUniqueLootList().isEmpty())
-                for (CustomItem customItem : customBossEntity.getUniqueLootList().keySet())
-                    if (ThreadLocalRandom.current().nextDouble() < customBossEntity.getUniqueLootList().get(customItem))
-                        customBossEntity.getLivingEntity().getWorld().dropItem(customBossEntity.getLivingEntity().getLocation(),
-                                customItem.generateItemStack((int) customBossEntity.getTier() + 1));
 
             //Do death message
             String playersList = "";
@@ -327,6 +322,18 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     playersList += player.getDisplayName();
                 else
                     playersList += ", " + player.getDisplayName();
+
+                //Do loot
+                if (!customBossEntity.getUniqueLootList().isEmpty())
+                    for (CustomItem customItem : customBossEntity.getUniqueLootList().keySet())
+                        if (ThreadLocalRandom.current().nextDouble() < customBossEntity.getUniqueLootList().get(customItem)) {
+                            Item loot = customBossEntity.getLivingEntity().getWorld().dropItem(customBossEntity.getLivingEntity().getLocation(),
+                                    customItem.generateItemStack((int) customBossEntity.getTier() + 1));
+                            SoulbindEnchantment.addEnchantment(loot, player);
+                            loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
+                            loot.setCustomNameVisible(true);
+                        }
+
             }
 
             if (customBossEntity.customBossConfigFields.getDeathMessage() != null)

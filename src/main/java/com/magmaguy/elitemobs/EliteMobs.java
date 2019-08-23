@@ -57,8 +57,6 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        worldguardIsEnabled = false;
-
         //Enable stats
         Metrics metrics = new Metrics(this);
 
@@ -165,6 +163,7 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onLoad() {
         //WorldGuard hook
+        //todo: fix
         try {
             worldguardIsEnabled = WorldGuardCompatibility.initialize();
         } catch (NoClassDefFoundError | IllegalStateException ex) {
