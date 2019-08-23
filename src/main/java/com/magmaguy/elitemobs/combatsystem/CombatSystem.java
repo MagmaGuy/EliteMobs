@@ -18,10 +18,6 @@ public class CombatSystem {
 
     private static HashSet<LivingEntity> customDamageEntity = new HashSet<>();
 
-    public static HashSet<LivingEntity> getCustomDamageEntities() {
-        return customDamageEntity;
-    }
-
     public static boolean isCustomDamageEntity(LivingEntity livingEntity) {
         return customDamageEntity.contains(livingEntity);
     }

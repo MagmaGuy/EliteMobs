@@ -12,7 +12,7 @@ public class MagmaguysToothpickConfig extends CustomLootConfigFields {
                 Material.WOODEN_SWORD.toString(),
                 "&4Magmaguy&c's &2Toothpick",
                 Arrays.asList("&aIn nearly mint condition!"),
-                Arrays.asList("VANISHING_CURSE,1", "SOULBIND,1"),
+                Arrays.asList("VANISHING_CURSE,1"),
                 null,
                 "dynamic",
                 "scalable",
