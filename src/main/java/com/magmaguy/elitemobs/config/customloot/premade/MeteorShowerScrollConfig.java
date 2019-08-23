@@ -12,7 +12,7 @@ public class MeteorShowerScrollConfig extends CustomLootConfigFields {
                 Material.PAPER.toString(),
                 "&7Meteor Shower Scroll",
                 Arrays.asList("&4Call forth destruction.", "&4Single-use."),
-                Arrays.asList("METEOR_SHOWER,1", "SOULBIND,1"),
+                Arrays.asList("METEOR_SHOWER,1"),
                 Arrays.asList(),
                 "dynamic",
                 "fixed",

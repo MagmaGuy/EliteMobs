@@ -17,12 +17,8 @@ import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
-import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -89,11 +85,7 @@ public class EliteMobEntity {
         if (!EliteMobs.worldguardIsEnabled)
             return true;
         if (!Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) return true;
-        com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
-        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionQuery query = container.createQuery();
-        ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
-        return set.testState(null, (StateFlag) WorldGuardCompatibility.getEliteMobsSpawnFlag());
+        return WorldGuardFlagChecker.checkFlag(location, (StateFlag) WorldGuardCompatibility.getEliteMobsSpawnFlag());
     }
 
     /**
