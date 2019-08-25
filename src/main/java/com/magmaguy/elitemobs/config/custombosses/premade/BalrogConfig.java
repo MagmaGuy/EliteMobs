@@ -35,6 +35,7 @@ public class BalrogConfig extends CustomBossConfigFields {
                 Arrays.asList(Particle.SMOKE_LARGE.toString(), Particle.SMOKE_LARGE.toString(), Particle.SMOKE_LARGE.toString(), Particle.SMOKE_LARGE.toString(),
                         Particle.FLAME.toString(), Particle.FLAME.toString()),
                 null,
-                null);
+                null,
+                0);
     }
 }

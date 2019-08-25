@@ -4,9 +4,16 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 
 public class CustomBossConfigFields {
+
+    private static HashSet<CustomBossConfigFields> naturallySpawnedElites = new HashSet<>();
+
+    public static HashSet<CustomBossConfigFields> getNaturallySpawnedElites() {
+        return naturallySpawnedElites;
+    }
 
     private String fileName;
     private String entityType;
@@ -34,6 +41,7 @@ public class CustomBossConfigFields {
     private boolean dropsVanillaLoot;
     private List<String> trails;
     private List<String> onDamageMessages, onDamagedMessages;
+    private double spawnChance;
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -64,7 +72,8 @@ public class CustomBossConfigFields {
                                   boolean dropsVanillaLoot,
                                   List<String> trails,
                                   List<String> onDamageMessages,
-                                  List<String> onDamagedMessages) {
+                                  List<String> onDamagedMessages,
+                                  double spawnChance) {
         this.fileName = fileName + ".yml";
         this.entityType = entityType;
         this.isEnabled = isEnabled;
@@ -92,6 +101,7 @@ public class CustomBossConfigFields {
         this.trails = trails;
         this.onDamageMessages = onDamageMessages;
         this.onDamagedMessages = onDamagedMessages;
+        this.spawnChance = spawnChance;
     }
 
 
@@ -131,6 +141,7 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("trails", trails);
         fileConfiguration.addDefault("onDamageMessages", onDamageMessages);
         fileConfiguration.addDefault("onDamagedMessages", onDamagedMessages);
+        fileConfiguration.addDefault("spawnChance", spawnChance);
     }
 
     /**
@@ -177,6 +188,12 @@ public class CustomBossConfigFields {
         this.trails = configuration.getStringList("trails");
         this.onDamageMessages = configuration.getStringList("onDamageMessages");
         this.onDamagedMessages = configuration.getStringList("onDamagedMessages");
+        if (configuration.get("spawnChance") != null) {
+            this.spawnChance = configuration.getDouble("spawnChance");
+            if (this.spawnChance > 0)
+                naturallySpawnedElites.add(this);
+        } else
+            this.spawnChance = 0;
     }
 
     public String getFileName() {
@@ -286,4 +303,9 @@ public class CustomBossConfigFields {
     public List<String> getOnDamagedMessages() {
         return onDamagedMessages;
     }
+
+    public double getSpawnChance() {
+        return spawnChance;
+    }
+
 }

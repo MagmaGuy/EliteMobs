@@ -78,7 +78,8 @@ public class EnchantmentsConfig {
             new HunterConfig(),
             new SoulbindConfig(),
             new CriticalStrikesConfig(),
-            new MeteorShowerConfig()
+            new MeteorShowerConfig(),
+            new DrillingConfig()
     ));
 
     public static void initializeConfigs() {

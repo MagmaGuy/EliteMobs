@@ -74,7 +74,7 @@ public class EliteMobs extends JavaPlugin {
         initializeConfigs();
 
         if (worldguardIsEnabled)
-            Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is enabled!");
+            Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is enabled!");
         else
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is not enabled!");
 
