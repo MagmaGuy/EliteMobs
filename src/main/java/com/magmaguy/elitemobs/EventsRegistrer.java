@@ -31,6 +31,7 @@ import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
 import com.magmaguy.elitemobs.items.*;
+import com.magmaguy.elitemobs.items.customenchantments.DrillingEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.MeteorShowerEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -241,6 +242,7 @@ public class EventsRegistrer {
         //Initialize items from custom events
         pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new MeteorShowerEnchantment.MeteorShowerEvents(), plugin);
+        pluginManager.registerEvents(new DrillingEnchantment(), plugin);
 
         //Initialize adventurer's guild
         pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);

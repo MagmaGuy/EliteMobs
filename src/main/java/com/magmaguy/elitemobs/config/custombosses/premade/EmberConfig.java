@@ -34,6 +34,7 @@ public class EmberConfig extends CustomBossConfigFields {
                 true,
                 Arrays.asList(Particle.SPELL_WITCH.toString()),
                 null,
-                null);
+                null,
+                0);
     }
 }

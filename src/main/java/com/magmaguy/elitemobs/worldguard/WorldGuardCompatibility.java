@@ -34,13 +34,13 @@ public class WorldGuardCompatibility {
             registry.register(ELITEMOBS_SPAWN_FLAG);
             Bukkit.getLogger().info("[EliteMobs] - elitemob-spawning");
         } catch (FlagConflictException | IllegalStateException e) {
-            Bukkit.getLogger().info("[EliteMobs] Warning: flag elitemob-spawning already exists! This is normal if you've just now reloaded EliteMobs.");
+            Bukkit.getLogger().warning("[EliteMobs] Warning: flag elitemob-spawning already exists! This is normal if you've just now reloaded EliteMobs.");
         }
         try {
             registry.register(ELITEMOBS_ONLY_SPAWN_FLAG);
             Bukkit.getLogger().info("[EliteMobs] - elitemob-only-spawning");
         } catch (FlagConflictException | IllegalStateException e) {
-            Bukkit.getLogger().info("[EliteMobs] Warning: flag elitemob-only-spawning already exists! This is normal if you've just now reloaded EliteMobs.");
+            Bukkit.getLogger().warning("[EliteMobs] Warning: flag elitemob-only-spawning already exists! This is normal if you've just now reloaded EliteMobs.");
         }
 
         return true;

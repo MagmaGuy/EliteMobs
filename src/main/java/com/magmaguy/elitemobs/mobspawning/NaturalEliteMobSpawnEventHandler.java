@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.mobspawning;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -16,6 +18,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by MagmaGuy on 10/10/2016.
@@ -40,6 +43,7 @@ public class NaturalEliteMobSpawnEventHandler {
             EliteMobEntity eliteMobEntity = new EliteMobEntity((LivingEntity) entity, eliteMobLevel, spawnReason);
             if (spawnReason.equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
                 eliteMobEntity.setHasSpecialLoot(false);
+            naturalCustomBossSpawn(entity, eliteMobLevel);
             return;
         }
 
@@ -54,6 +58,21 @@ public class NaturalEliteMobSpawnEventHandler {
 
         if (spawnReason.equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
             eliteMobEntity.setHasSpecialLoot(false);
+
+        naturalCustomBossSpawn(entity, eliteMobLevel);
+
+    }
+
+    private static void naturalCustomBossSpawn(Entity entity, int eliteMobLevel) {
+                /*
+        Check to see if they'll become a naturally spawned Custom Boss
+         */
+        for (CustomBossConfigFields customBossConfigFields : CustomBossConfigFields.getNaturallySpawnedElites())
+            if (entity.getType().toString().equalsIgnoreCase(customBossConfigFields.getEntityType()))
+                if (ThreadLocalRandom.current().nextDouble() < customBossConfigFields.getSpawnChance()) {
+                    CustomBossEntity.constructCustomBoss(customBossConfigFields.getFileName(), entity.getLocation(), eliteMobLevel);
+                    return;
+                }
 
     }
 
