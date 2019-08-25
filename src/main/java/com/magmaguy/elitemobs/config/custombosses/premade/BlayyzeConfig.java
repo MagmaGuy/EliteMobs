@@ -34,6 +34,7 @@ public class BlayyzeConfig extends CustomBossConfigFields {
                 true,
                 Arrays.asList(Material.FIRE_CHARGE.toString()),
                 null,
-                null);
+                null,
+                0);
     }
 }
