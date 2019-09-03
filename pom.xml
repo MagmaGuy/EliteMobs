@@ -7,7 +7,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.0.22</version>
+    <version>7.0.23</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -39,7 +39,7 @@
                             <include>org.bstats:*</include>
                         </includes>
                     </artifactSet>
-                    <relocations>
+                    <relocations>e
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>com.magmaguy.elitemobs</shadedPattern>
