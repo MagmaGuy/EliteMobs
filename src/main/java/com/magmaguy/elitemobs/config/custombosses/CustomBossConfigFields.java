@@ -4,8 +4,10 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class CustomBossConfigFields {
 
@@ -41,6 +43,7 @@ public class CustomBossConfigFields {
     private boolean dropsVanillaLoot;
     private List<String> trails;
     private List<String> onDamageMessages, onDamagedMessages;
+    private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
     private double spawnChance;
 
     /**
@@ -142,6 +145,8 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("onDamageMessages", onDamageMessages);
         fileConfiguration.addDefault("onDamagedMessages", onDamagedMessages);
         fileConfiguration.addDefault("spawnChance", spawnChance);
+        if (!additionalConfigOptions.isEmpty())
+            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     /**
@@ -306,6 +311,10 @@ public class CustomBossConfigFields {
 
     public double getSpawnChance() {
         return spawnChance;
+    }
+
+    public Map<String, Object> getAdditionalConfigOptions() {
+        return additionalConfigOptions;
     }
 
 }

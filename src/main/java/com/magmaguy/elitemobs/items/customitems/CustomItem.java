@@ -222,7 +222,8 @@ public class CustomItem {
                         name.equalsIgnoreCase(CriticalStrikesEnchantment.key) ||
                         name.equalsIgnoreCase(MeteorShowerEnchantment.key) ||
                         name.equalsIgnoreCase(SoulbindEnchantment.key) ||
-                        name.equalsIgnoreCase(DrillingEnchantment.key)) {
+                        name.equalsIgnoreCase(DrillingEnchantment.key) ||
+                        name.equalsIgnoreCase(IceBreakerEnchantment.key)) {
                     customEnchantments.put(name.toLowerCase(), level);
                     continue;
                 }
