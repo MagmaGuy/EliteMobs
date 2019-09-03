@@ -52,8 +52,8 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
     }
 
-    public static class FlamethrowerEnchantmentEvents implements Listener {
 
+    public static class FlamethrowerEnchantmentEvents implements Listener {
 
         @EventHandler
         public void onInteract(PlayerInteractEvent event) {

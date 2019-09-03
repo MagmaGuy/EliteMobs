@@ -33,5 +33,8 @@ public class ZombieFriendConfig extends CustomBossConfigFields {
                 null,
                 null,
                 0);
+
+
     }
+
 }

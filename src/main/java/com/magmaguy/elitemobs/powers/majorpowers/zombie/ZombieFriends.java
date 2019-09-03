@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.powers.majorpowers.zombie;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -44,8 +43,8 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                         nameClearer(reinforcement1);
 
-                        reinforcement1.getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage")
+                        reinforcement1.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("friendDeathMessage").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("friendDeathMessage")
                                         .size()))));
 
                     }
@@ -55,8 +54,8 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                         nameClearer(reinforcement2);
 
-                        reinforcement2.getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.DeathMessage")
+                        reinforcement2.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("DeathMessage").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("DeathMessage")
                                         .size()))));
 
                     }
@@ -70,8 +69,8 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                         nameClearer(event.getEliteMobEntity());
 
-                        event.getEliteMobEntity().getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieFriends.ZombieDialog").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.ZombieDialog")
+                        event.getEliteMobEntity().getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("originalEntityDialog").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("originalEntityDialog")
                                         .size()))));
 
                     }
@@ -80,8 +79,8 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                         nameClearer(reinforcement1);
 
-                        reinforcement1.getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog")
+                        reinforcement1.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("reinforcementDialog").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("reinforcementDialog")
                                         .size()))));
 
                     }
@@ -90,8 +89,8 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                         nameClearer(reinforcement2);
 
-                        reinforcement2.getLivingEntity().setCustomName(ChatColorConverter.convert(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog").
-                                get(ThreadLocalRandom.current().nextInt(ConfigValues.translationConfig.getStringList("ZombieFriends.FriendDialog")
+                        reinforcement2.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("reinforcementDialog").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("reinforcementDialog")
                                         .size()))));
 
                     }
