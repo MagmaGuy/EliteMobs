@@ -35,7 +35,7 @@ public class DeadMoonEvent extends EliteEvent implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!EliteEvent.getActiveEvents().contains(deadMoonEvent)) {
+                if (!EliteEvent.getActiveEvents().containsValue(deadMoonEvent)) {
                     cancel();
                     return;
                 }
@@ -43,6 +43,8 @@ public class DeadMoonEvent extends EliteEvent implements Listener {
                     completeEvent(deadMoonEvent.getActiveWorld());
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
+        super.isActive = true;
+        eventWatchdog();
     }
 
     @Override
@@ -52,7 +54,7 @@ public class DeadMoonEvent extends EliteEvent implements Listener {
                 if (event.getEntity().getType().equals(super.getEntityType()))
                     activateEvent(event.getLocation());
 
-        if (super.getBossIsAlive())
+        if (super.isActive)
             if (event.getEntity().getType().equals(EntityType.ZOMBIE))
                 new BukkitRunnable() {
                     @Override
@@ -66,16 +68,15 @@ public class DeadMoonEvent extends EliteEvent implements Listener {
 
     @Override
     public void eventWatchdog() {
-        new BukkitRunnable() {
-            boolean startMessageSent = false;
 
+        new BukkitRunnable() {
             @Override
             public void run() {
 
                 if (!(getActiveWorld().getTime() > 22800 ||
                         getActiveWorld().getTime() < 13184 ||
                         MoonPhaseDetector.detectMoonPhase(getActiveWorld()) != MoonPhaseDetector.MoonPhase.NEW_MOON) &&
-                        !startMessageSent)
+                        DeadMoonEvent.super.isActive)
                     return;
                 cancel();
                 completeEvent(getActiveWorld());

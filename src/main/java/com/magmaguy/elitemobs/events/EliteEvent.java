@@ -17,21 +17,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class EliteEvent extends AbstractEliteEvent {
 
-    private static HashSet<EliteEvent> activeEvents = new HashSet<>();
+    private static HashMap<UUID, EliteEvent> activeEvents = new HashMap<>();
 
-    public static void addActiveEvent(EliteEvent eliteEvent) {
-        activeEvents.add(eliteEvent);
+    private static void addActiveEvent(EliteEvent eliteEvent) {
+        activeEvents.put(eliteEvent.uuid, eliteEvent);
     }
 
-    public static void removeActiveEvent(EliteEvent eliteEvent) {
-        activeEvents.remove(eliteEvent);
+    private static void removeActiveEvent(EliteEvent eliteEvent) {
+        activeEvents.remove(eliteEvent.uuid);
     }
 
-    public static HashSet<EliteEvent> getActiveEvents() {
+    public static HashMap<UUID, EliteEvent> getActiveEvents() {
         return activeEvents;
     }
 
@@ -87,6 +88,8 @@ public class EliteEvent extends AbstractEliteEvent {
         KILL_COUNT
     }
 
+    private final UUID uuid = UUID.randomUUID();
+    protected boolean isActive = false;
     private ArrayList<World> worlds;
     private World activeWorld;
     private CustomBossEntity bossEntity;
@@ -99,7 +102,7 @@ public class EliteEvent extends AbstractEliteEvent {
 
     public EliteEvent(ArrayList<World> worlds, EventType eventType, EntityType entityType) {
         //TODO: This won't work in later versions
-        for (EliteEvent eliteEvent : activeEvents)
+        for (EliteEvent eliteEvent : activeEvents.values())
             if (eliteEvent.getEventType().equals(eventType))
                 return;
 
@@ -151,6 +154,7 @@ public class EliteEvent extends AbstractEliteEvent {
         removeActiveEvent(this);
         if (this.eventEndMessage == null) return;
         sendEventEndMessage(world);
+        this.isActive = false;
     }
 
     public void silentCompleteEvent() {
@@ -197,7 +201,7 @@ public class EliteEvent extends AbstractEliteEvent {
             if (!(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
                     event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)))
                 return;
-            for (EliteEvent eliteEvent : getActiveEvents()) {
+            for (EliteEvent eliteEvent : getActiveEvents().values()) {
                 if (eliteEvent.worlds.contains(event.getEntity().getWorld())) {
                     eliteEvent.activeWorld = event.getEntity().getWorld();
                     eliteEvent.spawnEventHandler(event);
@@ -208,7 +212,7 @@ public class EliteEvent extends AbstractEliteEvent {
         @EventHandler
         public void onBossDeath(EliteMobDeathEvent event) {
             if (getActiveEvents().isEmpty()) return;
-            for (EliteEvent eliteEvent : getActiveEvents())
+            for (EliteEvent eliteEvent : getActiveEvents().values())
                 if (event.getEliteMobEntity().equals(eliteEvent.getBossEntity())) {
                     eliteEvent.bossDeathEventHandler(event);
                     return;
