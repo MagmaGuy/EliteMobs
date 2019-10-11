@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.quests.dynamic.KillAmountQuest;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -95,7 +96,12 @@ public class PlayerQuest implements Cloneable {
     }
 
     private void setQuestObjective(QuestObjective questObjective) {
-        this.questObjective = questObjective;
+        try {
+            this.questObjective = questObjective.clone();
+        } catch (Exception ex) {
+            new WarningMessage("Failed to clone quest objective! Report this to the dev.");
+        }
+
     }
 
     public QuestReward getQuestReward() {
@@ -113,8 +119,8 @@ public class PlayerQuest implements Cloneable {
     public String getQuestStatus() {
         return QuestMenuConfig.questStatusMessage
                 .replace("$currentAmount", getQuestObjective().getCurrentKills() + "")
-                .replace("$objectiveAmount", questObjective.getObjectiveKills() + "")
-                .replace("$objectiveName", questObjective.getEliteMobName());
+                .replace("$objectiveAmount", getQuestObjective().getObjectiveKills() + "")
+                .replace("$objectiveName", getQuestObjective().getEliteMobName());
     }
 
 }

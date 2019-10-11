@@ -13,7 +13,12 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class QuestObjective {
+public class QuestObjective implements Cloneable {
+
+    @Override
+    public QuestObjective clone() throws CloneNotSupportedException {
+        return (QuestObjective) super.clone();
+    }
 
     private UUID questUUID;
     private int questTier;

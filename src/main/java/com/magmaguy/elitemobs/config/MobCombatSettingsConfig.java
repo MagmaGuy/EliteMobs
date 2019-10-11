@@ -39,10 +39,10 @@ public class MobCombatSettingsConfig {
         doNaturalMobSpawning = ConfigurationEngine.setBoolean(fileConfiguration, "doNaturalEliteMobSpawning", true);
         doSpawnersSpawnEliteMobs = ConfigurationEngine.setBoolean(fileConfiguration, "doSpawnersSpawnEliteMobs", false);
         aggressiveMobConversionPercentage = ConfigurationEngine.setDouble(fileConfiguration, "eliteMobsSpawnPercentage", 0.2);
-        perTierLevelIncrease = ConfigurationEngine.setInt(fileConfiguration, "levelsBetweenEliteMobTiers", 10);
+        perTierLevelIncrease = ConfigurationEngine.setInt(fileConfiguration, "mobTierLevelIncrease", 1);
         superMobsStackRange = ConfigurationEngine.setInt(fileConfiguration, "superMobStackRange", 15);
-        naturalElitemobLevelCap = ConfigurationEngine.setInt(fileConfiguration, "naturalEliteMobLevelCap", 1500);
-        eliteCreeperExplosionMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteCreeperExplosionMultiplier", 1D);
+        naturalElitemobLevelCap = ConfigurationEngine.setInt(fileConfiguration, "naturalEliteMobsLevelCap", 150);
+        eliteCreeperExplosionMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteCreeperExplosionsMultiplier", 10D);
         doEliteArmor = ConfigurationEngine.setBoolean(fileConfiguration, "doElitesWearArmor", true);
         doEliteHelmets = ConfigurationEngine.setBoolean(fileConfiguration, "doElitesWearHelmets", true);
         enableVisualEffectsForNaturalMobs = ConfigurationEngine.setBoolean(fileConfiguration, "doNaturalEliteMobVisualEffects", true);

@@ -61,7 +61,7 @@ public class EliteMobEntity {
     This just defines default behavior
      */
     private boolean hasCustomPowers = false;
-    private boolean isPersistent = true;
+    private Boolean isPersistent = true;
     private boolean hasVanillaLoot = true;
     private boolean hasEliteLoot = true;
     private CreatureSpawnEvent.SpawnReason spawnReason;
@@ -379,56 +379,56 @@ public class EliteMobEntity {
         livingEntity.getEquipment().setChestplate(new ItemStack(Material.AIR));
         livingEntity.getEquipment().setHelmet(new ItemStack(Material.AIR));
 
-        if (eliteLevel >= 50)
+        if (eliteLevel >= 5)
             if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
 
-        if (eliteLevel >= 100)
+        if (eliteLevel >= 10)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
 
-        if (eliteLevel >= 150)
+        if (eliteLevel >= 15)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
 
-        if (eliteLevel >= 200)
+        if (eliteLevel >= 20)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
 
-        if (eliteLevel >= 250)
+        if (eliteLevel >= 25)
             if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
 
-        if (eliteLevel >= 300)
+        if (eliteLevel >= 30)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
 
-        if (eliteLevel >= 350)
+        if (eliteLevel >= 35)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
 
-        if (eliteLevel >= 400)
+        if (eliteLevel >= 40)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
 
-        if (eliteLevel >= 450)
+        if (eliteLevel >= 45)
             if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
 
-        if (eliteLevel >= 500)
+        if (eliteLevel >= 50)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
 
-        if (eliteLevel >= 550)
+        if (eliteLevel >= 55)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
 
-        if (eliteLevel >= 600)
+        if (eliteLevel >= 60)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
 
-        if (eliteLevel >= 650)
+        if (eliteLevel >= 65)
             livingEntity.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 
-        if (eliteLevel >= 700)
+        if (eliteLevel >= 70)
             if (MobCombatSettingsConfig.doEliteHelmets)
                 livingEntity.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 
-        if (eliteLevel >= 750)
+        if (eliteLevel >= 75)
             livingEntity.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
 
-        if (eliteLevel >= 800)
+        if (eliteLevel >= 80)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 
     }
@@ -695,7 +695,7 @@ public class EliteMobEntity {
     public void setPersistent(Boolean bool) {
         if (bool != null) {
             this.isPersistent = bool;
-            this.getLivingEntity().setRemoveWhenFarAway(!bool);
+            this.getLivingEntity().setRemoveWhenFarAway(!this.isPersistent);
         } else {
             this.isPersistent = false;
             this.getLivingEntity().setRemoveWhenFarAway(true);

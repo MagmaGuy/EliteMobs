@@ -30,19 +30,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.3</version>
+                <version>3.1.0</version>
+                <!-- Do not include the <configuration>...</configuration> part if you are using Sponge! -->
                 <configuration>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <!--BStats-->
-                    <artifactSet>
-                        <includes>
-                            <include>org.bstats:*</include>
-                        </includes>
-                    </artifactSet>
-                    <relocations>e
+                    <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>com.magmaguy.elitemobs</shadedPattern>
+                            <!-- Replace this with your package! -->
+                            <shadedPattern>your.package</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -65,8 +60,8 @@
         </repository>
         <!--BStats repo-->
         <repository>
-            <id>bstats-repo</id>
-            <url>http://repo.bstats.org/content/repositories/releases/</url>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
         <!--WorldGuard repo-->
         <repository>
@@ -99,7 +94,8 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>1.1</version>
+            <version>1.5</version>
+            <scope>compile</scope>
         </dependency>
         <!--WorldGuard dependency-->
         <dependency>
