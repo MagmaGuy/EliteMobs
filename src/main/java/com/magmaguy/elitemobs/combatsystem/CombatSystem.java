@@ -9,7 +9,7 @@ public class CombatSystem {
     //todo: remove class, everything important's been moved out of it
     //TODO: Handle thorns damage and potion effects
 
-    public static final double PER_LEVEL_POWER_INCREASE = 0.1;
+    public static final double PER_LEVEL_POWER_INCREASE = 0.5;
 
     public static final double DIAMOND_TIER_LEVEL = 10;
     public static final double IRON_TIER_LEVEL = 6;

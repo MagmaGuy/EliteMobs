@@ -9,7 +9,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 
 public class QuestsTracker implements Listener {
 
-
     @EventHandler
     public void onEntityKill(EntityDeathEvent event) {
 
