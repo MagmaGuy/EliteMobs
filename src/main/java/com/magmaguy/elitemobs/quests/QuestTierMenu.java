@@ -14,7 +14,7 @@ public class QuestTierMenu {
 
     private Inventory inventory;
     private int questTier;
-    private List<PlayerQuest> playerQuests = new ArrayList<>();
+    private List<EliteQuest> eliteQuests = new ArrayList<>();
 
     public QuestTierMenu(int questTier) {
         setQuestTier(questTier);
@@ -34,44 +34,44 @@ public class QuestTierMenu {
         this.inventory = Bukkit.createInventory(null, 9, QuestMenuConfig.questSelectorMenuTitle
                 + " " + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier())));
         for (int i = 1; i < 4; i++) {
-            PlayerQuest playerQuest = QuestRandomizer.generateQuest(questTier);
-            this.inventory.setItem(2 * i, playerQuest.generateQuestItemStack());
-            addKillAmountQuests(playerQuest);
+            EliteQuest eliteQuest = EliteQuest.generateRandomQuest(questTier);
+            this.inventory.setItem(2 * i, eliteQuest.generateQuestItemStack());
+            addKillAmountQuests(eliteQuest);
         }
     }
 
-    private Inventory generatePlayerInventory(List<PlayerQuest> localPlayerQuests) {
+    private Inventory generatePlayerInventory(List<EliteQuest> localEliteQuests) {
         Inventory localInventory = Bukkit.createInventory(null, 9, QuestMenuConfig.questSelectorMenuTitle + " "
                 + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier())));
         for (int i = 1; i < 4; i++)
-            localInventory.setItem(2 * i, localPlayerQuests.get(i - 1).generateQuestItemStack());
+            localInventory.setItem(2 * i, localEliteQuests.get(i - 1).generateQuestItemStack());
         return localInventory;
     }
 
     public Inventory getInventory(Player player) {
-        List<PlayerQuest> playerQuests = new ArrayList<>();
+        List<EliteQuest> eliteQuests = new ArrayList<>();
         boolean hasQuest = false;
-        if (PlayerQuest.hasPlayerQuest(player))
-            for (PlayerQuest playerQuest : getPlayerQuests()) {
-                if (playerQuest.getQuestReward().equals(PlayerQuest.getPlayerQuest(player).getQuestReward())) {
-                    playerQuest = PlayerQuest.getPlayerQuest(player);
-                    playerQuests.add(playerQuest);
+        if (EliteQuest.hasPlayerQuest(player))
+            for (EliteQuest eliteQuest : getEliteQuests()) {
+                if (eliteQuest.getUuid().equals(EliteQuest.getPlayerQuest(player).getUuid())) {
+                    eliteQuest = EliteQuest.getPlayerQuest(player);
+                    eliteQuests.add(eliteQuest);
                     hasQuest = true;
                 } else
-                    playerQuests.add(playerQuest);
+                    eliteQuests.add(eliteQuest);
             }
 
         if (hasQuest)
-            return generatePlayerInventory(playerQuests);
+            return generatePlayerInventory(eliteQuests);
 
         return this.inventory;
     }
 
-    public void addKillAmountQuests(PlayerQuest playerQuest) {
-        getPlayerQuests().add(playerQuest);
+    public void addKillAmountQuests(EliteQuest eliteQuest) {
+        getEliteQuests().add(eliteQuest);
     }
 
-    public List<PlayerQuest> getPlayerQuests() {
-        return this.playerQuests;
+    public List<EliteQuest> getEliteQuests() {
+        return this.eliteQuests;
     }
 }

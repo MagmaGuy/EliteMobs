@@ -83,7 +83,7 @@ public class QuestsMenu implements Listener {
     }
 
     @EventHandler
-    public void onTierQuestClick(InventoryClickEvent event) throws CloneNotSupportedException {
+    public void onTierQuestClick(InventoryClickEvent event) {
         if (!event.getView().getTitle().contains(QuestMenuConfig.questSelectorMenuTitle)) return;
         if (!MenuUtils.isValidMenu(event)) return;
         event.setCancelled(true);
@@ -98,27 +98,27 @@ public class QuestsMenu implements Listener {
             }
 
         QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier);
-        PlayerQuest playerQuest = questTierMenu.getPlayerQuests().get(event.getSlot() / 2 - 1);
+        EliteQuest eliteQuest = questTierMenu.getEliteQuests().get(event.getSlot() / 2 - 1);
 
-        if (PlayerQuest.hasPlayerQuest((Player) event.getWhoClicked())) {
-            initializeCancelQuestDialog((Player) event.getWhoClicked(), playerQuest);
+        if (EliteQuest.hasPlayerQuest((Player) event.getWhoClicked())) {
+            initializeCancelQuestDialog((Player) event.getWhoClicked(), eliteQuest);
             event.getWhoClicked().closeInventory();
             return;
         }
 
-        PlayerQuest.addPlayerInQuests((Player) event.getWhoClicked(), playerQuest.clone());
-        playerQuest.getQuestObjective().sendQuestStartMessage((Player) event.getWhoClicked());
+        EliteQuest.addPlayerInQuests((Player) event.getWhoClicked(), eliteQuest);
+        eliteQuest.getQuestObjective().sendQuestStartMessage((Player) event.getWhoClicked());
         event.getWhoClicked().closeInventory();
 
     }
 
-    private static HashMap<Player, PlayerQuest> questPairs = new HashMap();
+    private static HashMap<Player, EliteQuest> questPairs = new HashMap();
 
     public static boolean playerHasPendingQuest(Player player) {
         return questPairs.containsKey(player);
     }
 
-    public static PlayerQuest getPlayerQuestPair(Player player) {
+    public static EliteQuest getPlayerQuestPair(Player player) {
         return questPairs.get(player);
     }
 
@@ -126,7 +126,7 @@ public class QuestsMenu implements Listener {
         questPairs.remove(player);
     }
 
-    private void initializeCancelQuestDialog(Player player, PlayerQuest playerQuest) {
+    private void initializeCancelQuestDialog(Player player, EliteQuest eliteQuest) {
         player.sendMessage(QuestMenuConfig.cancelMessagePart1);
         TextComponent interactiveMessage = new TextComponent(QuestMenuConfig.cancelMessagePart2);
         interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + player.getName() + " confirm"));
@@ -134,7 +134,7 @@ public class QuestsMenu implements Listener {
         player.spigot().sendMessage(interactiveMessage);
         player.sendMessage(QuestMenuConfig.cancelMessagePart3);
 
-        questPairs.put(player, playerQuest);
+        questPairs.put(player, eliteQuest);
     }
 
 }
