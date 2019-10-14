@@ -1,26 +1,22 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
 
 public class QuestsTracker implements Listener {
 
     @EventHandler
-    public void onEntityKill(EntityDeathEvent event) {
+    public void onEntityKill(EliteMobDeathEvent event) {
 
-        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-        if (eliteMobEntity == null) return;
-        if (!eliteMobEntity.getHasSpecialLoot()) return;
-        if (!eliteMobEntity.hasDamagers()) return;
+        if (!event.getEliteMobEntity().getHasSpecialLoot()) return;
+        if (!event.getEliteMobEntity().hasDamagers()) return;
 
-        for (Player player : eliteMobEntity.getDamagers().keySet())
-            if (PlayerQuest.hasPlayerQuest(player))
-                if (!PlayerQuest.getPlayerQuest(player).getQuestObjective().isTurnedIn())
-                    PlayerQuest.getPlayerQuest(player).processQuestProgression(eliteMobEntity, player);
+        for (Player player : event.getEliteMobEntity().getDamagers().keySet())
+            if (EliteQuest.hasPlayerQuest(player))
+                if (!EliteQuest.getPlayerQuest(player).getQuestObjective().isTurnedIn())
+                    EliteQuest.getPlayerQuest(player).processQuestProgression(event.getEliteMobEntity(), player);
 
     }
 

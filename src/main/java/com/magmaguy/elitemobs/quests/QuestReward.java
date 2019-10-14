@@ -5,23 +5,21 @@ import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import org.bukkit.entity.Player;
 
-public class QuestReward {
+import java.io.Serializable;
+
+public class QuestReward implements Serializable {
 
     enum RewardType {
         MONETARY
     }
 
     private RewardType rewardType;
-    private int questTier;
-    private double questDifficulty;
     private double questReward;
     String rewardMessage;
 
     public QuestReward(int questTier, double questDifficulty) {
         setRewardType();
-        setQuestTier(questTier);
-        setQuestDifficulty(questDifficulty);
-        setQuestReward();
+        setQuestReward(questTier, questDifficulty);
         setRewardMessage();
     }
 
@@ -33,31 +31,15 @@ public class QuestReward {
         return this.rewardType;
     }
 
-    private void setQuestTier(int questTier) {
-        this.questTier = questTier;
-    }
-
-    private int getQuestTier() {
-        return this.questTier;
-    }
-
-    private double getQuestDifficulty() {
-        return this.questDifficulty;
-    }
-
-    private void setQuestDifficulty(double questDifficulty) {
-        this.questDifficulty = questDifficulty;
-    }
-
     public double getQuestReward() {
         return this.questReward;
     }
 
-    private void setQuestReward() {
-        if (getQuestTier() == 0)
-            this.questReward = getQuestDifficulty() * 5;
+    private void setQuestReward(int questTier, double questDifficulty) {
+        if (questTier == 0)
+            this.questReward = questDifficulty;
         else
-            this.questReward = getQuestDifficulty();
+            this.questReward = questDifficulty;
     }
 
     public String getRewardMessage() {
