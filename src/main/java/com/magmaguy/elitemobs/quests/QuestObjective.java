@@ -11,14 +11,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class QuestObjective implements Cloneable {
-
-    @Override
-    public QuestObjective clone() throws CloneNotSupportedException {
-        return (QuestObjective) super.clone();
-    }
+public class QuestObjective implements Serializable {
 
     private UUID questUUID;
     private int questTier;
@@ -38,6 +34,7 @@ public class QuestObjective implements Cloneable {
         setMinimumEliteMobTier(minimumEliteMobTier);
         setEntityType(entityType);
         setQuestDifficulty();
+        setQuestReward();
     }
 
     public UUID getQuestUUID() {
@@ -48,8 +45,12 @@ public class QuestObjective implements Cloneable {
         this.questUUID = UUID.randomUUID();
     }
 
-    public void setQuestReward(QuestReward questReward) {
-        this.questReward = questReward;
+    public void setQuestReward() {
+        this.questReward = new QuestReward(this.questTier, this.questDifficulty);
+    }
+
+    public QuestReward getQuestReward() {
+        return this.questReward;
     }
 
     private void setQuestTier(int questTier) {
@@ -150,6 +151,9 @@ public class QuestObjective implements Cloneable {
                         .replace("$objectiveAmount", getObjectiveKills() + "")
                         .replace("$objectiveName", getEliteMobName())
                 , ChatColor.DARK_GREEN, ChatColor.GREEN);
+        Bukkit.broadcastMessage(QuestMenuConfig.questStartBroadcastMessage
+                .replace("$player", player.getDisplayName())
+                .replace("$rank", GuildRank.getRankName(getQuestTier())));
     }
 
     public void sendQuestCompleteMessage(Player player) {
@@ -188,7 +192,7 @@ public class QuestObjective implements Cloneable {
         setTurnedIn(true);
         setComplete(true);
         sendQuestCompleteMessage(player);
-        PlayerQuest.removePlayersInQuests(player);
+        EliteQuest.removePlayersInQuests(player);
     }
 
 }

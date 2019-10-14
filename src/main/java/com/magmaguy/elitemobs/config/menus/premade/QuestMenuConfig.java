@@ -20,7 +20,7 @@ public class QuestMenuConfig extends MenusConfigFields {
     public static String cancelMessagePart1, cancelMessagePart2, cancelMessagePart3;
     public static ItemStack killObjectiveButton;
     public static String questCancelMessage, questStartTitle, questStartSubtitle, questCompleteTitle, questCompleteSubtitle,
-            objectiveString, rewardMessage, questCompleteBroadcastMessage, questStatusMessage;
+            objectiveString, rewardMessage, questCompleteBroadcastMessage, questStatusMessage, questStartBroadcastMessage;
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -85,6 +85,7 @@ public class QuestMenuConfig extends MenusConfigFields {
         objectiveString = ConfigurationEngine.setString(fileConfiguration, "bossBarObjective", "Slay $objectiveAmount $objectiveName");
         rewardMessage = ConfigurationEngine.setString(fileConfiguration, "questRewardMessage", "&7[EM] &aQuest completed! &6Your reward is &2$reward $currencyName");
         questCompleteBroadcastMessage = ConfigurationEngine.setString(fileConfiguration, "questCompleteBroadcastMessage", "&7[EM] $player &2has completed a $rank &2quest!");
+        questStartBroadcastMessage = ConfigurationEngine.setString(fileConfiguration, "questStartBroadcastMessage", "&7[EM] $player &2has accepted a $rank &2quest!");
         questStatusMessage = ConfigurationEngine.setString(fileConfiguration, "questStatusMessage", "&7[EM] &aYou've slain &a$currentAmount &f/ &c$objectiveAmount &a$objectiveName");
     }
 }
