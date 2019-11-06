@@ -5,13 +5,10 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -50,41 +47,26 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
 
         //From this point on, the event damage is handled by Elite Mobs
 
-        double rawDamage = event.getEntityDamageByEntityEvent().getDamage();
-
+        //nullify vanilla reductions
         for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
             if (event.getEntityDamageByEntityEvent().isApplicable(modifier))
                 event.getEntityDamageByEntityEvent().setDamage(modifier, 0);
 
+        double rawDamage = event.getEntityDamageByEntityEvent().getDamage();
 
         //if the damage source is custom , the damage is final
         if (isCustomDamageEntity(eliteMobEntity.getLivingEntity())) {
             event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, rawDamage);
-            //Deal with the player getting killed
+            //Deal with the mob getting killed
             if (player.getHealth() - rawDamage <= 0)
                 PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, player));
             removeCustomDamageEntity(eliteMobEntity.getLivingEntity());
-            /*
-        This is a bit of a dirty hack, I may want to tighten it up later
-         */
-            //adjust current plugin health
-            eliteMobEntity.setHealth(eliteMobEntity.getMaxHealth() * eliteMobEntity.getLivingEntity().getHealth() / eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-            double damagePercentOfHealth = rawDamage / eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-            double pluginDamage = damagePercentOfHealth * eliteMobEntity.getMaxHealth();
-            eliteMobEntity.setHealth(eliteMobEntity.getHealth() - pluginDamage);
+            eliteMobEntity.setHealth(eliteMobEntity.getHealth() - rawDamage);
             return;
         }
 
-        double playerTier;
-        if (player.getInventory().getItemInMainHand() == null ||
-                player.getInventory().getItemInMainHand().getType().equals(Material.BOW) && event.getEntityDamageByEntityEvent().getDamager() instanceof Player)
-            playerTier = 0;
-        else
-            playerTier = ItemTierFinder.findBattleTier(player.getInventory().getItemInMainHand());
-        double eliteTier = MobTierCalculator.findMobTier(eliteMobEntity);
-        double maxHealth = eliteMobEntity.getLivingEntity().getMaxHealth();
-
-        double newDamage = playerToEliteDamageFormula(eliteTier, playerTier, maxHealth, player, eliteMobEntity);
+        double playerWeaponTier = ItemTierFinder.findBattleTier(player.getInventory().getItemInMainHand());
+        double newDamage = finalDamageCalculator(playerWeaponTier, player, eliteMobEntity);
 
         if (event.getEntityDamageByEntityEvent().getDamager() instanceof Arrow) {
             double arrowSpeedMultiplier = Math.sqrt(Math.pow(event.getEntityDamageByEntityEvent().getDamager().getVelocity().getX(), 2) +
@@ -100,53 +82,22 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         }
 
         event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
-
-        /*
-        This is a bit of a dirty hack, I may want to tighten it up later
-         */
-        //adjust current plugin health
-        eliteMobEntity.setHealth(eliteMobEntity.getMaxHealth() * eliteMobEntity.getLivingEntity().getHealth() / eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-        double damagePercentOfHealth = newDamage / eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-        double pluginDamage = damagePercentOfHealth * eliteMobEntity.getMaxHealth();
-        eliteMobEntity.setHealth(eliteMobEntity.getHealth() - pluginDamage);
-        eliteMobEntity.addDamager(player, pluginDamage);
+        eliteMobEntity.setHealth(eliteMobEntity.getHealth() - newDamage);
+        eliteMobEntity.addDamager(player, newDamage);
 
     }
 
     /**
      * Calculates Player -> EliteMobs damage.
      *
-     * @param eliteTier  Tier of the EliteMob
-     * @param playerTier Tier of the Player's weapon
-     * @param maxHealth  EliteMob's max health
-     * @param player     Player object
-     * @param eliteMob   EliteMob object
+     * @param player Player object
      * @return
      */
-    private double playerToEliteDamageFormula(double eliteTier, double playerTier, double maxHealth, Player player, EliteMobEntity eliteMob) {
+    private double finalDamageCalculator(double playerWeaponTier, Player player, EliteMobEntity eliteMobEntity) {
 
-        double tierDifference = playerTier - eliteTier;
-
-        /*
-        This caps the tier difference between mobs and players to prevent insurmountable boss fights
-         */
-        double maxTierDifference = 3;
-        tierDifference = Math.abs(tierDifference) > maxTierDifference ? (tierDifference > 0 ? maxTierDifference : -maxTierDifference) : tierDifference;
-
-        /*
-        This applies secondary enchantments, that is, it applies enchantments that only affect specific mob types
-        such as smite which only works with undead mobs
-         */
-        double bonusSecondaryEnchantmentDamage = secondaryEnchantmentDamageIncrease(player.getInventory().getItemInMainHand(), eliteMob.getLivingEntity());
-        double newTargetHitsToKill = (eliteMob.getDefaultMaxHealth() / 2) - bonusSecondaryEnchantmentDamage; //10 for zombies
-
-        double finalDamage = getCooledAttackStrength(player) * (maxHealth / newTargetHitsToKill + maxHealth / newTargetHitsToKill * tierDifference * 0.2);
-
-        //Apply health multiplier
-        finalDamage /= eliteMob.getHealthMultiplier();
-
-        //apply config multiplier
-        finalDamage *= MobCombatSettingsConfig.damageToEliteMultiplier;
+        double finalDamage = getCooledAttackStrength(player) *
+                (playerWeaponTier + secondaryEnchantmentDamageIncrease(player.getInventory().getItemInMainHand(), eliteMobEntity.getLivingEntity())) *
+                MobCombatSettingsConfig.damageToEliteMultiplier;
 
         finalDamage = finalDamage < 1 ? 1 : finalDamage;
         return finalDamage;
@@ -203,18 +154,12 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
     private double secondaryEnchantmentDamageIncrease(ItemStack weapon, LivingEntity eliteMob) {
 
         if (eliteMob instanceof Spider || eliteMob instanceof Silverfish)
-            return getDamageIncreasePercentage(Enchantment.DAMAGE_ARTHROPODS, ItemTagger.getEnchantment(weapon.getItemMeta(), Enchantment.DAMAGE_ARTHROPODS.getKey()));
+            return ItemTagger.getEnchantment(weapon.getItemMeta(), Enchantment.DAMAGE_ARTHROPODS.getKey());
         if (eliteMob instanceof Zombie || eliteMob instanceof Skeleton)
-            return getDamageIncreasePercentage(Enchantment.DAMAGE_UNDEAD, ItemTagger.getEnchantment(weapon.getItemMeta(), Enchantment.DAMAGE_UNDEAD.getKey()));
+            return ItemTagger.getEnchantment(weapon.getItemMeta(), Enchantment.DAMAGE_UNDEAD.getKey());
 
         return 0;
 
-    }
-
-
-    private double getDamageIncreasePercentage(Enchantment enchantment, int level) {
-        double maxEnchantmentLevel = EnchantmentsConfig.getEnchantment(enchantment).getMaxLevel();
-        return level / maxEnchantmentLevel <= 1 ? level / maxEnchantmentLevel : 1;
     }
 
     private boolean isCriticalHit(Player player) {
