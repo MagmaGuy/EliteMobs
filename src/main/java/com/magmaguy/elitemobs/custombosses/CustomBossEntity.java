@@ -72,11 +72,15 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         return customBosses.get(uuid);
     }
 
-    private CustomBossConfigFields customBossConfigFields;
+    public CustomBossConfigFields customBossConfigFields;
     private HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
     private UUID uuid;
 
-    public CustomBossEntity(CustomBossConfigFields customBossConfigFields, EntityType entityType, Location location, int mobLevel, HashSet<ElitePower> elitePowers) {
+    public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
+                            EntityType entityType,
+                            Location location,
+                            int mobLevel,
+                            HashSet<ElitePower> elitePowers) {
         super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
         uuid = UUID.randomUUID();
         super.setDamageMultiplier(customBossConfigFields.getDamageMultiplier());
@@ -122,7 +126,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
             }
 
-        }.runTaskLater(MetadataHandler.PLUGIN, (long) (20 * 60 * timeout));
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * timeout);
 
     }
 
@@ -306,6 +310,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
 
     }
+
 
     public static class CustomBossEntityEvents implements Listener {
 

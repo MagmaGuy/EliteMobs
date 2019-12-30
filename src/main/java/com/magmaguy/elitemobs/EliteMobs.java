@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.custombosses.RegionalBossHandler;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
@@ -157,6 +158,11 @@ public class EliteMobs extends JavaPlugin {
         Load plugin worlds
          */
         CustomWorldLoading.startupWorldInitialization();
+
+        /*
+        Spawn world bosses
+         */
+        RegionalBossHandler.initialize();
 
     }
 

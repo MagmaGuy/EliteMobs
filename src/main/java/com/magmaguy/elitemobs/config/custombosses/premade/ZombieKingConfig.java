@@ -37,6 +37,10 @@ public class ZombieKingConfig extends CustomBossConfigFields {
                 Arrays.asList(Particle.FLAME.toString()),
                 null,
                 null,
+                0,
+                false,
+                null,
+                0,
                 0);
     }
 

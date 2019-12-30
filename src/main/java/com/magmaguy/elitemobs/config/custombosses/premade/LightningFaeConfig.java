@@ -35,6 +35,10 @@ public class LightningFaeConfig extends CustomBossConfigFields {
                 Arrays.asList(Particle.SPELL.toString()),
                 null,
                 null,
+                0,
+                false,
+                null,
+                0,
                 0);
     }
 }

@@ -11,8 +11,8 @@ public class ElitePhantomConfig extends MobPropertiesConfigFields {
                 EntityType.PHANTOM,
                 true,
                 "&fLvl &2$level &fElite &9Phantom",
-                Arrays.asList("$player just had a bad nightmare about $entity!",
-                        "$player will be having nightmares about $entity!",
-                        "$entity has taught $player the value of sleep!"));
+                Arrays.asList("$player &cjust had a bad nightmare about $entity&c!",
+                        "$player &cwill be having nightmares about $entity&c!",
+                        "$entity &chas taught $player &cthe value of sleep!"));
     }
 }
