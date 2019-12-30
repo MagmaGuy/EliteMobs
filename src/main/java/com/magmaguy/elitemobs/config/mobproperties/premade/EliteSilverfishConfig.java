@@ -11,6 +11,6 @@ public class EliteSilverfishConfig extends MobPropertiesConfigFields {
                 EntityType.SILVERFISH,
                 true,
                 "&fLvl &2$level &fElite &7Silverfish",
-                Arrays.asList("$player mistook $entity for a stone block!"));
+                Arrays.asList("$player &cmistook $entity &cfor a stone block!"));
     }
 }

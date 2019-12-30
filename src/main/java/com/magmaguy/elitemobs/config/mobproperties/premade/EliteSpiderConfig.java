@@ -11,7 +11,7 @@ public class EliteSpiderConfig extends MobPropertiesConfigFields {
                 EntityType.SPIDER,
                 true,
                 "&fLvl &2$level &fElite &7Spider",
-                Arrays.asList("$player became entangled in $entity's web!",
-                        "$entity has devoured $player!"));
+                Arrays.asList("$player &cbecame entangled in $entity's &cweb!",
+                        "$entity &chas devoured $player&c!"));
     }
 }

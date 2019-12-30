@@ -98,7 +98,7 @@ public class SpiritWalk extends BossPower implements Listener {
 
     }
 
-    private void spiritWalkAnimation(LivingEntity bossMob, Location entityLocation, Location finalLocation) {
+    public static void spiritWalkAnimation(LivingEntity bossMob, Location entityLocation, Location finalLocation) {
 
         bossMob.setAI(false);
         bossMob.setInvulnerable(true);

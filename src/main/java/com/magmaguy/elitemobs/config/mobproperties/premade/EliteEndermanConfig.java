@@ -11,7 +11,8 @@ public class EliteEndermanConfig extends MobPropertiesConfigFields {
                 EntityType.ENDERMAN,
                 true,
                 "&fLvl &2$level &fElite &5Enderman",
-                Arrays.asList("$entity sent $player into the void!",
-                        "$player looked at $entity wrong!"));
+                Arrays.asList("$entity &csent $player &cinto the void!",
+                        "$player &clooked at $entity &cwrong!",
+                        "$player &cand $entity &cbecame best friends!"));
     }
 }

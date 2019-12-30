@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.actionevents.MiningEvent;
@@ -164,6 +165,7 @@ public class EventsRegistrer {
 
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
+        pluginManager.registerEvents(new RegionalBossEntity.RegionalBossEntityEvents(), plugin);
 
         //Metadata (player purger)
         pluginManager.registerEvents(new MetadataHandler(), plugin);

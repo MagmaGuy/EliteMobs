@@ -11,7 +11,7 @@ public class EliteDrownedConfig extends MobPropertiesConfigFields {
                 EntityType.DROWNED,
                 true,
                 "&fLvl &2$level &fElite &3Drowned",
-                Arrays.asList("$player has been brought down to the depths by $entity!",
-                        "$player has been drowned by $entity!"));
+                Arrays.asList("$player &chas been brought down to the depths by $entity!",
+                        "$player &chas been drowned by $entity!"));
     }
 }

@@ -11,7 +11,7 @@ public class EliteIronGolemConfig extends MobPropertiesConfigFields {
                 EntityType.IRON_GOLEM,
                 true,
                 "&fLvl &2$level &fElite &fIron Golem",
-                Arrays.asList("$player messed with the wrong $entity!",
-                        "$player has been taught the way of fist by $entity!"));
+                Arrays.asList("$player &cmessed with the wrong $entity&c!",
+                        "$player &chas been taught the way of fist by $entity&c!"));
     }
 }

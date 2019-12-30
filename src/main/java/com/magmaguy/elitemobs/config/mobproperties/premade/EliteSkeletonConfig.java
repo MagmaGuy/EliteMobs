@@ -11,6 +11,7 @@ public class EliteSkeletonConfig extends MobPropertiesConfigFields {
                 EntityType.SKELETON,
                 true,
                 "&fLvl &2$level &fElite &fSkeleton",
-                Arrays.asList("$player became $entity's pin cushion!"));
+                Arrays.asList("$player &cbecame $entity's &cpin cushion!",
+                        "$entity &cwanted to see $player's &cbones!"));
     }
 }
