@@ -11,7 +11,7 @@ public class EliteZombieConfig extends MobPropertiesConfigFields {
                 EntityType.ZOMBIE,
                 true,
                 "&fLvl &2$level &fElite &2Zombie",
-                Arrays.asList("$player was devoured by $entity!",
-                        "$entity got to $player's brains!"));
+                Arrays.asList("$player &cwas devoured by $entity&c!",
+                        "$entity &cgot to $player's &cbrains!"));
     }
 }

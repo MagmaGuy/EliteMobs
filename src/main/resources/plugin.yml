@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.1.0.1
+version: 7.1.0.2
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.13
@@ -12,7 +12,7 @@ commands:
     aliases: [em, adventurerguild, adventurersguild, ag, shareitem]
 permissions:
   elitemobs.*:
-    description: Gives access to all elitemobs commands
+    description: Gives access to all elitemobs commandse
     children:
       elitemobs.stats: true
       elitemobs.getloot: true

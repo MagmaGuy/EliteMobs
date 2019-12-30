@@ -11,6 +11,6 @@ public class EliteHuskConfig extends MobPropertiesConfigFields {
                 EntityType.HUSK,
                 true,
                 "&fLvl &2$level &fElite &7Husk",
-                Arrays.asList("$player was hollowed out by $entity!"));
+                Arrays.asList("$player &cwas hollowed out by $entity&c!"));
     }
 }

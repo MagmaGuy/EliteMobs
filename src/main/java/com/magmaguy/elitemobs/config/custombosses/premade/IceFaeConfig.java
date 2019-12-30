@@ -35,6 +35,10 @@ public class IceFaeConfig extends CustomBossConfigFields {
                 Arrays.asList(Particle.WATER_DROP.toString()),
                 null,
                 null,
+                0,
+                false,
+                null,
+                0,
                 0);
     }
 }

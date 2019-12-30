@@ -5,11 +5,10 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.worldguard.WorldGuardSpawnEventBypasser;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -225,53 +224,11 @@ public class NPCEntity {
     }
 
     private boolean setSpawnLocation(String spawnLocation) {
-        int counter = 0;
-        World world = null;
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        float yaw = 0;
-        float pitch = 0;
-        for (String substring : spawnLocation.split(",")) {
-            switch (counter) {
-                case 0:
-                    /*
-                    World is contained here
-                     */
-                    world = Bukkit.getWorld(substring);
-                    break;
-                case 1:
-                    /*
-                    X value is contained here
-                     */
-                    x = Double.valueOf(substring);
-                    break;
-                case 2:
-                    /*
-                    Y value is contained here
-                     */
-                    y = Double.valueOf(substring);
-                    break;
-                case 3:
-                    /*
-                    Z value is contained here
-                     */
-                    z = Double.valueOf(substring);
-                    break;
-                case 4:
-                    yaw = Float.valueOf(substring);
-                    break;
-                case 5:
-                    pitch = Float.valueOf(substring);
-                    break;
-            }
+        Location location = ConfigurationLocation.deserialize(spawnLocation);
 
-            counter++;
-        }
+        if (location == null) return false;
 
-        if (world == null) return false;
-
-        this.spawnLocation = new Location(world, x, y, z, yaw, pitch);
+        this.spawnLocation = location;
 
         return true;
     }

@@ -11,6 +11,7 @@ public class EliteCreeperConfig extends MobPropertiesConfigFields {
                 EntityType.CREEPER,
                 true,
                 "&fLvl &2$level &fElite &2Creeper",
-                Arrays.asList("$player was blasted away by $entity!"));
+                Arrays.asList("$player &cwas blasted away by $entity!",
+                        "$entity &cjust oh man'd $player&c!"));
     }
 }

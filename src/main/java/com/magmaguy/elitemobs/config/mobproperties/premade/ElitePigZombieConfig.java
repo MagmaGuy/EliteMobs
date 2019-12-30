@@ -11,7 +11,7 @@ public class ElitePigZombieConfig extends MobPropertiesConfigFields {
                 EntityType.PIG_ZOMBIE,
                 true,
                 "&fLvl &2$level &fElite &6Zombie Pigman",
-                Arrays.asList("$player was mobbed to death by $entity!",
-                        "$entity got $player's bacon!"));
+                Arrays.asList("$player &cwas mobbed to death by $entity&c!",
+                        "$entity &cgot $player's &cbacon!"));
     }
 }

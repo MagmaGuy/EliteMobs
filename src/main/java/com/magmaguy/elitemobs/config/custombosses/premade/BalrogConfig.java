@@ -36,6 +36,10 @@ public class BalrogConfig extends CustomBossConfigFields {
                         Particle.FLAME.toString(), Particle.FLAME.toString()),
                 null,
                 null,
+                0,
+                false,
+                null,
+                0,
                 0);
     }
 }

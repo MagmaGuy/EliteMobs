@@ -1,5 +1,8 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -15,6 +18,12 @@ public class CustomBossConfigFields {
 
     public static HashSet<CustomBossConfigFields> getNaturallySpawnedElites() {
         return naturallySpawnedElites;
+    }
+
+    private static HashSet<CustomBossConfigFields> regionalElites = new HashSet<>();
+
+    public static HashSet<CustomBossConfigFields> getRegionalElites() {
+        return regionalElites;
     }
 
     private String fileName;
@@ -45,6 +54,10 @@ public class CustomBossConfigFields {
     private List<String> onDamageMessages, onDamagedMessages;
     private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
     private double spawnChance;
+    private boolean isRegionalBoss;
+    private Location spawnLocation;
+    private int spawnCooldown;
+    private double leashRadius;
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -76,7 +89,11 @@ public class CustomBossConfigFields {
                                   List<String> trails,
                                   List<String> onDamageMessages,
                                   List<String> onDamagedMessages,
-                                  double spawnChance) {
+                                  double spawnChance,
+                                  boolean isRegionalBoss,
+                                  Location spawnLocation,
+                                  int spawnCooldown,
+                                  double leashRadius) {
         this.fileName = fileName + ".yml";
         this.entityType = entityType;
         this.isEnabled = isEnabled;
@@ -105,6 +122,10 @@ public class CustomBossConfigFields {
         this.onDamageMessages = onDamageMessages;
         this.onDamagedMessages = onDamagedMessages;
         this.spawnChance = spawnChance;
+        this.isRegionalBoss = isRegionalBoss;
+        this.spawnLocation = spawnLocation;
+        this.spawnCooldown = spawnCooldown;
+        this.leashRadius = leashRadius;
     }
 
 
@@ -145,6 +166,10 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("onDamageMessages", onDamageMessages);
         fileConfiguration.addDefault("onDamagedMessages", onDamagedMessages);
         fileConfiguration.addDefault("spawnChance", spawnChance);
+        fileConfiguration.addDefault("isRegionalBoss", isRegionalBoss);
+        fileConfiguration.addDefault("spawnLocation", spawnLocation);
+        fileConfiguration.addDefault("spawnCooldown", spawnCooldown);
+        fileConfiguration.addDefault("leashRadius", leashRadius);
         if (!additionalConfigOptions.isEmpty())
             fileConfiguration.addDefaults(additionalConfigOptions);
     }
@@ -199,6 +224,22 @@ public class CustomBossConfigFields {
                 naturallySpawnedElites.add(this);
         } else
             this.spawnChance = 0;
+        if (configuration.getBoolean("isRegionalBoss")) {
+            String location = configuration.getString("spawnLocation");
+            if (location == null) {
+                new WarningMessage("Regional / World boss does not have a set location! It will not spawn.");
+            } else {
+                this.spawnLocation = ConfigurationLocation.deserialize(configuration.getString("spawnLocation"));
+            }
+            if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
+            else this.spawnCooldown = configuration.getInt("spawnCooldown");
+
+            if (location != null)
+                regionalElites.add(this);
+        }
+
+        this.leashRadius = configuration.getDouble("leashRadius");
+
     }
 
     public String getFileName() {
@@ -311,6 +352,22 @@ public class CustomBossConfigFields {
 
     public double getSpawnChance() {
         return spawnChance;
+    }
+
+    public boolean isRegionalBoss() {
+        return isRegionalBoss;
+    }
+
+    public Location getSpawnLocation() {
+        return spawnLocation;
+    }
+
+    public int getSpawnCooldown() {
+        return spawnCooldown;
+    }
+
+    public double getLeashRadius() {
+        return leashRadius;
     }
 
     public Map<String, Object> getAdditionalConfigOptions() {
