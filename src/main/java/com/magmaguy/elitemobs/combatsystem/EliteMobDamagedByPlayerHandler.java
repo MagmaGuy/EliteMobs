@@ -30,6 +30,9 @@ import static com.magmaguy.elitemobs.combatsystem.CombatSystem.removeCustomDamag
 
 public class EliteMobDamagedByPlayerHandler implements Listener {
 
+    public static boolean display = false;
+    public static int damage = 0;
+
     /**
      * Player -> EliteMobs damage. Ignores vanilla armor that Elite Mobs are wearing as that is purely cosmetic.
      *
@@ -77,11 +80,13 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         }
 
         if (isCriticalHit(player)) {
-            newDamage *= 2;
+            newDamage += newDamage * 0.5;
             DamageDisplay.isCriticalHit = true;
         }
 
-        event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
+        display = true;
+        damage = (int) newDamage;
+        event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, 0);
         eliteMobEntity.setHealth(eliteMobEntity.getHealth() - newDamage);
         eliteMobEntity.addDamager(player, newDamage);
 
@@ -100,6 +105,7 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
                 MobCombatSettingsConfig.damageToEliteMultiplier;
 
         finalDamage = finalDamage < 1 ? 1 : finalDamage;
+
         return finalDamage;
 
     }

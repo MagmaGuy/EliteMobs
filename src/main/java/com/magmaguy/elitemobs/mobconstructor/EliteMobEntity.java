@@ -350,13 +350,25 @@ public class EliteMobEntity {
         livingEntity.setHealth(vanillaValue);
     }
 
+    private void setMaxHealth(double healthMultiplier) {
+        this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
+        this.maxHealth = (eliteTier * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth) * healthMultiplier;
+        //7 is the base damage of a diamond sword
+        this.health = this.maxHealth;
+        double vanillaValue = maxHealth > 2048 ? 2048 : maxHealth;
+        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(vanillaValue);
+        livingEntity.setHealth(vanillaValue);
+    }
+
     public void setHealth(double health) {
+        health = health < 0 ? 0 : health;
+
         this.health = health;
-        if (this.maxHealth <= 2048) {
+        if (this.maxHealth <= 2048)
             livingEntity.setHealth(health);
-        } else {
+        else
             livingEntity.setHealth(Math.ceil(this.defaultMaxHealth * this.health / this.maxHealth));
-        }
+
     }
 
     public double getHealth() {
@@ -787,6 +799,7 @@ public class EliteMobEntity {
 
     public void setHealthMultiplier(double healthMultiplier) {
         this.healthMultiplier = healthMultiplier;
+        this.setMaxHealth(healthMultiplier);
     }
 
     public double getDamageMultiplier() {

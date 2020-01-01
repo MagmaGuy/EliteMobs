@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.combatsystem.displays;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByPlayerHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
@@ -26,6 +27,12 @@ public class DamageDisplay implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHit(EntityDamageEvent event) {
+
+        if (EliteMobDamagedByPlayerHandler.display) {
+            EliteMobDamagedByPlayerHandler.display = false;
+            displayDamage(event.getEntity(), EliteMobDamagedByPlayerHandler.damage);
+            return;
+        }
 
         if (event.isCancelled()) return;
 

@@ -433,6 +433,9 @@ public class EntityTracker implements Listener {
     }
 
     private static void wipeEntity(Entity entity) {
+        if (entity instanceof LivingEntity)
+            if (!((LivingEntity) entity).getRemoveWhenFarAway())
+                return;
         unregisterEliteMob(entity);
         unregisterCullableEntity(entity);
         unregisterNPCEntity(entity);

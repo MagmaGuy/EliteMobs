@@ -34,6 +34,9 @@ public class RegionalBossEntity implements Listener {
     private boolean inCooldown = false;
     private UUID uuid;
     private CustomBossConfigFields customBossConfigFields;
+    private EntityType entityType;
+    private int mobLevel;
+    private HashSet<ElitePower> elitePowers;
 
     public RegionalBossEntity(CustomBossConfigFields customBossConfigFields) {
         this.spawnLocation = customBossConfigFields.getSpawnLocation();
@@ -45,7 +48,9 @@ public class RegionalBossEntity implements Listener {
     }
 
     private void spawnRegionalBoss() {
+
         EntityType entityType;
+
         try {
             entityType = EntityType.valueOf(customBossConfigFields.getEntityType());
         } catch (Exception ex) {
@@ -53,6 +58,8 @@ public class RegionalBossEntity implements Listener {
                     customBossConfigFields.getEntityType() + " a valid entity type in the Spigot API?");
             return;
         }
+
+        this.entityType = entityType;
 
         int mobLevel;
 
@@ -67,6 +74,8 @@ public class RegionalBossEntity implements Listener {
             }
         }
 
+        this.mobLevel = mobLevel;
+
         HashSet<ElitePower> elitePowers = new HashSet<>();
         for (String powerName : customBossConfigFields.getPowers())
             if (ElitePower.getElitePower(powerName) != null)
@@ -74,12 +83,24 @@ public class RegionalBossEntity implements Listener {
             else
                 new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
 
-        CustomBossEntity customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, elitePowers);
-        this.isAlive = true;
-        this.uuid = customBossEntity.getLivingEntity().getUniqueId();
-        checkLeash();
-        regionalBossWatchdog();
+        this.elitePowers = elitePowers;
 
+        spawnLocation.getChunk().load();
+        postChunkLoadSpawn();
+
+    }
+
+    public void postChunkLoadSpawn() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                CustomBossEntity customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, elitePowers);
+                isAlive = true;
+                uuid = customBossEntity.getLivingEntity().getUniqueId();
+                checkLeash();
+                regionalBossWatchdog();
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
 
     private void respawnRegionalBoss() {
@@ -140,10 +161,8 @@ public class RegionalBossEntity implements Listener {
                 }
 
                 if (entity.isDead()) {
-
                     respawnRegionalBoss();
                     cancel();
-
                 }
 
             }
