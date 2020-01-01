@@ -56,6 +56,7 @@ public class PlayerDamagedByEliteMobEvent extends Event {
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
         @EventHandler
         public void onEliteMobAttack(EntityDamageByEntityEvent event) {
+            if (event.isCancelled()) return;
             if (!(event.getEntity() instanceof Player)) return;
             Player player = (Player) event.getEntity();
             EliteMobEntity eliteMobEntity = null;

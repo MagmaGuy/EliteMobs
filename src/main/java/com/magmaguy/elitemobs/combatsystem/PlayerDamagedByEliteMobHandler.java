@@ -62,10 +62,6 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
         double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, event.getEliteMobEntity(), event.getEntityDamageByEntityEvent());
 
-        //Prevent untouchable armor and 1-shots
-        newDamage = newDamage < 1 ? 1 : newDamage;
-        newDamage = newDamage > 19 ? 19 : newDamage;
-
         //Set the final damage value
         event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
 
@@ -77,16 +73,19 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
     private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EliteMobEntity eliteMobEntity, EntityDamageByEntityEvent event) {
 
-        double tierDifference = eliteTier - playerTier;
+        double baseDamage = 5;
+        double bonusDamage = eliteTier;
+        double damageReduction = playerTier;
+        double secondaryDamageReduction = secondaryEnchantmentDamageReduction(player, event);
+        double customBossDamageMultiplier = eliteMobEntity.getDamageMultiplier();
 
-        tierDifference = (Math.abs(tierDifference) < 2) ? tierDifference : tierDifference > 0 ? 2 : -2;
+        double finalDamage = (baseDamage + bonusDamage - damageReduction - secondaryDamageReduction) *
+                MobCombatSettingsConfig.damageToPlayerMultiplier * customBossDamageMultiplier;
 
-        /*
-        Apply secondary enchantment damage reduction
-         */
-        double newBaseDamage = 4 - secondaryEnchantmentDamageReduction(player, event);
+        //Prevent 1-shots and players getting healed from hits
+        finalDamage = finalDamage < 1 ? 1 : finalDamage > 15 ? 15 : finalDamage;
 
-        return ((newBaseDamage + newBaseDamage * tierDifference) * eliteMobEntity.getDamageMultiplier()) * MobCombatSettingsConfig.damageToPlayerMultiplier;
+        return finalDamage;
 
     }
 
@@ -105,7 +104,6 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
         }
 
         totalReductionLevel = totalReductionLevel / 4;
-        totalReductionLevel = totalReductionLevel > 1 ? 1 : totalReductionLevel;
 
         return totalReductionLevel;
 
