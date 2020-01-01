@@ -41,6 +41,7 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean b) {
         this.isCancelled = b;
+        entityDamageEvent.setCancelled(b);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
 
     public static class EliteMobDamageEventFilter implements Listener {
 
-        @EventHandler(priority = EventPriority.HIGH)
+        @EventHandler(priority = EventPriority.NORMAL)
         public void onEntityDamageByEntityEvent(EntityDamageEvent event) {
 
             if (event.isCancelled()) return;

@@ -2,12 +2,16 @@ package com.magmaguy.elitemobs.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.items.LootTables;
+import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -311,6 +315,45 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     }
 
+    private void dropLoot(Player player) {
+
+        if (getUniqueLootList().isEmpty()) return;
+
+        for (CustomItem customItem : getUniqueLootList().keySet())
+            if (ThreadLocalRandom.current().nextDouble() < getUniqueLootList().get(customItem)) {
+
+                Item loot = null;
+                int itemTier = 0;
+
+                if (AdventurersGuildConfig.guildLootLimiter) {
+                    itemTier = (int) LootTables.setItemTier((int) getTier());
+                    if (itemTier > GuildRank.getRank(player) * 10)
+                        itemTier = GuildRank.getRank(player) * 10;
+                } else
+                    itemTier = (int) getTier() + 1;
+
+                switch (customItem.getScalability()) {
+                    case LIMITED:
+                        loot = getLivingEntity().getWorld().dropItem(getLivingEntity().getLocation(),
+                                ScalableItemConstructor.constructLimitedItem(itemTier, customItem));
+                        break;
+                    case SCALABLE:
+                        loot = getLivingEntity().getWorld().dropItem(getLivingEntity().getLocation(),
+                                ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem));
+                        break;
+                    case FIXED:
+                        loot = getLivingEntity().getWorld().dropItem(getLivingEntity().getLocation(),
+                                customItem.generateItemStack(itemTier + 1));
+                    default:
+                }
+
+                SoulbindEnchantment.addEnchantment(loot, player);
+                loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
+                loot.setCustomNameVisible(true);
+
+            }
+
+    }
 
     public static class CustomBossEntityEvents implements Listener {
 
@@ -329,16 +372,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     playersList += ", " + player.getDisplayName();
 
                 //Do loot
-                if (!customBossEntity.getUniqueLootList().isEmpty())
-                    for (CustomItem customItem : customBossEntity.getUniqueLootList().keySet())
-                        if (ThreadLocalRandom.current().nextDouble() < customBossEntity.getUniqueLootList().get(customItem)) {
-                            Item loot = customBossEntity.getLivingEntity().getWorld().dropItem(customBossEntity.getLivingEntity().getLocation(),
-                                    customItem.generateItemStack((int) customBossEntity.getTier() + 1));
-                            SoulbindEnchantment.addEnchantment(loot, player);
-                            loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
-                            loot.setCustomNameVisible(true);
-                        }
-
+                customBossEntity.dropLoot(player);
             }
 
             if (customBossEntity.customBossConfigFields.getDeathMessage() != null)

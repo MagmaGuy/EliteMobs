@@ -87,7 +87,6 @@ public class ScalableItemConstructor {
 
         }
 
-
         return newEnchantmentList;
 
     }

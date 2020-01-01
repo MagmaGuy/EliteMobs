@@ -47,6 +47,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean b) {
         this.isCancelled = b;
+        entityDamageByEntityEvent.setCancelled(b);
     }
 
     @Override
@@ -70,8 +71,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             Player player = null;
             if (event.getDamager() instanceof Player)
                 player = (Player) event.getDamager();
-            if (event.getDamager() instanceof Projectile &&
-                    (event.getDamager() instanceof Arrow || event.getDamager() instanceof Trident) &&
+            if ((event.getDamager() instanceof Arrow || event.getDamager() instanceof Trident) &&
                     ((Projectile) event.getDamager()).getShooter() instanceof Player)
                 player = (Player) ((Projectile) event.getDamager()).getShooter();
             if (player == null) return;
