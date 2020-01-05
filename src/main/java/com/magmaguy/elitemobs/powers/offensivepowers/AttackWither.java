@@ -19,6 +19,7 @@ public class AttackWither extends MinorPower implements Listener {
 
     @EventHandler
     public void onHit(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackWither attackWither = (AttackWither) event.getEliteMobEntity().getPower(this);
         if (attackWither == null) return;
 

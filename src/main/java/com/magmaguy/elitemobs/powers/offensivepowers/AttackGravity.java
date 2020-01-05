@@ -19,6 +19,7 @@ public class AttackGravity extends MinorPower implements Listener {
 
     @EventHandler
     public void attackGravity(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackGravity attackGravity = (AttackGravity) event.getEliteMobEntity().getPower(this);
         if (attackGravity == null) return;
         if (attackGravity.isCooldown()) return;

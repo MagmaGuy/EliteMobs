@@ -302,6 +302,7 @@ public class EntityTracker implements Listener {
      */
     public static void registerCullableEntity(Entity entity) {
         cullablePluginEntities.add(entity);
+        CrashFix.persistentTracker(entity);
     }
 
     /**

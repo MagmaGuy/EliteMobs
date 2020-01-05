@@ -23,7 +23,7 @@ public class RegionalBossEntity implements Listener {
 
     private static HashSet<RegionalBossEntity> regionalBossEntityList = new HashSet();
 
-    public HashSet<RegionalBossEntity> getRegionalBossEntityList() {
+    public static HashSet<RegionalBossEntity> getRegionalBossEntityList() {
         return regionalBossEntityList;
     }
 
@@ -34,9 +34,6 @@ public class RegionalBossEntity implements Listener {
     private boolean inCooldown = false;
     private UUID uuid;
     private CustomBossConfigFields customBossConfigFields;
-    private EntityType entityType;
-    private int mobLevel;
-    private HashSet<ElitePower> elitePowers;
 
     public RegionalBossEntity(CustomBossConfigFields customBossConfigFields) {
         this.spawnLocation = customBossConfigFields.getSpawnLocation();
@@ -59,8 +56,6 @@ public class RegionalBossEntity implements Listener {
             return;
         }
 
-        this.entityType = entityType;
-
         int mobLevel;
 
         if (customBossConfigFields.getLevel().equalsIgnoreCase("dynamic")) {
@@ -74,8 +69,6 @@ public class RegionalBossEntity implements Listener {
             }
         }
 
-        this.mobLevel = mobLevel;
-
         HashSet<ElitePower> elitePowers = new HashSet<>();
         for (String powerName : customBossConfigFields.getPowers())
             if (ElitePower.getElitePower(powerName) != null)
@@ -83,24 +76,13 @@ public class RegionalBossEntity implements Listener {
             else
                 new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
 
-        this.elitePowers = elitePowers;
-
         spawnLocation.getChunk().load();
-        postChunkLoadSpawn();
+        CustomBossEntity customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, elitePowers);
+        isAlive = true;
+        uuid = customBossEntity.getLivingEntity().getUniqueId();
+        checkLeash();
+        regionalBossWatchdog();
 
-    }
-
-    public void postChunkLoadSpawn() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                CustomBossEntity customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, elitePowers);
-                isAlive = true;
-                uuid = customBossEntity.getLivingEntity().getUniqueId();
-                checkLeash();
-                regionalBossWatchdog();
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
 
     private void respawnRegionalBoss() {
@@ -119,9 +101,13 @@ public class RegionalBossEntity implements Listener {
 
     }
 
+    public void setLeashRadius(double radius) {
+        this.leashRadius = radius;
+    }
+
     private void checkLeash() {
 
-        if (leashRadius < 10)
+        if (leashRadius < 1)
             return;
 
         new BukkitRunnable() {
@@ -170,22 +156,20 @@ public class RegionalBossEntity implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
     }
 
-    public static class RegionalBossEntityEvents implements Listener {
+    public void setSpawnLocation(Location spawnLocation) {
+        this.spawnLocation = spawnLocation;
+    }
 
+    public static class RegionalBossEntityEvents implements Listener {
         @EventHandler
         public void onRegionalBossDeath(EliteMobDeathEvent event) {
-
-            for (RegionalBossEntity regionalBossEntity : regionalBossEntityList) {
+            for (RegionalBossEntity regionalBossEntity : getRegionalBossEntityList()) {
                 if (!regionalBossEntity.isAlive) return;
                 if (regionalBossEntity.uuid == null) return;
                 if (!event.getEliteMobEntity().getLivingEntity().getUniqueId().equals(regionalBossEntity.uuid)) return;
-
                 regionalBossEntity.respawnRegionalBoss();
-
             }
-
         }
-
     }
 
 }

@@ -25,6 +25,7 @@ public class AttackFreeze extends MinorPower implements Listener {
 
     @EventHandler
     public void attackFreeze(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackFreeze attackFreeze = (AttackFreeze) event.getEliteMobEntity().getPower(this);
         if (attackFreeze == null) return;
         if (attackFreeze.isCooldown()) return;

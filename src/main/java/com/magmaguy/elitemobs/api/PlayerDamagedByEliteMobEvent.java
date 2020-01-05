@@ -7,18 +7,16 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-public class PlayerDamagedByEliteMobEvent extends Event {
+public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private Entity entity;
     private EliteMobEntity eliteMobEntity;
     private Player player;
+    private boolean isCancelled = false;
     private EntityDamageByEntityEvent entityDamageByEntityEvent;
 
     public PlayerDamagedByEliteMobEvent(EliteMobEntity eliteMobEntity, Player player, EntityDamageByEntityEvent event) {
@@ -51,6 +49,17 @@ public class PlayerDamagedByEliteMobEvent extends Event {
 
     public static HandlerList getHandlerList() {
         return handlers;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return this.isCancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean b) {
+        this.isCancelled = b;
+        entityDamageByEntityEvent.setCancelled(b);
     }
 
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {

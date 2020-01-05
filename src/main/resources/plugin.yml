@@ -1,8 +1,8 @@
 name: EliteMobs
-version: 7.1.0.3
+version: 7.1.1
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
-api-version: 1.13
+api-version: 1.14
 softdepend: [Multiverse-Core, WorldGuard, Vault]
 
 commands:
@@ -48,6 +48,7 @@ permissions:
       elitemobs.currency.set: true
       elitemobs.currency.check: true
       elitemobs.currency.add: true
+      elitemobs.customboss: true
   elitemobs.killall.*:
       description: Allows players to run all /elitemobs kill variations
       children:
@@ -221,4 +222,7 @@ permissions:
     default: op
   elitemobs.quest:
     description: Allows players to take on do quests
+    default: op
+  elitemobs.customboss:
+    description: Allows admins to edit Custom Boss settings
     default: op
