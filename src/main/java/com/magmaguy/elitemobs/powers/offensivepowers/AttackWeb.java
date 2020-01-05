@@ -20,6 +20,7 @@ public class AttackWeb extends MinorPower implements Listener {
 
     @EventHandler
     public void attackWeb(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackWeb attackWeb = (AttackWeb) event.getEliteMobEntity().getPower(this);
         if (attackWeb == null) return;
 

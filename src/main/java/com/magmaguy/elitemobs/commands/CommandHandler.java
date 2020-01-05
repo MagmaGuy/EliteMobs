@@ -271,6 +271,10 @@ public class CommandHandler implements CommandExecutor {
                 CustomBossEntity.getCustomBoss(UUID.fromString(args[2]))
                         .realTimeTracking((Player) commandSender);
                 return true;
+            case "customboss":
+                if (!userPermCheck("elitemobs.customboss", commandSender)) return true;
+                CustomBossCommandHandler.handleCommand((Player) commandSender, args);
+                return true;
             default:
                 validCommands(commandSender);
                 return true;

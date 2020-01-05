@@ -19,6 +19,7 @@ public class AttackConfusing extends MinorPower implements Listener {
 
     @EventHandler
     public void attackConfusing(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackConfusing attackConfusing = (AttackConfusing) event.getEliteMobEntity().getPower(this);
         if (attackConfusing == null) return;
         if (attackConfusing.isCooldown()) return;

@@ -14,6 +14,7 @@ public class AttackVacuum extends MinorPower implements Listener {
 
     @EventHandler
     public void onHit(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackVacuum attackVacuum = (AttackVacuum) event.getEliteMobEntity().getPower(this);
         if (attackVacuum == null) return;
 

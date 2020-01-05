@@ -392,6 +392,11 @@ public class EnchantmentGenerator {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
+        //Make sure vanishing and binding curses aren't always there
+        if (string.equalsIgnoreCase("VANISHING_CURSE") || string.equalsIgnoreCase("BINDING_CURSE"))
+            if (ThreadLocalRandom.current().nextDouble() < 0.5)
+                return enchantmentMap;
+
         if (enchantmentsConfigFields.isEnabled()) {
             Enchantment enchantment = enchantmentsConfigFields.getEnchantment();
             enchantmentMap.put(enchantment, enchantmentsConfigFields.getMaxLevel());

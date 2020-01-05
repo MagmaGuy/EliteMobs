@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
@@ -27,6 +28,8 @@ public class CustomBossConfigFields {
     }
 
     private String fileName;
+    private File file;
+    private FileConfiguration fileConfiguration;
     private String entityType;
     private boolean isEnabled;
     private String name;
@@ -180,6 +183,8 @@ public class CustomBossConfigFields {
     public CustomBossConfigFields(FileConfiguration configuration, File file) {
 
         this.fileName = file.getName();
+        this.file = file;
+        this.fileConfiguration = configuration;
         this.entityType = configuration.getString("entityType");
         if (configuration.get("isEnabled") != null)
             this.isEnabled = configuration.getBoolean("isEnabled");
@@ -360,6 +365,18 @@ public class CustomBossConfigFields {
 
     public Location getSpawnLocation() {
         return spawnLocation;
+    }
+
+    public void setSpawnLocation(Location spawnLocation) {
+        this.spawnLocation = spawnLocation;
+        this.fileConfiguration.set("spawnLocation", ConfigurationLocation.serialize(spawnLocation));
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+    }
+
+    public void setLeashRadius(double leashRadius) {
+        this.leashRadius = leashRadius;
+        this.fileConfiguration.set("leashRadius", leashRadius);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
 
     public int getSpawnCooldown() {

@@ -19,6 +19,7 @@ public class AttackPoison extends MinorPower implements Listener {
 
     @EventHandler
     public void onHit(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackPoison attackPoison = (AttackPoison) event.getEliteMobEntity().getPower(this);
         if (attackPoison == null) return;
 

@@ -19,6 +19,7 @@ public class AttackWeakness extends MinorPower implements Listener {
 
     @EventHandler
     public void attackWeakness(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackWeakness attackWeakness = (AttackWeakness) event.getEliteMobEntity().getPower(this);
         if (attackWeakness == null) return;
         if (attackWeakness.isCooldown()) return;

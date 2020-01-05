@@ -105,6 +105,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         else if (entityType.equals(EntityType.DROWNED))
             ((Drowned) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
+        else if (entityType.equals(EntityType.PIG_ZOMBIE))
+            ((PigZombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         super.setPersistent(customBossConfigFields.getIsPersistent());
         if (customBossConfigFields.getTrails() != null) startBossTrails();
         if (MobCombatSettingsConfig.showCustomBossLocation && customBossConfigFields.getLocationMessage() != null)
