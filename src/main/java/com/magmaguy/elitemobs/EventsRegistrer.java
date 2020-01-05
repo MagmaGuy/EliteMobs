@@ -176,6 +176,8 @@ public class EventsRegistrer {
         //Natural EliteMobs Spawning
         if (MobCombatSettingsConfig.doNaturalMobSpawning)
             pluginManager.registerEvents(new EntityTracker(), plugin);
+        //Fix lingering entity after crashes
+        pluginManager.registerEvents(new CrashFix(), plugin);
 
         //Natural Mob Metadata Assigner
         pluginManager.registerEvents(new NaturalMobSpawnEventHandler(), plugin);

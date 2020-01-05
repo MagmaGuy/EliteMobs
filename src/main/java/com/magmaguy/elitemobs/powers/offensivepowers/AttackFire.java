@@ -18,6 +18,7 @@ public class AttackFire extends MinorPower implements Listener {
     @EventHandler
     public void attackFire(PlayerDamagedByEliteMobEvent event) {
 
+        if (event.isCancelled()) return;
         AttackFire attackFire = (AttackFire) event.getEliteMobEntity().getPower(this);
         if (attackFire == null) return;
 

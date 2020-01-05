@@ -32,8 +32,10 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     public void removeOffensivePower(MinorPower minorPower) {
         for (Iterator<MinorPower> iterator = validOffensivePowers.iterator(); iterator.hasNext(); ) {
             MinorPower minorPower1 = iterator.next();
-            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName()))
+            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName())) {
                 iterator.remove();
+                return;
+            }
         }
     }
 
@@ -66,10 +68,12 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new EliteCaveSpider();
         new EliteCreeper();
         new EliteDrowned();
+        new EliteElderGuardian();
         new EliteEnderman();
         new EliteIronGolem();
         new ElitePhantom();
         new ElitePigZombie();
+        new ElitePillager();
         new EliteSilverfish();
         new EliteSkeleton();
         new EliteSpider();
@@ -77,11 +81,14 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new EliteWitherSkeleton();
         new EliteZombie();
         new EliteEndermite();
+        new EliteEvoker();
         new EliteStray();
         new EliteHusk();
+        new EliteIllusioner();
         new EliteVex();
         new EliteVindicator();
         new ElitePolarBear();
+        new EliteRavager();
     }
 
     public static boolean isValidEliteMobType(Entity entity) {

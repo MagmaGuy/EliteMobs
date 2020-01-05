@@ -19,6 +19,7 @@ public class AttackBlinding extends MinorPower implements Listener {
 
     @EventHandler
     public void attackBlinding(PlayerDamagedByEliteMobEvent event) {
+        if (event.isCancelled()) return;
         AttackBlinding attackBlinding = (AttackBlinding) event.getEliteMobEntity().getPower(this);
         if (attackBlinding == null) return;
         if (attackBlinding.isCooldown()) return;

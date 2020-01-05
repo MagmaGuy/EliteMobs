@@ -220,41 +220,25 @@ public class SpawnCommand {
         ArrayList<String> mobPowers = new ArrayList();
 
         if (commandSender instanceof Player) {
-
             if (args.length > 3) {
-
                 int index = 0;
-
                 for (String arg : args) {
-
                     //mob powers start after arg 2
                     if (index > 2)
                         mobPowers.add(arg);
-
                     index++;
-
                 }
-
             }
-
         } else if (commandSender instanceof ConsoleCommandSender || commandSender instanceof BlockCommandSender) {
-
             if (args.length > 6) {
-
                 int index = 0;
-
                 for (String arg : args) {
-
                     //mob powers start after arg 6
                     if (index > 6)
                         mobPowers.add(arg);
-
                     index++;
-
                 }
-
             }
-
         }
 
         return getPowers(mobPowers, commandSender);
