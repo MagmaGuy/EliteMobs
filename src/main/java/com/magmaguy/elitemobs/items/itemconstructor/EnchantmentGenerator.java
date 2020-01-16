@@ -61,6 +61,11 @@ public class EnchantmentGenerator {
         Secondary enchantments get added to a common pool to be randomized later
          */
         switch (material) {
+            case TRIDENT:
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOYALTY"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("RIPTIDE"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("CHANNELING"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("IMPALING"));
             case DIAMOND_SWORD:
             case GOLDEN_SWORD:
             case IRON_SWORD:
@@ -82,6 +87,15 @@ public class EnchantmentGenerator {
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_FIRE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_INFINITE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("ARROW_KNOCKBACK"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                break;
+            case CROSSBOW:
+                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("ARROW_DAMAGE", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("QUICK_CHARGE"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MULTISHOT"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("PIERCING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
@@ -290,6 +304,7 @@ public class EnchantmentGenerator {
                 validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
                 break;
             case BOW:
+            case CROSSBOW:
                 validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
                 break;
             case DIAMOND_PICKAXE:

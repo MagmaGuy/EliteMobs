@@ -47,7 +47,8 @@ public class CustomBossCommandHandler {
     private static void setLocation(CustomBossConfigFields customBossConfigFields, Location location) {
         customBossConfigFields.setSpawnLocation(location);
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList())
-            regionalBossEntity.setSpawnLocation(location);
+            if (customBossConfigFields.getFileName().equals(regionalBossEntity.getCustomBossConfigFields().getFileName()))
+                regionalBossEntity.setSpawnLocation(location);
     }
 
     private static void setLeashRadius(CustomBossConfigFields customBossConfigFields, Player player, String[] args) {
@@ -71,7 +72,8 @@ public class CustomBossCommandHandler {
 
         customBossConfigFields.setLeashRadius(leashRadius);
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList())
-            regionalBossEntity.setLeashRadius(leashRadius);
+            if (customBossConfigFields.getFileName().equals(regionalBossEntity.getCustomBossConfigFields().getFileName()))
+                regionalBossEntity.setLeashRadius(leashRadius);
 
     }
 

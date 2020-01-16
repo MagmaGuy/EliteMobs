@@ -16,7 +16,7 @@ public class ProceduralItemGenerationSettingsConfig {
     public static double customEnchantmentChance;
     public static List<String> validMaterials = new ArrayList<>();
     public static String swordName, bowName, pickaxeName, spadeName, hoeName, axeName, helmetName, chestplateName,
-            leggingsName, bootsName, shearsName, fishingRodName, shieldName, trident;
+            leggingsName, bootsName, shearsName, fishingRodName, shieldName, tridentName, crossbowName;
     public static List<String> nameFormat;
     public static List<String> nouns;
     public static List<String> adjectives;
@@ -99,6 +99,7 @@ public class ProceduralItemGenerationSettingsConfig {
         addMaterial(Material.TRIDENT);
         addMaterial(Material.FISHING_ROD);
         addMaterial(Material.BOW);
+        addMaterial(Material.CROSSBOW);
         addMaterial(Material.SHEARS);
 
         for (String material : fileConfiguration.getConfigurationSection("validMaterials").getKeys(false))
@@ -118,7 +119,8 @@ public class ProceduralItemGenerationSettingsConfig {
         shearsName = ConfigurationEngine.setString(fileConfiguration, "materialNames.shears", "Shears");
         fishingRodName = ConfigurationEngine.setString(fileConfiguration, "materialNames.fishingRod", "Fishing Rod");
         shieldName = ConfigurationEngine.setString(fileConfiguration, "materialNames.shield", "Shield");
-        trident = ConfigurationEngine.setString(fileConfiguration, "materialNames.trident", "Trident");
+        tridentName = ConfigurationEngine.setString(fileConfiguration, "materialNames.trident", "Trident");
+        crossbowName = ConfigurationEngine.setString(fileConfiguration, "materialNames.trident", "Crossbow");
 
         nameFormat = ConfigurationEngine.setList(fileConfiguration, "nameFormats", Arrays.asList(
                 "$verb $itemType of the $adjective $noun",

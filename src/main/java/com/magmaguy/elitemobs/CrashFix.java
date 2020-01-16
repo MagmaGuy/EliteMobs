@@ -20,6 +20,10 @@ public class CrashFix implements Listener {
         entity.getPersistentDataContainer().set(key, PersistentDataType.STRING, "delete_me");
     }
 
+    public static void persistentUntracker(Entity entity) {
+        entity.getPersistentDataContainer().remove(key);
+    }
+
     private HashSet<Chunk> knownSessionChunks = new HashSet<>();
 
     @EventHandler(priority = EventPriority.LOWEST)
