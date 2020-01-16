@@ -165,6 +165,7 @@ public class ItemTierFinder {
         switch (material) {
             case DIAMOND_SWORD:
             case DIAMOND_AXE:
+            case TRIDENT:
                 return DIAMOND_TIER + mainEnchantment;
             case DIAMOND_BOOTS:
             case DIAMOND_CHESTPLATE:
@@ -204,6 +205,7 @@ public class ItemTierFinder {
             case GOLDEN_AXE:
                 return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             case BOW:
+            case CROSSBOW:
                 return IRON_TIER + mainEnchantment3;
             case DIAMOND_HOE:
             case IRON_HOE:
@@ -219,8 +221,6 @@ public class ItemTierFinder {
                     return STONE_CHAIN_TIER + mainEnchantment;
                 if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
                     return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
-            case TRIDENT:
-                return DIAMOND_TIER + mainEnchantment;
             default:
                 return 0;
         }

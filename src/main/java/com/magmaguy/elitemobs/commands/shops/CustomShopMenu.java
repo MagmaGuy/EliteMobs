@@ -104,7 +104,7 @@ public class CustomShopMenu implements Listener {
         if (!SharedShopElements.inventoryNullPointerPreventer(event)) return;
 
         //reroll loot button
-        if (event.getCurrentItem().equals(CustomShopMenuConfig.rerollItem)) {
+        if (event.getCurrentItem().getItemMeta().getDisplayName().equals(CustomShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
             populateShop(event.getInventory());
             event.setCancelled(true);
             return;

@@ -17,6 +17,7 @@ public class MaterialTier {
             case DIAMOND_SHOVEL:
             case DIAMOND_SWORD:
             case DIAMOND_BOOTS:
+            case TRIDENT:
                 return CombatSystem.DIAMOND_TIER_LEVEL;
             case IRON_AXE:
             case IRON_HORSE_ARMOR:

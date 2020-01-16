@@ -101,7 +101,9 @@ public class NameGenerator {
             case SHIELD:
                 return ProceduralItemGenerationSettingsConfig.shieldName;
             case TRIDENT:
-                return ProceduralItemGenerationSettingsConfig.trident;
+                return ProceduralItemGenerationSettingsConfig.tridentName;
+            case CROSSBOW:
+                return ProceduralItemGenerationSettingsConfig.crossbowName;
         }
 
 

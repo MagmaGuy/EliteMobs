@@ -136,10 +136,6 @@ public class EliteMobEntity {
          */
         setArmor();
         /*
-        Register whether or not the elite mob is natural
-         */
-        this.isNaturalEntity = EntityTracker.isNaturalEntity(livingEntity);
-        /*
         Set the power list
          */
         randomizePowers(eliteMobProperties);
@@ -194,10 +190,6 @@ public class EliteMobEntity {
         Handle health, max is variable as per stacking rules
          */
         setMaxHealth();
-        /*
-        Register whether or not the elite mob is natural
-         */
-        this.isNaturalEntity = EntityTracker.isNaturalEntity(this.livingEntity);
         /*
         These have custom powers
          */

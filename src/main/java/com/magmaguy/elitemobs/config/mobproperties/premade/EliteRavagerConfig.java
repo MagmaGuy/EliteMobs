@@ -10,7 +10,7 @@ public class EliteRavagerConfig extends MobPropertiesConfigFields {
         super("elite_ravager",
                 EntityType.RAVAGER,
                 true,
-                "&fLvl &2$level &fElite &6Pillager",
+                "&fLvl &2$level &fElite &6Ravager",
                 Arrays.asList("$entity &cshowed $player &cwho's in charge!"));
     }
 }
