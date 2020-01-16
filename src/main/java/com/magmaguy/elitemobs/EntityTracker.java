@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
@@ -11,10 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
@@ -34,7 +31,7 @@ public class EntityTracker implements Listener {
     private static HashSet<LivingEntity> eliteMobsLivingEntities = new HashSet<>();
     private static HashSet<NPCEntity> npcEntities = new HashSet<>();
 
-    private static HashSet<LivingEntity> naturalEntities = new HashSet<>();
+    //    private static HashSet<LivingEntity> naturalEntities = new HashSet<>();
     private static HashSet<ArmorStand> armorStands = new HashSet<>();
     private static HashSet<Item> itemVisualEffects = new HashSet<>();
 
@@ -81,7 +78,7 @@ public class EntityTracker implements Listener {
      */
     public static void unregisterEliteMob(EliteMobEntity eliteMobEntity) {
         eliteMobs.remove(eliteMobEntity);
-        naturalEntities.remove(eliteMobEntity.getLivingEntity());
+//        naturalEntities.remove(eliteMobEntity.getLivingEntity());
         cullablePluginEntities.remove(eliteMobEntity.getLivingEntity());
         eliteMobEntity.getLivingEntity().removeMetadata(MetadataHandler.ELITE_MOB_METADATA, MetadataHandler.PLUGIN);
     }
@@ -169,55 +166,55 @@ public class EntityTracker implements Listener {
         return superMobs.contains(entity);
     }
 
-    /**
-     * Gets all living natural entities
-     *
-     * @return full list of natural entities
-     */
-    public static HashSet<LivingEntity> getNaturalEntities() {
-        return naturalEntities;
-    }
+//    /**
+//     * Gets all living natural entities
+//     *
+//     * @return full list of natural entities
+//     */
+//    public static HashSet<LivingEntity> getNaturalEntities() {
+//        return naturalEntities;
+//    }
 
-    /**
-     * Registers a LivingEntity as a natural entity
-     *
-     * @param livingEntity livingEntity to be registered
-     */
-    public static void registerNaturalEntity(LivingEntity livingEntity) {
-        if (!EliteMobProperties.isValidEliteMobType(livingEntity)) return;
-        naturalEntities.add(livingEntity);
-    }
+//    /**
+//     * Registers a LivingEntity as a natural entity
+//     *
+//     * @param livingEntity livingEntity to be registered
+//     */
+//    public static void registerNaturalEntity(LivingEntity livingEntity) {
+//        if (!EliteMobProperties.isValidEliteMobType(livingEntity)) return;
+//        naturalEntities.add(livingEntity);
+//    }
 
-    /**
-     * Unregisters a LivingEntity from the natural entities list
-     *
-     * @param livingEntity LivingEntity to unregister
-     */
-    public static void unregisterNaturalEntity(LivingEntity livingEntity) {
-        naturalEntities.remove(livingEntity);
-    }
+//    /**
+//     * Unregisters a LivingEntity from the natural entities list
+//     *
+//     * @param livingEntity LivingEntity to unregister
+//     */
+//    public static void unregisterNaturalEntity(LivingEntity livingEntity) {
+//        naturalEntities.remove(livingEntity);
+//    }
 
-    /**
-     * Unregisters an Entity from the Natural Entity list
-     *
-     * @param entity Entity to unregister
-     */
-    public static void unregisterNaturalEntity(Entity entity) {
-        if (EliteMobProperties.isValidEliteMobType(entity)) return;
-        if (!isNaturalEntity(entity)) return;
-        naturalEntities.remove(entity);
-    }
+//    /**
+//     * Unregisters an Entity from the Natural Entity list
+//     *
+//     * @param entity Entity to unregister
+//     */
+//    public static void unregisterNaturalEntity(Entity entity) {
+//        if (EliteMobProperties.isValidEliteMobType(entity)) return;
+//        if (!isNaturalEntity(entity)) return;
+//        naturalEntities.remove(entity);
+//    }
 
-    /**
-     * Checks if an Entity is a natural entity
-     *
-     * @param entity entity to check
-     * @return whether the Entity is naturally spawned
-     */
-    public static boolean isNaturalEntity(Entity entity) {
-        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
-        return naturalEntities.contains(entity);
-    }
+//    /**
+//     * Checks if an Entity is a natural entity
+//     *
+//     * @param entity entity to check
+//     * @return whether the Entity is naturally spawned
+//     */
+//    public static boolean isNaturalEntity(Entity entity) {
+//        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
+//        return naturalEntities.contains(entity);
+//    }
 
     /**
      * Registers an Armorstand for specific display purposes
@@ -313,6 +310,7 @@ public class EntityTracker implements Listener {
     public static void unregisterCullableEntity(Entity entity) {
         if (!cullablePluginEntities.contains(entity)) return;
         cullablePluginEntities.remove(entity);
+        CrashFix.persistentUntracker(entity);
         entity.remove();
     }
 
@@ -397,17 +395,17 @@ public class EntityTracker implements Listener {
     }
 
 
-    /*
-    Custom spawn reasons can be considered as natural spawns under specific config options
-     */
-    @EventHandler(priority = EventPriority.LOW)
-    public void registerNaturalEntity(CreatureSpawnEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
-                event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) &&
-                        !DefaultConfig.doStrictSpawningRules)
-            registerNaturalEntity(event.getEntity());
-    }
+//    /*
+//    Custom spawn reasons can be considered as natural spawns under specific config options
+//     */
+//    @EventHandler(priority = EventPriority.LOW)
+//    public void registerNaturalEntity(CreatureSpawnEvent event) {
+//        if (event.isCancelled()) return;
+//        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
+//                event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) &&
+//                        !DefaultConfig.doStrictSpawningRules)
+//            registerNaturalEntity(event.getEntity());
+//    }
 
 
     /**
@@ -426,7 +424,7 @@ public class EntityTracker implements Listener {
         superMobs.clear();
         itemVisualEffects.clear();
         armorStands.clear();
-        naturalEntities.clear();
+//        naturalEntities.clear();
         cullablePluginEntities.clear();
         npcEntities.clear();
         temporaryBlocks.clear();
@@ -443,7 +441,7 @@ public class EntityTracker implements Listener {
         unregisterArmorStand(entity);
         unregisterItemVisualEffects(entity);
         unregisterSuperMob(entity);
-        unregisterNaturalEntity(entity);
+//        unregisterNaturalEntity(entity);
     }
 
     /**
@@ -501,13 +499,13 @@ public class EntityTracker implements Listener {
                     }
                 }
 
-                for (Iterator<LivingEntity> iterator = naturalEntities.iterator(); iterator.hasNext(); ) {
-                    LivingEntity livingEntity = iterator.next();
-                    if (livingEntity == null || livingEntity.isDead()) {
-                        iterator.remove();
-                        entitiesCleared++;
-                    }
-                }
+//                for (Iterator<LivingEntity> iterator = naturalEntities.iterator(); iterator.hasNext(); ) {
+//                    LivingEntity livingEntity = iterator.next();
+//                    if (livingEntity == null || livingEntity.isDead()) {
+//                        iterator.remove();
+//                        entitiesCleared++;
+//                    }
+//                }
                 for (Iterator<ArmorStand> iterator = armorStands.iterator(); iterator.hasNext(); ) {
                     ArmorStand armorStand = iterator.next();
                     if (armorStand == null || armorStand.isDead()) {

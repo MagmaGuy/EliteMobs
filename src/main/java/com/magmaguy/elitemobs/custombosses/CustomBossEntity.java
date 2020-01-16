@@ -158,7 +158,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             @Override
             public void run() {
                 //In case of boss death, stop the effect
-                if (CustomBossEntity.super.getLivingEntity() == null || CustomBossEntity.super.getLivingEntity().isDead()) {
+                if (CustomBossEntity.super.getLivingEntity() == null || CustomBossEntity.super.getLivingEntity().isDead()
+                        || Bukkit.getEntity(bossUUID) == null) {
                     cancel();
                     return;
                 }

@@ -160,6 +160,10 @@ public class RegionalBossEntity implements Listener {
         this.spawnLocation = spawnLocation;
     }
 
+    public CustomBossConfigFields getCustomBossConfigFields() {
+        return customBossConfigFields;
+    }
+
     public static class RegionalBossEntityEvents implements Listener {
         @EventHandler
         public void onRegionalBossDeath(EliteMobDeathEvent event) {
