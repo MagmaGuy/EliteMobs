@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 
@@ -41,39 +43,44 @@ public class AdventurersGuildConfig {
         guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name", "EliteMobs_adventurers_guild");
         String locationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
 
-        guildWorldLocation = null;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                guildWorldLocation = null;
 
-        for (World world : Bukkit.getWorlds())
-            if (world.getName().equals(AdventurersGuildConfig.guildWorldName)) {
-                double x = 0, y = 0, z = 0;
-                float yaw = 0, pitch = 0;
-                int counter = 0;
+                for (World world : Bukkit.getWorlds())
+                    if (world.getName().equals(AdventurersGuildConfig.guildWorldName)) {
+                        double x = 0, y = 0, z = 0;
+                        float yaw = 0, pitch = 0;
+                        int counter = 0;
 
-                for (String substring : locationString.split(",")) {
-                    switch (counter) {
-                        case 0:
-                            x = Double.parseDouble(substring);
-                            break;
-                        case 1:
-                            y = Double.parseDouble(substring);
-                            break;
-                        case 2:
-                            z = Double.parseDouble(substring);
-                            break;
-                        case 3:
-                            yaw = Float.parseFloat(substring);
-                            break;
-                        case 4:
-                            pitch = Float.parseFloat(substring);
-                            break;
+                        for (String substring : locationString.split(",")) {
+                            switch (counter) {
+                                case 0:
+                                    x = Double.parseDouble(substring);
+                                    break;
+                                case 1:
+                                    y = Double.parseDouble(substring);
+                                    break;
+                                case 2:
+                                    z = Double.parseDouble(substring);
+                                    break;
+                                case 3:
+                                    yaw = Float.parseFloat(substring);
+                                    break;
+                                case 4:
+                                    pitch = Float.parseFloat(substring);
+                                    break;
+                            }
+                            counter++;
+
+                        }
+
+                        guildWorldLocation = new Location(world, x, y, z, yaw, pitch);
+
                     }
-                    counter++;
-
-                }
-
-                guildWorldLocation = new Location(world, x, y, z, yaw, pitch);
-
             }
+        }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20 * 10);
 
         agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);
         rankNames0 = ConfigurationEngine.setString(fileConfiguration, "0", "&8Commoner");

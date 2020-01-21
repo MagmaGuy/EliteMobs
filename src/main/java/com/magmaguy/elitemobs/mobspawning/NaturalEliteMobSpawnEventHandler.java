@@ -64,7 +64,7 @@ public class NaturalEliteMobSpawnEventHandler {
     }
 
     private static void naturalCustomBossSpawn(Entity entity, int eliteMobLevel) {
-                /*
+        /*
         Check to see if they'll become a naturally spawned Custom Boss
          */
         for (CustomBossConfigFields customBossConfigFields : CustomBossConfigFields.getNaturallySpawnedElites())
@@ -87,8 +87,8 @@ public class NaturalEliteMobSpawnEventHandler {
 
         List<Player> closePlayers = new ArrayList<>();
 
-        for (Player player : Bukkit.getOnlinePlayers())
-            if (player.getWorld().equals(spawnLocation.getWorld()) && player.getLocation().distanceSquared(spawnLocation) < Math.pow(range, 2))
+        for (Player player : spawnLocation.getWorld().getPlayers())
+            if (player.getLocation().distanceSquared(spawnLocation) < Math.pow(range, 2))
                 if (!player.getGameMode().equals(GameMode.SPECTATOR) && (!player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) ||
                         player.hasMetadata(MetadataHandler.VANISH_NO_PACKET) && !player.getMetadata(MetadataHandler.VANISH_NO_PACKET).get(0).asBoolean()))
                     closePlayers.add(player);

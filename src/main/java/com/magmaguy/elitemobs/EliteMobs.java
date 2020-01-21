@@ -29,6 +29,7 @@ import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
+import com.magmaguy.elitemobs.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
@@ -163,6 +164,11 @@ public class EliteMobs extends JavaPlugin {
         Spawn world bosses
          */
         RegionalBossHandler.initialize();
+
+        // Small check to make sure that PlaceholderAPI is installed
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new Placeholders().register();
+        }
 
     }
 
