@@ -292,7 +292,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (getLivingEntity().isDead()) {
+                if (getLivingEntity() == null || getLivingEntity().isDead()) {
                     cancel();
                     return;
                 }
