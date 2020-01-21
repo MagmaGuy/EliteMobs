@@ -169,8 +169,11 @@ public class CommandHandler implements CommandExecutor {
             case "simulateloot":
             case "simdrop":
             case "simulatedrop":
-                if (userPermCheck(SIMLOOT, commandSender))
-                    SimLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]));
+                if (commandSender instanceof Player) {
+                    if (userPermCheck(SIMLOOT, commandSender))
+                        SimLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]));
+                } else if (permCheck(SIMLOOT, commandSender))
+                    SimLootHandler.simLoot(commandSender, args);
                 return true;
             case "check":
             case "checkcurrency":
