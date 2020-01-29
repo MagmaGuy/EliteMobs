@@ -71,6 +71,15 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("By MagmaGuy");
 
         /*
+        Load plugin worlds
+         */
+        CustomWorldLoading.startupWorldInitialization();
+
+        //Prevent memory leaks
+        EntityTracker.memoryWatchdog();
+        CrashFix.startupCheck();
+
+        /*
         New config loading
          */
         initializeConfigs();
@@ -134,11 +143,6 @@ public class EliteMobs extends JavaPlugin {
         new NPCInitializer();
 
         /*
-        Make sure entities are getting culled - necessary due to some plugins on some servers
-         */
-        EntityTracker.entityValidator();
-
-        /*
         Check for new plugin version
          */
         VersionChecker.updateComparer();
@@ -154,11 +158,6 @@ public class EliteMobs extends JavaPlugin {
         Launch quests
          */
         QuestRefresher.generateNewQuestMenus();
-
-        /*
-        Load plugin worlds
-         */
-        CustomWorldLoading.startupWorldInitialization();
 
         /*
         Spawn world bosses

@@ -78,7 +78,6 @@ public class EntityTracker implements Listener {
      */
     public static void unregisterEliteMob(EliteMobEntity eliteMobEntity) {
         eliteMobs.remove(eliteMobEntity);
-//        naturalEntities.remove(eliteMobEntity.getLivingEntity());
         cullablePluginEntities.remove(eliteMobEntity.getLivingEntity());
         eliteMobEntity.getLivingEntity().removeMetadata(MetadataHandler.ELITE_MOB_METADATA, MetadataHandler.PLUGIN);
     }
@@ -115,7 +114,6 @@ public class EntityTracker implements Listener {
      * @param entity Entity to be unregistered
      */
     private static void unregisterEliteMob(Entity entity) {
-//        if (!isEliteMob(entity)) return;
         EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
         if (eliteMobEntity == null) return;
         eliteMobEntity.getLivingEntity().remove();
@@ -165,56 +163,6 @@ public class EntityTracker implements Listener {
         if (!SuperMobProperties.isValidSuperMobType(entity)) return false;
         return superMobs.contains(entity);
     }
-
-//    /**
-//     * Gets all living natural entities
-//     *
-//     * @return full list of natural entities
-//     */
-//    public static HashSet<LivingEntity> getNaturalEntities() {
-//        return naturalEntities;
-//    }
-
-//    /**
-//     * Registers a LivingEntity as a natural entity
-//     *
-//     * @param livingEntity livingEntity to be registered
-//     */
-//    public static void registerNaturalEntity(LivingEntity livingEntity) {
-//        if (!EliteMobProperties.isValidEliteMobType(livingEntity)) return;
-//        naturalEntities.add(livingEntity);
-//    }
-
-//    /**
-//     * Unregisters a LivingEntity from the natural entities list
-//     *
-//     * @param livingEntity LivingEntity to unregister
-//     */
-//    public static void unregisterNaturalEntity(LivingEntity livingEntity) {
-//        naturalEntities.remove(livingEntity);
-//    }
-
-//    /**
-//     * Unregisters an Entity from the Natural Entity list
-//     *
-//     * @param entity Entity to unregister
-//     */
-//    public static void unregisterNaturalEntity(Entity entity) {
-//        if (EliteMobProperties.isValidEliteMobType(entity)) return;
-//        if (!isNaturalEntity(entity)) return;
-//        naturalEntities.remove(entity);
-//    }
-
-//    /**
-//     * Checks if an Entity is a natural entity
-//     *
-//     * @param entity entity to check
-//     * @return whether the Entity is naturally spawned
-//     */
-//    public static boolean isNaturalEntity(Entity entity) {
-//        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
-//        return naturalEntities.contains(entity);
-//    }
 
     /**
      * Registers an Armorstand for specific display purposes
@@ -394,20 +342,6 @@ public class EntityTracker implements Listener {
         removeTemporaryBlock(event.getBlock());
     }
 
-
-//    /*
-//    Custom spawn reasons can be considered as natural spawns under specific config options
-//     */
-//    @EventHandler(priority = EventPriority.LOW)
-//    public void registerNaturalEntity(CreatureSpawnEvent event) {
-//        if (event.isCancelled()) return;
-//        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
-//                event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM) &&
-//                        !DefaultConfig.doStrictSpawningRules)
-//            registerNaturalEntity(event.getEntity());
-//    }
-
-
     /**
      * Purges all removable entities for a shutdown (or reload)
      */
@@ -424,14 +358,13 @@ public class EntityTracker implements Listener {
         superMobs.clear();
         itemVisualEffects.clear();
         armorStands.clear();
-//        naturalEntities.clear();
         cullablePluginEntities.clear();
         npcEntities.clear();
         temporaryBlocks.clear();
 
     }
 
-    private static void wipeEntity(Entity entity) {
+    public static void wipeEntity(Entity entity) {
         if (entity instanceof LivingEntity)
             if (!((LivingEntity) entity).getRemoveWhenFarAway())
                 return;
@@ -441,7 +374,6 @@ public class EntityTracker implements Listener {
         unregisterArmorStand(entity);
         unregisterItemVisualEffects(entity);
         unregisterSuperMob(entity);
-//        unregisterNaturalEntity(entity);
     }
 
     /**
@@ -469,7 +401,7 @@ public class EntityTracker implements Listener {
         wipeEntity(event.getEntity());
     }
 
-    public static void entityValidator() {
+    public static void memoryWatchdog() {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -499,13 +431,6 @@ public class EntityTracker implements Listener {
                     }
                 }
 
-//                for (Iterator<LivingEntity> iterator = naturalEntities.iterator(); iterator.hasNext(); ) {
-//                    LivingEntity livingEntity = iterator.next();
-//                    if (livingEntity == null || livingEntity.isDead()) {
-//                        iterator.remove();
-//                        entitiesCleared++;
-//                    }
-//                }
                 for (Iterator<ArmorStand> iterator = armorStands.iterator(); iterator.hasNext(); ) {
                     ArmorStand armorStand = iterator.next();
                     if (armorStand == null || armorStand.isDead()) {
@@ -521,10 +446,28 @@ public class EntityTracker implements Listener {
                     }
                 }
 
-//                Bukkit.getLogger().warning("[EliteMobs] Entities cleared: " + entitiesCleared);
+                for (Iterator<Entity> iterator = cullablePluginEntities.iterator(); iterator.hasNext(); ) {
+                    try {
+                        Entity entity = iterator.next();
+                        if (entity == null || entity.isDead()) {
+                            if (entity.getType().equals(EntityType.VILLAGER)) continue;
+                            if (entity instanceof LivingEntity)
+                                if (!((LivingEntity) entity).getRemoveWhenFarAway())
+                                    continue;
+                            iterator.remove();
+                            CrashFix.persistentUntracker(entity);
+                            entitiesCleared++;
+                        }
+                    } catch (Exception ex) {
+                        continue;
+                        //async is fun!
+                    }
+                }
+
+                //new DebugMessage("Culling " + entitiesCleared + " entities!");
 
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60, 20 * 60);
+        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 60 * 20, 60 * 20);
     }
 
 }
