@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.CrashFix;
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
@@ -36,6 +38,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -68,8 +71,16 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     private static HashMap<UUID, CustomBossEntity> customBosses = new HashMap<>();
 
-    public static void addCustomBoss(CustomBossEntity customBossEntity) {
+    private static void addCustomBoss(CustomBossEntity customBossEntity) {
         customBosses.put(customBossEntity.uuid, customBossEntity);
+    }
+
+    private static void removeCustomBoss(UUID uuid) {
+        customBosses.remove(uuid);
+    }
+
+    private static boolean isCustomBoss(UUID uuid) {
+        return customBosses.containsKey(uuid);
     }
 
     public static CustomBossEntity getCustomBoss(UUID uuid) {
@@ -86,7 +97,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                             int mobLevel,
                             HashSet<ElitePower> elitePowers) {
         super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
-        uuid = UUID.randomUUID();
+        uuid = super.getLivingEntity().getUniqueId();
         super.setDamageMultiplier(customBossConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossConfigFields.getHealthMultiplier());
         super.setHasSpecialLoot(customBossConfigFields.getDropsEliteMobsLoot());
@@ -137,6 +148,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     }
 
     public void startBossTrails() {
+        //todo: this is not good
         for (String string : this.customBossConfigFields.getTrails()) {
             try {
                 Particle particle = Particle.valueOf(string);
@@ -158,17 +170,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             @Override
             public void run() {
                 //In case of boss death, stop the effect
-                if (CustomBossEntity.super.getLivingEntity() == null || CustomBossEntity.super.getLivingEntity().isDead()
-                        || Bukkit.getEntity(bossUUID) == null) {
+                if (!getLivingEntity().isValid()) {
                     cancel();
                     return;
-                }
-                //In case of chunk being unloaded, pause the effect
-                if (!CustomBossEntity.super.getLivingEntity().isValid()) {
-                    if (Bukkit.getEntity(bossUUID).isValid())
-                        return;
-                    else
-                        CustomBossEntity.super.setLivingEntity((LivingEntity) Bukkit.getEntity(bossUUID));
                 }
                 //All conditions cleared, do the boss flair effect
                 Location entityCenter = getLivingEntity().getLocation().clone().add(0, getLivingEntity().getHeight() / 2, 0);
@@ -179,21 +183,13 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     private void doItemTrail(Material material) {
         new BukkitRunnable() {
-            UUID bossUUID = CustomBossEntity.super.getLivingEntity().getUniqueId();
 
             @Override
             public void run() {
                 //In case of boss death, stop the effect
-                if (CustomBossEntity.super.getLivingEntity() == null || CustomBossEntity.super.getLivingEntity().isDead()) {
+                if (!getLivingEntity().isValid()) {
                     cancel();
                     return;
-                }
-                //In case of chunk being unloaded, pause the effect
-                if (!CustomBossEntity.super.getLivingEntity().isValid()) {
-                    if (Bukkit.getEntity(bossUUID).isValid())
-                        return;
-                    else
-                        CustomBossEntity.super.setLivingEntity((LivingEntity) Bukkit.getEntity(bossUUID));
                 }
                 //All conditions cleared, do the boss flair effect
                 Location entityCenter = getLivingEntity().getLocation().clone().add(0, getLivingEntity().getHeight() / 2, 0);
@@ -207,6 +203,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     @Override
                     public void run() {
                         item.remove();
+                        EntityTracker.wipeEntity(item);
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20);
 
@@ -381,6 +378,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             if (customBossEntity.customBossConfigFields.getDeathMessage() != null)
                 Bukkit.broadcastMessage(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
 
+            removeCustomBoss(customBossEntity.uuid);
+
         }
 
         @EventHandler
@@ -397,6 +396,19 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             CustomBossEntity customBossEntity = (CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity();
             if (customBossEntity.customBossConfigFields.getOnDamageMessages().isEmpty()) return;
             Taunt.nametagProcessor(customBossEntity.getLivingEntity(), customBossEntity.customBossConfigFields.getOnDamageMessages());
+        }
+
+        @EventHandler
+        public void onChunkLoadEvent(ChunkLoadEvent event) {
+            for (Entity entity : event.getChunk().getEntities())
+                if (entity instanceof LivingEntity)
+                    if (CrashFix.isPersistentEntity(entity))
+                        if (isCustomBoss(entity.getUniqueId())) {
+                            CustomBossEntity customBossEntity = getCustomBoss(entity.getUniqueId());
+                            customBossEntity.setLivingEntity((LivingEntity) entity);
+                            customBossEntity.startBossTrails();
+                        }
+
         }
 
     }
