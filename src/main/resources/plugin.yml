@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.1.3
+version: 7.1.4
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -27,7 +27,6 @@ permissions:
       elitemobs.currency.user: true
       elitemobs.currency.admin: true
       elitemobs.currency.cointop: true
-      elitemobs.scoreboard: false
       elitemobs.events.*: true
       elitemobs.checktier: true
       elitemobs.checktier.others: true
@@ -88,9 +87,6 @@ permissions:
   elitemobs.spawnmob:
     description: Allow players to run /elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower(just keep adding until done)]
     default: op
-  elitemobs.scoreboard:
-    description: Shows a scoreboard with info about the elite mob a player might be standing next to
-    default: false
   elitemobs.killall.aggressiveelites:
     description: Allows players to run /elitemobs kill aggressive
     default: op
