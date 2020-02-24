@@ -98,7 +98,7 @@ public class QuestsMenu implements Listener {
             }
 
         QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier);
-        EliteQuest eliteQuest = questTierMenu.getEliteQuests().get(event.getSlot() / 2 - 1);
+        EliteQuest eliteQuest = questTierMenu.getEliteQuests().get(event.getSlot() / 2);
 
         if (EliteQuest.hasPlayerQuest((Player) event.getWhoClicked())) {
             initializeCancelQuestDialog((Player) event.getWhoClicked(), eliteQuest);

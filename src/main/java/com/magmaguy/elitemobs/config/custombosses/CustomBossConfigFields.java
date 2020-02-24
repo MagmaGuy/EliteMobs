@@ -8,10 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CustomBossConfigFields {
 
@@ -183,31 +180,61 @@ public class CustomBossConfigFields {
     public CustomBossConfigFields(FileConfiguration configuration, File file) {
 
         this.fileName = file.getName();
+
         this.file = file;
+
         this.fileConfiguration = configuration;
+
         this.entityType = configuration.getString("entityType");
-        if (configuration.get("isEnabled") != null)
+
+        if (configuration.get("isEnabled") == null)
+            this.isEnabled = true;
+        else
             this.isEnabled = configuration.getBoolean("isEnabled");
-        else this.isEnabled = true;
-        this.name = configuration.getString("name");
-        this.level = configuration.getString("level");
-        if (configuration.get("timeout") != null)
+
+        if (configuration.getString("name") == null)
+            this.name = "Undefined name";
+        else
+            this.name = configuration.getString("name");
+
+        if (configuration.getString("level") == null)
+            this.level = "-1";
+        else
+            this.level = configuration.getString("level");
+
+        if (configuration.get("timeout") == null)
+            this.timeout = 0;
+        else
             this.timeout = configuration.getInt("timeout");
-        else this.timeout = 0;
-        if (configuration.get("isPersistent") != null)
+
+        if (configuration.get("isPersistent") == null)
+            this.isPersistent = false;
+        else
             this.isPersistent = configuration.getBoolean("isPersistent");
-        else this.isPersistent = false;
-        this.healthMultiplier = configuration.getDouble("healthMultiplier");
-        this.damageMultiplier = configuration.getDouble("damageMultiplier");
-        this.helmet = Material.getMaterial(configuration.getString("helmet"));
-        this.chestplate = Material.getMaterial(configuration.getString("chestplate"));
-        this.leggings = Material.getMaterial(configuration.getString("leggings"));
-        this.boots = Material.getMaterial(configuration.getString("boots"));
-        this.mainHand = Material.getMaterial(configuration.getString("mainHand"));
-        this.offHand = Material.getMaterial(configuration.getString("offHand"));
-        if (configuration.get("isBaby") != null)
+
+        if (configuration.get("healthMultiplier") == null)
+            this.healthMultiplier = 1;
+        else
+            this.healthMultiplier = configuration.getDouble("healthMultiplier");
+
+        if (configuration.get("healthMultiplier") == null)
+            this.damageMultiplier = 1;
+        else
+            this.damageMultiplier = configuration.getDouble("damageMultiplier");
+
+
+        this.helmet = parseMaterial(configuration.getString("helmet"));
+        this.chestplate = parseMaterial(configuration.getString("chestplate"));
+        this.leggings = parseMaterial(configuration.getString("leggings"));
+        this.boots = parseMaterial(configuration.getString("boots"));
+        this.mainHand = parseMaterial(configuration.getString("mainHand"));
+        this.offHand = parseMaterial(configuration.getString("offHand"));
+
+        if (!configuration.contains("isBaby"))
+            this.isBaby = false;
+        else
             this.isBaby = configuration.getBoolean("isBaby");
-        else this.isBaby = false;
+
         this.powers = configuration.getStringList("powers");
         this.spawnMessage = configuration.getString("spawnMessage");
         this.deathMessage = configuration.getString("deathMessage");
@@ -221,15 +248,23 @@ public class CustomBossConfigFields {
             this.dropsVanillaLoot = configuration.getBoolean("dropsVanillaLoot");
         else this.dropsVanillaLoot = true;
         this.trails = configuration.getStringList("trails");
-        this.onDamageMessages = configuration.getStringList("onDamageMessages");
-        this.onDamagedMessages = configuration.getStringList("onDamagedMessages");
+        if (!configuration.contains("onDamageMessages"))
+            this.onDamageMessages = new ArrayList<>();
+        else
+            this.onDamageMessages = configuration.getStringList("onDamageMessages");
+        if (!configuration.contains("onDamagedMessages"))
+            this.onDamagedMessages = new ArrayList<>();
+        else
+            this.onDamagedMessages = configuration.getStringList("onDamagedMessages");
         if (configuration.get("spawnChance") != null) {
             this.spawnChance = configuration.getDouble("spawnChance");
             if (this.spawnChance > 0)
                 naturallySpawnedElites.add(this);
         } else
             this.spawnChance = 0;
-        if (configuration.getBoolean("isRegionalBoss")) {
+        if (!configuration.contains("isRegionalBoss"))
+            this.isRegionalBoss = false;
+        else if (configuration.getBoolean("isRegionalBoss")) {
             String location = configuration.getString("spawnLocation");
             if (location == null) {
                 new WarningMessage("Regional / World boss does not have a set location! It will not spawn.");
@@ -245,6 +280,15 @@ public class CustomBossConfigFields {
 
         this.leashRadius = configuration.getDouble("leashRadius");
 
+    }
+
+    private Material parseMaterial(String materialString) {
+        try {
+            return Material.getMaterial(materialString);
+        } catch (Exception e) {
+            new WarningMessage("File " + this.fileName + " has an invalid material string: " + materialString);
+            return Material.AIR;
+        }
     }
 
     public String getFileName() {

@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
+import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
@@ -35,6 +36,7 @@ import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.QuestRefresher;
 import com.magmaguy.elitemobs.runnables.EggRunnable;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
@@ -70,11 +72,6 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
         Bukkit.getLogger().info("By MagmaGuy");
 
-        /*
-        Load plugin worlds
-         */
-        CustomWorldLoading.startupWorldInitialization();
-
         //Prevent memory leaks
         EntityTracker.memoryWatchdog();
         CrashFix.startupCheck();
@@ -83,6 +80,11 @@ public class EliteMobs extends JavaPlugin {
         New config loading
          */
         initializeConfigs();
+
+        /*
+        Load plugin worlds
+         */
+        CustomWorldLoading.startupWorldInitialization();
 
         if (worldguardIsEnabled)
             Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is enabled!");
@@ -230,6 +232,8 @@ public class EliteMobs extends JavaPlugin {
         CustomLootConfig.initializeConfigs();
         CustomItem.initializeCustomItems();
         CustomEnchantment.initializeCustomEnchantments();
+        CustomTreasureChestsConfig.initializeConfigs();
+        TreasureChest.initializeTreasureChest();
         MobCombatSettingsConfig.initializeConfig();
         CommandsConfig.initializeConfigs();
         EventsConfig.initializeConfigs();
