@@ -1,13 +1,19 @@
 package com.magmaguy.elitemobs.items.customitems;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfigFields;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -28,6 +34,40 @@ public class CustomItem {
         if (!customItems.containsKey(fileName))
             return null;
         return customItems.get(fileName);
+    }
+
+    public static Item dropPlayerLoot(Player player, int tier, String customItemFileName, Location location) {
+        CustomItem customItem = getCustomItem(customItemFileName);
+        Item loot = null;
+        int itemTier = 0;
+
+        if (AdventurersGuildConfig.guildLootLimiter) {
+            itemTier = (int) LootTables.setItemTier(tier);
+            if (itemTier > GuildRank.getRank(player) * 10)
+                itemTier = GuildRank.getRank(player) * 10;
+        } else
+            itemTier = tier + 1;
+
+        switch (customItem.getScalability()) {
+            case LIMITED:
+                loot = location.getWorld().dropItem(location,
+                        ScalableItemConstructor.constructLimitedItem(itemTier, customItem));
+                break;
+            case SCALABLE:
+                loot = location.getWorld().dropItem(location,
+                        ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem));
+                break;
+            case FIXED:
+                loot = location.getWorld().dropItem(location,
+                        customItem.generateItemStack(itemTier + 1));
+            default:
+        }
+
+        SoulbindEnchantment.addEnchantment(loot, player);
+        loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
+        loot.setCustomNameVisible(true);
+
+        return loot;
     }
 
     private static void addCustomItem(String fileName, CustomItem customItem) {

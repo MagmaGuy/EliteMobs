@@ -37,6 +37,7 @@ import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
+import com.magmaguy.elitemobs.npcs.NPCChunkLoad;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
@@ -61,6 +62,7 @@ import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
 import com.magmaguy.elitemobs.quests.QuestsTracker;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.worldguard.WorldGuardEliteMobOnlyFlag;
 import com.magmaguy.elitemobs.worldguard.WorldGuardSpawnEventBypasser;
 import org.bukkit.Bukkit;
@@ -95,6 +97,9 @@ public class EventsRegistrer {
         //Mob loot
         pluginManager.registerEvents(new DefaultDropsHandler(), plugin);
         pluginManager.registerEvents(new ItemLootShower.ItemLootShowerEvents(), plugin);
+
+        //npcs
+        pluginManager.registerEvents(new NPCChunkLoad(), plugin);
 
         //potion effects
         pluginManager.registerEvents(new PotionEffectApplier(), plugin);
@@ -282,6 +287,7 @@ public class EventsRegistrer {
 
         pluginManager.registerEvents(new EntityTransformPreventer(), plugin);
 
+        pluginManager.registerEvents(new TreasureChest.TreasureChestEvents(), plugin);
 
         //Zone based spawning
         pluginManager.registerEvents(new ZoneWarner(), plugin);

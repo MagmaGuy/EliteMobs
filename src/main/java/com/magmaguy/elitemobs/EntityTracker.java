@@ -437,6 +437,7 @@ public class EntityTracker implements Listener {
                         iterator.remove();
                         entitiesCleared++;
                     }
+
                 }
                 for (Iterator<Item> iterator = itemVisualEffects.iterator(); iterator.hasNext(); ) {
                     Item item = iterator.next();
@@ -447,27 +448,22 @@ public class EntityTracker implements Listener {
                 }
 
                 for (Iterator<Entity> iterator = cullablePluginEntities.iterator(); iterator.hasNext(); ) {
-                    try {
-                        Entity entity = iterator.next();
-                        if (entity == null || entity.isDead()) {
-                            if (entity.getType().equals(EntityType.VILLAGER)) continue;
-                            if (entity instanceof LivingEntity)
-                                if (!((LivingEntity) entity).getRemoveWhenFarAway())
-                                    continue;
-                            iterator.remove();
-                            CrashFix.persistentUntracker(entity);
-                            entitiesCleared++;
-                        }
-                    } catch (Exception ex) {
-                        continue;
-                        //async is fun!
+                    Entity entity = iterator.next();
+                    if (entity == null || entity.isDead()) {
+                        if (entity.getType().equals(EntityType.VILLAGER)) continue;
+                        if (entity instanceof LivingEntity)
+                            if (!((LivingEntity) entity).getRemoveWhenFarAway())
+                                continue;
+                        iterator.remove();
+                        CrashFix.persistentUntracker(entity);
+                        entitiesCleared++;
                     }
                 }
 
                 //new DebugMessage("Culling " + entitiesCleared + " entities!");
 
             }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 60 * 20, 60 * 20);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 60 * 20, 60 * 20);
     }
 
 }

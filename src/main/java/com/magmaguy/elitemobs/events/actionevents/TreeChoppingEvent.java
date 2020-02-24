@@ -24,12 +24,12 @@ public class TreeChoppingEvent implements Listener {
         if (!FaeEventConfig.isEnabled) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
             return;
-        if (!(event.getBlock().getType().equals(Material.ACACIA_WOOD)
-                || event.getBlock().getType().equals(Material.BIRCH_WOOD)
-                || event.getBlock().getType().equals(Material.DARK_OAK_WOOD)
-                || event.getBlock().getType().equals(Material.JUNGLE_WOOD)
-                || event.getBlock().getType().equals(Material.OAK_WOOD)
-                || event.getBlock().getType().equals(Material.SPRUCE_WOOD)))
+        if (!(event.getBlock().getType().equals(Material.ACACIA_LOG)
+                || event.getBlock().getType().equals(Material.BIRCH_LOG)
+                || event.getBlock().getType().equals(Material.DARK_OAK_LOG)
+                || event.getBlock().getType().equals(Material.JUNGLE_LOG)
+                || event.getBlock().getType().equals(Material.OAK_LOG)
+                || event.getBlock().getType().equals(Material.SPRUCE_LOG)))
             return;
 
         if (ThreadLocalRandom.current().nextDouble() > FaeEventConfig.chanceOnChop)
@@ -40,7 +40,6 @@ public class TreeChoppingEvent implements Listener {
 
             @Override
             public void run() {
-
                 if (i > 20 * 3) {
                     CustomBossEntity.constructCustomBoss("lightning_fae.yml", event.getBlock().getLocation(),
                             ActionDynamicBossLevelConstructor.determineDynamicBossLevel(event.getBlock().getLocation()));

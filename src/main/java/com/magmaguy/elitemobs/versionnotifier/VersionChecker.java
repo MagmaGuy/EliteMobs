@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.versionnotifier;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,40 +16,45 @@ public class VersionChecker {
 
     public static void updateComparer() {
 
-        String currentVersion = MetadataHandler.PLUGIN.getDescription().getVersion();
-        String publicVersion = "";
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                String currentVersion = MetadataHandler.PLUGIN.getDescription().getVersion();
+                String publicVersion = "";
 
-        try {
-            Bukkit.getLogger().info("[EliteMobs] Latest public release is " + VersionChecker.readStringFromURL());
-            Bukkit.getLogger().info("[EliteMobs] Your version is " + currentVersion);
-            publicVersion = VersionChecker.readStringFromURL();
-        } catch (IOException e) {
-            Bukkit.getLogger().warning("[EliteMobs] Couldn't check latest version");
-            return;
-        }
+                try {
+                    Bukkit.getLogger().info("[EliteMobs] Latest public release is " + VersionChecker.readStringFromURL());
+                    Bukkit.getLogger().info("[EliteMobs] Your version is " + currentVersion);
+                    publicVersion = VersionChecker.readStringFromURL();
+                } catch (IOException e) {
+                    Bukkit.getLogger().warning("[EliteMobs] Couldn't check latest version");
+                    return;
+                }
 
-        if (Double.parseDouble(currentVersion.split("\\.")[0]) < Double.parseDouble(publicVersion.split("\\.")[0])) {
-            outOfDateHandler();
-            return;
-        }
-        if (Double.parseDouble(currentVersion.split("\\.")[0]) > Double.parseDouble(publicVersion.split("\\.")[0])) {
-            return;
-        }
-        if (Double.parseDouble(currentVersion.split("\\.")[1]) < Double.parseDouble(publicVersion.split("\\.")[1])) {
-            outOfDateHandler();
-            return;
-        }
-        if (Double.parseDouble(currentVersion.split("\\.")[1]) > Double.parseDouble(publicVersion.split("\\.")[0])) {
-            return;
-        }
-        if (Double.parseDouble(currentVersion.split("\\.")[2]) < Double.parseDouble(publicVersion.split("\\.")[2])) {
-            outOfDateHandler();
-            return;
-        }
+                if (Double.parseDouble(currentVersion.split("\\.")[0]) < Double.parseDouble(publicVersion.split("\\.")[0])) {
+                    outOfDateHandler();
+                    return;
+                }
+                if (Double.parseDouble(currentVersion.split("\\.")[0]) > Double.parseDouble(publicVersion.split("\\.")[0])) {
+                    return;
+                }
+                if (Double.parseDouble(currentVersion.split("\\.")[1]) < Double.parseDouble(publicVersion.split("\\.")[1])) {
+                    outOfDateHandler();
+                    return;
+                }
+                if (Double.parseDouble(currentVersion.split("\\.")[1]) > Double.parseDouble(publicVersion.split("\\.")[0])) {
+                    return;
+                }
+                if (Double.parseDouble(currentVersion.split("\\.")[2]) < Double.parseDouble(publicVersion.split("\\.")[2])) {
+                    outOfDateHandler();
+                    return;
+                }
 
-        Bukkit.getLogger().info("[EliteMobs] You are running the latest version!");
+                Bukkit.getLogger().info("[EliteMobs] You are running the latest version!");
 
-        pluginIsUpToDate = true;
+                pluginIsUpToDate = true;
+            }
+        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
 
     }
 
