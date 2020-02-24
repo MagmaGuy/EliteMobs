@@ -13,6 +13,7 @@ public class ChunkLocationChecker {
         double locationZ = location.getZ();
         if (!(chunkX <= locationX && chunkX + 16 >= locationX))
             return false;
+
         return chunkZ <= locationZ && chunkZ + 16 >= locationZ;
     }
 

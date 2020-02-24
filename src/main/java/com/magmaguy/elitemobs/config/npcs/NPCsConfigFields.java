@@ -166,7 +166,7 @@ public class NPCsConfigFields {
         this.location = location;
         this.fileConfiguration.set("location", location);
         try {
-            ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, NPCsConfig.getNPCsList().get(this.fileName).getFile());
+            ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, this.file);
         } catch (Exception ex) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }

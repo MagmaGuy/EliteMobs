@@ -4,17 +4,12 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
-import com.magmaguy.elitemobs.items.LootTables;
-import com.magmaguy.elitemobs.items.ScalableItemConstructor;
-import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
@@ -320,39 +315,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         if (getUniqueLootList().isEmpty()) return;
 
         for (CustomItem customItem : getUniqueLootList().keySet())
-            if (ThreadLocalRandom.current().nextDouble() < getUniqueLootList().get(customItem)) {
-
-                Item loot = null;
-                int itemTier = 0;
-
-                if (AdventurersGuildConfig.guildLootLimiter) {
-                    itemTier = (int) LootTables.setItemTier((int) getTier());
-                    if (itemTier > GuildRank.getRank(player) * 10)
-                        itemTier = GuildRank.getRank(player) * 10;
-                } else
-                    itemTier = (int) getTier() + 1;
-
-                switch (customItem.getScalability()) {
-                    case LIMITED:
-                        loot = getLivingEntity().getWorld().dropItem(getLivingEntity().getLocation(),
-                                ScalableItemConstructor.constructLimitedItem(itemTier, customItem));
-                        break;
-                    case SCALABLE:
-                        loot = getLivingEntity().getWorld().dropItem(getLivingEntity().getLocation(),
-                                ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem));
-                        break;
-                    case FIXED:
-                        loot = getLivingEntity().getWorld().dropItem(getLivingEntity().getLocation(),
-                                customItem.generateItemStack(itemTier + 1));
-                    default:
-                }
-
-                SoulbindEnchantment.addEnchantment(loot, player);
-                loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
-                loot.setCustomNameVisible(true);
-
-            }
-
+            if (ThreadLocalRandom.current().nextDouble() < getUniqueLootList().get(customItem))
+                CustomItem.dropPlayerLoot(player, (int) getTier(), customItem.getFileName(), getLivingEntity().getLocation());
     }
 
     public static class CustomBossEntityEvents implements Listener {

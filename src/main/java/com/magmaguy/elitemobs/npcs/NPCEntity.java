@@ -92,7 +92,7 @@ public class NPCEntity {
 
         WorldGuardSpawnEventBypasser.forceSpawn();
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
-        this.villager.setRemoveWhenFarAway(true);
+        this.villager.setRemoveWhenFarAway(false);
 
         if (!villager.isValid()) return;
 
@@ -129,7 +129,7 @@ public class NPCEntity {
         villager.setCustomNameVisible(true);
         villager.setProfession(profession);
         villager.setAI(canMove);
-        villager.setRemoveWhenFarAway(true);
+        villager.setRemoveWhenFarAway(false);
         initializeRole(role);
         dupeBuster();
     }
@@ -503,17 +503,13 @@ public class NPCEntity {
      * Busting makes me feel good!
      */
     private void dupeBuster() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!villager.isValid())
-                    return;
-                for (Entity entity : villager.getNearbyEntities(1.5, 3, 1.5))
-                    if ((entity instanceof Villager && entity.getCustomName() != null) ||
-                            (entity instanceof ArmorStand && !entity.equals(roleDisplay)))
-                        entity.remove();
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20);
+        if (!villager.isValid())
+            return;
+        for (Entity entity : villager.getNearbyEntities(1.5, 3, 1.5))
+            if ((entity instanceof Villager && entity.getCustomName() != null) ||
+                    (entity instanceof ArmorStand && !entity.equals(roleDisplay)))
+                entity.remove();
+
     }
 
 }
