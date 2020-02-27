@@ -258,10 +258,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 String locationString = (int) getLivingEntity().getLocation().getX() +
                         ", " + (int) getLivingEntity().getLocation().getY() +
                         ", " + (int) getLivingEntity().getLocation().getZ();
-                BossBar bossBar = Bukkit.createBossBar(ChatColorConverter.convert(customBossConfigFields.getLocationMessage().replace("$location", locationString)),
-                        BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-                bossBar.setProgress(getHealth() / getMaxHealth());
+
                 for (Player player : getLivingEntity().getWorld().getPlayers()) {
+                    BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+                    bossBar.setProgress(getHealth() / getMaxHealth());
                     if (trackingPlayer.contains(player))
                         continue;
                     bossBar.addPlayer(player);
@@ -284,17 +284,14 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (getLivingEntity() == null || getLivingEntity().isDead()) {
+                if (getLivingEntity().isDead()) {
                     cancel();
                     return;
                 }
                 String locationString = (int) getLivingEntity().getLocation().getX() +
                         ", " + (int) getLivingEntity().getLocation().getY() +
                         ", " + (int) getLivingEntity().getLocation().getZ();
-                BossBar bossBar = Bukkit.createBossBar(ChatColorConverter.convert(
-                        customBossConfigFields.getLocationMessage()
-                                .replace("$location", locationString)),
-                        BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+                BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
                 bossBar.setProgress(getHealth() / getMaxHealth());
                 bossBar.addPlayer(player);
 
@@ -308,6 +305,17 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
 
+    }
+
+    private String bossBarMessage(Player player, String locationString) {
+        if (customBossConfigFields.getLocationMessage().contains("$distance"))
+            if (player.getLocation().getWorld().equals(getLivingEntity().getLocation().getWorld()))
+                return ChatColorConverter.convert(customBossConfigFields.getLocationMessage()
+                        .replace("$location", locationString)
+                        .replace("$distance", "" + (int) getLivingEntity().getLocation().distance(player.getLocation())));
+
+        return ChatColorConverter.convert(customBossConfigFields.getLocationMessage()
+                .replace("$location", locationString));
     }
 
     private void dropLoot(Player player) {
