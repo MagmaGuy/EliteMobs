@@ -119,6 +119,10 @@ public class NaturalEliteMobSpawnEventHandler {
 
         if (playerCount == 0 || eliteMobLevel < 1) return 0;
 
+        //add wiggle room
+        int wiggle = ThreadLocalRandom.current().nextInt(5) - 2;
+        eliteMobLevel = wiggle + eliteMobLevel < 0 ? 0 : eliteMobLevel + wiggle;
+
         return eliteMobLevel;
 
     }

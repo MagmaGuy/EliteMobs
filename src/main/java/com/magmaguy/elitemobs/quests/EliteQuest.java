@@ -139,7 +139,7 @@ public class EliteQuest implements Serializable {
     public ItemStack generateQuestItemStack() {
         HashMap<String, String> placeholderReplacementPairs = new HashMap<>();
         String objectiveName = EliteMobProperties.getPluginData(getQuestObjective().getEntityType()).getName()
-                .replace("$level", MobTierCalculator.findMobLevel(getQuestObjective().getMinimumEliteMobTier()) + "");
+                .replace("$level", MobTierCalculator.findMobLevel(getQuestObjective().getMinimumEliteMobTier()) + "+");
         placeholderReplacementPairs.put("$objectiveAmount", getQuestObjective().getObjectiveKills() + "");
         placeholderReplacementPairs.put("$currentAmount", getQuestObjective().getCurrentKills() + "");
         placeholderReplacementPairs.put("$objectiveName", objectiveName);
