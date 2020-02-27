@@ -95,7 +95,7 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, eventDamage);
         if (eliteMobEntity.getHealth() - newDamage < 0)
             newDamage = eliteMobEntity.getHealth();
-        eliteMobEntity.setHealth(eliteMobEntity.getHealth() - (newDamage - eventDamage));
+        eliteMobEntity.setHealth(eliteMobEntity.getHealth() - newDamage);
         eliteMobEntity.addDamager(player, newDamage);
 
     }

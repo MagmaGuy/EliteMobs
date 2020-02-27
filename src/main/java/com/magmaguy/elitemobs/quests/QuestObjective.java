@@ -61,7 +61,6 @@ public class QuestObjective implements Serializable {
         return this.questTier;
     }
 
-
     private void setObjectiveKills(int objectiveKills) {
         this.objectiveKills = objectiveKills;
     }
