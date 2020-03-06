@@ -17,7 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.tags.ItemTagType;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -80,7 +80,8 @@ public class SoulbindEnchantment extends CustomEnchantment {
 
     private static void addEnchantment(ItemStack itemStack, Player player) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.getCustomTagContainer().setCustomTag(namespacedKey, ItemTagType.STRING, player.getUniqueId().toString());
+        itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, player.getUniqueId().toString());
+        itemStack.setItemMeta(itemMeta);
         List<String> lore = itemStack.getItemMeta().getLore();
         if (lore == null)
             lore = new ArrayList<>();
@@ -95,9 +96,9 @@ public class SoulbindEnchantment extends CustomEnchantment {
     public static boolean isValidSoulbindUser(ItemMeta itemMeta, Player player) {
         if (itemMeta == null)
             return true;
-        if (!itemMeta.getCustomTagContainer().hasCustomTag(namespacedKey, ItemTagType.STRING))
+        if (!itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.STRING))
             return true;
-        return UUID.fromString(itemMeta.getCustomTagContainer().getCustomTag(new NamespacedKey(MetadataHandler.PLUGIN, key), ItemTagType.STRING)).equals(player.getUniqueId());
+        return UUID.fromString(itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)).equals(player.getUniqueId());
     }
 
 
