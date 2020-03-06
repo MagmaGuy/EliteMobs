@@ -7,6 +7,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class ItemTagger {
     public static boolean isEliteItem(ItemStack itemStack) {
         if (itemStack == null) return false;
         if (!itemStack.hasItemMeta()) return false;
+        if (itemStack.getItemMeta().getCustomTagContainer().hasCustomTag(eliteMobsItemNamespacedKey, ItemTagType.BYTE))
+            return true;
         return itemStack.getItemMeta().getPersistentDataContainer().has(eliteMobsItemNamespacedKey, PersistentDataType.BYTE);
     }
 
@@ -84,10 +87,15 @@ public class ItemTagger {
             return 0;
         if (!hasEnchantment(itemMeta, enchantmentKey))
             return 0;
+        //for legacy items
+        if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
+            return itemMeta.getCustomTagContainer().getCustomTag(enchantmentKey, ItemTagType.INTEGER);
         return itemMeta.getPersistentDataContainer().get(enchantmentKey, PersistentDataType.INTEGER);
     }
 
     public static boolean hasEnchantment(ItemMeta itemMeta, NamespacedKey enchantmentKey) {
+        if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
+            return true;
         return itemMeta.getPersistentDataContainer().has(enchantmentKey, PersistentDataType.INTEGER);
     }
 

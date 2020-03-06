@@ -17,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -96,6 +97,9 @@ public class SoulbindEnchantment extends CustomEnchantment {
     public static boolean isValidSoulbindUser(ItemMeta itemMeta, Player player) {
         if (itemMeta == null)
             return true;
+        //for legacy items
+        if (itemMeta.getCustomTagContainer().hasCustomTag(namespacedKey, ItemTagType.STRING))
+            return UUID.fromString(itemMeta.getCustomTagContainer().getCustomTag(new NamespacedKey(MetadataHandler.PLUGIN, key), ItemTagType.STRING)).equals(player.getUniqueId());
         if (!itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.STRING))
             return true;
         return UUID.fromString(itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)).equals(player.getUniqueId());
