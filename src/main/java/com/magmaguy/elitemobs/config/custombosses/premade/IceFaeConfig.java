@@ -23,7 +23,7 @@ public class IceFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                false,
+                null,
                 Arrays.asList("attack_freeze.yml"),
                 null,
                 null,
@@ -35,10 +35,11 @@ public class IceFaeConfig extends CustomBossConfigFields {
                 Arrays.asList(Particle.WATER_DROP.toString()),
                 null,
                 null,
-                0,
-                false,
                 null,
-                0,
-                0);
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

@@ -36,11 +36,12 @@ public class TreasureGoblinConfig extends CustomBossConfigFields {
                 Arrays.asList(Material.GOLD_NUGGET.toString()),
                 null,
                 null,
-                0,
-                false,
                 null,
-                0,
-                0);
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
 }

@@ -41,6 +41,7 @@ import com.magmaguy.elitemobs.npcs.NPCChunkLoad;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
+import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.powers.AggroPrevention;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
@@ -292,6 +293,9 @@ public class EventsRegistrer {
         //Zone based spawning
         pluginManager.registerEvents(new ZoneWarner(), plugin);
         pluginManager.registerEvents(new DaylightWatchdog(), plugin);
+
+        //On death commands
+        pluginManager.registerEvents(new OnDeathCommands(), plugin);
 
     }
 

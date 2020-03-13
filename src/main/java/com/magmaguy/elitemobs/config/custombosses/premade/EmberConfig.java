@@ -23,7 +23,7 @@ public class EmberConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                false,
+                null,
                 Arrays.asList(),
                 null,
                 null,
@@ -35,10 +35,11 @@ public class EmberConfig extends CustomBossConfigFields {
                 Arrays.asList(Particle.SPELL_WITCH.toString()),
                 null,
                 null,
-                0,
-                false,
                 null,
-                0,
-                0);
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

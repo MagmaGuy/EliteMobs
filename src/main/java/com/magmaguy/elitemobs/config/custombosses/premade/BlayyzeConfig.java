@@ -23,7 +23,7 @@ public class BlayyzeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                false,
+                null,
                 Arrays.asList("meteor_shower.yml", "summon_embers.yml", "bullet_hell.yml", "spirit_walk.yml"),
                 "&cSomething came out of the meteorite's crater...",
                 "&6$players completed first contact.",
@@ -35,10 +35,11 @@ public class BlayyzeConfig extends CustomBossConfigFields {
                 Arrays.asList(Material.FIRE_CHARGE.toString()),
                 null,
                 null,
-                0,
-                false,
                 null,
-                0,
-                0);
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

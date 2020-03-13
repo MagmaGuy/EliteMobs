@@ -30,12 +30,12 @@ public class CustomBossCommandHandler {
             return;
         }
 
-        switch (args[2]) {
-            case "setSpawnLocation":
+        switch (args[2].toLowerCase()) {
+            case "setspawnlocation":
                 setLocation(customBossConfigFields, player.getLocation());
                 player.sendMessage("[EliteMobs] New spawn location set to where you are standing!");
                 return;
-            case "setLeashRadius":
+            case "setleashradius":
                 setLeashRadius(customBossConfigFields, player, args);
             default:
                 return;
