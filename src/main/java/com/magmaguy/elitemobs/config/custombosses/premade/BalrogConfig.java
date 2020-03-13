@@ -14,7 +14,7 @@ public class BalrogConfig extends CustomBossConfigFields {
                 "&4Balrog",
                 "dynamic",
                 0,
-                false,
+                null,
                 1,
                 1,
                 null,
@@ -23,7 +23,7 @@ public class BalrogConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                false,
+                null,
                 Arrays.asList("summon_raug.yml"),
                 null,
                 null,
@@ -36,10 +36,11 @@ public class BalrogConfig extends CustomBossConfigFields {
                         Particle.FLAME.toString(), Particle.FLAME.toString()),
                 null,
                 null,
-                0,
-                false,
                 null,
-                0,
-                0);
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

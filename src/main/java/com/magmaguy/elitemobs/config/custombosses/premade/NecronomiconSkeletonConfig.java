@@ -20,6 +20,14 @@ public class NecronomiconSkeletonConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
                 false,
                 null,
                 null,
@@ -27,15 +35,8 @@ public class NecronomiconSkeletonConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                false,
-                false,
                 null,
                 null,
-                null,
-                0,
-                false,
-                null,
-                0,
-                0);
+                null);
     }
 }

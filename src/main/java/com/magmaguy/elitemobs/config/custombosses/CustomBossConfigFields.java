@@ -58,6 +58,7 @@ public class CustomBossConfigFields {
     private Location spawnLocation;
     private int spawnCooldown;
     private double leashRadius;
+    private List<String> onDeathCommands;
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -67,7 +68,7 @@ public class CustomBossConfigFields {
                                   boolean isEnabled,
                                   String name,
                                   String level,
-                                  int timeout,
+                                  Integer timeout,
                                   Boolean isPersistent,
                                   double healthMultiplier,
                                   double damageMultiplier,
@@ -77,23 +78,24 @@ public class CustomBossConfigFields {
                                   Material boots,
                                   Material mainHand,
                                   Material offHand,
-                                  boolean isBaby,
+                                  Boolean isBaby,
                                   List<String> powers,
                                   String spawnMessage,
                                   String deathMessage,
                                   String escapeMessage,
                                   String locationMessage,
                                   List<String> uniqueLootList,
-                                  boolean dropsEliteMobsLoot,
-                                  boolean dropsVanillaLoot,
+                                  Boolean dropsEliteMobsLoot,
+                                  Boolean dropsVanillaLoot,
                                   List<String> trails,
                                   List<String> onDamageMessages,
                                   List<String> onDamagedMessages,
-                                  double spawnChance,
-                                  boolean isRegionalBoss,
+                                  Double spawnChance,
+                                  Boolean isRegionalBoss,
                                   Location spawnLocation,
-                                  int spawnCooldown,
-                                  double leashRadius) {
+                                  Integer spawnCooldown,
+                                  Double leashRadius,
+                                  List<String> onDeathCommands) {
         this.fileName = fileName + ".yml";
         this.entityType = entityType;
         this.isEnabled = isEnabled;
@@ -109,7 +111,8 @@ public class CustomBossConfigFields {
         this.boots = boots;
         this.mainHand = mainHand;
         this.offHand = offHand;
-        this.isBaby = isBaby;
+        if (isBaby != null)
+            this.isBaby = isBaby;
         this.powers = powers;
         this.spawnMessage = spawnMessage;
         this.deathMessage = deathMessage;
@@ -121,11 +124,17 @@ public class CustomBossConfigFields {
         this.trails = trails;
         this.onDamageMessages = onDamageMessages;
         this.onDamagedMessages = onDamagedMessages;
-        this.spawnChance = spawnChance;
-        this.isRegionalBoss = isRegionalBoss;
+        if (spawnChance != null)
+            this.spawnChance = spawnChance;
+        if (isRegionalBoss != null)
+            this.isRegionalBoss = isRegionalBoss;
         this.spawnLocation = spawnLocation;
-        this.spawnCooldown = spawnCooldown;
-        this.leashRadius = leashRadius;
+        if (spawnCooldown != null)
+            this.spawnCooldown = spawnCooldown;
+        if (leashRadius != null)
+            this.leashRadius = leashRadius;
+        if (onDeathCommands != null)
+            this.onDeathCommands = onDeathCommands;
     }
 
 
@@ -170,6 +179,7 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("spawnLocation", spawnLocation);
         fileConfiguration.addDefault("spawnCooldown", spawnCooldown);
         fileConfiguration.addDefault("leashRadius", leashRadius);
+        fileConfiguration.addDefault("onDeathCommands", onDeathCommands);
         if (!additionalConfigOptions.isEmpty())
             fileConfiguration.addDefaults(additionalConfigOptions);
     }
@@ -279,6 +289,8 @@ public class CustomBossConfigFields {
         }
 
         this.leashRadius = configuration.getDouble("leashRadius");
+
+        this.onDeathCommands = (List<String>) configuration.getList("onDeathCommands");
 
     }
 
@@ -429,6 +441,10 @@ public class CustomBossConfigFields {
 
     public double getLeashRadius() {
         return leashRadius;
+    }
+
+    public List<String> getOnDeathCommands() {
+        return onDeathCommands;
     }
 
     public Map<String, Object> getAdditionalConfigOptions() {

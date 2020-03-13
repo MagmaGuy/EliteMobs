@@ -12,12 +12,9 @@ public class BossSpecialAttackDamage {
 
         if (damagee.isInvulnerable() || damagee.getHealth() <= 0) return false;
 
-        if (damagee instanceof Player) {
-
+        if (damagee instanceof Player)
             if (!(((Player) damagee).getGameMode().equals(GameMode.SURVIVAL) ||
                     ((Player) damagee).getGameMode().equals(GameMode.ADVENTURE))) return false;
-
-        }
 
         CombatSystem.addCustomEntity(damagee);
         damagee.damage(damage, damager);
