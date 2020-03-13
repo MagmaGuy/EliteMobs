@@ -32,6 +32,7 @@ public class ItemTagger {
     }
 
     /**
+     * q
      * Registers all enchantments as they'd appear when constructing an item in EliteMobs
      *
      * @param itemMeta

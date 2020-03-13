@@ -36,10 +36,11 @@ public class TestCustomBossConfig extends CustomBossConfigFields {
                 Arrays.asList(Particle.BARRIER.toString()),
                 Arrays.asList("I've hit you!"),
                 Arrays.asList("I've been hit!"),
-                0,
+                0D,
                 false,
                 null,
                 0,
-                0);
+                0D,
+                Arrays.asList("broadcast $players has killed $name! That was level $level!"));
     }
 }

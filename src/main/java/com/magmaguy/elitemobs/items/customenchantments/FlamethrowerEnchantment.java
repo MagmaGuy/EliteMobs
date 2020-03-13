@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.utils.CooldownHandler;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,7 +46,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
         for (Location location : locations)
             for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
                 if (entity instanceof LivingEntity) {
-                    if (entity.equals(player))
+                    if (entity.getType().equals(EntityType.PLAYER))
                         continue;
                     BossSpecialAttackDamage.dealSpecialDamage(player, (LivingEntity) entity, 1);
                 }

@@ -23,7 +23,7 @@ public class LightningFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                false,
+                null,
                 Arrays.asList("attack_lightning.yml"),
                 null,
                 null,
@@ -35,10 +35,11 @@ public class LightningFaeConfig extends CustomBossConfigFields {
                 Arrays.asList(Particle.SPELL.toString()),
                 null,
                 null,
-                0,
-                false,
                 null,
-                0,
-                0);
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

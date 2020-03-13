@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.config;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MobCombatSettingsConfig {
 
@@ -30,6 +32,7 @@ public class MobCombatSettingsConfig {
     public static double damageToEliteMultiplier, damageToPlayerMultiplier;
     public static boolean showCustomBossLocation;
     public static String bossLocationMessage;
+    public static List<String> commandsOnDeath;
 
     public static void initializeConfig() {
 
@@ -61,6 +64,8 @@ public class MobCombatSettingsConfig {
         damageToPlayerMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "damageToPlayerMultiplier", 1);
         showCustomBossLocation = ConfigurationEngine.setBoolean(fileConfiguration, "showCustomBossLocation", true);
         bossLocationMessage = ConfigurationEngine.setString(fileConfiguration, "bossLocationMessage", "&7[EM] &2[Click to track!]");
+        //Accepts placeholders $players, $level and $name
+        commandsOnDeath = ConfigurationEngine.setList(fileConfiguration, "commandsOnEliteMobDeath", new ArrayList());
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 
