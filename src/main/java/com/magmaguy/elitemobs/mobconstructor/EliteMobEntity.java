@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
@@ -16,6 +17,7 @@ import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -73,6 +75,8 @@ public class EliteMobEntity {
     private double defaultMaxHealth;
 
     private boolean isCooldown = false;
+
+    private boolean triggeredAntiExploit = false;
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
@@ -154,17 +158,29 @@ public class EliteMobEntity {
      * @param name       the name for this boss mob, overrides the usual elite mob name format
      * @see com.magmaguy.elitemobs.custombosses.CustomBossEntity
      */
-    public EliteMobEntity(EntityType entityType, Location location, int eliteLevel, String name, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
-
+    public EliteMobEntity(EntityType entityType,
+                          Location location,
+                          int eliteLevel,
+                          String name,
+                          HashSet<ElitePower> mobPowers,
+                          CreatureSpawnEvent.SpawnReason spawnReason) {
+        this.eliteLevel = eliteLevel;
+        this.name = name;
+        this.powers = mobPowers;
+        this.spawnReason = spawnReason;
         /*
         Run a WorldGuard check to see if the entity is allowed to get converted at this location
          */
         if (!validSpawnLocation(location)) return;
-
         /*
         Register living entity to keep track of which entity this object is tied to
          */
         this.livingEntity = spawnBossMobLivingEntity(entityType, location, this);
+        /*
+        This is null for entities spawn in unloaded chunks. It gets picked back up in another method.
+         */
+        if (this.livingEntity == null)
+            return;
         /*
         Register level, this is variable as per stacking rules
          */
@@ -205,6 +221,48 @@ public class EliteMobEntity {
 
         livingEntity.setCanPickupItems(false);
 
+    }
+
+    public void continueCustomBossCreation(LivingEntity livingEntity) {
+        this.livingEntity = livingEntity;
+        /*
+        Register level, this is variable as per stacking rules
+         */
+        setEliteLevel(eliteLevel);
+        eliteTier = MobTierCalculator.findMobTier(eliteLevel);
+        /*
+        Sets the spawn reason
+         */
+        setSpawnReason(spawnReason);
+        /*
+        Start tracking the entity
+         */
+        if (!EntityTracker.registerEliteMob(this)) return;
+        /*
+        Get correct instance of plugin data, necessary for settings names and health among other things
+         */
+        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity.getType());
+        /*
+        Handle name, variable as per stacking rules
+         */
+        setName(name);
+        /*
+        Handle health, max is variable as per stacking rules
+         */
+        setMaxHealth();
+        /*
+        These have custom powers
+         */
+        this.hasCustomPowers = true;
+        for (ElitePower elitePower : powers) {
+            elitePower.applyPowers(livingEntity);
+            if (elitePower instanceof MajorPower)
+                this.majorPowerCount++;
+            if (elitePower instanceof MinorPower)
+                this.minorPowerCount++;
+        }
+
+        livingEntity.setCanPickupItems(false);
     }
 
     /**
@@ -287,8 +345,26 @@ public class EliteMobEntity {
      * This avoids accidentally assigning an elite mob to an entity spawned specifically to be a boss mob or reinforcement
      */
     private static LivingEntity spawnBossMobLivingEntity(EntityType entityType, Location location, EliteMobEntity eliteMobEntity) {
-        NaturalMobSpawnEventHandler.setIgnoreMob(true, eliteMobEntity);
-        return (LivingEntity) location.getWorld().spawnEntity(location, entityType);
+        if (ChunkLocationChecker.locationIsLoaded(location)) {
+            NaturalMobSpawnEventHandler.setIgnoreMob(true, eliteMobEntity);
+            return (LivingEntity) location.getWorld().spawnEntity(location, entityType);
+        } else {
+            Spawnable newSpawnable = new Spawnable();
+            newSpawnable.location = location;
+            newSpawnable.entityType = entityType;
+            newSpawnable.eliteMobEntity = eliteMobEntity;
+            CustomBossEntity.CustomBossEntityEvents.spawnableEntities.put(location.getChunk(), newSpawnable);
+            return null;
+        }
+    }
+
+    /*
+    todo: this probably does not work when it needs to be instantiated ?
+     */
+    public static class Spawnable {
+        public Location location;
+        public EntityType entityType;
+        public EliteMobEntity eliteMobEntity;
     }
 
     /**
@@ -835,6 +911,18 @@ public class EliteMobEntity {
 
     public boolean hasVanillaLoot() {
         return this.hasVanillaLoot;
+    }
+
+    public void setTriggeredAntiExploit(boolean triggeredAntiExploit) {
+        this.triggeredAntiExploit = triggeredAntiExploit;
+        if (triggeredAntiExploit) {
+            this.hasEliteLoot = false;
+            this.hasVanillaLoot = false;
+        }
+    }
+
+    public boolean getTriggeredAntiExploit() {
+        return this.triggeredAntiExploit;
     }
 
 }

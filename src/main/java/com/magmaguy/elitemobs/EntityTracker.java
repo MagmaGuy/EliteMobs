@@ -182,8 +182,8 @@ public class EntityTracker implements Listener {
     public static void unregisterArmorStand(Entity armorStand) {
         if (!armorStand.getType().equals(EntityType.ARMOR_STAND)) return;
         if (!isArmorStand(armorStand)) return;
-        armorStand.remove();
         armorStands.remove(armorStand);
+        armorStand.remove();
     }
 
     /**

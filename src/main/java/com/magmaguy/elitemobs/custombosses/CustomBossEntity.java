@@ -22,10 +22,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -330,6 +327,17 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     public static class CustomBossEntityEvents implements Listener {
 
+        public static HashMap<Chunk, Spawnable> spawnableEntities = new HashMap<>();
+
+        @EventHandler
+        public void onSpawn(ChunkLoadEvent event) {
+            if (spawnableEntities.isEmpty()) return;
+            if (!spawnableEntities.containsKey(event.getChunk())) return;
+            Spawnable spawnable = spawnableEntities.get(event.getChunk());
+            spawnableEntities.remove(event.getChunk());
+            spawnable.eliteMobEntity.continueCustomBossCreation((LivingEntity) spawnable.location.getWorld().spawnEntity(spawnable.location, spawnable.entityType));
+        }
+
         @EventHandler
         public void onEliteMobDeath(EliteMobDeathEvent event) {
             if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
@@ -345,7 +353,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     playersList += ", " + player.getDisplayName();
 
                 //Do loot
-                customBossEntity.dropLoot(player);
+                if (!customBossEntity.getTriggeredAntiExploit())
+                    customBossEntity.dropLoot(player);
             }
 
             if (customBossEntity.customBossConfigFields.getDeathMessage() != null)
@@ -353,7 +362,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
             removeCustomBoss(customBossEntity.uuid);
 
-            if (!customBossEntity.customBossConfigFields.getOnDeathCommands().isEmpty())
+            if (customBossEntity.customBossConfigFields.getOnDeathCommands() != null && !customBossEntity.customBossConfigFields.getOnDeathCommands().isEmpty())
                 OnDeathCommands.parseConsoleCommand(customBossEntity.customBossConfigFields.getOnDeathCommands(), event);
 
         }
