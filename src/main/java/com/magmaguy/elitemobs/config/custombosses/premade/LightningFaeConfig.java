@@ -29,7 +29,7 @@ public class LightningFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                null,
+                Arrays.asList("the_feller.yml:0.3"),
                 true,
                 true,
                 Arrays.asList(Particle.SPELL.toString()),

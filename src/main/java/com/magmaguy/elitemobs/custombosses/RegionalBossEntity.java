@@ -95,6 +95,7 @@ public class RegionalBossEntity implements Listener {
             public void run() {
                 inCooldown = false;
                 spawnRegionalBoss();
+                checkLeash();
             }
 
         }.runTaskLater(MetadataHandler.PLUGIN, respawnCooldown * 20 * 60);
@@ -116,7 +117,10 @@ public class RegionalBossEntity implements Listener {
 
                 Entity livingEntity = Bukkit.getEntity(uuid);
 
-                if (livingEntity == null || livingEntity.isDead()) {
+                if (livingEntity == null && isAlive)
+                    return;
+
+                if (!isAlive || livingEntity.isDead()) {
                     cancel();
                     return;
                 }

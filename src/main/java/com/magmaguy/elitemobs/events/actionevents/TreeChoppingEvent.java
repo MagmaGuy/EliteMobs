@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.events.actionevents;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.events.premade.FaeEventConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
@@ -20,6 +21,7 @@ public class TreeChoppingEvent implements Listener {
     public void onTreeFell(BlockBreakEvent event) {
 
         if (event.isCancelled()) return;
+        if (!EliteMobs.validWorldList.contains(event.getBlock().getWorld())) return;
         if (!event.getPlayer().hasPermission("elitemobs.events.fae")) return;
         if (!FaeEventConfig.isEnabled) return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
