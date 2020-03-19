@@ -43,6 +43,8 @@ public class LootTables implements Listener {
     }
 
     public static void generatePlayerLoot(EliteMobEntity eliteMobEntity) {
+        if (eliteMobEntity.getTriggeredAntiExploit())
+            return;
         for (Player player : eliteMobEntity.getDamagers().keySet()) {
 
             if (eliteMobEntity.getDamagers().get(player) / eliteMobEntity.getMaxHealth() < 0.1)
@@ -121,7 +123,7 @@ public class LootTables implements Listener {
             if (weighedItemsExist)
                 weightedProbability.put("weighed", ItemSettingsConfig.weighedItemWeight);
             if (fixedItemsExist)
-                if (CustomItem.getFixedItems().keySet().contains(itemTier))
+                if (CustomItem.getFixedItems().containsKey(itemTier))
                     weightedProbability.put("fixed", ItemSettingsConfig.fixedItemWeight);
             if (limitedItemsExist)
                 weightedProbability.put("limited", ItemSettingsConfig.limitedItemWeight);

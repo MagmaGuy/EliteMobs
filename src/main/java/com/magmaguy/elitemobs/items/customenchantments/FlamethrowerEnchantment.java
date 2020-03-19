@@ -105,6 +105,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
         }
 
         private void doParticleEffect(Player player, Location target, Particle particle) {
+            if (!player.getWorld().equals(target.getWorld())) return;
             Vector directionVector = target.clone().subtract(player.getLocation()).toVector().normalize();
             for (int i = 0; i < 5; i++) {
                 player.getWorld().spawnParticle(
