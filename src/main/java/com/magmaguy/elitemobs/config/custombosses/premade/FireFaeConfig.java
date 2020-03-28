@@ -29,6 +29,7 @@ public class FireFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 Arrays.asList("the_feller.yml:0.3"),
                 true,
                 true,

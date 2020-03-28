@@ -45,6 +45,7 @@ public class CustomBossConfigFields {
     private List<String> powers;
     private String spawnMessage;
     private String deathMessage;
+    private List<String> deathMessages;
     private String escapeMessage;
     private String locationMessage;
     private List<String> uniqueLootList;
@@ -82,6 +83,7 @@ public class CustomBossConfigFields {
                                   List<String> powers,
                                   String spawnMessage,
                                   String deathMessage,
+                                  List<String> deathMessages,
                                   String escapeMessage,
                                   String locationMessage,
                                   List<String> uniqueLootList,
@@ -116,6 +118,7 @@ public class CustomBossConfigFields {
         this.powers = powers;
         this.spawnMessage = spawnMessage;
         this.deathMessage = deathMessage;
+        this.deathMessages = deathMessages;
         this.escapeMessage = escapeMessage;
         this.locationMessage = locationMessage;
         this.uniqueLootList = uniqueLootList;
@@ -166,6 +169,7 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("powers", powers);
         fileConfiguration.addDefault("spawnMessage", spawnMessage);
         fileConfiguration.addDefault("deathMessage", deathMessage);
+        fileConfiguration.addDefault("deathMessages", deathMessages);
         fileConfiguration.addDefault("escapeMessage", escapeMessage);
         fileConfiguration.addDefault("locationMessage", locationMessage);
         fileConfiguration.addDefault("uniqueLootList", uniqueLootList);
@@ -248,6 +252,7 @@ public class CustomBossConfigFields {
         this.powers = configuration.getStringList("powers");
         this.spawnMessage = configuration.getString("spawnMessage");
         this.deathMessage = configuration.getString("deathMessage");
+        this.deathMessages = configuration.getStringList("deathMessages");
         this.escapeMessage = configuration.getString("escapeMessage");
         this.locationMessage = configuration.getString("locationMessage");
         this.uniqueLootList = configuration.getStringList("uniqueLootList");
@@ -377,6 +382,10 @@ public class CustomBossConfigFields {
 
     public String getDeathMessage() {
         return this.deathMessage;
+    }
+
+    public List<String> getDeathMessages() {
+        return this.deathMessages;
     }
 
     public String getEscapeMessage() {

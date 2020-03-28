@@ -220,6 +220,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
         if (AntiExploitConfig.noItemPickup)
             pluginManager.registerEvents(new PreventItemPickupByMobs(), plugin);
+        pluginManager.registerEvents(new AmbientDamageExploit(), plugin);
+        pluginManager.registerEvents(new EliteMobDamageDeescalation(), plugin);
+        pluginManager.registerEvents(new HoneyBlockJumpExploit(), plugin);
 
 
         //Initialize events

@@ -64,6 +64,7 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
             if (eliteMobEntity == null) return;
 
             Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedEvent(eliteMobEntity, event));
+            Bukkit.getServer().getPluginManager().callEvent(new AntiExploitEvent(eliteMobEntity, event));
 
         }
 

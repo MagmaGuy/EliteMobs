@@ -33,6 +33,7 @@ public class MobCombatSettingsConfig {
     public static boolean showCustomBossLocation;
     public static String bossLocationMessage;
     public static List<String> commandsOnDeath;
+    public static String bossKillParticipationMessage;
 
     public static void initializeConfig() {
 
@@ -66,6 +67,8 @@ public class MobCombatSettingsConfig {
         bossLocationMessage = ConfigurationEngine.setString(fileConfiguration, "bossLocationMessage", "&7[EM] &2[Click to track!]");
         //Accepts placeholders $players, $level and $name
         commandsOnDeath = ConfigurationEngine.setList(fileConfiguration, "commandsOnEliteMobDeath", new ArrayList());
+        //Accepts placeholder $playerDamage
+        bossKillParticipationMessage = ConfigurationEngine.setString(fileConfiguration, "bossKillParticipationMessage", "&eYour damage: &2$playerDamage");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 
