@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-    <version>7.1.10</version>
+  <version>7.1.12</version>
   <build>
     <defaultGoal>clean resources:resources package</defaultGoal>
     <finalName>${project.artifactId}</finalName>
@@ -49,11 +49,11 @@
     </repository>
     <repository>
       <id>sk89q-repo</id>
-      <url>http://maven.sk89q.com/repo/</url>
+      <url>https://maven.enginehub.org/repo/</url>
     </repository>
     <repository>
-      <id>vault-repo</id>
-      <url>http://nexus.hc.to/content/repositories/pub_releases</url>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
     <repository>
       <id>placeholderapi</id>
@@ -64,7 +64,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.14-R0.1-SNAPSHOT</version>
+      <version>1.15-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -91,40 +91,8 @@
     </dependency>
     <dependency>
       <groupId>com.sk89q.worldguard</groupId>
-      <artifactId>worldguard-core</artifactId>
-      <version>7.0.0-SNAPSHOT</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>worldedit-core</artifactId>
-          <groupId>com.sk89q.worldedit</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>intake</artifactId>
-          <groupId>com.sk89q.intake</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>squirrelid</artifactId>
-          <groupId>com.sk89q</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>flyway-core</artifactId>
-          <groupId>org.flywaydb</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>prtree</artifactId>
-          <groupId>org.khelekore</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.sk89q.worldguard</groupId>
-      <artifactId>worldguard-legacy</artifactId>
-      <version>7.0.0-SNAPSHOT</version>
+      <artifactId>worldguard-bukkit</artifactId>
+      <version>7.0.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -136,13 +104,17 @@
           <groupId>com.sk89q.worldedit</groupId>
         </exclusion>
         <exclusion>
+          <artifactId>worldguard-core</artifactId>
+          <groupId>com.sk89q.worldguard</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>commandbook</artifactId>
           <groupId>com.sk89q</groupId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>net.milkbowl.vault</groupId>
+      <groupId>com.github.MilkBowl</groupId>
       <artifactId>VaultAPI</artifactId>
       <version>1.7</version>
       <scope>provided</scope>

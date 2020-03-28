@@ -29,6 +29,7 @@ public class EmberConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 Arrays.asList(),
                 false,
                 true,

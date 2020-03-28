@@ -19,6 +19,7 @@ public class NPCChatBubble {
 
     public NPCChatBubble(String message, NPCEntity npcEntity, Player player) {
 
+        if (message == null) return;
         if (npcEntity.getVillager().hasPotionEffect(PotionEffectType.INVISIBILITY)) return;
         if (npcEntity.getIsTalking()) return;
         npcEntity.startTalkingCooldown();

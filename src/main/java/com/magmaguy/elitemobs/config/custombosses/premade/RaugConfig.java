@@ -30,6 +30,7 @@ public class RaugConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 false,
                 false,
                 Arrays.asList(Particle.SMOKE_LARGE.toString()),

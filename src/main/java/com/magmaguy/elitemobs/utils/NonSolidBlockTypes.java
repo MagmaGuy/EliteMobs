@@ -46,10 +46,10 @@ public class NonSolidBlockTypes {
         nonSolidBlocks.add(Material.ALLIUM);
         nonSolidBlocks.add(Material.AZURE_BLUET);
         nonSolidBlocks.add(Material.BLUE_ORCHID);
-//        nonSolidBlocks.add(Material.CORNFLOWER);
+        nonSolidBlocks.add(Material.CORNFLOWER);
         nonSolidBlocks.add(Material.DANDELION);
         nonSolidBlocks.add(Material.LILAC);
-//        nonSolidBlocks.add(Material.LILY_OF_THE_VALLEY);
+        nonSolidBlocks.add(Material.LILY_OF_THE_VALLEY);
         nonSolidBlocks.add(Material.OXEYE_DAISY);
         nonSolidBlocks.add(Material.PEONY);
         nonSolidBlocks.add(Material.POPPY);
@@ -59,7 +59,7 @@ public class NonSolidBlockTypes {
         nonSolidBlocks.add(Material.PINK_TULIP);
         nonSolidBlocks.add(Material.RED_TULIP);
         nonSolidBlocks.add(Material.WHITE_TULIP);
-//        nonSolidBlocks.add(Material.WITHER_ROSE);
+        nonSolidBlocks.add(Material.WITHER_ROSE);
     }
 
 }

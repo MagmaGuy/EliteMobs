@@ -28,6 +28,7 @@ public class TestCustomBossConfig extends CustomBossConfigFields {
                 Arrays.asList("invulnerability_knockback.yml"),
                 "A test boss has been spawned!",
                 "A test boss has been slain by $players!",
+                null,
                 "A test boss entity has escaped!",
                 "Test entity: $location",
                 Arrays.asList("magmaguys_toothpick.yml:1"),

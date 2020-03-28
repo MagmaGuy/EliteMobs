@@ -27,6 +27,7 @@ public class ZombieDadConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 false,
                 false,
                 null,

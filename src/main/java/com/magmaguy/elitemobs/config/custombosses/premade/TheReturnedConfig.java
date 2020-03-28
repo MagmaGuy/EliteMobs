@@ -27,6 +27,7 @@ public class TheReturnedConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 false,
                 true,
                 null,

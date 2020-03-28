@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -35,10 +36,8 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomBossEntity extends EliteMobEntity implements Listener {
@@ -350,15 +349,87 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 if (playersList.isEmpty())
                     playersList += player.getDisplayName();
                 else
-                    playersList += ", " + player.getDisplayName();
+                    playersList += ", &f" + player.getDisplayName();
 
                 //Do loot
                 if (!customBossEntity.getTriggeredAntiExploit())
                     customBossEntity.dropLoot(player);
             }
 
-            if (customBossEntity.customBossConfigFields.getDeathMessage() != null)
-                Bukkit.broadcastMessage(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
+            playersList = ChatColorConverter.convert(playersList);
+
+            if (customBossEntity.hasDamagers())
+                if (customBossEntity.customBossConfigFields.getDeathMessages() != null) {
+                    Player topDamager = null, secondDamager = null, thirdDamager = null;
+
+                    HashMap<Player, Double> sortedMap = sortByComparator(customBossEntity.getDamagers(), false);
+
+                    Iterator<Player> sortedMapIterator = sortedMap.keySet().iterator();
+                    for (int i = 1; i < 4; i++) {
+                        if (i > sortedMap.size())
+                            break;
+                        Player nextPlayer = sortedMapIterator.next();
+                        switch (i) {
+                            case 1:
+                                topDamager = nextPlayer;
+                                break;
+                            case 2:
+                                secondDamager = nextPlayer;
+                                break;
+                            case 3:
+                                thirdDamager = nextPlayer;
+                                break;
+                        }
+                    }
+
+                    for (String string : customBossEntity.customBossConfigFields.getDeathMessages()) {
+                        if (string.contains("$damager1name"))
+                            if (topDamager != null)
+                                string = string.replace("$damager1name", topDamager.getDisplayName());
+                            else
+                                string = "";
+                        if (string.contains("$damager1damage"))
+                            if (topDamager != null)
+                                string = string.replace("$damager1damage", Round.twoDecimalPlaces(customBossEntity.getDamagers().get(topDamager)) + "");
+                            else
+                                string = "";
+                        if (string.contains("$damager2name"))
+                            if (secondDamager != null)
+                                string = string.replace("$damager2name", secondDamager.getDisplayName());
+                            else
+                                string = "";
+                        if (string.contains("$damager2damage"))
+                            if (secondDamager != null)
+                                string = string.replace("$damager2damage", Round.twoDecimalPlaces(customBossEntity.getDamagers().get(secondDamager)) + "");
+                            else
+                                string = "";
+                        if (string.contains("$damager3name"))
+                            if (thirdDamager != null)
+                                string = string.replace("$damager3name", thirdDamager.getDisplayName());
+                            else
+                                string = "";
+                        if (string.contains("$damager3damage"))
+                            if (thirdDamager != null)
+                                string = string.replace("$damager3damage", Round.twoDecimalPlaces(customBossEntity.getDamagers().get(thirdDamager)) + "");
+                            else
+                                string = "";
+                        if (string.contains("$players"))
+                            string = string.replace("$players", playersList);
+                        Bukkit.broadcastMessage(ChatColorConverter.convert(string));
+                    }
+
+                    for (Player player : Bukkit.getOnlinePlayers())
+                        if (customBossEntity.getDamagers().containsKey(player))
+                            player.sendMessage(
+                                    ChatColorConverter.convert(
+                                            MobCombatSettingsConfig.bossKillParticipationMessage.replace(
+                                                    "$playerDamage",
+                                                    Round.twoDecimalPlaces(customBossEntity.getDamagers().get(player)) + "")));
+
+                } else {
+                    if (customBossEntity.customBossConfigFields.getDeathMessage() != null)
+                        Bukkit.broadcastMessage(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
+                }
 
             removeCustomBoss(customBossEntity.uuid);
 
@@ -366,6 +437,33 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 OnDeathCommands.parseConsoleCommand(customBossEntity.customBossConfigFields.getOnDeathCommands(), event);
 
         }
+
+
+        private static HashMap<Player, Double> sortByComparator(HashMap<Player, Double> unsortMap, final boolean order) {
+
+            List<Entry<Player, Double>> list = new LinkedList<Entry<Player, Double>>(unsortMap.entrySet());
+
+            // Sorting the list based on values
+            Collections.sort(list, new Comparator<Entry<Player, Double>>() {
+                public int compare(Entry<Player, Double> o1,
+                                   Entry<Player, Double> o2) {
+                    if (order) {
+                        return o1.getValue().compareTo(o2.getValue());
+                    } else {
+                        return o2.getValue().compareTo(o1.getValue());
+                    }
+                }
+            });
+
+            // Maintaining insertion order with the help of LinkedList
+            HashMap<Player, Double> sortedMap = new LinkedHashMap<Player, Double>();
+            for (Entry<Player, Double> entry : list) {
+                sortedMap.put(entry.getKey(), entry.getValue());
+            }
+
+            return sortedMap;
+        }
+
 
         @EventHandler
         public void onDamagedMessages(EliteMobDamagedEvent eliteMobDamagedEvent) {

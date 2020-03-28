@@ -27,6 +27,7 @@ public class NecronomiconZombieConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 false,
                 false,
                 null,
