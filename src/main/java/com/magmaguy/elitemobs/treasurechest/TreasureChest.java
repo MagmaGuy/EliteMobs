@@ -129,7 +129,9 @@ public class TreasureChest {
             location.getWorld().getBlockAt(location).setType(chestMaterial);
         Chest chest = (Chest) location.getBlock().getState();
         chest.setCustomName(this.key);
+        //todo: add block face
         chest.update();
+
         startEffects();
     }
 

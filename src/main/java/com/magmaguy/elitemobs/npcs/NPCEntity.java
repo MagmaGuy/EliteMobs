@@ -496,7 +496,9 @@ public class NPCEntity {
      * @return Selected String
      */
     private String selectString(List<String> strings) {
-        return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
+        if (strings != null && !strings.isEmpty())
+            return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
+        return null;
     }
 
     /**

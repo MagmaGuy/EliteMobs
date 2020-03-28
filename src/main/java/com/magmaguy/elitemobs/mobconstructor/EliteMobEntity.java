@@ -4,7 +4,9 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
+import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
@@ -77,6 +79,7 @@ public class EliteMobEntity {
     private boolean isCooldown = false;
 
     private boolean triggeredAntiExploit = false;
+    private int antiExploitPoints = 0;
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
@@ -924,5 +927,17 @@ public class EliteMobEntity {
     public boolean getTriggeredAntiExploit() {
         return this.triggeredAntiExploit;
     }
+
+    public void incrementAntiExploit(int value, String cause) {
+        antiExploitPoints += value;
+        if (antiExploitPoints > AntiExploitConfig.antiExploitThreshold)
+            setTriggeredAntiExploit(true);
+        AntiExploitMessage.sendWarning(livingEntity, cause);
+    }
+
+    public void decrementAntiExploit(int value) {
+        antiExploitPoints -= value;
+    }
+
 
 }

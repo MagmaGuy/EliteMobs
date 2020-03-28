@@ -29,6 +29,7 @@ public class BalrogConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 Arrays.asList("dwarven_greed.yml:1"),
                 true,
                 true,
