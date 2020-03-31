@@ -19,6 +19,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -199,7 +200,9 @@ public class TreasureChest {
                     CustomItem.dropPlayerLoot(player, randomizeTier(), filename, location);
 
             } catch (Exception ex) {
-                new WarningMessage("Malformed loot entry for " + this.fileName + " !");
+                if (string.equalsIgnoreCase("hyper_loot.yml"))
+
+                    new WarningMessage("Malformed loot entry for " + this.fileName + " !");
                 new WarningMessage("Entry: " + string);
                 new WarningMessage("Correct format: filename.yml:odds");
             }
@@ -348,6 +351,13 @@ public class TreasureChest {
                     treasureChest.effectIsOn = true;
                     treasureChest.startEffects();
                 }
+        }
+
+        @EventHandler
+        public void onBreak(BlockBreakEvent event) {
+            for (TreasureChest treasureChest : treasureChestHashMap.values())
+                if (event.getBlock().getLocation().equals(treasureChest.location.getBlock().getLocation()))
+                    event.setCancelled(true);
         }
 
     }

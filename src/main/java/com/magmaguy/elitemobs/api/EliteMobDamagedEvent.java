@@ -19,6 +19,10 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
         this.entity = eliteMobEntity.getLivingEntity();
         this.eliteMobEntity = eliteMobEntity;
         this.entityDamageEvent = event;
+        if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK))
+            return;
+        eliteMobEntity.damage(event.getDamage());
+        event.setDamage(0);
     }
 
     public Entity getEntity() {
