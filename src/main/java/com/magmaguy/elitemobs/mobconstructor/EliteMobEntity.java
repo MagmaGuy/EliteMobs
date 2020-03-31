@@ -438,7 +438,17 @@ public class EliteMobEntity {
         if (this.maxHealth <= 2048)
             livingEntity.setHealth(health);
         else
-            livingEntity.setHealth(Math.ceil(this.defaultMaxHealth * this.health / this.maxHealth));
+            livingEntity.setHealth(Math.ceil(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * this.health / this.maxHealth));
+
+    }
+
+    public void damage(double damage) {
+        health = health - damage < 0 ? 0 : health - damage;
+
+        if (this.maxHealth <= 2048)
+            livingEntity.setHealth(health);
+        else
+            livingEntity.setHealth(Math.ceil(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * this.health / this.maxHealth));
 
     }
 

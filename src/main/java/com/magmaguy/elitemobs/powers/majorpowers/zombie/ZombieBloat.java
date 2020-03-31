@@ -7,7 +7,10 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Giant;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,7 +41,7 @@ public class ZombieBloat extends MajorPower implements Listener {
         new BukkitRunnable() {
 
             int timer = 0;
-            Zombie eventZombie = (Zombie) event.getEntity();
+            LivingEntity eventZombie = (LivingEntity) event.getEntity();
 
             @Override
             public void run() {
@@ -64,7 +67,7 @@ public class ZombieBloat extends MajorPower implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-    private void bloatEffect(Zombie eventZombie) {
+    private void bloatEffect(LivingEntity eventZombie) {
         /*
         Spawn giant for "bloat" effect
          */
