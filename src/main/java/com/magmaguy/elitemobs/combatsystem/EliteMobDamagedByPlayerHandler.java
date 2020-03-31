@@ -64,7 +64,7 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
             if (player.getHealth() - rawDamage <= 0)
                 PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, player));
             removeCustomDamageEntity(eliteMobEntity.getLivingEntity());
-            eliteMobEntity.setHealth(eliteMobEntity.getHealth() - rawDamage);
+            eliteMobEntity.damage(rawDamage);
             return;
         }
 
@@ -95,8 +95,9 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, eventDamage);
         if (eliteMobEntity.getHealth() - newDamage < 0)
             newDamage = eliteMobEntity.getHealth();
-        eliteMobEntity.setHealth(eliteMobEntity.getHealth() - newDamage);
+        eliteMobEntity.damage(newDamage);
         eliteMobEntity.addDamager(player, newDamage);
+        playerHitCooldownHashMap.put(event.getPlayer(), clock);
 
     }
 

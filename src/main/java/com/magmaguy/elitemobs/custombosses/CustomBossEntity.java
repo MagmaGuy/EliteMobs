@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -222,13 +223,14 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     private void setEquipment(Material helmet, Material chestplate, Material leggings, Material boots, Material mainHand, Material offHand) {
         try {
-            super.getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(helmet));
-            super.getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(chestplate));
-            super.getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(leggings));
-            super.getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(boots));
-            super.getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(mainHand));
-            super.getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(offHand));
+            getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(helmet));
+            getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(chestplate));
+            getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(leggings));
+            getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(boots));
+            getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(mainHand));
+            getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(offHand));
         } catch (Exception ex) {
+            new DebugMessage("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossConfigFields.getFileName());
         }
     }
 
@@ -359,7 +361,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             playersList = ChatColorConverter.convert(playersList);
 
             if (customBossEntity.hasDamagers())
-                if (customBossEntity.customBossConfigFields.getDeathMessages() != null) {
+                if (customBossEntity.customBossConfigFields.getDeathMessages() != null && customBossEntity.customBossConfigFields.getDeathMessages().size() > 0) {
                     Player topDamager = null, secondDamager = null, thirdDamager = null;
 
                     HashMap<Player, Double> sortedMap = sortByComparator(customBossEntity.getDamagers(), false);
