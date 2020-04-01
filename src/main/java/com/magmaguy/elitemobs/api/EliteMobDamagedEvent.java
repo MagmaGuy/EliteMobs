@@ -2,6 +2,9 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.*;
@@ -68,7 +71,10 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
             if (eliteMobEntity == null) return;
 
             Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedEvent(eliteMobEntity, event));
-            Bukkit.getServer().getPluginManager().callEvent(new AntiExploitEvent(eliteMobEntity, event));
+            if (eliteMobEntity.isInAntiExploitCooldown()) return;
+            if (WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsDungeonFlag()))
+                return;
+            Bukkit.getServer().getPluginManager().callEvent(new GenericAntiExploitEvent(eliteMobEntity, event));
 
         }
 

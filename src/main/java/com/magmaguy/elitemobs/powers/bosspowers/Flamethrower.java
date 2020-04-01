@@ -43,7 +43,7 @@ public class Flamethrower extends BossPower implements Listener {
                 doParticleEffect(eliteMobEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
                 counter++;
 
-                if (counter < 20) return;
+                if (counter < 20 * 2) return;
                 doFlamethrowerPhase2(eliteMobEntity, fixedPlayerLocation);
                 cancel();
 

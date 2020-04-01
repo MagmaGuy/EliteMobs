@@ -80,6 +80,7 @@ public class EliteMobEntity {
 
     private boolean triggeredAntiExploit = false;
     private int antiExploitPoints = 0;
+    private boolean inAntiExploitCooldown = false;
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
@@ -864,10 +865,15 @@ public class EliteMobEntity {
     }
 
     public void addDamager(Player player, double damage) {
-        if (!this.damagers.containsKey(player))
+        Player oldPlayerInstance = null;
+        for (Player iteratedPlayer : damagers.keySet())
+            if (iteratedPlayer.getUniqueId().equals(player.getUniqueId())) {
+                oldPlayerInstance = player;
+                this.damagers.put(oldPlayerInstance, this.damagers.get(player) + damage);
+                break;
+            }
+        if (oldPlayerInstance == null)
             this.damagers.put(player, damage);
-        else
-            this.damagers.put(player, this.damagers.get(player) + damage);
     }
 
     public boolean hasDamagers() {
@@ -940,14 +946,22 @@ public class EliteMobEntity {
 
     public void incrementAntiExploit(int value, String cause) {
         antiExploitPoints += value;
-        if (antiExploitPoints > AntiExploitConfig.antiExploitThreshold)
+        if (antiExploitPoints > AntiExploitConfig.antiExploitThreshold) {
             setTriggeredAntiExploit(true);
-        AntiExploitMessage.sendWarning(livingEntity, cause);
+            AntiExploitMessage.sendWarning(livingEntity, cause);
+        }
     }
 
     public void decrementAntiExploit(int value) {
         antiExploitPoints -= value;
     }
 
+    public boolean isInAntiExploitCooldown() {
+        return this.inAntiExploitCooldown;
+    }
+
+    public void setInAntiExploitCooldown(boolean bool) {
+        this.inAntiExploitCooldown = bool;
+    }
 
 }
