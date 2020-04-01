@@ -215,14 +215,16 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PreventMountExploit(), plugin);
         pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
         pluginManager.registerEvents(new PreventLargeDarkroomExploit(), plugin);
-        pluginManager.registerEvents(new PreventDensityExploit(), plugin);
+        //TODO: THIS IS BROKEN DUE TO SUMMONING POWERS pluginManager.registerEvents(new PreventDensityExploit(), plugin);
         pluginManager.registerEvents(new PreventTowerExploit(), plugin);
         pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
         if (AntiExploitConfig.noItemPickup)
             pluginManager.registerEvents(new PreventItemPickupByMobs(), plugin);
-        pluginManager.registerEvents(new AmbientDamageExploit(), plugin);
-        pluginManager.registerEvents(new EliteMobDamageDeescalation(), plugin);
+        if (AntiExploitConfig.ambientDamageExploit)
+            pluginManager.registerEvents(new AmbientDamageExploit(), plugin);
         pluginManager.registerEvents(new HoneyBlockJumpExploit(), plugin);
+        pluginManager.registerEvents(new GenericAntiExploitListener(), plugin);
+        pluginManager.registerEvents(new EliteMobDamagedByPlayerAntiExploitListener(), plugin);
 
 
         //Initialize events
