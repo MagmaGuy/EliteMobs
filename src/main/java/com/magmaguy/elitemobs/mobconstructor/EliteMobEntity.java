@@ -868,8 +868,8 @@ public class EliteMobEntity {
         Player oldPlayerInstance = null;
         for (Player iteratedPlayer : damagers.keySet())
             if (iteratedPlayer.getUniqueId().equals(player.getUniqueId())) {
-                oldPlayerInstance = player;
-                this.damagers.put(oldPlayerInstance, this.damagers.get(player) + damage);
+                oldPlayerInstance = iteratedPlayer;
+                this.damagers.put(iteratedPlayer, this.damagers.get(iteratedPlayer) + damage);
                 break;
             }
         if (oldPlayerInstance == null)
@@ -960,8 +960,14 @@ public class EliteMobEntity {
         return this.inAntiExploitCooldown;
     }
 
-    public void setInAntiExploitCooldown(boolean bool) {
-        this.inAntiExploitCooldown = bool;
+    public void setInAntiExploitCooldown() {
+        this.inAntiExploitCooldown = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                inAntiExploitCooldown = false;
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
     }
 
 }

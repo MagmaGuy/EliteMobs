@@ -36,7 +36,7 @@ public class BlayyzeConfig extends CustomBossConfigFields {
                         "&aSlayers: $players",
                         "&e&l---------------------------------------------"),
                 "&6The ayyliens have been taken to area 51!",
-                "&6????: $location",
+                "&6????: $distance blocks away",
                 Arrays.asList("meteor_shower_scroll.yml:1"),
                 true,
                 true,

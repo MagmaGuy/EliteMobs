@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
@@ -17,6 +18,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
     private EliteMobEntity eliteMobEntity;
     private Player player;
     private boolean isCancelled = false;
+    public boolean rangedAttack;
     private EntityDamageByEntityEvent entityDamageByEntityEvent;
 
     public EliteMobDamagedByPlayerEvent(EliteMobEntity eliteMobEntity, Player player, EntityDamageByEntityEvent event) {
@@ -24,11 +26,12 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
         this.eliteMobEntity = eliteMobEntity;
         this.player = player;
         this.entityDamageByEntityEvent = event;
+        this.isCancelled = event.isCancelled();
+        this.rangedAttack = event.getDamager() instanceof Projectile;
         if (event.isCancelled()) return;
-        if (!eliteMobEntity.getLivingEntity().hasAI()) return;
         if (eliteMobEntity.isInAntiExploitCooldown()) return;
         //No antiexploit checks for dungeons
-        if (WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsDungeonFlag()))
+        if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsDungeonFlag()))
             return;
         Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerAntiExploitEvent(eliteMobEntity, this));
     }
@@ -87,7 +90,6 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             if (player == null) return;
 
             Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event));
-            if (eliteMobEntity.isInAntiExploitCooldown()) return;
 
         }
 

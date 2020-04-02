@@ -37,7 +37,7 @@ public class TreasureGoblinConfig extends CustomBossConfigFields {
                         "&aSlayers: $players",
                         "&e&l---------------------------------------------"),
                 "&4A Treasure Goblin has escaped!",
-                "&cTreasure Goblin: $location",
+                "&cTreasure Goblin: $distance blocks away",
                 Arrays.asList(),
                 true,
                 true,
