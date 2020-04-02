@@ -31,6 +31,7 @@ public class MeteorEvent extends EliteEvent implements Listener {
         eventWatchdog();
         FallingBlock meteor = createMeteorite(location);
         new BukkitRunnable() {
+            int counter = 0;
             @Override
             public void run() {
                 if (!meteor.getLocation().subtract(new Vector(0, 1, 0)).getBlock().getType().equals(Material.AIR) &&
@@ -42,6 +43,9 @@ public class MeteorEvent extends EliteEvent implements Listener {
                         CustomBossEntity.constructCustomBoss("ember.yml", landingLocation.add(new Vector(0, 10, 0)), DynamicBossLevelConstructor.findDynamicBossLevel());
                     return;
                 }
+                counter++;
+                if (counter > 60 * 20 * 2)
+                    cancel();
                 meteor.getWorld().spawnParticle(Particle.SMOKE_LARGE, meteor.getLocation(), 10, 0, 0, 0);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);

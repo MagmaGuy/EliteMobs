@@ -22,7 +22,7 @@ public class RareDropEffect implements Listener {
             return;
 
         new BukkitRunnable() {
-
+            int counter = 0;
             @Override
             public void run() {
 
@@ -43,6 +43,9 @@ public class RareDropEffect implements Listener {
 
                 }
 
+                counter++;
+                if (counter > 20 * 60 * 2)
+                    cancel();
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
