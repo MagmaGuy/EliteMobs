@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -68,7 +69,14 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
             return;
         }
 
-        double playerWeaponTier = ItemTierFinder.findBattleTier(player.getInventory().getItemInMainHand());
+        double playerWeaponTier;
+        //Melee attacks dealt with ranged weapons should have a tier of 0
+        if (!event.rangedAttack &&
+                (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) ||
+                        player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW)))
+            playerWeaponTier = 0;
+        else
+            playerWeaponTier = ItemTierFinder.mainHandCombatParser(player.getInventory().getItemInMainHand());
         double newDamage = finalDamageCalculator(playerWeaponTier, player, eliteMobEntity);
 
         if (event.getEntityDamageByEntityEvent().getDamager() instanceof Arrow) {

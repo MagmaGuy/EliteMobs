@@ -223,7 +223,6 @@ public class EventsRegistrer {
         if (AntiExploitConfig.ambientDamageExploit)
             pluginManager.registerEvents(new AmbientDamageExploit(), plugin);
         pluginManager.registerEvents(new HoneyBlockJumpExploit(), plugin);
-        pluginManager.registerEvents(new GenericAntiExploitListener(), plugin);
         pluginManager.registerEvents(new EliteMobDamagedByPlayerAntiExploitListener(), plugin);
 
 

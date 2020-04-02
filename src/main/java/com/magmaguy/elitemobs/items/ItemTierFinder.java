@@ -226,6 +226,53 @@ public class ItemTierFinder {
         }
     }
 
+    public static double mainHandCombatParser(ItemStack itemStack) {
+
+        Material material = itemStack.getType();
+
+        return parseMainHandMaterials(material, findMainEnchantment(itemStack, Enchantment.DAMAGE_ALL), findMainEnchantment(itemStack, Enchantment.PROTECTION_ENVIRONMENTAL), findMainEnchantment(itemStack, Enchantment.ARROW_DAMAGE));
+
+    }
+
+    private static double parseMainHandMaterials(Material material, int mainEnchantment, int mainEnchantment2, int mainEnchantment3) {
+        switch (material) {
+            case DIAMOND_SWORD:
+            case DIAMOND_AXE:
+            case TRIDENT:
+                return DIAMOND_TIER + mainEnchantment;
+            case IRON_AXE:
+            case IRON_SWORD:
+                return IRON_TIER + mainEnchantment;
+            case STONE_SWORD:
+            case STONE_AXE:
+                return STONE_CHAIN_TIER + mainEnchantment;
+            case WOODEN_SWORD:
+            case WOODEN_AXE:
+            case GOLDEN_SWORD:
+            case GOLDEN_AXE:
+                return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
+            case BOW:
+            case CROSSBOW:
+                return IRON_TIER + mainEnchantment3;
+            case DIAMOND_HOE:
+            case IRON_HOE:
+            case STONE_HOE:
+            case GOLDEN_HOE:
+            case WOODEN_HOE:
+                if (!ItemSettingsConfig.useHoesAsWeapons) return 0;
+                if (material.equals(Material.DIAMOND_HOE))
+                    return DIAMOND_TIER + mainEnchantment;
+                if (material.equals(Material.IRON_HOE))
+                    return IRON_TIER + mainEnchantment;
+                if (material.equals(Material.STONE_HOE))
+                    return STONE_CHAIN_TIER + mainEnchantment;
+                if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
+                    return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
+            default:
+                return 0;
+        }
+    }
+
     private static int findMainEnchantment(HashMap<Enchantment, Integer> enchantmentMap, Enchantment enchantment) {
 
         int enchantments = 0;

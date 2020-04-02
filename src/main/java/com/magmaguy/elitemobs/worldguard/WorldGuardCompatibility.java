@@ -12,7 +12,7 @@ public class WorldGuardCompatibility {
 
     private static final Flag ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
     private static final Flag ELITEMOBS_ONLY_SPAWN_FLAG = new StateFlag("elitemob-only-spawning", true);
-    private static final Flag ELITEMOBS_DUNGEON_FLAG = new StateFlag("elitemobs-dungeon", true);
+    private static final Flag ELITEMOBS_ANTIEXPLOIT = new StateFlag("elitemobs-antiexploit", true);
 
     public static boolean initialize() {
 
@@ -44,10 +44,10 @@ public class WorldGuardCompatibility {
             Bukkit.getLogger().warning("[EliteMobs] Warning: flag elitemob-only-spawning already exists! This is normal if you've just now reloaded EliteMobs.");
         }
         try {
-            registry.register(ELITEMOBS_DUNGEON_FLAG);
-            Bukkit.getLogger().info("[EliteMobs] - elitemob-dungeon");
+            registry.register(ELITEMOBS_ANTIEXPLOIT);
+            Bukkit.getLogger().info("[EliteMobs] - elitemob-antiexploit");
         } catch (FlagConflictException | IllegalStateException e) {
-            Bukkit.getLogger().warning("[EliteMobs] Warning: flag elitemob-dungeon already exists! This is normal if you've just now reloaded EliteMobs.");
+            Bukkit.getLogger().warning("[EliteMobs] Warning: flag elitemob-antiexploit already exists! This is normal if you've just now reloaded EliteMobs.");
         }
 
         return true;
@@ -63,7 +63,7 @@ public class WorldGuardCompatibility {
     }
 
     public static final Flag getEliteMobsDungeonFlag() {
-        return ELITEMOBS_DUNGEON_FLAG;
+        return ELITEMOBS_ANTIEXPLOIT;
     }
 
 }
