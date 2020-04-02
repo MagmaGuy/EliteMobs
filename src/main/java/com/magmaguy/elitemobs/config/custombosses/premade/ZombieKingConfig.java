@@ -38,7 +38,7 @@ public class ZombieKingConfig extends CustomBossConfigFields {
                         "&aSlayers: $players",
                         "&e&l---------------------------------------------"),
                 "&4The Zombie King has escaped!",
-                "&cZombie King: $location",
+                "&cZombie King: $distance blocks away",
                 Arrays.asList("zombie_kings_axe.yml:1"),
                 true,
                 true,

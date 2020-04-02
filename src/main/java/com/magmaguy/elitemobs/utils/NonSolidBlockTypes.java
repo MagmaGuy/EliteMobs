@@ -16,6 +16,7 @@ public class NonSolidBlockTypes {
         nonSolidBlocks.add(Material.AIR);
         nonSolidBlocks.add(Material.CAVE_AIR);
         nonSolidBlocks.add(Material.TALL_GRASS);
+        nonSolidBlocks.add(Material.GRASS);
         nonSolidBlocks.add(Material.PAINTING);
         nonSolidBlocks.add(Material.TORCH);
         nonSolidBlocks.add(Material.STONE_BUTTON);

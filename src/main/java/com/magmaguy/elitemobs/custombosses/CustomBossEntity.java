@@ -259,6 +259,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                         ", " + (int) getLivingEntity().getLocation().getZ();
 
                 for (Player player : getLivingEntity().getWorld().getPlayers()) {
+                    if (!player.getWorld().equals(getLivingEntity().getWorld())) continue;
                     BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
                     bossBar.setProgress(getHealth() / getMaxHealth());
                     if (trackingPlayer.contains(player))
@@ -278,6 +279,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     public void realTimeTracking(Player player) {
         if (trackingPlayer.contains(player)) return;
+        if (!getLivingEntity().getWorld().equals(player.getWorld())) {
+            player.sendMessage("You're not in the right world to track this boss!");
+        }
         trackingPlayer.add(player);
 
         new BukkitRunnable() {
