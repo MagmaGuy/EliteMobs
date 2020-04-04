@@ -1,22 +1,20 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemQualityColorizer;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class RareDropEffect implements Listener {
 
     public static void runEffect(Item item) {
 
+        if (!ItemSettingsConfig.enableRareItemParticleEffects) return;
         if (!(ItemQualityColorizer.getItemQuality(item.getItemStack()).equals(ItemQualityColorizer.ItemQuality.LIGHT_BLUE) ||
                 ItemQualityColorizer.getItemQuality(item.getItemStack()).equals(ItemQualityColorizer.ItemQuality.GOLD)))
             return;
@@ -31,24 +29,14 @@ public class RareDropEffect implements Listener {
                     return;
                 }
 
-                for (int i = 0; i < 3; i++) {
+                item.getWorld().spawnParticle(Particle.PORTAL, item.getLocation(), 5, 0.01, 0.01, 0.01, 0.5);
 
-                    Location location = item.getLocation().clone();
-                    double randomizedY = ThreadLocalRandom.current().nextDouble() * 2;
-                    double randomizedX = (ThreadLocalRandom.current().nextDouble() * 2 - 1) / randomizedY;
-                    double randomizedZ = (ThreadLocalRandom.current().nextDouble() * 2 - 1) / randomizedY;
-                    location.add(new Vector(randomizedX, randomizedY, randomizedZ));
-
-                    location.getWorld().spawnParticle(Particle.DRAGON_BREATH, location, 1, 0, 0, 0, 0);
-
-                }
-
-                counter++;
+                counter += 20;
                 if (counter > 20 * 60 * 2)
                     cancel();
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
 
     }
 

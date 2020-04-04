@@ -714,6 +714,13 @@ public class EliteMobEntity {
         return null;
     }
 
+    public ElitePower getPower(String elitePower) {
+        for (ElitePower iteratedPower : getPowers())
+            if (iteratedPower.getFileName().equals(elitePower))
+                return iteratedPower;
+        return null;
+    }
+
     /**
      * Returns the maximum health that this Elite Mob has
      *

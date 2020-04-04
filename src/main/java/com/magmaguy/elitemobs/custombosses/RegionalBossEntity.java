@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -35,8 +34,8 @@ public class RegionalBossEntity implements Listener {
     private UUID uuid;
     private CustomBossConfigFields customBossConfigFields;
 
-    public RegionalBossEntity(CustomBossConfigFields customBossConfigFields) {
-        this.spawnLocation = customBossConfigFields.getSpawnLocation();
+    public RegionalBossEntity(CustomBossConfigFields customBossConfigFields, Location spawnLocation) {
+        this.spawnLocation = spawnLocation;
         this.respawnCooldown = customBossConfigFields.getSpawnCooldown();
         this.customBossConfigFields = customBossConfigFields;
         this.leashRadius = customBossConfigFields.getLeashRadius();
@@ -69,15 +68,9 @@ public class RegionalBossEntity implements Listener {
             }
         }
 
-        HashSet<ElitePower> elitePowers = new HashSet<>();
-        for (String powerName : customBossConfigFields.getPowers())
-            if (ElitePower.getElitePower(powerName) != null)
-                elitePowers.add(ElitePower.getElitePower(powerName));
-            else
-                new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
-
         spawnLocation.getChunk().load();
-        CustomBossEntity customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, elitePowers);
+
+        CustomBossEntity customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
         isAlive = true;
         uuid = customBossEntity.getLivingEntity().getUniqueId();
         checkLeash();

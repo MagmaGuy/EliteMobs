@@ -23,6 +23,7 @@ public class ItemSettingsConfig {
     public static boolean doRareDropsEffect;
     public static String eliteEnchantLoreString;
     public static boolean useHoesAsWeapons;
+    public static boolean enableRareItemParticleEffects;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
@@ -60,6 +61,7 @@ public class ItemSettingsConfig {
         doRareDropsEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doRareDropsEffect", true);
         eliteEnchantLoreString = ChatColorConverter.convert(ConfigurationEngine.setString(fileConfiguration, "eliteEnchantmentLoreString", "&6Elite"));
         useHoesAsWeapons = ConfigurationEngine.setBoolean(fileConfiguration, "useHoesAsWeapons", false);
+        enableRareItemParticleEffects = ConfigurationEngine.setBoolean(fileConfiguration, "enableRareItemParticleEffects", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

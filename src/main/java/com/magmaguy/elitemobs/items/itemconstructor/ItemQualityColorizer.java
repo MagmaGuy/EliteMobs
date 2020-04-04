@@ -46,9 +46,7 @@ public class ItemQualityColorizer {
 
         //get percentage of max enchants it could have
         if (maxRankCalculator(itemStack) > 0) {
-
             enchantPercentage = enchantmentCount * 100 / maxRankCalculator(itemStack);
-
         }
 
         if (enchantPercentage > 100)

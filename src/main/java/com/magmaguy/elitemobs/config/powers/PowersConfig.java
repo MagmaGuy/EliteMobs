@@ -25,7 +25,7 @@ public class PowersConfig {
         return powers.get(fileName);
     }
 
-    private static ArrayList<PowersConfigFields> powersConfigFieldsList = new ArrayList<>(Arrays.asList(
+    private static ArrayList<PowersConfigFields> powersConfigFieldsList = new ArrayList(Arrays.asList(
             new FlamePyreConfig(),
             new FlamethrowerConfig(),
             new GoldExplosionConfig(),
@@ -67,7 +67,8 @@ public class PowersConfig {
             new AttackWitherConfig(),
             new SummonEmbersConfig(),
             new MeteorShowerConfig(),
-            new BulletHellConfig()
+            new BulletHellConfig(),
+            new CustomSummonPowerConfig()
     ));
 
     public static void initializeConfigs() {

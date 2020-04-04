@@ -199,7 +199,7 @@ public class ElitePower {
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
 
-    protected boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
+    protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
         if (event.isCancelled()) return false;
         if (elitePower.isCooldown()) return false;
         return !event.getEliteMobEntity().isCooldown();
