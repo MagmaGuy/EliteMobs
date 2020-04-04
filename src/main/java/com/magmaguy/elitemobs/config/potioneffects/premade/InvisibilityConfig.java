@@ -6,7 +6,7 @@ public class InvisibilityConfig extends PotionEffectsConfigFields {
     public InvisibilityConfig() {
         super("invisibility",
                 true,
-                "invisibility",
+                "Invisibility",
                 3,
                 50);
     }

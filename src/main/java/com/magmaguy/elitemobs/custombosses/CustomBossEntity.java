@@ -47,19 +47,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
         if (!customBossMobsConfigAttributes.isEnabled()) return null;
 
-        HashSet<ElitePower> elitePowers = new HashSet<>();
-        for (String powerName : customBossMobsConfigAttributes.getPowers())
-            if (ElitePower.getElitePower(powerName) != null)
-                elitePowers.add(ElitePower.getElitePower(powerName));
-            else
-                new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
-
         return new CustomBossEntity(
                 customBossMobsConfigAttributes,
                 EntityType.valueOf(customBossMobsConfigAttributes.getEntityType()),
                 location,
                 mobLevel,
-                elitePowers);
+                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
     }
 
     private static HashMap<UUID, CustomBossEntity> customBosses = new HashMap<>();
@@ -97,12 +90,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         this.customBossConfigFields = customBossConfigFields;
         if (customBossConfigFields.getSpawnMessage() != null)
             Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
-        setEquipment(customBossConfigFields.getHelmet(),
-                customBossConfigFields.getChestplate(),
-                customBossConfigFields.getLeggings(),
-                customBossConfigFields.getBoots(),
-                customBossConfigFields.getMainHand(),
-                customBossConfigFields.getOffHand());
+        setEquipment();
         if (customBossConfigFields.getTimeout() > 0)
             startEscapeMechanismDelay(customBossConfigFields.getTimeout());
         if (entityType.equals(EntityType.ZOMBIE))
@@ -158,11 +146,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     private void doParticleTrail(Particle particle) {
         new BukkitRunnable() {
-            UUID bossUUID = CustomBossEntity.super.getLivingEntity().getUniqueId();
-
             @Override
             public void run() {
-                //In case of boss death, stop the effect
+                //In case of boss death or chunk unload, stop the effect
                 if (!getLivingEntity().isValid()) {
                     cancel();
                     return;
@@ -201,7 +187,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 }.runTaskLater(MetadataHandler.PLUGIN, 20);
 
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
     }
 
     private void parseUniqueLootList() {
@@ -221,14 +207,14 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         return this.uniqueLootList;
     }
 
-    private void setEquipment(Material helmet, Material chestplate, Material leggings, Material boots, Material mainHand, Material offHand) {
+    private void setEquipment() {
         try {
-            getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(helmet));
-            getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(chestplate));
-            getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(leggings));
-            getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(boots));
-            getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(mainHand));
-            getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(offHand));
+            getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(customBossConfigFields.getHelmet()));
+            getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(customBossConfigFields.getChestplate()));
+            getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(customBossConfigFields.getLeggings()));
+            getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(customBossConfigFields.getBoots()));
+            getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(customBossConfigFields.getMainHand()));
+            getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(customBossConfigFields.getOffHand()));
         } catch (Exception ex) {
             new DebugMessage("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossConfigFields.getFileName());
         }
