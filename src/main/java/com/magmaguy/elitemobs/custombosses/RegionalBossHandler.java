@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.custombosses;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import org.bukkit.Location;
 import org.bukkit.event.Listener;
 
 import java.util.HashMap;
@@ -21,7 +22,11 @@ public class RegionalBossHandler implements Listener {
         if (!customBossConfigFields.isEnabled()) return;
         if (customBossConfigFields.getSpawnLocation() == null) return;
 
-        new RegionalBossEntity(customBossConfigFields);
+        if (customBossConfigFields.getSpawnLocations() != null && customBossConfigFields.getSpawnLocations().size() > 0)
+            for (Location newSpawnLocation : customBossConfigFields.getSpawnLocations())
+                new RegionalBossEntity(customBossConfigFields, newSpawnLocation);
+
+        new RegionalBossEntity(customBossConfigFields, customBossConfigFields.getSpawnLocation());
 
     }
 

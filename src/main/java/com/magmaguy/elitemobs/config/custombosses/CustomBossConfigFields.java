@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class CustomBossConfigFields {
@@ -57,6 +58,7 @@ public class CustomBossConfigFields {
     private double spawnChance;
     private boolean isRegionalBoss;
     private Location spawnLocation;
+    private List<Location> spawnLocations;
     private int spawnCooldown;
     private double leashRadius;
     private List<String> onDeathCommands;
@@ -286,6 +288,14 @@ public class CustomBossConfigFields {
             } else {
                 this.spawnLocation = ConfigurationLocation.deserialize(configuration.getString("spawnLocation"));
             }
+            List<String> locations = configuration.getStringList("spawnLocations");
+            if (locations != null && locations.size() > 0) {
+                List<Location> parsedList = new ArrayList<>();
+                for (String string : locations)
+                    parsedList.add(ConfigurationLocation.deserialize(string));
+                this.spawnLocations = parsedList;
+            } else
+                this.spawnLocations = new ArrayList<>();
             if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
             else this.spawnCooldown = configuration.getInt("spawnCooldown");
 
@@ -300,6 +310,8 @@ public class CustomBossConfigFields {
     }
 
     private Material parseMaterial(String materialString) {
+        if (materialString == null)
+            return Material.AIR;
         try {
             return Material.getMaterial(materialString);
         } catch (Exception e) {
@@ -430,6 +442,23 @@ public class CustomBossConfigFields {
 
     public Location getSpawnLocation() {
         return spawnLocation;
+    }
+
+    public List<Location> getSpawnLocations() {
+        return spawnLocations;
+    }
+
+    public void addSpawnLocation(Location location) {
+        spawnLocations.add(location);
+        List<String> convertedList = new ArrayList<>();
+        for (Location iteratedLocation : spawnLocations)
+            convertedList.add(ConfigurationLocation.serialize(iteratedLocation));
+        fileConfiguration.set("spawnLocations", convertedList);
+        try {
+            fileConfiguration.save(file);
+        } catch (IOException ex) {
+            new WarningMessage("Failed to save new boss location! It will not show up in the right place after a restart. Report this to the dev.");
+        }
     }
 
     public void setSpawnLocation(Location spawnLocation) {

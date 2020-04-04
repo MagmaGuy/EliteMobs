@@ -168,6 +168,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new SummonEmbers(), plugin);
         pluginManager.registerEvents(new MeteorShower(), plugin);
         pluginManager.registerEvents(new BulletHell(), plugin);
+        pluginManager.registerEvents(new CustomSummonPower.CustomSummonPowerEvent(), plugin);
 
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);

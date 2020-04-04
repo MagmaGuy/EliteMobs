@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class CustomBossCommandHandler {
 
@@ -13,6 +14,7 @@ public class CustomBossCommandHandler {
         if (args.length < 2) {
             player.sendMessage("[EliteMobs] Possible command syntax:");
             player.sendMessage("- /elitemobs customboss [filename] setSpawnLocation");
+            player.sendMessage("- /elitemobs customboss [filename] addSpawnLocation");
             player.sendMessage("- /elitemobs customboss [filename] setLeashRadius [radius]");
             return;
         }
@@ -32,9 +34,12 @@ public class CustomBossCommandHandler {
 
         switch (args[2].toLowerCase()) {
             case "setspawnlocation":
-                setLocation(customBossConfigFields, player.getLocation());
+                setSpawnLocation(customBossConfigFields, player.getLocation());
                 player.sendMessage("[EliteMobs] New spawn location set to where you are standing!");
                 return;
+            case "addspawnlocation":
+                addSpawnLocation(customBossConfigFields, player.getLocation());
+                player.sendMessage("[EliteMobs] An additional spawn location was set to where you are standing!");
             case "setleashradius":
                 setLeashRadius(customBossConfigFields, player, args);
             default:
@@ -44,11 +49,16 @@ public class CustomBossCommandHandler {
 
     }
 
-    private static void setLocation(CustomBossConfigFields customBossConfigFields, Location location) {
-        customBossConfigFields.setSpawnLocation(location);
+    private static void setSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location) {
+        customBossConfigFields.setSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList())
             if (customBossConfigFields.getFileName().equals(regionalBossEntity.getCustomBossConfigFields().getFileName()))
-                regionalBossEntity.setSpawnLocation(location);
+                regionalBossEntity.setSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
+    }
+
+    private static void addSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location) {
+        customBossConfigFields.addSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
+        new RegionalBossEntity(customBossConfigFields, location.clone().add(new Vector(0, 0.2, 0)));
     }
 
     private static void setLeashRadius(CustomBossConfigFields customBossConfigFields, Player player, String[] args) {

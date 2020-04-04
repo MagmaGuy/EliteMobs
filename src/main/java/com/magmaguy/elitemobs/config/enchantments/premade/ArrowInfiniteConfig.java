@@ -6,7 +6,7 @@ public class ArrowInfiniteConfig extends EnchantmentsConfigFields {
     public ArrowInfiniteConfig() {
         super("arrow_infinite",
                 true,
-                "infinity",
+                "Infinity",
                 1,
                 6);
     }
