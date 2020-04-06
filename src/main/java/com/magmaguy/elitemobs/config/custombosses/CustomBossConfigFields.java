@@ -61,6 +61,7 @@ public class CustomBossConfigFields {
     private List<Location> spawnLocations;
     private int spawnCooldown;
     private double leashRadius;
+    private Integer followRange;
     private List<String> onDeathCommands;
 
     /**
@@ -303,6 +304,8 @@ public class CustomBossConfigFields {
                 regionalElites.add(this);
         }
 
+        this.followRange = configuration.getInt("followRange");
+
         this.leashRadius = configuration.getDouble("leashRadius");
 
         this.onDeathCommands = (List<String>) configuration.getList("onDeathCommands");
@@ -479,6 +482,10 @@ public class CustomBossConfigFields {
 
     public double getLeashRadius() {
         return leashRadius;
+    }
+
+    public Integer getFollowRange() {
+        return this.followRange;
     }
 
     public List<String> getOnDeathCommands() {

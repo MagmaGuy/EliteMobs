@@ -433,7 +433,7 @@ public class EntityTracker implements Listener {
 
                 for (Iterator<ArmorStand> iterator = armorStands.iterator(); iterator.hasNext(); ) {
                     ArmorStand armorStand = iterator.next();
-                    if (armorStand == null || armorStand.isDead()) {
+                    if (armorStand == null || !armorStand.isValid()) {
                         iterator.remove();
                         entitiesCleared++;
                     }
@@ -441,7 +441,7 @@ public class EntityTracker implements Listener {
                 }
                 for (Iterator<Item> iterator = itemVisualEffects.iterator(); iterator.hasNext(); ) {
                     Item item = iterator.next();
-                    if (item == null || item.isDead()) {
+                    if (item == null || !item.isValid()) {
                         iterator.remove();
                         entitiesCleared++;
                     }
@@ -449,7 +449,7 @@ public class EntityTracker implements Listener {
 
                 for (Iterator<Entity> iterator = cullablePluginEntities.iterator(); iterator.hasNext(); ) {
                     Entity entity = iterator.next();
-                    if (entity == null || entity.isDead()) {
+                    if (entity == null || !entity.isValid()) {
                         if (entity.getType().equals(EntityType.VILLAGER)) continue;
                         if (entity instanceof LivingEntity)
                             if (!((LivingEntity) entity).getRemoveWhenFarAway())

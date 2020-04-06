@@ -40,6 +40,7 @@ public class CustomBossCommandHandler {
             case "addspawnlocation":
                 addSpawnLocation(customBossConfigFields, player.getLocation());
                 player.sendMessage("[EliteMobs] An additional spawn location was set to where you are standing!");
+                return;
             case "setleashradius":
                 setLeashRadius(customBossConfigFields, player, args);
             default:
@@ -57,6 +58,7 @@ public class CustomBossCommandHandler {
     }
 
     private static void addSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location) {
+        setSpawnLocation(customBossConfigFields, location);
         customBossConfigFields.addSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
         new RegionalBossEntity(customBossConfigFields, location.clone().add(new Vector(0, 0.2, 0)));
     }
