@@ -13,6 +13,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
@@ -75,7 +77,7 @@ public class RegionalBossEntity implements Listener {
         uuid = customBossEntity.getLivingEntity().getUniqueId();
         checkLeash();
         regionalBossWatchdog();
-
+        customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
     }
 
     private void respawnRegionalBoss() {
@@ -123,7 +125,7 @@ public class RegionalBossEntity implements Listener {
                 }
 
                 if (livingEntity.getLocation().distance(spawnLocation) > leashRadius)
-                    SpiritWalk.spiritWalkAnimation((LivingEntity) livingEntity, livingEntity.getLocation(), spawnLocation);
+                    SpiritWalk.spiritWalkRegionalBossAnimation((LivingEntity) livingEntity, livingEntity.getLocation(), spawnLocation);
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 3);

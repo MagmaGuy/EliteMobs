@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -98,6 +99,7 @@ public class SpiritWalk extends BossPower implements Listener {
 
     }
 
+
     public static void spiritWalkAnimation(LivingEntity bossMob, Location entityLocation, Location finalLocation) {
 
         bossMob.setAI(false);
@@ -119,6 +121,43 @@ public class SpiritWalk extends BossPower implements Listener {
                     bossMob.setInvulnerable(false);
                     bossMob.removePotionEffect(PotionEffectType.GLOWING);
                     cancel();
+
+                }
+
+                bossMob.teleport(bossMob.getLocation().clone().add(toDestination.clone()));
+
+                counter++;
+
+            }
+
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+
+    }
+
+    public static void spiritWalkRegionalBossAnimation(LivingEntity bossMob, Location entityLocation, Location finalLocation) {
+
+        bossMob.setAI(false);
+        bossMob.setInvulnerable(true);
+        bossMob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 10, 1));
+        Vector toDestination = finalLocation.clone().subtract(entityLocation.clone()).toVector().normalize().divide(new Vector(2, 2, 2));
+
+        new BukkitRunnable() {
+
+            int counter = 0;
+
+            @Override
+            public void run() {
+
+                if (bossMob.getLocation().clone().distance(finalLocation) < 2 || counter > 20 * 10) {
+
+                    bossMob.teleport(finalLocation);
+                    bossMob.setAI(true);
+                    bossMob.setInvulnerable(false);
+                    bossMob.removePotionEffect(PotionEffectType.GLOWING);
+                    cancel();
+                    if (bossMob instanceof Mob)
+                        if (((Mob) bossMob).getTarget() == null)
+                            bossMob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
 
                 }
 
