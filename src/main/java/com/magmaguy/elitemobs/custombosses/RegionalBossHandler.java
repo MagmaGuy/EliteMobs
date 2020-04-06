@@ -22,9 +22,11 @@ public class RegionalBossHandler implements Listener {
         if (!customBossConfigFields.isEnabled()) return;
         if (customBossConfigFields.getSpawnLocation() == null) return;
 
-        if (customBossConfigFields.getSpawnLocations() != null && customBossConfigFields.getSpawnLocations().size() > 0)
+        if (customBossConfigFields.getSpawnLocations() != null && customBossConfigFields.getSpawnLocations().size() > 0) {
             for (Location newSpawnLocation : customBossConfigFields.getSpawnLocations())
                 new RegionalBossEntity(customBossConfigFields, newSpawnLocation);
+            return;
+        }
 
         new RegionalBossEntity(customBossConfigFields, customBossConfigFields.getSpawnLocation());
 

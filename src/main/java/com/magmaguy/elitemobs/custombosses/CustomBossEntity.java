@@ -25,6 +25,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -33,7 +34,9 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -76,6 +79,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     public CustomBossConfigFields customBossConfigFields;
     private HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
     private UUID uuid;
+    private boolean trailIsActive = false;
 
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
                             EntityType entityType,
@@ -107,6 +111,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             super.setHasVanillaLoot(customBossConfigFields.getDropsVanillaLoot());
         parseUniqueLootList();
         addCustomBoss(this);
+        if (customBossConfigFields.getFollowRange() != null && customBossConfigFields.getFollowRange() > 0 && getLivingEntity() instanceof Mob)
+            getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
     }
 
     private void startEscapeMechanismDelay(int timeout) {
@@ -130,6 +136,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     public void startBossTrails() {
         //todo: this is not good
+        if (trailIsActive) return;
+        trailIsActive = true;
         for (String string : this.customBossConfigFields.getTrails()) {
             try {
                 Particle particle = Particle.valueOf(string);
@@ -151,6 +159,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 //In case of boss death or chunk unload, stop the effect
                 if (!getLivingEntity().isValid()) {
                     cancel();
+                    trailIsActive = false;
                     return;
                 }
                 //All conditions cleared, do the boss flair effect
@@ -168,6 +177,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 //In case of boss death, stop the effect
                 if (!getLivingEntity().isValid()) {
                     cancel();
+                    trailIsActive = false;
                     return;
                 }
                 //All conditions cleared, do the boss flair effect
@@ -484,6 +494,17 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                             customBossEntity.startBossTrails();
                         }
 
+        }
+
+        @EventHandler
+        public void bossTargetEvent(EntityTargetEvent event) {
+            if (!(event.getTarget() instanceof Player)) return;
+            if (((Player) event.getTarget()).getGameMode().equals(GameMode.CREATIVE)) return;
+            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+            if (eliteMobEntity == null) return;
+            if (!(eliteMobEntity instanceof CustomBossEntity)) return;
+            if (eliteMobEntity.getLivingEntity().getPotionEffect(PotionEffectType.SLOW) == null) return;
+            eliteMobEntity.getLivingEntity().removePotionEffect(PotionEffectType.SLOW);
         }
 
     }
