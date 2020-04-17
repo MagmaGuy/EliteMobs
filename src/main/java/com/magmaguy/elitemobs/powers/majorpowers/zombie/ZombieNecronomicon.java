@@ -15,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -57,10 +56,10 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
     private void necronomiconVisualEffect(EliteMobEntity eliteMobEntity, ZombieNecronomicon zombieNecronomicon) {
 
-        Zombie zombie = (Zombie) eliteMobEntity.getLivingEntity();
-        zombie.setAI(false);
+        LivingEntity livingEntity = eliteMobEntity.getLivingEntity();
+        livingEntity.setAI(false);
         zombieNecronomicon.setIsFiring(true);
-        nameScroller(zombie, zombieNecronomicon);
+        nameScroller(livingEntity, zombieNecronomicon);
 
         if (!MobCombatSettingsConfig.enableWarningVisualEffects)
             return;
@@ -71,12 +70,12 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
             @Override
             public void run() {
-                if (!zombie.isValid() || zombie.hasAI()) {
+                if (!livingEntity.isValid() || livingEntity.hasAI()) {
                     for (List<Item> itemList : fourTrack.values())
                         for (Item item : itemList)
                             item.remove();
-                    if (zombie.isValid())
-                        zombie.setCustomName(EntityTracker.getEliteMobEntity(zombie).getName());
+                    if (livingEntity.isValid())
+                        livingEntity.setCustomName(EntityTracker.getEliteMobEntity(livingEntity).getName());
                     zombieNecronomicon.setIsFiring(false);
                     cancel();
                     return;
@@ -89,13 +88,13 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                         List<Item> itemList = new ArrayList<>();
                         for (int j = 0; j < 4; j++) {
                             ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
-                            Item item = VisualItemInitializer.initializeItem(itemStack, zombie.getLocation());
+                            Item item = VisualItemInitializer.initializeItem(itemStack, livingEntity.getLocation());
                             itemList.add(item);
                         }
                         fourTrack.put(i, itemList);
                     }
                 } else
-                    itemMover(fourTrack, zombie, counter);
+                    itemMover(fourTrack, livingEntity, counter);
 
                 counter++;
             }
@@ -147,7 +146,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
     }
 
-    private void nameScroller(Zombie zombie, ZombieNecronomicon zombieNecronomicon) {
+    private void nameScroller(LivingEntity livingEntity, ZombieNecronomicon zombieNecronomicon) {
 
         new BukkitRunnable() {
             String fullChant = convert(PowersConfig.getPower("zombie_necronomicon.yml").getConfiguration().getString("summoningChant"));
@@ -155,7 +154,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
             @Override
             public void run() {
 
-                if (!zombie.isValid() || zombie.hasAI()) {
+                if (!livingEntity.isValid() || livingEntity.hasAI()) {
                     cancel();
                     return;
                 }
@@ -164,7 +163,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     zombieNecronomicon.chantIndex = 0;
 
                 String subString = fullChant.substring(zombieNecronomicon.chantIndex, zombieNecronomicon.chantIndex + 31);
-                zombie.setCustomName(subString);
+                livingEntity.setCustomName(subString);
                 zombieNecronomicon.chantIndex++;
             }
 

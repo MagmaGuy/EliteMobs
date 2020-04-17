@@ -78,6 +78,7 @@ public class RegionalBossEntity implements Listener {
         checkLeash();
         regionalBossWatchdog();
         customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
+        customBossEntity.setIsRegionalBoss(true);
     }
 
     private void respawnRegionalBoss() {

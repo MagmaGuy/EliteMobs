@@ -82,6 +82,8 @@ public class EliteMobEntity {
     private int antiExploitPoints = 0;
     private boolean inAntiExploitCooldown = false;
 
+    private boolean isRegionalBoss = false;
+
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
      * the Elite Mob conversion
@@ -975,6 +977,14 @@ public class EliteMobEntity {
                 inAntiExploitCooldown = false;
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
+    }
+
+    public boolean isRegionalBoss() {
+        return this.isRegionalBoss;
+    }
+
+    public void setIsRegionalBoss(boolean isRegionalBoss) {
+        this.isRegionalBoss = isRegionalBoss;
     }
 
 }

@@ -162,6 +162,7 @@ public class EnchantmentGenerator {
             case GOLDEN_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
+            case TURTLE_HELMET:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("PROTECTION_ENVIRONMENTAL", itemTier));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("BINDING_CURSE"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
