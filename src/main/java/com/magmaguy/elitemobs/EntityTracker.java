@@ -116,6 +116,7 @@ public class EntityTracker implements Listener {
     private static void unregisterEliteMob(Entity entity) {
         EliteMobEntity eliteMobEntity = getEliteMobEntity(entity);
         if (eliteMobEntity == null) return;
+        if (eliteMobEntity.isRegionalBoss()) return;
         eliteMobEntity.getLivingEntity().remove();
         eliteMobs.remove(eliteMobEntity);
         eliteMobsLivingEntities.remove(eliteMobEntity.getLivingEntity());
@@ -418,11 +419,13 @@ public class EntityTracker implements Listener {
 
                 for (Iterator<EliteMobEntity> iterator = eliteMobs.iterator(); iterator.hasNext(); ) {
                     EliteMobEntity eliteMobEntity = iterator.next();
-                    if (eliteMobEntity == null || eliteMobEntity.getLivingEntity() == null || eliteMobEntity.getLivingEntity().isDead()) {
+                    if (eliteMobEntity == null || eliteMobEntity.getLivingEntity() == null && !eliteMobEntity.isRegionalBoss()
+                            || eliteMobEntity.getLivingEntity().isDead() && !eliteMobEntity.isRegionalBoss()) {
                         iterator.remove();
                         entitiesCleared++;
                     }
                 }
+
                 for (Iterator<LivingEntity> iterator = eliteMobsLivingEntities.iterator(); iterator.hasNext(); ) {
                     LivingEntity livingEntity = iterator.next();
                     if (livingEntity == null || livingEntity.isDead()) {

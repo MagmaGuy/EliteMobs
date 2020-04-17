@@ -27,7 +27,6 @@ public class OnDeathCommands implements Listener {
                 if (event.getEliteMobEntity().hasDamagers())
                     for (Player player : event.getEliteMobEntity().getDamagers().keySet())
                         runConsoleCommand(string.replace("$players", player.getName()));
-                return;
             }
             runConsoleCommand(string);
         }
