@@ -81,6 +81,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     private UUID uuid;
     private boolean trailIsActive = false;
 
+    public LivingEntity advancedGetEntity() {
+        return (LivingEntity) Bukkit.getEntity(this.uuid);
+    }
+
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
                             EntityType entityType,
                             Location location,
@@ -115,6 +119,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
     }
 
+    /**
+     * Starts the escape mechanic for bosses that have this feature. After a set time, in minutes, the boss will escape,
+     * potentially broadcasting an escape message.
+     */
     private void startEscapeMechanismDelay(int timeout) {
 
         if (timeout < 1) return;
@@ -123,8 +131,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
             @Override
             public void run() {
-                if (CustomBossEntity.super.getLivingEntity().isDead()) return;
-                CustomBossEntity.super.remove();
+                LivingEntity livingEntity = advancedGetEntity();
+                if (livingEntity == null) return;
+                if (livingEntity.isDead()) return;
+                livingEntity.remove();
                 if (customBossConfigFields.getEscapeMessage() != null)
                     Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
 
@@ -439,7 +449,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 OnDeathCommands.parseConsoleCommand(customBossEntity.customBossConfigFields.getOnDeathCommands(), event);
 
         }
-
 
         private static HashMap<Player, Double> sortByComparator(HashMap<Player, Double> unsortMap, final boolean order) {
 

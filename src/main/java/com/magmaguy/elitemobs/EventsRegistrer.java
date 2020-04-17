@@ -292,6 +292,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new WorldGuardEliteMobOnlyFlag(), plugin);
 
         pluginManager.registerEvents(new EntityTransformPreventer(), plugin);
+        pluginManager.registerEvents(new PreventEliteEquipmentDrop(), plugin);
 
         pluginManager.registerEvents(new TreasureChest.TreasureChestEvents(), plugin);
 
