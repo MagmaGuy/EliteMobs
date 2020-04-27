@@ -72,7 +72,7 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
             if (eliteMobEntity == null) return;
 
             Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedEvent(eliteMobEntity, event));
-            if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsDungeonFlag()))
+            if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
                 return;
             Bukkit.getServer().getPluginManager().callEvent(new GenericAntiExploitEvent(eliteMobEntity, event));
 
