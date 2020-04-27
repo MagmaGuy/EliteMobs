@@ -69,6 +69,7 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new EliteCreeper();
         new EliteDrowned();
         new EliteElderGuardian();
+        new EliteGuardian();
         new EliteEnderman();
         new EliteIronGolem();
         new ElitePhantom();

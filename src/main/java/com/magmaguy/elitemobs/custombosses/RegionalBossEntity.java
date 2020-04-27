@@ -70,6 +70,9 @@ public class RegionalBossEntity implements Listener {
             }
         }
 
+        if (spawnLocation == null)
+            return;
+
         spawnLocation.getChunk().load();
 
         CustomBossEntity customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
