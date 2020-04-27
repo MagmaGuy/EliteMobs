@@ -29,6 +29,7 @@ public class MobPropertiesConfig {
             new EliteCreeperConfig(),
             new EliteDrownedConfig(),
             new EliteElderGuardianConfig(),
+            new EliteGuardianConfig(),
             new EliteEndermanConfig(),
             new EliteEndermiteConfig(),
             new EliteEvokerConfig(),

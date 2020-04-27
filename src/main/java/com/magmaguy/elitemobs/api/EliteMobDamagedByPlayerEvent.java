@@ -31,7 +31,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
         if (event.isCancelled()) return;
         if (eliteMobEntity.isInAntiExploitCooldown()) return;
         //No antiexploit checks for dungeons
-        if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsDungeonFlag()))
+        if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
             return;
         Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerAntiExploitEvent(eliteMobEntity, this));
     }

@@ -284,13 +284,13 @@ public class CustomBossConfigFields {
             this.isRegionalBoss = false;
         else if (configuration.getBoolean("isRegionalBoss")) {
             String location = configuration.getString("spawnLocation");
-            if (location == null) {
+            List<String> locations = configuration.getStringList("spawnLocations");
+            if (location == null && locations.size() < 1) {
                 new WarningMessage("Regional / World boss does not have a set location! It will not spawn.");
-            } else {
+            } else if (location != null) {
                 this.spawnLocation = ConfigurationLocation.deserialize(configuration.getString("spawnLocation"));
             }
-            List<String> locations = configuration.getStringList("spawnLocations");
-            if (locations != null && locations.size() > 0) {
+            if (locations.size() > 0) {
                 List<Location> parsedList = new ArrayList<>();
                 for (String string : locations)
                     parsedList.add(ConfigurationLocation.deserialize(string));
@@ -300,7 +300,7 @@ public class CustomBossConfigFields {
             if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
             else this.spawnCooldown = configuration.getInt("spawnCooldown");
 
-            if (location != null)
+            if (location != null || spawnLocations != null)
                 regionalElites.add(this);
         }
 
