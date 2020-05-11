@@ -13,7 +13,6 @@ public class DefaultConfig {
     public static int superMobStackAmount;
     public static boolean preventCreeperDamageToPassiveMobs;
     public static boolean doPermissionTitles;
-    public static boolean hideEnchantmentsAttribute;
     public static boolean preventEliteMobConversionOfNamedMobs;
     public static boolean doStrictSpawningRules;
     public static double nightmareWorldSpawnBonus;
@@ -27,7 +26,6 @@ public class DefaultConfig {
         superMobStackAmount = ConfigurationEngine.setInt(fileConfiguration, "superMobStackAmount", 50);
         preventCreeperDamageToPassiveMobs = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteCreeperDamageToPassiveMobs", true);
         doPermissionTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useTitlesForMissingPermissionMessages", true);
-        hideEnchantmentsAttribute = ConfigurationEngine.setBoolean(fileConfiguration, "hideEnchantmentAttributes", false);
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);
         doStrictSpawningRules = ConfigurationEngine.setBoolean(fileConfiguration, "enableHighCompatibilityMode", false);
         nightmareWorldSpawnBonus = ConfigurationEngine.setDouble(fileConfiguration, "nightmareWorldSpawnBonus", 0.5);

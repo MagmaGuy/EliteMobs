@@ -36,6 +36,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -58,7 +59,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
     }
 
-    private static HashMap<UUID, CustomBossEntity> customBosses = new HashMap<>();
+    private static final HashMap<UUID, CustomBossEntity> customBosses = new HashMap<>();
 
     private static void addCustomBoss(CustomBossEntity customBossEntity) {
         customBosses.put(customBossEntity.uuid, customBossEntity);
@@ -77,8 +78,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     }
 
     public CustomBossConfigFields customBossConfigFields;
-    private HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
-    private UUID uuid;
+    private final HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
+    private final UUID uuid;
     private boolean trailIsActive = false;
 
     public LivingEntity advancedGetEntity() {
@@ -240,7 +241,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         }
     }
 
-    private HashSet<Player> trackingPlayer = new HashSet<>();
+    private final HashSet<Player> trackingPlayer = new HashSet<>();
 
     private void sendLocation() {
 
@@ -447,6 +448,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
             if (customBossEntity.customBossConfigFields.getOnDeathCommands() != null && !customBossEntity.customBossConfigFields.getOnDeathCommands().isEmpty())
                 OnDeathCommands.parseConsoleCommand(customBossEntity.customBossConfigFields.getOnDeathCommands(), event);
+
+            if (!customBossEntity.customBossConfigFields.getDropsVanillaLoot()) {
+                event.getEntityDeathEvent().setDroppedExp(0);
+                for (ItemStack itemStack : event.getEntityDeathEvent().getDrops())
+                    itemStack.setAmount(0);
+            }
 
         }
 
