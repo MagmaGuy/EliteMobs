@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
@@ -28,9 +27,6 @@ public class LoreGenerator {
                                         HashMap<String, Integer> customEnchantments,
                                         List<String> potionList, List<String> loreList,
                                         EliteMobEntity eliteMobEntity) {
-
-        if (DefaultConfig.hideEnchantmentsAttribute)
-            return itemMeta;
 
         List<String> lore = new ArrayList<>();
 
@@ -79,9 +75,6 @@ public class LoreGenerator {
                                         HashMap<Enchantment, Integer> enchantmentMap,
                                         HashMap<String, Integer> customEnchantments,
                                         EliteMobEntity eliteMobEntity) {
-
-        if (DefaultConfig.hideEnchantmentsAttribute)
-            return itemMeta;
 
         List<String> lore = new ArrayList<>();
 

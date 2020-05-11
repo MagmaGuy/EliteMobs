@@ -166,7 +166,7 @@ public class ItemQualityColorizer {
 
         List list = new ArrayList();
 
-        if (itemMeta.getLore() != null || !itemMeta.getLore().isEmpty()) {
+        if (itemMeta.getLore() != null && !itemMeta.getLore().isEmpty()) {
 
             for (String string : itemMeta.getLore()) {
 
