@@ -198,6 +198,7 @@ public class ItemTierFinder {
             case LEATHER_CHESTPLATE:
             case LEATHER_HELMET:
             case LEATHER_LEGGINGS:
+            case TURTLE_HELMET:
                 return GOLD_WOOD_LEATHER_TIER + mainEnchantment2;
             case WOODEN_SWORD:
             case WOODEN_AXE:
