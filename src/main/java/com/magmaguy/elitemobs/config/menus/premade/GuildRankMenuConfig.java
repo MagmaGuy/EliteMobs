@@ -17,9 +17,10 @@ public class GuildRankMenuConfig extends MenusConfigFields {
 
     public static String menuName;
     public static String lowTierWarning, normalTierWarning;
-    public static ItemStack unlockedButton, lockedButton, currentButton, nextButton;
+    public static ItemStack unlockedButton, lockedButton, currentButton, nextButton, prestigeLockedButton, prestigeNextUnlockButton;
     public static String notEnoughCurrencyMessage, unlockMessage, broadcastMessage, failedMessage;
-    public static String spawnRateModifierMessage, lootModifierMessage, difficultyModifierMessage;
+    public static String spawnRateModifierMessage, lootModifierMessage, difficultyModifierMessage, lootTierMessage, currencyBonusMessage,
+            healthBonusMessage, critBonusMessage, dodgeBonusMessage;
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -34,11 +35,12 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                         Arrays.asList("&f&m-------------------------------",
                                 "&aThis rank is unlocked!",
                                 "&fYou can select it.",
-                                "$tierWarning",
                                 "&f&m-------------------------------",
-                                "$lootBonus",
-                                "$mobSpawning",
-                                "$difficultyBonus")), fileConfiguration);
+                                "$lootTier",
+                                "$currencyBonusMessage",
+                                "$maxHealthIncrease",
+                                "$chanceToCrit",
+                                "$chanceToDodge")), fileConfiguration);
         unlockedButton = ItemStackSerializer.deserialize("unlockedButton", fileConfiguration);
 
         ItemStackSerializer.serialize(
@@ -48,11 +50,12 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                         Arrays.asList("&f&m-------------------------------",
                                 "&aThis rank is locked!",
                                 "&cYou need the $previousRank rank first!",
-                                "$tierWarning",
                                 "&f&m-------------------------------",
-                                "$lootBonus",
-                                "$mobSpawning",
-                                "$difficultyBonus")), fileConfiguration);
+                                "$lootTier",
+                                "$currencyBonusMessage",
+                                "$maxHealthIncrease",
+                                "$chanceToCrit",
+                                "$chanceToDodge")), fileConfiguration);
         lockedButton = ItemStackSerializer.deserialize("lockedButton", fileConfiguration);
 
         ItemStackSerializer.serialize(
@@ -61,28 +64,59 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                         "$rankName",
                         Arrays.asList("&f&m-------------------------------",
                                 "&aThis is your current rank!",
-                                "$tierWarning",
                                 "&f&m-------------------------------",
-                                "$lootBonus",
-                                "$mobSpawning",
-                                "$difficultyBonus")), fileConfiguration);
+                                "$lootTier",
+                                "$currencyBonusMessage",
+                                "$maxHealthIncrease",
+                                "$chanceToCrit",
+                                "$chanceToDodge")), fileConfiguration);
         currentButton = ItemStackSerializer.deserialize("currentButton", fileConfiguration);
 
         ItemStackSerializer.serialize(
                 "nextButton",
                 ItemStackGenerator.generateItemStack(Material.YELLOW_STAINED_GLASS_PANE,
-                        "$rankName",
-                        Arrays.asList("&f&m-------------------------------",
+                        "Prestige $prestigeNumber",
+                        Arrays.asList(
                                 "&6This is the next rank you can unlock",
                                 "&aSelect it when you're ready!",
                                 "&6Costs $price &6$currencyName",
                                 "&fYou have &a$currentCurrency $currencyName",
-                                "$tierWarning",
                                 "&f&m-------------------------------",
-                                "$lootBonus",
-                                "$mobSpawning",
-                                "$difficultyBonus")), fileConfiguration);
+                                "$lootTier",
+                                "$currencyBonusMessage",
+                                "$maxHealthIncrease",
+                                "$chanceToCrit",
+                                "$chanceToDodge")), fileConfiguration);
         nextButton = ItemStackSerializer.deserialize("nextButton", fileConfiguration);
+
+        ItemStackSerializer.serialize(
+                "prestigeLockedButton",
+                ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS,
+                        "Prestige $rank",
+                        Arrays.asList("&f&m-------------------------------",
+                                "&4You must unlock all guild ranks first!",
+                                "&f&m-------------------------------")), fileConfiguration);
+        prestigeLockedButton = ItemStackSerializer.deserialize("prestigeLockedButton", fileConfiguration);
+
+        ItemStackSerializer.serialize(
+                "prestigeNextUnlockButton",
+                ItemStackGenerator.generateItemStack(Material.GOLD_BLOCK,
+                        "Prestige $rank",
+                        Arrays.asList("&f&m-------------------------------",
+                                "&2Prestige unlock is ready!",
+                                "&6Costs $price &6$currencyName",
+                                "&cBuying prestige will reset guild ranks",
+                                "&abut will allow you to unlock:",
+                                "&a- Access to higher guild tiers",
+                                "&a- Access to higher tier loot",
+                                "&a- More coins from kills and quests",
+                                "&a- Higher max health",
+                                "&a- Base chance to crit",
+                                "&a- Base chance to dodge",
+                                "&4Warning: this resets you current",
+                                "&4EliteMobs currency!",
+                                "&f&m-------------------------------")), fileConfiguration);
+        prestigeNextUnlockButton = ItemStackSerializer.deserialize("prestigeNextUnlockButton", fileConfiguration);
 
         notEnoughCurrencyMessage = ConfigurationEngine.setString(fileConfiguration, "notEnoughCurrencyMessage",
                 "&7[EliteMobs] &4You don't have enough Elite Coins ($neededAmount $currencyName)! Sell some Elite Mob loot to [/em shop]! " +
@@ -97,6 +131,12 @@ public class GuildRankMenuConfig extends MenusConfigFields {
         spawnRateModifierMessage = ConfigurationEngine.setString(fileConfiguration, "spawnRateModifierMessage", "&fElite Mob spawn rate modifier: &c$modifier%");
         lootModifierMessage = ConfigurationEngine.setString(fileConfiguration, "lootModifierMessage", "&fElite Mob loot modifier: &a$modifier%");
         difficultyModifierMessage = ConfigurationEngine.setString(fileConfiguration, "difficultyModifierMessage", "&fElite Mob difficulty modifier: &c$modifier%");
+
+        lootTierMessage = ConfigurationEngine.setString(fileConfiguration, "lootTierMessage", "&2Elites can drop up to tier $tier loot!");
+        currencyBonusMessage = ConfigurationEngine.setString(fileConfiguration, "currencyBonusMessage", "&a$amount% coins from drops and quests!");
+        healthBonusMessage = ConfigurationEngine.setString(fileConfiguration, "healthBonusMessage", "&cAdds $amount ❤ of max health");
+        critBonusMessage = ConfigurationEngine.setString(fileConfiguration, "critBonusMessage", "&eAdds $amount% chance to crit");
+        dodgeBonusMessage = ConfigurationEngine.setString(fileConfiguration, "dodgeBonusMessage", "&8Adds $amount% chance to dodge");
 
     }
 

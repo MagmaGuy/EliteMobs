@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -13,20 +14,8 @@ public class AdventurersGuildConfig {
     public static String guildLocationString;
     public static Location guildWorldLocation;
     public static boolean agTeleport;
-    private static String RANK_NAMES = "Adventurers Guild Rank Names";
-    private static String guildRank = "Guild Rank ";
-    public static String rankNames0 = guildRank + RANK_NAMES + "0";
-    public static String rankNames1 = guildRank + RANK_NAMES + "1";
-    public static String rankNames2 = guildRank + RANK_NAMES + "2";
-    public static String rankNames3 = guildRank + RANK_NAMES + "3";
-    public static String rankNames4 = guildRank + RANK_NAMES + "4";
-    public static String rankNames5 = guildRank + RANK_NAMES + "5";
-    public static String rankNames6 = guildRank + RANK_NAMES + "6";
-    public static String rankNames7 = guildRank + RANK_NAMES + "7";
-    public static String rankNames8 = guildRank + RANK_NAMES + "8";
-    public static String rankNames9 = guildRank + RANK_NAMES + "9";
-    public static String rankNames10 = guildRank + RANK_NAMES + "10";
-    public static String rankNames11 = guildRank + RANK_NAMES + "11";
+    public static String[][] rankNames = new String[11][21];
+    public static String[][] shortRankNames = new String[11][21];
     public static boolean guildLootLimiter;
     public static String lootLimiterMessage;
     public static boolean alwaysUseNpcs;
@@ -41,23 +30,324 @@ public class AdventurersGuildConfig {
         guildLocationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
         guildWorldLocation = null;
         agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);
-        rankNames0 = ConfigurationEngine.setString(fileConfiguration, "0", "&8Commoner");
-        rankNames1 = ConfigurationEngine.setString(fileConfiguration, "1", "&fFresh Meat");
-        rankNames2 = ConfigurationEngine.setString(fileConfiguration, "2", "&fRookie");
-        rankNames3 = ConfigurationEngine.setString(fileConfiguration, "3", "&fAdventurer");
-        rankNames4 = ConfigurationEngine.setString(fileConfiguration, "4", "&2Journeyman");
-        rankNames5 = ConfigurationEngine.setString(fileConfiguration, "5", "&2Elite Adventurer");
-        rankNames6 = ConfigurationEngine.setString(fileConfiguration, "6", "&2Veteran");
-        rankNames7 = ConfigurationEngine.setString(fileConfiguration, "7", "&1Slayer");
-        rankNames8 = ConfigurationEngine.setString(fileConfiguration, "8", "&1Exterminator");
-        rankNames9 = ConfigurationEngine.setString(fileConfiguration, "9", "&5&lElite Hunter");
-        rankNames10 = ConfigurationEngine.setString(fileConfiguration, "10", "&5Hero");
-        rankNames11 = ConfigurationEngine.setString(fileConfiguration, "11", "&6&l&oLegend");
+
+        //iterate through all prestige tiers
+        for (int prestigeRank = 0; prestigeRank < 11; prestigeRank++)
+            for (int normalRank = 0; normalRank < 11 + prestigeRank; normalRank++) {
+                String rankName = "";
+                String shortRankName = "";
+                switch (normalRank) {
+                    case 0:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&8Commoner");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&80");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &8Commoner");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&80");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 1:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&fRookie");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&8Ⅰ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fRookie");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&fⅠ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 2:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&fNovice");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&fⅡ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fNovice");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&fⅡ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 3:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&fApprentice");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&fⅢ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fApprentice");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&fⅢ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 4:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&2Adventurer");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&2Ⅳ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Adventurer");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&2Ⅳ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 5:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&2Journeyman");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&2Ⅴ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Journeyman");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&2Ⅴ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 6:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&2Adept");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&2Ⅵ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Adept");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&2Ⅵ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 7:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&1Veteran");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&1Ⅶ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &1Veteran");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&1Ⅶ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 8:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&1Elite");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&1Ⅷ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &1Elite");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&1Ⅷ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 9:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&lMaster");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&5Ⅸ");
+                        } else {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Master");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5Ⅸ");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 10:
+                        if (prestigeRank == 0) {
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, "&5Hero");
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&5Ⅹ");
+                        } else {
+                            shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5Ⅹ");
+                            rankName = ConfigurationEngine.setString(fileConfiguration,
+                                    "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Hero");
+                        }
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 11:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Legend");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅠ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 12:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Myth");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅡ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 13:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Immortal");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅢ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 14:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Chosen");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅣ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 15:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Ascendant");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅤ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 16:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Titan");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅥ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 17:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Demigod");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅦ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 18:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Deity");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅧ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 19:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Godhunter");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅨ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                    case 20:
+                        rankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Godslayer");
+                        shortRankName = ConfigurationEngine.setString(fileConfiguration,
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅩ");
+                        rankNames[prestigeRank][normalRank] = rankName;
+                        shortRankNames[prestigeRank][normalRank] = shortRankName;
+                        break;
+                }
+
+            }
+
         guildLootLimiter = ConfigurationEngine.setBoolean(fileConfiguration, "limitLootBasedOnGuildTier", true);
         lootLimiterMessage = ConfigurationEngine.setString(fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!");
         alwaysUseNpcs = ConfigurationEngine.setBoolean(fileConfiguration, "alwaysUseNpcsWhenAvailable", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+    }
+
+    public static String getRankName(int prestigeTier, int rankTier) {
+        return ChatColorConverter.convert(rankNames[prestigeTier][rankTier]);
+    }
+
+    public static String getShortenedRankName(int prestigeTier, int rankTier) {
+        return ChatColorConverter.convert(shortRankNames[prestigeTier][rankTier]);
+    }
+
+    private static String prestigeColors(int prestigeTier) {
+        switch (prestigeTier) {
+            case 1:
+                return "&7";
+            case 2:
+            case 3:
+                return "&f";
+            case 4:
+            case 5:
+            case 6:
+                return "&2";
+            case 7:
+            case 8:
+            case 9:
+                return "&1";
+            case 10:
+                return "&5";
+            default:
+                return "error";
+        }
+    }
+
+    private static String prestigeNumerals(int prestigeTier) {
+        switch (prestigeTier) {
+            case 1:
+                return "Ⅰ";
+            case 2:
+                return "Ⅱ";
+            case 3:
+                return "Ⅲ";
+            case 4:
+                return "Ⅳ";
+            case 5:
+                return "Ⅴ";
+            case 6:
+                return "Ⅵ";
+            case 7:
+                return "Ⅶ";
+            case 8:
+                return "Ⅷ";
+            case 9:
+                return "Ⅸ";
+            case 10:
+                return "Ⅹ";
+            default:
+                return "error";
+        }
     }
 
 }

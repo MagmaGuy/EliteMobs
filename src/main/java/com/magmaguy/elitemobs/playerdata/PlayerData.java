@@ -1,123 +1,387 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.GuildRankData;
-import com.magmaguy.elitemobs.config.PlayerCacheDataConfig;
-import com.magmaguy.elitemobs.config.PlayerMaxGuildRankConfig;
-import com.magmaguy.elitemobs.config.PlayerMoneyData;
-import org.bukkit.scheduler.BukkitRunnable;
+import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class PlayerData {
 
-    public static HashMap<UUID, String> playerDisplayName = new HashMap<>();
-    public static HashMap<UUID, Double> playerCurrency = new HashMap<>();
-    public static HashMap<UUID, Integer> playerMaxGuildRank = new HashMap<>();
-    public static HashMap<UUID, Integer> playerSelectedGuildRank = new HashMap<>();
+    private static final HashMap<UUID, PlayerData> playerDataHashMap = new HashMap<>();
 
-    public static void initializePlayerData() {
+    public static void clearPlayerData(UUID uuid) {
+        playerDataHashMap.remove(uuid);
+    }
 
-        initializeDisplayName();
-        initializeCurrency();
-        initializeSelectedGuildRank();
-        initializeMaxGuildRank();
+    public static String getDisplayName(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseString(uuid, "DisplayName");
+
+        return Bukkit.getPlayer(uuid).getCustomName();
+    }
+
+    public static void setDisplayName(UUID uuid, String displayName) {
+        setDatabaseValue(uuid, "DisplayName", displayName);
+    }
+
+    public static double getCurrency(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseDouble(uuid, "CURRENCY");
+
+        return playerDataHashMap.get(uuid).currency;
+    }
+
+    public static void setCurrency(UUID uuid, double currency) {
+        setDatabaseValue(uuid, "Currency", currency);
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).currency = currency;
+    }
+
+    public static int getGuildPrestigeLevel(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseInteger(uuid, "GuildPrestigeLevel");
+        return playerDataHashMap.get(uuid).guildPrestigeLevel;
+    }
+
+    public static void setGuildPrestigeLevel(UUID uuid, int newPrestigeLevel) {
+        setDatabaseValue(uuid, "GuildPrestigeLevel", newPrestigeLevel);
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).guildPrestigeLevel = newPrestigeLevel;
+    }
+
+    public static int getMaxGuildLevel(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseInteger(uuid, "GuildMaxLevel");
+
+        return playerDataHashMap.get(uuid).maxGuildLevel;
+    }
+
+    public static void setMaxGuildLevel(UUID uuid, int maxGuildLevel) {
+        setDatabaseValue(uuid, "GuildMaxLevel", maxGuildLevel);
+
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).maxGuildLevel = maxGuildLevel;
+    }
+
+    public static int getActiveGuildLevel(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseInteger(uuid, "GuildActiveLevel");
+
+        return playerDataHashMap.get(uuid).activeGuildLevel;
+    }
+
+    public static void setActiveGuildLevel(UUID uuid, int activeGuildLevel) {
+        setDatabaseValue(uuid, "GuildActiveLevel", activeGuildLevel);
+
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).activeGuildLevel = activeGuildLevel;
+    }
+
+    public static int getScore(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseInteger(uuid, "Score");
+
+        return playerDataHashMap.get(uuid).score;
+    }
+
+    public static void incrementScore(UUID uuid, int levelToIncrement) {
+        setDatabaseValue(uuid, "Score", getScore(uuid) + levelToIncrement * 2);
+
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).score += 1;
+    }
+
+    public static int getKills(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseInteger(uuid, "Kills");
+
+        return playerDataHashMap.get(uuid).kills;
+    }
+
+    public static void incrementKills(UUID uuid) {
+        setDatabaseValue(uuid, "Kills", getKills(uuid) + 1);
+
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).kills += 1;
+    }
+
+    public static int getHighestLevelKilled(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseInteger(uuid, "HighestLevelKilled");
+
+        return playerDataHashMap.get(uuid).highestLevelKilled;
+    }
+
+    public static void setHighestLevelKilled(UUID uuid, int tentativeNewLevel) {
+        if (tentativeNewLevel < getHighestLevelKilled(uuid)) return;
+        setDatabaseValue(uuid, "HighestLevelKilled", tentativeNewLevel);
+
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).highestLevelKilled = tentativeNewLevel;
+    }
+
+    public static int getDeaths(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseInteger(uuid, "Deaths");
+
+        return playerDataHashMap.get(uuid).deaths;
+    }
+
+    public static void incrementDeaths(UUID uuid) {
+        setDatabaseValue(uuid, "Deaths", getDeaths(uuid) + 1);
+
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).deaths += 1;
+    }
+
+    public static int getQuestsCompleted(UUID uuid) {
+        if (!playerDataHashMap.containsKey(uuid))
+            return getDatabaseInteger(uuid, "QuestsCompleted");
+
+        return playerDataHashMap.get(uuid).questsCompleted;
+    }
+
+    public static void incrementQuestsCompleted(UUID uuid) {
+        setDatabaseValue(uuid, "QuestsCompleted", getQuestsCompleted(uuid) + 1);
+
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).questsCompleted += 1;
+    }
+
+    public static void setDatabaseValue(UUID uuid, String key, Object value) {
+        Statement statement = null;
+
+        try {
+            getConnection().setAutoCommit(false);
+            statement = connection.createStatement();
+            String sql = "UPDATE " + player_data_table_name + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
+            statement.executeUpdate(sql);
+            getConnection().commit();
+
+            statement.close();
+            getConnection().close();
+        } catch (Exception e) {
+            new WarningMessage("Failed to update database value.");
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    private static String getDatabaseString(UUID uuid, String value) {
+        try {
+            return getResultSet(uuid).getString(value);
+        } catch (Exception e) {
+            new WarningMessage("Failed to get double value from database!");
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static Double getDatabaseDouble(UUID uuid, String value) {
+        try {
+            return getResultSet(uuid).getDouble(value);
+        } catch (Exception e) {
+            new WarningMessage("Failed to get double value from database!");
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static Integer getDatabaseInteger(UUID uuid, String value) {
+        try {
+            return getResultSet(uuid).getInt(value);
+        } catch (Exception e) {
+            new WarningMessage("Failed to obtain integer value from database!");
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static ResultSet getResultSet(UUID uuid) {
+        Statement statement = null;
+        try {
+            getConnection().setAutoCommit(false);
+            statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+
+            resultSet.close();
+            statement.close();
+            getConnection().close();
+            return resultSet;
+
+        } catch (Exception e) {
+            new WarningMessage("Failed to get value from database!");
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    private double currency;
+    private int guildPrestigeLevel, maxGuildLevel, activeGuildLevel, score, kills, highestLevelKilled, deaths, questsCompleted;
+
+    /**
+     * Called when a player logs in, storing their data in memory
+     *
+     * @param uuid
+     */
+    public PlayerData(UUID uuid) {
+        Statement statement = null;
+        try {
+            getConnection().setAutoCommit(false);
+            statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+
+            this.currency = resultSet.getDouble("Currency");
+            this.guildPrestigeLevel = resultSet.getInt("GuildPrestigeLevel");
+            this.maxGuildLevel = resultSet.getInt("GuildMaxLevel");
+            this.activeGuildLevel = resultSet.getInt("GuildActiveLevel");
+            this.score = resultSet.getInt("Score");
+            this.kills = resultSet.getInt("Kills");
+            this.highestLevelKilled = resultSet.getInt("HighestLevelKilled");
+            this.deaths = resultSet.getInt("Deaths");
+            this.questsCompleted = resultSet.getInt("QuestsCompleted");
+
+            resultSet.close();
+            statement.close();
+            getConnection().close();
+            playerDataHashMap.put(uuid, this);
+            return;
+        } catch (Exception e) {
+            new WarningMessage("No player entry detected, generating new entry!");
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+
+        try {
+            getConnection().setAutoCommit(false);
+
+            statement = getConnection().createStatement();
+            String sql = "INSERT INTO " + player_data_table_name +
+                    " (PlayerUUID," +
+                    " DisplayName," +
+                    " Currency," +
+                    " GuildPrestigeLevel," +
+                    " GuildMaxLevel," +
+                    " GuildActiveLevel," +
+                    " Score," +
+                    " Kills," +
+                    " HighestLevelKilled," +
+                    " Deaths," +
+                    " QuestsCompleted) " +
+                    //identifier
+                    "VALUES ('" + uuid.toString() + "'," +
+                    //display name
+                    " '" + Bukkit.getPlayer(uuid).getCustomName() + "'," +
+                    //currency
+                    " 0," +
+                    //guild_prestige_level
+                    " 0," +
+                    //guild_max_level
+                    " 1," +
+                    //guild_active_level
+                    " 1," +
+                    //score
+                    "0," +
+                    //kills
+                    "0," +
+                    //highestLevelKilled
+                    "0," +
+                    //deaths
+                    "0," +
+                    //questsCompleted
+                    "0);";
+            statement.executeUpdate(sql);
+
+            this.currency = 0;
+            this.guildPrestigeLevel = 0;
+            this.maxGuildLevel = 1;
+            this.activeGuildLevel = 1;
+            this.score = 0;
+            this.kills = 0;
+            this.highestLevelKilled = 0;
+            this.deaths = 0;
+            this.questsCompleted = 0;
+
+            statement.close();
+            getConnection().commit();
+            getConnection().close();
+            playerDataHashMap.put(uuid, this);
+        } catch (Exception e) {
+            new WarningMessage("Failed to generate an entry!");
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    private static Connection connection = null;
+    public static final String database_name = "player_data.db";
+    public static final String player_data_table_name = "PlayerData";
+
+    public static Connection getConnection() throws Exception {
+        File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + database_name);
+        if (connection == null || connection.isClosed()) {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+        }
+        return connection;
+    }
+
+    public static void initializeDatabaseConnection() {
+        Statement statement = null;
+        try {
+            System.out.println("Opened database successfully");
+
+            statement = getConnection().createStatement();
+            String sql = "CREATE TABLE IF NOT EXISTS " + player_data_table_name +
+                    "(PlayerUUID             TEXT PRIMARY KEY    NOT NULL," +
+                    " DisplayName                       TEXT," +
+                    " Currency                          REAL," +
+                    " GuildPrestigeLevel                 INT," +
+                    " GuildMaxLevel                      INT," +
+                    " GuildActiveLevel                   INT," +
+                    " QuestStatus                       NONE," +
+                    " Score                              INT," +
+                    " Kills                              INT," +
+                    " HighestLevelKilled                 INT," +
+                    " Deaths                             INT," +
+                    " QuestsCompleted                    INT);";
+            statement.executeUpdate(sql);
+            statement.close();
+            getConnection().close();
+
+            for (Player player : Bukkit.getOnlinePlayers())
+                new PlayerData(player.getUniqueId());
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            new WarningMessage("Failed to establish a connection to the SQLite database. This is not good.");
+        }
+
+        new PortOldData();
 
     }
 
-    public static void clearPlayerData() {
+    public static class PlayerDataEvents implements Listener {
+        @EventHandler(priority = EventPriority.LOWEST)
+        public void onPlayerLogin(PlayerJoinEvent event) {
+            new PlayerData(event.getPlayer().getUniqueId());
+        }
 
-        playerDisplayName.clear();
-        playerCurrency.clear();
-        playerMaxGuildRank.clear();
-        playerSelectedGuildRank.clear();
-
-    }
-
-    public static int databaseSyncTaskID = 0;
-    public static boolean playerCacheChanged = false;
-    public static boolean playerCurrencyChanged = false;
-    public static boolean playerSelectedGuildRankChanged = false;
-    public static boolean playerMaxGuildRankChanged = false;
-
-    public static void synchronizeDatabases() {
-
-        databaseSyncTaskID = new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                saveDatabases();
-
-            }
-
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60, 20 * 60).getTaskId();
-
-    }
-
-    public static void saveDatabases() {
-
-        if (playerCacheChanged)
-            saveDisplayName();
-        if (playerCurrencyChanged)
-            saveCurrency();
-        if (playerSelectedGuildRankChanged)
-            saveSelectedGuildRank();
-        if (playerMaxGuildRankChanged)
-            saveMaxGuildRank();
-
-    }
-
-    private static void initializeDisplayName() {
-        for (String string : PlayerCacheDataConfig.fileConfiguration.getKeys(true))
-            playerDisplayName.put(UUID.fromString(string), PlayerCacheDataConfig.fileConfiguration.getString(string));
-    }
-
-    private static void saveDisplayName() {
-        for (UUID uuid : playerDisplayName.keySet())
-            PlayerCacheDataConfig.fileConfiguration.set(uuid.toString(), playerDisplayName.get(uuid));
-        PlayerCacheDataConfig.saveConfig();
-        playerCacheChanged = false;
-    }
-
-    private static void initializeCurrency() {
-        for (String string : PlayerMoneyData.getFileConfiguration().getKeys(true))
-            playerCurrency.put(UUID.fromString(string), PlayerMoneyData.getDouble(string));
-    }
-
-    private static void saveCurrency() {
-
-        for (UUID uuid : playerCurrency.keySet())
-            PlayerMoneyData.getFileConfiguration().set(uuid.toString(), playerCurrency.get(uuid));
-
-        PlayerMoneyData.saveConfig();
-        playerCurrencyChanged = false;
-    }
-
-    private static void initializeMaxGuildRank() {
-        for (String string : PlayerMaxGuildRankConfig.fileConfiguration.getKeys(true))
-            playerMaxGuildRank.put(UUID.fromString(string), PlayerMaxGuildRankConfig.fileConfiguration.getInt(string));
-    }
-
-    private static void saveMaxGuildRank() {
-        for (UUID uuid : playerMaxGuildRank.keySet())
-            PlayerMaxGuildRankConfig.fileConfiguration.set(uuid.toString(), playerMaxGuildRank.get(uuid));
-        PlayerMaxGuildRankConfig.saveConfig();
-        playerMaxGuildRankChanged = false;
-    }
-
-    private static void initializeSelectedGuildRank() {
-        for (String string : GuildRankData.getFileConfiguration().getKeys(true))
-            playerSelectedGuildRank.put(UUID.fromString(string), GuildRankData.getInt(string));
-    }
-
-    private static void saveSelectedGuildRank() {
-        for (UUID uuid : playerSelectedGuildRank.keySet())
-            GuildRankData.getFileConfiguration().set(uuid.toString(), playerSelectedGuildRank.get(uuid));
-
-        GuildRankData.saveConfig();
-        playerSelectedGuildRankChanged = false;
+        @EventHandler
+        public void onPlayerLogout(PlayerQuitEvent event) {
+            clearPlayerData(event.getPlayer().getUniqueId());
+            setDisplayName(event.getPlayer().getUniqueId(), event.getPlayer().getCustomName());
+        }
     }
 
 }

@@ -5,15 +5,9 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.economy.UUIDFilter;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 import static org.bukkit.Bukkit.getServer;
 
@@ -23,18 +17,15 @@ import static org.bukkit.Bukkit.getServer;
 public class CurrencyCommandsHandler {
 
     public static void payCommand(String playerName, double amount) {
-
         if (amount > 0)
-            EconomyHandler.addCurrency(UUIDFilter.guessUUI(playerName), amount);
-
-
+            EconomyHandler.addCurrency(Bukkit.getPlayer(playerName).getUniqueId(), amount);
     }
 
     public static void payCommand(Player commandSender, String[] args) {
 
         try {
 
-            if (Double.parseDouble(args[2]) > 0 && Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))) {
+            if (Double.parseDouble(args[2]) > 0 && Integer.parseInt(args[2]) <= EconomyHandler.checkCurrency(Bukkit.getPlayer(commandSender.getName()).getUniqueId())) {
 
                 payCommand(args[1], Integer.parseInt(args[2]));
                 subtractCommand(commandSender.getName(), Integer.parseInt(args[2]));
@@ -50,7 +41,7 @@ public class CurrencyCommandsHandler {
                         ChatColorConverter.convert(
                                 ConfigValues.translationConfig
                                         .getString(TranslationConfig.ECONOMY_CURRENCY_LEFT_MESSAGE)
-                                        .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName()))))
+                                        .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(Bukkit.getPlayer(commandSender.getName()).getUniqueId())))
                                         .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
                 Player recipient = getServer().getPlayer(args[1]);
@@ -88,7 +79,7 @@ public class CurrencyCommandsHandler {
 
     public static void addCommand(String playerName, double amount) {
 
-        EconomyHandler.addCurrency(UUIDFilter.guessUUI(playerName), amount);
+        EconomyHandler.addCurrency(Bukkit.getPlayer(playerName).getUniqueId(), amount);
 
     }
 
@@ -99,7 +90,7 @@ public class CurrencyCommandsHandler {
             addCommand(args[1], Integer.parseInt(args[2]));
 
             commandSender.sendMessage("You have added " + args[2] + " to " + args[1]);
-            commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(args[2])));
+            commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(Bukkit.getPlayer(args[2]).getUniqueId()));
 
         } catch (Exception e) {
 
@@ -128,7 +119,7 @@ public class CurrencyCommandsHandler {
 
     public static void subtractCommand(String playerName, double amount) {
 
-        EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(playerName), amount);
+        EconomyHandler.subtractCurrency(Bukkit.getPlayer(playerName).getUniqueId(), amount);
 
     }
 
@@ -139,7 +130,7 @@ public class CurrencyCommandsHandler {
             subtractCommand(args[1], Integer.parseInt(args[2]));
 
             commandSender.sendMessage("You have subtracted " + args[2] + " from " + args[1]);
-            commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(commandSender.getName())));
+            commandSender.sendMessage("They now have " + EconomyHandler.checkCurrency(Bukkit.getPlayer(commandSender.getName()).getUniqueId()));
 
         } catch (Exception e) {
 
@@ -151,7 +142,7 @@ public class CurrencyCommandsHandler {
 
     public static void setCommand(String playerName, double amount) {
 
-        EconomyHandler.setCurrency(UUIDFilter.guessUUI(playerName), amount);
+        EconomyHandler.setCurrency(Bukkit.getPlayer(playerName).getUniqueId(), amount);
 
     }
 
@@ -172,7 +163,7 @@ public class CurrencyCommandsHandler {
 
     public static Double checkCommand(String playerName) {
 
-        return EconomyHandler.checkCurrency(UUIDFilter.guessUUI(playerName));
+        return EconomyHandler.checkCurrency(Bukkit.getPlayer(playerName).getUniqueId());
 
     }
 
@@ -189,7 +180,7 @@ public class CurrencyCommandsHandler {
 
     public static Double walletCommand(String playerName) {
 
-        return EconomyHandler.checkCurrency(UUIDFilter.guessUUI(playerName));
+        return EconomyHandler.checkCurrency(Bukkit.getPlayer(playerName).getUniqueId());
 
     }
 
@@ -204,62 +195,62 @@ public class CurrencyCommandsHandler {
 
     }
 
-    public static void coinTop(CommandSender commandSender) {
+    //public static void coinTop(CommandSender commandSender) {
 
-        ArrayList<UUID> arrayList = new ArrayList();
+    //    ArrayList<UUID> arrayList = new ArrayList();
 
-        for (UUID uuid : PlayerData.playerCurrency.keySet()) {
+    //    for (UUID uuid : PlayerData.playerCurrency.keySet()) {
 
-            if (arrayList.size() == 0) {
+    //        if (arrayList.size() == 0) {
 
-                arrayList.add(uuid);
+    //            arrayList.add(uuid);
 
-            } else {
+    //        } else {
 
-                int index = arrayList.size();
+    //            int index = arrayList.size();
 
-                for (UUID inArrayUUID : arrayList) {
+    //            for (UUID inArrayUUID : arrayList) {
 
-                    double arrayEntryValue = PlayerData.playerCurrency.get(inArrayUUID);
-                    double newValue = PlayerData.playerCurrency.get(uuid);
+    //                double arrayEntryValue = PlayerData.playerCurrency.get(inArrayUUID);
+    //                double newValue = PlayerData.playerCurrency.get(uuid);
 
-                    if (newValue > arrayEntryValue) {
+    //                if (newValue > arrayEntryValue) {
 
-                        index = arrayList.indexOf(inArrayUUID);
-                        break;
+    //                    index = arrayList.indexOf(inArrayUUID);
+    //                    break;
 
-                    }
+    //                }
 
-                }
+    //            }
 
-                arrayList.add(index, uuid);
+    //            arrayList.add(index, uuid);
 
-            }
+    //        }
 
-        }
+    //    }
 
-        commandSender.sendMessage(ChatColor.RED + "[EliteMobs] " + ChatColor.DARK_GREEN + EconomySettingsConfig.currencyName + " High Score:");
+    //    commandSender.sendMessage(ChatColor.RED + "[EliteMobs] " + ChatColor.DARK_GREEN + EconomySettingsConfig.currencyName + " High Score:");
 
-        int iterationAmount = 10;
+    //    int iterationAmount = 10;
 
-        if (arrayList.size() < 10) {
+    //    if (arrayList.size() < 10) {
 
-            iterationAmount = arrayList.size();
+    //        iterationAmount = arrayList.size();
 
-        }
+    //    }
 
-        for (int i = 0; i < iterationAmount; i++) {
+    //    for (int i = 0; i < iterationAmount; i++) {
 
-            String name = PlayerData.playerDisplayName.get(arrayList.get(i));
-            double amount = PlayerData.playerCurrency.get(arrayList.get(i));
+    //        String name = PlayerData.playerDisplayName.get(arrayList.get(i));
+    //        double amount = PlayerData.playerCurrency.get(arrayList.get(i));
 
-            int place = i + 1;
+    //        int place = i + 1;
 
-            commandSender.sendMessage(ChatColor.GREEN + "#" + place + " " + ChatColor.WHITE + name + " with " +
-                    ChatColor.DARK_GREEN + amount + " " + ChatColor.GREEN + EconomySettingsConfig.currencyName);
+    //        commandSender.sendMessage(ChatColor.GREEN + "#" + place + " " + ChatColor.WHITE + name + " with " +
+    //                ChatColor.DARK_GREEN + amount + " " + ChatColor.GREEN + EconomySettingsConfig.currencyName);
 
-        }
+    //    }
 
-    }
+    //}
 
 }

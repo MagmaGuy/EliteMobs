@@ -5,166 +5,256 @@ import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.GuildRankMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class GuildRankMenuHandler implements Listener {
 
     @EventHandler
     public void onRankSelectorClick(InventoryClickEvent event) {
-
         if (!(event.getWhoClicked() instanceof Player)) return;
-        if (!event.getView().getTitle().equals(GuildRankMenuConfig.menuName)) return;
-        if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) return;
-
+        if (!inventories.contains(event.getInventory())) return;
         event.setCancelled(true);
-        if (event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
+        Player player = (Player) event.getWhoClicked();
+
+        if (event.getSlot() == prestigetRankSlot) {
+            selectPrestigeUnlock(player);
             return;
         }
+        Integer selectedRank = null;
 
-        int maxTier = PlayerData.playerMaxGuildRank.get(event.getWhoClicked().getUniqueId());
-        int selectedTier = event.getSlot();
-
-        if (selectedTier < maxTier + 1) {
-            PlayerData.playerSelectedGuildRank.put(event.getWhoClicked().getUniqueId(), selectedTier);
-            initializeGuildRankMenu((Player) event.getWhoClicked());
-            if (AdventurersGuildConfig.addMaxHealth)
-                MaxHealthHandler.adjustMaxHealth((Player) event.getWhoClicked());
-        }
-
-        if (selectedTier == maxTier + 1) {
-            if (EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) < tierPriceCalculator(selectedTier))
-                event.getWhoClicked().sendMessage(GuildRankMenuConfig.notEnoughCurrencyMessage
-                        .replace("$neededAmount", tierPriceCalculator(selectedTier) + "")
-                        .replace("$currentAmount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + "")
-                        .replace("$currencyName", EconomySettingsConfig.currencyName));
-            else {
-                EconomyHandler.subtractCurrency(event.getWhoClicked().getUniqueId(), tierPriceCalculator(selectedTier));
-                GuildRank.setRank((Player) event.getWhoClicked(), selectedTier);
-                GuildRank.setActiveRank((Player) event.getWhoClicked(), selectedTier);
-                event.getWhoClicked().sendMessage(GuildRankMenuConfig.unlockMessage
-                        .replace("$rankName", GuildRank.getRankName(selectedTier))
-                        .replace("$price", tierPriceCalculator(selectedTier) + "")
-                        .replace("$currencyName", EconomySettingsConfig.currencyName));
-                initializeGuildRankMenu((Player) event.getWhoClicked());
-                Bukkit.broadcastMessage(GuildRankMenuConfig.broadcastMessage
-                        .replace("$player", ((Player) event.getWhoClicked()).getDisplayName())
-                        .replace("$rankName", GuildRank.getRankName(selectedTier)));
-                if (AdventurersGuildConfig.addMaxHealth)
-                    MaxHealthHandler.adjustMaxHealth((Player) event.getWhoClicked());
+        for (int i = 0; i < rankSlots.size(); i++) {
+            if (rankSlots.get(i) == event.getSlot()) {
+                selectedRank = i;
+                break;
             }
         }
 
-        if (selectedTier > maxTier + 1)
-            event.getWhoClicked().sendMessage(GuildRankMenuConfig.failedMessage);
+        //Clicked nothing
+        if (selectedRank == null) return;
+
+        if (GuildRank.getMaxGuildRank(player) >= selectedRank) {
+            selectUnlockedRank(player, selectedRank);
+            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
+            return;
+        }
+
+        if (GuildRank.getMaxGuildRank(player) + 1 == selectedRank) {
+            selectRankToUnlock(player, selectedRank);
+            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
+            return;
+        }
+
+        if (GuildRank.getMaxGuildRank(player) < selectedRank) {
+            selectPrestigeUnlock(player);
+            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
+            return;
+        }
 
     }
 
-    public static void initializeGuildRankMenu(Player player) {
+    private static void selectUnlockedRank(Player player, int guildRank) {
+        GuildRank.setActiveGuildRank(player, guildRank);
+    }
 
-        Inventory difficultyMenu = Bukkit.createInventory(player, 18, GuildRankMenuConfig.menuName);
-
-        if (!PlayerData.playerMaxGuildRank.containsKey(player.getUniqueId())) {
-            PlayerData.playerMaxGuildRank.put(player.getUniqueId(), 1);
-            PlayerData.playerMaxGuildRankChanged = true;
+    private static void selectRankToUnlock(Player player, int guildRank) {
+        double price = tierPriceCalculator(guildRank, GuildRank.getGuildPrestigeRank(player));
+        if (EconomyHandler.checkCurrency(player.getUniqueId()) < price) {
+            player.sendMessage(GuildRankMenuConfig.notEnoughCurrencyMessage
+                    .replace("$neededAmount", tierPriceCalculator(guildRank, GuildRank.getGuildPrestigeRank(player)) + "")
+                    .replace("$currentAmount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
+                    .replace("$currencyName", EconomySettingsConfig.currencyName));
+            return;
         }
+        EconomyHandler.subtractCurrency(player.getUniqueId(), price);
+        GuildRank.setActiveGuildRank(player, guildRank);
+        GuildRank.setMaxGuildRank(player, guildRank);
+        player.sendMessage(GuildRankMenuConfig.unlockMessage
+                .replace("$rankName", GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), guildRank))
+                .replace("$price", tierPriceCalculator(guildRank, GuildRank.getGuildPrestigeRank(player)) + "")
+                .replace("$currencyName", EconomySettingsConfig.currencyName));
 
-        if (!PlayerData.playerSelectedGuildRank.containsKey(player.getUniqueId())) {
-            PlayerData.playerSelectedGuildRank.put(player.getUniqueId(), 1);
-            PlayerData.playerSelectedGuildRankChanged = true;
+        Bukkit.broadcastMessage(GuildRankMenuConfig.broadcastMessage
+                .replace("$player", player.getDisplayName())
+                .replace("$rankName", GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), guildRank)));
+    }
+
+    private static void selectPrestigeUnlock(Player player) {
+        if (GuildRank.getActiveGuildRank(player) != 10 + GuildRank.getGuildPrestigeRank(player))
+            return;
+        if (EconomyHandler.checkCurrency(player.getUniqueId()) < tierPriceCalculator(GuildRank.getGuildPrestigeRank(player) + 12, GuildRank.getGuildPrestigeRank(player)))
+            return;
+        EconomyHandler.setCurrency(player.getUniqueId(), 0);
+        GuildRank.setMaxGuildRank(player, 1);
+        GuildRank.setActiveGuildRank(player, 1);
+        GuildRank.setGuildPrestigeRank(player, GuildRank.getGuildPrestigeRank(player) + 1);
+
+        for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
+            iteratedPlayer.sendTitle(player.getDisplayName(), ChatColor.DARK_GREEN + "has unlocked Prestige " + GuildRank.getGuildPrestigeRank(player) + "!");
         }
+        player.closeInventory();
+    }
 
-        for (int i = 0; i < 12; i++) {
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!inventories.contains(event.getInventory())) return;
+        inventories.remove(event.getInventory());
+    }
 
-            ItemStack itemStack = null;
+    private static final HashSet<Inventory> inventories = new HashSet<>();
 
-            if (i <= PlayerData.playerMaxGuildRank.get(player.getUniqueId()))
-                itemStack = difficultyItemStackConstructor(guildRankStatus.UNLOCKED, i, player);
-            if (i > PlayerData.playerMaxGuildRank.get(player.getUniqueId()))
-                itemStack = difficultyItemStackConstructor(guildRankStatus.LOCKED, i, player);
-            if (i == PlayerData.playerSelectedGuildRank.get(player.getUniqueId()))
-                itemStack = difficultyItemStackConstructor(guildRankStatus.SELECTED, i, player);
-            if (i == PlayerData.playerMaxGuildRank.get(player.getUniqueId()) + 1)
-                itemStack = difficultyItemStackConstructor(guildRankStatus.NEXT_UNLOCK, i, player);
+    private static final ArrayList<Integer> rankSlots = new ArrayList<>(Arrays.asList(
+            4, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42));
 
-            difficultyMenu.addItem(itemStack);
+    private static final int prestigetRankSlot = 49;
 
-        }
-
+    /**
+     * Using the following slots for the menu:
+     * 4 - Commoner rank
+     * Normal ranks:
+     * 11, 12, 13, 14, 15
+     * 20, 21, 22, 23, 24
+     * 39, 30, 31, 32, 34
+     * 38, 39, 40, 41, 42
+     * 49 - Prestige button
+     *
+     * @param player Player for whom the menu will be generated
+     * @return Returns the inventory generated
+     */
+    public static Inventory initializeGuildRankMenu(Player player) {
+        Inventory difficultyMenu = Bukkit.createInventory(player, 54, GuildRankMenuConfig.menuName);
+        difficultyMenu = populateInventory(difficultyMenu, player);
+        inventories.add(difficultyMenu);
         player.openInventory(difficultyMenu);
-
+        return difficultyMenu;
     }
 
-    private static ItemStack difficultyItemStackConstructor(guildRankStatus guildRankStatus, int rank, Player player) {
+    public static Inventory populateInventory(Inventory difficultyMenu, Player player) {
+        for (int i = 0; i < 11 + GuildRank.getGuildPrestigeRank(player); i++) {
+            ItemStack itemStack = null;
+            if (GuildRank.isWithinActiveGuildRankIgnorePrestige(player, i)) {
+                itemStack = difficultyItemStackConstructor(guildRankStatus.UNLOCKED, i, player, false);
+            }
+            if (GuildRank.getActiveGuildRank(player) < i && GuildRank.getMaxGuildRank(player) >= i) {
+                itemStack = difficultyItemStackConstructor(guildRankStatus.UNLOCKED, i, player, false);
+            }
+            if (GuildRank.getActiveGuildRank(player) == i) {
+                itemStack = difficultyItemStackConstructor(guildRankStatus.SELECTED, i, player, false);
+            }
+            if (GuildRank.getMaxGuildRank(player) < i) {
+                itemStack = difficultyItemStackConstructor(guildRankStatus.LOCKED, i, player, false);
+            }
+            if (GuildRank.getMaxGuildRank(player) + 1 == i) {
+                itemStack = difficultyItemStackConstructor(guildRankStatus.NEXT_UNLOCK, i, player, false);
+            }
+            difficultyMenu.setItem(rankSlots.get(i), itemStack);
+        }
+
+        if (GuildRank.getGuildPrestigeRank(player) < 10) {
+            if (GuildRank.getActiveGuildRank(player) < 10 + GuildRank.getGuildPrestigeRank(player))
+                difficultyMenu.setItem(prestigetRankSlot, difficultyItemStackConstructor
+                        (guildRankStatus.PRESTIGE_LOCKED, GuildRank.getGuildPrestigeRank(player) + 1, player, true));
+            else
+                difficultyMenu.setItem(prestigetRankSlot, difficultyItemStackConstructor
+                        (guildRankStatus.PRESTIGE_NEXT_UNLOCK, GuildRank.getGuildPrestigeRank(player) + 1, player, true));
+        }
+
+        return difficultyMenu;
+    }
+
+    private static ItemStack difficultyItemStackConstructor(guildRankStatus guildRankStatus, int activeGuildRank, Player player, boolean isPrestigeSlot) {
 
         ItemStack itemStack = null;
 
-        String lowTierWarning = "";
-        if (rank < 1) lowTierWarning = GuildRankMenuConfig.lowTierWarning;
-        else lowTierWarning = GuildRankMenuConfig.normalTierWarning;
-
         String priceString = "";
-        if (tierPriceCalculator(rank) > EconomyHandler.checkCurrency(player.getUniqueId()))
-            priceString = "&c" + tierPriceCalculator(rank);
-        else
-            priceString = "&a" + tierPriceCalculator(rank);
-
+        if (!isPrestigeSlot)
+            if (tierPriceCalculator(activeGuildRank, GuildRank.getGuildPrestigeRank(player)) > EconomyHandler.checkCurrency(player.getUniqueId()))
+                priceString = "&c" + tierPriceCalculator(activeGuildRank, GuildRank.getGuildPrestigeRank(player));
+            else
+                priceString = "&a" + tierPriceCalculator(activeGuildRank, GuildRank.getGuildPrestigeRank(player));
+        else {
+            if (tierPriceCalculator(GuildRank.getGuildPrestigeRank(player) + 12, GuildRank.getGuildPrestigeRank(player)) > EconomyHandler.checkCurrency(player.getUniqueId()))
+                priceString = "&c" + tierPriceCalculator(GuildRank.getGuildPrestigeRank(player) + 12, GuildRank.getGuildPrestigeRank(player));
+            else
+                priceString = "&a" + tierPriceCalculator(GuildRank.getGuildPrestigeRank(player) + 12, GuildRank.getGuildPrestigeRank(player));
+        }
         switch (guildRankStatus) {
             case UNLOCKED:
-                itemStack = constructButtonItemStack(rank, lowTierWarning, GuildRankMenuConfig.unlockedButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.unlockedButton.clone(), player, priceString);
                 break;
             case LOCKED:
-                itemStack = constructButtonItemStack(rank, lowTierWarning, GuildRankMenuConfig.lockedButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.lockedButton.clone(), player, priceString);
                 break;
             case SELECTED:
-                itemStack = constructButtonItemStack(rank, lowTierWarning, GuildRankMenuConfig.currentButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.currentButton.clone(), player, priceString);
                 break;
             case NEXT_UNLOCK:
-                itemStack = constructButtonItemStack(rank, lowTierWarning, GuildRankMenuConfig.nextButton.clone(), player, priceString);
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.nextButton.clone(), player, priceString);
+                break;
+            case PRESTIGE_LOCKED:
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.prestigeLockedButton.clone(), player, priceString);
+                break;
+            case PRESTIGE_NEXT_UNLOCK:
+                itemStack = constructButtonItemStack(activeGuildRank, GuildRankMenuConfig.prestigeNextUnlockButton.clone(), player, priceString);
                 break;
         }
 
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(GuildRank.getRankName(rank) + " rank");
+        if (guildRankStatus.equals(GuildRankMenuHandler.guildRankStatus.UNLOCKED) ||
+                guildRankStatus.equals(GuildRankMenuHandler.guildRankStatus.LOCKED) ||
+                guildRankStatus.equals(GuildRankMenuHandler.guildRankStatus.SELECTED) ||
+                guildRankStatus.equals(GuildRankMenuHandler.guildRankStatus.NEXT_UNLOCK))
+            itemMeta.setDisplayName(GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), activeGuildRank));
+        else
+            itemMeta.setDisplayName(itemMeta.getDisplayName().replace("$rank", GuildRank.getGuildPrestigeRank(player) + 1 + ""));
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
 
     }
 
-    private static ItemStack constructButtonItemStack(int rank, String lowTierWarning, ItemStack itemStack, Player player, String priceString) {
+    private static ItemStack constructButtonItemStack(int activeGuildRank, ItemStack itemStack, Player player, String priceString) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         List<String> newLore = new ArrayList<>();
-        for (String string : itemMeta.getLore())
+        for (String string : itemMeta.getLore()) {
             switch (string) {
-                case "$tierWarning":
-                    newLore.add(lowTierWarning);
+                case "$lootTier":
+                    if (lootTierString(activeGuildRank) != null)
+                        newLore.add(lootTierString(activeGuildRank));
                     break;
-                case "$lootBonus":
-                    newLore.add(lootBonus(rank));
+                case "$maxHealthIncrease":
+                    if (healthBonusString(GuildRank.getGuildPrestigeRank(player), activeGuildRank) != null)
+                        newLore.add(healthBonusString(GuildRank.getGuildPrestigeRank(player), activeGuildRank));
                     break;
-                case "$mobSpawning":
-                    newLore.add(mobSpawning(rank));
+                case "$chanceToCrit":
+                    if (critBonusString(GuildRank.getGuildPrestigeRank(player), activeGuildRank) != null)
+                        newLore.add(critBonusString(GuildRank.getGuildPrestigeRank(player), activeGuildRank));
                     break;
-                case "$difficultyBonus":
-                    newLore.add(difficultyBonus(rank));
+                case "$chanceToDodge":
+                    if (dodgeBonusString(GuildRank.getGuildPrestigeRank(player), activeGuildRank) != null)
+                        newLore.add(dodgeBonusString(GuildRank.getGuildPrestigeRank(player), activeGuildRank));
+                    break;
+                case "$currencyBonusMessage":
+                    if (GuildRank.getGuildPrestigeRank(player) > 0)
+                        newLore.add(currencyBonusString(GuildRank.getGuildPrestigeRank(player)));
                     break;
                 default:
                     if (string.contains("$previousRank")) {
                         newLore.add(string.replace("$previousRank",
-                                (GuildRank.getRankName(PlayerData.playerMaxGuildRank.get(player.getUniqueId()) + 1)) + ""));
+                                (GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getMaxGuildRank(player) + 1) + "")));
                         continue;
                     }
                     if (string.contains("$price")) {
@@ -183,89 +273,60 @@ public class GuildRankMenuHandler implements Listener {
                     newLore.add(string);
                     break;
             }
+        }
         itemMeta.setLore(newLore);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
 
-    private static String mobSpawning(int rank) {
-
-        int mobSpawning = 0;
-
-        if (rank == 0) mobSpawning = 10;
-        if (rank == 1) mobSpawning = 100;
-        if (rank == 2) mobSpawning = 120;
-        if (rank == 3) mobSpawning = 140;
-        if (rank == 4) mobSpawning = 160;
-        if (rank == 5) mobSpawning = 180;
-        if (rank == 6) mobSpawning = 200;
-        if (rank == 7) mobSpawning = 220;
-        if (rank == 8) mobSpawning = 240;
-        if (rank == 9) mobSpawning = 260;
-        if (rank == 10) mobSpawning = 280;
-        if (rank == 11) mobSpawning = 300;
-
-        return GuildRankMenuConfig.spawnRateModifierMessage.replace("$modifier", mobSpawning + "");
-
+    private static String lootTierString(int activeGuildRank) {
+        if (!AdventurersGuildConfig.guildLootLimiter) return null;
+        return GuildRankMenuConfig.lootTierMessage.replace("$tier", GuildRank.lootTierValue(activeGuildRank) + "");
     }
 
-    private static String lootBonus(int rank) {
-
-        int lootBonus = 0;
-
-        if (rank == 0) lootBonus = 10;
-        if (rank == 1) lootBonus = 100;
-        if (rank == 2) lootBonus = 120;
-        if (rank == 3) lootBonus = 140;
-        if (rank == 4) lootBonus = 160;
-        if (rank == 5) lootBonus = 180;
-        if (rank == 6) lootBonus = 200;
-        if (rank == 7) lootBonus = 220;
-        if (rank == 8) lootBonus = 240;
-        if (rank == 9) lootBonus = 260;
-        if (rank == 10) lootBonus = 280;
-        if (rank == 11) lootBonus = 300;
-
-        return GuildRankMenuConfig.lootModifierMessage.replace("$modifier", lootBonus + "");
-
+    private static String currencyBonusString(int activeGuildRank) {
+        return GuildRankMenuConfig.currencyBonusMessage.replace("$amount", GuildRank.currencyBonusMultiplier(activeGuildRank) + "");
     }
 
-    private static String difficultyBonus(int rank) {
+    private static String healthBonusString(int prestigeLevel, int guildRank) {
+        if (!AdventurersGuildConfig.addMaxHealth) return null;
+        if (prestigeLevel < 1)
+            return null;
+        return GuildRankMenuConfig.healthBonusMessage.replace("$amount", GuildRank.healthBonusValue(prestigeLevel, guildRank) + "");
+    }
 
-        int difficultyBonus = 0;
+    private static String critBonusString(int prestigeLevel, int guildRank) {
+        if (!AdventurersGuildConfig.addMaxHealth) return null;
+        if (prestigeLevel < 3)
+            return null;
+        return GuildRankMenuConfig.critBonusMessage.replace("$amount", GuildRank.critBonusValue(prestigeLevel, guildRank) + "");
+    }
 
-        if (rank == 0) difficultyBonus = 10;
-        if (rank == 1) difficultyBonus = 100;
-        if (rank == 2) difficultyBonus = 110;
-        if (rank == 3) difficultyBonus = 120;
-        if (rank == 4) difficultyBonus = 130;
-        if (rank == 5) difficultyBonus = 140;
-        if (rank == 6) difficultyBonus = 150;
-        if (rank == 7) difficultyBonus = 160;
-        if (rank == 8) difficultyBonus = 170;
-        if (rank == 9) difficultyBonus = 180;
-        if (rank == 10) difficultyBonus = 190;
-        if (rank == 11) difficultyBonus = 200;
-
-        return GuildRankMenuConfig.spawnRateModifierMessage.replace("$modifier", difficultyBonus + "");
-
+    private static String dodgeBonusString(int prestigeLevel, int guildRank) {
+        if (!AdventurersGuildConfig.addMaxHealth) return null;
+        if (prestigeLevel < 4)
+            return null;
+        return GuildRankMenuConfig.dodgeBonusMessage.replace("$amount", GuildRank.dodgeBonusValue(prestigeLevel, guildRank) + "");
     }
 
     private enum guildRankStatus {
         UNLOCKED,
         SELECTED,
         NEXT_UNLOCK,
-        LOCKED
+        LOCKED,
+        PRESTIGE_LOCKED,
+        PRESTIGE_NEXT_UNLOCK,
     }
 
-    private static int tierPriceCalculator(int tier) {
+    private static int tierPriceCalculator(int tier, int prestigeLevel) {
         /*Logic:
         tier * 10 = max mob tier
         max mob tier / 2 = loot shower payout for killing 1 em at max level for that player
         payout * 1000 = amount of elite mobs to kill before going up a rank
          */
         double eliteMobsToKillBeforeGuildRankup = 100 + 500 * (tier - 1) * 0.1;
-        return (int) ((tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup);
+        return (int) (((tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup)
+                + (tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup * (prestigeLevel / 2));
     }
 
 }

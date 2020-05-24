@@ -27,7 +27,7 @@ public class CheckTierOthersCommand {
         }
 
         double gearTier = ItemTierFinder.findPlayerTier(player);
-        double guildRank = GuildRank.getActiveRank(player);
+        double guildRank = GuildRank.getActiveGuildRank(player);
         if (guildRank == 0)
             guildRank = -10;
         else

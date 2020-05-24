@@ -2,8 +2,10 @@ package com.magmaguy.elitemobs.placeholderapi;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -83,21 +85,24 @@ public class Placeholders extends PlaceholderExpansion {
      */
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
+        new DebugMessage("running 0");
 
         if (!player.isOnline())
             return "Only online players!";
 
         switch (identifier) {
             case "player_combat_tier":
+                new DebugMessage("running");
                 return "" + ItemTierFinder.findPlayerTier(player);
             case "player_active_guild_rank_numerical":
-                return "" + GuildRank.getActiveRank(player);
+                return "" + GuildRank.getActiveGuildRank(player);
             case "player_maximum_guild_rank_numerical":
-                return "" + GuildRank.getRank(player);
+                return "" + GuildRank.getMaxGuildRank(player);
+            //todo: handle prestige here
             case "player_active_guild_rank_name":
-                return GuildRank.getRankName(GuildRank.getActiveRank(player));
+                return GuildRank.getRankName(0, GuildRank.getActiveGuildRank(player));
             case "player_maximum_guild_rank_name":
-                return GuildRank.getRankName(GuildRank.getRank(player));
+                return GuildRank.getRankName(0, GuildRank.getMaxGuildRank(player));
             case "player_money":
                 return "" + EconomyHandler.checkCurrency(player.getUniqueId());
             case "player_top_tier":
@@ -112,13 +117,15 @@ public class Placeholders extends PlaceholderExpansion {
                 int highestGuildRank = 0;
                 String highestGuildUser = "";
                 for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
-                    int currentGuildRank = GuildRank.getRank(iteratedPlayer);
+                    int currentGuildRank = GuildRank.getMaxGuildRank(iteratedPlayer);
                     if (currentGuildRank > highestGuildRank) {
                         highestGuildRank = currentGuildRank;
                         highestGuildUser = iteratedPlayer.getDisplayName();
                     }
                 }
                 return highestGuildUser;
+            case "player_shortened_guild_rank":
+                return AdventurersGuildConfig.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player));
         }
 
         // We return null if an invalid placeholder (f.e. %someplugin_placeholder3%)

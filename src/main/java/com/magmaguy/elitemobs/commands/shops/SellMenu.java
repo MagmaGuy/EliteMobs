@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
@@ -31,7 +30,7 @@ public class SellMenu implements Listener {
     private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("///");
     public static final String SHOP_NAME = SellMenuConfig.shopName + SHOP_KEY;
 
-    private static List<Integer> validSlots = SellMenuConfig.storeSlots;
+    private static final List<Integer> validSlots = SellMenuConfig.storeSlots;
 
     /**
      * Creates a menu for selling elitemobs items. Only special Elite Mob items can be sold here.
@@ -104,7 +103,7 @@ public class SellMenu implements Listener {
                     if (validSlots.contains(positionCounter))
                         if (itemStack != null) {
                             double amountDeduced = ItemWorthCalculator.determineResaleWorth(itemStack) * itemStack.getAmount();
-                            EconomyHandler.addCurrency(UUIDFilter.guessUUI(event.getWhoClicked().getName()), amountDeduced);
+                            EconomyHandler.addCurrency(event.getWhoClicked().getUniqueId(), amountDeduced);
                             event.getWhoClicked().sendMessage(
                                     ChatColorConverter.convert(
                                             ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SELL_MESSAGE)
@@ -118,7 +117,7 @@ public class SellMenu implements Listener {
                 event.getWhoClicked().sendMessage(
                         ChatColorConverter.convert(
                                 ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
-                                        .replace("$currency_amount", EconomyHandler.checkCurrency(UUIDFilter.guessUUI(event.getWhoClicked().getName())) + "")
+                                        .replace("$currency_amount", EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) + "")
                                         .replace("$currency_name", EconomySettingsConfig.currencyName)));
                 return;
             }

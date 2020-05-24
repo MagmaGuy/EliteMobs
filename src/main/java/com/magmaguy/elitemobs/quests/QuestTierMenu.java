@@ -14,7 +14,7 @@ public class QuestTierMenu {
 
     private Inventory inventory;
     private int questTier;
-    private List<EliteQuest> eliteQuests = new ArrayList<>();
+    private final List<EliteQuest> eliteQuests = new ArrayList<>();
 
     public QuestTierMenu(int questTier) {
         setQuestTier(questTier);
@@ -32,7 +32,7 @@ public class QuestTierMenu {
     private void setInventory() {
         //Can't do the entire title with the rank because the title is used to identify the menu type
         this.inventory = Bukkit.createInventory(null, 9, QuestMenuConfig.questSelectorMenuTitle
-                + " " + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier())));
+                + " " + ChatColorConverter.convert(GuildRank.getRankName(0, getQuestTier())));
         for (int i = 1; i < 4; i++) {
             EliteQuest eliteQuest = EliteQuest.generateRandomQuest(questTier);
             this.inventory.setItem(2 * i, eliteQuest.generateQuestItemStack());
@@ -42,7 +42,7 @@ public class QuestTierMenu {
 
     private Inventory generatePlayerInventory(List<EliteQuest> localEliteQuests) {
         Inventory localInventory = Bukkit.createInventory(null, 9, QuestMenuConfig.questSelectorMenuTitle + " "
-                + ChatColorConverter.convert(GuildRank.getRankName(getQuestTier())));
+                + ChatColorConverter.convert(GuildRank.getRankName(0, getQuestTier())));
         for (int i = 1; i < 4; i++)
             localInventory.setItem(2 * i, localEliteQuests.get(i - 1).generateQuestItemStack());
         return localInventory;

@@ -16,7 +16,6 @@ import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -79,7 +78,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     public CustomBossConfigFields customBossConfigFields;
     private final HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
-    private final UUID uuid;
+    private UUID uuid;
     private boolean trailIsActive = false;
 
     public LivingEntity advancedGetEntity() {
@@ -92,6 +91,13 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                             int mobLevel,
                             HashSet<ElitePower> elitePowers) {
         super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        if (super.getLivingEntity() == null) {
+            new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " . Cause for failure:" +
+                    " Tried to spawn in a region that prevented it from spawning. This is probably not an EliteMobs issue," +
+                    " but a region management issue. Check if mobs are allowed to spawn where you are trying to spawn it. Location: "
+                    + location.toString());
+            return;
+        }
         uuid = super.getLivingEntity().getUniqueId();
         super.setDamageMultiplier(customBossConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossConfigFields.getHealthMultiplier());
@@ -237,7 +243,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(customBossConfigFields.getMainHand()));
             getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(customBossConfigFields.getOffHand()));
         } catch (Exception ex) {
-            new DebugMessage("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossConfigFields.getFileName());
+            new WarningMessage("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossConfigFields.getFileName());
         }
     }
 

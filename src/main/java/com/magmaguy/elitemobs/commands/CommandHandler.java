@@ -136,8 +136,8 @@ public class CommandHandler implements CommandExecutor {
             case "currencytop":
             case "$top":
                 if (permCheck(CURRENCY_COINTOP, commandSender))
-                    CurrencyCommandsHandler.coinTop(commandSender);
-                return true;
+                    //CurrencyCommandsHandler.coinTop(commandSender);
+                    return true;
             case "version":
                 if (permCheck(VERSION, commandSender))
                     VersionHandler.versionCommand(commandSender, args);
@@ -268,6 +268,7 @@ public class CommandHandler implements CommandExecutor {
             case "rank":
             case "guildrank":
                 if (!userPermCheck("elitemobs.guild.menu", commandSender)) return true;
+                GuildRankMenuHandler guildRankMenuHandler = new GuildRankMenuHandler();
                 GuildRankMenuHandler.initializeGuildRankMenu((Player) commandSender);
                 return true;
             case "trackcustomboss":
@@ -277,6 +278,10 @@ public class CommandHandler implements CommandExecutor {
             case "customboss":
                 if (!userPermCheck("elitemobs.customboss", commandSender)) return true;
                 CustomBossCommandHandler.handleCommand((Player) commandSender, args);
+                return true;
+            case "setrank":
+                if (!userPermCheck("elitemobs.admin", commandSender)) return true;
+                GuildRankCommands.setGuildRank(args);
                 return true;
             default:
                 validCommands(commandSender);

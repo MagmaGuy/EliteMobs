@@ -34,7 +34,6 @@ import com.magmaguy.elitemobs.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
-import com.magmaguy.elitemobs.quests.QuestRefresher;
 import com.magmaguy.elitemobs.runnables.EggRunnable;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
@@ -104,8 +103,7 @@ public class EliteMobs extends JavaPlugin {
         EventsRegistrer.registerEvents();
 
         //Launch the local data cache
-        PlayerData.initializePlayerData();
-        PlayerData.synchronizeDatabases();
+        PlayerData.initializeDatabaseConnection();
 
         //Get world list
         worldScanner();
@@ -159,7 +157,7 @@ public class EliteMobs extends JavaPlugin {
         /*
         Launch quests
          */
-        QuestRefresher.generateNewQuestMenus();
+        //QuestRefresher.generateNewQuestMenus();
 
         /*
         Spawn world bosses
@@ -201,11 +199,8 @@ public class EliteMobs extends JavaPlugin {
         zoneBasedSpawningWorlds.clear();
 
         //save cached data
-        Bukkit.getScheduler().cancelTask(PlayerData.databaseSyncTaskID);
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");
-        PlayerData.saveDatabases();
         Bukkit.getLogger().info("[EliteMobs] All saved! Good night.");
-        PlayerData.clearPlayerData();
 
     }
 
@@ -213,8 +208,6 @@ public class EliteMobs extends JavaPlugin {
         DefaultConfig.initializeConfig();
         ItemSettingsConfig.initializeConfig();
         ProceduralItemGenerationSettingsConfig.initializeConfig();
-        PlayerCacheDataConfig.initializeConfig();
-        PlayerMaxGuildRankConfig.initializeConfig();
         PotionEffectsConfig.initializeConfigs();
         ConfigValues.initializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
@@ -222,8 +215,6 @@ public class EliteMobs extends JavaPlugin {
         EnchantmentsConfig.initializeConfigs();
         AntiExploitConfig.initializeConfig();
         CombatTagConfig.initializeConfig();
-        GuildRankData.initializeConfig();
-        PlayerMoneyData.initializeConfig();
         CustomBossesConfig.initializeConfigs();
         AntiExploitConfig.initializeConfig();
         AdventurersGuildConfig.initializeConfig();

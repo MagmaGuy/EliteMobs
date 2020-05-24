@@ -25,7 +25,10 @@ public class EnchantmentGenerator {
         for (Enchantment enchantment : enchantmentMap.keySet()) {
             if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() && ItemSettingsConfig.useEliteEnchantments) {
                 if (EliteEnchantments.isPotentialEliteEnchantment(enchantment)) {
-                    itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
+                    if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel()) {
+                        itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
+                    } else
+                        itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
                 } else
                     itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
 
