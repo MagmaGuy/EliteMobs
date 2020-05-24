@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.collateralminecraftchanges;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
+import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerDeathMessageByEliteMob implements Listener {
 
-    private static HashMap<Player, String> deadPlayerList = new HashMap<>();
+    private static final HashMap<Player, String> deadPlayerList = new HashMap<>();
 
     public static void addDeadPlayer(Player player, String deathMessage) {
         deadPlayerList.put(player, deathMessage);
@@ -33,6 +34,7 @@ public class PlayerDeathMessageByEliteMob implements Listener {
 
         if (isDeadPlayer(event.getEntity())) {
             event.setDeathMessage(deadPlayerList.get(event.getEntity()));
+            PlayerStatsTracker.registerPlayerDeath(event.getEntity());
             removeDeadPlayer(event.getEntity());
         }
 

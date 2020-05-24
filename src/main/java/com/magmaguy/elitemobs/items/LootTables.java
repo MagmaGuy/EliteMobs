@@ -56,8 +56,8 @@ public class LootTables implements Listener {
 
             if (AdventurersGuildConfig.guildLootLimiter) {
                 double itemTier = setItemTier((int) eliteMobEntity.getTier());
-                if (itemTier < 100 && itemTier > GuildRank.getRank(player) * 10) {
-                    itemTier = GuildRank.getRank(player) * 10;
+                if (itemTier < 100 && itemTier > GuildRank.getActiveGuildRank(player) * 10) {
+                    itemTier = GuildRank.getActiveGuildRank(player) * 10;
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -85,12 +85,12 @@ public class LootTables implements Listener {
         }
     }
 
-    private static boolean proceduralItemsOn = ProceduralItemGenerationSettingsConfig.doProceduralItemDrops;
-    private static boolean customItemsOn = ItemSettingsConfig.doEliteMobsLoot && !CustomItem.getCustomItemStackList().isEmpty();
-    private static boolean weighedItemsExist = CustomItem.getWeighedFixedItems() != null && !CustomItem.getWeighedFixedItems().isEmpty();
-    private static boolean fixedItemsExist = CustomItem.getFixedItems() != null && !CustomItem.getFixedItems().isEmpty();
-    private static boolean limitedItemsExist = CustomItem.getLimitedItem() != null && !CustomItem.getLimitedItem().isEmpty();
-    private static boolean scalableItemsExist = CustomItem.getScalableItems() != null && !CustomItem.getScalableItems().isEmpty();
+    private static final boolean proceduralItemsOn = ProceduralItemGenerationSettingsConfig.doProceduralItemDrops;
+    private static final boolean customItemsOn = ItemSettingsConfig.doEliteMobsLoot && !CustomItem.getCustomItemStackList().isEmpty();
+    private static final boolean weighedItemsExist = CustomItem.getWeighedFixedItems() != null && !CustomItem.getWeighedFixedItems().isEmpty();
+    private static final boolean fixedItemsExist = CustomItem.getFixedItems() != null && !CustomItem.getFixedItems().isEmpty();
+    private static final boolean limitedItemsExist = CustomItem.getLimitedItem() != null && !CustomItem.getLimitedItem().isEmpty();
+    private static final boolean scalableItemsExist = CustomItem.getScalableItems() != null && !CustomItem.getScalableItems().isEmpty();
 
     private static Item generateLoot(EliteMobEntity eliteMobEntity) {
 

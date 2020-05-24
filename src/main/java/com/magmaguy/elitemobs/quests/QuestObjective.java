@@ -1,12 +1,10 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.utils.StringColorAnimator;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -150,9 +148,9 @@ public class QuestObjective implements Serializable {
                         .replace("$objectiveAmount", getObjectiveKills() + "")
                         .replace("$objectiveName", getEliteMobName())
                 , ChatColor.DARK_GREEN, ChatColor.GREEN);
-        Bukkit.broadcastMessage(QuestMenuConfig.questStartBroadcastMessage
-                .replace("$player", player.getDisplayName())
-                .replace("$rank", GuildRank.getRankName(getQuestTier())));
+        // Bukkit.broadcastMessage(QuestMenuConfig.questStartBroadcastMessage
+        //         .replace("$player", player.getDisplayName())
+        //         .replace("$rank", GuildRank.getRankName(getQuestTier())));
     }
 
     public void sendQuestCompleteMessage(Player player) {
@@ -162,9 +160,9 @@ public class QuestObjective implements Serializable {
                         .replace("$objectiveAmount", getObjectiveKills() + "")
                         .replace("$objectiveName", getEliteMobName()),
                 ChatColor.GOLD, ChatColor.YELLOW);
-        Bukkit.broadcastMessage(QuestMenuConfig.questCompleteBroadcastMessage
-                .replace("$player", player.getDisplayName())
-                .replace("$rank", GuildRank.getRankName(getQuestTier())));
+        // Bukkit.broadcastMessage(QuestMenuConfig.questCompleteBroadcastMessage
+        //         .replace("$player", player.getDisplayName())
+        //         .replace("$rank", GuildRank.getRankName(getQuestTier())));
     }
 
     public void sendQuestProgressionMessage(Player player) {

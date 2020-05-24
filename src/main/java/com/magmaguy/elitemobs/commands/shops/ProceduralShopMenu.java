@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.economy.UUIDFilter;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.ItemWorthSwitcher;
@@ -52,7 +51,7 @@ public class ProceduralShopMenu implements Listener {
 
     }
 
-    private static List<Integer> validSlots = ProceduralShopMenuConfig.storeSlots;
+    private static final List<Integer> validSlots = ProceduralShopMenuConfig.storeSlots;
 
     private static void shopContents(Inventory shopInventory) {
 
@@ -118,9 +117,9 @@ public class ProceduralShopMenu implements Listener {
                 player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
                 player.closeInventory();
 
-            } else if (EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) >= itemValue) {
+            } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
                 //player has enough money
-                EconomyHandler.subtractCurrency(UUIDFilter.guessUUI(player.getName()), itemValue);
+                EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
                 ItemWorthSwitcher.switchToResaleValue(itemStack);
                 player.getInventory().addItem(itemStack);
                 populateShop(event.getInventory());

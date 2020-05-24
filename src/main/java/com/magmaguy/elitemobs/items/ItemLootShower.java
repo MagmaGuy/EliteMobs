@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -29,7 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemLootShower implements Listener {
 
-    private Player player;
+    private final Player player;
 
     public ItemLootShower(double eliteMobTier, Location location, Player player) {
 
@@ -39,7 +40,8 @@ public class ItemLootShower implements Listener {
             return;
 
         new BukkitRunnable() {
-            int currencyAmount = (int) (eliteMobTier / 2 * EconomySettingsConfig.currencyShowerMultiplier);
+            int currencyAmount = (int) (eliteMobTier / 2 * EconomySettingsConfig.currencyShowerMultiplier *
+                    GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
 
             @Override
             public void run() {
@@ -186,7 +188,7 @@ public class ItemLootShower implements Listener {
         currencyItem.setCustomNameVisible(true);
     }
 
-    private static HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
+    private static final HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
 
     /**
      * Currency pickup event

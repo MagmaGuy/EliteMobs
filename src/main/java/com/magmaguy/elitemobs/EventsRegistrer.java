@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
-import com.magmaguy.elitemobs.adventurersguild.MaxHealthHandler;
 import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.antiexploit.*;
 import com.magmaguy.elitemobs.api.*;
@@ -42,6 +42,7 @@ import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powers.AggroPrevention;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
@@ -77,6 +78,8 @@ public class EventsRegistrer {
 
         PluginManager pluginManager = Bukkit.getPluginManager();
         Plugin plugin = MetadataHandler.PLUGIN;
+
+        pluginManager.registerEvents(new PlayerData.PlayerDataEvents(), plugin);
 
         //Load passive mobs TODO: find generic alternative to this
         pluginManager.registerEvents(new ChickenHandler(), plugin);
@@ -260,8 +263,6 @@ public class EventsRegistrer {
 
         //Initialize adventurer's guild
         pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);
-        if (AdventurersGuildConfig.addMaxHealth)
-            pluginManager.registerEvents(new MaxHealthHandler(), plugin);
         pluginManager.registerEvents(new SpawnControl(), plugin);
         //register quests
         pluginManager.registerEvents(new QuestsMenu(), plugin);
@@ -304,6 +305,9 @@ public class EventsRegistrer {
 
         //On death commands
         pluginManager.registerEvents(new OnDeathCommands(), plugin);
+
+        //Player stuff
+        pluginManager.registerEvents(new GuildRank.GuildRankEvents(), plugin);
 
     }
 

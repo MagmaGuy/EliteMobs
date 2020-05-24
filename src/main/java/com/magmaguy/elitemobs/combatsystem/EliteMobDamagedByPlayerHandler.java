@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.combatsystem;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
@@ -186,11 +187,12 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
     }
 
     private boolean isCriticalHit(Player player) {
-        int criticalStrike = ItemTagger.getEnchantment(player.getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key));
-        return ThreadLocalRandom.current().nextDouble() < criticalStrike / 10.0;
+        int criticalStrike = ItemTagger.getEnchantment(player.getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key)) / 10;
+        criticalStrike += (GuildRank.critBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100);
+        return ThreadLocalRandom.current().nextDouble() < criticalStrike;
     }
 
-    private HashMap<Player, Integer> playerHitCooldownHashMap = new HashMap<>();
+    private final HashMap<Player, Integer> playerHitCooldownHashMap = new HashMap<>();
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event) {

@@ -60,7 +60,7 @@ public class StatsCommand {
         for (Player player : Bukkit.getOnlinePlayers()) {
             double currentTier = ItemTierFinder.findPlayerTier(player);
             threatAverage += currentTier;
-            int currentGuildRank = GuildRank.getRank(player);
+            int currentGuildRank = GuildRank.getMaxGuildRank(player);
             guildRankAverage += currentGuildRank;
             if (currentTier > highestThreat) {
                 highestThreat = currentTier;
@@ -87,7 +87,7 @@ public class StatsCommand {
         commandSender.sendMessage(ChatColorConverter.convert(
                 "&7[EM] &2Average threat tier: &a" + Round.twoDecimalPlaces(threatAverage)));
         commandSender.sendMessage(ChatColorConverter.convert(
-                "&7[EM] &2Highest adventurer's guild tier: &a" + highestGuildUser + " &2at guild rank &a" + GuildRank.getRankName(highestGuildRank) + " &2(&a" + highestGuildRank + "&2)"));
+                "&7[EM] &2Highest adventurer's guild tier: &a" + highestGuildUser + " &2at guild rank &a" + GuildRank.getRankName(0, highestGuildRank) + " &2(&a" + highestGuildRank + "&2)"));
         commandSender.sendMessage(ChatColorConverter.convert(
                 "&7[EM] &2Average guild rank: &a" + Round.twoDecimalPlaces(guildRankAverage)));
         commandSender.sendMessage(ChatColorConverter.convert(

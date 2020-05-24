@@ -16,7 +16,9 @@ public class WorldGuardDungeonFlag implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
         if (!EliteMobs.worldguardIsEnabled) return;
-        if (event.getEntity().getType().equals(EntityType.ARMOR_STAND)) return;
+        if (event.getEntity().getType().equals(EntityType.ARMOR_STAND) ||
+                event.getEntity().getType().equals(EntityType.VILLAGER) && event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM))
+            return;
         if (WorldGuardFlagChecker.checkFlag(event.getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsDungeonFlag())) {
             EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteMobEntity != null)
