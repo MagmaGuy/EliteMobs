@@ -182,15 +182,13 @@ public class LoreGenerator {
 
     }
 
-    private static ItemMeta applyVanillaEnchantments(HashMap<Enchantment, Integer> enchantmentMap, ItemMeta
-            itemMeta) {
+    private static ItemMeta applyVanillaEnchantments(HashMap<Enchantment, Integer> enchantmentMap, ItemMeta itemMeta) {
 
         for (Enchantment enchantment : enchantmentMap.keySet())
             if (EliteEnchantments.isPotentialEliteEnchantment(enchantment) && enchantmentMap.get(enchantment) > enchantment.getMaxLevel())
                 itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
             else
                 itemMeta.addEnchant(enchantment, enchantmentMap.get(enchantment), true);
-
 
         return itemMeta;
 

@@ -23,7 +23,7 @@ import java.util.List;
 
 public class CustomItem {
 
-    private static HashMap<String, CustomItem> customItems = new HashMap<>();
+    private static final HashMap<String, CustomItem> customItems = new HashMap<>();
 
     public static HashMap<String, CustomItem> getCustomItems() {
         return customItems;
@@ -43,8 +43,8 @@ public class CustomItem {
 
         if (AdventurersGuildConfig.guildLootLimiter) {
             itemTier = (int) LootTables.setItemTier(tier);
-            if (itemTier > GuildRank.getRank(player) * 10)
-                itemTier = GuildRank.getRank(player) * 10;
+            if (itemTier > GuildRank.getActiveGuildRank(player) * 10)
+                itemTier = GuildRank.getActiveGuildRank(player) * 10;
         } else
             itemTier = tier + 1;
 
@@ -75,7 +75,7 @@ public class CustomItem {
     }
 
     // Used to get loot via commands
-    private static ArrayList<ItemStack> customItemStackList = new ArrayList<>();
+    private static final ArrayList<ItemStack> customItemStackList = new ArrayList<>();
 
     /**
      * Returns a full list of custom items using their configuration settings
@@ -93,7 +93,7 @@ public class CustomItem {
     }
 
     // Used to drop static loot using the weighed chance system
-    private static HashMap<ItemStack, Double> weighedFixedItems = new HashMap<>();
+    private static final HashMap<ItemStack, Double> weighedFixedItems = new HashMap<>();
 
     /**
      * Returns a full list of weighed static items to be used in the looting process
@@ -109,7 +109,7 @@ public class CustomItem {
         weighedFixedItems.put(customItem.generateDefaultsItemStack(), customItem.getDropWeight());
     }
 
-    private static HashMap<Integer, ArrayList<ItemStack>> tieredLoot = new HashMap<>();
+    private static final HashMap<Integer, ArrayList<ItemStack>> tieredLoot = new HashMap<>();
 
     public static HashMap<Integer, ArrayList<ItemStack>> getTieredLoot() {
         return tieredLoot;
@@ -129,7 +129,7 @@ public class CustomItem {
         }
     }
 
-    private static HashMap<Integer, ArrayList<CustomItem>> fixedItems = new HashMap<>();
+    private static final HashMap<Integer, ArrayList<CustomItem>> fixedItems = new HashMap<>();
 
     public static HashMap<Integer, ArrayList<CustomItem>> getFixedItems() {
         return fixedItems;
@@ -142,13 +142,13 @@ public class CustomItem {
             fixedItems.get(customItem.getItemTier()).add(customItem);
     }
 
-    private static List<CustomItem> scalableItems = new ArrayList<>();
+    private static final List<CustomItem> scalableItems = new ArrayList<>();
 
     public static List<CustomItem> getScalableItems() {
         return scalableItems;
     }
 
-    private static HashMap<Integer, ArrayList<CustomItem>> limitedItems = new HashMap<>();
+    private static final HashMap<Integer, ArrayList<CustomItem>> limitedItems = new HashMap<>();
 
     public static HashMap<Integer, ArrayList<CustomItem>> getLimitedItem() {
         return limitedItems;
@@ -169,14 +169,14 @@ public class CustomItem {
             new CustomItem(configFields);
     }
 
-    private CustomLootConfigFields customLootConfigFields;
+    private final CustomLootConfigFields customLootConfigFields;
     private String fileName;
     private boolean isEnabled = true;
     private Material material;
     private String name;
     private List<String> lore = new ArrayList<>();
-    private HashMap<Enchantment, Integer> enchantments = new HashMap();
-    private HashMap<String, Integer> customEnchantments = new HashMap();
+    private final HashMap<Enchantment, Integer> enchantments = new HashMap();
+    private final HashMap<String, Integer> customEnchantments = new HashMap();
     private List<String> potionEffects = new ArrayList<>();
     private int itemTier;
     private double dropWeight = 0;

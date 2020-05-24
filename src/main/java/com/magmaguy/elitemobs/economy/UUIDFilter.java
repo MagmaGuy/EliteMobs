@@ -15,39 +15,23 @@
 
 package com.magmaguy.elitemobs.economy;
 
-import com.magmaguy.elitemobs.playerdata.PlayerData;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
-import java.util.UUID;
-
 /**
  * Created by MagmaGuy on 20/06/2017.
  */
 public class UUIDFilter {
 
-    public static UUID guessUUI(String string) {
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-
-            if (player.getName().equalsIgnoreCase(string) || player.getDisplayName().equalsIgnoreCase(string)) {
-
-                return player.getUniqueId();
-
-            }
-
-        }
-
-        for (UUID uuid : PlayerData.playerDisplayName.keySet()) {
-
-            if (ChatColor.stripColor(PlayerData.playerDisplayName.get(uuid)).equalsIgnoreCase(string))
-                return uuid;
-
-        }
-
-        return null;
-
-    }
+    //public static UUID guessUUI(String string) {
+//
+    //    for (Player player : Bukkit.getOnlinePlayers())
+    //        if (player.getName().equalsIgnoreCase(string) || player.getDisplayName().equalsIgnoreCase(string))
+    //            return player.getUniqueId();
+//
+    //    for (UUID uuid : PlayerData.playerDisplayName.keySet())
+    //        if (ChatColor.stripColor(PlayerData.playerDisplayName.get(uuid)).equalsIgnoreCase(string))
+    //            return uuid;
+    //
+    //    return null;
+//
+    //}
 
 }

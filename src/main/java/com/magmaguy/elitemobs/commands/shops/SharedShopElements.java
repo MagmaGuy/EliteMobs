@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.economy.UUIDFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -47,7 +46,7 @@ public class SharedShopElements {
                 player.sendMessage(
                         ChatColorConverter.convert(
                                 ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
-                                        .replace("$currency_amount", EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + "")
+                                        .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
                                         .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
 
@@ -73,7 +72,7 @@ public class SharedShopElements {
                 player.sendMessage(
                         ChatColorConverter.convert(
                                 ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
-                                        .replace("$currency_amount", EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + "")
+                                        .replace("$currency_amount", EconomyHandler.checkCurrency(player.getUniqueId()) + "")
                                         .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
                 player.sendMessage(

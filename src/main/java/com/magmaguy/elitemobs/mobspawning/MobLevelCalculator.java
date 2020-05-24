@@ -14,7 +14,7 @@ public class MobLevelCalculator {
         //Add selected player gear tier modifier
         double perPlayerEliteMobLevel = ItemTierFinder.findPlayerTier(player);
         //Add selected guild rank modifier
-        double guildRank = GuildRank.getActiveRank(player);
+        double guildRank = GuildRank.getActiveGuildRank(player);
         if (guildRank == 0)
             guildRank = -10;
         else

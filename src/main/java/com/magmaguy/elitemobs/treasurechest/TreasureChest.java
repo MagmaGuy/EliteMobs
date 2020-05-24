@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureChest {
 
-    private static HashMap<String, TreasureChest> treasureChestHashMap = new HashMap<>();
+    private static final HashMap<String, TreasureChest> treasureChestHashMap = new HashMap<>();
 
     public static HashMap<String, TreasureChest> getTreasureChestHashMap() {
         return treasureChestHashMap;
@@ -55,10 +55,10 @@ public class TreasureChest {
         GROUP
     }
 
-    private CustomTreasureChestConfigFields customTreasureChestConfigFields;
-    private String fileName;
-    private String key;
-    private boolean isEnabled;
+    private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
+    private final String fileName;
+    private final String key;
+    private final boolean isEnabled;
     private Material chestMaterial;
     private BlockFace facing;
     private int chestTier;
@@ -213,7 +213,8 @@ public class TreasureChest {
     }
 
     private void lowRankMessage(Player player) {
-        player.sendMessage(ChatColorConverter.convert("&7[EM] &cYour guild rank needs to be " + GuildRank.getRankName(chestTier)
+        //todo: fix treasure chests to incorporate prestige ranks into them
+        player.sendMessage(ChatColorConverter.convert("&7[EM] &cYour guild rank needs to be " + GuildRank.getRankName(0, chestTier)
                 + " &cin order to open this chest!"));
     }
 
@@ -331,7 +332,7 @@ public class TreasureChest {
             if (!getTreasureChestHashMap().containsKey(event.getView().getTitle())) return;
             event.setCancelled(true);
             TreasureChest treasureChest = getTreasureChest(event.getView().getTitle());
-            if (GuildRank.getRank((Player) event.getPlayer()) < treasureChest.chestTier)
+            if (GuildRank.getMaxGuildRank((Player) event.getPlayer()) < treasureChest.chestTier)
                 treasureChest.lowRankMessage((Player) event.getPlayer());
             else
                 treasureChest.doInteraction((Player) event.getPlayer());

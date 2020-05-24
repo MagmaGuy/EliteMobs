@@ -16,6 +16,7 @@ public class AdventurersGuildCommand {
         if (adventurersGuildTeleport(player)) return;
 
         if (!player.hasPermission("elitemobs.guild.menu")) return;
+        GuildRankMenuHandler guildRankMenuHandler = new GuildRankMenuHandler();
         GuildRankMenuHandler.initializeGuildRankMenu(player);
 
     }

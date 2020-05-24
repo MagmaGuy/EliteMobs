@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,14 +18,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class SoulbindEnchantment extends CustomEnchantment {
 
@@ -56,7 +55,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
                 soulboundPlayer.setGravity(false);
                 new BukkitRunnable() {
                     int counter = 0;
-                    Location lastLocation = item.getLocation().clone();
+                    final Location lastLocation = item.getLocation().clone();
 
                     @Override
                     public void run() {
@@ -77,11 +76,15 @@ public class SoulbindEnchantment extends CustomEnchantment {
 
     }
 
-    private static NamespacedKey namespacedKey = new NamespacedKey(MetadataHandler.PLUGIN, key);
+    private static final NamespacedKey namespacedKey = new NamespacedKey(MetadataHandler.PLUGIN, key);
 
     private static void addEnchantment(ItemStack itemStack, Player player) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, player.getUniqueId().toString());
+        //for legacy reasons, prestige 0 gets no prestige tier id
+        if (GuildRank.getGuildPrestigeRank(player) == 0)
+            itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, player.getUniqueId().toString());
+        else
+            itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, player.getUniqueId().toString() + GuildRank.getGuildPrestigeRank(player));
         itemStack.setItemMeta(itemMeta);
         List<String> lore = itemStack.getItemMeta().getLore();
         if (lore == null)
@@ -90,6 +93,9 @@ public class SoulbindEnchantment extends CustomEnchantment {
                 ChatColorConverter.convert(
                         EnchantmentsConfig.getEnchantment("soulbind.yml")
                                 .getFileConfiguration().getString("loreString").replace("$player", player.getDisplayName())));
+        if (GuildRank.getGuildPrestigeRank(player) > 0)
+            lore.add(ChatColorConverter.convert("Prestige " + GuildRank.getGuildPrestigeRank(player)));
+
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
     }
@@ -98,11 +104,15 @@ public class SoulbindEnchantment extends CustomEnchantment {
         if (itemMeta == null)
             return true;
         //for legacy items
-        if (itemMeta.getCustomTagContainer().hasCustomTag(namespacedKey, ItemTagType.STRING))
-            return UUID.fromString(itemMeta.getCustomTagContainer().getCustomTag(new NamespacedKey(MetadataHandler.PLUGIN, key), ItemTagType.STRING)).equals(player.getUniqueId());
+        //if (GuildRank.getGuildPrestigeRank(player) == 0)
+        //    if (itemMeta.getCustomTagContainer().hasCustomTag(namespacedKey, ItemTagType.STRING))
+        //        return itemMeta.getCustomTagContainer().getCustomTag(new NamespacedKey(MetadataHandler.PLUGIN, key), ItemTagType.STRING).equals(player.getUniqueId().toString());
         if (!itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.STRING))
             return true;
-        return UUID.fromString(itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)).equals(player.getUniqueId());
+        if (GuildRank.getGuildPrestigeRank(player) == 0)
+            return itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING).equals(player.getUniqueId().toString());
+        else
+            return (itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)).equals(player.getUniqueId().toString() + GuildRank.getGuildPrestigeRank(player));
     }
 
 
@@ -112,18 +122,6 @@ public class SoulbindEnchantment extends CustomEnchantment {
             if (isValidSoulbindUser(event.getItem().getItemStack().getItemMeta(), event.getPlayer())) return;
             event.setCancelled(true);
         }
-
-//        @EventHandler
-//        public void onInventoryPickup(InventoryClickEvent inventoryClickEvent) {
-//            if (inventoryClickEvent.getClickedInventory() == null) return;
-//            if (inventoryClickEvent.getClickedInventory().getType().equals(InventoryType.PLAYER)) return;
-//            if (!inventoryClickEvent.getWhoClicked().getType().equals(EntityType.PLAYER)) return;
-//            if (inventoryClickEvent.getCurrentItem() == null) return;
-//            if (inventoryClickEvent.getCurrentItem().getItemMeta() == null) return;
-//            if (isValidSoulbindUser(inventoryClickEvent.getCurrentItem().getItemMeta(), (Player) inventoryClickEvent.getWhoClicked()))
-//                return;
-//            inventoryClickEvent.setCancelled(true);
-//        }
     }
 
     public static void soulbindWatchdog() {

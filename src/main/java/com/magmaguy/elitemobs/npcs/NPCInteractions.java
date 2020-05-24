@@ -47,6 +47,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
+                            GuildRankMenuHandler guildRankMenuHandler = new GuildRankMenuHandler();
                             GuildRankMenuHandler.initializeGuildRankMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);

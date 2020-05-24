@@ -16,11 +16,9 @@ public class CriticalStrikesEnchantment extends CustomEnchantment {
     }
 
     public static void criticalStrikePopupMessage(Location location) {
-
         DialogArmorStand.createDialogArmorStand(location.clone().subtract(new Vector(0, 0, 0)),
                 ChatColorConverter.convert(EnchantmentsConfig.getEnchantment("critical_strikes.yml")
                         .getFileConfiguration().getString("criticalHitPopup")));
-
     }
 
 }

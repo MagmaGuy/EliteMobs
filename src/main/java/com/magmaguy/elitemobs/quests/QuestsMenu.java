@@ -32,22 +32,23 @@ public class QuestsMenu implements Listener {
 
         for (int index = 0; index < 12; index++) {
 
-            if (GuildRank.isWithinActiveRank(player, index)) {
+            //todo: handle prestige ranks
+            if (GuildRank.isWithinActiveGuildRank(player, 0, index)) {
 
                 HashMap<String, String> replacementItemStack = new HashMap<>();
-                replacementItemStack.put("$rank", GuildRank.getRankName(index));
+                replacementItemStack.put("$rank", GuildRank.getRankName(0, index));
                 inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.validTierButton, replacementItemStack));
 
-            } else if (GuildRank.isWithinRank(player, index)) {
+            } else if (GuildRank.isWithinMaxGuildRank(player, 0, index)) {
 
                 HashMap<String, String> replacementItemStack = new HashMap<>();
-                replacementItemStack.put("$rank", GuildRank.getRankName(index));
+                replacementItemStack.put("$rank", GuildRank.getRankName(0, index));
                 inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.inactiveTierButton, replacementItemStack));
 
             } else {
 
                 HashMap<String, String> replacementItemStack = new HashMap<>();
-                replacementItemStack.put("$rank", GuildRank.getRankName(index));
+                replacementItemStack.put("$rank", GuildRank.getRankName(0, index));
                 inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.invalidTierButton, replacementItemStack));
 
             }
@@ -92,7 +93,7 @@ public class QuestsMenu implements Listener {
         int tier = 0;
 
         for (int i = 0; i < 11; i++)
-            if (event.getView().getTitle().contains(GuildRank.getRankName(i))) {
+            if (event.getView().getTitle().contains(GuildRank.getRankName(0, i))) {
                 tier = i;
                 break;
             }
@@ -112,7 +113,7 @@ public class QuestsMenu implements Listener {
 
     }
 
-    private static HashMap<Player, EliteQuest> questPairs = new HashMap();
+    private static final HashMap<Player, EliteQuest> questPairs = new HashMap();
 
     public static boolean playerHasPendingQuest(Player player) {
         return questPairs.containsKey(player);
