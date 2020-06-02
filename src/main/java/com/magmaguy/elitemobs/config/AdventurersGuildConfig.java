@@ -5,6 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 public class AdventurersGuildConfig {
 
@@ -19,6 +21,7 @@ public class AdventurersGuildConfig {
     public static boolean guildLootLimiter;
     public static String lootLimiterMessage;
     public static boolean alwaysUseNpcs;
+    public static List<String> onRankUpCommand, onPrestigeUpCommand;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
@@ -42,12 +45,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&8Commoner");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&80");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &8Commoner");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&80");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -57,12 +60,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&fRookie");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&8Ⅰ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fRookie");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&fⅠ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -72,12 +75,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&fNovice");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&fⅡ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fNovice");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&fⅡ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -87,12 +90,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&fApprentice");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&fⅢ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &fApprentice");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&fⅢ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -102,12 +105,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&2Adventurer");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&2Ⅳ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Adventurer");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&2Ⅳ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -117,12 +120,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&2Journeyman");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&2Ⅴ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Journeyman");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&2Ⅴ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -132,12 +135,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&2Adept");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&2Ⅵ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &2Adept");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&2Ⅵ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -147,12 +150,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&1Veteran");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&1Ⅶ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &1Veteran");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&1Ⅶ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -162,12 +165,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&1Elite");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&1Ⅷ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &1Elite");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&1Ⅷ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -177,12 +180,12 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&lMaster");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&5Ⅸ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Master");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5Ⅸ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         }
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
@@ -192,10 +195,10 @@ public class AdventurersGuildConfig {
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, "&5Hero");
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&5Ⅹ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", "&6&l✧&e" + romanNumerals(normalRank));
                         } else {
                             shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5Ⅹ");
+                                    "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                             rankName = ConfigurationEngine.setString(fileConfiguration,
                                     "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Hero");
                         }
@@ -206,7 +209,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Legend");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅠ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -214,7 +217,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Myth");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅡ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -222,7 +225,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Immortal");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅢ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -230,7 +233,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Chosen");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅣ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -238,7 +241,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Ascendant");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅤ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -246,7 +249,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Titan");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅥ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -254,7 +257,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Demigod");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅦ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -262,7 +265,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Deity");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅧ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -270,7 +273,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Godhunter");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅨ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -278,7 +281,7 @@ public class AdventurersGuildConfig {
                         rankName = ConfigurationEngine.setString(fileConfiguration,
                                 "Prestige " + prestigeRank + " rank " + normalRank, prestigeColors(prestigeRank) + "Prestige " + prestigeRank + " &5Godslayer");
                         shortRankName = ConfigurationEngine.setString(fileConfiguration,
-                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "P" + prestigeNumerals(prestigeRank) + "&5ⅩⅩ");
+                                "Prestige " + prestigeRank + " rank " + normalRank + " short placeholder", prestigeColors(prestigeRank) + "⚜" + romanNumerals(prestigeRank) + "&6&l✧&e" + romanNumerals(normalRank));
                         rankNames[prestigeRank][normalRank] = rankName;
                         shortRankNames[prestigeRank][normalRank] = shortRankName;
                         break;
@@ -289,6 +292,8 @@ public class AdventurersGuildConfig {
         guildLootLimiter = ConfigurationEngine.setBoolean(fileConfiguration, "limitLootBasedOnGuildTier", true);
         lootLimiterMessage = ConfigurationEngine.setString(fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!");
         alwaysUseNpcs = ConfigurationEngine.setBoolean(fileConfiguration, "alwaysUseNpcsWhenAvailable", true);
+        onRankUpCommand = ConfigurationEngine.setList(fileConfiguration, "onRankUpCommand", Arrays.asList());
+        onPrestigeUpCommand = ConfigurationEngine.setList(fileConfiguration, "onPrestigeUpCommand", Arrays.asList());
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
@@ -304,18 +309,23 @@ public class AdventurersGuildConfig {
     private static String prestigeColors(int prestigeTier) {
         switch (prestigeTier) {
             case 1:
-                return "&7";
+                return "&e";
             case 2:
-            case 3:
-                return "&f";
-            case 4:
-            case 5:
-            case 6:
                 return "&2";
+            case 3:
+                return "&a";
+            case 4:
+                return "&3";
+            case 5:
+                return "&b";
+            case 6:
+                return "&4";
             case 7:
+                return "&c";
             case 8:
+                return "&9";
             case 9:
-                return "&1";
+                return "&d";
             case 10:
                 return "&5";
             default:
@@ -323,28 +333,50 @@ public class AdventurersGuildConfig {
         }
     }
 
-    private static String prestigeNumerals(int prestigeTier) {
+    private static String romanNumerals(int prestigeTier) {
         switch (prestigeTier) {
             case 1:
                 return "Ⅰ";
             case 2:
-                return "Ⅱ";
+                return "ⅠⅠ";
             case 3:
-                return "Ⅲ";
+                return "ⅠⅠⅠ";
             case 4:
-                return "Ⅳ";
+                return "ⅠⅤ";
             case 5:
                 return "Ⅴ";
             case 6:
-                return "Ⅵ";
+                return "ⅤⅠ";
             case 7:
-                return "Ⅶ";
+                return "ⅤⅠⅠ";
             case 8:
-                return "Ⅷ";
+                return "ⅤⅠⅠⅠ";
             case 9:
-                return "Ⅸ";
+                return "ⅠⅩ";
             case 10:
                 return "Ⅹ";
+            case 11:
+                return "ⅩⅠ";
+            case 12:
+                return "ⅩⅠⅠ";
+            case 13:
+                return "ⅩⅠⅠⅠ";
+            case 14:
+                return "ⅩⅠⅤ";
+            case 15:
+                return "ⅩⅤ";
+            case 16:
+                return "ⅩⅤⅠ";
+            case 17:
+                return "ⅩⅤⅠⅠ";
+            case 18:
+                return "ⅩⅤⅠⅠⅠ";
+            case 19:
+                return "ⅩⅠⅤ";
+            case 20:
+                return "ⅩⅩ";
+            case 0:
+                return "0";
             default:
                 return "error";
         }

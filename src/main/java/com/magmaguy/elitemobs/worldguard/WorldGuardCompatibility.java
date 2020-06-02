@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
 public class WorldGuardCompatibility {
 
     private static Flag ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
-    private static Flag ELITEMOBS_ONLY_SPAWN_FLAG = new StateFlag("elitemob-only-spawning", true);
+    private static Flag ELITEMOBS_ONLY_SPAWN_FLAG = new StateFlag("elitemob-only-spawning", false);
     private static Flag ELITEMOBS_ANTIEXPLOIT = new StateFlag("elitemobs-antiexploit", true);
     private static Flag ELITEMOBS_DUNGEON = new StateFlag("elitemobs-dungeon", false);
 

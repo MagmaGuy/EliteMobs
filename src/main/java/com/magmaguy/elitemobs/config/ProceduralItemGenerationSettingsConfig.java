@@ -39,8 +39,6 @@ public class ProceduralItemGenerationSettingsConfig {
         addMaterial(Material.DIAMOND_SWORD);
         addMaterial(Material.DIAMOND_AXE);
         addMaterial(Material.DIAMOND_HOE);
-        addMaterial(Material.DIAMOND_PICKAXE);
-        addMaterial(Material.DIAMOND_SHOVEL);
 
 
         addMaterial(Material.IRON_HELMET);
@@ -51,8 +49,6 @@ public class ProceduralItemGenerationSettingsConfig {
         addMaterial(Material.IRON_SWORD);
         addMaterial(Material.IRON_AXE);
         addMaterial(Material.IRON_HOE);
-        addMaterial(Material.IRON_PICKAXE);
-        addMaterial(Material.IRON_SHOVEL);
 
 
         addMaterial(Material.GOLDEN_HELMET);
@@ -63,8 +59,6 @@ public class ProceduralItemGenerationSettingsConfig {
         addMaterial(Material.GOLDEN_SWORD);
         addMaterial(Material.GOLDEN_AXE);
         addMaterial(Material.GOLDEN_HOE);
-        addMaterial(Material.GOLDEN_PICKAXE);
-        addMaterial(Material.GOLDEN_SHOVEL);
 
 
         addMaterial(Material.CHAINMAIL_HELMET);
@@ -81,26 +75,17 @@ public class ProceduralItemGenerationSettingsConfig {
 
         addMaterial(Material.STONE_SWORD);
         addMaterial(Material.STONE_AXE);
-        addMaterial(Material.STONE_HOE);
-        addMaterial(Material.STONE_PICKAXE);
-        addMaterial(Material.STONE_SHOVEL);
 
 
         addMaterial(Material.WOODEN_SWORD);
         addMaterial(Material.WOODEN_AXE);
-        addMaterial(Material.WOODEN_HOE);
-        addMaterial(Material.WOODEN_PICKAXE);
-        addMaterial(Material.STONE_SHOVEL);
 
 
         addMaterial(Material.SHIELD);
-        addMaterial(Material.SHEARS);
         addMaterial(Material.TURTLE_HELMET);
         addMaterial(Material.TRIDENT);
-        addMaterial(Material.FISHING_ROD);
         addMaterial(Material.BOW);
         addMaterial(Material.CROSSBOW);
-        addMaterial(Material.SHEARS);
 
         for (String material : fileConfiguration.getConfigurationSection("validMaterials").getKeys(false))
             if (fileConfiguration.getConfigurationSection("validMaterials").getBoolean(material))

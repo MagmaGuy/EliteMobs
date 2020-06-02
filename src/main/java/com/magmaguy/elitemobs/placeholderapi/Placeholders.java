@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -85,14 +84,12 @@ public class Placeholders extends PlaceholderExpansion {
      */
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        new DebugMessage("running 0");
 
         if (!player.isOnline())
             return "Only online players!";
 
         switch (identifier) {
             case "player_combat_tier":
-                new DebugMessage("running");
                 return "" + ItemTierFinder.findPlayerTier(player);
             case "player_active_guild_rank_numerical":
                 return "" + GuildRank.getActiveGuildRank(player);
@@ -125,7 +122,7 @@ public class Placeholders extends PlaceholderExpansion {
                 }
                 return highestGuildUser;
             case "player_shortened_guild_rank":
-                return AdventurersGuildConfig.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player));
+                return AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player));
         }
 
         // We return null if an invalid placeholder (f.e. %someplugin_placeholder3%)

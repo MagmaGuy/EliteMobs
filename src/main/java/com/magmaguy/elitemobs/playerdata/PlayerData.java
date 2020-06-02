@@ -38,7 +38,7 @@ public class PlayerData {
     }
 
     public static double getCurrency(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseDouble(uuid, "CURRENCY");
 
         return playerDataHashMap.get(uuid).currency;
@@ -51,7 +51,7 @@ public class PlayerData {
     }
 
     public static int getGuildPrestigeLevel(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseInteger(uuid, "GuildPrestigeLevel");
         return playerDataHashMap.get(uuid).guildPrestigeLevel;
     }
@@ -63,7 +63,7 @@ public class PlayerData {
     }
 
     public static int getMaxGuildLevel(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseInteger(uuid, "GuildMaxLevel");
 
         return playerDataHashMap.get(uuid).maxGuildLevel;
@@ -77,7 +77,7 @@ public class PlayerData {
     }
 
     public static int getActiveGuildLevel(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseInteger(uuid, "GuildActiveLevel");
 
         return playerDataHashMap.get(uuid).activeGuildLevel;
@@ -91,7 +91,7 @@ public class PlayerData {
     }
 
     public static int getScore(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseInteger(uuid, "Score");
 
         return playerDataHashMap.get(uuid).score;
@@ -105,7 +105,7 @@ public class PlayerData {
     }
 
     public static int getKills(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseInteger(uuid, "Kills");
 
         return playerDataHashMap.get(uuid).kills;
@@ -119,7 +119,7 @@ public class PlayerData {
     }
 
     public static int getHighestLevelKilled(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseInteger(uuid, "HighestLevelKilled");
 
         return playerDataHashMap.get(uuid).highestLevelKilled;
@@ -134,7 +134,7 @@ public class PlayerData {
     }
 
     public static int getDeaths(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseInteger(uuid, "Deaths");
 
         return playerDataHashMap.get(uuid).deaths;
@@ -148,7 +148,7 @@ public class PlayerData {
     }
 
     public static int getQuestsCompleted(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (playerDataHashMap.get(uuid) == null)
             return getDatabaseInteger(uuid, "QuestsCompleted");
 
         return playerDataHashMap.get(uuid).questsCompleted;
@@ -167,7 +167,11 @@ public class PlayerData {
         try {
             getConnection().setAutoCommit(false);
             statement = connection.createStatement();
-            String sql = "UPDATE " + player_data_table_name + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
+            String sql;
+            if (value instanceof String)
+                sql = "UPDATE " + player_data_table_name + " SET " + key + " = '" + value + "' WHERE PlayerUUID = '" + uuid.toString() + "';";
+            else
+                sql = "UPDATE " + player_data_table_name + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
             statement.executeUpdate(sql);
             getConnection().commit();
 
@@ -253,10 +257,12 @@ public class PlayerData {
             this.deaths = resultSet.getInt("Deaths");
             this.questsCompleted = resultSet.getInt("QuestsCompleted");
 
+            playerDataHashMap.put(uuid, this);
+            new WarningMessage(playerDataHashMap.get(uuid).guildPrestigeLevel + "");
+
             resultSet.close();
             statement.close();
             getConnection().close();
-            playerDataHashMap.put(uuid, this);
             return;
         } catch (Exception e) {
             new WarningMessage("No player entry detected, generating new entry!");
@@ -282,7 +288,7 @@ public class PlayerData {
                     //identifier
                     "VALUES ('" + uuid.toString() + "'," +
                     //display name
-                    " '" + Bukkit.getPlayer(uuid).getCustomName() + "'," +
+                    " '" + Bukkit.getPlayer(uuid).getName() + "'," +
                     //currency
                     " 0," +
                     //guild_prestige_level
@@ -337,6 +343,7 @@ public class PlayerData {
     }
 
     public static void initializeDatabaseConnection() {
+        new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data").mkdirs();
         Statement statement = null;
         try {
             System.out.println("Opened database successfully");
@@ -380,7 +387,7 @@ public class PlayerData {
         @EventHandler
         public void onPlayerLogout(PlayerQuitEvent event) {
             clearPlayerData(event.getPlayer().getUniqueId());
-            setDisplayName(event.getPlayer().getUniqueId(), event.getPlayer().getCustomName());
+            setDisplayName(event.getPlayer().getUniqueId(), event.getPlayer().getName());
         }
     }
 

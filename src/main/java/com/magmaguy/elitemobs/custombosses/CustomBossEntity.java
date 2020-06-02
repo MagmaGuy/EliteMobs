@@ -143,7 +143,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 if (livingEntity.isDead()) return;
                 livingEntity.remove();
                 if (customBossConfigFields.getEscapeMessage() != null)
-                    Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
+                    for (Player player : Bukkit.getOnlinePlayers())
+                        if (player.getWorld().equals(livingEntity.getWorld()))
+                            player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
 
             }
 
@@ -252,6 +254,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     private void sendLocation() {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!player.getWorld().equals(getLivingEntity().getWorld())) continue;
             TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.bossLocationMessage);
             interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + player.getName() + " " + this.uuid));
             interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Track the " + getName()).create()));
