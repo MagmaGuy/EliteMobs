@@ -90,6 +90,12 @@ public class GuildRankMenuHandler implements Listener {
         Bukkit.broadcastMessage(GuildRankMenuConfig.broadcastMessage
                 .replace("$player", player.getDisplayName())
                 .replace("$rankName", GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), guildRank)));
+        if (!AdventurersGuildConfig.onRankUpCommand.isEmpty())
+            for (String command : AdventurersGuildConfig.onRankUpCommand)
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        command.replace("$player", player.getName())
+                                .replace("$prestigeRank", GuildRank.getActiveGuildRank(player) + "")
+                                .replace("$activeRank", GuildRank.getGuildPrestigeRank(player) + ""));
     }
 
     private static void selectPrestigeUnlock(Player player) {
@@ -106,6 +112,12 @@ public class GuildRankMenuHandler implements Listener {
             iteratedPlayer.sendTitle(player.getDisplayName(), ChatColor.DARK_GREEN + "has unlocked Prestige " + GuildRank.getGuildPrestigeRank(player) + "!");
         }
         player.closeInventory();
+        if (!AdventurersGuildConfig.onPrestigeUpCommand.isEmpty())
+            for (String command : AdventurersGuildConfig.onPrestigeUpCommand)
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        command.replace("$player", player.getName())
+                                .replace("$prestigeRank", GuildRank.getActiveGuildRank(player) + "")
+                                .replace("$activeRank", GuildRank.getGuildPrestigeRank(player) + ""));
     }
 
     @EventHandler

@@ -66,7 +66,7 @@ import com.magmaguy.elitemobs.quests.QuestsMenu;
 import com.magmaguy.elitemobs.quests.QuestsTracker;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.worldguard.WorldGuardDungeonFlag;
-import com.magmaguy.elitemobs.worldguard.WorldGuardEliteMobOnlyFlag;
+import com.magmaguy.elitemobs.worldguard.WorldGuardEliteMobOnlySpawnFlag;
 import com.magmaguy.elitemobs.worldguard.WorldGuardSpawnEventBypasser;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -291,7 +291,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new NPCProximitySensor(), plugin);
         pluginManager.registerEvents(new FindNewWorlds(), plugin);
         pluginManager.registerEvents(new WorldGuardSpawnEventBypasser(), plugin);
-        pluginManager.registerEvents(new WorldGuardEliteMobOnlyFlag(), plugin);
+        pluginManager.registerEvents(new WorldGuardEliteMobOnlySpawnFlag(), plugin);
         pluginManager.registerEvents(new WorldGuardDungeonFlag(), plugin);
 
         pluginManager.registerEvents(new EntityTransformPreventer(), plugin);
