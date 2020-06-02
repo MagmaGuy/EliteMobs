@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>7.1.24.pre-1</version>
+  <version>7.1.24.pre-2</version>
   <build>
     <defaultGoal>clean resources:resources package</defaultGoal>
     <finalName>${project.artifactId}</finalName>
@@ -38,32 +38,32 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>spigotmc-repo</id>
-        <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-    </repository>
-      <repository>
-          <id>CodeMC</id>
-          <url>https://repo.codemc.org/repository/maven-public</url>
-      </repository>
-      <repository>
-          <id>sk89q-repo</id>
-          <url>https://maven.enginehub.org/repo/</url>
-      </repository>
-      <repository>
-          <id>jitpack.io</id>
-          <url>https://jitpack.io</url>
-      </repository>
-      <repository>
-          <id>placeholderapi</id>
-          <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-      </repository>
-      <repository>
-          <id>codemc-repo</id>
-          <url>https://repo.codemc.io/repository/maven-public/</url>
-      </repository>
-  </repositories>
+    <repositories>
+        <repository>
+            <id>spigotmc-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+        </repository>
+    </repositories>
   <dependencies>
     <dependency>
       <groupId>org.spigotmc</groupId>

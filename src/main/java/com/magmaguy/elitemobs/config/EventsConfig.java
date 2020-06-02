@@ -22,7 +22,7 @@ public class EventsConfig {
         configuration.addDefault(MAXIMUM_ONLINE_PLAYERS, 100);
         configuration.addDefault(MINIMUM_EVENT_FREQUENCY, 45);
         configuration.addDefault(MAXIMUM_EVENT_FREQUENCY, 10);
-        configuration.addDefault(ANNOUNCEMENT_BROADCAST_WORLD_ONLY, false);
+        configuration.addDefault(ANNOUNCEMENT_BROADCAST_WORLD_ONLY, true);
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);
