@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.custombosses;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
@@ -11,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
@@ -22,19 +24,20 @@ import java.util.UUID;
 
 public class RegionalBossEntity implements Listener {
 
-    private static HashSet<RegionalBossEntity> regionalBossEntityList = new HashSet();
+    private static final HashSet<RegionalBossEntity> regionalBossEntityList = new HashSet();
 
     public static HashSet<RegionalBossEntity> getRegionalBossEntityList() {
         return regionalBossEntityList;
     }
 
+    private CustomBossEntity customBossEntity;
     private boolean isAlive;
-    private Location spawnLocation;
+    private final Location spawnLocation;
     private double leashRadius;
-    private int respawnCooldown;
+    private final int respawnCooldown;
     private boolean inCooldown = false;
     private UUID uuid;
-    private CustomBossConfigFields customBossConfigFields;
+    private final CustomBossConfigFields customBossConfigFields;
 
     public RegionalBossEntity(CustomBossConfigFields customBossConfigFields, Location spawnLocation) {
         this.spawnLocation = spawnLocation;
@@ -75,13 +78,15 @@ public class RegionalBossEntity implements Listener {
 
         spawnLocation.getChunk().load();
 
-        CustomBossEntity customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
+        customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
         isAlive = true;
         uuid = customBossEntity.getLivingEntity().getUniqueId();
         checkLeash();
         regionalBossWatchdog();
         customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
         customBossEntity.setIsRegionalBoss(true);
+        if (customBossConfigFields.getTimeout() > 0)
+            startEscapeMechanismDelay(customBossConfigFields.getTimeout());
     }
 
     private void respawnRegionalBoss() {
@@ -136,6 +141,33 @@ public class RegionalBossEntity implements Listener {
 
     }
 
+    /**
+     * Starts the escape mechanic for bosses that have this feature. After a set time, in minutes, the boss will escape,
+     * potentially broadcasting an escape message.
+     */
+    private void startEscapeMechanismDelay(int timeout) {
+
+        if (timeout < 1) return;
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                LivingEntity livingEntity = customBossEntity.advancedGetEntity();
+                if (livingEntity == null) return;
+                if (livingEntity.isDead()) return;
+                livingEntity.remove();
+                if (customBossConfigFields.getEscapeMessage() != null)
+                    for (Player player : Bukkit.getOnlinePlayers())
+                        if (player.getWorld().equals(livingEntity.getWorld()))
+                            player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
+
+            }
+
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * timeout);
+
+    }
+
     private void regionalBossWatchdog() {
 
         new BukkitRunnable() {
@@ -157,10 +189,6 @@ public class RegionalBossEntity implements Listener {
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
-    }
-
-    public void setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
     }
 
     public CustomBossConfigFields getCustomBossConfigFields() {

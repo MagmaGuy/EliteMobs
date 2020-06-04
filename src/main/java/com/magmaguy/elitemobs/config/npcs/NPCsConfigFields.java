@@ -9,20 +9,20 @@ import java.util.List;
 
 public class NPCsConfigFields {
 
-    private String fileName;
+    private final String fileName;
     private boolean isEnabled;
-    private String name;
-    private String role;
-    private String profession;
+    private final String name;
+    private final String role;
+    private final String profession;
     private String location;
-    private List<String> greetings;
-    private List<String> dialog;
-    private List<String> farewell;
-    private boolean canMove;
-    private boolean canTalk;
-    private double activationRadius;
-    private boolean canSleep;
-    private String interactionType;
+    private final List<String> greetings;
+    private final List<String> dialog;
+    private final List<String> farewell;
+    private final boolean canMove;
+    private final boolean canTalk;
+    private final double activationRadius;
+    private final boolean canSleep;
+    private final String interactionType;
     private FileConfiguration fileConfiguration = null;
     private File file;
 
@@ -155,7 +155,7 @@ public class NPCsConfigFields {
         this.isEnabled = enabled;
         this.fileConfiguration.set("isEnabled", enabled);
         try {
-            ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, NPCsConfig.getNPCsList().get(this.fileName).getFile());
+            ConfigurationEngine.fileSaverCustomValues(this.fileConfiguration, this.file);
         } catch (Exception e) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the enabled status for an NPC with no config file! Did you delete it during runtime?");
         }
@@ -166,7 +166,7 @@ public class NPCsConfigFields {
         this.location = location;
         this.fileConfiguration.set("location", location);
         try {
-            ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, this.file);
+            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
         } catch (Exception ex) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }
