@@ -106,8 +106,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         if (customBossConfigFields.getSpawnMessage() != null)
             Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
         setEquipment();
-        if (customBossConfigFields.getTimeout() > 0)
-            startEscapeMechanismDelay(customBossConfigFields.getTimeout());
         if (entityType.equals(EntityType.ZOMBIE))
             ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         else if (entityType.equals(EntityType.DROWNED))
@@ -124,33 +122,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         addCustomBoss(this);
         if (customBossConfigFields.getFollowRange() != null && customBossConfigFields.getFollowRange() > 0 && getLivingEntity() instanceof Mob)
             getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
-    }
-
-    /**
-     * Starts the escape mechanic for bosses that have this feature. After a set time, in minutes, the boss will escape,
-     * potentially broadcasting an escape message.
-     */
-    private void startEscapeMechanismDelay(int timeout) {
-
-        if (timeout < 1) return;
-
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                LivingEntity livingEntity = advancedGetEntity();
-                if (livingEntity == null) return;
-                if (livingEntity.isDead()) return;
-                livingEntity.remove();
-                if (customBossConfigFields.getEscapeMessage() != null)
-                    for (Player player : Bukkit.getOnlinePlayers())
-                        if (player.getWorld().equals(livingEntity.getWorld()))
-                            player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
-
-            }
-
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * timeout);
-
     }
 
     public void startBossTrails() {
@@ -238,6 +209,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     private void setEquipment() {
         try {
+            getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(Material.AIR));
+            getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(Material.AIR));
+            getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(Material.AIR));
+            getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(Material.AIR));
+            getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(Material.AIR));
+            getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(Material.AIR));
             getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(customBossConfigFields.getHelmet()));
             getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(customBossConfigFields.getChestplate()));
             getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(customBossConfigFields.getLeggings()));

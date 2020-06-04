@@ -85,7 +85,7 @@ public class Placeholders extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
 
-        if (!player.isOnline())
+        if (player == null)
             return "Only online players!";
 
         switch (identifier) {

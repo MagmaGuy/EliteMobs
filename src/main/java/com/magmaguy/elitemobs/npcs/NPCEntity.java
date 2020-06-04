@@ -21,11 +21,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity {
 
-    private static HashSet<NPCEntity> npcEntityHashSet = new HashSet<>();
+    private static final HashSet<NPCEntity> npcEntityHashSet = new HashSet<>();
 
     private Villager villager;
 
-    private NPCsConfigFields npCsConfigFields;
+    private final NPCsConfigFields npCsConfigFields;
     private String name;
     private String role;
     private ArmorStand roleDisplay;
@@ -223,13 +223,16 @@ public class NPCEntity {
         return this.spawnLocation;
     }
 
+    /**
+     * Initializes the spawn location of the NPCEntity
+     *
+     * @param spawnLocation
+     * @return
+     */
     private boolean setSpawnLocation(String spawnLocation) {
         Location location = ConfigurationLocation.deserialize(spawnLocation);
-
         if (location == null) return false;
-
         this.spawnLocation = location;
-
         return true;
     }
 

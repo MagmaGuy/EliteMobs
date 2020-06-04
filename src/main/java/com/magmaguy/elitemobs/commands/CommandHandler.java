@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.items.ShareItem;
+import com.magmaguy.elitemobs.playerdata.PlayerStatusScreen;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
@@ -282,6 +283,9 @@ public class CommandHandler implements CommandExecutor {
             case "setrank":
                 if (!userPermCheck("elitemobs.admin", commandSender)) return true;
                 GuildRankCommands.setGuildRank(args);
+                return true;
+            case "status":
+                new PlayerStatusScreen((Player) commandSender);
                 return true;
             default:
                 validCommands(commandSender);
