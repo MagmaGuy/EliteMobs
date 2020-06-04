@@ -43,6 +43,7 @@ import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
 import com.magmaguy.elitemobs.powers.AggroPrevention;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
@@ -80,6 +81,7 @@ public class EventsRegistrer {
         Plugin plugin = MetadataHandler.PLUGIN;
 
         pluginManager.registerEvents(new PlayerData.PlayerDataEvents(), plugin);
+        pluginManager.registerEvents(new PlayerStatsTracker(), plugin);
 
         //Load passive mobs TODO: find generic alternative to this
         pluginManager.registerEvents(new ChickenHandler(), plugin);

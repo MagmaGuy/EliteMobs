@@ -39,8 +39,7 @@ public class PlayerData {
 
     public static double getCurrency(UUID uuid) {
         if (playerDataHashMap.get(uuid) == null)
-            return getDatabaseDouble(uuid, "CURRENCY");
-
+            return getDatabaseDouble(uuid, "Currency");
         return playerDataHashMap.get(uuid).currency;
     }
 
@@ -51,7 +50,7 @@ public class PlayerData {
     }
 
     public static int getGuildPrestigeLevel(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!playerDataHashMap.containsKey(uuid))
             return getDatabaseInteger(uuid, "GuildPrestigeLevel");
         return playerDataHashMap.get(uuid).guildPrestigeLevel;
     }
@@ -185,9 +184,15 @@ public class PlayerData {
 
     private static String getDatabaseString(UUID uuid, String value) {
         try {
-            return getResultSet(uuid).getString(value);
+            Statement statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            String reply = resultSet.getString(value);
+            resultSet.close();
+            statement.close();
+            getConnection().close();
+            return reply;
         } catch (Exception e) {
-            new WarningMessage("Failed to get double value from database!");
+            new WarningMessage("Failed to get string value from database!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             return null;
         }
@@ -195,7 +200,13 @@ public class PlayerData {
 
     private static Double getDatabaseDouble(UUID uuid, String value) {
         try {
-            return getResultSet(uuid).getDouble(value);
+            Statement statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            double reply = resultSet.getDouble(value);
+            resultSet.close();
+            statement.close();
+            getConnection().close();
+            return reply;
         } catch (Exception e) {
             new WarningMessage("Failed to get double value from database!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -205,9 +216,15 @@ public class PlayerData {
 
     private static Integer getDatabaseInteger(UUID uuid, String value) {
         try {
-            return getResultSet(uuid).getInt(value);
+            Statement statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            int reply = resultSet.getInt(value);
+            resultSet.close();
+            statement.close();
+            getConnection().close();
+            return reply;
         } catch (Exception e) {
-            new WarningMessage("Failed to obtain integer value from database!");
+            new WarningMessage("Failed to get integer value from database!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             return null;
         }
@@ -217,12 +234,11 @@ public class PlayerData {
         Statement statement = null;
         try {
             getConnection().setAutoCommit(false);
-            statement = getConnection().createStatement();
+            //statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
 
-            resultSet.close();
-            statement.close();
-            getConnection().close();
+            //statement.close();
+            //getConnection().close();
             return resultSet;
 
         } catch (Exception e) {
@@ -258,7 +274,6 @@ public class PlayerData {
             this.questsCompleted = resultSet.getInt("QuestsCompleted");
 
             playerDataHashMap.put(uuid, this);
-            new WarningMessage(playerDataHashMap.get(uuid).guildPrestigeLevel + "");
 
             resultSet.close();
             statement.close();
@@ -319,10 +334,11 @@ public class PlayerData {
             this.deaths = 0;
             this.questsCompleted = 0;
 
+            playerDataHashMap.put(uuid, this);
+
             statement.close();
             getConnection().commit();
             getConnection().close();
-            playerDataHashMap.put(uuid, this);
         } catch (Exception e) {
             new WarningMessage("Failed to generate an entry!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());

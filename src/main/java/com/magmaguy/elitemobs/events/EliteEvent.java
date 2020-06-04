@@ -6,6 +6,9 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -22,7 +25,7 @@ import java.util.UUID;
 
 public class EliteEvent extends AbstractEliteEvent {
 
-    private static HashMap<UUID, EliteEvent> activeEvents = new HashMap<>();
+    private static final HashMap<UUID, EliteEvent> activeEvents = new HashMap<>();
 
     private static void addActiveEvent(EliteEvent eliteEvent) {
         activeEvents.put(eliteEvent.uuid, eliteEvent);
@@ -200,6 +203,9 @@ public class EliteEvent extends AbstractEliteEvent {
             if (!EliteMobs.validWorldList.contains(event.getLocation().getWorld())) return;
             if (!(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
                     event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)))
+                return;
+            if (EliteMobs.worldguardIsEnabled &&
+                    !WorldGuardFlagChecker.checkFlag(event.getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsEventsFlag()))
                 return;
             for (EliteEvent eliteEvent : getActiveEvents().values()) {
                 if (eliteEvent.worlds.contains(event.getEntity().getWorld())) {

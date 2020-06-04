@@ -138,11 +138,6 @@ public class EliteMobs extends JavaPlugin {
         SuperMobScanner.scanSuperMobs();
 
         /*
-        Initialize NPCs
-         */
-        new NPCInitializer();
-
-        /*
         Check for new plugin version
          */
         VersionChecker.updateComparer();
@@ -163,6 +158,11 @@ public class EliteMobs extends JavaPlugin {
         Spawn world bosses
          */
         RegionalBossHandler.initialize();
+
+        /*
+        Initialize NPCs
+         */
+        new NPCInitializer();
 
         // Small check to make sure that PlaceholderAPI is installed
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
