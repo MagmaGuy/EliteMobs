@@ -30,12 +30,12 @@ public class RegionalBossEntity implements Listener {
         return regionalBossEntityList;
     }
 
-    private CustomBossEntity customBossEntity;
-    private boolean isAlive;
+    public CustomBossEntity customBossEntity;
+    public boolean isAlive;
     private final Location spawnLocation;
     private double leashRadius;
     private final int respawnCooldown;
-    private boolean inCooldown = false;
+    public boolean inCooldown = false;
     private UUID uuid;
     private final CustomBossConfigFields customBossConfigFields;
 
