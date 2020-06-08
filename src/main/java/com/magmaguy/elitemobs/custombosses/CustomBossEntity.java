@@ -76,6 +76,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         return customBosses.get(uuid);
     }
 
+    public static HashMap<UUID, CustomBossEntity> getCustomBosses() {
+        return customBosses;
+    }
+
     public CustomBossConfigFields customBossConfigFields;
     private final HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
     private UUID uuid;
