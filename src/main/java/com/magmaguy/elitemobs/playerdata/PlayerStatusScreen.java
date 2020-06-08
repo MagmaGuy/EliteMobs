@@ -27,33 +27,34 @@ public class PlayerStatusScreen implements Listener {
                         "EliteMobs slain: " + PlayerData.getKills(player.getUniqueId()) + "\n" +
                         "Highest Level slain: " + PlayerData.getHighestLevelKilled(player.getUniqueId()) + "\n" +
                         "Times slain by Elites: " + PlayerData.getDeaths(player.getUniqueId()) + "\n" +
-                        "Quests completed: " + PlayerData.getQuestsCompleted(player.getUniqueId());
+                        "Quests completed: " + PlayerData.getQuestsCompleted(player.getUniqueId()) + "\n" +
+                        "EliteMobs Score: " + PlayerData.getScore(player.getUniqueId());
 
-        String helmetString = "Helmet ilvl = 0" + "\n";
-        String chestplateString = "Chestplate ilvl = 0" + "\n";
-        String leggingsString = "Leggings ilvl = 0" + "\n";
-        String bootsString = "Boots ilvl = 0" + "\n";
-        String mainHandString = "Main Hand ilvl = 0" + "\n";
-        String offHandString = "Offhand ilvl = 0" + "\n";
+        String helmetString = "          ☠ - 0 ilvl" + "\n";
+        String chestplateString = "          ▼ - 0 ilvl" + "\n";
+        String leggingsString = "          Π - 0 ilvl" + "\n";
+        String bootsString = "          ╯╰ - 0 ilvl" + "\n";
+        String mainHandString = "    ⚔ - 0";
+        String offHandString = "    ⛨ - 0" + "\n";
 
         if (player.getEquipment() != null) {
             if (player.getEquipment().getHelmet() != null)
-                helmetString = "Helmet ilvl: " + ItemTierFinder.findBattleTier(player.getEquipment().getHelmet()) + "\n";
+                helmetString = "          ☠ - " + ItemTierFinder.findBattleTier(player.getEquipment().getHelmet()) + " ilvl\n";
             if (player.getEquipment().getChestplate() != null)
-                chestplateString = "Chestplate ilvl: " + ItemTierFinder.findBattleTier(player.getEquipment().getChestplate()) + "\n";
+                chestplateString = "          ▼ - " + ItemTierFinder.findBattleTier(player.getEquipment().getChestplate()) + " ilvl\n";
             if (player.getEquipment().getLeggings() != null)
-                leggingsString = "Leggings ilvl: " + ItemTierFinder.findBattleTier(player.getEquipment().getLeggings()) + "\n";
+                leggingsString = "          Π - " + ItemTierFinder.findBattleTier(player.getEquipment().getLeggings()) + " ilvl\n";
             if (player.getEquipment().getBoots() != null)
-                bootsString = "Boots ilvl: " + ItemTierFinder.findBattleTier(player.getEquipment().getBoots()) + "\n";
+                bootsString = "          ╯╰ - " + ItemTierFinder.findBattleTier(player.getEquipment().getBoots()) + " ilvl\n";
             if (player.getEquipment().getItemInMainHand() != null && !player.getEquipment().getItemInMainHand().getType().equals(Material.AIR))
-                mainHandString = "Main Hand ilvl: " + ItemTierFinder.findBattleTier(player.getEquipment().getItemInMainHand()) + "\n";
+                mainHandString = "    ⚔ - " + ItemTierFinder.findBattleTier(player.getEquipment().getItemInMainHand());
             if (player.getEquipment().getItemInOffHand() != null && !player.getEquipment().getItemInOffHand().getType().equals(Material.AIR))
-                offHandString = "Boots ilvl: " + ItemTierFinder.findBattleTier(player.getEquipment().getItemInOffHand()) + "\n";
+                offHandString = "    ⛨ - : " + ItemTierFinder.findBattleTier(player.getEquipment().getItemInOffHand()) + "\n";
         }
 
         String materials = helmetString + chestplateString + leggingsString + bootsString + mainHandString + offHandString + "\n" +
-                "Armor ilvl (dmg-): " + ItemTierFinder.findArmorSetTier(player) + "\n" +
-                "Weapon ilvl (dmg+): " + ItemTierFinder.findWeaponTier(player) + "\n";
+                "Armor ilvl: " + ItemTierFinder.findArmorSetTier(player) + "\n" +
+                "Weapon ilvl: " + ItemTierFinder.findWeaponTier(player) + "\n";
 
         List<String> pages = new ArrayList<String>();
         pages.add(page);

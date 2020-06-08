@@ -100,7 +100,14 @@ public class PlayerData {
         setDatabaseValue(uuid, "Score", getScore(uuid) + levelToIncrement * 2);
 
         if (playerDataHashMap.containsKey(uuid))
-            playerDataHashMap.get(uuid).score += 1;
+            playerDataHashMap.get(uuid).score += (levelToIncrement * 2);
+    }
+
+    public static void decrementScore(UUID uuid) {
+        setDatabaseValue(uuid, "Score", getScore(uuid) - 100);
+
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).score -= 100;
     }
 
     public static int getKills(UUID uuid) {

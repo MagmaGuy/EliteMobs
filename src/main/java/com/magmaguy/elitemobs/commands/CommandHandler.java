@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.commands.admin.CheckTierOthersCommand;
+import com.magmaguy.elitemobs.commands.admin.CustomBossDebugScreen;
 import com.magmaguy.elitemobs.commands.admin.StatsCommand;
 import com.magmaguy.elitemobs.commands.admin.npc.NPCCommands;
 import com.magmaguy.elitemobs.commands.combat.CheckTierCommand;
@@ -287,6 +288,10 @@ public class CommandHandler implements CommandExecutor {
             case "status":
                 new PlayerStatusScreen((Player) commandSender);
                 return true;
+            case "debug":
+                if (!userPermCheck("elitemobs.admin", commandSender)) return true;
+                new CustomBossDebugScreen((Player) commandSender, args);
+                return true;
             default:
                 validCommands(commandSender);
                 return true;
@@ -318,17 +323,12 @@ public class CommandHandler implements CommandExecutor {
     }
 
     public static boolean userPermCheck(String permission, CommandSender commandSender) {
-
-        if (commandSender instanceof Player) {
-
+        if (commandSender instanceof Player)
             return permCheck(permission, commandSender);
-
-        }
 
         commandSender.sendMessage("[EliteMobs] You may not run this command.");
         commandSender.sendMessage("[EliteMobs] This is a user command.");
         return false;
-
     }
 
     private static void validCommands(CommandSender commandSender) {

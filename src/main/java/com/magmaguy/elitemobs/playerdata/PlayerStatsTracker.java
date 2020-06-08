@@ -9,6 +9,7 @@ public class PlayerStatsTracker implements Listener {
 
     public static void registerPlayerDeath(Player player) {
         PlayerData.incrementDeaths(player.getUniqueId());
+        PlayerData.decrementScore(player.getUniqueId());
     }
 
     @EventHandler
