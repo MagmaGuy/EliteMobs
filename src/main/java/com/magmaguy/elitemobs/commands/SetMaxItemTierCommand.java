@@ -30,7 +30,7 @@ public class SetMaxItemTierCommand {
 //        customConfigLoader2.saveCustomConfig(MobCombatSettingsConfig.CONFIG_NAME);
 
         commandSender.sendMessage(ChatColorConverter.convert(
-                "Warning: This command is currently under maintenance!"));
+                "Warning: This command is no longer necessary!"));
 
 //        commandSender.sendMessage(ChatColorConverter.convert(
 //                "Warning: You have set the max tier to " + tier + "!"));

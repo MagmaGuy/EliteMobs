@@ -7,7 +7,7 @@ public class ProtectionProjectileConfig extends EnchantmentsConfigFields {
         super("protection_projectile",
                 true,
                 "Projectile Protection",
-                50,
+                100,
                 6);
     }
 }

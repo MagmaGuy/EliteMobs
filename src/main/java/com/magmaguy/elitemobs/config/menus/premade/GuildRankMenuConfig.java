@@ -114,7 +114,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
                                 "&a- Base chance to crit",
                                 "&a- Base chance to dodge",
                                 "&4Warning: this resets you current",
-                                "&4EliteMobs currency!",
+                                "&4EliteMobs ITEMS AND CURRENCY!",
                                 "&f&m-------------------------------")), fileConfiguration);
         prestigeNextUnlockButton = ItemStackSerializer.deserialize("prestigeNextUnlockButton", fileConfiguration);
 

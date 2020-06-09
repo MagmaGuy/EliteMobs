@@ -7,7 +7,7 @@ public class ArrowDamageConfig extends EnchantmentsConfigFields {
         super("arrow_damage",
                 true,
                 "Power",
-                100,
+                200,
                 13);
     }
 }

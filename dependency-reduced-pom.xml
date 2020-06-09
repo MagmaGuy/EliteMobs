@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>7.1.24.pre-4</version>
+  <version>7.1.24.pre-5</version>
   <build>
     <defaultGoal>clean resources:resources package</defaultGoal>
     <finalName>${project.artifactId}</finalName>
@@ -17,16 +17,16 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.1.0</version>
+          <executions>
+              <execution>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>shade</goal>
+                  </goals>
+              </execution>
+          </executions>
           <configuration>
               <relocations>
                   <relocation>
@@ -84,16 +84,16 @@
                     <groupId>com.google.code.gson</groupId>
                 </exclusion>
                 <exclusion>
-          <artifactId>bungeecord-chat</artifactId>
-          <groupId>net.md-5</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>snakeyaml</artifactId>
-          <groupId>org.yaml</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
+                    <artifactId>bungeecord-chat</artifactId>
+                    <groupId>net.md-5</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>snakeyaml</artifactId>
+                    <groupId>org.yaml</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
       <groupId>com.sk89q.worldguard</groupId>
       <artifactId>worldguard-bukkit</artifactId>
       <version>7.0.0</version>
