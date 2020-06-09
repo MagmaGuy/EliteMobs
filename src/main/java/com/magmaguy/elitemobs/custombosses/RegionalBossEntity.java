@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
+import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -168,6 +169,9 @@ public class RegionalBossEntity implements Listener {
 
     }
 
+    /**
+     * This may cause issues when bosses wander really far from teh spawn chunk
+     */
     private void regionalBossWatchdog() {
 
         new BukkitRunnable() {
@@ -176,6 +180,7 @@ public class RegionalBossEntity implements Listener {
             public void run() {
                 if (inCooldown)
                     return;
+                if (!ChunkLocationChecker.locationIsLoaded(spawnLocation)) return;
                 if (customBossEntity == null ||
                         customBossEntity.advancedGetEntity() == null ||
                         customBossEntity.advancedGetEntity().isDead()) {
