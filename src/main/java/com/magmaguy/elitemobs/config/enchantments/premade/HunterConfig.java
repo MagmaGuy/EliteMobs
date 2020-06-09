@@ -9,6 +9,6 @@ public class HunterConfig extends EnchantmentsConfigFields {
                 "Hunter",
                 3,
                 10);
-        super.getAdditionalConfigOptions().put("hunterSpawnBonus", 0.1);
+        super.getAdditionalConfigOptions().put("hunterSpawnBonus", 0.05);
     }
 }

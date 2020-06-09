@@ -83,7 +83,7 @@ public class RegionalBossEntity implements Listener {
         uuid = customBossEntity.getLivingEntity().getUniqueId();
         checkLeash();
         regionalBossWatchdog();
-        customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
+        customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
         customBossEntity.setIsRegionalBoss(true);
         if (customBossConfigFields.getTimeout() > 0)
             startEscapeMechanismDelay(customBossConfigFields.getTimeout());
@@ -174,14 +174,10 @@ public class RegionalBossEntity implements Listener {
 
             @Override
             public void run() {
-                Entity entity = Bukkit.getEntity(uuid);
-
-                if (entity == null || !isAlive) {
-                    cancel();
-                    return;
-                }
-
-                if (entity.isDead()) {
+                if (!inCooldown &&
+                        customBossEntity == null ||
+                        customBossEntity.advancedGetEntity() == null ||
+                        customBossEntity.advancedGetEntity().isDead()) {
                     respawnRegionalBoss();
                     cancel();
                 }

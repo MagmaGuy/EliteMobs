@@ -7,7 +7,7 @@ public class ProtectionExplosionsConfig extends EnchantmentsConfigFields {
         super("protection_explosions",
                 true,
                 "Blast Protection",
-                50,
+                100,
                 6);
     }
 }
