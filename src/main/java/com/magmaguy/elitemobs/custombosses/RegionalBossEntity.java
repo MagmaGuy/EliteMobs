@@ -174,8 +174,9 @@ public class RegionalBossEntity implements Listener {
 
             @Override
             public void run() {
-                if (!inCooldown &&
-                        customBossEntity == null ||
+                if (inCooldown)
+                    return;
+                if (customBossEntity == null ||
                         customBossEntity.advancedGetEntity() == null ||
                         customBossEntity.advancedGetEntity().isDead()) {
                     respawnRegionalBoss();

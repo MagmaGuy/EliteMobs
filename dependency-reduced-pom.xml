@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.magmaguy</groupId>
   <artifactId>EliteMobs</artifactId>
-  <version>7.1.24.pre-5</version>
+  <version>7.1.24.pre-6</version>
   <build>
     <defaultGoal>clean resources:resources package</defaultGoal>
     <finalName>${project.artifactId}</finalName>
@@ -16,26 +16,26 @@
           <target>1.8</target>
         </configuration>
       </plugin>
-      <plugin>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>3.1.0</version>
-          <executions>
-              <execution>
-                  <phase>package</phase>
-                  <goals>
-                      <goal>shade</goal>
-                  </goals>
-              </execution>
-          </executions>
-          <configuration>
-              <relocations>
-                  <relocation>
-                      <pattern>org.bstats</pattern>
-                      <shadedPattern>your.package</shadedPattern>
-                  </relocation>
-              </relocations>
-          </configuration>
-      </plugin>
+        <plugin>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <relocations>
+                    <relocation>
+                        <pattern>org.bstats</pattern>
+                        <shadedPattern>your.package</shadedPattern>
+                    </relocation>
+                </relocations>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
     <repositories>
@@ -94,16 +94,16 @@
             </exclusions>
         </dependency>
         <dependency>
-      <groupId>com.sk89q.worldguard</groupId>
-      <artifactId>worldguard-bukkit</artifactId>
-      <version>7.0.0</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>bukkit</artifactId>
-          <groupId>org.bukkit</groupId>
-        </exclusion>
-        <exclusion>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>7.0.0</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bukkit</artifactId>
+                    <groupId>org.bukkit</groupId>
+                </exclusion>
+                <exclusion>
           <artifactId>worldedit-bukkit</artifactId>
           <groupId>com.sk89q.worldedit</groupId>
         </exclusion>
