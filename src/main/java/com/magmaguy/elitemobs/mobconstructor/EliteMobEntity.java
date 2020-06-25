@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -70,7 +71,7 @@ public class EliteMobEntity {
     private boolean hasEliteLoot = true;
     private CreatureSpawnEvent.SpawnReason spawnReason;
 
-    private HashMap<Player, Double> damagers = new HashMap<>();
+    private final HashMap<Player, Double> damagers = new HashMap<>();
 
     private double healthMultiplier = 1.0;
     private double damageMultiplier = 1.0;
@@ -170,6 +171,10 @@ public class EliteMobEntity {
                           String name,
                           HashSet<ElitePower> mobPowers,
                           CreatureSpawnEvent.SpawnReason spawnReason) {
+        if (!EliteMobProperties.isValidEliteMobType(entityType)) {
+            new WarningMessage("Attempted to spawn custom boss with of type " + entityType + " which is not a valid type for Elite Mobs. The boss will not be spawned.");
+            return;
+        }
         this.eliteLevel = eliteLevel;
         this.name = name;
         this.powers = mobPowers;
