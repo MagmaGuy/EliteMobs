@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,37 +39,11 @@ public class EliteQuest implements Serializable {
     }
 
     private static EntityType generateRandomEntityType() {
-
-        ArrayList<EntityType> validEntities = new ArrayList<>();
-
-        if (EliteMobProperties.isValidEliteMobType(EntityType.BLAZE))
-            validEntities.add(EntityType.BLAZE);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.CAVE_SPIDER))
-            validEntities.add(EntityType.CAVE_SPIDER);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.CREEPER))
-            validEntities.add(EntityType.CREEPER);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.ENDERMAN))
-            validEntities.add(EntityType.ENDERMAN);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.PIG_ZOMBIE))
-            validEntities.add(EntityType.PIG_ZOMBIE);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.SKELETON))
-            validEntities.add(EntityType.SKELETON);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.SPIDER))
-            validEntities.add(EntityType.SPIDER);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.WITHER_SKELETON))
-            validEntities.add(EntityType.WITHER_SKELETON);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.ZOMBIE))
-            validEntities.add(EntityType.ZOMBIE);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.STRAY))
-            validEntities.add(EntityType.STRAY);
-        if (EliteMobProperties.isValidEliteMobType(EntityType.HUSK))
-            validEntities.add(EntityType.HUSK);
-
-        return validEntities.get(ThreadLocalRandom.current().nextInt(validEntities.size()));
-
+        Object[] array = EliteMobProperties.getValidMobTypes().toArray();
+        return (EntityType) array[ThreadLocalRandom.current().nextInt(array.length)];
     }
 
-    private static HashMap<Player, EliteQuest> questTracker = new HashMap();
+    private static final HashMap<Player, EliteQuest> questTracker = new HashMap();
 
     private static HashMap<Player, EliteQuest> getQuestTracker() {
         return questTracker;
@@ -106,8 +79,8 @@ public class EliteQuest implements Serializable {
     Actual class constructor
      */
     private QuestObjective questObjective;
-    private UUID uuid = UUID.randomUUID();
-    private int counter = 0;
+    private final UUID uuid = UUID.randomUUID();
+    private final int counter = 0;
 
     public EliteQuest(QuestObjective questObjective) {
         setQuestObjective(questObjective);

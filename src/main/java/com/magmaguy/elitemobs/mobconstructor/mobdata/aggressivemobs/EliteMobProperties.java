@@ -19,10 +19,10 @@ public abstract class EliteMobProperties extends PluginMobProperties {
      */
 
     public static HashSet<EliteMobProperties> eliteMobData = new HashSet<>();
-    private HashSet<MajorPower> validMajorPowers = new HashSet<>();
-    private HashSet<MinorPower> validDefensivePowers = (HashSet<MinorPower>) ElitePower.getDefensivePowers().clone();
-    private HashSet<MinorPower> validOffensivePowers = (HashSet<MinorPower>) ElitePower.getOffensivePowers().clone();
-    private HashSet<MinorPower> validMiscellaneousPowers = (HashSet<MinorPower>) ElitePower.getMiscellaneousPowers().clone();
+    private final HashSet<MajorPower> validMajorPowers = new HashSet<>();
+    private final HashSet<MinorPower> validDefensivePowers = (HashSet<MinorPower>) ElitePower.getDefensivePowers().clone();
+    private final HashSet<MinorPower> validOffensivePowers = (HashSet<MinorPower>) ElitePower.getOffensivePowers().clone();
+    private final HashSet<MinorPower> validMiscellaneousPowers = (HashSet<MinorPower>) ElitePower.getMiscellaneousPowers().clone();
 
     public void addMajorPower(String powerName) {
         if (PowersConfig.getPower(powerName).isEnabled())
@@ -73,7 +73,7 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new EliteEnderman();
         new EliteIronGolem();
         new ElitePhantom();
-        new ElitePigZombie();
+        new EliteZombifiedPiglin();
         new ElitePillager();
         new EliteSilverfish();
         new EliteSkeleton();
@@ -99,24 +99,18 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     }
 
     public static boolean isValidEliteMobType(EntityType entityType) {
-
         for (EliteMobProperties eliteMobProperties : eliteMobData)
             if (eliteMobProperties.getEntityType().equals(entityType))
                 if (eliteMobProperties.isEnabled)
                     return true;
-
         return false;
-
     }
 
     public static EliteMobProperties getPluginData(EntityType entityType) {
-
         for (EliteMobProperties eliteMobProperties : eliteMobData)
             if (eliteMobProperties.getEntityType().equals(entityType))
                 return eliteMobProperties;
-
         return null;
-
     }
 
     public static EliteMobProperties getPluginData(Entity entity) {

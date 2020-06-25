@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -114,8 +115,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         else if (entityType.equals(EntityType.DROWNED))
             ((Drowned) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        else if (entityType.equals(EntityType.PIG_ZOMBIE))
-            ((PigZombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
+        else if (!VersionChecker.currentVersionIsUnder(16, 0))
+            if (entityType.equals(EntityType.ZOMBIFIED_PIGLIN))
+                ((PigZombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         super.setPersistent(customBossConfigFields.getIsPersistent());
         if (customBossConfigFields.getTrails() != null) startBossTrails();
         if (MobCombatSettingsConfig.showCustomBossLocation && customBossConfigFields.getLocationMessage() != null)
