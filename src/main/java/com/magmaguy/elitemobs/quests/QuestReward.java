@@ -10,7 +10,9 @@ import java.io.Serializable;
 public class QuestReward implements Serializable {
 
     enum RewardType {
-        MONETARY
+        MONETARY,
+        ITEM,
+        MIXED
     }
 
     private RewardType rewardType;

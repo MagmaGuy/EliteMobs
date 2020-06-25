@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.mobproperties;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.mobproperties.premade.*;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
@@ -12,7 +13,7 @@ import java.util.HashMap;
 
 public class MobPropertiesConfig {
 
-    private static HashMap<EntityType, MobPropertiesConfigFields> mobProperties = new HashMap<>();
+    private static final HashMap<EntityType, MobPropertiesConfigFields> mobProperties = new HashMap<>();
 
     public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {
         return mobProperties;
@@ -23,7 +24,7 @@ public class MobPropertiesConfig {
     }
 
 
-    private static ArrayList<MobPropertiesConfigFields> mobPropertiesConfigFieldsList = new ArrayList<>(Arrays.asList(
+    private static final ArrayList<MobPropertiesConfigFields> mobPropertiesConfigFieldsList = new ArrayList<>(Arrays.asList(
             new EliteBlazeConfig(),
             new EliteCaveSpiderConfig(),
             new EliteCreeperConfig(),
@@ -38,7 +39,6 @@ public class MobPropertiesConfig {
             new EliteIronGolemConfig(),
             new ElitePhantomConfig(),
             new ElitePillagerConfig(),
-            new ElitePigZombieConfig(),
             new ElitePolarBearConfig(),
             new EliteRavagerConfig(),
             new EliteSilverfishConfig(),
@@ -58,6 +58,8 @@ public class MobPropertiesConfig {
     ));
 
     public static void initializeConfigs() {
+        if (!VersionChecker.currentVersionIsUnder(16, 0))
+            mobPropertiesConfigFieldsList.add(new EliteZombiefiedPiglin());
         for (MobPropertiesConfigFields mobPropertiesConfigFields : mobPropertiesConfigFieldsList)
             initializeConfiguration(mobPropertiesConfigFields);
 

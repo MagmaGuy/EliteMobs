@@ -81,7 +81,14 @@ public class RegionalBossEntity implements Listener {
 
         customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
         isAlive = true;
-        uuid = customBossEntity.getLivingEntity().getUniqueId();
+        try {
+            uuid = customBossEntity.getLivingEntity().getUniqueId();
+        } catch (Exception ex) { //This is thrown if the entity failed to spawn if, for example, the entity type is not valid
+            new WarningMessage("Regional boss from config file " + customBossConfigFields.getFileName() + " failed to spawn." +
+                    " This is either because another plugin prevented it from spawning (check region management plugins like WorldGuard)" +
+                    " or because something in the config (probably entity type) was not valid.");
+            return;
+        }
         checkLeash();
         regionalBossWatchdog();
         customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
