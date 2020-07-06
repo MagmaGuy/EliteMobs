@@ -12,12 +12,13 @@ public class CombatSystem {
     public static final double PER_LEVEL_POWER_INCREASE = 0.5;
     public static final double TARGET_HITS_TO_KILL = 7; //affects max health assignment on EliteMobEntity.java
 
+    public static final double NETHERITE_TIER_LEVEL = 8;
     public static final double DIAMOND_TIER_LEVEL = 7;
     public static final double IRON_TIER_LEVEL = 6;
     public static final double STONE_CHAIN_TIER_LEVEL = 5;
     public static final double GOLD_WOOD_LEATHER_TIER_LEVEL = 3;
 
-    private static HashSet<LivingEntity> customDamageEntity = new HashSet<>();
+    private static final HashSet<LivingEntity> customDamageEntity = new HashSet<>();
 
     public static boolean isCustomDamageEntity(LivingEntity livingEntity) {
         return customDamageEntity.contains(livingEntity);

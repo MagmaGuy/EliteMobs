@@ -91,7 +91,15 @@ public class NPCEntity {
         if (!npCsConfigFields.isEnabled()) return;
 
         WorldGuardSpawnEventBypasser.forceSpawn();
-        this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+        try {
+            this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+        } catch (Exception ex) {
+            new WarningMessage("NPC " + npCsConfigFields.getFileName() + " tried to spawn in an invalid location. " +
+                    "This may be due to region protection preventing it from spawning correctly. If not, delete the location" +
+                    " in its configuration file and try setting it up again.");
+            return;
+        }
+
         this.villager.setRemoveWhenFarAway(false);
 
         if (!villager.isValid()) return;
