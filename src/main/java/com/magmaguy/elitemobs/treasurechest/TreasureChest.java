@@ -126,8 +126,13 @@ public class TreasureChest {
     }
 
     private void generateChest() {
-        if (!location.getWorld().getBlockAt(location).getType().equals(chestMaterial))
-            location.getWorld().getBlockAt(location).setType(chestMaterial);
+        try {
+            if (!location.getWorld().getBlockAt(location).getType().equals(chestMaterial))
+                location.getWorld().getBlockAt(location).setType(chestMaterial);
+        } catch (Exception ex) {
+            new WarningMessage("Custom Treasure Chest " + fileName + " has an invalid location and can not be placed.");
+            return;
+        }
         Chest chest = (Chest) location.getBlock().getState();
         chest.setCustomName(this.key);
         //todo: add block face

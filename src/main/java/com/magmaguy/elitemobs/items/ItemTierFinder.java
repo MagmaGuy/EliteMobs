@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -14,9 +15,7 @@ import java.util.List;
 public class ItemTierFinder {
 
     public static double findPlayerTier(Player player) {
-
         return (4 * findArmorSetTier(player) + findWeaponTier(player)) / 5;
-
     }
 
     public static double findArmorSetTier(Player player) {
@@ -24,35 +23,23 @@ public class ItemTierFinder {
         double totalArmorThreat = 0;
 
         if (player.getEquipment().getHelmet() != null) {
-
             ItemStack helmet = player.getEquipment().getHelmet();
-
             totalArmorThreat += findBattleTier(helmet);
-
         }
 
         if (player.getEquipment().getChestplate() != null) {
-
             ItemStack chestplate = player.getEquipment().getChestplate();
-
             totalArmorThreat += findBattleTier(chestplate);
-
         }
 
         if (player.getEquipment().getLeggings() != null) {
-
             ItemStack leggings = player.getEquipment().getLeggings();
-
             totalArmorThreat += findBattleTier(leggings);
-
         }
 
         if (player.getEquipment().getBoots() != null) {
-
             ItemStack boots = player.getEquipment().getBoots();
-
             totalArmorThreat += findBattleTier(boots);
-
         }
 
         double averageArmorThreat = totalArmorThreat / 4;
@@ -223,6 +210,17 @@ public class ItemTierFinder {
                 if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
                     return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             default:
+                if (!VersionChecker.currentVersionIsUnder(16, 0)) {
+                    if (material.equals(Material.NETHERITE_HELMET) ||
+                            material.equals(Material.NETHERITE_CHESTPLATE) ||
+                            material.equals(Material.NETHERITE_LEGGINGS) ||
+                            material.equals(Material.NETHERITE_BOOTS))
+                        return CombatSystem.NETHERITE_TIER_LEVEL + mainEnchantment2;
+                    if (material.equals(Material.NETHERITE_SWORD) ||
+                            material.equals(Material.NETHERITE_AXE) ||
+                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
+                        return CombatSystem.NETHERITE_TIER_LEVEL + mainEnchantment;
+                }
                 return 0;
         }
     }
@@ -270,6 +268,10 @@ public class ItemTierFinder {
                 if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
                     return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             default:
+                if (material.equals(Material.NETHERITE_SWORD) ||
+                        material.equals(Material.NETHERITE_AXE) ||
+                        material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
+                    return CombatSystem.NETHERITE_TIER_LEVEL + mainEnchantment;
                 return 0;
         }
     }
