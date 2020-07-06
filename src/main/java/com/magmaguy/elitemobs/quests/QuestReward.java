@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
@@ -17,12 +18,10 @@ public class QuestReward implements Serializable {
 
     private RewardType rewardType;
     private double questReward;
-    String rewardMessage;
 
     public QuestReward(int questTier, double questDifficulty) {
         setRewardType();
         setQuestReward(questTier, questDifficulty);
-        setRewardMessage();
     }
 
     private void setRewardType() {
@@ -38,25 +37,18 @@ public class QuestReward implements Serializable {
     }
 
     private void setQuestReward(int questTier, double questDifficulty) {
-        if (questTier == 0)
-            this.questReward = questDifficulty;
-        else
-            this.questReward = questDifficulty;
+        this.questReward = questDifficulty;
     }
 
-    public String getRewardMessage() {
-        return this.rewardMessage;
-    }
-
-    private void setRewardMessage() {
-        this.rewardMessage = this.questReward + " " + EconomySettingsConfig.currencyName;
+    public String getRewardMessage(Player player) {
+        return (this.questReward * GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player))) + " " + EconomySettingsConfig.currencyName;
     }
 
     public void doReward(Player player) {
         if (rewardType.equals(RewardType.MONETARY)) {
-            EconomyHandler.addCurrency(player.getUniqueId(), questReward);
+            EconomyHandler.addCurrency(player.getUniqueId(), this.questReward * GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
             player.sendMessage(QuestMenuConfig.rewardMessage
-                    .replace("$reward", questReward + "")
+                    .replace("$reward", this.questReward * GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)) + "")
                     .replace("$currencyName", EconomySettingsConfig.currencyName));
         }
     }

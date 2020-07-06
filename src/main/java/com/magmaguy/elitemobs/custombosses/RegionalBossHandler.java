@@ -1,14 +1,15 @@
 package com.magmaguy.elitemobs.custombosses;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
-import org.bukkit.Location;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
 public class RegionalBossHandler implements Listener {
 
-    private static HashMap<CustomBossConfigFields, CustomBossEntity> livingBossEntities = new HashMap<>();
+    private static final HashMap<CustomBossConfigFields, CustomBossEntity> livingBossEntities = new HashMap<>();
 
     public static void initialize() {
 
@@ -20,16 +21,18 @@ public class RegionalBossHandler implements Listener {
     private static void spawnRegionalBoss(CustomBossConfigFields customBossConfigFields) {
 
         if (!customBossConfigFields.isEnabled()) return;
-        if (customBossConfigFields.getSpawnLocation() == null && customBossConfigFields.getSpawnLocations().size() < 1)
+        if (customBossConfigFields.getConfigRegionalEntities().size() < 1)
             return;
 
-        if (customBossConfigFields.getSpawnLocations().size() > 0) {
-            for (Location newSpawnLocation : customBossConfigFields.getSpawnLocations())
-                new RegionalBossEntity(customBossConfigFields, newSpawnLocation);
-            return;
-        }
+        for (CustomBossConfigFields.ConfigRegionalEntity configRegionalEntities : customBossConfigFields.getConfigRegionalEntities().values())
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    new RegionalBossEntity(customBossConfigFields, configRegionalEntities);
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, customBossConfigFields.getTicksBeforeRespawn(configRegionalEntities.uuid));
+        return;
 
-        new RegionalBossEntity(customBossConfigFields, customBossConfigFields.getSpawnLocation());
 
     }
 

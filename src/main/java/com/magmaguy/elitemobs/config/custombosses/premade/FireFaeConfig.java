@@ -40,7 +40,6 @@ public class FireFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                null,
                 null);
     }
 }

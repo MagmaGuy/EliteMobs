@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.commands.admin.CheckTierOthersCommand;
-import com.magmaguy.elitemobs.commands.admin.CustomBossDebugScreen;
+import com.magmaguy.elitemobs.commands.admin.DebugScreen;
 import com.magmaguy.elitemobs.commands.admin.StatsCommand;
 import com.magmaguy.elitemobs.commands.admin.npc.NPCCommands;
 import com.magmaguy.elitemobs.commands.combat.CheckTierCommand;
@@ -290,7 +290,7 @@ public class CommandHandler implements CommandExecutor {
                 return true;
             case "debug":
                 if (!userPermCheck("elitemobs.admin", commandSender)) return true;
-                new CustomBossDebugScreen((Player) commandSender, args);
+                new DebugScreen((Player) commandSender, args);
                 return true;
             default:
                 validCommands(commandSender);
