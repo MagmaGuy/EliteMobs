@@ -51,7 +51,36 @@ public class ItemLootShower implements Listener {
                     return;
                 }
 
-                if (currencyAmount >= 20) {
+                if (currencyAmount >= 50) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
+                        dropFifty(location);
+                        currencyAmount -= 50;
+                        return;
+                    }
+
+                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
+                        dropTwenty(location);
+                        currencyAmount -= 20;
+                        return;
+                    }
+
+                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
+                        dropTen(location);
+                        currencyAmount -= 10;
+                        return;
+                    }
+
+                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
+                        dropFive(location);
+                        currencyAmount -= 5;
+                        return;
+                    }
+
+                    dropOne(location);
+                    currencyAmount--;
+                    return;
+
+                } else if (currencyAmount >= 20) {
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropTwenty(location);
                         currencyAmount -= 20;
@@ -182,6 +211,20 @@ public class ItemLootShower implements Listener {
         } catch (Exception ex) {
             new WarningMessage("Material for EliteMob shower 20 is invalid. Defaulting to emerald.");
             currencyItem = generateCurrencyItem(Material.EMERALD, location, 20);
+        }
+
+        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 20 + " " + EconomySettingsConfig.currencyName));
+        currencyItem.setCustomNameVisible(true);
+    }
+
+    private void dropFifty(Location location) {
+
+        Item currencyItem;
+        try {
+            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.lootShowerMaterial50), location, 50);
+        } catch (Exception ex) {
+            new WarningMessage("Material for EliteMob shower 50 is invalid. Defaulting to emerald block.");
+            currencyItem = generateCurrencyItem(Material.EMERALD_BLOCK, location, 50);
         }
 
         currencyItem.setCustomName(ChatColorConverter.convert("&2" + 20 + " " + EconomySettingsConfig.currencyName));

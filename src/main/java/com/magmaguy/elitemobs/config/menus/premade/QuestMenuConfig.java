@@ -15,7 +15,7 @@ public class QuestMenuConfig extends MenusConfigFields {
         super("quest_menu");
     }
 
-    public static String questTierSelectorMenuTitle, questSelectorMenuTitle;
+    public static String menuName, questSelectorMenuTitle;
     public static ItemStack validTierButton, inactiveTierButton, invalidTierButton;
     public static String cancelMessagePart1, cancelMessagePart2, cancelMessagePart3;
     public static ItemStack killObjectiveButton;
@@ -24,8 +24,7 @@ public class QuestMenuConfig extends MenusConfigFields {
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        questTierSelectorMenuTitle = ConfigurationEngine.setString(fileConfiguration, "questTierSelectorMenuTitle", "[EM] Quest Tier Selection");
-        questSelectorMenuTitle = ConfigurationEngine.setString(fileConfiguration, "questSelectorMenuTitle", "[EM] Quest Selection");
+        menuName = ConfigurationEngine.setString(fileConfiguration, "menuName", "[EM] Quest Selection");
 
         ItemStackSerializer.serialize(
                 "validTierButton",
@@ -36,27 +35,6 @@ public class QuestMenuConfig extends MenusConfigFields {
                                 "&aget special rewards!")),
                 fileConfiguration);
         validTierButton = ItemStackSerializer.deserialize("validTierButton", fileConfiguration);
-
-        ItemStackSerializer.serialize(
-                "inactiveTierButton",
-                ItemStackGenerator.generateItemStack(Material.YELLOW_STAINED_GLASS_PANE,
-                        "&6You can get a $rank &6quest!",
-                        Arrays.asList(
-                                "&eChange your active guild rank",
-                                "&eto $rank &eto accept there quests!")),
-                fileConfiguration);
-        inactiveTierButton = ItemStackSerializer.deserialize("inactiveTierButton", fileConfiguration);
-
-        ItemStackSerializer.serialize(
-                "invalidTierButton",
-                ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
-                        "&4You can't get a $rank &4quest yet!",
-                        Arrays.asList(
-                                "&cYou must first unlock the ",
-                                "$rank &cguild rank",
-                                "&cto accept these quests!")),
-                fileConfiguration);
-        invalidTierButton = ItemStackSerializer.deserialize("invalidTierButton", fileConfiguration);
 
         cancelMessagePart1 = ConfigurationEngine.setString(fileConfiguration, "cancelQuestMessage1",
                 "&c&l&m&o---------------------------------------------" +

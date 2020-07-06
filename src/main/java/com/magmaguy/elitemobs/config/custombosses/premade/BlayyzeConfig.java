@@ -47,7 +47,6 @@ public class BlayyzeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                null,
                 null);
     }
 }

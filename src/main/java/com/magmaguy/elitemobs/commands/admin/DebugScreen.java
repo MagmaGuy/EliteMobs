@@ -2,18 +2,33 @@ package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.playerdata.PlayerStatusScreen;
+import com.magmaguy.elitemobs.utils.BookMaker;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomBossDebugScreen {
+public class DebugScreen {
 
-    public CustomBossDebugScreen(Player player, String[] args) {
+    public DebugScreen(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage("[EliteMobs] Correct command syntax: /em debug [customBossFilename] OR /em debug [playerName]");
+            player.sendMessage("Currently only works with regional bosses!");
+            player.sendMessage("Also works with fragments of filenames (i.e. 'pirate' instead of 'pirate_1.yml')");
+            player.sendMessage("Also works with fragments of boss names (as they show up in-game, careful with color codes)");
+            return;
+        }
+
+        if (Bukkit.getPlayer(args[1]) != null)
+            new PlayerStatusScreen(player, Bukkit.getPlayer(args[1]));
+        else CustomBossDebugScreen(player, args);
+
+    }
+
+    public void CustomBossDebugScreen(Player player, String[] args) {
 
         if (args.length < 2) {
             player.sendMessage("[EliteMobs] Correct command syntax: /em debug [filename]");
@@ -23,10 +38,6 @@ public class CustomBossDebugScreen {
             return;
         }
 
-        ItemStack writtenBook = new ItemStack(Material.WRITTEN_BOOK);
-        BookMeta bookMeta = (BookMeta) writtenBook.getItemMeta();
-        bookMeta.setTitle(player.getDisplayName() + " stats");
-        bookMeta.setAuthor("EliteMobs");
         List<String> pages = new ArrayList<String>();
 
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList()) {
@@ -51,9 +62,8 @@ public class CustomBossDebugScreen {
             pages.add(page);
         }
 
-        bookMeta.setPages(pages);
-        writtenBook.setItemMeta(bookMeta);
-        player.openBook(writtenBook);
+        BookMaker.generateBook(player, pages);
+
     }
 
 }

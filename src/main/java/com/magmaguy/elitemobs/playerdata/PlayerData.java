@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.quests.PlayerQuests;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,8 +28,16 @@ public class PlayerData {
         playerDataHashMap.remove(uuid);
     }
 
+    public static boolean isInMemory(Player player) {
+        return playerDataHashMap.containsKey(player.getUniqueId());
+    }
+
+    public static boolean isInMemory(UUID uuid) {
+        return playerDataHashMap.containsKey(uuid);
+    }
+
     public static String getDisplayName(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (!isInMemory(uuid))
             return getDatabaseString(uuid, "DisplayName");
 
         return Bukkit.getPlayer(uuid).getCustomName();
@@ -38,7 +48,7 @@ public class PlayerData {
     }
 
     public static double getCurrency(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!isInMemory(uuid))
             return getDatabaseDouble(uuid, "Currency");
         return playerDataHashMap.get(uuid).currency;
     }
@@ -50,7 +60,7 @@ public class PlayerData {
     }
 
     public static int getGuildPrestigeLevel(UUID uuid) {
-        if (!playerDataHashMap.containsKey(uuid))
+        if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "GuildPrestigeLevel");
         return playerDataHashMap.get(uuid).guildPrestigeLevel;
     }
@@ -62,7 +72,7 @@ public class PlayerData {
     }
 
     public static int getMaxGuildLevel(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "GuildMaxLevel");
 
         return playerDataHashMap.get(uuid).maxGuildLevel;
@@ -76,7 +86,7 @@ public class PlayerData {
     }
 
     public static int getActiveGuildLevel(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "GuildActiveLevel");
 
         return playerDataHashMap.get(uuid).activeGuildLevel;
@@ -89,8 +99,29 @@ public class PlayerData {
             playerDataHashMap.get(uuid).activeGuildLevel = activeGuildLevel;
     }
 
+    public static PlayerQuests getQuestStatus(UUID uuid) {
+        try {
+            if (!isInMemory(uuid))
+                return (PlayerQuests) getDatabaseBlob(uuid, "QuestStatus");
+            return playerDataHashMap.get(uuid).questStatus;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public static void setQuestStatus(UUID uuid, PlayerQuests questStatus) {
+        //todo: proper serialization
+        try {
+            setDatabaseValue(uuid, "QuestStatus", questStatus);
+            if (playerDataHashMap.containsKey(uuid))
+                playerDataHashMap.get(uuid).questStatus = questStatus;
+        } catch (Exception ex) {
+            new WarningMessage("Failed to serialize player quest data!");
+        }
+    }
+
     public static int getScore(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "Score");
 
         return playerDataHashMap.get(uuid).score;
@@ -111,7 +142,7 @@ public class PlayerData {
     }
 
     public static int getKills(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "Kills");
 
         return playerDataHashMap.get(uuid).kills;
@@ -125,7 +156,7 @@ public class PlayerData {
     }
 
     public static int getHighestLevelKilled(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "HighestLevelKilled");
 
         return playerDataHashMap.get(uuid).highestLevelKilled;
@@ -140,7 +171,7 @@ public class PlayerData {
     }
 
     public static int getDeaths(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "Deaths");
 
         return playerDataHashMap.get(uuid).deaths;
@@ -154,7 +185,7 @@ public class PlayerData {
     }
 
     public static int getQuestsCompleted(UUID uuid) {
-        if (playerDataHashMap.get(uuid) == null)
+        if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "QuestsCompleted");
 
         return playerDataHashMap.get(uuid).questsCompleted;
@@ -186,6 +217,22 @@ public class PlayerData {
         } catch (Exception e) {
             new WarningMessage("Failed to update database value.");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    private static Object getDatabaseBlob(UUID uuid, String value) {
+        try {
+            Statement statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            Object blob = resultSet.getBlob(value);
+            resultSet.close();
+            statement.close();
+            getConnection().close();
+            return blob;
+        } catch (Exception e) {
+            new WarningMessage("Failed to get string value from database!");
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            return null;
         }
     }
 
@@ -257,6 +304,7 @@ public class PlayerData {
 
     private double currency;
     private int guildPrestigeLevel, maxGuildLevel, activeGuildLevel, score, kills, highestLevelKilled, deaths, questsCompleted;
+    private PlayerQuests questStatus;
 
     /**
      * Called when a player logs in, storing their data in memory
@@ -275,6 +323,12 @@ public class PlayerData {
             this.maxGuildLevel = resultSet.getInt("GuildMaxLevel");
             this.activeGuildLevel = resultSet.getInt("GuildActiveLevel");
             this.score = resultSet.getInt("Score");
+            try {
+                this.questStatus = (PlayerQuests) resultSet.getBlob("QuestStatus");
+            } catch (Exception exception) {
+                //for players with no quest status
+                questStatus = new PlayerQuests(Bukkit.getPlayer(uuid));
+            }
             this.kills = resultSet.getInt("Kills");
             this.highestLevelKilled = resultSet.getInt("HighestLevelKilled");
             this.deaths = resultSet.getInt("Deaths");
@@ -285,6 +339,7 @@ public class PlayerData {
             resultSet.close();
             statement.close();
             getConnection().close();
+            new DebugMessage("Loaded data from player " + Bukkit.getPlayer(uuid).getDisplayName());
             return;
         } catch (Exception e) {
             new WarningMessage("No player entry detected, generating new entry!");
@@ -335,6 +390,7 @@ public class PlayerData {
             this.guildPrestigeLevel = 0;
             this.maxGuildLevel = 1;
             this.activeGuildLevel = 1;
+            this.questStatus = null;
             this.score = 0;
             this.kills = 0;
             this.highestLevelKilled = 0;
@@ -346,6 +402,7 @@ public class PlayerData {
             statement.close();
             getConnection().commit();
             getConnection().close();
+            new DebugMessage("Created new database entry for player " + Bukkit.getPlayer(uuid).getDisplayName());
         } catch (Exception e) {
             new WarningMessage("Failed to generate an entry!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -365,6 +422,14 @@ public class PlayerData {
         return connection;
     }
 
+    public static void closeConnection() {
+        try {
+            getConnection().close();
+        } catch (Exception ex) {
+            new WarningMessage("Could not correctly close database connection.");
+        }
+    }
+
     public static void initializeDatabaseConnection() {
         new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data").mkdirs();
         Statement statement = null;
@@ -379,7 +444,7 @@ public class PlayerData {
                     " GuildPrestigeLevel                 INT," +
                     " GuildMaxLevel                      INT," +
                     " GuildActiveLevel                   INT," +
-                    " QuestStatus                       NONE," +
+                    " QuestStatus                       BLOB," +
                     " Score                              INT," +
                     " Kills                              INT," +
                     " HighestLevelKilled                 INT," +

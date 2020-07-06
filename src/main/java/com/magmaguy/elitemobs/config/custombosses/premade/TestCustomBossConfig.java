@@ -39,7 +39,6 @@ public class TestCustomBossConfig extends CustomBossConfigFields {
                 Arrays.asList("I've been hit!"),
                 0D,
                 false,
-                null,
                 0,
                 0D,
                 Arrays.asList("broadcast $players has killed $name! That was level $level!"));

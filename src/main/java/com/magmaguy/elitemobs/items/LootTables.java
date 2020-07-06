@@ -56,7 +56,7 @@ public class LootTables implements Listener {
 
             if (AdventurersGuildConfig.guildLootLimiter) {
                 double itemTier = setItemTier((int) eliteMobEntity.getTier());
-                if (itemTier < 100 && itemTier > GuildRank.getActiveGuildRank(player) * 10) {
+                if (itemTier > GuildRank.getActiveGuildRank(player) * 10) {
                     itemTier = GuildRank.getActiveGuildRank(player) * 10;
                     new BukkitRunnable() {
                         @Override
