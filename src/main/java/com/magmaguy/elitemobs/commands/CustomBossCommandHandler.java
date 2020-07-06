@@ -48,7 +48,7 @@ public class CustomBossCommandHandler {
 
     private static void addSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location) {
         customBossConfigFields.addSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
-        new RegionalBossEntity(customBossConfigFields, location.clone().add(new Vector(0, 0.2, 0)));
+        new RegionalBossEntity(customBossConfigFields, customBossConfigFields.new ConfigRegionalEntity(location, 0));
     }
 
     private static void setLeashRadius(CustomBossConfigFields customBossConfigFields, Player player, String[] args) {

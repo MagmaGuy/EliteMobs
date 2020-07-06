@@ -1,141 +1,98 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
-import com.magmaguy.elitemobs.utils.ItemStackSerializer;
-import com.magmaguy.elitemobs.utils.MenuUtils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class QuestsMenu implements Listener {
 
-    /**
-     * Opens the main quest menu for a player. This contains all the ranks.
-     *
-     * @param player Player for whom the quest menu will open
-     */
-    public void initializeQuestTierSelectorMenu(Player player) {
-
-        Inventory inventory = Bukkit.createInventory(player, 18, QuestMenuConfig.questTierSelectorMenuTitle);
-
-        for (int index = 0; index < 12; index++) {
-
-            //todo: handle prestige ranks
-            if (GuildRank.isWithinActiveGuildRank(player, 0, index)) {
-
-                HashMap<String, String> replacementItemStack = new HashMap<>();
-                replacementItemStack.put("$rank", GuildRank.getRankName(0, index));
-                inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.validTierButton, replacementItemStack));
-
-            } else if (GuildRank.isWithinMaxGuildRank(player, 0, index)) {
-
-                HashMap<String, String> replacementItemStack = new HashMap<>();
-                replacementItemStack.put("$rank", GuildRank.getRankName(0, index));
-                inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.inactiveTierButton, replacementItemStack));
-
-            } else {
-
-                HashMap<String, String> replacementItemStack = new HashMap<>();
-                replacementItemStack.put("$rank", GuildRank.getRankName(0, index));
-                inventory.setItem(index, ItemStackSerializer.itemStackPlaceholderReplacer(QuestMenuConfig.invalidTierButton, replacementItemStack));
-
-            }
-
-        }
-
-        player.openInventory(inventory);
-
-    }
-
     @EventHandler
-    public void onMainQuestClick(InventoryClickEvent event) {
-        if (!MenuUtils.isValidMenu(event, QuestMenuConfig.questTierSelectorMenuTitle)) return;
+    public void onRankSelectorClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
+        if (!inventories.contains(event.getInventory())) return;
         event.setCancelled(true);
-        if (event.getInventory().getType().equals(InventoryType.PLAYER)) return;
-        if (!event.getCurrentItem().getType().equals(Material.GREEN_STAINED_GLASS_PANE)) return;
+        Player player = (Player) event.getWhoClicked();
 
-        initializeTierQuestMenu((Player) event.getWhoClicked(), event.getSlot());
-    }
+        Integer selectedRank = null;
 
-    /**
-     * Opens the tier quest menu for a player. This lists currently available quests.
-     *
-     * @param player   Player for whom the menu will open
-     * @param menuSlot Menu slot, used to guess the tier of the quest
-     */
-    public void initializeTierQuestMenu(Player player, int menuSlot) {
-
-        int questTier = menuSlot;
-
-        player.openInventory(QuestRefresher.getQuestTierInventory(questTier).getInventory(player));
-
-    }
-
-    @EventHandler
-    public void onTierQuestClick(InventoryClickEvent event) {
-        if (!event.getView().getTitle().contains(QuestMenuConfig.questSelectorMenuTitle)) return;
-        if (!MenuUtils.isValidMenu(event)) return;
-        event.setCancelled(true);
-        if (event.getInventory().getType().equals(InventoryType.PLAYER)) return;
-
-        int tier = 0;
-
-        for (int i = 0; i < 11; i++)
-            if (event.getView().getTitle().contains(GuildRank.getRankName(0, i))) {
-                tier = i;
+        for (int i = 0; i < rankSlots.size(); i++) {
+            if (rankSlots.get(i) == event.getSlot()) {
+                selectedRank = i;
                 break;
             }
-
-        QuestTierMenu questTierMenu = QuestRefresher.getQuestTierInventory(tier);
-        EliteQuest eliteQuest = questTierMenu.getEliteQuests().get(event.getSlot() / 2 - 1);
-
-        if (EliteQuest.hasPlayerQuest((Player) event.getWhoClicked())) {
-            initializeCancelQuestDialog((Player) event.getWhoClicked(), eliteQuest);
-            event.getWhoClicked().closeInventory();
-            return;
         }
 
-        EliteQuest.addPlayerInQuests((Player) event.getWhoClicked(), eliteQuest);
-        eliteQuest.getQuestObjective().sendQuestStartMessage((Player) event.getWhoClicked());
-        event.getWhoClicked().closeInventory();
+        //Clicked nothing
+        if (selectedRank == null) return;
+
+        EliteQuest eliteQuest = rotatingQuests.get(GuildRank.getActiveGuildRank(player)).get(selectedRank);
+
+        if (!PlayerQuests.hasQuest(player, eliteQuest)) {
+            PlayerQuests.addQuest(player, eliteQuest);
+            player.sendMessage("You've accepted a quest!");
+            player.sendMessage("Objective: kill " + eliteQuest.getQuestObjective().getObjectiveKills() + " level " + eliteQuest.getQuestObjective().getMinimumEliteMobLevel() + "+ " + eliteQuest.getQuestObjective().getEliteMobName());
+            player.closeInventory();
+        }
 
     }
 
-    private static final HashMap<Player, EliteQuest> questPairs = new HashMap();
-
-    public static boolean playerHasPendingQuest(Player player) {
-        return questPairs.containsKey(player);
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!inventories.contains(event.getInventory())) return;
+        inventories.remove(event.getInventory());
     }
 
-    public static EliteQuest getPlayerQuestPair(Player player) {
-        return questPairs.get(player);
+    private static final HashSet<Inventory> inventories = new HashSet<>();
+
+    private static final ArrayList<Integer> rankSlots = new ArrayList<>(Arrays.asList(10, 12, 14, 16));
+
+    public static Inventory initializeQuestsMenu(Player player) {
+        Inventory questsMenu = Bukkit.createInventory(player, 18, QuestMenuConfig.menuName);
+        questsMenu = populateInventory(questsMenu, player);
+        inventories.add(questsMenu);
+        player.openInventory(questsMenu);
+        return questsMenu;
     }
 
-    public static void removePlayerQuestPair(Player player) {
-        questPairs.remove(player);
+    private static Inventory populateInventory(Inventory inventory, Player player) {
+        for (int i = 0; i < rankSlots.size(); i++)
+            inventory.setItem(rankSlots.get(i), rotatingQuests.get(GuildRank.getActiveGuildRank(player)).get(i).generateQuestItemStack(player));
+        return inventory;
     }
 
-    private void initializeCancelQuestDialog(Player player, EliteQuest eliteQuest) {
-        player.sendMessage(QuestMenuConfig.cancelMessagePart1);
-        TextComponent interactiveMessage = new TextComponent(QuestMenuConfig.cancelMessagePart2);
-        interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + player.getName() + " confirm"));
-        interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Cancel!").create()));
-        player.spigot().sendMessage(interactiveMessage);
-        player.sendMessage(QuestMenuConfig.cancelMessagePart3);
+    private static final HashMap<Integer, ArrayList<EliteQuest>> rotatingQuests = new HashMap();
 
-        questPairs.put(player, eliteQuest);
+    //refreshes quests every hour
+    public static void questRefresher() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                populateQuests();
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 60 * 60 * 20);
+    }
+
+    private static void populateQuests() {
+        for (int i = 0; i < 20; i++) {
+            ArrayList<EliteQuest> questList = new ArrayList();
+            for (int j = 0; j < 4; j++) {
+                questList.add(new EliteQuest(i));
+            }
+            rotatingQuests.put(i, questList);
+        }
     }
 
 }

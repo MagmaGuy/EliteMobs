@@ -10,8 +10,7 @@ public class QuestCommand {
     }
 
     public static void doMainQuestCommand(Player player) {
-        QuestsMenu questsMenu = new QuestsMenu();
-        questsMenu.initializeQuestTierSelectorMenu(player);
+        QuestsMenu.initializeQuestsMenu(player);
     }
 
 }

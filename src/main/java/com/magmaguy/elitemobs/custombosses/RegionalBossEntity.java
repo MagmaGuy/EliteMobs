@@ -32,6 +32,7 @@ public class RegionalBossEntity implements Listener {
     }
 
     public CustomBossEntity customBossEntity;
+    private final CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity;
     public boolean isAlive;
     private final Location spawnLocation;
     private double leashRadius;
@@ -40,8 +41,9 @@ public class RegionalBossEntity implements Listener {
     private UUID uuid;
     private final CustomBossConfigFields customBossConfigFields;
 
-    public RegionalBossEntity(CustomBossConfigFields customBossConfigFields, Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
+    public RegionalBossEntity(CustomBossConfigFields customBossConfigFields, CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity) {
+        this.configRegionalEntity = configRegionalEntity;
+        this.spawnLocation = configRegionalEntity.spawnLocation;
         this.respawnCooldown = customBossConfigFields.getSpawnCooldown();
         this.customBossConfigFields = customBossConfigFields;
         this.leashRadius = customBossConfigFields.getLeashRadius();
@@ -111,6 +113,8 @@ public class RegionalBossEntity implements Listener {
             }
 
         }.runTaskLater(MetadataHandler.PLUGIN, respawnCooldown * 20 * 60);
+
+        customBossConfigFields.updateTicksBeforeRespawn(configRegionalEntity.uuid, respawnCooldown);
 
     }
 

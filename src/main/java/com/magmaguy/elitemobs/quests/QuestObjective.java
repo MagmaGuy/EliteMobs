@@ -10,57 +10,32 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 public class QuestObjective implements Serializable {
 
-    private UUID questUUID;
-    private int questTier;
+    private final int questTier;
     private int objectiveKills = 0;
     private int currentKills = 0;
     private int minimumEliteMobTier = 0;
     private int minimumEliteMobLevel = 0;
     private double questDifficulty = 0;
-    private EntityType entityType;
+    private final EntityType entityType;
     private boolean isComplete = false;
     private boolean isTurnedIn = false;
-    private QuestReward questReward;
+    private final QuestReward questReward;
 
     public QuestObjective(int objectiveKills, int minimumEliteMobTier, EntityType entityType, int questTier) {
-        setQuestTier(questTier);
-        setObjectiveKills(objectiveKills);
-        setMinimumEliteMobTier(minimumEliteMobTier);
-        setEntityType(entityType);
-        setQuestDifficulty();
-        setQuestReward();
-    }
-
-    public UUID getQuestUUID() {
-        return questUUID;
-    }
-
-    public void setQuestUUID(UUID questUUID) {
-        this.questUUID = UUID.randomUUID();
-    }
-
-    public void setQuestReward() {
+        this.questTier = questTier;
+        this.objectiveKills = objectiveKills;
+        this.minimumEliteMobTier = minimumEliteMobTier;
+        this.minimumEliteMobLevel = MobTierCalculator.findMobLevel(getMinimumEliteMobTier());
+        this.entityType = entityType;
+        this.questDifficulty = questTier * 10 * getObjectiveKills();
         this.questReward = new QuestReward(this.questTier, this.questDifficulty);
     }
 
     public QuestReward getQuestReward() {
         return this.questReward;
-    }
-
-    private void setQuestTier(int questTier) {
-        this.questTier = questTier;
-    }
-
-    public int getQuestTier() {
-        return this.questTier;
-    }
-
-    private void setObjectiveKills(int objectiveKills) {
-        this.objectiveKills = objectiveKills;
     }
 
     public int getObjectiveKills() {
@@ -88,21 +63,8 @@ public class QuestObjective implements Serializable {
         sendQuestProgressionMessage(player);
     }
 
-    public void setCurrentKills(int currentKills) {
-        this.currentKills = currentKills;
-    }
-
-    private void setEntityType(EntityType entityType) {
-        this.entityType = entityType;
-    }
-
     public EntityType getEntityType() {
         return entityType;
-    }
-
-    private void setMinimumEliteMobTier(int minimumEliteMobTier) {
-        this.minimumEliteMobTier = minimumEliteMobTier;
-        setMinimumEliteMobLevel();
     }
 
     public int getMinimumEliteMobTier() {
@@ -113,20 +75,8 @@ public class QuestObjective implements Serializable {
         return minimumEliteMobLevel;
     }
 
-    private void setMinimumEliteMobLevel() {
-        this.minimumEliteMobLevel = MobTierCalculator.findMobLevel(getMinimumEliteMobTier());
-    }
-
     public double getQuestDifficulty() {
         return this.questDifficulty;
-    }
-
-    public void setQuestDifficulty() {
-        if (questTier == 0)
-            this.questDifficulty = getObjectiveKills();
-        else
-            this.questDifficulty = questTier * 10 * getObjectiveKills();
-
     }
 
     public boolean isComplete() {
@@ -148,9 +98,6 @@ public class QuestObjective implements Serializable {
                         .replace("$objectiveAmount", getObjectiveKills() + "")
                         .replace("$objectiveName", getEliteMobName())
                 , ChatColor.DARK_GREEN, ChatColor.GREEN);
-        // Bukkit.broadcastMessage(QuestMenuConfig.questStartBroadcastMessage
-        //         .replace("$player", player.getDisplayName())
-        //         .replace("$rank", GuildRank.getRankName(getQuestTier())));
     }
 
     public void sendQuestCompleteMessage(Player player) {
@@ -160,9 +107,6 @@ public class QuestObjective implements Serializable {
                         .replace("$objectiveAmount", getObjectiveKills() + "")
                         .replace("$objectiveName", getEliteMobName()),
                 ChatColor.GOLD, ChatColor.YELLOW);
-        // Bukkit.broadcastMessage(QuestMenuConfig.questCompleteBroadcastMessage
-        //         .replace("$player", player.getDisplayName())
-        //         .replace("$rank", GuildRank.getRankName(getQuestTier())));
     }
 
     public void sendQuestProgressionMessage(Player player) {
