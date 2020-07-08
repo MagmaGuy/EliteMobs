@@ -31,12 +31,12 @@ import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
-import com.magmaguy.elitemobs.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
 import com.magmaguy.elitemobs.runnables.EggRunnable;
+import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
@@ -170,6 +170,11 @@ public class EliteMobs extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new Placeholders().register();
         }
+
+        /*
+        Hook to DiscordSRV
+         */
+
 
     }
 

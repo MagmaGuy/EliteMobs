@@ -13,6 +13,8 @@ import java.util.*;
 
 public class CustomBossConfigFields {
 
+    public static HashSet<CustomBossConfigFields> customBossConfigFields = new HashSet<>();
+
     private static final HashSet<CustomBossConfigFields> naturallySpawnedElites = new HashSet<>();
 
     public static HashSet<CustomBossConfigFields> getNaturallySpawnedElites() {
@@ -63,6 +65,7 @@ public class CustomBossConfigFields {
     private double leashRadius;
     private Integer followRange;
     private List<String> onDeathCommands;
+    private String mountedEntity;
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -345,6 +348,10 @@ public class CustomBossConfigFields {
 
         this.onDeathCommands = (List<String>) configuration.getList("onDeathCommands");
 
+        this.mountedEntity = configuration.getString("mountedEntity");
+
+        customBossConfigFields.add(this);
+
     }
 
     public class ConfigRegionalEntity {
@@ -554,6 +561,10 @@ public class CustomBossConfigFields {
         } catch (IOException ex) {
             new WarningMessage("Failed to save Custom Boss data during shutdown! Let the dev know about this error!");
         }
+    }
+
+    public String getMountedEntity() {
+        return this.mountedEntity;
     }
 
 }

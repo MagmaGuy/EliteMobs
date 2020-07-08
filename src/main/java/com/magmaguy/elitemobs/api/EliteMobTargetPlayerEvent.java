@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -14,10 +15,10 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 public class EliteMobTargetPlayerEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
-    private Entity entity;
-    private EliteMobEntity eliteMobEntity;
-    private Player player;
-    private EntityTargetLivingEntityEvent entityTargetLivingEntityEvent;
+    private final Entity entity;
+    private final EliteMobEntity eliteMobEntity;
+    private final Player player;
+    private final EntityTargetLivingEntityEvent entityTargetLivingEntityEvent;
 
     public EliteMobTargetPlayerEvent(EliteMobEntity eliteMobEntity, Player player, EntityTargetLivingEntityEvent event) {
         this.entity = event.getEntity();
@@ -59,7 +60,8 @@ public class EliteMobTargetPlayerEvent extends Event {
             EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteMobEntity == null) return;
 
-            Bukkit.getServer().getPluginManager().callEvent(new EliteMobTargetPlayerEvent(eliteMobEntity, player, event));
+            if (player.getGameMode().equals(GameMode.ADVENTURE) || player.getGameMode().equals(GameMode.SURVIVAL))
+                Bukkit.getServer().getPluginManager().callEvent(new EliteMobTargetPlayerEvent(eliteMobEntity, player, event));
         }
     }
 

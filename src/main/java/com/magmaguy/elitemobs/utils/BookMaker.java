@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.utils;
 
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,6 +15,22 @@ public class BookMaker {
         bookMeta.setTitle("EliteMobs Book");
         bookMeta.setAuthor("MagmaGuy");
         bookMeta.setPages(pages);
+        writtenBook.setItemMeta(bookMeta);
+        player.openBook(writtenBook);
+        return writtenBook;
+    }
+
+    public static ItemStack generateBook(Player player, TextComponent[] pages) {
+        ItemStack writtenBook = new ItemStack(Material.WRITTEN_BOOK);
+        BookMeta bookMeta = (BookMeta) writtenBook.getItemMeta();
+        bookMeta.setTitle("EliteMobs Book");
+        bookMeta.setAuthor("MagmaGuy");
+
+        for (TextComponent textComponent : pages) {
+            TextComponent[] stupid = new TextComponent[1];
+            stupid[0] = textComponent;
+            bookMeta.spigot().addPage(stupid);
+        }
         writtenBook.setItemMeta(bookMeta);
         player.openBook(writtenBook);
         return writtenBook;

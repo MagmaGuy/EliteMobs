@@ -30,7 +30,7 @@ public class TestCustomBossConfig extends CustomBossConfigFields {
                 "A test boss has been slain by $players!",
                 null,
                 "A test boss entity has escaped!",
-                "Test entity: $location",
+                "Test entity: $distance",
                 Arrays.asList("magmaguys_toothpick.yml:1"),
                 true,
                 true,

@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RegionalBossEntity implements Listener {
 
@@ -146,7 +147,7 @@ public class RegionalBossEntity implements Listener {
                 }
 
                 if (livingEntity.getLocation().distance(spawnLocation) > leashRadius)
-                    SpiritWalk.spiritWalkRegionalBossAnimation((LivingEntity) livingEntity, livingEntity.getLocation(), spawnLocation);
+                    SpiritWalk.spiritWalkRegionalBossAnimation(customBossEntity, livingEntity.getLocation(), spawnLocation);
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 3);
@@ -181,7 +182,7 @@ public class RegionalBossEntity implements Listener {
     }
 
     /**
-     * This may cause issues when bosses wander really far from teh spawn chunk
+     * This may cause issues when bosses wander really far from the spawn chunk
      */
     private void regionalBossWatchdog() {
 
@@ -201,7 +202,7 @@ public class RegionalBossEntity implements Listener {
 
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 30 + ThreadLocalRandom.current().nextInt(31));
     }
 
     public CustomBossConfigFields getCustomBossConfigFields() {

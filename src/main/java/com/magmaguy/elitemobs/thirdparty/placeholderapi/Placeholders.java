@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.placeholderapi;
+package com.magmaguy.elitemobs.thirdparty.placeholderapi;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;

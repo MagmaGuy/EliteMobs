@@ -1,25 +1,28 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.*;
-import org.bukkit.event.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    private Entity entity;
-    private EliteMobEntity eliteMobEntity;
-    private Player player;
+    private final Entity entity;
+    private final EliteMobEntity eliteMobEntity;
+    private final Player player;
     private boolean isCancelled = false;
     public boolean rangedAttack;
-    private EntityDamageByEntityEvent entityDamageByEntityEvent;
+    private final EntityDamageByEntityEvent entityDamageByEntityEvent;
 
     public EliteMobDamagedByPlayerEvent(EliteMobEntity eliteMobEntity, Player player, EntityDamageByEntityEvent event) {
         this.entity = eliteMobEntity.getLivingEntity();
@@ -70,29 +73,6 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
     public static HandlerList getHandlerList() {
         return handlers;
-    }
-
-
-    public static class EntityDamagedByEntityFilter implements Listener {
-
-        @EventHandler(priority = EventPriority.HIGH)
-        public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-
-            if (event.isCancelled()) return;
-            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteMobEntity == null) return;
-            Player player = null;
-            if (event.getDamager() instanceof Player)
-                player = (Player) event.getDamager();
-            if ((event.getDamager() instanceof Arrow || event.getDamager() instanceof Trident) &&
-                    ((Projectile) event.getDamager()).getShooter() instanceof Player)
-                player = (Player) ((Projectile) event.getDamager()).getShooter();
-            if (player == null) return;
-
-            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event));
-
-        }
-
     }
 
 }

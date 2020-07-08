@@ -34,6 +34,7 @@ public class MobCombatSettingsConfig {
     public static String bossLocationMessage;
     public static List<String> commandsOnDeath;
     public static String bossKillParticipationMessage;
+    public static boolean regenerateCustomBossHealthOnCombatEnd;
 
     public static void initializeConfig() {
 
@@ -69,6 +70,7 @@ public class MobCombatSettingsConfig {
         commandsOnDeath = ConfigurationEngine.setList(fileConfiguration, "commandsOnEliteMobDeath", new ArrayList());
         //Accepts placeholder $playerDamage
         bossKillParticipationMessage = ConfigurationEngine.setString(fileConfiguration, "bossKillParticipationMessage", "&eYour damage: &2$playerDamage");
+        regenerateCustomBossHealthOnCombatEnd = ConfigurationEngine.setBoolean(fileConfiguration, "regenerateCustomBossHealthOnCombatEnd", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

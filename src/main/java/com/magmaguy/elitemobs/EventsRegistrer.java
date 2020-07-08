@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
-import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
 import com.magmaguy.elitemobs.antiexploit.*;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
@@ -19,6 +18,7 @@ import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.custombosses.AdvancedAggroManager;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
@@ -117,12 +117,12 @@ public class EventsRegistrer {
         /*
         Register API events
          */
-        pluginManager.registerEvents(new EliteMobDamagedByPlayerEvent.EntityDamagedByEntityFilter(), plugin);
         pluginManager.registerEvents(new EliteMobDeathEvent.EliteMobDeathEventFilter(), plugin);
         pluginManager.registerEvents(new EliteMobTargetPlayerEvent.EliteMobTargetPlayerEventFilter(), plugin);
         pluginManager.registerEvents(new EliteMobDamagedEvent.EliteMobDamageEventFilter(), plugin);
         pluginManager.registerEvents(new PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter(), plugin);
         pluginManager.registerEvents(new EliteMobDamagedByEliteMobEvent.EliteMobDamagedByEliteMobFilter(), plugin);
+        pluginManager.registerEvents(new EliteMobEnterCombatEvent.EliteMobEnterCombatEventFilter(), plugin);
 
         /*
         While these powers could be registered in a more automated way, I realized that it's also a bad way of getting
@@ -179,6 +179,7 @@ public class EventsRegistrer {
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
         pluginManager.registerEvents(new RegionalBossEntity.RegionalBossEntityEvents(), plugin);
+        pluginManager.registerEvents(new AdvancedAggroManager(), plugin);
 
         //Metadata (player purger)
         pluginManager.registerEvents(new MetadataHandler(), plugin);
@@ -265,7 +266,6 @@ public class EventsRegistrer {
 
         //Initialize adventurer's guild
         pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);
-        pluginManager.registerEvents(new SpawnControl(), plugin);
         //register quests
         pluginManager.registerEvents(new QuestsMenu(), plugin);
         pluginManager.registerEvents(new QuestsTracker(), plugin);

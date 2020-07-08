@@ -9,14 +9,14 @@ import java.util.HashSet;
 
 public class Heal {
 
-    private static HashSet<Player> healCooldown = new HashSet<>();
+    private static final HashSet<Player> healCooldown = new HashSet<>();
 
     public static void doHeal(Player player, ElitePotionEffect elitePotionEffect) {
         if (healCooldown.contains(player)) return;
         PotionEffectApplier.addOnHitCooldown(healCooldown, player, 20 * 5);
         double healedAmount = (elitePotionEffect.getPotionEffect().getAmplifier() + 1);
         healedAmount = healedAmount + player.getHealth() > player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() ?
-                player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() : healedAmount;
+                0 : healedAmount;
         player.setHealth(player.getHealth() + healedAmount);
     }
 
