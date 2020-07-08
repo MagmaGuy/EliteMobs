@@ -84,6 +84,7 @@ public class EliteMobEntity {
     private boolean inAntiExploitCooldown = false;
 
     private boolean isRegionalBoss = false;
+    private boolean inCombat = false;
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
@@ -458,6 +459,11 @@ public class EliteMobEntity {
         else
             livingEntity.setHealth(Math.ceil(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * this.health / this.maxHealth));
 
+    }
+
+    public void fullHeal() {
+        setHealth(this.maxHealth);
+        damagers.clear();
     }
 
     public double getHealth() {
@@ -879,15 +885,13 @@ public class EliteMobEntity {
     }
 
     public void addDamager(Player player, double damage) {
-        Player oldPlayerInstance = null;
-        for (Player iteratedPlayer : damagers.keySet())
-            if (iteratedPlayer.getUniqueId().equals(player.getUniqueId())) {
-                oldPlayerInstance = iteratedPlayer;
-                this.damagers.put(iteratedPlayer, this.damagers.get(iteratedPlayer) + damage);
-                break;
-            }
-        if (oldPlayerInstance == null)
-            this.damagers.put(player, damage);
+        if (!damagers.isEmpty())
+            for (Player iteratedPlayer : damagers.keySet())
+                if (iteratedPlayer.getUniqueId().equals(player.getUniqueId())) {
+                    this.damagers.put(iteratedPlayer, this.damagers.get(iteratedPlayer) + damage);
+                    return;
+                }
+        this.damagers.put(player, damage);
     }
 
     public boolean hasDamagers() {
@@ -990,6 +994,14 @@ public class EliteMobEntity {
 
     public void setIsRegionalBoss(boolean isRegionalBoss) {
         this.isRegionalBoss = isRegionalBoss;
+    }
+
+    public void setIsInCombat(boolean inCombat) {
+        this.inCombat = inCombat;
+    }
+
+    public boolean isInCombat() {
+        return this.inCombat;
     }
 
 }

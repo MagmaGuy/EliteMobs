@@ -47,7 +47,7 @@ public class EconomySettingsConfig {
         lootShowerMaterial10 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.10", Material.GOLD_BLOCK.name());
         lootShowerMaterial20 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.20", Material.EMERALD.name());
         lootShowerMaterial50 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.50", Material.EMERALD_BLOCK.name());
-        adventurersGuildNotificationMessage = ConfigurationEngine.setString(fileConfiguration, "adventurersGuildNotificationMessage", "&7[EM] Extra spending money? Try &a/ag &7or &a/em shop&7!");
+        adventurersGuildNotificationMessage = ConfigurationEngine.setString(fileConfiguration, "adventurersGuildNotificationMessages", "&7[EM] Extra spending money? Try &a/em !");
 
         addMaterial(fileConfiguration, Material.DIAMOND_AXE, diamondLevel);
         addMaterial(fileConfiguration, Material.DIAMOND_BOOTS, diamondLevel);

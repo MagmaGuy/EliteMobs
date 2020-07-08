@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -16,6 +17,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.combatsystem.CombatSystem.isCustomDamageEntity;
 import static com.magmaguy.elitemobs.combatsystem.CombatSystem.removeCustomDamageEntity;
@@ -36,8 +40,20 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
         Player player = (Player) event.getEntity();
 
-        if (player.isBlocking())
+        if (player.isBlocking()) {
+            if (player.getInventory().getItemInOffHand().getType().equals(Material.SHIELD)) {
+                Damageable damageable = (Damageable) player.getInventory().getItemInOffHand().getItemMeta();
+
+                if (player.getInventory().getItemInOffHand().getItemMeta().hasEnchant(Enchantment.DURABILITY))
+                    if (player.getInventory().getItemInOffHand().getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D < ThreadLocalRandom.current().nextDouble())
+                        damageable.setDamage(damageable.getDamage() + 5);
+                    else
+                        damageable.setDamage(damageable.getDamage() + 5);
+                if (Material.SHIELD.getMaxDurability() < damageable.getDamage())
+                    player.getInventory().setItemInOffHand(null);
+            }
             return;
+        }
 
         double rawDamage = event.getEntityDamageByEntityEvent().getDamage();
 

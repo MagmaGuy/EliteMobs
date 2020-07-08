@@ -4,9 +4,8 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
-import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.antiexploit.PreventMountExploit;
+import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -34,7 +33,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -65,6 +63,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         customBosses.put(customBossEntity.uuid, customBossEntity);
     }
 
+    public static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
+
     private static void removeCustomBoss(UUID uuid) {
         customBosses.remove(uuid);
     }
@@ -83,8 +83,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     public CustomBossConfigFields customBossConfigFields;
     private final HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
-    private UUID uuid;
+    public UUID uuid;
     private boolean trailIsActive = false;
+    private boolean trackable = false;
 
     public LivingEntity advancedGetEntity() {
         return (LivingEntity) Bukkit.getEntity(this.uuid);
@@ -115,19 +116,25 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         else if (entityType.equals(EntityType.DROWNED))
             ((Drowned) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
+        else if (entityType.equals(EntityType.HUSK))
+            ((Husk) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         else if (!VersionChecker.currentVersionIsUnder(16, 0))
             if (entityType.equals(EntityType.ZOMBIFIED_PIGLIN))
                 ((PigZombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         super.setPersistent(customBossConfigFields.getIsPersistent());
         if (customBossConfigFields.getTrails() != null) startBossTrails();
-        if (MobCombatSettingsConfig.showCustomBossLocation && customBossConfigFields.getLocationMessage() != null)
+        if (MobCombatSettingsConfig.showCustomBossLocation && customBossConfigFields.getLocationMessage() != null) {
+            this.trackable = true;
+            trackableCustomBosses.add(this);
             sendLocation();
+        }
         if (customBossConfigFields.getDropsVanillaLoot())
             super.setHasVanillaLoot(customBossConfigFields.getDropsVanillaLoot());
         parseUniqueLootList();
         addCustomBoss(this);
         if (customBossConfigFields.getFollowRange() != null && customBossConfigFields.getFollowRange() > 0 && getLivingEntity() instanceof Mob)
             getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
+        mountEntity();
     }
 
     public void startBossTrails() {
@@ -235,7 +242,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     private final HashSet<Player> trackingPlayer = new HashSet<>();
 
     private void sendLocation() {
-
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!player.getWorld().equals(getLivingEntity().getWorld())) continue;
             TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.bossLocationMessage);
@@ -243,37 +249,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Track the " + getName()).create()));
             player.spigot().sendMessage(interactiveMessage);
         }
-
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (getLivingEntity().isDead()) {
-                    cancel();
-                    return;
-                }
-
-                String locationString = (int) getLivingEntity().getLocation().getX() +
-                        ", " + (int) getLivingEntity().getLocation().getY() +
-                        ", " + (int) getLivingEntity().getLocation().getZ();
-
-                for (Player player : getLivingEntity().getWorld().getPlayers()) {
-                    if (!player.getWorld().equals(getLivingEntity().getWorld())) continue;
-                    BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-                    bossBar.setProgress(getHealth() / getMaxHealth());
-                    if (trackingPlayer.contains(player))
-                        continue;
-                    bossBar.addPlayer(player);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            bossBar.removePlayer(player);
-                        }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 20 * 15);
-                }
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 60 * 3);
-
     }
 
     public void realTimeTracking(Player player) {
@@ -309,7 +284,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     }
 
-    private String bossBarMessage(Player player, String locationString) {
+    public String bossBarMessage(Player player, String locationString) {
         if (customBossConfigFields.getLocationMessage().contains("$distance"))
             if (player.getLocation().getWorld().equals(getLivingEntity().getLocation().getWorld()))
                 return ChatColorConverter.convert(customBossConfigFields.getLocationMessage()
@@ -327,6 +302,34 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         for (CustomItem customItem : getUniqueLootList().keySet())
             if (ThreadLocalRandom.current().nextDouble() < getUniqueLootList().get(customItem))
                 CustomItem.dropPlayerLoot(player, (int) getTier(), customItem.getFileName(), getLivingEntity().getLocation());
+    }
+
+    private void mountEntity() {
+        if (customBossConfigFields.getMountedEntity() == null) return;
+        try {
+            EntityType entityType = EntityType.valueOf(customBossConfigFields.getMountedEntity());
+            LivingEntity livingEntity = (LivingEntity) getLivingEntity().getWorld().spawnEntity(getLivingEntity().getLocation(), entityType);
+            PreventMountExploit.bypass = true;
+            livingEntity.addPassenger(getLivingEntity());
+
+        } catch (Exception ex) {
+            //This runs when it's not an API entity
+            for (CustomBossConfigFields iteratedField : CustomBossConfigFields.customBossConfigFields) {
+                if (iteratedField.getFileName().equalsIgnoreCase(customBossConfigFields.getMountedEntity())) {
+                    CustomBossEntity customBossEntity = constructCustomBoss(customBossConfigFields.getMountedEntity(), getLivingEntity().getLocation(), getLevel());
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            PreventMountExploit.bypass = true;
+                            customBossEntity.getLivingEntity().addPassenger(getLivingEntity());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 2);
+                    return;
+                }
+            }
+            new WarningMessage("Attempted to make Custom Boss " + customBossConfigFields.getFileName() + " mount invalid" +
+                    " entity or boss " + customBossConfigFields.getMountedEntity() + " . Fix this in the configuration file.");
+        }
     }
 
     public static class CustomBossEntityEvents implements Listener {
@@ -347,6 +350,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
             CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
 
+            if (customBossEntity.trackable)
+                trackableCustomBosses.remove(customBossEntity);
 
             //Do death message
             String playersList = "";
@@ -474,7 +479,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             return sortedMap;
         }
 
-
         @EventHandler
         public void onDamagedMessages(EliteMobDamagedEvent eliteMobDamagedEvent) {
             if (!(eliteMobDamagedEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
@@ -505,14 +509,54 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         }
 
         @EventHandler
-        public void bossTargetEvent(EntityTargetEvent event) {
-            if (!(event.getTarget() instanceof Player)) return;
-            if (((Player) event.getTarget()).getGameMode().equals(GameMode.CREATIVE)) return;
-            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteMobEntity == null) return;
-            if (!(eliteMobEntity instanceof CustomBossEntity)) return;
-            if (eliteMobEntity.getLivingEntity().getPotionEffect(PotionEffectType.SLOW) == null) return;
-            eliteMobEntity.getLivingEntity().removePotionEffect(PotionEffectType.SLOW);
+        public void removeSlowEvent(EliteMobEnterCombatEvent event) {
+            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
+            if (event.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW) == null) return;
+            event.getEliteMobEntity().getLivingEntity().removePotionEffect(PotionEffectType.SLOW);
+        }
+
+        @EventHandler
+        public void onCombatExitEvent(EliteMobExitCombatEvent event) {
+            if (!MobCombatSettingsConfig.regenerateCustomBossHealthOnCombatEnd) return;
+            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
+
+        }
+
+        @EventHandler
+        public void displayBossBar(EliteMobEnterCombatEvent event) {
+            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
+            CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
+            if (customBossEntity.customBossConfigFields.getLocationMessage() == null || customBossEntity.customBossConfigFields.getLocationMessage().length() == 0)
+                return;
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!event.getEliteMobEntity().getLivingEntity().isValid() || !customBossEntity.isInCombat()) {
+                        cancel();
+                        return;
+                    }
+
+                    for (Entity entity : event.getEliteMobEntity().getLivingEntity().getNearbyEntities(20, 20, 20))
+                        if (entity.getType().equals(EntityType.PLAYER)) {
+                            if (customBossEntity.trackingPlayer.contains(entity)) continue;
+                            String locationString = (int) event.getEliteMobEntity().getLivingEntity().getLocation().getX() +
+                                    ", " + (int) event.getEliteMobEntity().getLivingEntity().getLocation().getY() +
+                                    ", " + (int) event.getEliteMobEntity().getLivingEntity().getLocation().getZ();
+                            BossBar bossBar = Bukkit.createBossBar(customBossEntity.bossBarMessage((Player) entity, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+                            bossBar.setProgress(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
+                            bossBar.addPlayer((Player) entity);
+
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    bossBar.removePlayer((Player) entity);
+                                }
+                            }.runTaskLater(MetadataHandler.PLUGIN, 5);
+                        }
+
+                }
+            }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
         }
 
     }

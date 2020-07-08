@@ -16,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -31,11 +30,11 @@ import static com.magmaguy.elitemobs.utils.WeightedProbability.pickWeighedProbab
  */
 public class LootTables implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
 
         if (!event.getEliteMobEntity().getHasSpecialLoot()) return;
-        if (event.getEliteMobEntity().getLevel() < 2) return;
+        if (event.getEliteMobEntity().getLevel() < 1) return;
         if (event.getEliteMobEntity().getDamagers().isEmpty()) return;
 
         generatePlayerLoot(event.getEliteMobEntity());

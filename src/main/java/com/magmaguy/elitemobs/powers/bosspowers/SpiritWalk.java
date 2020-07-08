@@ -1,11 +1,17 @@
 package com.magmaguy.elitemobs.powers.bosspowers;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.antiexploit.PreventMountExploit;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
+import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.EventHandler;
@@ -134,34 +140,73 @@ public class SpiritWalk extends BossPower implements Listener {
 
     }
 
-    public static void spiritWalkRegionalBossAnimation(LivingEntity bossMob, Location entityLocation, Location finalLocation) {
+    public static void spiritWalkRegionalBossAnimation(EliteMobEntity eliteMobEntity, Location entityLocation, Location finalLocation) {
 
-        bossMob.setAI(false);
-        bossMob.setInvulnerable(true);
-        bossMob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 10, 1));
+        eliteMobEntity.getLivingEntity().setAI(false);
+        eliteMobEntity.getLivingEntity().setInvulnerable(true);
+        eliteMobEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 10, 1));
         Vector toDestination = finalLocation.clone().subtract(entityLocation.clone()).toVector().normalize().divide(new Vector(2, 2, 2));
 
+        Entity vehicle = null;
+
+        if (eliteMobEntity.getLivingEntity().isInsideVehicle()) {
+            vehicle = eliteMobEntity.getLivingEntity().getVehicle();
+            if (vehicle instanceof LivingEntity)
+                ((LivingEntity) vehicle).setAI(false);
+            vehicle.setInvulnerable(true);
+        }
+
         new BukkitRunnable() {
+            final Entity vehicle = eliteMobEntity.getLivingEntity().getVehicle();
 
             int counter = 0;
 
             @Override
             public void run() {
+                if (eliteMobEntity.getLivingEntity().isInsideVehicle())
+                    eliteMobEntity.getLivingEntity().leaveVehicle();
 
-                if (bossMob.getLocation().clone().distance(finalLocation) < 2 || counter > 20 * 10) {
+                if (eliteMobEntity.getLivingEntity().getLocation().clone().distance(finalLocation) < 2 || counter > 20 * 10) {
 
-                    bossMob.teleport(finalLocation);
-                    bossMob.setAI(true);
-                    bossMob.setInvulnerable(false);
-                    bossMob.removePotionEffect(PotionEffectType.GLOWING);
+                    eliteMobEntity.getLivingEntity().setAI(true);
+                    eliteMobEntity.getLivingEntity().setInvulnerable(false);
+
+                    if (vehicle != null && vehicle.isValid())
+                        vehicle.teleport(finalLocation);
+                    eliteMobEntity.getLivingEntity().teleport(finalLocation);
+
+                    if (vehicle != null && vehicle.isValid()) {
+                        if (vehicle instanceof LivingEntity) {
+                            ((LivingEntity) vehicle).setAI(true);
+                            EliteMobEntity vehicleBoss = EntityTracker.getEliteMobEntity(vehicle);
+                            if (vehicleBoss != null)
+                                Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(vehicleBoss));
+
+                        }
+
+                        vehicle.setInvulnerable(false);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                PreventMountExploit.bypass = true;
+                                vehicle.addPassenger(eliteMobEntity.getLivingEntity());
+                            }
+                        }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                    }
+                    eliteMobEntity.getLivingEntity().removePotionEffect(PotionEffectType.GLOWING);
                     cancel();
-                    if (bossMob instanceof Mob)
-                        if (((Mob) bossMob).getTarget() == null)
-                            bossMob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
+
+                    Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
+                    if (eliteMobEntity.getLivingEntity() instanceof Mob)
+                        if (((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null)
+                            eliteMobEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
 
                 }
 
-                bossMob.teleport(bossMob.getLocation().clone().add(toDestination.clone()));
+                if (vehicle != null && vehicle.isValid()) {
+                    vehicle.teleport(eliteMobEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
+                }
+                eliteMobEntity.getLivingEntity().teleport(eliteMobEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
 
                 counter++;
 
