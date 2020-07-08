@@ -76,6 +76,10 @@ public class CommandHandler implements CommandExecutor {
         }
 
         if (args.length == 0) {
+            if (commandSender instanceof Player && DefaultConfig.emLeadsToStatusMenu) {
+                new PlayerStatusScreen((Player) commandSender);
+                return true;
+            }
             validCommands(commandSender);
             return true;
         }
@@ -270,12 +274,15 @@ public class CommandHandler implements CommandExecutor {
             case "rank":
             case "guildrank":
                 if (!userPermCheck("elitemobs.guild.menu", commandSender)) return true;
+                if (AdventurersGuildCommand.adventurersGuildTeleport((Player) commandSender)) {
+                    new AdventurersGuildCommand((Player) commandSender);
+                    return true;
+                }
                 GuildRankMenuHandler guildRankMenuHandler = new GuildRankMenuHandler();
                 GuildRankMenuHandler.initializeGuildRankMenu((Player) commandSender);
                 return true;
             case "trackcustomboss":
-                CustomBossEntity.getCustomBoss(UUID.fromString(args[2]))
-                        .realTimeTracking((Player) commandSender);
+                CustomBossEntity.getCustomBoss(UUID.fromString(args[2])).realTimeTracking((Player) commandSender);
                 return true;
             case "customboss":
                 if (!userPermCheck("elitemobs.customboss", commandSender)) return true;

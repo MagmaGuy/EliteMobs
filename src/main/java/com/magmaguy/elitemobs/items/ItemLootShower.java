@@ -227,7 +227,7 @@ public class ItemLootShower implements Listener {
             currencyItem = generateCurrencyItem(Material.EMERALD_BLOCK, location, 50);
         }
 
-        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 20 + " " + EconomySettingsConfig.currencyName));
+        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 50 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
     }
 

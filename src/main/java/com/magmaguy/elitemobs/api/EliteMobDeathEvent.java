@@ -13,12 +13,14 @@ import org.bukkit.event.entity.EntityDeathEvent;
 public class EliteMobDeathEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
-    private Entity entity;
-    private EliteMobEntity eliteMobEntity;
-    private EntityDeathEvent entityDeathEvent;
+    private final Entity entity;
+    private final EliteMobEntity eliteMobEntity;
+    private final EntityDeathEvent entityDeathEvent;
 
     public EliteMobDeathEvent(EliteMobEntity eliteMobEntity, EntityDeathEvent entityDeathEvent) {
         this.entity = eliteMobEntity.getLivingEntity();
+        //todo: check if this prevents vanilla drop behavior
+        if (entity != null) entity.remove();
         this.eliteMobEntity = eliteMobEntity;
         this.entityDeathEvent = entityDeathEvent;
     }

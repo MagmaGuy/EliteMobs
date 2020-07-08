@@ -217,6 +217,7 @@ public class PlayerData {
         } catch (Exception e) {
             new WarningMessage("Failed to update database value.");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            closeConnection();
         }
     }
 
@@ -232,6 +233,7 @@ public class PlayerData {
         } catch (Exception e) {
             new WarningMessage("Failed to get string value from database!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            closeConnection();
             return null;
         }
     }
@@ -248,6 +250,7 @@ public class PlayerData {
         } catch (Exception e) {
             new WarningMessage("Failed to get string value from database!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            closeConnection();
             return null;
         }
     }
@@ -264,6 +267,7 @@ public class PlayerData {
         } catch (Exception e) {
             new WarningMessage("Failed to get double value from database!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            closeConnection();
             return null;
         }
     }
@@ -280,6 +284,7 @@ public class PlayerData {
         } catch (Exception e) {
             new WarningMessage("Failed to get integer value from database!");
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            closeConnection();
             return null;
         }
     }
@@ -297,6 +302,7 @@ public class PlayerData {
 
         } catch (Exception e) {
             new WarningMessage("Failed to get value from database!");
+            closeConnection();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             return null;
         }
@@ -313,6 +319,7 @@ public class PlayerData {
      */
     public PlayerData(UUID uuid) {
         Statement statement = null;
+        closeConnection();
         try {
             getConnection().setAutoCommit(false);
             statement = getConnection().createStatement();
@@ -343,6 +350,7 @@ public class PlayerData {
             return;
         } catch (Exception e) {
             new WarningMessage("No player entry detected, generating new entry!");
+            closeConnection();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
 
@@ -405,6 +413,7 @@ public class PlayerData {
             new DebugMessage("Created new database entry for player " + Bukkit.getPlayer(uuid).getDisplayName());
         } catch (Exception e) {
             new WarningMessage("Failed to generate an entry!");
+            closeConnection();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
     }
@@ -460,6 +469,7 @@ public class PlayerData {
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             new WarningMessage("Failed to establish a connection to the SQLite database. This is not good.");
+            closeConnection();
         }
 
         new PortOldData();

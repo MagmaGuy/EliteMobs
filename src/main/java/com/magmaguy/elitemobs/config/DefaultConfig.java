@@ -16,6 +16,7 @@ public class DefaultConfig {
     public static boolean preventEliteMobConversionOfNamedMobs;
     public static boolean doStrictSpawningRules;
     public static double nightmareWorldSpawnBonus;
+    public static boolean emLeadsToStatusMenu;
 
     public static void initializeConfig() {
 
@@ -29,6 +30,8 @@ public class DefaultConfig {
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);
         doStrictSpawningRules = ConfigurationEngine.setBoolean(fileConfiguration, "enableHighCompatibilityMode", false);
         nightmareWorldSpawnBonus = ConfigurationEngine.setDouble(fileConfiguration, "nightmareWorldSpawnBonus", 0.5);
+        emLeadsToStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "emLeadsToStatusMenu", true);
+
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

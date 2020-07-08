@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.combatsystem;
 
+import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
@@ -10,6 +11,7 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -19,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -40,28 +43,33 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
      *
      * @param event
      */
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void eliteMobDamageByPlayer(EliteMobDamagedByPlayerEvent event) {
-
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void eliteMobDamageByPlayer(EntityDamageByEntityEvent event) {
         if (event.isCancelled()) return;
-        Player player = event.getPlayer();
+        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        if (eliteMobEntity == null) return;
+        Player player = null;
+        if (event.getDamager() instanceof Player)
+            player = (Player) event.getDamager();
+        if ((event.getDamager() instanceof Arrow || event.getDamager() instanceof Trident) &&
+                ((Projectile) event.getDamager()).getShooter() instanceof Player)
+            player = (Player) ((Projectile) event.getDamager()).getShooter();
         if (player == null) return;
 
-        EliteMobEntity eliteMobEntity = event.getEliteMobEntity();
         if (eliteMobEntity == null) return;
 
         //From this point on, the event damage is handled by Elite Mobs
 
         //nullify vanilla reductions
         for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
-            if (event.getEntityDamageByEntityEvent().isApplicable(modifier))
-                event.getEntityDamageByEntityEvent().setDamage(modifier, 0);
+            if (event.isApplicable(modifier))
+                event.setDamage(modifier, 0);
 
-        double rawDamage = event.getEntityDamageByEntityEvent().getDamage();
+        double rawDamage = event.getDamage();
 
         //if the damage source is custom , the damage is final
         if (isCustomDamageEntity(eliteMobEntity.getLivingEntity())) {
-            event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, rawDamage);
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, rawDamage);
             //Deal with the mob getting killed
             if (player.getHealth() - rawDamage <= 0)
                 PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, player));
@@ -72,7 +80,7 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
 
         double playerWeaponTier;
         //Melee attacks dealt with ranged weapons should have a tier of 0
-        if (!event.rangedAttack &&
+        if (!(event.getDamager() instanceof Projectile) &&
                 (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) ||
                         player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW)))
             playerWeaponTier = 0;
@@ -80,10 +88,10 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
             playerWeaponTier = ItemTierFinder.mainHandCombatParser(player.getInventory().getItemInMainHand());
         double newDamage = finalDamageCalculator(playerWeaponTier, player, eliteMobEntity);
 
-        if (event.getEntityDamageByEntityEvent().getDamager() instanceof Arrow) {
-            double arrowSpeedMultiplier = Math.sqrt(Math.pow(event.getEntityDamageByEntityEvent().getDamager().getVelocity().getX(), 2) +
-                    Math.pow(event.getEntityDamageByEntityEvent().getDamager().getVelocity().getY(), 2) +
-                    Math.pow(event.getEntityDamageByEntityEvent().getDamager().getVelocity().getZ(), 2)) / 5;
+        if (event.getDamager() instanceof Arrow) {
+            double arrowSpeedMultiplier = Math.sqrt(Math.pow(event.getDamager().getVelocity().getX(), 2) +
+                    Math.pow(event.getDamager().getVelocity().getY(), 2) +
+                    Math.pow(event.getDamager().getVelocity().getZ(), 2)) / 5;
             arrowSpeedMultiplier = (arrowSpeedMultiplier < 1) ? arrowSpeedMultiplier : 1;
             newDamage *= arrowSpeedMultiplier;
         }
@@ -101,12 +109,14 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         else
             eventDamage = 7;
 
-        event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, eventDamage);
+        event.setDamage(EntityDamageEvent.DamageModifier.BASE, eventDamage);
         if (eliteMobEntity.getHealth() - newDamage < 0)
             newDamage = eliteMobEntity.getHealth();
-        eliteMobEntity.damage(newDamage);
         eliteMobEntity.addDamager(player, newDamage);
-        playerHitCooldownHashMap.put(event.getPlayer(), clock);
+        eliteMobEntity.damage(newDamage);
+        playerHitCooldownHashMap.put(player, clock);
+
+        Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event));
 
     }
 

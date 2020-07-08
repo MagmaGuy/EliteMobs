@@ -17,18 +17,21 @@ public class ShareItem {
         if (!itemStack.getItemMeta().hasDisplayName()) return;
         if (!itemStack.getItemMeta().hasLore()) return;
 
-        String stringList = itemStack.getItemMeta().getDisplayName();
         String name = itemStack.getItemMeta().getDisplayName();
 
-        if (itemStack.getItemMeta().hasLore())
-            for (String loreString : itemStack.getItemMeta().getLore())
-                stringList += "\n" + loreString;
-
         TextComponent interactiveMessage = new TextComponent(player.getDisplayName() + ": " + name);
-        interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(stringList).create()));
+        setItemHoverEvent(interactiveMessage, itemStack);
 
         for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers())
             onlinePlayer.spigot().sendMessage(interactiveMessage);
+    }
+
+    public static void setItemHoverEvent(TextComponent textComponent, ItemStack itemStack) {
+        String stringList = itemStack.getItemMeta().getDisplayName();
+        if (itemStack.getItemMeta().hasLore())
+            for (String loreString : itemStack.getItemMeta().getLore())
+                stringList += "\n" + loreString;
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(stringList).create()));
     }
 
 }
