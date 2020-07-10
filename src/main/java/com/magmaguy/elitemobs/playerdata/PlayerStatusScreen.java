@@ -307,7 +307,7 @@ public class PlayerStatusScreen implements Listener {
 
         for (CustomBossEntity customBossEntity : CustomBossEntity.trackableCustomBosses) {
             TextComponent message = new TextComponent(customBossEntity.bossBarMessage(player, customBossEntity.customBossConfigFields.getLocationMessage()) + "\n");
-            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to track!").create()));
+            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to track/untrack!").create()));
             message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + player.getName() + " " + customBossEntity.uuid));
             textComponent.addExtra(message);
         }

@@ -49,7 +49,8 @@ public class ZombieKingConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
-                null);
+                null,
+                2);
     }
 
 }

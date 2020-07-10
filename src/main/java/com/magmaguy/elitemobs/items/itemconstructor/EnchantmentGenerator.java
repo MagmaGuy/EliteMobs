@@ -141,6 +141,16 @@ public class EnchantmentGenerator {
             case WOODEN_HOE:
                 if (ItemSettingsConfig.useHoesAsWeapons)
                     enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
+                enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DIG_SPEED", itemTier));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));
+                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("VANISHING_CURSE"));
+                if (ThreadLocalRandom.current().nextDouble() < 0.5) {
+                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOOT_BONUS_BLOCKS"));
+                } else {
+                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("SILK_TOUCH"));
+                }
+                break;
             case SHIELD:
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DURABILITY", itemTier));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("MENDING"));

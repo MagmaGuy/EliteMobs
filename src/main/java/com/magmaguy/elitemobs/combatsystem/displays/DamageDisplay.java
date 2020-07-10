@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.utils.DialogArmorStand;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -58,25 +57,23 @@ public class DamageDisplay implements Listener {
 
         if (!MobCombatSettingsConfig.displayDamageOnHit) return;
 
-        Location entityLocation = entity.getLocation();
-
         Random random = new Random();
-        double randomCoordX = (random.nextDouble() * 2) - 1 + entityLocation.getX();
-        double randomCoordZ = (random.nextDouble() * 2) - 1 + entityLocation.getZ();
+        double randomCoordX = (random.nextDouble() * 2) - 1;
+        double randomCoordZ = (random.nextDouble() * 2) - 1;
 
-        Location newLocation = new Location(entityLocation.getWorld(), randomCoordX, entityLocation.getY() + 1.5, randomCoordZ);
+        Vector offset = new Vector(randomCoordX, 1.5, randomCoordZ);
 
         if (isCriticalHit) {
             isCriticalHit = false;
             DialogArmorStand.createDialogArmorStand(
-                    newLocation.clone(),
+                    entity,
                     ChatColorConverter.convert(EnchantmentsConfig.getEnchantment("critical_strikes.yml").getFileConfiguration()
-                            .getString("criticalHitColor") + "" + ChatColor.BOLD + "" + (int) damage + ""));
-            CriticalStrikesEnchantment.criticalStrikePopupMessage(newLocation.clone().add(new Vector(0, 0.2, 0)));
+                            .getString("criticalHitColor") + "" + ChatColor.BOLD + "" + (int) damage + ""), offset);
+            CriticalStrikesEnchantment.criticalStrikePopupMessage(entity, new Vector(0, 0.2, 0));
             return;
         }
 
-        DialogArmorStand.createDialogArmorStand(newLocation, ChatColor.RED + "" + ChatColor.BOLD + "" + (int) damage + "");
+        DialogArmorStand.createDialogArmorStand(entity, ChatColor.RED + "" + ChatColor.BOLD + "" + (int) damage + "", offset);
 
     }
 

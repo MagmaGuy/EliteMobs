@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
+import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
@@ -103,7 +103,7 @@ public class FlamePyre extends BossPower implements Listener {
     private void doDamage(EliteMobEntity eliteMobEntity, double range1, double range2, double range3) {
         for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(range1, range2, range3))
             if (entity instanceof LivingEntity && !entity.equals(eliteMobEntity.getLivingEntity()))
-                BossSpecialAttackDamage.dealSpecialDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
+                BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
     }
 
     /**

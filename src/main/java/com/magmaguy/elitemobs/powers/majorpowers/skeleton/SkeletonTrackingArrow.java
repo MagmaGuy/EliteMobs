@@ -65,7 +65,7 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
             @Override
             public void run() {
                 if (player.isValid() && !player.isDead() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())
-                        && player.getLocation().distanceSquared(arrow.getLocation()) < 900 && !arrow.isOnGround() || !arrow.isValid()) {
+                        && player.getLocation().distanceSquared(arrow.getLocation()) < 900 && !arrow.isOnGround()) {
                     if (counter % 10 == 0)
                         arrow.setVelocity(arrow.getVelocity().add(arrowAdjustmentVector(arrow, player)));
                     arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.01, 0.01, 0.01, 0.01);

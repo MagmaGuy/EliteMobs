@@ -18,13 +18,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.magmaguy.elitemobs.combatsystem.CombatSystem.isCustomDamageEntity;
-import static com.magmaguy.elitemobs.combatsystem.CombatSystem.removeCustomDamageEntity;
-
 public class PlayerDamagedByEliteMobHandler implements Listener {
+
+    public static boolean bypass = false;
 
     /**
      * EliteMobs -> player damage handler.
@@ -42,33 +42,25 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
         if (player.isBlocking()) {
             if (player.getInventory().getItemInOffHand().getType().equals(Material.SHIELD)) {
-                Damageable damageable = (Damageable) player.getInventory().getItemInOffHand().getItemMeta();
+                ItemMeta itemMeta = player.getInventory().getItemInOffHand().getItemMeta();
+                Damageable damageable = (Damageable) itemMeta;
 
                 if (player.getInventory().getItemInOffHand().getItemMeta().hasEnchant(Enchantment.DURABILITY))
-                    if (player.getInventory().getItemInOffHand().getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D < ThreadLocalRandom.current().nextDouble())
+                    if (player.getInventory().getItemInOffHand().getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D > ThreadLocalRandom.current().nextDouble())
                         damageable.setDamage(damageable.getDamage() + 5);
-                    else
-                        damageable.setDamage(damageable.getDamage() + 5);
+                player.getInventory().getItemInOffHand().setItemMeta(itemMeta);
                 if (Material.SHIELD.getMaxDurability() < damageable.getDamage())
                     player.getInventory().setItemInOffHand(null);
             }
             return;
         }
 
-        double rawDamage = event.getEntityDamageByEntityEvent().getDamage();
-
-        //Get rid of all vanilla armor reduction
-        for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
-            if (event.getEntityDamageByEntityEvent().isApplicable(modifier))
-                event.getEntityDamageByEntityEvent().setDamage(modifier, 0);
-
         //if the damage source is custom , the damage is final
-        if (isCustomDamageEntity(event.getEliteMobEntity().getLivingEntity())) {
-            event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, rawDamage);
+        if (bypass) {
+            bypass = false;
             //Deal with the player getting killed
             if (player.getHealth() - event.getEntityDamageByEntityEvent().getDamage() <= 0)
                 PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, event.getEliteMobEntity().getLivingEntity()));
-            removeCustomDamageEntity(event.getEliteMobEntity().getLivingEntity());
             return;
         }
 

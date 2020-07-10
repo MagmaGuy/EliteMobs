@@ -152,8 +152,9 @@ public class ItemTierFinder {
         switch (material) {
             case DIAMOND_SWORD:
             case DIAMOND_AXE:
-            case TRIDENT:
                 return DIAMOND_TIER + mainEnchantment;
+            case TRIDENT:
+                return CombatSystem.TRIDENT + mainEnchantment;
             case DIAMOND_BOOTS:
             case DIAMOND_CHESTPLATE:
             case DIAMOND_HELMET:
@@ -237,8 +238,9 @@ public class ItemTierFinder {
         switch (material) {
             case DIAMOND_SWORD:
             case DIAMOND_AXE:
-            case TRIDENT:
                 return DIAMOND_TIER + mainEnchantment;
+            case TRIDENT:
+                return CombatSystem.TRIDENT + mainEnchantment;
             case IRON_AXE:
             case IRON_SWORD:
                 return IRON_TIER + mainEnchantment;
