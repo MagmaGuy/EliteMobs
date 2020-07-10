@@ -171,11 +171,11 @@ public class SpiritWalk extends BossPower implements Listener {
                     eliteMobEntity.getLivingEntity().setAI(true);
                     eliteMobEntity.getLivingEntity().setInvulnerable(false);
 
-                    if (vehicle != null && vehicle.isValid())
+                    if (vehicle != null && !vehicle.isDead())
                         vehicle.teleport(finalLocation);
                     eliteMobEntity.getLivingEntity().teleport(finalLocation);
 
-                    if (vehicle != null && vehicle.isValid()) {
+                    if (vehicle != null && !vehicle.isDead()) {
                         if (vehicle instanceof LivingEntity) {
                             ((LivingEntity) vehicle).setAI(true);
                             EliteMobEntity vehicleBoss = EntityTracker.getEliteMobEntity(vehicle);
@@ -203,7 +203,7 @@ public class SpiritWalk extends BossPower implements Listener {
 
                 }
 
-                if (vehicle != null && vehicle.isValid()) {
+                if (vehicle != null && !vehicle.isDead()) {
                     vehicle.teleport(eliteMobEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
                 }
                 eliteMobEntity.getLivingEntity().teleport(eliteMobEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));

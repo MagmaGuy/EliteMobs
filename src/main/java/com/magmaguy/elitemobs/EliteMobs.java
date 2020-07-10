@@ -171,11 +171,6 @@ public class EliteMobs extends JavaPlugin {
             new Placeholders().register();
         }
 
-        /*
-        Hook to DiscordSRV
-         */
-
-
     }
 
     @Override
@@ -242,6 +237,7 @@ public class EliteMobs extends JavaPlugin {
         MobCombatSettingsConfig.initializeConfig();
         CommandsConfig.initializeConfigs();
         EventsConfig.initializeConfigs();
+        DiscordSRVConfig.initializeConfig();
     }
 
     public static void worldScanner() {

@@ -40,6 +40,7 @@ public class IceFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 }

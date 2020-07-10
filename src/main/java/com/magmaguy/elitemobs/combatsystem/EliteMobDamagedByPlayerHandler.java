@@ -22,16 +22,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static com.magmaguy.elitemobs.combatsystem.CombatSystem.isCustomDamageEntity;
-import static com.magmaguy.elitemobs.combatsystem.CombatSystem.removeCustomDamageEntity;
 
 public class EliteMobDamagedByPlayerHandler implements Listener {
 
@@ -60,20 +56,14 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
 
         //From this point on, the event damage is handled by Elite Mobs
 
-        //nullify vanilla reductions
-        for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
-            if (event.isApplicable(modifier))
-                event.setDamage(modifier, 0);
-
-        double rawDamage = event.getDamage();
-
         //if the damage source is custom , the damage is final
-        if (isCustomDamageEntity(eliteMobEntity.getLivingEntity())) {
-            event.setDamage(EntityDamageEvent.DamageModifier.BASE, rawDamage);
+        if (CombatSystem.bypass) {
+            double rawDamage = event.getDamage();
+            CombatSystem.bypass = false;
+            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event));
             //Deal with the mob getting killed
             if (player.getHealth() - rawDamage <= 0)
                 PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, player));
-            removeCustomDamageEntity(eliteMobEntity.getLivingEntity());
             eliteMobEntity.damage(rawDamage);
             return;
         }
@@ -101,15 +91,8 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
             DamageDisplay.isCriticalHit = true;
         }
 
-        display = true;
-        damage = (int) newDamage;
-        double eventDamage = 0;
-        if (damage <= 7)
-            eventDamage = damage;
-        else
-            eventDamage = 7;
+        //event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage());
 
-        event.setDamage(EntityDamageEvent.DamageModifier.BASE, eventDamage);
         if (eliteMobEntity.getHealth() - newDamage < 0)
             newDamage = eliteMobEntity.getHealth();
         eliteMobEntity.addDamager(player, newDamage);

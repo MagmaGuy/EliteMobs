@@ -105,6 +105,14 @@ public class TreasureChest {
         if (location == null)
             return;
 
+        try {
+            location.getChunk().load();
+        } catch (Exception ex) {
+            new WarningMessage("Failed to load location " + location.toString() + " - this location can not be loaded");
+            new WarningMessage("Does the world " + location.getWorld() + " exist? Did the world name change or has the world been removed?");
+            return;
+        }
+
         if (!customTreasureChestConfigFields.getDropStyle().equalsIgnoreCase("single") &&
                 !customTreasureChestConfigFields.getDropStyle().equalsIgnoreCase("group"))
             this.dropStyle = DropStyle.SINGLE;

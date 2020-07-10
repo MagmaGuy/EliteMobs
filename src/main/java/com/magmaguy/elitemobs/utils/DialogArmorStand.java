@@ -5,20 +5,20 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class DialogArmorStand {
 
-    public static ArmorStand createDialogArmorStand(Location location, String dialog) {
+    public static ArmorStand createDialogArmorStand(Entity sourceEntity, String dialog, Vector offset) {
 
-        ArmorStand armorStand = (ArmorStand) location.getWorld().spawnEntity(location.add(new Vector(0, -50, 0)), EntityType.ARMOR_STAND);
+        ArmorStand armorStand = (ArmorStand) sourceEntity.getWorld().spawnEntity(sourceEntity.getLocation().clone().add(new Vector(0, -50, 0)), EntityType.ARMOR_STAND);
 
         armorStand.setVisible(false);
         armorStand.setMarker(true);
         armorStand.setCustomName(dialog);
-        armorStand.setGravity(false);
         EntityTracker.registerArmorStands(armorStand);
         armorStand.setCustomNameVisible(false);
 
@@ -27,16 +27,18 @@ public class DialogArmorStand {
         new BukkitRunnable() {
 
             int taskTimer = 0;
+            Location tickLocation = sourceEntity.getLocation().clone();
 
             @Override
             public void run() {
 
+                if (sourceEntity.isValid())
+                    tickLocation = sourceEntity.getLocation().clone();
+
                 if (taskTimer == 0) {
-                    armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
-                            armorStand.getLocation().getY() + 50, armorStand.getLocation().getZ()));
+                    armorStand.teleport(tickLocation.clone().add(offset).add(new Vector(0, 1, 0)));
                 } else
-                    armorStand.teleport(new Location(armorStand.getWorld(), armorStand.getLocation().getX(),
-                            armorStand.getLocation().getY() + 0.05, armorStand.getLocation().getZ()));
+                    armorStand.teleport(tickLocation.clone().add(offset).add(new Vector(0, taskTimer * 0.05, 0)));
 
                 if (taskTimer == 1)
                     armorStand.setCustomNameVisible(true);
@@ -44,10 +46,8 @@ public class DialogArmorStand {
                 taskTimer++;
 
                 if (taskTimer > 15) {
-
                     EntityTracker.unregisterArmorStand(armorStand);
                     cancel();
-
                 }
 
             }

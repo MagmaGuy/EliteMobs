@@ -7,10 +7,10 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.DialogArmorStand;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.util.Vector;
 
 public class HealthDisplay implements Listener {
 
@@ -47,10 +47,9 @@ public class HealthDisplay implements Listener {
         int maxHealth = (int) eliteMobEntity.getMaxHealth();
         int currentHealth = (int) (eliteMobEntity.getHealth());
 
-        Location entityLocation = new Location(eliteMobEntity.getLivingEntity().getWorld(), eliteMobEntity.getLivingEntity().getLocation().getX(),
-                eliteMobEntity.getLivingEntity().getLocation().getY() + eliteMobEntity.getLivingEntity().getEyeHeight() + 0.5, eliteMobEntity.getLivingEntity().getLocation().getZ());
+        Vector offset = new Vector(0, eliteMobEntity.getLivingEntity().getEyeHeight() + 0.5, 0);
 
-        DialogArmorStand.createDialogArmorStand(entityLocation, setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
+        DialogArmorStand.createDialogArmorStand(eliteMobEntity.getLivingEntity(), setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth, offset);
 
     }
 

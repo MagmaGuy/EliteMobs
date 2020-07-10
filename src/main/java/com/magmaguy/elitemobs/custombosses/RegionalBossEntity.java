@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
+import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -80,8 +81,13 @@ public class RegionalBossEntity implements Listener {
         if (spawnLocation == null)
             return;
 
-        spawnLocation.getChunk().load();
-
+        try {
+            spawnLocation.getChunk().load();
+        } catch (Exception ex) {
+            new WarningMessage("Failed to load location " + spawnLocation.toString() + " - this location can not be loaded");
+            new WarningMessage("Does the world " + spawnLocation.getWorld() + " exist? Did the world name change or has the world been removed?");
+            return;
+        }
         customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
         isAlive = true;
         try {
@@ -170,10 +176,13 @@ public class RegionalBossEntity implements Listener {
                 if (livingEntity == null) return;
                 if (livingEntity.isDead()) return;
                 livingEntity.remove();
+                if (customBossConfigFields.getAnnouncementPriority() < 1) return;
                 if (customBossConfigFields.getEscapeMessage() != null)
                     for (Player player : Bukkit.getOnlinePlayers())
                         if (player.getWorld().equals(livingEntity.getWorld()))
                             player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
+                if (customBossConfigFields.getAnnouncementPriority() < 3) return;
+                new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
 
             }
 

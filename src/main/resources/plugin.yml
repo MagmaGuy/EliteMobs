@@ -1,9 +1,9 @@
 name: EliteMobs
-version: 7.1.28
+version: 7.1.29
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
-softdepend: [Multiverse-Core, WorldGuard, Vault, PlaceholderAPI, HolographicDisplays]
+softdepend: [Multiverse-Core, WorldGuard, Vault, PlaceholderAPI, HolographicDisplays, DiscordSRV]
 
 commands:
   elitemobs:

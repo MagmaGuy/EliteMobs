@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
+import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.utils.CooldownHandler;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -31,7 +31,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
         super(key);
     }
 
-    private static ArrayList<Player> playersUsingFlamethrower = new ArrayList<>();
+    private static final ArrayList<Player> playersUsingFlamethrower = new ArrayList<>();
 
     private static List<Location> generateDamagePoints(Player player, Location fixedPlayerLocation) {
         List<Location> locations = new ArrayList<>();
@@ -48,7 +48,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                 if (entity instanceof LivingEntity) {
                     if (entity.getType().equals(EntityType.PLAYER))
                         continue;
-                    BossSpecialAttackDamage.dealSpecialDamage(player, (LivingEntity) entity, 1);
+                    BossCustomAttackDamage.dealCustomDamage(player, (LivingEntity) entity, 1);
                 }
 
     }

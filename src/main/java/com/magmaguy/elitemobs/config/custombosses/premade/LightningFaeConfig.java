@@ -40,6 +40,7 @@ public class LightningFaeConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 }
