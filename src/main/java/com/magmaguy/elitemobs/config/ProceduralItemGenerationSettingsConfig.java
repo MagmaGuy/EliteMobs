@@ -38,7 +38,7 @@ public class ProceduralItemGenerationSettingsConfig {
 
         addMaterial(Material.DIAMOND_SWORD);
         addMaterial(Material.DIAMOND_AXE);
-        addMaterial(Material.DIAMOND_HOE);
+        //addMaterial(Material.DIAMOND_HOE);
 
 
         addMaterial(Material.IRON_HELMET);
@@ -48,7 +48,7 @@ public class ProceduralItemGenerationSettingsConfig {
 
         addMaterial(Material.IRON_SWORD);
         addMaterial(Material.IRON_AXE);
-        addMaterial(Material.IRON_HOE);
+        //addMaterial(Material.IRON_HOE);
 
 
         addMaterial(Material.GOLDEN_HELMET);
@@ -58,7 +58,7 @@ public class ProceduralItemGenerationSettingsConfig {
 
         addMaterial(Material.GOLDEN_SWORD);
         addMaterial(Material.GOLDEN_AXE);
-        addMaterial(Material.GOLDEN_HOE);
+        //addMaterial(Material.GOLDEN_HOE);
 
 
         addMaterial(Material.CHAINMAIL_HELMET);

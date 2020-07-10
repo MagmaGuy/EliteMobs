@@ -26,6 +26,10 @@ public class BookMaker {
         bookMeta.setTitle("EliteMobs Book");
         bookMeta.setAuthor("MagmaGuy");
 
+        /*
+        for some reason the spigot api isn't respecting the whole 1 page per array element, so this converts it to a
+        format that actually works
+         */
         for (TextComponent textComponent : pages) {
             TextComponent[] stupid = new TextComponent[1];
             stupid[0] = textComponent;

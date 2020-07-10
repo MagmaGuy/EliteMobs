@@ -16,6 +16,8 @@ public class ElitePowerParser {
             if (!hasCustomSummons && powerName.split(":")[0].equalsIgnoreCase("summon")) {
                 elitePowers.add(new CustomSummonPower(powers));
                 hasCustomSummons = true;
+            } else if (hasCustomSummons && powerName.split(":")[0].equalsIgnoreCase("summon")) {
+                continue;
             } else if (ElitePower.getElitePower(powerName) != null)
                 elitePowers.add(ElitePower.getElitePower(powerName));
             else

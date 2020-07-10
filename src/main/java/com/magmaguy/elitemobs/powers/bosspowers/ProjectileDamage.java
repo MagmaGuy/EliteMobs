@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
+import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -36,7 +36,7 @@ public class ProjectileDamage {
                     for (Entity entity : goldNugget.getNearbyEntities(0.1, 0.1, 0.1))
                         if (entity instanceof LivingEntity)
                             if (entity.getType().equals(EntityType.PLAYER)) {
-                                BossSpecialAttackDamage.dealSpecialDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
+                                BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
                                 iterator.remove();
                                 goldNugget.remove();
                                 removed = true;

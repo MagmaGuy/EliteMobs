@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
+import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
@@ -116,7 +116,7 @@ public class Flamethrower extends BossPower implements Listener {
             for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
                 if (entity instanceof LivingEntity) {
                     if (eliteMobEntity.getLivingEntity().equals(entity)) continue;
-                    BossSpecialAttackDamage.dealSpecialDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
+                    BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
                 }
 
     }

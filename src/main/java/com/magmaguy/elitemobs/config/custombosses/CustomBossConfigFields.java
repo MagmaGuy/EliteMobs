@@ -66,6 +66,7 @@ public class CustomBossConfigFields {
     private Integer followRange;
     private List<String> onDeathCommands;
     private String mountedEntity;
+    private Integer announcementPriority = 0;
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -102,7 +103,8 @@ public class CustomBossConfigFields {
                                   Boolean isRegionalBoss,
                                   Integer spawnCooldown,
                                   Double leashRadius,
-                                  List<String> onDeathCommands) {
+                                  List<String> onDeathCommands,
+                                  Integer announcementPriority) {
         this.fileName = fileName + ".yml";
         this.entityType = entityType;
         this.isEnabled = isEnabled;
@@ -142,6 +144,7 @@ public class CustomBossConfigFields {
             this.leashRadius = leashRadius;
         if (onDeathCommands != null)
             this.onDeathCommands = onDeathCommands;
+        this.announcementPriority = announcementPriority;
     }
 
 
@@ -189,6 +192,7 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("onDeathCommands", onDeathCommands);
         if (!additionalConfigOptions.isEmpty())
             fileConfiguration.addDefaults(additionalConfigOptions);
+        fileConfiguration.addDefault("announcementPriority", announcementPriority);
     }
 
     /**
@@ -351,6 +355,11 @@ public class CustomBossConfigFields {
         this.mountedEntity = configuration.getString("mountedEntity");
 
         customBossConfigFields.add(this);
+
+        if (configuration.get("announcementPriority") != null)
+            this.announcementPriority = configuration.getInt("announcementPriority");
+        else
+            this.announcementPriority = 1;
 
     }
 
@@ -565,6 +574,22 @@ public class CustomBossConfigFields {
 
     public String getMountedEntity() {
         return this.mountedEntity;
+    }
+
+    /**
+     * Announcement priority:
+     * 0 - no messages
+     * 1 - spawn/kill/escape messages
+     * 2 - spawn/kill/escape messages + player tracking
+     * 3 - spawn/kill/escape messages + player tracking + DiscordSRV discord notifications
+     * <p>
+     * Default is 1 since the spawn messages have to be added to config files intentionally and it's weird to have to
+     * enabled them elsewhere on purpose
+     *
+     * @return
+     */
+    public int getAnnouncementPriority() {
+        return this.announcementPriority;
     }
 
 }

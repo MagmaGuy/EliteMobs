@@ -15,6 +15,7 @@ import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
+import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -109,8 +110,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         super.setHealthMultiplier(customBossConfigFields.getHealthMultiplier());
         super.setHasSpecialLoot(customBossConfigFields.getDropsEliteMobsLoot());
         this.customBossConfigFields = customBossConfigFields;
-        if (customBossConfigFields.getSpawnMessage() != null)
-            Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
+        spawnMessage();
         setEquipment();
         if (entityType.equals(EntityType.ZOMBIE))
             ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
@@ -123,7 +123,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 ((PigZombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
         super.setPersistent(customBossConfigFields.getIsPersistent());
         if (customBossConfigFields.getTrails() != null) startBossTrails();
-        if (MobCombatSettingsConfig.showCustomBossLocation && customBossConfigFields.getLocationMessage() != null) {
+        if (customBossConfigFields.getAnnouncementPriority() > 1 && MobCombatSettingsConfig.showCustomBossLocation && customBossConfigFields.getLocationMessage() != null) {
             this.trackable = true;
             trackableCustomBosses.add(this);
             sendLocation();
@@ -135,6 +135,14 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         if (customBossConfigFields.getFollowRange() != null && customBossConfigFields.getFollowRange() > 0 && getLivingEntity() instanceof Mob)
             getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
         mountEntity();
+    }
+
+    private void spawnMessage() {
+        if (customBossConfigFields.getSpawnMessage() == null) return;
+        if (customBossConfigFields.getAnnouncementPriority() < 1) return;
+        Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
+        if (customBossConfigFields.getAnnouncementPriority() < 3) return;
+        new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
     }
 
     public void startBossTrails() {
@@ -252,36 +260,56 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     }
 
     public void realTimeTracking(Player player) {
-        if (trackingPlayer.contains(player)) return;
+        if (trackingPlayer.contains(player)) {
+            trackingPlayer.remove(player);
+            return;
+        }
         if (!getLivingEntity().getWorld().equals(player.getWorld())) {
             player.sendMessage("You're not in the right world to track this boss!");
         }
         trackingPlayer.add(player);
+        startBossBarTask(player);
+
+    }
+
+    HashMap<Player, BossBar> playerBossbars = new HashMap<>();
+
+    public void startBossBarTask(Player player) {
+
+        if (playerBossbars.containsKey(player))
+            return;
+
+        String locationString = (int) getLivingEntity().getLocation().getX() +
+                ", " + (int) getLivingEntity().getLocation().getY() +
+                ", " + (int) getLivingEntity().getLocation().getZ();
+        BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+        bossBar.setProgress(getHealth() / getMaxHealth());
+        bossBar.addPlayer(player);
+
+        playerBossbars.put(player, bossBar);
+
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (getLivingEntity().isDead()) {
+                if (getLivingEntity().isDead() ||
+                        !player.isOnline() ||
+                        !player.getWorld().equals(getLivingEntity().getWorld()) ||
+                        !trackingPlayer.contains(player) && player.getLocation().distance(getLivingEntity().getLocation()) > 20) {
+                    bossBar.removeAll();
                     cancel();
+                    playerBossbars.remove(player);
                     return;
                 }
+
                 String locationString = (int) getLivingEntity().getLocation().getX() +
                         ", " + (int) getLivingEntity().getLocation().getY() +
                         ", " + (int) getLivingEntity().getLocation().getZ();
-                BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-                bossBar.setProgress(getHealth() / getMaxHealth());
-                bossBar.addPlayer(player);
+                bossBar.setTitle(bossBarMessage(player, locationString));
 
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        bossBar.removePlayer(player);
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 20);
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
-
     }
 
     public String bossBarMessage(Player player, String locationString) {
@@ -368,7 +396,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
             playersList = ChatColorConverter.convert(playersList);
 
-            if (customBossEntity.hasDamagers())
+            if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 0 && customBossEntity.hasDamagers())
                 if (customBossEntity.customBossConfigFields.getDeathMessages() != null && customBossEntity.customBossConfigFields.getDeathMessages().size() > 0) {
                     Player topDamager = null, secondDamager = null, thirdDamager = null;
 
@@ -426,6 +454,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                         if (string.contains("$players"))
                             string = string.replace("$players", playersList);
                         Bukkit.broadcastMessage(ChatColorConverter.convert(string));
+                        if (string.length() > 0)
+                            if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 2)
+                                new DiscordSRVAnnouncement(ChatColorConverter.convert(string));
                     }
 
                     for (Player player : Bukkit.getOnlinePlayers())
@@ -437,8 +468,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                                                     Round.twoDecimalPlaces(customBossEntity.getDamagers().get(player)) + "")));
 
                 } else {
-                    if (customBossEntity.customBossConfigFields.getDeathMessage() != null)
+                    if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 0 && customBossEntity.customBossConfigFields.getDeathMessage() != null)
                         Bukkit.broadcastMessage(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
+                    if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 2)
+                        new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
                 }
 
             removeCustomBoss(customBossEntity.uuid);
@@ -538,22 +571,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     }
 
                     for (Entity entity : event.getEliteMobEntity().getLivingEntity().getNearbyEntities(20, 20, 20))
-                        if (entity.getType().equals(EntityType.PLAYER)) {
-                            if (customBossEntity.trackingPlayer.contains(entity)) continue;
-                            String locationString = (int) event.getEliteMobEntity().getLivingEntity().getLocation().getX() +
-                                    ", " + (int) event.getEliteMobEntity().getLivingEntity().getLocation().getY() +
-                                    ", " + (int) event.getEliteMobEntity().getLivingEntity().getLocation().getZ();
-                            BossBar bossBar = Bukkit.createBossBar(customBossEntity.bossBarMessage((Player) entity, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-                            bossBar.setProgress(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
-                            bossBar.addPlayer((Player) entity);
-
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    bossBar.removePlayer((Player) entity);
-                                }
-                            }.runTaskLater(MetadataHandler.PLUGIN, 5);
-                        }
+                        if (entity.getType().equals(EntityType.PLAYER))
+                            customBossEntity.startBossBarTask((Player) entity);
 
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.utils.DialogArmorStand;
-import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 
@@ -15,10 +15,10 @@ public class CriticalStrikesEnchantment extends CustomEnchantment {
         super(key);
     }
 
-    public static void criticalStrikePopupMessage(Location location) {
-        DialogArmorStand.createDialogArmorStand(location.clone().subtract(new Vector(0, 0, 0)),
+    public static void criticalStrikePopupMessage(Entity entity, Vector offset) {
+        DialogArmorStand.createDialogArmorStand(entity,
                 ChatColorConverter.convert(EnchantmentsConfig.getEnchantment("critical_strikes.yml")
-                        .getFileConfiguration().getString("criticalHitPopup")));
+                        .getFileConfiguration().getString("criticalHitPopup")), new Vector(0, 0, 0));
     }
 
 }

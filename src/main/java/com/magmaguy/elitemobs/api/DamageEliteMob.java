@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.events.BossSpecialAttackDamage;
+import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.entity.Player;
 
@@ -62,7 +62,7 @@ public class DamageEliteMob {
 
         finalDamage = finalDamage < 1 ? 1 : finalDamage;
 
-        BossSpecialAttackDamage.dealSpecialDamage(player, eliteMobEntity.getLivingEntity(), finalDamage);
+        BossCustomAttackDamage.dealCustomDamage(player, eliteMobEntity.getLivingEntity(), finalDamage);
 
     }
 

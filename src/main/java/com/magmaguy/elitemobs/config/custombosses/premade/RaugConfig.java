@@ -40,6 +40,7 @@ public class RaugConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 }

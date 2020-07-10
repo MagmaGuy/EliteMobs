@@ -41,6 +41,7 @@ public class BalrogConfig extends CustomBossConfigFields {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 }

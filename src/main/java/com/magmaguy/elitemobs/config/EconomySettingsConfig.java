@@ -29,6 +29,8 @@ public class EconomySettingsConfig {
         File file = ConfigurationEngine.fileCreator("EconomySettings.yml");
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
+        double netheriteLevel = CombatSystem.NETHERITE_TIER_LEVEL + 10;
+        double tridentLevel = CombatSystem.TRIDENT + 10;
         double diamondLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10;
         double ironLevel = CombatSystem.IRON_TIER_LEVEL + 10;
         double stoneChainLevel = CombatSystem.STONE_CHAIN_TIER_LEVEL + 10;
@@ -104,9 +106,19 @@ public class EconomySettingsConfig {
         addMaterial(fileConfiguration, Material.WOODEN_HOE, goldWoodLeatherLevel);
         addMaterial(fileConfiguration, Material.WOODEN_PICKAXE, goldWoodLeatherLevel);
 
-        addMaterial(fileConfiguration, Material.TRIDENT, diamondLevel);
+        addMaterial(fileConfiguration, Material.TRIDENT, tridentLevel);
         addMaterial(fileConfiguration, Material.ELYTRA, diamondLevel);
         addMaterial(fileConfiguration, Material.TURTLE_HELMET, goldWoodLeatherLevel);
+
+        addMaterial(fileConfiguration, Material.NETHERITE_AXE, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_PICKAXE, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_SHOVEL, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_HOE, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_SWORD, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_HELMET, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_CHESTPLATE, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_LEGGINGS, netheriteLevel);
+        addMaterial(fileConfiguration, Material.NETHERITE_BOOTS, netheriteLevel);
 
         defaultMaterialWorth = ConfigurationEngine.setDouble(fileConfiguration, "materialWorth.defaultMaterialWorth", 1);
 

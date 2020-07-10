@@ -41,6 +41,7 @@ public class TestCustomBossConfig extends CustomBossConfigFields {
                 false,
                 0,
                 0D,
-                Arrays.asList("broadcast $players has killed $name! That was level $level!"));
+                Arrays.asList("broadcast $players has killed $name! That was level $level!"),
+                1);
     }
 }

@@ -6,12 +6,18 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DrillingEnchantment extends CustomEnchantment implements Listener {
 
@@ -35,7 +41,8 @@ public class DrillingEnchantment extends CustomEnchantment implements Listener {
         drillBlocks(event.getBlock(),
                 ItemTagger.getEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, key)),
                 event.getPlayer().getLocation(),
-                event.getPlayer().getInventory().getItemInMainHand());
+                event.getPlayer().getInventory().getItemInMainHand(),
+                event.getPlayer());
 
     }
 
@@ -51,9 +58,11 @@ public class DrillingEnchantment extends CustomEnchantment implements Listener {
     private Material material = null;
     private ItemStack itemStack = null;
     private MiningDirection miningDirection = null;
+    private Player player;
 
-    private void drillBlocks(Block originalBlock, int enchantmentLevel, Location playerLocation, ItemStack playerItem) {
+    private void drillBlocks(Block originalBlock, int enchantmentLevel, Location playerLocation, ItemStack playerItem, Player player) {
 
+        this.player = player;
         this.material = originalBlock.getType();
         this.itemStack = playerItem;
         this.miningDirection = determineDirection(originalBlock.getLocation(), playerLocation);
@@ -119,7 +128,16 @@ public class DrillingEnchantment extends CustomEnchantment implements Listener {
         Block finalBlock = originalBlock.getWorld().getBlockAt(originalBlock.getLocation().clone().add(addedVector));
         if (!this.material.equals(finalBlock.getType())) return finalBlock;
         finalBlock.breakNaturally(this.itemStack);
-        itemStack.setDurability((short) (itemStack.getDurability() + 2));
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        Damageable damageable = (Damageable) itemMeta;
+
+        if (itemStack.getItemMeta().hasEnchant(Enchantment.DURABILITY))
+            if (itemStack.getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D > ThreadLocalRandom.current().nextDouble())
+                damageable.setDamage(damageable.getDamage() + 1);
+        itemStack.setItemMeta(itemMeta);
+        if (itemStack.getType().getMaxDurability() < damageable.getDamage())
+            player.getInventory().setItemInMainHand(null);
         return finalBlock;
     }
 

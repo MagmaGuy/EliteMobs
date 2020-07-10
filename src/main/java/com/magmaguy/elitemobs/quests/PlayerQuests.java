@@ -14,6 +14,7 @@ public class PlayerQuests implements Serializable {
     }
 
     public static void addQuest(Player player, EliteQuest eliteQuest) {
+        EliteQuest.addPlayerInQuests(player, eliteQuest);
         if (getData(player).quests != null) {
             getData(player).quests.add(eliteQuest);
             //todo check if this modifies it or is a deep copy
