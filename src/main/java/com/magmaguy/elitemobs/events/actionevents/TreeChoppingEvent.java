@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -26,7 +25,7 @@ public class TreeChoppingEvent implements Listener {
         if (event.isCancelled()) return;
         if (!EliteMobs.validWorldList.contains(event.getBlock().getWorld())) return;
         if (EliteMobs.worldguardIsEnabled &&
-                !WorldGuardFlagChecker.checkFlag(event.getPlayer().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsEventsFlag()))
+                !WorldGuardFlagChecker.checkFlag(event.getPlayer().getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
             return;
         if (!event.getPlayer().hasPermission("elitemobs.events.fae")) return;
         if (!FaeEventConfig.isEnabled) return;

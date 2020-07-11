@@ -31,4 +31,14 @@ public class WorldGuardFlagChecker {
         return object == null ? null : (Integer) object;
     }
 
+    @Nullable
+    public static Integer getRegionMinimumLevel(Location location) {
+        return WorldGuardFlagChecker.getIntegerFlagValue(location, WorldGuardCompatibility.getEliteMobsMinimumLevel());
+    }
+
+    @Nullable
+    public static Integer getRegionMaximumLevel(Location location) {
+        return WorldGuardFlagChecker.getIntegerFlagValue(location, WorldGuardCompatibility.getEliteMobsMaximumLevel());
+    }
+
 }
