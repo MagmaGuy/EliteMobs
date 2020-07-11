@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -21,23 +22,29 @@ public class MaterialGenerator {
 
     public static Material generateMaterial(double itemTier) {
 
-        List<Material> localValidMaterials = initializeValidProceduralMaterials();
+        List<Material> localValidMaterials = (List<Material>) validProceduralMaterials.clone();
 
         if (localValidMaterials.isEmpty()) initializeValidProceduralMaterials();
 
-        if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL) {
-            localValidMaterials.remove(DIAMOND_AXE);
-            localValidMaterials.remove(DIAMOND_HORSE_ARMOR);
-            localValidMaterials.remove(DIAMOND_CHESTPLATE);
-            localValidMaterials.remove(DIAMOND_HELMET);
-            localValidMaterials.remove(DIAMOND_HOE);
-            localValidMaterials.remove(DIAMOND_LEGGINGS);
-            localValidMaterials.remove(DIAMOND_PICKAXE);
-            localValidMaterials.remove(DIAMOND_SHOVEL);
-            localValidMaterials.remove(DIAMOND_SWORD);
-            localValidMaterials.remove(DIAMOND_BOOTS);
 
-        }
+        if (itemTier < CombatSystem.TRIDENT)
+            localValidMaterials.remove(TRIDENT);
+
+        if (VersionChecker.currentVersionIsUnder(16, 0) && itemTier < CombatSystem.NETHERITE_TIER_LEVEL)
+
+            if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL) {
+                localValidMaterials.remove(DIAMOND_AXE);
+                localValidMaterials.remove(DIAMOND_HORSE_ARMOR);
+                localValidMaterials.remove(DIAMOND_CHESTPLATE);
+                localValidMaterials.remove(DIAMOND_HELMET);
+                localValidMaterials.remove(DIAMOND_HOE);
+                localValidMaterials.remove(DIAMOND_LEGGINGS);
+                localValidMaterials.remove(DIAMOND_PICKAXE);
+                localValidMaterials.remove(DIAMOND_SHOVEL);
+                localValidMaterials.remove(DIAMOND_SWORD);
+                localValidMaterials.remove(DIAMOND_BOOTS);
+
+            }
 
         if (itemTier < CombatSystem.IRON_TIER_LEVEL) {
 
@@ -76,24 +83,22 @@ public class MaterialGenerator {
 
     }
 
-    private static List<Material> initializeValidProceduralMaterials() {
+    private static final ArrayList<Material> validProceduralMaterials = new ArrayList();
 
-        List<Material> validMaterials = new ArrayList<>();
+    public static void initializeValidProceduralMaterials() {
 
         for (String string : ProceduralItemGenerationSettingsConfig.validMaterials) {
 
             try {
 
                 Material parsedMaterial = getMaterial(string);
-                validMaterials.add(parsedMaterial);
+                validProceduralMaterials.add(parsedMaterial);
 
             } catch (Exception e) {
                 Bukkit.getLogger().info("Invalid material type detected: " + string);
             }
 
         }
-
-        return validMaterials;
 
     }
 

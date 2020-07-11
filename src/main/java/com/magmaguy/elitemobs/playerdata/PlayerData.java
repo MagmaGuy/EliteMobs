@@ -433,7 +433,8 @@ public class PlayerData {
 
     public static void closeConnection() {
         try {
-            getConnection().close();
+            if (connection == null) return;
+            connection.close();
         } catch (Exception ex) {
             new WarningMessage("Could not correctly close database connection.");
         }

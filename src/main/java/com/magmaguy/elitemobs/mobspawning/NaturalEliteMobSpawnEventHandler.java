@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -54,8 +53,8 @@ public class NaturalEliteMobSpawnEventHandler {
 
         //Takes worldguard minimum and maximum level flags into account
         if (EliteMobs.worldguardIsEnabled) {
-            Integer minLevel = WorldGuardFlagChecker.getIntegerFlagValue(entity.getLocation(), WorldGuardCompatibility.getEliteMobsMinimumLevel());
-            Integer maxLevel = WorldGuardFlagChecker.getIntegerFlagValue(entity.getLocation(), WorldGuardCompatibility.getEliteMobsMaximumLevel());
+            Integer minLevel = WorldGuardFlagChecker.getRegionMinimumLevel(entity.getLocation());
+            Integer maxLevel = WorldGuardFlagChecker.getRegionMaximumLevel(entity.getLocation());
             if (minLevel != null)
                 eliteMobLevel = minLevel > eliteMobLevel ? minLevel : eliteMobLevel;
             if (maxLevel != null)
