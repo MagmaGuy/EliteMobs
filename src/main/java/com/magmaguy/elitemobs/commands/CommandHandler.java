@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.playerdata.PlayerStatusScreen;
+import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
@@ -298,6 +299,19 @@ public class CommandHandler implements CommandExecutor {
             case "debug":
                 if (!userPermCheck("elitemobs.admin", commandSender)) return true;
                 new DebugScreen((Player) commandSender, args);
+                return true;
+            case "discord":
+                if (!userPermCheck("elitemobs.admin", commandSender)) return true;
+                if (args.length < 2) {
+                    commandSender.sendMessage("EliteMobs discord room: https://discord.gg/9f5QSka");
+                    commandSender.sendMessage("If you're trying to send a message via DiscordSRV, the correct commands is /em discord [message]");
+                } else {
+                    StringBuilder message = new StringBuilder();
+                    for (int i = 0; i < args.length; i++)
+                        if (i > 0)
+                            message.append(args[i] + " ");
+                    new DiscordSRVAnnouncement(message.toString());
+                }
                 return true;
             default:
                 validCommands(commandSender);

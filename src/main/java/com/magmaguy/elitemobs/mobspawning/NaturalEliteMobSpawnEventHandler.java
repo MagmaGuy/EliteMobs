@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.mobspawning;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
@@ -8,6 +9,8 @@ import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -25,7 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class NaturalEliteMobSpawnEventHandler {
 
-    private static int range = Bukkit.getServer().getViewDistance() * 16;
+    private static final int range = Bukkit.getServer().getViewDistance() * 16;
 
     /**
      * This manages Elite Mob that are spawned naturally. It takes a mob that spawns normally in the world, randomizes
@@ -47,8 +50,18 @@ public class NaturalEliteMobSpawnEventHandler {
             return;
         }
 
-
         int eliteMobLevel = getNaturalMobLevel(entity.getLocation());
+
+        //Takes worldguard minimum and maximum level flags into account
+        if (EliteMobs.worldguardIsEnabled) {
+            Integer minLevel = WorldGuardFlagChecker.getIntegerFlagValue(entity.getLocation(), WorldGuardCompatibility.getEliteMobsMinimumLevel());
+            Integer maxLevel = WorldGuardFlagChecker.getIntegerFlagValue(entity.getLocation(), WorldGuardCompatibility.getEliteMobsMaximumLevel());
+            if (minLevel != null)
+                eliteMobLevel = minLevel > eliteMobLevel ? minLevel : eliteMobLevel;
+            if (maxLevel != null)
+                eliteMobLevel = maxLevel < eliteMobLevel ? maxLevel : eliteMobLevel;
+        }
+
         if (eliteMobLevel < 0) return;
 
         if (eliteMobLevel > MobCombatSettingsConfig.naturalElitemobLevelCap)
