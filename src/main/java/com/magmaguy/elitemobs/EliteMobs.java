@@ -185,7 +185,7 @@ public class EliteMobs extends JavaPlugin {
             worldguardIsEnabled = false;
         }
         if (!worldguardIsEnabled)
-            if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null)
+            if (Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard"))
                 worldguardIsEnabled = true;
 
     }

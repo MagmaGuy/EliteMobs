@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.items.itemconstructor.MaterialGenerator;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -1415,6 +1416,8 @@ public class ProceduralItemGenerationSettingsConfig {
         ));
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+
+        MaterialGenerator.initializeValidProceduralMaterials();
     }
 
     private static void addMaterial(Material material) {
