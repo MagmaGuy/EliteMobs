@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.28</version>
+    <version>7.1.30</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -31,54 +31,54 @@
                 <configuration>
                     <relocations>
                         <relocation>
-              <pattern>org.bstats</pattern>
-              <shadedPattern>your.package</shadedPattern>
-            </relocation>
-          </relocations>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <repositories>
-      <repository>
-          <id>spigot-repo</id>
-          <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-      </repository>
-    <repository>
-      <id>CodeMC</id>
-      <url>https://repo.codemc.org/repository/maven-public</url>
-    </repository>
-    <repository>
-      <id>sk89q-repo</id>
-      <url>https://maven.enginehub.org/repo/</url>
-    </repository>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-      <repository>
-          <id>placeholderapi</id>
-          <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-      </repository>
-      <repository>
-          <id>codemc-repo</id>
-          <url>https://repo.codemc.io/repository/maven-public/</url>
-      </repository>
-      <repository>
-          <id>Scarsz-Nexus</id>
-          <url>https://nexus.scarsz.me/content/groups/public/</url>
-      </repository>
-  </repositories>
-  <dependencies>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.16.1-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>commons-lang</artifactId>
-          <groupId>commons-lang</groupId>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>your.package</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>Scarsz-Nexus</id>
+            <url>https://nexus.scarsz.me/content/groups/public/</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.16.1-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-lang</artifactId>
+                    <groupId>commons-lang</groupId>
         </exclusion>
         <exclusion>
           <artifactId>guava</artifactId>
@@ -122,18 +122,18 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>com.github.MilkBowl</groupId>
-      <artifactId>VaultAPI</artifactId>
-      <version>1.7</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-            <artifactId>bukkit</artifactId>
-            <groupId>org.bukkit</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bukkit</artifactId>
+                    <groupId>org.bukkit</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
       <dependency>
           <groupId>me.clip</groupId>
           <artifactId>placeholderapi</artifactId>
