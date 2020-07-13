@@ -14,7 +14,7 @@ public class DiscordSRVAnnouncement {
     private static boolean isInitialized = false;
 
     public DiscordSRVAnnouncement(String announcement) {
-        if (!Bukkit.getPluginManager().isPluginEnabled("DiscordSRV")) return;
+        if (Bukkit.getPluginManager().getPlugin("DiscordSRV") == null) return;
         if (DiscordSRVConfig.announcementRoomName.equals("YOU_NEED_TO_PUT_THE_NAME_OF_THE_DISCORD_ROOM_YOU_WANT_ELITEMOBS" +
                 "_ANNOUNCEMENTS_TO_BE_BROADCASTED_IN_AS_YOU_HAVE_IN_YOUR_DISCORDSRV_CONFIGURATION_FILE_CHECK_ELITEMOBS_WIKI_FOR_DETAILS"))
             return;

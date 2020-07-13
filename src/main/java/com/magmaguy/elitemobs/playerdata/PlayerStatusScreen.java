@@ -284,7 +284,7 @@ public class PlayerStatusScreen implements Listener {
             case TURTLE_HELMET:
                 return ChatColor.GREEN;
             default:
-                if (VersionChecker.currentVersionIsUnder(16, 0)) {
+                if (!VersionChecker.currentVersionIsUnder(16, 0)) {
                     if (material.equals(Material.NETHERITE_HELMET) ||
                             material.equals(Material.NETHERITE_CHESTPLATE) ||
                             material.equals(Material.NETHERITE_LEGGINGS) ||
