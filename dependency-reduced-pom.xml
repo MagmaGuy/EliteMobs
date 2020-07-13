@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.31</version>
+    <version>7.1.32</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -89,39 +89,39 @@
                     <groupId>com.google.code.gson</groupId>
                 </exclusion>
                 <exclusion>
-          <artifactId>bungeecord-chat</artifactId>
-          <groupId>net.md-5</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>snakeyaml</artifactId>
-          <groupId>org.yaml</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
+                    <artifactId>bungeecord-chat</artifactId>
+                    <groupId>net.md-5</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>snakeyaml</artifactId>
+                    <groupId>org.yaml</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
       <groupId>com.sk89q.worldguard</groupId>
       <artifactId>worldguard-bukkit</artifactId>
       <version>7.0.0</version>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>bukkit</artifactId>
-          <groupId>org.bukkit</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>worldedit-bukkit</artifactId>
-          <groupId>com.sk89q.worldedit</groupId>
-        </exclusion>
-          <exclusion>
-              <artifactId>worldguard-core</artifactId>
-              <groupId>com.sk89q.worldguard</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>commandbook</artifactId>
-              <groupId>com.sk89q</groupId>
-          </exclusion>
-      </exclusions>
-    </dependency>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bukkit</artifactId>
+                    <groupId>org.bukkit</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>worldedit-bukkit</artifactId>
+                    <groupId>com.sk89q.worldedit</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>worldguard-core</artifactId>
+                    <groupId>com.sk89q.worldguard</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commandbook</artifactId>
+                    <groupId>com.sk89q</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
