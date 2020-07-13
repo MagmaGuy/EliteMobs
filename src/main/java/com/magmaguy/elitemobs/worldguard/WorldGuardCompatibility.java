@@ -21,7 +21,7 @@ public class WorldGuardCompatibility {
     public static boolean initialize() {
 
         //Enable WorldGuard
-        if (!Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") == null)
             return false;
 
         Bukkit.getLogger().info("[EliteMobs] WorldGuard detected.");
