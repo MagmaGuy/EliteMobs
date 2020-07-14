@@ -89,7 +89,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     private boolean trackable = false;
 
     public LivingEntity advancedGetEntity() {
-        return (LivingEntity) Bukkit.getEntity(this.uuid);
+        if (getLivingEntity() != null)
+            return getLivingEntity();
+        else {
+            setLivingEntity((LivingEntity) Bukkit.getEntity(this.uuid));
+            return (LivingEntity) Bukkit.getEntity(this.uuid);
+        }
     }
 
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields,

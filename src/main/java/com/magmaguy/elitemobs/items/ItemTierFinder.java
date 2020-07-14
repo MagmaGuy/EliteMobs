@@ -52,12 +52,6 @@ public class ItemTierFinder {
 
         List<ItemStack> itemList = new ArrayList<>();
 
-        if (player.getInventory().getItemInOffHand() != null && !player.getInventory().getItemInOffHand().getType().equals(Material.AIR)) {
-
-            itemList.add(player.getInventory().getItemInOffHand());
-
-        }
-
         for (int i = 0; i < 9; i++) {
 
             if (player.getInventory().getItem(i) != null && !player.getInventory().getItem(i).getType().equals(Material.AIR)) {
@@ -69,7 +63,14 @@ public class ItemTierFinder {
                         material.equals(Material.STONE_SWORD) || material.equals(Material.STONE_AXE) ||
                         material.equals(Material.GOLDEN_SWORD) || material.equals(Material.GOLDEN_AXE) ||
                         material.equals(Material.WOODEN_SWORD) || material.equals(Material.WOODEN_AXE) ||
-                        material.equals(Material.BOW)) {
+                        material.equals(Material.BOW) ||
+                        !VersionChecker.currentVersionIsUnder(16, 0) && material.equals(Material.NETHERITE_SWORD) ||
+                        !VersionChecker.currentVersionIsUnder(16, 0) && material.equals(Material.NETHERITE_AXE) ||
+                        ItemSettingsConfig.useHoesAsWeapons && material.equals(Material.DIAMOND_HOE) ||
+                        ItemSettingsConfig.useHoesAsWeapons && material.equals(Material.IRON_HOE) ||
+                        ItemSettingsConfig.useHoesAsWeapons && material.equals(Material.STONE_HOE) ||
+                        ItemSettingsConfig.useHoesAsWeapons && material.equals(Material.WOODEN_HOE) ||
+                        !VersionChecker.currentVersionIsUnder(16, 0) && ItemSettingsConfig.useHoesAsWeapons && material.equals(Material.NETHERITE_HOE)) {
 
                     itemList.add(player.getInventory().getItem(i));
 
@@ -81,21 +82,12 @@ public class ItemTierFinder {
 
         double highestTier = 0;
 
-        if (itemList.size() > 0) {
-
+        if (itemList.size() > 0)
             for (ItemStack itemStack : itemList) {
-
                 double currentTier = findBattleTier(itemStack);
-
-                if (currentTier > highestTier) {
-
+                if (currentTier > highestTier)
                     highestTier = currentTier;
-
-                }
-
             }
-
-        }
 
         return highestTier;
 
@@ -270,10 +262,11 @@ public class ItemTierFinder {
                 if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
                     return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             default:
-                if (material.equals(Material.NETHERITE_SWORD) ||
-                        material.equals(Material.NETHERITE_AXE) ||
-                        material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
-                    return CombatSystem.NETHERITE_TIER_LEVEL + mainEnchantment;
+                if (!VersionChecker.currentVersionIsUnder(16, 0))
+                    if (material.equals(Material.NETHERITE_SWORD) ||
+                            material.equals(Material.NETHERITE_AXE) ||
+                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
+                        return CombatSystem.NETHERITE_TIER_LEVEL + mainEnchantment;
                 return 0;
         }
     }
