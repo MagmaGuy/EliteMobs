@@ -39,7 +39,7 @@ public class BlacksmithConfig extends NPCsConfigFields {
                 false,
                 true,
                 3,
-                true,
+                false,
                 "PROCEDURALLY_GENERATED_SHOP"
         );
     }
