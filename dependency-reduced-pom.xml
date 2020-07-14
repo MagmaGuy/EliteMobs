@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.32</version>
+    <version>7.1.33</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -99,10 +99,10 @@
             </exclusions>
         </dependency>
         <dependency>
-      <groupId>com.sk89q.worldguard</groupId>
-      <artifactId>worldguard-bukkit</artifactId>
-      <version>7.0.0</version>
-      <scope>provided</scope>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>7.0.0</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>bukkit</artifactId>

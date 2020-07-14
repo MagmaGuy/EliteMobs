@@ -183,6 +183,7 @@ public class RegionalBossEntity implements Listener {
                             player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
                 if (customBossConfigFields.getAnnouncementPriority() < 3) return;
                 new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
+                CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
 
             }
 

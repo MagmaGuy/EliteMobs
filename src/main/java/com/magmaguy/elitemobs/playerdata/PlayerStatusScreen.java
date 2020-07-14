@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.utils.BookMaker;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -46,7 +47,12 @@ public class PlayerStatusScreen implements Listener {
         pages[1] = statsPage(targetPlayer);
         pages[2] = gearPage(targetPlayer);
         pages[3] = commandsPage();
-        pages[4] = bossTrackingPage(targetPlayer);
+        int bossCounter = 4;
+        for (TextComponent textComponent : bossTrackingPage(targetPlayer)) {
+            pages[bossCounter] = textComponent;
+            bossCounter++;
+        }
+
 
         int counter = 0;
         for (TextComponent textComponent : pages) {
@@ -299,19 +305,49 @@ public class PlayerStatusScreen implements Listener {
         }
     }
 
-    private TextComponent bossTrackingPage(Player player) {
-        TextComponent textComponent = new TextComponent(ChatColorConverter.convert(
-                "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
-                        "&4&lBoss Tracker:\n" +
-                        "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
+    private TextComponent[] bossTrackingPage(Player player) {
 
+
+        ArrayList<TextComponent> textComponents = new ArrayList<>();
+        int counter = 0;
         for (CustomBossEntity customBossEntity : CustomBossEntity.trackableCustomBosses) {
+            if (customBossEntity == null ||
+                    customBossEntity.advancedGetEntity() == null ||
+                    customBossEntity.advancedGetEntity().isDead()) {
+                CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
+                continue;
+            }
             TextComponent message = new TextComponent(customBossEntity.bossBarMessage(player, customBossEntity.customBossConfigFields.getLocationMessage()) + "\n");
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to track/untrack!").create()));
             message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + player.getName() + " " + customBossEntity.uuid));
-            textComponent.addExtra(message);
+            textComponents.add(message);
+
+            counter++;
         }
-        return textComponent;
+
+        if (counter == 0) {
+            TextComponent[] textComponent = new TextComponent[1];
+            textComponent[0] = new TextComponent(ChatColorConverter.convert(
+                    "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
+                            "&4&lBoss Tracker:\n" +
+                            "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
+            return textComponent;
+        } else {
+            TextComponent[] textComponent = new TextComponent[(int) Math.ceil(counter / 6d)];
+            int internalCounter = 0;
+            new DebugMessage((int) Math.ceil(counter / 6d));
+            for (TextComponent text : textComponents) {
+                if (internalCounter % 6 == 0)
+                    textComponent[(int) Math.floor(internalCounter / 6d)] = new TextComponent(ChatColorConverter.convert(
+                            "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
+                                    "&4&lBoss Tracker:\n" +
+                                    "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
+                textComponent[(int) Math.floor(internalCounter / 6d)].addExtra(text);
+                new DebugMessage("adding boss");
+                internalCounter++;
+            }
+            return textComponent;
+        }
     }
 
     private TextComponent commandsPage() {
