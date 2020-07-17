@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
@@ -118,9 +119,7 @@ public class SpawnCommand {
 
             try {
 
-                for (World worldIterator : validWorldList)
-                    if (worldIterator.getName().equals(args[1]))
-                        world = worldIterator;
+                world = Bukkit.getWorld(args[1]);
 
             } catch (Exception e) {
 

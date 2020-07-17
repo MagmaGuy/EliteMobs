@@ -68,9 +68,11 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         LivingEntity livingEntity = event.getEntity();
 
-        int huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(livingEntity);
 
-        double validChance = MobCombatSettingsConfig.aggressiveMobConversionPercentage + huntingGearChanceAdder;
+        double validChance = MobCombatSettingsConfig.aggressiveMobConversionPercentage;
+
+        int huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(livingEntity);
+        validChance += huntingGearChanceAdder;
 
         if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + event.getEntity().getWorld().getName()))
             validChance += DefaultConfig.nightmareWorldSpawnBonus;

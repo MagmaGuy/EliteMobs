@@ -15,6 +15,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -301,7 +302,10 @@ public class CustomItem {
     }
 
     private void parseItemType() {
-        if (this.customLootConfigFields.getItemType() == null) this.itemType = ItemType.CUSTOM;
+        if (this.customLootConfigFields.getItemType() == null) {
+            this.itemType = ItemType.CUSTOM;
+            return;
+        }
         switch (this.customLootConfigFields.getItemType()) {
             case "custom":
                 this.itemType = ItemType.CUSTOM;
@@ -369,26 +373,33 @@ public class CustomItem {
     }
 
     public ItemStack generateDefaultsItemStack() {
-        return ItemConstructor.constructItem(
-                getName(),
-                getMaterial(),
-                getEnchantments(),
-                getCustomEnchantments(),
-                getPotionEffects(),
-                getLore(),
-                null);
+        ItemStack itemStack =
+                ItemConstructor.constructItem(
+                        getName(),
+                        getMaterial(),
+                        getEnchantments(),
+                        getCustomEnchantments(),
+                        getPotionEffects(),
+                        getLore(),
+                        null);
+        parseCustomModelID(itemStack);
+        return itemStack;
     }
 
     public ItemStack generateItemStack(int itemTier) {
+        ItemStack itemStack = null;
         switch (this.scalability) {
             case FIXED:
-                return generateDefaultsItemStack();
+                itemStack = generateDefaultsItemStack();
+                break;
             case LIMITED:
-                return ScalableItemConstructor.constructLimitedItem(itemTier, this);
+                itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this);
+                break;
             case SCALABLE:
-                return ScalableItemConstructor.constructScalableItem(itemTier, this);
+                itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this);
         }
-        return null;
+        parseCustomModelID(itemStack);
+        return itemStack;
     }
 
     public CustomLootConfigFields getCustomLootConfigFields() {
@@ -442,4 +453,12 @@ public class CustomItem {
     public ItemType getItemType() {
         return itemType;
     }
+
+    public void parseCustomModelID(ItemStack itemStack) {
+        if (customLootConfigFields.getCustomModelID() == null) return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setCustomModelData(customLootConfigFields.getCustomModelID());
+        itemStack.setItemMeta(itemMeta);
+    }
+
 }

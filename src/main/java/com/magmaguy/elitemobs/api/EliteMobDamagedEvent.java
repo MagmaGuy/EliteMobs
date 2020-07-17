@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.*;
@@ -14,10 +13,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class EliteMobDamagedEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    private Entity entity;
-    private EliteMobEntity eliteMobEntity;
+    private final Entity entity;
+    private final EliteMobEntity eliteMobEntity;
     private boolean isCancelled = false;
-    private EntityDamageEvent entityDamageEvent;
+    private final EntityDamageEvent entityDamageEvent;
 
     public EliteMobDamagedEvent(EliteMobEntity eliteMobEntity, EntityDamageEvent event) {
         this.entity = eliteMobEntity.getLivingEntity();
@@ -72,7 +71,7 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
             if (eliteMobEntity == null) return;
 
             Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedEvent(eliteMobEntity, event));
-            if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
+            if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
                 return;
             Bukkit.getServer().getPluginManager().callEvent(new GenericAntiExploitEvent(eliteMobEntity, event));
 

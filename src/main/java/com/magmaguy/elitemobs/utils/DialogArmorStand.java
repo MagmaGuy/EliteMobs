@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -14,14 +13,7 @@ public class DialogArmorStand {
 
     public static ArmorStand createDialogArmorStand(Entity sourceEntity, String dialog, Vector offset) {
 
-        ArmorStand armorStand = (ArmorStand) sourceEntity.getWorld().spawnEntity(sourceEntity.getLocation().clone().add(new Vector(0, -50, 0)), EntityType.ARMOR_STAND);
-
-        armorStand.setVisible(false);
-        armorStand.setMarker(true);
-        armorStand.setCustomName(dialog);
-        EntityTracker.registerArmorStands(armorStand);
-        armorStand.setCustomNameVisible(false);
-
+        ArmorStand armorStand = VisualArmorStand.VisualArmorStand(sourceEntity.getLocation().clone().add(new Vector(0, -50, 0)), dialog);
 
         //This part is necessary because armorstands are visible on their first tick to players
         new BukkitRunnable() {

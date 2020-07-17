@@ -26,25 +26,25 @@ public class EntityTracker implements Listener {
     /*
     These HashSets track basically everything for live plugin entities
      */
-    private static HashSet<LivingEntity> superMobs = new HashSet<>();
-    private static HashSet<EliteMobEntity> eliteMobs = new HashSet<>();
-    private static HashSet<LivingEntity> eliteMobsLivingEntities = new HashSet<>();
-    private static HashSet<NPCEntity> npcEntities = new HashSet<>();
+    private static final HashSet<LivingEntity> superMobs = new HashSet<>();
+    private static final HashSet<EliteMobEntity> eliteMobs = new HashSet<>();
+    private static final HashSet<LivingEntity> eliteMobsLivingEntities = new HashSet<>();
+    private static final HashSet<NPCEntity> npcEntities = new HashSet<>();
 
     //    private static HashSet<LivingEntity> naturalEntities = new HashSet<>();
-    private static HashSet<ArmorStand> armorStands = new HashSet<>();
-    private static HashSet<Item> itemVisualEffects = new HashSet<>();
+    private static final HashSet<ArmorStand> armorStands = new HashSet<>();
+    private static final HashSet<Item> itemVisualEffects = new HashSet<>();
 
     /*
     This HashSet shouldn't really be scanned during runtime for aside from the occasional updates, it mostly exists to
     cull entities once the server shuts down
      */
-    private static HashSet<Entity> cullablePluginEntities = new HashSet<>();
+    private static final HashSet<Entity> cullablePluginEntities = new HashSet<>();
 
     /*
     Temporary blocks
      */
-    private static HashSet<Block> temporaryBlocks = new HashSet<>();
+    private static final HashSet<Block> temporaryBlocks = new HashSet<>();
 
     /**
      * Gets all living elite mobs
@@ -367,7 +367,7 @@ public class EntityTracker implements Listener {
 
     public static void wipeEntity(Entity entity) {
         if (entity instanceof LivingEntity)
-            if (!((LivingEntity) entity).getRemoveWhenFarAway())
+            if (!entity.getType().equals(EntityType.ARMOR_STAND) && !((LivingEntity) entity).getRemoveWhenFarAway())
                 return;
         unregisterEliteMob(entity);
         unregisterCullableEntity(entity);
