@@ -60,7 +60,7 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         if (CombatSystem.bypass) {
             double rawDamage = event.getDamage();
             CombatSystem.bypass = false;
-            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event));
+            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event, damage));
             //Deal with the mob getting killed
             if (player.getHealth() - rawDamage <= 0)
                 PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, player));
@@ -96,10 +96,12 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         if (eliteMobEntity.getHealth() - newDamage < 0)
             newDamage = eliteMobEntity.getHealth();
         eliteMobEntity.addDamager(player, newDamage);
-        eliteMobEntity.damage(newDamage);
+
         playerHitCooldownHashMap.put(player, clock);
 
-        Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event));
+        Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event, newDamage));
+        if (!event.isCancelled())
+            eliteMobEntity.damage(newDamage);
 
     }
 

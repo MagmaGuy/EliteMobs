@@ -27,11 +27,14 @@ public class MeteorEvent extends EliteEvent implements Listener {
 
     @Override
     public void activateEvent(Location location) {
+        if (location.getWorld().getEnvironment().equals(World.Environment.NETHER))
+            return;
         unQueue();
         eventWatchdog();
         FallingBlock meteor = createMeteorite(location);
         new BukkitRunnable() {
             int counter = 0;
+
             @Override
             public void run() {
                 if (!meteor.getLocation().subtract(new Vector(0, 1, 0)).getBlock().getType().equals(Material.AIR) &&

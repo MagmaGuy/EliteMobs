@@ -18,7 +18,6 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.custombosses.RegionalBossHandler;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
@@ -27,7 +26,7 @@ import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
+import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
@@ -193,9 +192,6 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList())
-            regionalBossEntity.getCustomBossConfigFields().saveTicksBeforeRespawn();
-
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
 
         EntityTracker.shutdownPurger();
@@ -261,7 +257,7 @@ public class EliteMobs extends JavaPlugin {
         if (!zoneBasedSpawningWorlds.isEmpty())
             Grid.initializeGrid();
         int eggTimerInterval = 20 * 60 * 10 / DefaultConfig.superMobStackAmount;
-        PotionEffectApplier.potionEffectApplier();
+        new PlayerPotionEffects();
         QuestsMenu.questRefresher();
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.superMobStackAmount > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);

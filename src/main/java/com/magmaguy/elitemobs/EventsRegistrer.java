@@ -33,7 +33,7 @@ import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
-import com.magmaguy.elitemobs.items.potioneffects.PotionEffectApplier;
+import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
@@ -109,7 +109,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new NPCChunkLoad(), plugin);
 
         //potion effects
-        pluginManager.registerEvents(new PotionEffectApplier(), plugin);
+        pluginManager.registerEvents(new PlayerPotionEffects(), plugin);
 
         //getloot AdventurersGuildMenu
         pluginManager.registerEvents(new getLootMenu(), plugin);

@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class PlayerStatusScreen implements Listener {
@@ -310,11 +311,12 @@ public class PlayerStatusScreen implements Listener {
 
         ArrayList<TextComponent> textComponents = new ArrayList<>();
         int counter = 0;
-        for (CustomBossEntity customBossEntity : CustomBossEntity.trackableCustomBosses) {
+        for (Iterator<CustomBossEntity> customBossEntityIterator = CustomBossEntity.trackableCustomBosses.iterator(); customBossEntityIterator.hasNext(); ) {
+            CustomBossEntity customBossEntity = customBossEntityIterator.next();
             if (customBossEntity == null ||
                     customBossEntity.advancedGetEntity() == null ||
                     customBossEntity.advancedGetEntity().isDead()) {
-                CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
+                customBossEntityIterator.remove();
                 continue;
             }
             TextComponent message = new TextComponent(customBossEntity.bossBarMessage(player, customBossEntity.customBossConfigFields.getLocationMessage()) + "\n");
@@ -343,7 +345,6 @@ public class PlayerStatusScreen implements Listener {
                                     "&4&lBoss Tracker:\n" +
                                     "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
                 textComponent[(int) Math.floor(internalCounter / 6d)].addExtra(text);
-                new DebugMessage("adding boss");
                 internalCounter++;
             }
             return textComponent;

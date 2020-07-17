@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -23,8 +22,10 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
     private boolean isCancelled = false;
     public boolean rangedAttack;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
+    private final double damage;
 
-    public EliteMobDamagedByPlayerEvent(EliteMobEntity eliteMobEntity, Player player, EntityDamageByEntityEvent event) {
+    public EliteMobDamagedByPlayerEvent(EliteMobEntity eliteMobEntity, Player player, EntityDamageByEntityEvent event, double damage) {
+        this.damage = damage;
         this.entity = eliteMobEntity.getLivingEntity();
         this.eliteMobEntity = eliteMobEntity;
         this.player = player;
@@ -34,7 +35,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
         if (event.isCancelled()) return;
         if (eliteMobEntity.isInAntiExploitCooldown()) return;
         //No antiexploit checks for dungeons
-        if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
+        if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
             return;
         Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerAntiExploitEvent(eliteMobEntity, this));
     }

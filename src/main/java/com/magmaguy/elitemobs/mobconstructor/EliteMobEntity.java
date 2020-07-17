@@ -471,6 +471,10 @@ public class EliteMobEntity {
         }
     }
 
+    public void heal(double healValue) {
+        damage(-healValue);
+    }
+
     public void fullHeal() {
         setHealth(this.maxHealth);
         damagers.clear();

@@ -5,11 +5,11 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.utils.VisualArmorStand;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,17 +42,10 @@ public class SoulbindEnchantment extends CustomEnchantment {
             public void run() {
                 if (!item.isValid())
                     return;
-                ArmorStand soulboundPlayer = (ArmorStand) item.getLocation().getWorld().spawnEntity(
-                        item.getLocation().clone().add(new Vector(0, -50, 0)), EntityType.ARMOR_STAND);
-                EntityTracker.registerArmorStands(soulboundPlayer);
-                soulboundPlayer.setVisible(false);
-                soulboundPlayer.setMarker(true);
-                soulboundPlayer.setCustomName(
-                        ChatColorConverter.convert(
-                                EnchantmentsConfig.getEnchantment("soulbind.yml")
-                                        .getFileConfiguration().getString("hologramString").replace("$player", player.getDisplayName())));
-                soulboundPlayer.setCustomNameVisible(true);
-                soulboundPlayer.setGravity(false);
+
+                ArmorStand soulboundPlayer = VisualArmorStand.VisualArmorStand(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
+                        EnchantmentsConfig.getEnchantment("soulbind.yml")
+                                .getFileConfiguration().getString("hologramString").replace("$player", player.getDisplayName())));
                 new BukkitRunnable() {
                     int counter = 0;
                     final Location lastLocation = item.getLocation().clone();

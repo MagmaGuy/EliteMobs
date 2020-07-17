@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -14,7 +15,8 @@ public class EliteMobExitCombatEvent extends Event {
         this.eliteMobEntity = eliteMobEntity;
         eliteMobEntity.setIsInCombat(false);
         if (MobCombatSettingsConfig.regenerateCustomBossHealthOnCombatEnd)
-            eliteMobEntity.fullHeal();
+            if (!eliteMobEntity.getLivingEntity().getType().equals(EntityType.PHANTOM))
+                eliteMobEntity.fullHeal();
     }
 
     public EliteMobEntity getEliteMobEntity() {
