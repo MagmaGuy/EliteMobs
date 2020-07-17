@@ -38,7 +38,8 @@ public class PlayerData {
 
     public static String getDisplayName(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseString(uuid, "DisplayName");
+            return "Placeholder";
+        //return getDatabaseString(uuid, "DisplayName");
 
         return Bukkit.getPlayer(uuid).getCustomName();
     }
@@ -49,7 +50,8 @@ public class PlayerData {
 
     public static double getCurrency(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseDouble(uuid, "Currency");
+            return 0;
+        //return getDatabaseDouble(uuid, "Currency");
         return playerDataHashMap.get(uuid).currency;
     }
 
@@ -61,7 +63,8 @@ public class PlayerData {
 
     public static int getGuildPrestigeLevel(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildPrestigeLevel");
+            return 0;
+        //return getDatabaseInteger(uuid, "GuildPrestigeLevel");
         return playerDataHashMap.get(uuid).guildPrestigeLevel;
     }
 
@@ -73,7 +76,8 @@ public class PlayerData {
 
     public static int getMaxGuildLevel(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildMaxLevel");
+            return 0;
+        //return getDatabaseInteger(uuid, "GuildMaxLevel");
 
         return playerDataHashMap.get(uuid).maxGuildLevel;
     }
@@ -87,7 +91,8 @@ public class PlayerData {
 
     public static int getActiveGuildLevel(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "GuildActiveLevel");
+            return 0;
+        //return getDatabaseInteger(uuid, "GuildActiveLevel");
 
         return playerDataHashMap.get(uuid).activeGuildLevel;
     }
@@ -102,7 +107,8 @@ public class PlayerData {
     public static PlayerQuests getQuestStatus(UUID uuid) {
         try {
             if (!isInMemory(uuid))
-                return (PlayerQuests) getDatabaseBlob(uuid, "QuestStatus");
+                //return (PlayerQuests) getDatabaseBlob(uuid, "QuestStatus");
+                return null;
             return playerDataHashMap.get(uuid).questStatus;
         } catch (Exception ex) {
             return null;
@@ -143,7 +149,8 @@ public class PlayerData {
 
     public static int getKills(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "Kills");
+            return 0;
+        //return getDatabaseInteger(uuid, "Kills");
 
         return playerDataHashMap.get(uuid).kills;
     }
@@ -157,7 +164,8 @@ public class PlayerData {
 
     public static int getHighestLevelKilled(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "HighestLevelKilled");
+            return 0;
+        //return getDatabaseInteger(uuid, "HighestLevelKilled");
 
         return playerDataHashMap.get(uuid).highestLevelKilled;
     }
@@ -172,7 +180,8 @@ public class PlayerData {
 
     public static int getDeaths(UUID uuid) {
         if (!isInMemory(uuid))
-            return getDatabaseInteger(uuid, "Deaths");
+            return 0;
+        //return getDatabaseInteger(uuid, "Deaths");
 
         return playerDataHashMap.get(uuid).deaths;
     }

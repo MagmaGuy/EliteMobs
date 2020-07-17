@@ -111,20 +111,20 @@ public class GuildRank {
             case 1:
             case 2:
             case 3:
-                prestigeBonus = 2;
+                prestigeBonus = AdventurersGuildConfig.health1;
                 break;
             case 4:
             case 5:
             case 6:
-                prestigeBonus = 2.5;
+                prestigeBonus = AdventurersGuildConfig.health2;
                 break;
             case 7:
             case 8:
             case 9:
-                prestigeBonus = 3;
+                prestigeBonus = AdventurersGuildConfig.health3;
                 break;
             case 10:
-                prestigeBonus = 4;
+                prestigeBonus = AdventurersGuildConfig.health4;
                 break;
         }
         return prestigeBonus * guildRank;
@@ -138,7 +138,7 @@ public class GuildRank {
      * @return
      */
     public static double dodgeBonusValue(int prestigeLevel, int guildRank) {
-        if (!AdventurersGuildConfig.addMaxHealth) return 0;
+        if (!AdventurersGuildConfig.addDodge) return 0;
         double prestigeBonus = 0;
         switch (prestigeLevel) {
             case 0:
@@ -149,16 +149,16 @@ public class GuildRank {
             case 3:
             case 4:
             case 5:
-                prestigeBonus = 3;
+                prestigeBonus = AdventurersGuildConfig.dodge1;
                 break;
             case 6:
             case 7:
             case 8:
-                prestigeBonus = 6;
+                prestigeBonus = AdventurersGuildConfig.dodge2;
                 break;
             case 9:
             case 10:
-                prestigeBonus = 10;
+                prestigeBonus = AdventurersGuildConfig.dodge3;
                 break;
         }
         return Round.twoDecimalPlaces(guildRank / (10D + prestigeLevel) * prestigeBonus);
@@ -172,7 +172,7 @@ public class GuildRank {
      * @return
      */
     public static double critBonusValue(int prestigeLevel, int guildRank) {
-        if (!AdventurersGuildConfig.addMaxHealth) return 0;
+        if (!AdventurersGuildConfig.addCrit) return 0;
         double prestigeBonus = 0;
         switch (prestigeLevel) {
             case 0:
@@ -182,17 +182,17 @@ public class GuildRank {
             case 2:
             case 3:
             case 4:
-                prestigeBonus = 3;
+                prestigeBonus = AdventurersGuildConfig.crit1;
                 break;
             case 5:
             case 6:
             case 7:
-                prestigeBonus = 6;
+                prestigeBonus = AdventurersGuildConfig.crit2;
                 break;
             case 8:
             case 9:
             case 10:
-                prestigeBonus = 10;
+                prestigeBonus = AdventurersGuildConfig.crit3;
                 break;
         }
         return Round.twoDecimalPlaces(guildRank / (10D + prestigeLevel) * prestigeBonus);

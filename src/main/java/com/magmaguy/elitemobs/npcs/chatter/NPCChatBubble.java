@@ -1,12 +1,10 @@
 package com.magmaguy.elitemobs.npcs.chatter;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.utils.VisualArmorStand;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -32,13 +30,7 @@ public class NPCChatBubble {
                     .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
                     .add(new Vector(0, -50 - (0.2 * lineCounter), 0));
 
-            ArmorStand messageBubble = (ArmorStand) newLocation.getWorld().spawnEntity(newLocation, EntityType.ARMOR_STAND);
-            EntityTracker.registerArmorStands(messageBubble);
-            messageBubble.setVisible(false);
-            messageBubble.setMarker(true);
-            messageBubble.setCustomName(ChatColorConverter.convert(substring));
-            messageBubble.setCustomNameVisible(true);
-            messageBubble.setGravity(false);
+            ArmorStand visualArmorStand = VisualArmorStand.VisualArmorStand(newLocation, substring);
 
             new BukkitRunnable() {
                 int counter = 0;
@@ -46,16 +38,16 @@ public class NPCChatBubble {
                 @Override
                 public void run() {
                     if (counter > 20 * 5) {
-                        messageBubble.remove();
+                        visualArmorStand.remove();
                         cancel();
                         return;
                     }
 
                     if (counter == 1)
-                        messageBubble.teleport(messageBubble.getLocation().add(new Vector(0, 49.2, 0)));
+                        visualArmorStand.teleport(visualArmorStand.getLocation().add(new Vector(0, 49.2, 0)));
 
                     if (counter > 1)
-                        messageBubble.teleport(messageBubble.getLocation().clone().add(new Vector(0, 0.005, 0)));
+                        visualArmorStand.teleport(visualArmorStand.getLocation().clone().add(new Vector(0, 0.005, 0)));
 
                     counter++;
                 }

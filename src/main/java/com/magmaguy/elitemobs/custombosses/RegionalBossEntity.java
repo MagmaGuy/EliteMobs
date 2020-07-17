@@ -114,6 +114,13 @@ public class RegionalBossEntity implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
+                customBossConfigFields.saveTicksBeforeRespawn();
+            }
+        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
                 inCooldown = false;
                 spawnRegionalBoss();
                 checkLeash();

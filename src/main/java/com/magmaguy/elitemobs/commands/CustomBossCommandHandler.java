@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -34,21 +35,32 @@ public class CustomBossCommandHandler {
 
         switch (args[2].toLowerCase()) {
             case "addspawnlocation":
-                addSpawnLocation(customBossConfigFields, player.getLocation());
-                player.sendMessage("[EliteMobs] An additional spawn location was set to where you are standing!");
+                if (addSpawnLocation(customBossConfigFields, player.getLocation()))
+                    player.sendMessage("[EliteMobs] An additional spawn location was set to where you are standing!");
+                else {
+                    player.sendMessage("Attempted to run command /em customboss " + customBossConfigFields.getFileName() + " addSpawnLocation ");
+                    player.sendMessage("The file " + customBossConfigFields.getFileName() + " is not set to generate regional bosses and therefore no spawn locations can be added to the boss.");
+                    player.sendMessage("Please refer to the EliteMobs wiki for documentation on World Bosses. If you're just trying to spawn a boss, use the command /em spawn");
+                }
                 return;
             case "setleashradius":
                 setLeashRadius(customBossConfigFields, player, args);
             default:
                 return;
-
         }
 
     }
 
-    private static void addSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location) {
+    private static boolean addSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location) {
+        if (!customBossConfigFields.isRegionalBoss()) {
+            new WarningMessage("Attempted to run command /em cusotmboss " + customBossConfigFields.getFileName() + " addSpawnLocation ");
+            new WarningMessage("The file " + customBossConfigFields.getFileName() + " is not set to generate regional bosses and therefore no spawn locations can be added to the boss.");
+            new WarningMessage("Please refer to the EliteMobs wiki for documentation on World Bosses. If you're just trying to spawn a boss, use the command /em spawn");
+            return false;
+        }
         customBossConfigFields.addSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
         new RegionalBossEntity(customBossConfigFields, customBossConfigFields.new ConfigRegionalEntity(location, 0));
+        return true;
     }
 
     private static void setLeashRadius(CustomBossConfigFields customBossConfigFields, Player player, String[] args) {

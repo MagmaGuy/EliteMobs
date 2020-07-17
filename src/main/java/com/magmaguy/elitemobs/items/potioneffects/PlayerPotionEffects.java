@@ -17,39 +17,96 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.UUID;
 
 /**
  * Created by MagmaGuy on 14/03/2017.
  */
-public class PotionEffectApplier implements Listener {
+public class PlayerPotionEffects implements Listener {
 
-    public static void potionEffectApplier() {
+    public PlayerPotionEffects() {
         new BukkitRunnable() {
             @Override
             public void run() {
                 //scan through what players are wearing
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    checkContinuousPotionEffects(player.getInventory().getItemInMainHand(), player);
-                    checkContinuousPotionEffects(player.getInventory().getItemInOffHand(), player);
-                    checkContinuousPotionEffects(player.getInventory().getBoots(), player);
-                    checkContinuousPotionEffects(player.getInventory().getLeggings(), player);
-                    checkContinuousPotionEffects(player.getInventory().getChestplate(), player);
-                    checkContinuousPotionEffects(player.getInventory().getHelmet(), player);
+                    if (!playerPotionEffectsHashMap.containsKey(player.getUniqueId()))
+                        new PlayerPotionEffectCache(player);
+                    playerPotionEffectsHashMap.get(player.getUniqueId()).processInventory(player);
                 }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 1);
     }
 
-    private static void checkContinuousPotionEffects(ItemStack itemStack, Player player) {
-        if (!ItemTagger.isEliteItem(itemStack)) return;
-        if (ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.continuousPotionEffectKey) == null)
-            return;
-        for (ElitePotionEffect elitePotionEffect : ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.continuousPotionEffectKey))
-            doContinuousPotionEffect(elitePotionEffect, player);
+    private static ArrayList<ElitePotionEffect> checkContinuousPotionEffects(ItemStack itemStack, Player player) {
+        ArrayList<ElitePotionEffect> potionEffects = new ArrayList<>();
+        if (!ItemTagger.isEliteItem(itemStack)) return potionEffects;
+        potionEffects = ItemTagger.getPotionEffects(itemStack.getItemMeta(), ItemTagger.continuousPotionEffectKey);
+        if (potionEffects == null)
+            return new ArrayList<>();
+        return potionEffects;
     }
 
-    private static void doContinuousPotionEffect(ElitePotionEffect elitePotionEffect, Player player) {
+    private static final HashMap<UUID, PlayerPotionEffectCache> playerPotionEffectsHashMap = new HashMap<>();
+
+    private class PlayerPotionEffectCache {
+
+        private class ItemEnchantmentsPair {
+            ItemStack itemStack;
+            ArrayList<ElitePotionEffect> potionEffects;
+
+            public ItemEnchantmentsPair(ItemStack itemStack, ArrayList<ElitePotionEffect> potionEffects) {
+                this.itemStack = itemStack;
+                this.potionEffects = potionEffects;
+            }
+        }
+
+        public HashMap<String, ItemEnchantmentsPair> itemEnchantmentsPairHashMap = new HashMap<>();
+
+        public PlayerPotionEffectCache(Player player) {
+            itemEnchantmentsPairHashMap.put("helmet", processPair(player.getInventory().getHelmet(), player));
+            itemEnchantmentsPairHashMap.put("leggings", processPair(player.getInventory().getLeggings(), player));
+            itemEnchantmentsPairHashMap.put("chestplate", processPair(player.getInventory().getChestplate(), player));
+            itemEnchantmentsPairHashMap.put("boots", processPair(player.getInventory().getBoots(), player));
+            itemEnchantmentsPairHashMap.put("itemInMainHand", processPair(player.getInventory().getItemInMainHand(), player));
+            itemEnchantmentsPairHashMap.put("itemInOffHand", processPair(player.getInventory().getItemInOffHand(), player));
+            playerPotionEffectsHashMap.put(player.getUniqueId(), this);
+        }
+
+        private ItemEnchantmentsPair processPair(ItemStack itemStack, Player player) {
+            return new ItemEnchantmentsPair(itemStack, checkContinuousPotionEffects(itemStack, player));
+        }
+
+        public void processInventory(Player player) {
+            processItem(player.getInventory().getHelmet(), "helmet", player);
+            processItem(player.getInventory().getChestplate(), "chestplate", player);
+            processItem(player.getInventory().getLeggings(), "leggings", player);
+            processItem(player.getInventory().getBoots(), "boots", player);
+            processItem(player.getInventory().getItemInMainHand(), "itemInMainHand", player);
+            processItem(player.getInventory().getItemInOffHand(), "itemInOffHand", player);
+        }
+
+        private void processItem(ItemStack itemStack, String key, Player player) {
+            ItemEnchantmentsPair itemEnchantmentsPair = itemEnchantmentsPairHashMap.get(key);
+            if (itemStack == null) return;
+            if (itemEnchantmentsPair.itemStack == null || !itemEnchantmentsPair.itemStack.isSimilar(itemStack))
+                itemEnchantmentsPairHashMap.put(key, processPair(itemStack, player));
+
+            for (ElitePotionEffect elitePotionEffect : itemEnchantmentsPair.potionEffects)
+                doContinuousPotionEffect(elitePotionEffect, player);
+        }
+    }
+
+
+    private void doContinuousPotionEffect(ElitePotionEffect elitePotionEffect, Player player) {
+
+        //if the player has a higher amplifier potion effect, ignore. If it's the same, reapply to refresh the effect
+        if (player.hasPotionEffect(elitePotionEffect.getPotionEffect().getType()) &&
+                player.getPotionEffect(elitePotionEffect.getPotionEffect().getType()).getAmplifier() > elitePotionEffect.getPotionEffect().getAmplifier())
+            return;
 
         if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HEAL)) {
             Heal.doHeal(player, elitePotionEffect);

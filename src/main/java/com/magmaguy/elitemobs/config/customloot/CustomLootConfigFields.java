@@ -7,7 +7,7 @@ import java.util.List;
 
 public class CustomLootConfigFields {
 
-    private static List<CustomLootConfigFields> customLootConfigFields = new ArrayList<>();
+    private static final List<CustomLootConfigFields> customLootConfigFields = new ArrayList<>();
 
     public static List<CustomLootConfigFields> getCustomLootConfigFields() {
         return customLootConfigFields;
@@ -17,16 +17,17 @@ public class CustomLootConfigFields {
         customLootConfigFields.add(customLootConfig);
     }
 
-    private String fileName;
-    private boolean isEnabled;
-    private String material;
-    private String name;
-    private List<String> lore;
-    private List<String> enchantments;
-    private List<String> potionEffects;
-    private String dropWeight;
-    private String scalability;
-    private String itemType;
+    private final String fileName;
+    private final boolean isEnabled;
+    private final String material;
+    private final String name;
+    private final List<String> lore;
+    private final List<String> enchantments;
+    private final List<String> potionEffects;
+    private final String dropWeight;
+    private final String scalability;
+    private final String itemType;
+    private Integer customModelID;
 
 
     public CustomLootConfigFields(String fileName,
@@ -79,6 +80,7 @@ public class CustomLootConfigFields {
         this.dropWeight = configuration.getString("dropWeight");
         this.scalability = configuration.getString("scalability");
         this.itemType = configuration.getString("itemType");
+        this.customModelID = configuration.getInt("customModelID");
     }
 
     public String getFileName() {
@@ -119,5 +121,9 @@ public class CustomLootConfigFields {
 
     public String getItemType() {
         return itemType;
+    }
+
+    public Integer getCustomModelID() {
+        return this.customModelID;
     }
 }

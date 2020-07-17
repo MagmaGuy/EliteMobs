@@ -11,7 +11,7 @@ import java.util.List;
 public class AdventurersGuildConfig {
 
     public static boolean enableAdventurersGuild;
-    public static boolean addMaxHealth;
+    public static boolean addMaxHealth, addCrit, addDodge;
     public static String guildWorldName;
     public static String guildLocationString;
     public static Location guildWorldLocation;
@@ -22,6 +22,7 @@ public class AdventurersGuildConfig {
     public static String lootLimiterMessage;
     public static boolean alwaysUseNpcs;
     public static List<String> onRankUpCommand, onPrestigeUpCommand;
+    public static double dodge1, dodge2, dodge3, crit1, crit2, crit3, health1, health2, health3, health4;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
@@ -29,6 +30,8 @@ public class AdventurersGuildConfig {
 
         enableAdventurersGuild = ConfigurationEngine.setBoolean(fileConfiguration, "Enable adventurer's guild", true);
         addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
+        addCrit = ConfigurationEngine.setBoolean(fileConfiguration, "Add critical chance when unlocking higher guild ranks", true);
+        addDodge = ConfigurationEngine.setBoolean(fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
         guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name", "EliteMobs_adventurers_guild");
         guildLocationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
         guildWorldLocation = null;
@@ -294,6 +297,16 @@ public class AdventurersGuildConfig {
         alwaysUseNpcs = ConfigurationEngine.setBoolean(fileConfiguration, "alwaysUseNpcsWhenAvailable", true);
         onRankUpCommand = ConfigurationEngine.setList(fileConfiguration, "onRankUpCommand", Arrays.asList());
         onPrestigeUpCommand = ConfigurationEngine.setList(fileConfiguration, "onPrestigeUpCommand", Arrays.asList());
+        dodge1 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige3Bonus", 3);
+        dodge2 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige6Bonus", 6);
+        dodge3 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige9Bonus", 10);
+        crit1 = ConfigurationEngine.setDouble(fileConfiguration, "critPrestige2Bonus", 3);
+        crit2 = ConfigurationEngine.setDouble(fileConfiguration, "critPrestige5Bonus", 6);
+        crit3 = ConfigurationEngine.setDouble(fileConfiguration, "critPrestige8Bonus", 10);
+        health1 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige1Bonus", 2);
+        health2 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige4Bonus", 2.5);
+        health3 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige7Bonus", 3);
+        health4 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige10Bonus", 4);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
