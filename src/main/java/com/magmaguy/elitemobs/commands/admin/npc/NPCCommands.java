@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands.admin.npc;
 
+import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
@@ -23,11 +24,11 @@ public class NPCCommands {
 
         switch (args[1]) {
             case "set":
-                if (permCheck("elitemobs.npc.set", commandSender))
+                if (permCheck(CommandHandler.NPC, commandSender))
                     setNPC((Player) commandSender, args);
                 break;
             case "remove":
-                if (permCheck("elitemobs.npc.remove", commandSender))
+                if (permCheck(CommandHandler.NPC, commandSender))
                     removeNPC((Player) commandSender, args);
                 break;
             default:

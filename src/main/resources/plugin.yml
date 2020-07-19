@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.1.34
+version: 7.1.35
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -12,7 +12,7 @@ commands:
     aliases: [em, adventurerguild, adventurersguild, ag, shareitem]
 permissions:
   elitemobs.*:
-    description: Gives access to all elitemobs commandse
+    description: Gives access to all elitemobs commands
     children:
       elitemobs.stats: true
       elitemobs.getloot: true
@@ -26,10 +26,15 @@ permissions:
       elitemobs.killall.specificentity: true
       elitemobs.currency.user: true
       elitemobs.currency.admin: true
-      elitemobs.currency.cointop: true
       elitemobs.events.*: true
       elitemobs.checktier: true
       elitemobs.checktier.others: true
+      elitemobs.npc: true
+      elitemobs.customboss: true
+      elitemobs.debug: true
+      elitemobs.discord: true
+      elitemobs.autosetup: true
+      elitemobs.versionnotification: true
       elitemobs.user: true
     default: op
   elitemobs.currency.user:
@@ -39,7 +44,6 @@ permissions:
       elitemobs.customshop: true
       elitemobs.currency.pay: true
       elitemobs.currency.wallet: true
-      elitemobs.currency.cointop: true
   elitemobs.currency.admin:
     description: Gives access to the commands admins need to set economy values
     children:
@@ -47,25 +51,23 @@ permissions:
       elitemobs.currency.set: true
       elitemobs.currency.check: true
       elitemobs.currency.add: true
-      elitemobs.customboss: true
   elitemobs.killall.*:
-      description: Allows players to run all /elitemobs kill variations
-      children:
-        elitemobs.killall.aggressiveelites: true
-        elitemobs.killall.passiveelites: true
-        elitemobs.killall.specificentity: true
+    description: Allows players to run all /elitemobs kill variations
+    children:
+      elitemobs.killall.aggressiveelites: true
+      elitemobs.killall.passiveelites: true
+      elitemobs.killall.specificentity: true
   elitemobs.user:
-      description: Gives access to all recommended user commands
-      children:
-        elitemobs.stats: true
-        elitemobs.events.kraken: true
-        elitemobs.events.balrog: true
-        elitemobs.events.fae: true
-        elitemobs.checktier: true
-        elitemobs.adventurersguild: true
-        elitemobs.currency.user: true
-        elitemobs.guild: true
-        elitemobs.quest: true
+    description: Gives access to all recommended user commands
+    children:
+      elitemobs.events.kraken: true
+      elitemobs.events.balrog: true
+      elitemobs.events.fae: true
+      elitemobs.checktier: true
+      elitemobs.adventurersguild: true
+      elitemobs.currency.user: true
+      elitemobs.guild: true
+      elitemobs.quest: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -135,35 +137,11 @@ permissions:
   elitemobs.currency.check:
     description: Allows players to run /elitemobs check [username]
     default: op
-  elitemobs.currency.wallet:
+  elitemobs.currency.check.others:
     description: Allows players to run /elitemobs wallet
     default: op
-  elitemobs.currency.cointop:
-    description: Allows players to run /elitemobs highscore
-    default: op
-  elitemobs.events.*:
+  elitemobs.events:
     description: Allows players to launch all events
-    children:
-      elitemobs.events.smalltreasuregoblin: true
-      elitemobs.events.deadmoon: true
-    default: op
-  elitemobs.events.smalltreasuregoblin:
-    description: Allows players to run /elitemobs event smalltreasuregoblin
-    default: op
-  elitemobs.events.deadmoon:
-    description: Allows players to run /elitemobs event deadmoon
-    default: op
-  elitemobs.events.kraken:
-    description: Allows players to randomly trigger the Kraken event when fishing;
-    defaut: true
-  elitemobs.events.balrog:
-    description: Allows players to randomly trigger the Balrog event when mining ore veins
-    default: true
-  elitemobs.events.fae:
-    description: Allows players to randomly trigger the Fae event when chopping down trees
-    default: true
-  elitemobs.config.setmaxtier:
-    description: Allows players to run /elitemobs setmaxtier [tier]
     default: op
   elitemobs.checktier:
     description: Allows players to run /elitemobs checktier
@@ -192,14 +170,8 @@ permissions:
   elitemobs.adventurersguild.menu:
     description: Allows players to open the adventurer's guild menu through /ag
     default: op
-  elitemobs.npc.set:
+  elitemobs.npc:
     description: Allows players to set the location of a specific NPC
-    default: op
-  elitemobs.npc.remove:
-    description: Allows players to remove a specific NPC
-    default: op
-  elitemobs.npc.add:
-    description: Allows players to add a specific NPC
     default: op
   elitemobs.autosetup:
     description: Allows players to run /em autosetup. This is used for setting up the adventurer's guild map
@@ -222,3 +194,11 @@ permissions:
   elitemobs.customboss:
     description: Allows admins to edit Custom Boss settings
     default: op
+  elitemobs.discord:
+    description: Allows admins to see the link to the EliteMobs discord channel and to send messages to the linked Discord channel for testing announcements
+    defaut: op
+  elitemobs.debug:
+    description: Allows admins to the the various debug screens in EliteMobs
+    default: op
+  elitemobs.setrank:
+    description: Allows admins to use /em setrank [player] [prestigeTier] [guildTier]

@@ -14,7 +14,6 @@ public class CustomBossCommandHandler {
 
         if (args.length < 2) {
             player.sendMessage("[EliteMobs] Possible command syntax:");
-            player.sendMessage("- /elitemobs customboss [filename] setSpawnLocation");
             player.sendMessage("- /elitemobs customboss [filename] addSpawnLocation");
             player.sendMessage("- /elitemobs customboss [filename] setLeashRadius [radius]");
             return;

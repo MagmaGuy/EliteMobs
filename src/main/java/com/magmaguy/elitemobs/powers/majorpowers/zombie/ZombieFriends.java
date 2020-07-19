@@ -39,7 +39,7 @@ public class ZombieFriends extends MajorPower implements Listener {
             public void run() {
                 if (!event.getEliteMobEntity().getLivingEntity().isValid() || !reinforcement1.getLivingEntity().isValid() && !reinforcement2.getLivingEntity().isValid()) {
 
-                    if (reinforcement1.getLivingEntity().isValid()) {
+                    if (reinforcement1 != null && reinforcement1.getLivingEntity().isValid()) {
 
                         nameClearer(reinforcement1);
 
@@ -49,7 +49,7 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                     }
 
-                    if (reinforcement2.getLivingEntity().isValid()) {
+                    if (reinforcement2 != null && reinforcement2.getLivingEntity().isValid()) {
 
 
                         nameClearer(reinforcement2);

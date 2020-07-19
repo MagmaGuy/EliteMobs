@@ -284,9 +284,13 @@ public class CustomBossConfigFields {
                 naturallySpawnedElites.add(this);
         } else
             this.spawnChance = 0;
+
         if (!configuration.contains("isRegionalBoss"))
             this.isRegionalBoss = false;
-        else if (configuration.getBoolean("isRegionalBoss")) {
+        else
+            this.isRegionalBoss = configuration.getBoolean("isRegionalBoss");
+
+        if (this.isRegionalBoss) {
 
             /*
             Legacy: convert old spawn locations to new spawn locations
