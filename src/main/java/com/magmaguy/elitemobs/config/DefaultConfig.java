@@ -1,6 +1,9 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 
@@ -17,11 +20,17 @@ public class DefaultConfig {
     public static boolean doStrictSpawningRules;
     public static double nightmareWorldSpawnBonus;
     public static boolean emLeadsToStatusMenu;
+    public static boolean otherCommandsLeadToEMStatusMenu;
+    public static boolean usePermissions;
+    public static boolean setupDone;
+
+    private static File file = null;
+    private static FileConfiguration fileConfiguration = null;
 
     public static void initializeConfig() {
 
-        File file = ConfigurationEngine.fileCreator("config.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+        file = ConfigurationEngine.fileCreator("config.yml");
+        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         alwaysShowNametags = ConfigurationEngine.setBoolean(fileConfiguration, "alwaysShowEliteMobNameTags", false);
         superMobStackAmount = ConfigurationEngine.setInt(fileConfiguration, "superMobStackAmount", 50);
@@ -31,10 +40,34 @@ public class DefaultConfig {
         doStrictSpawningRules = ConfigurationEngine.setBoolean(fileConfiguration, "enableHighCompatibilityMode", false);
         nightmareWorldSpawnBonus = ConfigurationEngine.setDouble(fileConfiguration, "nightmareWorldSpawnBonus", 0.5);
         emLeadsToStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "emLeadsToStatusMenu", true);
-
+        otherCommandsLeadToEMStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "otherCommandsLeadToEMStatusMenu", true);
+        usePermissions = ConfigurationEngine.setBoolean(fileConfiguration, "Use permissions", false);
+        setupDone = ConfigurationEngine.setBoolean(fileConfiguration, "setupDone", false);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 
+    }
+
+    public static void setUsePermissions(boolean bool, Player player) {
+        usePermissions = bool;
+        fileConfiguration.set("Use permissions", bool);
+        setupDone = true;
+        fileConfiguration.set("setupDone", true);
+        try {
+            fileConfiguration.save(file);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to save config.yml!");
+        }
+
+        player.sendMessage("----------------------------------------------------");
+        player.sendMessage(ChatColorConverter.convert("&2[EliteMobs] Preference registered! Use of permissions is " + usePermissions));
+        if (usePermissions)
+            player.sendMessage(ChatColorConverter.convert("&cReminder: Recommended user permissions is elitemobs.user"));
+        else
+            player.sendMessage(ChatColorConverter.convert("/aPlayers will be able to access all the recommended features. OPs will have global access."));
+        player.sendMessage(ChatColorConverter.convert("&cYou can change this preference at any point in config.yml under \"Use permissions\""));
+        player.sendMessage(ChatColorConverter.convert("&4This message will not be shown again."));
+        player.sendMessage("----------------------------------------------------");
     }
 
 }
