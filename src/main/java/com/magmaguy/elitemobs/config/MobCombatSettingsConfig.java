@@ -35,6 +35,7 @@ public class MobCombatSettingsConfig {
     public static List<String> commandsOnDeath;
     public static String bossKillParticipationMessage;
     public static boolean regenerateCustomBossHealthOnCombatEnd;
+    public static String defaultOtherWorldBossLocationMessage;
 
     public static void initializeConfig() {
 
@@ -71,6 +72,7 @@ public class MobCombatSettingsConfig {
         //Accepts placeholder $playerDamage
         bossKillParticipationMessage = ConfigurationEngine.setString(fileConfiguration, "bossKillParticipationMessage", "&eYour damage: &2$playerDamage");
         regenerateCustomBossHealthOnCombatEnd = ConfigurationEngine.setBoolean(fileConfiguration, "regenerateCustomBossHealthOnCombatEnd", true);
+        defaultOtherWorldBossLocationMessage = ConfigurationEngine.setString(fileConfiguration, "defaultOtherWorldBossLocationMessage", "$name: In different world!");
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

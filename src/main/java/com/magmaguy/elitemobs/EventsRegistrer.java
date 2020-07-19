@@ -31,6 +31,7 @@ import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
+import com.magmaguy.elitemobs.initialsetup.PermissionlessModeWarning;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
@@ -79,6 +80,9 @@ public class EventsRegistrer {
 
         PluginManager pluginManager = Bukkit.getPluginManager();
         Plugin plugin = MetadataHandler.PLUGIN;
+
+        if (!DefaultConfig.setupDone)
+            pluginManager.registerEvents(new PermissionlessModeWarning(), plugin);
 
         pluginManager.registerEvents(new PlayerData.PlayerDataEvents(), plugin);
         pluginManager.registerEvents(new PlayerStatsTracker(), plugin);

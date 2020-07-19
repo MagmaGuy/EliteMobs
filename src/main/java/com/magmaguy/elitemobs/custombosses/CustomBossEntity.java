@@ -318,14 +318,18 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     }
 
     public String bossBarMessage(Player player, String locationString) {
-        if (customBossConfigFields.getLocationMessage().contains("$distance"))
-            if (player.getLocation().getWorld().equals(getLivingEntity().getLocation().getWorld()))
-                return ChatColorConverter.convert(customBossConfigFields.getLocationMessage()
-                        .replace("$location", locationString)
-                        .replace("$distance", "" + (int) getLivingEntity().getLocation().distance(player.getLocation())));
+        if (customBossConfigFields.getLocationMessage().contains("$distance") || customBossConfigFields.getLocationMessage().contains("$location")) {
+            if (!player.getLocation().getWorld().equals(advancedGetEntity().getWorld()))
+                return ChatColorConverter.convert(MobCombatSettingsConfig.defaultOtherWorldBossLocationMessage
+                        .replace("$name", getName()));
 
-        return ChatColorConverter.convert(customBossConfigFields.getLocationMessage()
-                .replace("$location", locationString));
+            return ChatColorConverter.convert(customBossConfigFields.getLocationMessage()
+                    .replace("$distance", "" + (int) getLivingEntity().getLocation().distance(player.getLocation())))
+                    .replace("$location", locationString);
+        }
+
+        return ChatColorConverter.convert(customBossConfigFields.getLocationMessage());
+
     }
 
     private void dropLoot(Player player) {

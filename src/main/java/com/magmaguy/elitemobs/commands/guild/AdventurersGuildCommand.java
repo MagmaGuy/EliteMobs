@@ -38,7 +38,7 @@ public class AdventurersGuildCommand {
 
     }
 
-    private static Location defineTeleportLocation() {
+    public static Location defineTeleportLocation() {
 
         for (World world : Bukkit.getWorlds())
             if (world.getName().equals(AdventurersGuildConfig.guildWorldName)) {

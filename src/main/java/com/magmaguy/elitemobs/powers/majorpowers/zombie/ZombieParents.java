@@ -41,7 +41,7 @@ public class ZombieParents extends MajorPower implements Listener {
 
                 if (!event.getEliteMobEntity().getLivingEntity().isValid()) {
 
-                    if (reinforcementDad.getLivingEntity().isValid()) {
+                    if (reinforcementDad != null && reinforcementDad.getLivingEntity().isValid()) {
 
                         nameClearer(reinforcementDad);
 
@@ -51,7 +51,7 @@ public class ZombieParents extends MajorPower implements Listener {
 
                     }
 
-                    if (reinforcementMom.getLivingEntity().isValid()) {
+                    if (reinforcementMom != null && reinforcementMom.getLivingEntity().isValid()) {
 
                         nameClearer(reinforcementMom);
 
@@ -75,7 +75,7 @@ public class ZombieParents extends MajorPower implements Listener {
 
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcementDad.getLivingEntity().isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcementDad != null && reinforcementDad.getLivingEntity().isValid()) {
 
                         nameClearer(reinforcementDad);
 
@@ -85,7 +85,7 @@ public class ZombieParents extends MajorPower implements Listener {
 
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcementMom.getLivingEntity().isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcementMom != null && reinforcementMom.getLivingEntity().isValid()) {
 
                         nameClearer(reinforcementMom);
 
