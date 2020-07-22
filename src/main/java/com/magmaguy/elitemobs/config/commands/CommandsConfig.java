@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.commands;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.commands.premade.CheckTierConfig;
+import com.magmaguy.elitemobs.config.commands.premade.CheckTierOthersConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -10,8 +11,9 @@ import java.util.Arrays;
 
 public class CommandsConfig {
 
-    private static ArrayList<CommandsConfigFields> commandsConfigFields = new ArrayList<>(Arrays.asList(
-            new CheckTierConfig()
+    private static final ArrayList<CommandsConfigFields> commandsConfigFields = new ArrayList<>(Arrays.asList(
+            new CheckTierConfig(),
+            new CheckTierOthersConfig()
     ));
 
     public static void initializeConfigs() {

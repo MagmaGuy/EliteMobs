@@ -11,6 +11,7 @@ public abstract class PluginMobProperties {
     public String name;
     public EntityType entityType;
     public double defaultMaxHealth;
+    public double baseDamage;
 
     public boolean isEnabled() {
         return isEnabled;

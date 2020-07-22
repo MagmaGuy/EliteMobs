@@ -11,6 +11,7 @@ public class EliteEvokerConfig extends MobPropertiesConfigFields {
                 EntityType.EVOKER,
                 true,
                 "&fLvl &2$level &fElite &5Evoker",
-                Arrays.asList("$player &cwas enchanted by $entity&c!"));
+                Arrays.asList("$player &cwas enchanted by $entity&c!"),
+                9);
     }
 }

@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,7 +21,7 @@ public class AttackLightning extends MinorPower implements Listener {
         super(PowersConfig.getPower("attack_lightning.yml"));
     }
 
-    private static HashSet<UUID> lightningUUIDs = new HashSet<>();
+    private static final HashSet<UUID> lightningUUIDs = new HashSet<>();
 
     @EventHandler
     public void onTarget(EliteMobTargetPlayerEvent event) {
@@ -37,7 +37,7 @@ public class AttackLightning extends MinorPower implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!eliteMobEntity.getLivingEntity().isValid() || ((Monster) eliteMobEntity.getLivingEntity()).getTarget() == null) {
+                if (!eliteMobEntity.getLivingEntity().isValid() || ((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null) {
                     cancel();
                     attackLightning.setIsFiring(false);
                     return;

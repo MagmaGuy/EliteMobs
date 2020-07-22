@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -81,7 +82,7 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
     private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EliteMobEntity eliteMobEntity, EntityDamageByEntityEvent event) {
 
-        double baseDamage = 5;
+        double baseDamage = EliteMobProperties.getPluginData(eliteMobEntity.getLivingEntity().getType()).baseDamage;
         double bonusDamage = eliteTier;
         double damageReduction = playerTier;
         double secondaryDamageReduction = secondaryEnchantmentDamageReduction(player, event);

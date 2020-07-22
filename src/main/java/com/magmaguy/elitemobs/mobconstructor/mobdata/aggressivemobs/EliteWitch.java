@@ -6,18 +6,13 @@ import org.bukkit.entity.EntityType;
 public class EliteWitch extends EliteMobProperties {
 
     public EliteWitch() {
-
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.WITCH).getName();
-
         this.entityType = EntityType.WITCH;
-
         this.defaultMaxHealth = 26;
-
+        this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.WITCH).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.WITCH).isEnabled();
-
         if (this.isEnabled)
             eliteMobData.add(this);
-
     }
 
 }

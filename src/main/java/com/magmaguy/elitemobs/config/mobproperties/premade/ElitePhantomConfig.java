@@ -13,6 +13,7 @@ public class ElitePhantomConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &9Phantom",
                 Arrays.asList("$player &cjust had a bad nightmare about $entity&c!",
                         "$player &cwill be having nightmares about $entity&c!",
-                        "$entity &chas taught $player &cthe value of sleep!"));
+                        "$entity &chas taught $player &cthe value of sleep!"),
+                9);
     }
 }

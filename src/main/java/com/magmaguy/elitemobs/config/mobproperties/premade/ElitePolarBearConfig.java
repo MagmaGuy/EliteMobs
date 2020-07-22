@@ -12,6 +12,7 @@ public class ElitePolarBearConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &fPolar Bear",
                 Arrays.asList("$player &cwas clawed to death by $entity&c!",
-                        "$player &cwas mauled to death by $entity&c!"));
+                        "$player &cwas mauled to death by $entity&c!"),
+                9);
     }
 }

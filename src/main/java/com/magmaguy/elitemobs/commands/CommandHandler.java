@@ -84,10 +84,10 @@ public class CommandHandler implements CommandExecutor {
         if (commandSender.isOp())
             switch (args[0]) {
                 case "usepermissions":
-                    DefaultConfig.setUsePermissions(true, (Player) commandSender);
+                    DefaultConfig.setUsePermissions(true, commandSender);
                     return true;
                 case "dontusepermissions":
-                    DefaultConfig.setUsePermissions(false, (Player) commandSender);
+                    DefaultConfig.setUsePermissions(false, commandSender);
                     return true;
             }
 
@@ -100,7 +100,9 @@ public class CommandHandler implements CommandExecutor {
 
         if (!DefaultConfig.usePermissions) {
             if (permission.equals(SHOP) ||
+                    permission.equals(SHOP + ".command") ||
                     permission.equals(CUSTOMSHOP) ||
+                    permission.equals(CUSTOMSHOP + ".command") ||
                     permission.equals(CURRENCY_PAY) ||
                     permission.equals(CURRENCY_WALLET) ||
                     permission.equals(ADVENTURERS_GUILD) ||
@@ -238,7 +240,9 @@ public class CommandHandler implements CommandExecutor {
         if (!DefaultConfig.usePermissions) {
             if (commandSender instanceof Player) {
                 if (permission.equals(SHOP) ||
+                        permission.equals(SHOP + ".command") ||
                         permission.equals(CUSTOMSHOP) ||
+                        permission.equals(CUSTOMSHOP + ".command") ||
                         permission.equals(CURRENCY_PAY) ||
                         permission.equals(CURRENCY_WALLET) ||
                         permission.equals(ADVENTURERS_GUILD) ||
