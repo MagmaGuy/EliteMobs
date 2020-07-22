@@ -11,6 +11,7 @@ public class EliteBlazeConfig extends MobPropertiesConfigFields {
                 EntityType.BLAZE,
                 true,
                 "&fLvl &2$level &fElite &eBlaze",
-                Arrays.asList("$player &cwas lit ablaze by $entity!"));
+                Arrays.asList("$player &cwas lit ablaze by $entity!"),
+                9);
     }
 }

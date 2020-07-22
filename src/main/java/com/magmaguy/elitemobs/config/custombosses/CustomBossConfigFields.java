@@ -2,10 +2,15 @@ package com.magmaguy.elitemobs.config.custombosses;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,12 +43,12 @@ public class CustomBossConfigFields {
     private final Boolean isPersistent;
     private final double healthMultiplier;
     private final double damageMultiplier;
-    private final Material helmet;
-    private final Material chestplate;
-    private final Material leggings;
-    private final Material boots;
-    private final Material mainHand;
-    private final Material offHand;
+    private ItemStack helmet = null;
+    private ItemStack chestplate = null;
+    private ItemStack leggings = null;
+    private ItemStack boots = null;
+    private ItemStack mainHand = null;
+    private ItemStack offHand = null;
     private boolean isBaby;
     private final List<String> powers;
     private final String spawnMessage;
@@ -114,12 +119,18 @@ public class CustomBossConfigFields {
         this.isPersistent = isPersistent;
         this.healthMultiplier = healthMultiplier;
         this.damageMultiplier = damageMultiplier;
-        this.helmet = helmet;
-        this.chestplate = chestplate;
-        this.leggings = leggings;
-        this.boots = boots;
-        this.mainHand = mainHand;
-        this.offHand = offHand;
+        if (helmet != null)
+            this.helmet = parseItem(helmet.toString());
+        if (chestplate != null)
+            this.chestplate = parseItem(chestplate.toString());
+        if (leggings != null)
+            this.leggings = parseItem(leggings.toString());
+        if (boots != null)
+            this.boots = parseItem(boots.toString());
+        if (mainHand != null)
+            this.mainHand = parseItem(mainHand.toString());
+        if (offHand != null)
+            this.offHand = parseItem(offHand.toString());
         if (isBaby != null)
             this.isBaby = isBaby;
         this.powers = powers;
@@ -160,18 +171,19 @@ public class CustomBossConfigFields {
         fileConfiguration.addDefault("isPersistent", isPersistent);
         fileConfiguration.addDefault("healthMultiplier", healthMultiplier);
         fileConfiguration.addDefault("damageMultiplier", damageMultiplier);
+        //warning: this makes it so defaults can't use custom model data, which doesn't really matter right now for defaults
         if (helmet != null)
-            fileConfiguration.addDefault("helmet", helmet.toString());
+            fileConfiguration.addDefault("helmet", helmet.getType().toString());
         if (chestplate != null)
-            fileConfiguration.addDefault("chestplate", chestplate.toString());
+            fileConfiguration.addDefault("chestplate", chestplate.getType().toString());
         if (leggings != null)
-            fileConfiguration.addDefault("leggings", leggings.toString());
+            fileConfiguration.addDefault("leggings", leggings.getType().toString());
         if (boots != null)
-            fileConfiguration.addDefault("boots", boots.toString());
+            fileConfiguration.addDefault("boots", boots.getType().toString());
         if (mainHand != null)
-            fileConfiguration.addDefault("mainHand", mainHand.toString());
+            fileConfiguration.addDefault("mainHand", mainHand.getType().toString());
         if (offHand != null)
-            fileConfiguration.addDefault("offHand", offHand.toString());
+            fileConfiguration.addDefault("offHand", offHand.getType().toString());
         fileConfiguration.addDefault("isBaby", isBaby);
         fileConfiguration.addDefault("powers", powers);
         fileConfiguration.addDefault("spawnMessage", spawnMessage);
@@ -242,14 +254,12 @@ public class CustomBossConfigFields {
             this.damageMultiplier = 1;
         else
             this.damageMultiplier = configuration.getDouble("damageMultiplier");
-
-
-        this.helmet = parseMaterial(configuration.getString("helmet"));
-        this.chestplate = parseMaterial(configuration.getString("chestplate"));
-        this.leggings = parseMaterial(configuration.getString("leggings"));
-        this.boots = parseMaterial(configuration.getString("boots"));
-        this.mainHand = parseMaterial(configuration.getString("mainHand"));
-        this.offHand = parseMaterial(configuration.getString("offHand"));
+        this.helmet = parseItem(configuration.getString("helmet"));
+        this.chestplate = parseItem(configuration.getString("chestplate"));
+        this.leggings = parseItem(configuration.getString("leggings"));
+        this.boots = parseItem(configuration.getString("boots"));
+        this.mainHand = parseItem(configuration.getString("mainHand"));
+        this.offHand = parseItem(configuration.getString("offHand"));
 
         if (!configuration.contains("isBaby"))
             this.isBaby = false;
@@ -378,14 +388,29 @@ public class CustomBossConfigFields {
         }
     }
 
-    private Material parseMaterial(String materialString) {
+    private ItemStack parseItem(String materialString) {
         if (materialString == null)
-            return Material.AIR;
+            return ItemStackGenerator.generateItemStack(Material.AIR);
         try {
-            return Material.getMaterial(materialString);
+            if (materialString.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")) {
+                ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
+                SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
+                skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString(materialString)));
+                playerHead.setItemMeta(skullMeta);
+                return playerHead;
+            }
+            if (materialString.contains(":")) {
+                ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.getMaterial(materialString.split(":")[0]));
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                itemMeta.setCustomModelData(Integer.parseInt(materialString.split(":")[1]));
+                itemStack.setItemMeta(itemMeta);
+                return itemStack;
+            } else
+                return ItemStackGenerator.generateItemStack(Material.getMaterial(materialString));
         } catch (Exception e) {
             new WarningMessage("File " + this.fileName + " has an invalid material string: " + materialString);
-            return Material.AIR;
+            new WarningMessage("If you're trying to use a player UUID, something went wrong while trying to assign the UUID.");
+            return ItemStackGenerator.generateItemStack(Material.AIR);
         }
     }
 
@@ -425,27 +450,27 @@ public class CustomBossConfigFields {
         return this.damageMultiplier;
     }
 
-    public Material getHelmet() {
+    public ItemStack getHelmet() {
         return this.helmet;
     }
 
-    public Material getChestplate() {
+    public ItemStack getChestplate() {
         return this.chestplate;
     }
 
-    public Material getLeggings() {
+    public ItemStack getLeggings() {
         return this.leggings;
     }
 
-    public Material getBoots() {
+    public ItemStack getBoots() {
         return this.boots;
     }
 
-    public Material getMainHand() {
+    public ItemStack getMainHand() {
         return this.mainHand;
     }
 
-    public Material getOffHand() {
+    public ItemStack getOffHand() {
         return this.offHand;
     }
 

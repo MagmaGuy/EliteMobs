@@ -9,6 +9,7 @@ public class SuperCowConfig extends MobPropertiesConfigFields {
                 EntityType.COW,
                 true,
                 "&2Super Cow",
-                null);
+                null,
+                0);
     }
 }

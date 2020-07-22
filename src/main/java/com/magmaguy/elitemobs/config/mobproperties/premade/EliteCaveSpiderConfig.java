@@ -11,6 +11,7 @@ public class EliteCaveSpiderConfig extends MobPropertiesConfigFields {
                 EntityType.CAVE_SPIDER,
                 true,
                 "&fLvl &2$level &fElite &3Cave Spider",
-                Arrays.asList("$player &cbecame entangled in $entity's &cweb!"));
+                Arrays.asList("$player &cbecame entangled in $entity's &cweb!"),
+                3);
     }
 }

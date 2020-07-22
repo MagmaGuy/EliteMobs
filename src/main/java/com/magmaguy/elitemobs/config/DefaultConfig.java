@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 
@@ -48,7 +48,7 @@ public class DefaultConfig {
 
     }
 
-    public static void setUsePermissions(boolean bool, Player player) {
+    public static void setUsePermissions(boolean bool, CommandSender commandSender) {
         usePermissions = bool;
         fileConfiguration.set("Use permissions", bool);
         setupDone = true;
@@ -59,15 +59,15 @@ public class DefaultConfig {
             new WarningMessage("Failed to save config.yml!");
         }
 
-        player.sendMessage("----------------------------------------------------");
-        player.sendMessage(ChatColorConverter.convert("&2[EliteMobs] Preference registered! Use of permissions is " + usePermissions));
+        commandSender.sendMessage("----------------------------------------------------");
+        commandSender.sendMessage(ChatColorConverter.convert("&2[EliteMobs] Preference registered! Use of permissions is " + usePermissions));
         if (usePermissions)
-            player.sendMessage(ChatColorConverter.convert("&cReminder: Recommended user permissions is elitemobs.user"));
+            commandSender.sendMessage(ChatColorConverter.convert("&cReminder: Recommended user permissions is elitemobs.user"));
         else
-            player.sendMessage(ChatColorConverter.convert("/aPlayers will be able to access all the recommended features. OPs will have global access."));
-        player.sendMessage(ChatColorConverter.convert("&cYou can change this preference at any point in config.yml under \"Use permissions\""));
-        player.sendMessage(ChatColorConverter.convert("&4This message will not be shown again."));
-        player.sendMessage("----------------------------------------------------");
+            commandSender.sendMessage(ChatColorConverter.convert("&aPlayers will be able to access all the recommended features. OPs will have global access."));
+        commandSender.sendMessage(ChatColorConverter.convert("&cYou can change this preference at any point in config.yml under \"Use permissions\""));
+        commandSender.sendMessage(ChatColorConverter.convert("&4This message will not be shown again."));
+        commandSender.sendMessage("----------------------------------------------------");
     }
 
 }

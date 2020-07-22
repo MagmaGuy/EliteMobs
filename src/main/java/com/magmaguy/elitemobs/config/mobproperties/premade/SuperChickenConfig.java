@@ -9,6 +9,7 @@ public class SuperChickenConfig extends MobPropertiesConfigFields {
                 EntityType.CHICKEN,
                 true,
                 "&2Super Chicken",
-                null);
+                null,
+                0);
     }
 }

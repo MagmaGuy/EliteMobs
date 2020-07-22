@@ -11,6 +11,7 @@ public class EliteIllusionerConfig extends MobPropertiesConfigFields {
                 EntityType.ILLUSIONER,
                 true,
                 "&fLvl &2$level &fElite &8Illusioner",
-                Arrays.asList("$player&c fell for $entity's &cillusions!"));
+                Arrays.asList("$player&c fell for $entity's &cillusions!"),
+                5);
     }
 }

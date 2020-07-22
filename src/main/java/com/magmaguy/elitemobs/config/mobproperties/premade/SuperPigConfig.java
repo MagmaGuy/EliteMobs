@@ -9,6 +9,7 @@ public class SuperPigConfig extends MobPropertiesConfigFields {
                 EntityType.PIG,
                 true,
                 "&dSuper Pig",
-                null);
+                null,
+                0);
     }
 }
