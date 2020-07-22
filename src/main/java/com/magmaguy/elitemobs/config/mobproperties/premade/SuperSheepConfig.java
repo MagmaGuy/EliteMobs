@@ -9,6 +9,7 @@ public class SuperSheepConfig extends MobPropertiesConfigFields {
                 EntityType.SHEEP,
                 true,
                 "Super Sheep",
-                null);
+                null,
+                0);
     }
 }

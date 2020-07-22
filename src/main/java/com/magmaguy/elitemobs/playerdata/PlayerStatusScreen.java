@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.utils.BookMaker;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -337,7 +336,6 @@ public class PlayerStatusScreen implements Listener {
         } else {
             TextComponent[] textComponent = new TextComponent[(int) Math.ceil(counter / 6d)];
             int internalCounter = 0;
-            new DebugMessage((int) Math.ceil(counter / 6d));
             for (TextComponent text : textComponents) {
                 if (internalCounter % 6 == 0)
                     textComponent[(int) Math.floor(internalCounter / 6d)] = new TextComponent(ChatColorConverter.convert(

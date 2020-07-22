@@ -11,6 +11,7 @@ public class EliteZombifiedPiglin extends EliteMobProperties {
         }
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.ZOMBIFIED_PIGLIN).getName();
         this.entityType = EntityType.ZOMBIFIED_PIGLIN;
+        this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.ZOMBIFIED_PIGLIN).getBaseDamage();
         this.defaultMaxHealth = 20;
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.ZOMBIFIED_PIGLIN).isEnabled();
         if (this.isEnabled)

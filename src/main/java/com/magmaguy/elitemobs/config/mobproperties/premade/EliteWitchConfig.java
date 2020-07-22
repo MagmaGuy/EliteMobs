@@ -12,6 +12,7 @@ public class EliteWitchConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &5Witch",
                 Arrays.asList("$player &cbecame $entity's &ctest subject!",
-                        "$player &chas been bewitched by $entity&c!"));
+                        "$player &chas been bewitched by $entity&c!"),
+                6);
     }
 }

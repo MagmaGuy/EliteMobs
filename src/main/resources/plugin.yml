@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.1.35
+version: 7.1.36
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -43,13 +43,13 @@ permissions:
       elitemobs.shop: true
       elitemobs.customshop: true
       elitemobs.currency.pay: true
-      elitemobs.currency.wallet: true
+      elitemobs.currency.check: true
   elitemobs.currency.admin:
     description: Gives access to the commands admins need to set economy values
     children:
       elitemobs.currency.subtract: true
       elitemobs.currency.set: true
-      elitemobs.currency.check: true
+      elitemobs.currency.check.others: true
       elitemobs.currency.add: true
   elitemobs.killall.*:
     description: Allows players to run all /elitemobs kill variations
@@ -68,6 +68,8 @@ permissions:
       elitemobs.currency.user: true
       elitemobs.guild: true
       elitemobs.quest: true
+      elitemobs.shop: true
+      elitemobs.customshop: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -135,10 +137,10 @@ permissions:
     description: Allows players to run /elitemobs set [username] [amount]
     default: op
   elitemobs.currency.check:
-    description: Allows players to run /elitemobs check [username]
+    description: Allows players to run /elitemobs wallet
     default: op
   elitemobs.currency.check.others:
-    description: Allows players to run /elitemobs wallet
+    description: Allows players to run /elitemobs check [username]
     default: op
   elitemobs.events:
     description: Allows players to launch all events

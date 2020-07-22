@@ -11,6 +11,7 @@ public class EliteVindicatorConfig extends MobPropertiesConfigFields {
                 EntityType.VINDICATOR,
                 true,
                 "&fLvl &2$level &fElite &8Vindicator",
-                Arrays.asList("$entity &cvindicated his fighting skills over $player&c!"));
+                Arrays.asList("$entity &cvindicated his fighting skills over $player&c!"),
+                19.5);
     }
 }

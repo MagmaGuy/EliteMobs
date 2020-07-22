@@ -9,6 +9,7 @@ public class SuperMushroomCowConfig extends MobPropertiesConfigFields {
                 EntityType.MUSHROOM_COW,
                 true,
                 "&2Super Mooshroom Cow",
-                null);
+                null,
+                0);
     }
 }

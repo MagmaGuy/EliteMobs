@@ -11,6 +11,7 @@ public class EliteVexConfig extends MobPropertiesConfigFields {
                 EntityType.VEX,
                 true,
                 "&fLvl &2$level &fElite &bVex",
-                Arrays.asList("$entity &chas vexed $player&c!"));
+                Arrays.asList("$entity &chas vexed $player&c!"),
+                13);
     }
 }

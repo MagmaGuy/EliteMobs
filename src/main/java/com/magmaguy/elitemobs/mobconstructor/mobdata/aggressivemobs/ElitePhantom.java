@@ -7,20 +7,14 @@ import org.bukkit.entity.EntityType;
 public class ElitePhantom extends EliteMobProperties {
 
     public ElitePhantom() {
-
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.PHANTOM).getName();
-
         this.entityType = EntityType.PHANTOM;
-
         this.defaultMaxHealth = 20;
-
+        this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.PHANTOM).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.PHANTOM).isEnabled();
-
         removeOffensivePower(new AttackLightning());
-
         if (this.isEnabled)
             eliteMobData.add(this);
-
     }
 
 }

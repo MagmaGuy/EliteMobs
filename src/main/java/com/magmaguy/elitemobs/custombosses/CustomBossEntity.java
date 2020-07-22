@@ -235,18 +235,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     private void setEquipment() {
         try {
-            getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(Material.AIR));
-            getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(Material.AIR));
-            getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(Material.AIR));
-            getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(Material.AIR));
-            getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(Material.AIR));
-            getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(Material.AIR));
-            getLivingEntity().getEquipment().setHelmet(ItemStackGenerator.generateItemStack(customBossConfigFields.getHelmet()));
-            getLivingEntity().getEquipment().setChestplate(ItemStackGenerator.generateItemStack(customBossConfigFields.getChestplate()));
-            getLivingEntity().getEquipment().setLeggings(ItemStackGenerator.generateItemStack(customBossConfigFields.getLeggings()));
-            getLivingEntity().getEquipment().setBoots(ItemStackGenerator.generateItemStack(customBossConfigFields.getBoots()));
-            getLivingEntity().getEquipment().setItemInMainHand(ItemStackGenerator.generateItemStack(customBossConfigFields.getMainHand()));
-            getLivingEntity().getEquipment().setItemInOffHand(ItemStackGenerator.generateItemStack(customBossConfigFields.getOffHand()));
+            getLivingEntity().getEquipment().setHelmet(customBossConfigFields.getHelmet());
+            getLivingEntity().getEquipment().setChestplate(customBossConfigFields.getChestplate());
+            getLivingEntity().getEquipment().setLeggings(customBossConfigFields.getLeggings());
+            getLivingEntity().getEquipment().setBoots(customBossConfigFields.getBoots());
+            getLivingEntity().getEquipment().setItemInMainHand(customBossConfigFields.getMainHand());
+            getLivingEntity().getEquipment().setItemInOffHand(customBossConfigFields.getOffHand());
         } catch (Exception ex) {
             new WarningMessage("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossConfigFields.getFileName());
         }

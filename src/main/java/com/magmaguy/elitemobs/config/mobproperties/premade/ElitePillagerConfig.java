@@ -12,6 +12,7 @@ public class ElitePillagerConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &8Pillager",
                 Arrays.asList("$entity &cplundered $player&c!",
-                        "$entity &cpillaged $player&c!"));
+                        "$entity &cpillaged $player&c!"),
+                5);
     }
 }

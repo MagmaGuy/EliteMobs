@@ -32,6 +32,10 @@ public class ProjectileDamage {
 
                 for (Iterator<Item> iterator = goldNuggets.iterator(); iterator.hasNext(); ) {
                     Item goldNugget = iterator.next();
+                    if (goldNugget == null) {
+                        iterator.remove();
+                        continue;
+                    }
                     boolean removed = false;
                     for (Entity entity : goldNugget.getNearbyEntities(0.1, 0.1, 0.1))
                         if (entity instanceof LivingEntity)
