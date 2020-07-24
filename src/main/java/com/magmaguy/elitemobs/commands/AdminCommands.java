@@ -163,9 +163,9 @@ public class AdminCommands {
             case ("set"):
                 if (CommandHandler.permCheck(CommandHandler.CURRENCY_SET, commandSender))
                     CurrencyCommandsHandler.setCommand(commandSender, args);
+                return true;
 
-
-                //guild system
+            //guild system
             case "setrank":
                 if (!CommandHandler.userPermCheck(CommandHandler.SET_RANK, commandSender)) return true;
                 GuildRankCommands.setGuildRank(args);

@@ -38,8 +38,7 @@ public class PlayerData {
 
     public static String getDisplayName(UUID uuid) {
         if (!isInMemory(uuid))
-            return "Placeholder";
-        //return getDatabaseString(uuid, "DisplayName");
+            return getDatabaseString(uuid, "DisplayName");
 
         return Bukkit.getPlayer(uuid).getCustomName();
     }
@@ -50,8 +49,7 @@ public class PlayerData {
 
     public static double getCurrency(UUID uuid) {
         if (!isInMemory(uuid))
-            return 0;
-        //return getDatabaseDouble(uuid, "Currency");
+            return getDatabaseDouble(uuid, "Currency");
         return playerDataHashMap.get(uuid).currency;
     }
 
@@ -63,8 +61,7 @@ public class PlayerData {
 
     public static int getGuildPrestigeLevel(UUID uuid) {
         if (!isInMemory(uuid))
-            return 0;
-        //return getDatabaseInteger(uuid, "GuildPrestigeLevel");
+            return getDatabaseInteger(uuid, "GuildPrestigeLevel");
         return playerDataHashMap.get(uuid).guildPrestigeLevel;
     }
 
@@ -76,8 +73,7 @@ public class PlayerData {
 
     public static int getMaxGuildLevel(UUID uuid) {
         if (!isInMemory(uuid))
-            return 0;
-        //return getDatabaseInteger(uuid, "GuildMaxLevel");
+            return getDatabaseInteger(uuid, "GuildMaxLevel");
 
         return playerDataHashMap.get(uuid).maxGuildLevel;
     }
@@ -91,8 +87,7 @@ public class PlayerData {
 
     public static int getActiveGuildLevel(UUID uuid) {
         if (!isInMemory(uuid))
-            return 0;
-        //return getDatabaseInteger(uuid, "GuildActiveLevel");
+            return getDatabaseInteger(uuid, "GuildActiveLevel");
 
         return playerDataHashMap.get(uuid).activeGuildLevel;
     }
@@ -107,8 +102,7 @@ public class PlayerData {
     public static PlayerQuests getQuestStatus(UUID uuid) {
         try {
             if (!isInMemory(uuid))
-                //return (PlayerQuests) getDatabaseBlob(uuid, "QuestStatus");
-                return null;
+                return (PlayerQuests) getDatabaseBlob(uuid, "QuestStatus");
             return playerDataHashMap.get(uuid).questStatus;
         } catch (Exception ex) {
             return null;
@@ -149,8 +143,7 @@ public class PlayerData {
 
     public static int getKills(UUID uuid) {
         if (!isInMemory(uuid))
-            return 0;
-        //return getDatabaseInteger(uuid, "Kills");
+            return getDatabaseInteger(uuid, "Kills");
 
         return playerDataHashMap.get(uuid).kills;
     }
@@ -164,8 +157,7 @@ public class PlayerData {
 
     public static int getHighestLevelKilled(UUID uuid) {
         if (!isInMemory(uuid))
-            return 0;
-        //return getDatabaseInteger(uuid, "HighestLevelKilled");
+            return getDatabaseInteger(uuid, "HighestLevelKilled");
 
         return playerDataHashMap.get(uuid).highestLevelKilled;
     }
@@ -180,8 +172,7 @@ public class PlayerData {
 
     public static int getDeaths(UUID uuid) {
         if (!isInMemory(uuid))
-            return 0;
-        //return getDatabaseInteger(uuid, "Deaths");
+            return getDatabaseInteger(uuid, "Deaths");
 
         return playerDataHashMap.get(uuid).deaths;
     }
@@ -334,34 +325,42 @@ public class PlayerData {
             statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
 
-            this.currency = resultSet.getDouble("Currency");
-            this.guildPrestigeLevel = resultSet.getInt("GuildPrestigeLevel");
-            this.maxGuildLevel = resultSet.getInt("GuildMaxLevel");
-            this.activeGuildLevel = resultSet.getInt("GuildActiveLevel");
-            this.score = resultSet.getInt("Score");
-            try {
-                this.questStatus = (PlayerQuests) resultSet.getBlob("QuestStatus");
-            } catch (Exception exception) {
-                //for players with no quest status
-                questStatus = new PlayerQuests(Bukkit.getPlayer(uuid));
-            }
-            this.kills = resultSet.getInt("Kills");
-            this.highestLevelKilled = resultSet.getInt("HighestLevelKilled");
-            this.deaths = resultSet.getInt("Deaths");
-            this.questsCompleted = resultSet.getInt("QuestsCompleted");
+            if (resultSet.next()) {
+                this.currency = resultSet.getDouble("Currency");
+                this.guildPrestigeLevel = resultSet.getInt("GuildPrestigeLevel");
+                this.maxGuildLevel = resultSet.getInt("GuildMaxLevel");
+                this.activeGuildLevel = resultSet.getInt("GuildActiveLevel");
+                this.score = resultSet.getInt("Score");
+                try {
+                    this.questStatus = (PlayerQuests) resultSet.getBlob("QuestStatus");
+                } catch (Exception exception) {
+                    //for players with no quest status
+                    questStatus = new PlayerQuests(Bukkit.getPlayer(uuid));
+                }
+                this.kills = resultSet.getInt("Kills");
+                this.highestLevelKilled = resultSet.getInt("HighestLevelKilled");
+                this.deaths = resultSet.getInt("Deaths");
+                this.questsCompleted = resultSet.getInt("QuestsCompleted");
 
-            playerDataHashMap.put(uuid, this);
+                playerDataHashMap.put(uuid, this);
+
+                resultSet.close();
+                statement.close();
+                getConnection().close();
+                new DebugMessage("Loaded data from player " + Bukkit.getPlayer(uuid).getDisplayName());
+                return;
+            }
 
             resultSet.close();
             statement.close();
-            getConnection().close();
-            new DebugMessage("Loaded data from player " + Bukkit.getPlayer(uuid).getDisplayName());
-            return;
+            closeConnection();
         } catch (Exception e) {
-            new WarningMessage("No player entry detected, generating new entry!");
+            new WarningMessage("Something went wrong while generating a new player entry. This is bad! Tell the dev.");
             closeConnection();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+
+        new WarningMessage("No player entry detected, generating new entry!");
 
         try {
             getConnection().setAutoCommit(false);
@@ -452,6 +451,7 @@ public class PlayerData {
     public static void initializeDatabaseConnection() {
         new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data").mkdirs();
         Statement statement = null;
+
         try {
             System.out.println("Opened database successfully");
 

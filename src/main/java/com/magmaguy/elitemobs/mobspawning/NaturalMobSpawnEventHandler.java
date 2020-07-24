@@ -16,7 +16,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
-import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 
 /**
  * Created by MagmaGuy on 24/04/2017.
@@ -56,13 +55,11 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (!ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + event.getEntity().getWorld().getName()))
             return;
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
-                !MobCombatSettingsConfig.doSpawnersSpawnEliteMobs)
+                !MobCombatSettingsConfig.doSpawnersSpawnEliteMobs || event.getSpawnReason() == CUSTOM && DefaultConfig.doStrictSpawningRules)
             return;
         if (event.getEntity().getCustomName() != null && DefaultConfig.preventEliteMobConversionOfNamedMobs)
             return;
 
-        if (!(event.getSpawnReason() == NATURAL || event.getSpawnReason() == CUSTOM && !DefaultConfig.doStrictSpawningRules))
-            return;
         if (!EliteMobProperties.isValidEliteMobType(event.getEntityType()))
             return;
 

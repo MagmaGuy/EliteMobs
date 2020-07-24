@@ -305,7 +305,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                         ", " + (int) getLivingEntity().getLocation().getY() +
                         ", " + (int) getLivingEntity().getLocation().getZ();
                 bossBar.setTitle(bossBarMessage(player, locationString));
-
+                bossBar.setProgress(getHealth() / getMaxHealth());
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
