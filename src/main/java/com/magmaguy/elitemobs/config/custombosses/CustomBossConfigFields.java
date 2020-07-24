@@ -26,7 +26,7 @@ public class CustomBossConfigFields {
         return naturallySpawnedElites;
     }
 
-    private static final HashSet<CustomBossConfigFields> regionalElites = new HashSet<>();
+    public static final HashSet<CustomBossConfigFields> regionalElites = new HashSet<>();
 
     public static HashSet<CustomBossConfigFields> getRegionalElites() {
         return regionalElites;
@@ -65,7 +65,7 @@ public class CustomBossConfigFields {
     private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
     private double spawnChance;
     private boolean isRegionalBoss;
-    private final HashMap<UUID, ConfigRegionalEntity> ConfigRegionalEntities = new HashMap<>();
+    private final HashMap<UUID, ConfigRegionalEntity> configRegionalEntities = new HashMap<>();
     private int spawnCooldown;
     private double leashRadius;
     private Integer followRange;
@@ -348,14 +348,14 @@ public class CustomBossConfigFields {
                     if (string.contains(":"))
                         respawnTime = Long.parseLong(string.substring(string.indexOf(":") + 1));
                     ConfigRegionalEntity configRegionalEntity = new ConfigRegionalEntity(deserializedLocation, respawnTime);
-                    this.ConfigRegionalEntities.put(configRegionalEntity.uuid, configRegionalEntity);
+                    this.configRegionalEntities.put(configRegionalEntity.uuid, configRegionalEntity);
                 }
             }
 
             if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
             else this.spawnCooldown = configuration.getInt("spawnCooldown");
 
-            if (ConfigRegionalEntities != null)
+            if (configRegionalEntities != null)
                 regionalElites.add(this);
 
         }
@@ -535,14 +535,14 @@ public class CustomBossConfigFields {
     }
 
     public HashMap<UUID, ConfigRegionalEntity> getConfigRegionalEntities() {
-        return ConfigRegionalEntities;
+        return configRegionalEntities;
     }
 
-    public void addSpawnLocation(Location location) {
+    public ConfigRegionalEntity addSpawnLocation(Location location) {
         ConfigRegionalEntity newConfigRegionalEntity = new ConfigRegionalEntity(location, 0);
-        ConfigRegionalEntities.put(newConfigRegionalEntity.uuid, newConfigRegionalEntity);
+        configRegionalEntities.put(newConfigRegionalEntity.uuid, newConfigRegionalEntity);
         List<String> convertedList = new ArrayList<>();
-        for (ConfigRegionalEntity configRegionalEntity : ConfigRegionalEntities.values())
+        for (ConfigRegionalEntity configRegionalEntity : configRegionalEntities.values())
             convertedList.add(ConfigurationLocation.serialize(configRegionalEntity.spawnLocation) + ":" + configRegionalEntity.respawnTimeLeft);
         fileConfiguration.set("spawnLocations", convertedList);
         try {
@@ -550,6 +550,7 @@ public class CustomBossConfigFields {
         } catch (IOException ex) {
             new WarningMessage("Failed to save new boss location! It will not show up in the right place after a restart. Report this to the dev.");
         }
+        return newConfigRegionalEntity;
     }
 
     public void setLeashRadius(double leashRadius) {
@@ -579,19 +580,18 @@ public class CustomBossConfigFields {
     }
 
     public int getTicksBeforeRespawn(UUID uuid) {
-        return (int) (ConfigRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20 < 0 ?
+        return (int) (configRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20 < 0 ?
                 0 :
-                (int) (ConfigRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20;
+                (int) (configRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20;
     }
 
     public void updateTicksBeforeRespawn(UUID uuid, int delayInMinutes) {
-        long newTime = delayInMinutes * 60 * 1000 + System.currentTimeMillis();
-        ConfigRegionalEntities.get(uuid).respawnTimeLeft = newTime;
+        configRegionalEntities.get(uuid).respawnTimeLeft = (delayInMinutes * 60 * 1000) + System.currentTimeMillis();
     }
 
     public void saveTicksBeforeRespawn() {
         List<String> convertedList = new ArrayList<>();
-        for (ConfigRegionalEntity configRegionalEntity : ConfigRegionalEntities.values())
+        for (ConfigRegionalEntity configRegionalEntity : configRegionalEntities.values())
             convertedList.add(ConfigurationLocation.serialize(configRegionalEntity.spawnLocation) + ":" + configRegionalEntity.respawnTimeLeft);
         fileConfiguration.set("spawnLocations", convertedList);
         try {
@@ -618,6 +618,8 @@ public class CustomBossConfigFields {
      * @return
      */
     public int getAnnouncementPriority() {
+        if (this.announcementPriority == null)
+            return 1;
         return this.announcementPriority;
     }
 
