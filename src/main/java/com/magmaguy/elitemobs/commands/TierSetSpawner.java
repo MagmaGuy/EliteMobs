@@ -10,12 +10,12 @@ public class TierSetSpawner {
 
     public static void spawnTierItem(int tierLevel, Player player) {
 
-        ItemStack helmet = new ItemStack(Material.DIAMOND_HELMET);
-        ItemStack chestplate = new ItemStack(Material.DIAMOND_CHESTPLATE);
-        ItemStack leggings = new ItemStack(Material.DIAMOND_LEGGINGS);
-        ItemStack boots = new ItemStack(Material.DIAMOND_BOOTS);
-        ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
-        ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
+        ItemStack helmet = new ItemStack(Material.NETHERITE_HELMET);
+        ItemStack chestplate = new ItemStack(Material.NETHERITE_CHESTPLATE);
+        ItemStack leggings = new ItemStack(Material.NETHERITE_LEGGINGS);
+        ItemStack boots = new ItemStack(Material.NETHERITE_BOOTS);
+        ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
+        ItemStack axe = new ItemStack(Material.NETHERITE_AXE);
         ItemStack bow = new ItemStack(Material.BOW);
 
         if (tierLevel > 1) {

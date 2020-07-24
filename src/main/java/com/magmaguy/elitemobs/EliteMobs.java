@@ -42,6 +42,8 @@ import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
+import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -57,6 +59,7 @@ public class EliteMobs extends JavaPlugin {
     public static boolean worldguardIsEnabled = false;
     public static List<World> zoneBasedSpawningWorlds = new ArrayList<>();
     public static List<World> nightmareWorlds = new ArrayList<>();
+    public Object placeholders = null;
 
     @Override
     public void onEnable() {
@@ -167,7 +170,9 @@ public class EliteMobs extends JavaPlugin {
 
         // Small check to make sure that PlaceholderAPI is installed
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new Placeholders().register();
+            Placeholders placeholders = new Placeholders();
+            placeholders.register();
+            this.placeholders = placeholders;
         }
 
     }
@@ -198,6 +203,9 @@ public class EliteMobs extends JavaPlugin {
 
         validWorldList.clear();
         zoneBasedSpawningWorlds.clear();
+
+        if (this.placeholders != null)
+            PlaceholderAPI.unregisterExpansion((PlaceholderExpansion) this.placeholders);
 
         //save cached data
         PlayerData.closeConnection();

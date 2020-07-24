@@ -52,13 +52,13 @@ public class CustomBossCommandHandler {
 
     private static boolean addSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location) {
         if (!customBossConfigFields.isRegionalBoss()) {
-            new WarningMessage("Attempted to run command /em cusotmboss " + customBossConfigFields.getFileName() + " addSpawnLocation ");
+            new WarningMessage("Attempted to run command /em customboss " + customBossConfigFields.getFileName() + " addSpawnLocation ");
             new WarningMessage("The file " + customBossConfigFields.getFileName() + " is not set to generate regional bosses and therefore no spawn locations can be added to the boss.");
             new WarningMessage("Please refer to the EliteMobs wiki for documentation on World Bosses. If you're just trying to spawn a boss, use the command /em spawn");
             return false;
         }
-        customBossConfigFields.addSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
-        new RegionalBossEntity(customBossConfigFields, customBossConfigFields.new ConfigRegionalEntity(location, 0));
+        CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity = customBossConfigFields.addSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
+        new RegionalBossEntity(customBossConfigFields, configRegionalEntity);
         return true;
     }
 

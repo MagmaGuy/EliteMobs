@@ -41,6 +41,10 @@ public class PlayerStatusScreen implements Listener {
         generateBook(player, player);
     }
 
+    public PlayerStatusScreen(Player player, int page) {
+        generateBook(player, player);
+    }
+
     private ItemStack generateBook(Player requestingPlayer, Player targetPlayer) {
         TextComponent[] pages = new TextComponent[50];
         pages[0] = coverPage(targetPlayer);
