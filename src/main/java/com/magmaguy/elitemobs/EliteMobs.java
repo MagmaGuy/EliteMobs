@@ -24,12 +24,12 @@ import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
@@ -108,6 +108,7 @@ public class EliteMobs extends JavaPlugin {
 
         //Launch the local data cache
         PlayerData.initializeDatabaseConnection();
+        ElitePlayerInventory.initialize();
 
         //Get world list
         worldScanner();
@@ -269,8 +270,6 @@ public class EliteMobs extends JavaPlugin {
         QuestsMenu.questRefresher();
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.superMobStackAmount > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
-            if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
-                SoulbindEnchantment.soulbindWatchdog();
         }
     }
 

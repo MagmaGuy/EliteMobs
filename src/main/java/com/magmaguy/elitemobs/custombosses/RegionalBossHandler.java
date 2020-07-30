@@ -24,15 +24,14 @@ public class RegionalBossHandler implements Listener {
         if (customBossConfigFields.getConfigRegionalEntities().size() < 1)
             return;
 
-        for (CustomBossConfigFields.ConfigRegionalEntity configRegionalEntities : customBossConfigFields.getConfigRegionalEntities().values())
+        for (CustomBossConfigFields.ConfigRegionalEntity configRegionalEntities : customBossConfigFields.getConfigRegionalEntities().values()) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     new RegionalBossEntity(customBossConfigFields, configRegionalEntities);
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, customBossConfigFields.getTicksBeforeRespawn(configRegionalEntities.uuid));
-        return;
-
+        }
 
     }
 

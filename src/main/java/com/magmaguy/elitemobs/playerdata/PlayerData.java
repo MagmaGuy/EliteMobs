@@ -203,7 +203,7 @@ public class PlayerData {
 
         try {
             getConnection().setAutoCommit(false);
-            statement = connection.createStatement();
+            statement = getConnection().createStatement();
             String sql;
             if (value instanceof String)
                 sql = "UPDATE " + player_data_table_name + " SET " + key + " = '" + value + "' WHERE PlayerUUID = '" + uuid.toString() + "';";
@@ -347,7 +347,6 @@ public class PlayerData {
                 resultSet.close();
                 statement.close();
                 getConnection().close();
-                new DebugMessage("Loaded data from player " + Bukkit.getPlayer(uuid).getDisplayName());
                 return;
             }
 
@@ -435,6 +434,7 @@ public class PlayerData {
         if (connection == null || connection.isClosed()) {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+            connection.setAutoCommit(false);
         }
         return connection;
     }

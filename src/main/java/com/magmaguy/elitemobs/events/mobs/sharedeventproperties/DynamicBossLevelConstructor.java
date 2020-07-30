@@ -1,21 +1,17 @@
 package com.magmaguy.elitemobs.events.mobs.sharedeventproperties;
 
-import com.magmaguy.elitemobs.mobspawning.MobLevelCalculator;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class DynamicBossLevelConstructor {
 
     public static int findDynamicBossLevel() {
-
         int bossLevel = 1;
-
         for (Player player : Bukkit.getServer().getOnlinePlayers())
-            if (MobLevelCalculator.determineMobLevel(player) > bossLevel)
-                bossLevel = MobLevelCalculator.determineMobLevel(player);
-
+            if (ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getNaturalMobSpawnLevel(true) > bossLevel)
+                bossLevel = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getNaturalMobSpawnLevel(false);
         return bossLevel;
-
     }
 
 }

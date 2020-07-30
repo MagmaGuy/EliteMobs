@@ -4,10 +4,10 @@ import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -67,7 +67,7 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
         //Determine tiers
         double eliteTier = MobTierCalculator.findMobTier(event.getEliteMobEntity());
-        double playerTier = ItemTierFinder.findArmorSetTier(player);
+        double playerTier = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getArmorTier(true);
 
         double newDamage = eliteToPlayerDamageFormula(eliteTier, playerTier, player, event.getEliteMobEntity(), event.getEntityDamageByEntityEvent());
 

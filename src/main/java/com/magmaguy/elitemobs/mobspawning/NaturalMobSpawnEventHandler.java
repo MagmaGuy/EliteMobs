@@ -1,18 +1,30 @@
 package com.magmaguy.elitemobs.mobspawning;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.utils.PlayerScanner;
+import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
@@ -68,7 +80,9 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         double validChance = MobCombatSettingsConfig.aggressiveMobConversionPercentage;
 
-        int huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(livingEntity);
+        ArrayList<Player> nearbyPlayers = PlayerScanner.getNearbyPlayers(livingEntity.getLocation());
+
+        int huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
         validChance += huntingGearChanceAdder;
 
         if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + event.getEntity().getWorld().getName()))
@@ -77,7 +91,92 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;
 
-        NaturalEliteMobSpawnEventHandler.naturalMobProcessor(livingEntity, event.getSpawnReason());
+        if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + livingEntity.getWorld().getName())) {
+            int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()) * MobCombatSettingsConfig.perTierLevelIncrease);
+            EliteMobEntity eliteMobEntity = new EliteMobEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
+            if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
+                eliteMobEntity.setHasSpecialLoot(false);
+            naturalCustomBossSpawn(livingEntity, eliteMobLevel);
+            return;
+        }
+
+        int eliteMobLevel = getNaturalMobLevel(livingEntity.getLocation(), nearbyPlayers);
+
+        //Takes worldguard minimum and maximum level flags into account
+        if (EliteMobs.worldguardIsEnabled) {
+            Integer minLevel = WorldGuardFlagChecker.getRegionMinimumLevel(livingEntity.getLocation());
+            Integer maxLevel = WorldGuardFlagChecker.getRegionMaximumLevel(livingEntity.getLocation());
+            if (minLevel != null)
+                eliteMobLevel = minLevel > eliteMobLevel ? minLevel : eliteMobLevel;
+            if (maxLevel != null)
+                eliteMobLevel = maxLevel < eliteMobLevel ? maxLevel : eliteMobLevel;
+        }
+
+        if (eliteMobLevel < 0) return;
+
+        if (eliteMobLevel > MobCombatSettingsConfig.naturalElitemobLevelCap)
+            eliteMobLevel = MobCombatSettingsConfig.naturalElitemobLevelCap;
+
+        EliteMobEntity eliteMobEntity = new EliteMobEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
+
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
+            eliteMobEntity.setHasSpecialLoot(false);
+
+        naturalCustomBossSpawn(livingEntity, eliteMobLevel);
+
+    }
+
+    private static void naturalCustomBossSpawn(Entity entity, int eliteMobLevel) {
+        /*
+        Check to see if they'll become a naturally spawned Custom Boss
+         */
+        for (CustomBossConfigFields customBossConfigFields : CustomBossConfigFields.getNaturallySpawnedElites())
+            if (entity.getType().toString().equalsIgnoreCase(customBossConfigFields.getEntityType()))
+                if (ThreadLocalRandom.current().nextDouble() < customBossConfigFields.getSpawnChance()) {
+                    CustomBossEntity.constructCustomBoss(customBossConfigFields.getFileName(), entity.getLocation(), eliteMobLevel);
+                    return;
+                }
+
+    }
+
+    /**
+     * This gets the level the natural Elite Mob should have. This level is determined by the power of the armor and weapons
+     * the players are wearing, as well as by how many players are in the area.
+     *
+     * @param spawnLocation Location to scan around for players
+     * @return
+     */
+    public static int getNaturalMobLevel(Location spawnLocation, ArrayList<Player> nearbyPlayers) {
+
+        int eliteMobLevel = 1;
+        int playerCount = 0;
+
+        for (Player player : nearbyPlayers) {
+            int individualPlayerThreat = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getNaturalMobSpawnLevel(true);
+            playerCount++;
+
+            if (individualPlayerThreat > eliteMobLevel)
+                eliteMobLevel = individualPlayerThreat;
+        }
+
+        /*
+        Party system modifier
+        Each player adds a +2 tier bonus
+         */
+        eliteMobLevel += playerCount * 2 * MobTierCalculator.PER_TIER_LEVEL_INCREASE;
+
+        if (MobCombatSettingsConfig.increaseDifficultyWithSpawnDistance) {
+            int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease(spawnLocation);
+            eliteMobLevel += levelIncrement;
+        }
+
+        if (playerCount == 0 || eliteMobLevel < 1) return 0;
+
+        //add wiggle room
+        int wiggle = ThreadLocalRandom.current().nextInt(5) - 2;
+        eliteMobLevel = wiggle + eliteMobLevel < 0 ? 0 : eliteMobLevel + wiggle;
+
+        return eliteMobLevel;
 
     }
 

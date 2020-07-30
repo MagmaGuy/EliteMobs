@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -91,22 +91,21 @@ public class Placeholders extends PlaceholderExpansion {
 
         switch (identifier) {
             case "player_combat_tier":
-                return "" + ItemTierFinder.findPlayerTier(player);
+                return "" + ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);
             case "player_active_guild_rank_numerical":
                 return "" + GuildRank.getActiveGuildRank(player);
             case "player_maximum_guild_rank_numerical":
                 return "" + GuildRank.getMaxGuildRank(player);
-            //todo: handle prestige here
             case "player_active_guild_rank_name":
-                return GuildRank.getRankName(0, GuildRank.getActiveGuildRank(player));
+                return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player));
             case "player_maximum_guild_rank_name":
-                return GuildRank.getRankName(0, GuildRank.getMaxGuildRank(player));
+                return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getMaxGuildRank(player));
             case "player_money":
                 return "" + EconomyHandler.checkCurrency(player.getUniqueId());
             case "player_top_tier":
                 double highestThreat = 0;
                 for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
-                    double currentTier = ItemTierFinder.findPlayerTier(iteratedPlayer);
+                    double currentTier = ElitePlayerInventory.playerInventories.get(iteratedPlayer.getUniqueId()).getFullPlayerTier(true);
                     if (currentTier > highestThreat)
                         highestThreat = currentTier;
                     return "" + highestThreat;
