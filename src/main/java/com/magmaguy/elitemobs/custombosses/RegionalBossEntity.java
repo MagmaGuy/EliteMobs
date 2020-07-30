@@ -49,6 +49,11 @@ public class RegionalBossEntity implements Listener {
         this.respawnCooldown = customBossConfigFields.getSpawnCooldown();
         this.customBossConfigFields = customBossConfigFields;
         this.leashRadius = customBossConfigFields.getLeashRadius();
+        if (spawnLocation == null || spawnLocation.getWorld() == null) {
+            new WarningMessage("Spawn location for regional boss " + customBossConfigFields.getFileName() + " is not valid. Incorrect location: " + spawnLocation);
+            new WarningMessage("EliteMobs will skip this entity's spawn.");
+            return;
+        }
         spawnRegionalBoss();
         regionalBossEntityList.add(this);
     }
@@ -104,6 +109,7 @@ public class RegionalBossEntity implements Listener {
         customBossEntity.setIsRegionalBoss(true);
         if (customBossConfigFields.getTimeout() > 0)
             startEscapeMechanismDelay(customBossConfigFields.getTimeout());
+
     }
 
     private void respawnRegionalBoss() {

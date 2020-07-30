@@ -7,15 +7,11 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,7 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -52,8 +47,6 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
             player = (Player) ((Projectile) event.getDamager()).getShooter();
         if (player == null) return;
 
-        if (eliteMobEntity == null) return;
-
         //From this point on, the event damage is handled by Elite Mobs
 
         //if the damage source is custom , the damage is final
@@ -75,7 +68,7 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
                         player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW)))
             playerWeaponTier = 0;
         else
-            playerWeaponTier = ItemTierFinder.mainHandCombatParser(player.getInventory().getItemInMainHand());
+            playerWeaponTier = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponTier(true);
         double newDamage = finalDamageCalculator(playerWeaponTier, player, eliteMobEntity);
 
         if (event.getDamager() instanceof Arrow) {
@@ -114,7 +107,7 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
     private double finalDamageCalculator(double playerWeaponTier, Player player, EliteMobEntity eliteMobEntity) {
 
         double finalDamage = getCooledAttackStrength(player) *
-                (playerWeaponTier + secondaryEnchantmentDamageIncrease(player.getInventory().getItemInMainHand(), eliteMobEntity.getLivingEntity())) *
+                (playerWeaponTier + secondaryEnchantmentDamageIncrease(player, eliteMobEntity.getLivingEntity())) *
                 MobCombatSettingsConfig.damageToEliteMultiplier;
 
         finalDamage = finalDamage < 1 ? 1 : finalDamage;
@@ -162,27 +155,19 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
     }
 
 
-    /**
-     * Calculates the Player -> EliteMobs damage increase from secondary enchantments. Adds to the total as a percentage
-     * of the maximum health.
-     *
-     * @param weapon   Weapon used by the player
-     * @param eliteMob EliteMob instance
-     * @return Value to be added
-     */
-    private double secondaryEnchantmentDamageIncrease(ItemStack weapon, LivingEntity eliteMob) {
+    private double secondaryEnchantmentDamageIncrease(Player player, LivingEntity eliteMob) {
 
         if (eliteMob instanceof Spider || eliteMob instanceof Silverfish)
-            return ItemTagger.getEnchantment(weapon.getItemMeta(), Enchantment.DAMAGE_ARTHROPODS.getKey());
+            return ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageArthropodsLevel(player.getInventory().getItemInMainHand(), false);
         if (eliteMob instanceof Zombie || eliteMob instanceof Skeleton)
-            return ItemTagger.getEnchantment(weapon.getItemMeta(), Enchantment.DAMAGE_UNDEAD.getKey());
+            return ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageUndeadLevel(player.getInventory().getItemInMainHand(), false);
 
         return 0;
 
     }
 
     private boolean isCriticalHit(Player player) {
-        int criticalStrike = ItemTagger.getEnchantment(player.getInventory().getItemInMainHand().getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key)) / 10;
+        double criticalStrike = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getCritChance(false);
         criticalStrike += (GuildRank.critBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100);
         return ThreadLocalRandom.current().nextDouble() < criticalStrike;
     }

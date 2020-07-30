@@ -2,14 +2,14 @@ package com.magmaguy.elitemobs.commands.combat;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.commands.premade.CheckTierConfig;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import org.bukkit.entity.Player;
 
 public class CheckTierCommand {
 
     public CheckTierCommand(Player player) {
 
-        double gearTier = ItemTierFinder.findPlayerTier(player);
+        double gearTier = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);
         double guildRank = GuildRank.getActiveGuildRank(player);
         if (guildRank == 0)
             guildRank = -10;

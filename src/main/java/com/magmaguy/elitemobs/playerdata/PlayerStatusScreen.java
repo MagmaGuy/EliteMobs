@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -198,27 +197,27 @@ public class PlayerStatusScreen implements Listener {
 
         if (targetPlayer.getEquipment() != null) {
             if (targetPlayer.getEquipment().getHelmet() != null) {
-                helmetString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getHelmet().getType()) + "☠" + ChatColor.BLACK + " - " + (int) ItemTierFinder.findBattleTier(targetPlayer.getEquipment().getHelmet()) + "\n");
+                helmetString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getHelmet().getType()) + "☠" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).helmet.getTier(targetPlayer.getInventory().getHelmet(), true) + "\n");
                 ShareItem.setItemHoverEvent(helmetString, targetPlayer.getEquipment().getHelmet());
             }
             if (targetPlayer.getEquipment().getChestplate() != null) {
-                chestplateString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getChestplate().getType()) + "▼" + ChatColor.BLACK + " - " + (int) ItemTierFinder.findBattleTier(targetPlayer.getEquipment().getChestplate()) + "\n");
+                chestplateString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getChestplate().getType()) + "▼" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).chestplate.getTier(targetPlayer.getInventory().getChestplate(), true) + "\n");
                 ShareItem.setItemHoverEvent(chestplateString, targetPlayer.getEquipment().getChestplate());
             }
             if (targetPlayer.getEquipment().getLeggings() != null) {
-                leggingsString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getLeggings().getType()) + "Π" + ChatColor.BLACK + " - " + (int) ItemTierFinder.findBattleTier(targetPlayer.getEquipment().getLeggings()) + "\n");
+                leggingsString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getLeggings().getType()) + "Π" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).leggings.getTier(targetPlayer.getInventory().getLeggings(), true) + "\n");
                 ShareItem.setItemHoverEvent(leggingsString, targetPlayer.getEquipment().getLeggings());
             }
             if (targetPlayer.getEquipment().getBoots() != null) {
-                bootsString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getBoots().getType()) + "╯╰" + ChatColor.BLACK + " - " + (int) ItemTierFinder.findBattleTier(targetPlayer.getEquipment().getBoots()) + "\n");
+                bootsString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getBoots().getType()) + "╯╰" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).boots.getTier(targetPlayer.getInventory().getBoots(), true) + "\n");
                 ShareItem.setItemHoverEvent(bootsString, targetPlayer.getEquipment().getBoots());
             }
             if (targetPlayer.getEquipment().getItemInMainHand() != null && !targetPlayer.getEquipment().getItemInMainHand().getType().equals(Material.AIR)) {
-                mainHandString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getItemInMainHand().getType()) + "⚔" + ChatColor.BLACK + " - " + (int) ItemTierFinder.findBattleTier(targetPlayer.getEquipment().getItemInMainHand()));
+                mainHandString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getItemInMainHand().getType()) + "⚔" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).mainhand.getTier(targetPlayer.getInventory().getItemInMainHand(), true));
                 ShareItem.setItemHoverEvent(mainHandString, targetPlayer.getEquipment().getItemInMainHand());
             }
             if (targetPlayer.getEquipment().getItemInOffHand() != null && !targetPlayer.getEquipment().getItemInOffHand().getType().equals(Material.AIR)) {
-                offHandString = new TextComponent(" | " + unicodeColorizer(targetPlayer.getEquipment().getItemInOffHand().getType()) + "⛨" + ChatColor.BLACK + " - " + (int) ItemTierFinder.findBattleTier(targetPlayer.getEquipment().getItemInOffHand()) + "\n");
+                offHandString = new TextComponent(" | " + unicodeColorizer(targetPlayer.getEquipment().getItemInOffHand().getType()) + "⛨" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).offhand.getTier(targetPlayer.getInventory().getItemInOffHand(), true) + "\n");
                 ShareItem.setItemHoverEvent(offHandString, targetPlayer.getEquipment().getItemInOffHand());
             }
         }
@@ -234,8 +233,8 @@ public class PlayerStatusScreen implements Listener {
 
         finalComponent.addExtra("\n");
 
-        finalComponent.addExtra("Armor ilvl: " + ItemTierFinder.findArmorSetTier(targetPlayer) + "\n");
-        finalComponent.addExtra("Weapon ilvl: " + ItemTierFinder.findWeaponTier(targetPlayer) + "\n");
+        finalComponent.addExtra("Armor tier: " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getArmorTier(true) + "\n");
+        finalComponent.addExtra("Weapon tier: " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).mainhand.getTier(targetPlayer.getInventory().getItemInMainHand(), true) + "\n");
 
         return finalComponent;
     }

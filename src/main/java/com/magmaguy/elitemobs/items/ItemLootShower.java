@@ -7,11 +7,13 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -26,11 +28,76 @@ import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemLootShower implements Listener {
 
     private final Player player;
+    public static HashMap<UUID, Coin> coinValues = new HashMap<>();
+
+    private class Coin {
+        UUID player;
+        UUID item;
+        double value;
+        boolean pickupable;
+
+        public Coin(double value, Player player, Item item) {
+            this.player = player.getUniqueId();
+            this.value = value;
+            this.item = item.getUniqueId();
+            coinValues.put(item.getUniqueId(), this);
+            pickupable = false;
+            item.setGravity(false);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (coinValues.containsValue(this)) {
+                        if (Bukkit.getEntity(item.getUniqueId()) != null)
+                            Bukkit.getEntity(item.getUniqueId()).remove();
+                        coinValues.remove(item);
+                    }
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * 5);
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+
+                    if (!item.isValid() || !player.isValid() || !player.getWorld().equals(item.getWorld())) {
+                        cancel();
+                        pickupable = true;
+                        item.setGravity(true);
+                        return;
+                    }
+
+                    item.setVelocity(player.getLocation().clone().subtract(item.getLocation()).toVector().normalize().multiply(0.2));
+
+                    if (player.getLocation().distanceSquared(item.getLocation()) <= 1) {
+                        item.remove();
+                        EconomyHandler.addCurrency(player.getUniqueId(), value);
+                        sendCurrencyNotification(player);
+
+                        //cache for counting how much coin they're getting over a short amount of time
+                        if (playerCurrencyPickup.containsKey(player))
+                            playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + value);
+                        else
+                            playerCurrencyPickup.put(player, value);
+
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                TextComponent.fromLegacyText(
+                                        ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
+                                                .replace("$currency_name", EconomySettingsConfig.currencyName)
+                                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
+                        coinValues.remove(this);
+                        cancel();
+                        return;
+                    }
+
+                }
+            }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
+        }
+    }
 
     public ItemLootShower(double eliteMobTier, Location location, Player player) {
 
@@ -39,14 +106,22 @@ public class ItemLootShower implements Listener {
         if (!EconomySettingsConfig.enableCurrencyShower)
             return;
 
+        int adjustedEliteMobsTier = (int) (eliteMobTier - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
+
+        adjustedEliteMobsTier = adjustedEliteMobsTier < 0 ? adjustedEliteMobsTier : Math.min(adjustedEliteMobsTier, 5);
+
+        adjustedEliteMobsTier += eliteMobTier;
+
+        int finalAdjustedEliteMobsTier = adjustedEliteMobsTier;
         new BukkitRunnable() {
-            int currencyAmount = (int) (eliteMobTier / 2 * EconomySettingsConfig.currencyShowerMultiplier *
+
+            int currencyAmount = (int) (finalAdjustedEliteMobsTier / 2 * EconomySettingsConfig.currencyShowerMultiplier *
                     GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
 
             @Override
             public void run() {
 
-                if (currencyAmount == 0) {
+                if (currencyAmount <= 0) {
                     cancel();
                     return;
                 }
@@ -156,6 +231,8 @@ public class ItemLootShower implements Listener {
 
         SoulbindEnchantment.addEnchantment(currencyItem, this.player);
 
+        new Coin(value, player, currencyItem);
+
         return currencyItem;
 
     }
@@ -231,6 +308,7 @@ public class ItemLootShower implements Listener {
         currencyItem.setCustomNameVisible(true);
     }
 
+
     private static final HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
 
     /**
@@ -241,25 +319,21 @@ public class ItemLootShower implements Listener {
         public static void onItemPickup(PlayerPickupItemEvent event) {
             if (event.isCancelled()) return;
 
-            if (event.getItem() == null ||
-                    !event.getItem().getItemStack().hasItemMeta() ||
-                    !event.getItem().getItemStack().getItemMeta().hasLore() ||
-                    event.getItem().getItemStack().getItemMeta().getLore().get(0) == null ||
-                    event.getItem().getItemStack().getItemMeta().getLore().get(0).isEmpty() ||
-                    !event.getItem().getItemStack().getItemMeta().getLore().get(0).equalsIgnoreCase("EliteMobsCurrencyItem"))
-                return;
-
+            //coins are soulbound so if someone can pick them up they can have it
+            if (!coinValues.containsKey(event.getItem().getUniqueId())) return;
             event.setCancelled(true);
+            Coin coin = coinValues.get(event.getItem().getUniqueId());
+            if (!coin.pickupable)
+                return;
+            coinValues.remove(event.getItem().getUniqueId());
 
             Player player = event.getPlayer();
-
-            double amountIncremented = Double.valueOf(event.getItem().getItemStack().getItemMeta().getLore().get(1));
-
+            double amountIncremented = coin.value;
             event.getItem().remove();
-
             EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
             sendCurrencyNotification(player);
 
+            //cache for counting how much coin they're getting over a short amount of time
             if (playerCurrencyPickup.containsKey(player))
                 playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + amountIncremented);
             else

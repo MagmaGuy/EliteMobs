@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -58,7 +58,7 @@ public class StatsCommand {
         String highestGuildUser = "";
         double guildRankAverage = 0;
         for (Player player : Bukkit.getOnlinePlayers()) {
-            double currentTier = ItemTierFinder.findPlayerTier(player);
+            double currentTier = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);
             threatAverage += currentTier;
             int currentGuildRank = GuildRank.getMaxGuildRank(player);
             guildRankAverage += currentGuildRank;
