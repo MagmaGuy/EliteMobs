@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.utils.VisualArmorStand;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
@@ -108,53 +107,12 @@ public class SoulbindEnchantment extends CustomEnchantment {
             return (itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)).equals(player.getUniqueId().toString() + GuildRank.getGuildPrestigeRank(player));
     }
 
-
     public static class SoulbindEnchantmentEvents implements Listener {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onPickup(PlayerPickupItemEvent event) {
             if (isValidSoulbindUser(event.getItem().getItemStack().getItemMeta(), event.getPlayer())) return;
             event.setCancelled(true);
         }
-    }
-
-    public static void soulbindWatchdog() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                //scan through what players are wearing
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (!isValidSoulbindUser(player.getInventory().getItemInMainHand().getItemMeta(), player)) {
-                        player.getWorld().dropItem(player.getLocation(), player.getInventory().getItemInMainHand());
-                        player.getInventory().getItemInMainHand().setAmount(0);
-                    }
-
-                    if (!isValidSoulbindUser(player.getInventory().getItemInOffHand().getItemMeta(), player)) {
-                        player.getWorld().dropItem(player.getLocation(), player.getInventory().getItemInOffHand());
-                        player.getInventory().getItemInOffHand().setAmount(0);
-                    }
-
-                    if (player.getInventory().getBoots() != null && !isValidSoulbindUser(player.getInventory().getBoots().getItemMeta(), player)) {
-                        player.getWorld().dropItem(player.getLocation(), player.getInventory().getBoots());
-                        player.getInventory().getBoots().setAmount(0);
-                    }
-
-                    if (player.getInventory().getLeggings() != null && !isValidSoulbindUser(player.getInventory().getLeggings().getItemMeta(), player)) {
-                        player.getWorld().dropItem(player.getLocation(), player.getInventory().getLeggings());
-                        player.getInventory().getLeggings().setAmount(0);
-                    }
-
-                    if (player.getInventory().getChestplate() != null && !isValidSoulbindUser(player.getInventory().getChestplate().getItemMeta(), player)) {
-                        player.getWorld().dropItem(player.getLocation(), player.getInventory().getChestplate());
-                        player.getInventory().getChestplate().setAmount(0);
-                    }
-
-                    if (player.getInventory().getHelmet() != null && !isValidSoulbindUser(player.getInventory().getHelmet().getItemMeta(), player)) {
-                        player.getWorld().dropItem(player.getLocation(), player.getInventory().getHelmet());
-                        player.getInventory().getHelmet().setAmount(0);
-                    }
-                }
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 1);
     }
 
 }

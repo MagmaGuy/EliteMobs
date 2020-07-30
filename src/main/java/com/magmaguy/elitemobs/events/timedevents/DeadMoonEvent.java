@@ -9,7 +9,8 @@ import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.EventWorldFilter;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.mobspawning.NaturalEliteMobSpawnEventHandler;
+import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
+import com.magmaguy.elitemobs.utils.PlayerScanner;
 import org.bukkit.Location;
 import org.bukkit.WorldType;
 import org.bukkit.entity.EntityType;
@@ -61,7 +62,7 @@ public class DeadMoonEvent extends EliteEvent implements Listener {
                     public void run() {
                         if (!EntityTracker.isEliteMob(event.getEntity()))
                             CustomBossEntity.constructCustomBoss("the_returned.yml", event.getLocation(),
-                                    NaturalEliteMobSpawnEventHandler.getNaturalMobLevel(event.getLocation()));
+                                    NaturalMobSpawnEventHandler.getNaturalMobLevel(event.getLocation(), PlayerScanner.getNearbyPlayers(event.getLocation())));
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }

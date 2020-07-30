@@ -350,13 +350,12 @@ public class CustomBossConfigFields {
                     ConfigRegionalEntity configRegionalEntity = new ConfigRegionalEntity(deserializedLocation, respawnTime);
                     this.configRegionalEntities.put(configRegionalEntity.uuid, configRegionalEntity);
                 }
-            }
 
-            if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
-            else this.spawnCooldown = configuration.getInt("spawnCooldown");
+                if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
+                else this.spawnCooldown = configuration.getInt("spawnCooldown");
 
-            if (configRegionalEntities != null)
                 regionalElites.add(this);
+            }
 
         }
 
@@ -386,6 +385,7 @@ public class CustomBossConfigFields {
             this.spawnLocation = spawnLocation;
             this.respawnTimeLeft = cooldown;
         }
+
     }
 
     private ItemStack parseItem(String materialString) {
@@ -579,10 +579,10 @@ public class CustomBossConfigFields {
         return additionalConfigOptions;
     }
 
-    public int getTicksBeforeRespawn(UUID uuid) {
-        return (int) (configRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20 < 0 ?
+    public long getTicksBeforeRespawn(UUID uuid) {
+        return (configRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20 < 0 ?
                 0 :
-                (int) (configRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20;
+                (configRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20;
     }
 
     public void updateTicksBeforeRespawn(UUID uuid, int delayInMinutes) {

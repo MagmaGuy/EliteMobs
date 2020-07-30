@@ -43,6 +43,7 @@ import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
 import com.magmaguy.elitemobs.powers.AggroPrevention;
@@ -85,6 +86,7 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new PermissionlessModeWarning(), plugin);
 
         pluginManager.registerEvents(new PlayerData.PlayerDataEvents(), plugin);
+        pluginManager.registerEvents(new ElitePlayerInventory.ElitePlayerInventoryEvents(), plugin);
         pluginManager.registerEvents(new PlayerStatsTracker(), plugin);
 
         //Load passive mobs TODO: find generic alternative to this

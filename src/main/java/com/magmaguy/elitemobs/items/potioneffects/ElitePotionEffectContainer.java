@@ -45,6 +45,7 @@ public class ElitePotionEffectContainer {
     }
 
     public static ArrayList<ElitePotionEffect> getElitePotionEffectContainer(ItemMeta itemMeta, NamespacedKey namespacedKey) {
+        if (itemMeta == null) return new ArrayList<>();
         //for legacy items
         if (itemMeta.getCustomTagContainer().hasCustomTag(namespacedKey, ItemTagType.STRING)) {
             ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
@@ -56,7 +57,8 @@ public class ElitePotionEffectContainer {
         }
 
 
-        if (!itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.STRING)) return null;
+        if (!itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.STRING))
+            return new ArrayList<>();
         ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
         for (String string : itemMeta.getPersistentDataContainer().get(namespacedKey, PersistentDataType.STRING).split(":"))
             if (string.length() > 0)
@@ -89,5 +91,6 @@ public class ElitePotionEffectContainer {
             elitePotionEffects.add(new ElitePotionEffect(subString));
         return elitePotionEffects;
     }
+
 
 }

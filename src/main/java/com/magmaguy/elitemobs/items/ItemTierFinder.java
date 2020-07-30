@@ -93,10 +93,10 @@ public class ItemTierFinder {
 
     }
 
-    private static final double IRON_TIER = CombatSystem.IRON_TIER_LEVEL;
-    private static final double STONE_CHAIN_TIER = CombatSystem.IRON_TIER_LEVEL;
-    private static final double GOLD_WOOD_LEATHER_TIER = CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL;
-    private static final double DIAMOND_TIER = CombatSystem.DIAMOND_TIER_LEVEL;
+    private static final int IRON_TIER = CombatSystem.IRON_TIER_LEVEL;
+    private static final int STONE_CHAIN_TIER = CombatSystem.IRON_TIER_LEVEL;
+    private static final int GOLD_WOOD_LEATHER_TIER = CombatSystem.GOLD_WOOD_LEATHER_TIER_LEVEL;
+    private static final int DIAMOND_TIER = CombatSystem.DIAMOND_TIER_LEVEL;
 
     public static double findGenericTier(Material material, HashMap<Enchantment, Integer> enchantmentList) {
 
@@ -132,7 +132,7 @@ public class ItemTierFinder {
 
     }
 
-    public static double findBattleTier(ItemStack itemStack) {
+    public static int findBattleTier(ItemStack itemStack) {
 
         Material material = itemStack.getType();
 
@@ -140,7 +140,7 @@ public class ItemTierFinder {
 
     }
 
-    private static double parseMaterials(Material material, int mainEnchantment, int mainEnchantment2, int mainEnchantment3) {
+    private static int parseMaterials(Material material, int mainEnchantment, int mainEnchantment2, int mainEnchantment3) {
         switch (material) {
             case DIAMOND_SWORD:
             case DIAMOND_AXE:
@@ -218,7 +218,7 @@ public class ItemTierFinder {
         }
     }
 
-    public static double mainHandCombatParser(ItemStack itemStack) {
+    public static int mainHandCombatParser(ItemStack itemStack) {
 
         Material material = itemStack.getType();
 
@@ -226,7 +226,7 @@ public class ItemTierFinder {
 
     }
 
-    private static double parseMainHandMaterials(Material material, int mainEnchantment, int mainEnchantment2, int mainEnchantment3) {
+    private static int parseMainHandMaterials(Material material, int mainEnchantment, int mainEnchantment2, int mainEnchantment3) {
         switch (material) {
             case DIAMOND_SWORD:
             case DIAMOND_AXE:
