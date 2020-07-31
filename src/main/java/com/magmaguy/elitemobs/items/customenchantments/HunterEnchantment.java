@@ -16,8 +16,8 @@ public class HunterEnchantment extends CustomEnchantment {
 
     private static final int range = Bukkit.getServer().getViewDistance() * 16;
 
-    public static int getHuntingGearBonus(ArrayList<Player> players) {
-        int huntingGearChanceAdder = 0;
+    public static double getHuntingGearBonus(ArrayList<Player> players) {
+        double huntingGearChanceAdder = 0;
         for (Player player : players)
             huntingGearChanceAdder += ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getHunterChance(true);
         return huntingGearChanceAdder;

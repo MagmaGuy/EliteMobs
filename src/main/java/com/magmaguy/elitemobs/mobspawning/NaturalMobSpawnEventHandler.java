@@ -82,7 +82,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         ArrayList<Player> nearbyPlayers = PlayerScanner.getNearbyPlayers(livingEntity.getLocation());
 
-        int huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
+        double huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
         validChance += huntingGearChanceAdder;
 
         if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + event.getEntity().getWorld().getName()))

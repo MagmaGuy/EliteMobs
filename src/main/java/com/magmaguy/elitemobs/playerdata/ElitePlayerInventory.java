@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.playerdata;
 
-import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import org.bukkit.Bukkit;
@@ -125,11 +124,10 @@ public class ElitePlayerInventory {
     }
 
     public double getHunterChance(boolean update) {
-        return (helmet.getHunterChance(player.getInventory().getHelmet(), update) +
+        return helmet.getHunterChance(player.getInventory().getHelmet(), update) +
                 chestplate.getHunterChance(player.getInventory().getChestplate(), update) +
                 leggings.getHunterChance(player.getInventory().getLeggings(), update) +
-                boots.getHunterChance(player.getInventory().getBoots(), update) *
-                        EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus"));
+                boots.getHunterChance(player.getInventory().getBoots(), update);
     }
 
     public static class ElitePlayerInventoryEvents implements Listener {
