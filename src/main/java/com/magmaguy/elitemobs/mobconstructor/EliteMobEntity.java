@@ -342,8 +342,8 @@ public class EliteMobEntity {
                 if (elitePower instanceof MinorPower)
                     this.minorPowerCount++;
             }
-            MinorPowerPowerStance minorPowerPowerStance = new MinorPowerPowerStance(this);
-            MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance(this);
+            new MinorPowerPowerStance(this);
+            new MajorPowerPowerStance(this);
         } else {
             randomizePowers(eliteMobProperties);
         }
