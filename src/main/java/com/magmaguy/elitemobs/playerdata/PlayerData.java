@@ -471,6 +471,7 @@ public class PlayerData {
                     " QuestsCompleted                    INT);";
             statement.executeUpdate(sql);
             statement.close();
+            getConnection().commit();
             getConnection().close();
 
             for (Player player : Bukkit.getOnlinePlayers())
