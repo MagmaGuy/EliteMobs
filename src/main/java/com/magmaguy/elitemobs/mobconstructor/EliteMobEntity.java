@@ -84,6 +84,7 @@ public class EliteMobEntity {
 
     private boolean isRegionalBoss = false;
     private boolean inCombat = false;
+    private boolean inCombatGracePeriod = false;
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
@@ -1016,6 +1017,20 @@ public class EliteMobEntity {
 
     public boolean isInCombat() {
         return this.inCombat;
+    }
+
+    public void setCombatGracePeriod(int delayInTicks) {
+        this.inCombatGracePeriod = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                inCombatGracePeriod = false;
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, delayInTicks);
+    }
+
+    public boolean isInCombatGracePeriod() {
+        return this.inCombatGracePeriod;
     }
 
 }

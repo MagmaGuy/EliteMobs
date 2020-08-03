@@ -63,7 +63,7 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
 
     public static class EliteMobDamageEventFilter implements Listener {
 
-        @EventHandler(priority = EventPriority.NORMAL)
+        @EventHandler(priority = EventPriority.HIGH)
         public void onEntityDamageByEntityEvent(EntityDamageEvent event) {
 
             if (event.isCancelled()) return;

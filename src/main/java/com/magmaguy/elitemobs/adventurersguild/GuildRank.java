@@ -81,6 +81,7 @@ public class GuildRank {
     }
 
     public static void setMaxHealth(Player player, int activeGuildRank, int prestigeRank) {
+        if (!AdventurersGuildConfig.enableAdventurersGuild || !AdventurersGuildConfig.addMaxHealth) return;
         double guildRankBonus = healthBonusValue(prestigeRank, activeGuildRank);
         double newMaxHealth = 20 + guildRankBonus;
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(newMaxHealth);
