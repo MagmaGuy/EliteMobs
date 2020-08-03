@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import com.magmaguy.elitemobs.powers.offensivepowers.AttackArrow;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -43,6 +44,7 @@ public class BulletHell extends BossPower implements Listener {
             eliteMobEntity.getLivingEntity().teleport(eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
         new BukkitRunnable() {
             int counter = 0;
+            final Location initialLocation = eliteMobEntity.getLivingEntity().getLocation().clone();
 
             @Override
             public void run() {
@@ -68,6 +70,7 @@ public class BulletHell extends BossPower implements Listener {
                 if (counter > 20) {
                     cancel();
                     eliteMobEntity.getLivingEntity().setAI(true);
+                    eliteMobEntity.getLivingEntity().teleport(initialLocation);
                 }
 
             }

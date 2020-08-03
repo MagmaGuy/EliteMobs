@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.magmaguy</groupId>
-  <artifactId>EliteMobs</artifactId>
-  <version>7.1.41</version>
-  <build>
-    <defaultGoal>clean resources:resources package</defaultGoal>
-    <finalName>${project.artifactId}</finalName>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.magmaguy</groupId>
+    <artifactId>EliteMobs</artifactId>
+    <version>7.1.42</version>
+    <build>
+        <defaultGoal>clean resources:resources package</defaultGoal>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
         <version>3.6.2</version>
         <configuration>
           <source>1.8</source>
@@ -57,17 +57,21 @@
       <url>https://jitpack.io</url>
     </repository>
     <repository>
-      <id>placeholderapi</id>
-      <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        <id>placeholderapi</id>
+        <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
     </repository>
-    <repository>
-      <id>codemc-repo</id>
-      <url>https://repo.codemc.io/repository/maven-public/</url>
-    </repository>
-    <repository>
-      <id>Scarsz-Nexus</id>
-      <url>https://nexus.scarsz.me/content/groups/public/</url>
-    </repository>
+      <repository>
+          <id>codemc-repo</id>
+          <url>https://repo.codemc.io/repository/maven-public/</url>
+      </repository>
+      <repository>
+          <id>Scarsz-Nexus</id>
+          <url>https://nexus.scarsz.me/content/groups/public/</url>
+      </repository>
+      <repository>
+          <id>md_5-public</id>
+          <url>http://repo.md-5.net/content/groups/public/</url>
+      </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -79,18 +83,6 @@
         <exclusion>
           <artifactId>commons-lang</artifactId>
           <groupId>commons-lang</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>guava</artifactId>
-          <groupId>com.google.guava</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>gson</artifactId>
-          <groupId>com.google.code.gson</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>bungeecord-chat</artifactId>
-          <groupId>net.md-5</groupId>
         </exclusion>
         <exclusion>
           <artifactId>snakeyaml</artifactId>
@@ -221,10 +213,6 @@
         <exclusion>
           <artifactId>spring-expression</artifactId>
           <groupId>org.springframework</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>guava</artifactId>
-          <groupId>com.google.guava</groupId>
         </exclusion>
       </exclusions>
     </dependency>

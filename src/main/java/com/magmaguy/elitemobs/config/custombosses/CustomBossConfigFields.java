@@ -72,6 +72,8 @@ public class CustomBossConfigFields {
     private List<String> onDeathCommands;
     private String mountedEntity;
     private Integer announcementPriority = 0;
+    private String disguise = null;
+    private Boolean frozen = false;
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -374,6 +376,12 @@ public class CustomBossConfigFields {
         else
             this.announcementPriority = 1;
 
+        this.disguise = configuration.getString("disguise");
+
+        this.frozen = configuration.getBoolean("frozen");
+        if (frozen == null)
+            frozen = false;
+
     }
 
     public class ConfigRegionalEntity {
@@ -621,6 +629,20 @@ public class CustomBossConfigFields {
         if (this.announcementPriority == null)
             return 1;
         return this.announcementPriority;
+    }
+
+    /**
+     * Integration with LibsDisguises
+     * Only used if that plugin is loaded.
+     *
+     * @return The string with which to form the DisguiseType
+     */
+    public String getDisguise() {
+        return this.disguise;
+    }
+
+    public Boolean getFrozen() {
+        return this.frozen;
     }
 
 }

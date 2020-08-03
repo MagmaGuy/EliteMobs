@@ -32,20 +32,21 @@ public class EliteMobEnterCombatEvent extends Event {
                     Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
                 }
                 //todo: combat isn't ending when no players are nearby
-                if (((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null) {
-                    for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(
-                            eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
-                            eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
-                            eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue())) {
-                        if (entity instanceof Player) {
-                            if (!(((Player) entity).getGameMode().equals(GameMode.SURVIVAL) || ((Player) entity).getGameMode().equals(GameMode.ADVENTURE)))
-                                continue;
-                            return;
+                if (!eliteMobEntity.isInCombatGracePeriod())
+                    if (((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null) {
+                        for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(
+                                eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
+                                eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
+                                eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue())) {
+                            if (entity instanceof Player) {
+                                if (!(((Player) entity).getGameMode().equals(GameMode.SURVIVAL) || ((Player) entity).getGameMode().equals(GameMode.ADVENTURE)))
+                                    continue;
+                                return;
+                            }
+                            cancel();
+                            Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
                         }
-                        cancel();
-                        Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
                     }
-                }
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
