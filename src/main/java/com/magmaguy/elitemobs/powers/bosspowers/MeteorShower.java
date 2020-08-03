@@ -37,7 +37,7 @@ public class MeteorShower extends BossPower implements Listener {
         eliteMobEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             int counter = 0;
-
+            final Location initialLocation = eliteMobEntity.getLivingEntity().getLocation().clone();
             @Override
             public void run() {
 
@@ -49,6 +49,7 @@ public class MeteorShower extends BossPower implements Listener {
                 if (counter > 10 * 20) {
                     cancel();
                     eliteMobEntity.getLivingEntity().setAI(true);
+                    eliteMobEntity.getLivingEntity().teleport(initialLocation);
                     return;
                 }
 

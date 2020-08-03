@@ -7,7 +7,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.41</version>
+    <version>7.1.42</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -88,6 +88,11 @@
             <id>Scarsz-Nexus</id>
             <url>https://nexus.scarsz.me/content/groups/public/</url>
         </repository>
+        <!-- Lib's Disguises -->
+        <repository>
+            <id>md_5-public</id>
+            <url>http://repo.md-5.net/content/groups/public/</url>
+        </repository>
 
     </repositories>
 
@@ -139,6 +144,12 @@
             <artifactId>discordsrv</artifactId>
             <version>1.19.1</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- Libs Disguises -->
+        <dependency>
+            <groupId>LibsDisguises</groupId>
+            <artifactId>LibsDisguises</artifactId>
+            <version>10.0.15</version>
         </dependency>
 
     </dependencies>

@@ -303,6 +303,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new WorldGuardDungeonFlag(), plugin);
 
         pluginManager.registerEvents(new EntityTransformPreventer(), plugin);
+        pluginManager.registerEvents(new EliteBlazeWaterDamagePrevention(), plugin);
         pluginManager.registerEvents(new PreventEliteEquipmentDrop(), plugin);
 
         pluginManager.registerEvents(new TreasureChest.TreasureChestEvents(), plugin);

@@ -46,12 +46,13 @@ public class SpiritWalk extends BossPower implements Listener {
 
     @EventHandler
     public void onBossMobGotHit(EliteMobDamagedEvent event) {
+        if (event.isCancelled()) return;
         if (!event.getEliteMobEntity().hasPower(this)) return;
         SpiritWalk spiritWalk = (SpiritWalk) event.getEliteMobEntity().getPower(this);
 
         if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.DROWNING) ||
                 event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION))
-            initializeSpiritWalk(event.getEliteMobEntity().getLivingEntity());
+            initializeSpiritWalk(event.getEliteMobEntity());
 
 
         spiritWalk.incrementHitCounter();
@@ -59,11 +60,11 @@ public class SpiritWalk extends BossPower implements Listener {
         if (spiritWalk.getHitsCounter() < 9) return;
 
         spiritWalk.resetHitsCounter();
-        initializeSpiritWalk(event.getEliteMobEntity().getLivingEntity());
+        initializeSpiritWalk(event.getEliteMobEntity());
 
     }
 
-    public void initializeSpiritWalk(LivingEntity bossMob) {
+    public void initializeSpiritWalk(EliteMobEntity eliteMobEntity) {
 
         new BukkitRunnable() {
 
@@ -74,7 +75,7 @@ public class SpiritWalk extends BossPower implements Listener {
 
                 if (counter > 3) cancel();
 
-                Location bossLocation = bossMob.getLocation().clone();
+                Location bossLocation = eliteMobEntity.getLivingEntity().getLocation().clone();
 
                 for (int i = 0; i < 20; i++) {
 
@@ -90,7 +91,7 @@ public class SpiritWalk extends BossPower implements Listener {
 
                     if (newValidLocation != null) {
 
-                        spiritWalkAnimation(bossMob, bossMob.getLocation(), newValidLocation.add(new Vector(0.5, 1, 0.5)));
+                        spiritWalkAnimation(eliteMobEntity, eliteMobEntity.getLivingEntity().getLocation(), newValidLocation.add(new Vector(0.5, 1, 0.5)));
                         cancel();
                         break;
                     }
@@ -106,12 +107,13 @@ public class SpiritWalk extends BossPower implements Listener {
     }
 
 
-    public static void spiritWalkAnimation(LivingEntity bossMob, Location entityLocation, Location finalLocation) {
+    public static void spiritWalkAnimation(EliteMobEntity eliteMobEntity, Location entityLocation, Location finalLocation) {
 
-        bossMob.setAI(false);
-        bossMob.setInvulnerable(true);
-        bossMob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 10, 1));
+        eliteMobEntity.getLivingEntity().setAI(false);
+        eliteMobEntity.getLivingEntity().setInvulnerable(true);
+        eliteMobEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 10, 1));
         Vector toDestination = finalLocation.clone().subtract(entityLocation.clone()).toVector().normalize().divide(new Vector(2, 2, 2));
+        eliteMobEntity.setCombatGracePeriod(20 * 20);
 
         new BukkitRunnable() {
 
@@ -120,17 +122,17 @@ public class SpiritWalk extends BossPower implements Listener {
             @Override
             public void run() {
 
-                if (bossMob.getLocation().clone().distance(finalLocation) < 2 || counter > 20 * 10) {
+                if (eliteMobEntity.getLivingEntity().getLocation().clone().distance(finalLocation) < 2 || counter > 20 * 10) {
 
-                    bossMob.teleport(finalLocation);
-                    bossMob.setAI(true);
-                    bossMob.setInvulnerable(false);
-                    bossMob.removePotionEffect(PotionEffectType.GLOWING);
+                    eliteMobEntity.getLivingEntity().teleport(finalLocation);
+                    eliteMobEntity.getLivingEntity().setAI(true);
+                    eliteMobEntity.getLivingEntity().setInvulnerable(false);
+                    eliteMobEntity.getLivingEntity().removePotionEffect(PotionEffectType.GLOWING);
                     cancel();
 
                 }
 
-                bossMob.teleport(bossMob.getLocation().clone().add(toDestination.clone()));
+                eliteMobEntity.getLivingEntity().teleport(eliteMobEntity.getLivingEntity().getLocation().clone().add(toDestination.clone()));
 
                 counter++;
 

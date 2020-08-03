@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
+import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -36,6 +37,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -140,6 +142,14 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         if (customBossConfigFields.getFollowRange() != null && customBossConfigFields.getFollowRange() > 0 && getLivingEntity() instanceof Mob)
             getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
         mountEntity();
+        if (customBossConfigFields.getDisguise() != null)
+            if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
+                DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity());
+        if (customBossConfigFields.getFrozen()) {
+            getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10));
+            getLivingEntity().setCollidable(false);
+            getLivingEntity().setGravity(false);
+        }
     }
 
     private void spawnMessage() {
