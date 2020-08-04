@@ -37,6 +37,7 @@ public class NameGenerator {
     private static String materialStringParser(Material material) {
 
         switch (material) {
+            case NETHERITE_SWORD:
             case DIAMOND_SWORD:
             case GOLDEN_SWORD:
             case IRON_SWORD:
@@ -45,30 +46,35 @@ public class NameGenerator {
                 return ProceduralItemGenerationSettingsConfig.swordName;
             case BOW:
                 return ProceduralItemGenerationSettingsConfig.bowName;
+            case NETHERITE_PICKAXE:
             case DIAMOND_PICKAXE:
             case GOLDEN_PICKAXE:
             case IRON_PICKAXE:
             case STONE_PICKAXE:
             case WOODEN_PICKAXE:
                 return ProceduralItemGenerationSettingsConfig.pickaxeName;
+            case NETHERITE_SHOVEL:
             case DIAMOND_SHOVEL:
             case GOLDEN_SHOVEL:
             case IRON_SHOVEL:
             case STONE_SHOVEL:
             case WOODEN_SHOVEL:
                 return ProceduralItemGenerationSettingsConfig.spadeName;
+            case NETHERITE_HOE:
             case DIAMOND_HOE:
             case GOLDEN_HOE:
             case IRON_HOE:
             case STONE_HOE:
             case WOODEN_HOE:
                 return ProceduralItemGenerationSettingsConfig.hoeName;
+            case NETHERITE_AXE:
             case DIAMOND_AXE:
             case GOLDEN_AXE:
             case IRON_AXE:
             case STONE_AXE:
             case WOODEN_AXE:
                 return ProceduralItemGenerationSettingsConfig.axeName;
+            case NETHERITE_HELMET:
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:
             case GOLDEN_HELMET:
@@ -76,18 +82,21 @@ public class NameGenerator {
             case LEATHER_HELMET:
             case TURTLE_HELMET:
                 return ProceduralItemGenerationSettingsConfig.helmetName;
+            case NETHERITE_CHESTPLATE:
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
                 return ProceduralItemGenerationSettingsConfig.chestplateName;
+            case NETHERITE_LEGGINGS:
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
             case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
                 return ProceduralItemGenerationSettingsConfig.leggingsName;
+            case NETHERITE_BOOTS:
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
             case GOLDEN_BOOTS:
