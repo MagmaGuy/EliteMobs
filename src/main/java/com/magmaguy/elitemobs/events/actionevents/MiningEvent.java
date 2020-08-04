@@ -5,9 +5,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.events.premade.BalrogEventConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
-import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -28,7 +27,7 @@ public class MiningEvent implements Listener {
         if (!BalrogEventConfig.isEnabled) return;
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
         if (EliteMobs.worldguardIsEnabled &&
-                !WorldGuardFlagChecker.checkFlag(event.getPlayer().getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsEventsFlag()))
+                !WorldGuardFlagChecker.checkFlag(event.getPlayer().getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
             return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
             return;

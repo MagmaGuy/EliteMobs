@@ -6,9 +6,8 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
-import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -205,7 +204,7 @@ public class EliteEvent extends AbstractEliteEvent {
                     event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)))
                 return;
             if (EliteMobs.worldguardIsEnabled &&
-                    !WorldGuardFlagChecker.checkFlag(event.getLocation(), (StateFlag) WorldGuardCompatibility.getEliteMobsEventsFlag()))
+                    !WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
                 return;
             for (EliteEvent eliteEvent : getActiveEvents().values()) {
                 if (eliteEvent.worlds.contains(event.getEntity().getWorld())) {

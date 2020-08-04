@@ -8,6 +8,8 @@ public class BossCustomAttackDamage {
 
     public static boolean dealCustomDamage(LivingEntity damager, LivingEntity damagee, double damage) {
 
+        if (damager.equals(damagee)) return false;
+
         if (damagee.isInvulnerable() || damagee.getHealth() <= 0) return false;
 
         if (damagee instanceof Player)

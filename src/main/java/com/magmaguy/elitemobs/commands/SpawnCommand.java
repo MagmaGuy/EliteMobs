@@ -7,6 +7,8 @@ import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.bosspowers.DeathSlice;
+import com.magmaguy.elitemobs.powers.bosspowers.FlamePyre;
 import com.magmaguy.elitemobs.powers.defensivepowers.*;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
@@ -344,6 +346,21 @@ public class SpawnCommand {
                         break;
                     case "attackvacuum":
                         elitePowers.add(new AttackVacuum());
+                        break;
+                    case "arrowfireworks":
+                        elitePowers.add(new ArrowFireworks());
+                        break;
+                    case "arrowrain":
+                        elitePowers.add(new ArrowRain());
+                        break;
+                    case "groundpound":
+                        elitePowers.add(new GroundPound());
+                        break;
+                    case "deathslice":
+                        elitePowers.add(new DeathSlice());
+                        break;
+                    case "flamepyre":
+                        elitePowers.add(new FlamePyre());
                         break;
                     default:
                         commandSender.sendMessage(string + " is not a valid power.");

@@ -37,6 +37,9 @@ public class LootTables implements Listener {
         if (event.getEliteMobEntity().getLevel() < 1) return;
         if (event.getEliteMobEntity().getDamagers().isEmpty()) return;
 
+        if (!event.getEliteMobEntity().hasVanillaLoot())
+            event.getEntityDeathEvent().getDrops().clear();
+
         generatePlayerLoot(event.getEliteMobEntity());
 
     }
