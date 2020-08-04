@@ -107,7 +107,6 @@ public class PortOldData {
                 currency += 30000;
 
             try {
-                com.magmaguy.elitemobs.playerdata.PlayerData.getConnection().setAutoCommit(false);
                 Statement statement = null;
                 statement = com.magmaguy.elitemobs.playerdata.PlayerData.getConnection().createStatement();
                 String sql = "INSERT INTO " + com.magmaguy.elitemobs.playerdata.PlayerData.player_data_table_name +
@@ -130,6 +129,7 @@ public class PortOldData {
                 com.magmaguy.elitemobs.playerdata.PlayerData.getConnection().close();
             } catch (Exception e) {
                 new WarningMessage("Warning: Failed to write values from old config files to new database system. Tell the dev!");
+                System.err.println(e.getClass().getName() + ": " + e.getMessage());
                 errored = true;
             }
 

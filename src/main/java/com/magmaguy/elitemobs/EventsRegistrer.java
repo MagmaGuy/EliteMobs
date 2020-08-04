@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.custombosses.AdvancedAggroManager;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.custombosses.PhaseBossEntity;
 import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
@@ -58,19 +59,16 @@ import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieFriends;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
-import com.magmaguy.elitemobs.powers.miscellaneouspowers.BonusLoot;
-import com.magmaguy.elitemobs.powers.miscellaneouspowers.Corpse;
-import com.magmaguy.elitemobs.powers.miscellaneouspowers.Implosion;
-import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
 import com.magmaguy.elitemobs.quests.QuestsTracker;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.worldguard.WorldGuardDungeonFlag;
-import com.magmaguy.elitemobs.worldguard.WorldGuardEliteMobOnlySpawnFlag;
-import com.magmaguy.elitemobs.worldguard.WorldGuardSpawnEventBypasser;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -144,6 +142,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new Corpse(), plugin);
         pluginManager.registerEvents(new Implosion(), plugin);
         pluginManager.registerEvents(new AttackArrow(), plugin);
+        pluginManager.registerEvents(new ArrowFireworks(), plugin);
         pluginManager.registerEvents(new AttackBlinding(), plugin);
         pluginManager.registerEvents(new AttackFire(), plugin);
         pluginManager.registerEvents(new AttackFireball(), plugin);
@@ -156,6 +155,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new AttackWeb(), plugin);
         pluginManager.registerEvents(new AttackWither(), plugin);
         pluginManager.registerEvents(new AttackVacuum(), plugin);
+        pluginManager.registerEvents(new ArrowRain(), plugin);
+        pluginManager.registerEvents(new GroundPound(), plugin);
 
         //Major mob powers
         pluginManager.registerEvents(new SkeletonPillar(), plugin);
@@ -180,10 +181,12 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new SummonEmbers(), plugin);
         pluginManager.registerEvents(new MeteorShower(), plugin);
         pluginManager.registerEvents(new BulletHell(), plugin);
+        pluginManager.registerEvents(new DeathSlice(), plugin);
         pluginManager.registerEvents(new CustomSummonPower.CustomSummonPowerEvent(), plugin);
 
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
+        pluginManager.registerEvents(new PhaseBossEntity.PhaseBossEntityListener(), plugin);
         pluginManager.registerEvents(new RegionalBossEntity.RegionalBossEntityEvents(), plugin);
         pluginManager.registerEvents(new AdvancedAggroManager(), plugin);
 

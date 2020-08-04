@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.custombosses.PhaseBossEntity;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
@@ -19,10 +20,10 @@ import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,10 +33,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EliteMobEntity {
@@ -85,6 +83,8 @@ public class EliteMobEntity {
     private boolean isRegionalBoss = false;
     private boolean inCombat = false;
     private boolean inCombatGracePeriod = false;
+
+    public UUID phaseBossID = null;
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
@@ -172,6 +172,29 @@ public class EliteMobEntity {
                           String name,
                           HashSet<ElitePower> mobPowers,
                           CreatureSpawnEvent.SpawnReason spawnReason) {
+        initializeCustomBossEliteEntity(entityType, location, eliteLevel, name, mobPowers, spawnReason);
+
+    }
+
+    public EliteMobEntity(EntityType entityType,
+                          Location location,
+                          int eliteLevel,
+                          String name,
+                          HashSet<ElitePower> mobPowers,
+                          CreatureSpawnEvent.SpawnReason spawnReason,
+                          double healthPercentage,
+                          UUID phaseBossID) {
+        initializeCustomBossEliteEntity(entityType, location, eliteLevel, name, mobPowers, spawnReason);
+        this.phaseBossID = phaseBossID;
+        this.setHealth(healthPercentage * maxHealth);
+    }
+
+    private void initializeCustomBossEliteEntity(EntityType entityType,
+                                                 Location location,
+                                                 int eliteLevel,
+                                                 String name,
+                                                 HashSet<ElitePower> mobPowers,
+                                                 CreatureSpawnEvent.SpawnReason spawnReason) {
         if (!EliteMobProperties.isValidEliteMobType(entityType)) {
             new WarningMessage("Attempted to spawn custom boss with of type " + entityType + " which is not a valid type for Elite Mobs. The boss will not be spawned.");
             return;
@@ -232,7 +255,6 @@ public class EliteMobEntity {
         }
 
         livingEntity.setCanPickupItems(false);
-
     }
 
     public void continueCustomBossCreation(LivingEntity livingEntity) {
@@ -477,6 +499,11 @@ public class EliteMobEntity {
     }
 
     public void fullHeal() {
+        if (phaseBossID != null) {
+            if (PhaseBossEntity.phaseBosses.containsKey(phaseBossID))
+                PhaseBossEntity.phaseBosses.get(phaseBossID).fullHeal(this);
+            return;
+        }
         setHealth(this.maxHealth);
         damagers.clear();
     }
@@ -909,6 +936,10 @@ public class EliteMobEntity {
         this.damagers.put(player, damage);
     }
 
+    public void addDamagers(HashMap<Player, Double> newDamagers) {
+        this.damagers.putAll(newDamagers);
+    }
+
     public boolean hasDamagers() {
         return !damagers.isEmpty();
     }
@@ -955,6 +986,8 @@ public class EliteMobEntity {
     public void remove() {
         this.getLivingEntity().remove();
         EntityTracker.unregisterEliteMob(this);
+        if (phaseBossID != null)
+            PhaseBossEntity.phaseBosses.remove(phaseBossID);
     }
 
     public void setHasVanillaLoot(boolean hasVanillaLoot) {

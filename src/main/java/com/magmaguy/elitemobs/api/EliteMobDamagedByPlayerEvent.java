@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

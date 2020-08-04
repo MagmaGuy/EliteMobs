@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.worldguard;
+package com.magmaguy.elitemobs.thirdparty.worldguard;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;

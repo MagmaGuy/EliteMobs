@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class PowersConfig {
 
-    private static HashMap<String, PowersConfigFields> powers = new HashMap();
+    private static final HashMap<String, PowersConfigFields> powers = new HashMap();
 
     public static void addPowers(String fileName, PowersConfigFields powersConfigFields) {
         powers.put(fileName, powersConfigFields);
@@ -25,7 +25,7 @@ public class PowersConfig {
         return powers.get(fileName);
     }
 
-    private static ArrayList<PowersConfigFields> powersConfigFieldsList = new ArrayList(Arrays.asList(
+    private static final ArrayList<PowersConfigFields> powersConfigFieldsList = new ArrayList(Arrays.asList(
             new FlamePyreConfig(),
             new FlamethrowerConfig(),
             new GoldExplosionConfig(),
@@ -68,7 +68,11 @@ public class PowersConfig {
             new SummonEmbersConfig(),
             new MeteorShowerConfig(),
             new BulletHellConfig(),
-            new CustomSummonPowerConfig()
+            new CustomSummonPowerConfig(),
+            new ArrowFireworksConfig(),
+            new ArrowRainConfig(),
+            new GroundPoundConfig(),
+            new DeathSliceConfig()
     ));
 
     public static void initializeConfigs() {

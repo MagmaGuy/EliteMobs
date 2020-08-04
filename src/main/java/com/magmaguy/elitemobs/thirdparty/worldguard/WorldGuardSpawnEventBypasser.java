@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.worldguard;
+package com.magmaguy.elitemobs.thirdparty.worldguard;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

@@ -39,7 +39,7 @@ public class DamageDisplay implements Listener {
 
         if (MobCombatSettingsConfig.onlyShowDamageForEliteMobs) {
 
-            if (EntityTracker.isEliteMob(event.getEntity()) && event.getEntity() instanceof LivingEntity) {
+            if (EntityTracker.isEliteMob(event.getEntity()) && event.getEntity() instanceof LivingEntity && EntityTracker.getEliteMobEntity(event.getEntity()) != null) {
                 if (event.getDamage() > 0)
                     displayDamage(event.getEntity(),
                             event.getFinalDamage() /
