@@ -67,7 +67,7 @@ public class MeteorShower extends BossPower implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-    private static void doCloudEffect(Location location) {
+    public static void doCloudEffect(Location location) {
         for (int i = 0; i < 1; i++) {
             int randX = ThreadLocalRandom.current().nextInt(30) - 15;
             int randY = ThreadLocalRandom.current().nextInt(2);

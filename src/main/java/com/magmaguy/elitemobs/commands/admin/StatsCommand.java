@@ -57,16 +57,18 @@ public class StatsCommand {
         int highestGuildRank = 0;
         String highestGuildUser = "";
         double guildRankAverage = 0;
+        Player highestGuildRankPlayer = null;
         for (Player player : Bukkit.getOnlinePlayers()) {
             double currentTier = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);
             threatAverage += currentTier;
-            int currentGuildRank = GuildRank.getMaxGuildRank(player);
+            int currentGuildRank = GuildRank.getActiveGuildRank(player);
             guildRankAverage += currentGuildRank;
             if (currentTier > highestThreat) {
                 highestThreat = currentTier;
                 highestThreatUser = player.getDisplayName();
             }
             if (currentGuildRank > highestGuildRank) {
+                highestGuildRankPlayer = player;
                 highestGuildRank = currentGuildRank;
                 highestGuildUser = player.getDisplayName();
             }
@@ -82,12 +84,13 @@ public class StatsCommand {
                 "&7[EM] &2There are currently §l§6" + (aggressiveCount + passiveCount) + " §f§2EliteMobs mobs entities in the world, of which &a"
                         + aggressiveCount + " &2are Elite Mobs and &a" + passiveCount + " &2are Super Mobs."));
         commandSender.sendMessage(ChatColorConverter.convert(breakdownString.toString()));
+        if (highestGuildRankPlayer == null) return;
         commandSender.sendMessage(ChatColorConverter.convert(
                 "&7[EM] &2Highest online threat tier: &a" + highestThreatUser + " &2at total threat tier &a" + highestThreat));
         commandSender.sendMessage(ChatColorConverter.convert(
                 "&7[EM] &2Average threat tier: &a" + Round.twoDecimalPlaces(threatAverage)));
         commandSender.sendMessage(ChatColorConverter.convert(
-                "&7[EM] &2Highest adventurer's guild tier: &a" + highestGuildUser + " &2at guild rank &a" + GuildRank.getRankName(0, highestGuildRank) + " &2(&a" + highestGuildRank + "&2)"));
+                "&7[EM] &2Highest adventurer's guild tier: &a" + highestGuildUser + " &2at guild rank &a" + GuildRank.getRankName(GuildRank.getGuildPrestigeRank(highestGuildRankPlayer), highestGuildRank) + " &2(&a" + highestGuildRank + "&2)"));
         commandSender.sendMessage(ChatColorConverter.convert(
                 "&7[EM] &2Average guild rank: &a" + Round.twoDecimalPlaces(guildRankAverage)));
         commandSender.sendMessage(ChatColorConverter.convert(

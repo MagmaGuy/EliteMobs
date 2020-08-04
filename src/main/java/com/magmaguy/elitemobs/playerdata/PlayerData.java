@@ -202,7 +202,6 @@ public class PlayerData {
         Statement statement = null;
 
         try {
-            getConnection().setAutoCommit(false);
             statement = getConnection().createStatement();
             String sql;
             if (value instanceof String)
@@ -210,9 +209,9 @@ public class PlayerData {
             else
                 sql = "UPDATE " + player_data_table_name + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
             statement.executeUpdate(sql);
-            getConnection().commit();
-
             statement.close();
+
+            getConnection().commit();
             getConnection().close();
         } catch (Exception e) {
             new WarningMessage("Failed to update database value.");
@@ -289,25 +288,6 @@ public class PlayerData {
         }
     }
 
-    private static ResultSet getResultSet(UUID uuid) {
-        Statement statement = null;
-        try {
-            getConnection().setAutoCommit(false);
-            //statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-
-            //statement.close();
-            //getConnection().close();
-            return resultSet;
-
-        } catch (Exception e) {
-            new WarningMessage("Failed to get value from database!");
-            closeConnection();
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            return null;
-        }
-    }
-
     private double currency;
     private int guildPrestigeLevel, maxGuildLevel, activeGuildLevel, score, kills, highestLevelKilled, deaths, questsCompleted;
     private PlayerQuests questStatus;
@@ -321,7 +301,6 @@ public class PlayerData {
         Statement statement = null;
         closeConnection();
         try {
-            getConnection().setAutoCommit(false);
             statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
 
@@ -362,8 +341,6 @@ public class PlayerData {
         new WarningMessage("No player entry detected, generating new entry!");
 
         try {
-            getConnection().setAutoCommit(false);
-
             statement = getConnection().createStatement();
             String sql = "INSERT INTO " + player_data_table_name +
                     " (PlayerUUID," +

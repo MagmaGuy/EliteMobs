@@ -23,7 +23,7 @@ import java.util.HashSet;
 
 public class ElitePower {
 
-    private static HashSet<ElitePower> elitePowers = new HashSet(Arrays.asList(
+    private static final HashSet<ElitePower> elitePowers = new HashSet(Arrays.asList(
             //Boss powers
             new FlamePyre(),
             new Flamethrower(),
@@ -36,6 +36,7 @@ public class ElitePower {
             new MeteorShower(),
             new BulletHell(),
             new SummonEmbers(),
+            new DeathSlice(),
 
             //major powers
             new SkeletonPillar(),
@@ -74,7 +75,10 @@ public class ElitePower {
             new AttackVacuum(),
             new AttackWeakness(),
             new AttackWeb(),
-            new AttackWither()
+            new AttackWither(),
+            new ArrowFireworks(),
+            new ArrowRain(),
+            new GroundPound()
     ));
 
     private static HashSet<ElitePower> getElitePowers() {
@@ -89,7 +93,7 @@ public class ElitePower {
         return null;
     }
 
-    private static HashSet<MinorPower> defensivePowers = new HashSet<>(Arrays.asList(
+    private static final HashSet<MinorPower> defensivePowers = new HashSet<>(Arrays.asList(
             new Invisibility(),
             new InvulnerabilityArrow(),
             new InvulnerabilityFallDamage(),
@@ -100,19 +104,20 @@ public class ElitePower {
         return defensivePowers;
     }
 
-    private static HashSet<MinorPower> miscellaneousPowers = new HashSet<>(Arrays.asList(
+    private static final HashSet<MinorPower> miscellaneousPowers = new HashSet<>(Arrays.asList(
             new BonusLoot(),
             new Corpse(),
             new Implosion(),
             new MoonWalk(),
             new MovementSpeed(),
-            new Taunt()));
+            new Taunt(),
+            new GroundPound()));
 
     public static HashSet<MinorPower> getMiscellaneousPowers() {
         return miscellaneousPowers;
     }
 
-    private static HashSet<MinorPower> offensivePowers = new HashSet<>(Arrays.asList(
+    private static final HashSet<MinorPower> offensivePowers = new HashSet<>(Arrays.asList(
             new AttackArrow(),
             new AttackBlinding(),
             new AttackConfusing(),
@@ -126,18 +131,20 @@ public class ElitePower {
             new AttackVacuum(),
             new AttackWeakness(),
             new AttackWeb(),
-            new AttackWither()));
+            new AttackWither(),
+            new ArrowFireworks(),
+            new ArrowRain()));
 
     public static HashSet<MinorPower> getOffensivePowers() {
         return offensivePowers;
     }
 
     private boolean cooldown = false;
-    private String fileName;
-    private String trail;
-    private String name;
+    private final String fileName;
+    private final String trail;
+    private final String name;
     private boolean isFiring = false;
-    private FileConfiguration configuration;
+    private final FileConfiguration configuration;
 
     /**
      * This is overwritten by certain classes to apply powers to a living entity upon activation

@@ -74,6 +74,7 @@ public class CustomBossConfigFields {
     private Integer announcementPriority = 0;
     private String disguise = null;
     private Boolean frozen = false;
+    private List<String> phases = new ArrayList<>();
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -382,6 +383,8 @@ public class CustomBossConfigFields {
         if (frozen == null)
             frozen = false;
 
+        this.phases = configuration.getStringList("phases");
+
     }
 
     public class ConfigRegionalEntity {
@@ -643,6 +646,10 @@ public class CustomBossConfigFields {
 
     public Boolean getFrozen() {
         return this.frozen;
+    }
+
+    public List<String> getPhases() {
+        return this.phases;
     }
 
 }

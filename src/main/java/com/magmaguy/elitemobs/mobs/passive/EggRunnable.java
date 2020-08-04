@@ -1,6 +1,5 @@
-package com.magmaguy.elitemobs.runnables;
+package com.magmaguy.elitemobs.mobs.passive;
 
-import com.magmaguy.elitemobs.mobs.passive.ChickenHandler;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class EggRunnable extends BukkitRunnable {

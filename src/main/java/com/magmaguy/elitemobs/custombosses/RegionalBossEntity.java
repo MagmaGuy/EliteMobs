@@ -40,7 +40,7 @@ public class RegionalBossEntity implements Listener {
     private double leashRadius;
     private final int respawnCooldown;
     public boolean inCooldown = false;
-    private UUID uuid;
+    public UUID uuid;
     private final CustomBossConfigFields customBossConfigFields;
 
     public RegionalBossEntity(CustomBossConfigFields customBossConfigFields, CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity) {
@@ -93,7 +93,7 @@ public class RegionalBossEntity implements Listener {
             new WarningMessage("Does the world " + spawnLocation.getWorld() + " exist? Did the world name change or has the world been removed?");
             return;
         }
-        customBossEntity = new CustomBossEntity(customBossConfigFields, entityType, spawnLocation, mobLevel, ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
+        customBossEntity = CustomBossEntity.constructCustomBoss(customBossConfigFields.getFileName(), spawnLocation, mobLevel, this, false);
         isAlive = true;
         try {
             uuid = customBossEntity.getLivingEntity().getUniqueId();
@@ -188,7 +188,6 @@ public class RegionalBossEntity implements Listener {
                 LivingEntity livingEntity = customBossEntity.advancedGetEntity();
                 if (livingEntity == null) return;
                 if (livingEntity.isDead()) return;
-                livingEntity.remove();
                 if (customBossConfigFields.getAnnouncementPriority() < 1) return;
                 if (customBossConfigFields.getEscapeMessage() != null)
                     for (Player player : Bukkit.getOnlinePlayers())
@@ -196,7 +195,7 @@ public class RegionalBossEntity implements Listener {
                             player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
                 if (customBossConfigFields.getAnnouncementPriority() < 3) return;
                 new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
-                CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
+                customBossEntity.remove();
 
             }
 

@@ -60,6 +60,34 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
     }
 
+    public static CustomBossEntity constructCustomBoss(String fileName, Location location, int mobLevel, RegionalBossEntity regionalBossEntity, boolean isPhaseBossRespawn) {
+        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
+        if (!customBossMobsConfigAttributes.isEnabled()) return null;
+
+        return new CustomBossEntity(
+                customBossMobsConfigAttributes,
+                EntityType.valueOf(customBossMobsConfigAttributes.getEntityType()),
+                location,
+                mobLevel,
+                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()),
+                regionalBossEntity,
+                isPhaseBossRespawn);
+    }
+
+    public static CustomBossEntity constructCustomBoss(String fileName, Location location, int mobLevel, double health, UUID phaseBossUUID) {
+        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
+        if (!customBossMobsConfigAttributes.isEnabled()) return null;
+
+        return new CustomBossEntity(
+                customBossMobsConfigAttributes,
+                EntityType.valueOf(customBossMobsConfigAttributes.getEntityType()),
+                location,
+                mobLevel,
+                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()),
+                health,
+                phaseBossUUID);
+    }
+
     private static final HashMap<UUID, CustomBossEntity> customBosses = new HashMap<>();
 
     private static void addCustomBoss(CustomBossEntity customBossEntity) {
@@ -99,6 +127,15 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         }
     }
 
+    /**
+     * For normal Custom Bosses (not regional and not phase bosses)
+     *
+     * @param customBossConfigFields
+     * @param entityType
+     * @param location
+     * @param mobLevel
+     * @param elitePowers
+     */
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
                             EntityType entityType,
                             Location location,
@@ -112,12 +149,84 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     + location.toString());
             return;
         }
+        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+        spawnMessage();
+        if (customBossConfigFields.getPhases().size() > 0)
+            new PhaseBossEntity(this);
+    }
+
+    /**
+     * For regional bosses
+     *
+     * @param customBossConfigFields
+     * @param entityType
+     * @param location
+     * @param mobLevel
+     * @param elitePowers
+     */
+    public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
+                            EntityType entityType,
+                            Location location,
+                            int mobLevel,
+                            HashSet<ElitePower> elitePowers,
+                            RegionalBossEntity regionalBossEntity,
+                            boolean isPhaseBossRespawn) {
+        super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        if (super.getLivingEntity() == null) {
+            new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " . Cause for failure:" +
+                    " Tried to spawn in a region that prevented it from spawning. This is probably not an EliteMobs issue," +
+                    " but a region management issue. Check if mobs are allowed to spawn where you are trying to spawn it. Location: "
+                    + location.toString());
+            return;
+        }
+        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+        if (!isPhaseBossRespawn)
+            spawnMessage();
+        if (customBossConfigFields.getPhases().size() > 0) {
+            new PhaseBossEntity(this, regionalBossEntity);
+        }
+    }
+
+    /**
+     * For Custom bosses spawned by the phase boss system
+     *
+     * @param customBossConfigFields
+     * @param entityType
+     * @param location
+     * @param mobLevel
+     * @param elitePowers
+     * @param health
+     * @param phaseBossUUID
+     */
+    public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
+                            EntityType entityType,
+                            Location location,
+                            int mobLevel,
+                            HashSet<ElitePower> elitePowers,
+                            double health,
+                            UUID phaseBossUUID) {
+        super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM, health, phaseBossUUID);
+        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+        this.setHealth(health * getMaxHealth());
+    }
+
+    private void initializeCustomBoss(CustomBossConfigFields customBossConfigFields,
+                                      EntityType entityType,
+                                      Location location,
+                                      int mobLevel,
+                                      HashSet<ElitePower> elitePowers) {
+        if (super.getLivingEntity() == null) {
+            new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " . Cause for failure:" +
+                    " Tried to spawn in a region that prevented it from spawning. This is probably not an EliteMobs issue," +
+                    " but a region management issue. Check if mobs are allowed to spawn where you are trying to spawn it. Location: "
+                    + location.toString());
+            return;
+        }
         uuid = super.getLivingEntity().getUniqueId();
         super.setDamageMultiplier(customBossConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossConfigFields.getHealthMultiplier());
         super.setHasSpecialLoot(customBossConfigFields.getDropsEliteMobsLoot());
         this.customBossConfigFields = customBossConfigFields;
-        spawnMessage();
         setEquipment();
         if (entityType.equals(EntityType.ZOMBIE))
             ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
@@ -371,6 +480,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             new WarningMessage("Attempted to make Custom Boss " + customBossConfigFields.getFileName() + " mount invalid" +
                     " entity or boss " + customBossConfigFields.getMountedEntity() + " . Fix this in the configuration file.");
         }
+    }
+
+    @Override
+    public void remove() {
+        super.remove();
+        trackableCustomBosses.remove(this);
     }
 
     public static class CustomBossEntityEvents implements Listener {
