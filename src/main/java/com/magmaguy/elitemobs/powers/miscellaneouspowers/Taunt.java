@@ -102,16 +102,15 @@ public class Taunt extends MinorPower implements Listener {
         String tempName = list.get(randomizedKey);
         entity.setCustomName(convert(tempName));
         new BukkitRunnable() {
-
             @Override
             public void run() {
                 if (!entity.isValid())
                     return;
-                entity.setCustomName(EntityTracker.getEliteMobEntity(entity).getName());
+                final EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(entity);
+                if (eliteMobEntity == null)
+                    return;
+                entity.setCustomName(eliteMobEntity.getName());
             }
-
-
         }.runTaskLater(MetadataHandler.PLUGIN, 4 * 20);
     }
-
 }
