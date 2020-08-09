@@ -2,15 +2,14 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
-import com.magmaguy.elitemobs.antiexploit.*;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combatsystem.*;
+import com.magmaguy.elitemobs.combatsystem.antiexploit.*;
+import com.magmaguy.elitemobs.combatsystem.combattag.CombatTag;
+import com.magmaguy.elitemobs.combatsystem.combattag.TeleportTag;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
-import com.magmaguy.elitemobs.combatsystem.displays.DisplayMob;
 import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
-import com.magmaguy.elitemobs.combattag.CombatTag;
-import com.magmaguy.elitemobs.combattag.TeleportTag;
 import com.magmaguy.elitemobs.commands.getLootMenu;
 import com.magmaguy.elitemobs.commands.shops.BuyOrSellMenu;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
@@ -18,10 +17,6 @@ import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
-import com.magmaguy.elitemobs.custombosses.AdvancedAggroManager;
-import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.custombosses.PhaseBossEntity;
-import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.actionevents.MiningEvent;
@@ -37,6 +32,10 @@ import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.AdvancedAggroManager;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCChunkLoad;
@@ -288,9 +287,6 @@ public class EventsRegistrer {
 
         //Prevent elitemob on elitemob aggro
         pluginManager.registerEvents(new AggroPrevention(), plugin);
-
-        //Refresh display case Elite Mobs
-        pluginManager.registerEvents(new DisplayMob(), plugin);
 
         //Player effect when a rare item is on the ground
         if (ItemSettingsConfig.doRareDropsEffect)

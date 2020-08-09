@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
-import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
+import com.magmaguy.elitemobs.mobs.passive.PassiveEliteMobDeathHandler;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -39,7 +39,7 @@ public class MergeHandler implements Listener {
         if (!(eventEntity instanceof LivingEntity)) return;
 
         if (SuperMobProperties.isValidSuperMobType(eventEntity))
-            SuperMobScanner.newSuperMobScan((LivingEntity) eventEntity);
+            PassiveEliteMobDeathHandler.SuperMobScanner.newSuperMobScan((LivingEntity) eventEntity);
 
     }
 

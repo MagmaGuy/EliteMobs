@@ -56,6 +56,10 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
         return entityDamageByEntityEvent;
     }
 
+    public double getDamage() {
+        return damage;
+    }
+
     @Override
     public boolean isCancelled() {
         return this.isCancelled;
