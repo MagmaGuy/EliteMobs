@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ProceduralItemGenerationSettingsConfig {
 
-    private static FileConfiguration fileConfiguration;
+    public static FileConfiguration fileConfiguration;
 
     public static boolean doProceduralItemDrops;
     public static double customEnchantmentChance;
@@ -88,9 +88,7 @@ public class ProceduralItemGenerationSettingsConfig {
         addMaterial(Material.BOW);
         addMaterial(Material.CROSSBOW);
 
-        for (String material : fileConfiguration.getConfigurationSection("validMaterials").getKeys(false))
-            if (fileConfiguration.getConfigurationSection("validMaterials").getBoolean(material))
-                validMaterials.add(material);
+        cacheMaterials();
 
         swordName = ConfigurationEngine.setString(fileConfiguration, "materialNames.swordName", "Sword");
         bowName = ConfigurationEngine.setString(fileConfiguration, "materialNames.bowName", "Bow");
@@ -106,7 +104,7 @@ public class ProceduralItemGenerationSettingsConfig {
         fishingRodName = ConfigurationEngine.setString(fileConfiguration, "materialNames.fishingRod", "Fishing Rod");
         shieldName = ConfigurationEngine.setString(fileConfiguration, "materialNames.shield", "Shield");
         tridentName = ConfigurationEngine.setString(fileConfiguration, "materialNames.trident", "Trident");
-        crossbowName = ConfigurationEngine.setString(fileConfiguration, "materialNames.trident", "Crossbow");
+        crossbowName = ConfigurationEngine.setString(fileConfiguration, "materialNames.crossbow", "Crossbow");
 
         nameFormat = ConfigurationEngine.setList(fileConfiguration, "nameFormats", Arrays.asList(
                 "$verb $itemType of the $adjective $noun",
@@ -1415,13 +1413,19 @@ public class ProceduralItemGenerationSettingsConfig {
                 "Slapper"
         ));
 
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
         MaterialGenerator.initializeValidProceduralMaterials();
     }
 
     private static void addMaterial(Material material) {
         ConfigurationEngine.setBoolean(fileConfiguration, "validMaterials." + material.name(), true);
+    }
+
+    public static void cacheMaterials() {
+        for (String material : fileConfiguration.getConfigurationSection("validMaterials").getKeys(false))
+            if (fileConfiguration.getConfigurationSection("validMaterials").getBoolean(material))
+                validMaterials.add(material);
     }
 
 

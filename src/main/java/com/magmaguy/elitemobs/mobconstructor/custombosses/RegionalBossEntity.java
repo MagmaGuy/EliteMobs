@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.custombosses;
+package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -22,7 +22,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RegionalBossEntity implements Listener {
@@ -40,7 +39,6 @@ public class RegionalBossEntity implements Listener {
     private double leashRadius;
     private final int respawnCooldown;
     public boolean inCooldown = false;
-    public UUID uuid;
     private final CustomBossConfigFields customBossConfigFields;
 
     public RegionalBossEntity(CustomBossConfigFields customBossConfigFields, CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity) {
@@ -95,8 +93,10 @@ public class RegionalBossEntity implements Listener {
         }
         customBossEntity = CustomBossEntity.constructCustomBoss(customBossConfigFields.getFileName(), spawnLocation, mobLevel, this, false);
         isAlive = true;
+
         try {
-            uuid = customBossEntity.getLivingEntity().getUniqueId();
+            //todo: clean this up
+            customBossEntity.advancedGetEntity();
         } catch (Exception ex) { //This is thrown if the entity failed to spawn if, for example, the entity type is not valid
             new WarningMessage("Regional boss from config file " + customBossConfigFields.getFileName() + " failed to spawn." +
                     " This is either because another plugin prevented it from spawning (check region management plugins like WorldGuard)" +
@@ -151,7 +151,7 @@ public class RegionalBossEntity implements Listener {
             @Override
             public void run() {
 
-                Entity livingEntity = Bukkit.getEntity(uuid);
+                Entity livingEntity = customBossEntity.advancedGetEntity();
 
                 if (livingEntity == null && isAlive)
                     return;
@@ -236,8 +236,9 @@ public class RegionalBossEntity implements Listener {
         public void onRegionalBossDeath(EliteMobDeathEvent event) {
             for (RegionalBossEntity regionalBossEntity : getRegionalBossEntityList()) {
                 if (!regionalBossEntity.isAlive) return;
-                if (regionalBossEntity.uuid == null) return;
-                if (!event.getEliteMobEntity().getLivingEntity().getUniqueId().equals(regionalBossEntity.uuid)) return;
+                if (regionalBossEntity.customBossEntity.advancedGetEntity() == null) return;
+                if (!event.getEliteMobEntity().getLivingEntity().getUniqueId().equals(regionalBossEntity.customBossEntity.uuid))
+                    return;
                 regionalBossEntity.respawnRegionalBoss();
             }
         }

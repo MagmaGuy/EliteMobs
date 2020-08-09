@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.CommandRunner;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
@@ -14,6 +16,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+
 public class EliteMobEnterCombatEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
@@ -24,6 +28,8 @@ public class EliteMobEnterCombatEvent extends Event {
         this.targetEntity = targetEntity;
         this.eliteMobEntity = eliteMobEntity;
         eliteMobEntity.setIsInCombat(true);
+        if (eliteMobEntity instanceof CustomBossEntity)
+            CommandRunner.runCommandFromList(((CustomBossEntity) eliteMobEntity).customBossConfigFields.getOnCombatEnterCommands(), new ArrayList<>());
         new BukkitRunnable() {
             @Override
             public void run() {

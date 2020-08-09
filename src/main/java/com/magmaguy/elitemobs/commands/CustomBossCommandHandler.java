@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
-import com.magmaguy.elitemobs.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

@@ -7,7 +7,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.42.1</version>
+    <version>7.1.42.3</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -129,7 +129,7 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.10.3</version>
+            <version>2.10.9</version>
             <scope>provided</scope>
         </dependency>
         <!-- SQLite https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
