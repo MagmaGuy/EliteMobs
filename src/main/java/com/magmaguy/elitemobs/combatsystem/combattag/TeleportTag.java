@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.combattag;
+package com.magmaguy.elitemobs.combatsystem.combattag;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 public class TeleportTag implements Listener {
 
-    private static HashMap<Player, Vector> teleportingPlayers = new HashMap<>();
+    private static final HashMap<Player, Vector> teleportingPlayers = new HashMap<>();
 
     public static boolean isTeleportingPlayer(Player player) {
         return teleportingPlayers.containsKey(player);

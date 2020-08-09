@@ -70,6 +70,9 @@ public class CustomBossConfigFields {
     private double leashRadius;
     private Integer followRange;
     private List<String> onDeathCommands;
+    private List<String> onSpawnCommands;
+    private List<String> onCombatEnterCommands;
+    private List<String> onCombatLeaveCommands;
     private String mountedEntity;
     private Integer announcementPriority = 0;
     private String disguise = null;
@@ -368,6 +371,12 @@ public class CustomBossConfigFields {
 
         this.onDeathCommands = (List<String>) configuration.getList("onDeathCommands");
 
+        this.onSpawnCommands = (List<String>) configuration.getList("onSpawnCommands");
+
+        this.onCombatEnterCommands = (List<String>) configuration.getList("onCombatEnterCommands");
+
+        this.onCombatLeaveCommands = (List<String>) configuration.getList("onCombatLeaveCommands");
+
         this.mountedEntity = configuration.getString("mountedEntity");
 
         customBossConfigFields.add(this);
@@ -584,6 +593,18 @@ public class CustomBossConfigFields {
 
     public List<String> getOnDeathCommands() {
         return onDeathCommands;
+    }
+
+    public List<String> getOnSpawnCommands() {
+        return onSpawnCommands;
+    }
+
+    public List<String> getOnCombatEnterCommands() {
+        return onCombatEnterCommands;
+    }
+
+    public List<String> getOnCombatLeaveCommands() {
+        return onCombatLeaveCommands;
     }
 
     public Map<String, Object> getAdditionalConfigOptions() {

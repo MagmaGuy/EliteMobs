@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.42.1</version>
+    <version>7.1.42.3</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -21,16 +21,16 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <relocations>
-            <relocation>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <relocations>
+                        <relocation>
               <pattern>org.bstats</pattern>
               <shadedPattern>your.package</shadedPattern>
             </relocation>
@@ -42,16 +42,16 @@
   <repositories>
     <repository>
       <id>spigot-repo</id>
-      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
-    <repository>
-      <id>CodeMC</id>
-      <url>https://repo.codemc.org/repository/maven-public</url>
-    </repository>
-    <repository>
-      <id>sk89q-repo</id>
-        <url>https://maven.enginehub.org/repo/</url>
-    </repository>
+      <repository>
+          <id>CodeMC</id>
+          <url>https://repo.codemc.org/repository/maven-public</url>
+      </repository>
+      <repository>
+          <id>sk89q-repo</id>
+          <url>https://maven.enginehub.org/repo/</url>
+      </repository>
       <repository>
           <id>jitpack.io</id>
           <url>https://jitpack.io</url>
@@ -74,34 +74,34 @@
       </repository>
   </repositories>
   <dependencies>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.16.1-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-        <exclusions>
-            <exclusion>
-                <artifactId>commons-lang</artifactId>
-                <groupId>commons-lang</groupId>
-            </exclusion>
-            <exclusion>
-                <artifactId>guava</artifactId>
-                <groupId>com.google.guava</groupId>
-            </exclusion>
-            <exclusion>
-                <artifactId>gson</artifactId>
-                <groupId>com.google.code.gson</groupId>
-            </exclusion>
-            <exclusion>
-                <artifactId>bungeecord-chat</artifactId>
-                <groupId>net.md-5</groupId>
-            </exclusion>
-            <exclusion>
-                <artifactId>snakeyaml</artifactId>
-                <groupId>org.yaml</groupId>
-            </exclusion>
-        </exclusions>
-    </dependency>
+      <dependency>
+          <groupId>org.spigotmc</groupId>
+          <artifactId>spigot-api</artifactId>
+          <version>1.16.1-R0.1-SNAPSHOT</version>
+          <scope>provided</scope>
+          <exclusions>
+              <exclusion>
+                  <artifactId>commons-lang</artifactId>
+                  <groupId>commons-lang</groupId>
+              </exclusion>
+              <exclusion>
+                  <artifactId>guava</artifactId>
+                  <groupId>com.google.guava</groupId>
+              </exclusion>
+              <exclusion>
+                  <artifactId>gson</artifactId>
+                  <groupId>com.google.code.gson</groupId>
+              </exclusion>
+              <exclusion>
+                  <artifactId>bungeecord-chat</artifactId>
+                  <groupId>net.md-5</groupId>
+              </exclusion>
+              <exclusion>
+                  <artifactId>snakeyaml</artifactId>
+                  <groupId>org.yaml</groupId>
+              </exclusion>
+          </exclusions>
+      </dependency>
     <dependency>
       <groupId>com.sk89q.worldguard</groupId>
       <artifactId>worldguard-bukkit</artifactId>
@@ -138,12 +138,18 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>me.clip</groupId>
-      <artifactId>placeholderapi</artifactId>
-      <version>2.10.3</version>
-      <scope>provided</scope>
-    </dependency>
+      <dependency>
+          <groupId>me.clip</groupId>
+          <artifactId>placeholderapi</artifactId>
+          <version>2.10.9</version>
+          <scope>provided</scope>
+          <exclusions>
+              <exclusion>
+                  <artifactId>annotations</artifactId>
+                  <groupId>org.jetbrains</groupId>
+              </exclusion>
+          </exclusions>
+      </dependency>
     <dependency>
       <groupId>com.discordsrv</groupId>
       <artifactId>discordsrv</artifactId>
@@ -208,16 +214,16 @@
         </exclusion>
         <exclusion>
           <artifactId>MCDiscordReserializer</artifactId>
-          <groupId>dev.vankka</groupId>
+            <groupId>dev.vankka</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>text-api</artifactId>
-          <groupId>net.kyori</groupId>
-        </exclusion>
-        <exclusion>
-            <artifactId>text-serializer-legacy</artifactId>
-            <groupId>net.kyori</groupId>
-        </exclusion>
+          <exclusion>
+              <artifactId>text-api</artifactId>
+              <groupId>net.kyori</groupId>
+          </exclusion>
+          <exclusion>
+              <artifactId>text-serializer-legacy</artifactId>
+              <groupId>net.kyori</groupId>
+          </exclusion>
           <exclusion>
               <artifactId>text-adapter-bukkit</artifactId>
               <groupId>net.kyori</groupId>

@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.custombosses;
+package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
@@ -75,8 +75,10 @@ public class PhaseBossEntity {
 
         CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss(currentPhase.customBossConfigFields.getFileName(), eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), currentPhase.healthPercentage, uuid);
         customBossEntity.addDamagers(eliteMobEntity.getDamagers());
-        regionalBossEntity.customBossEntity = customBossEntity;
-        regionalBossEntity.uuid = customBossEntity.getLivingEntity().getUniqueId();
+
+        if (regionalBossEntity != null)
+            regionalBossEntity.customBossEntity = customBossEntity;
+
         eliteMobEntity.getLivingEntity().remove();
         EntityTracker.unregisterEliteMob(eliteMobEntity);
     }
@@ -85,11 +87,12 @@ public class PhaseBossEntity {
         if (eliteMobEntity.getLivingEntity().isInsideVehicle())
             eliteMobEntity.getLivingEntity().getVehicle().remove();
         CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss(bossPhases.get(0).customBossConfigFields.getFileName(), eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), regionalBossEntity, true);
-        regionalBossEntity.customBossEntity = customBossEntity;
-        regionalBossEntity.uuid = customBossEntity.getLivingEntity().getUniqueId();
-        eliteMobEntity.remove();
-        if (regionalBossEntity != null)
+        if (regionalBossEntity != null) {
+            regionalBossEntity.customBossEntity = customBossEntity;
             customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
+        }
+        eliteMobEntity.remove();
+        EntityTracker.unregisterEliteMob(eliteMobEntity);
     }
 
     public static class PhaseBossEntityListener implements Listener {

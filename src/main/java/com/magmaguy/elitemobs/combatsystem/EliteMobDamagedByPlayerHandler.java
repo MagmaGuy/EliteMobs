@@ -93,6 +93,7 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
         playerHitCooldownHashMap.put(player, clock);
 
         Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByPlayerEvent(eliteMobEntity, player, event, newDamage));
+        DamageDisplay.isCustomDamage = true;
         if (!event.isCancelled())
             eliteMobEntity.damage(newDamage);
 

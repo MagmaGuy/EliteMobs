@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.combattag;
+package com.magmaguy.elitemobs.combatsystem.combattag;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;

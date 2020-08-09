@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.custombosses;
+package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;

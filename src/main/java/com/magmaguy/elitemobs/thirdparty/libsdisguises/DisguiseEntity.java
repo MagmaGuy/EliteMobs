@@ -1,10 +1,8 @@
 package com.magmaguy.elitemobs.thirdparty.libsdisguises;
 
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import me.libraryaddict.disguise.disguisetypes.DisguiseType;
-import me.libraryaddict.disguise.disguisetypes.MiscDisguise;
-import me.libraryaddict.disguise.disguisetypes.MobDisguise;
-import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
+import me.libraryaddict.disguise.DisguiseAPI;
+import me.libraryaddict.disguise.disguisetypes.*;
 import org.bukkit.entity.Entity;
 
 public class DisguiseEntity {
@@ -19,6 +17,11 @@ public class DisguiseEntity {
 
         if (disguiseName.contains("player:")) {
             playerDisguise(disguiseName.replace("player:", ""), entity);
+            return;
+        }
+
+        if (disguiseName.contains("custom")) {
+            customDisguise(disguiseName.replace("custom:", ""), entity);
             return;
         }
 
@@ -42,19 +45,35 @@ public class DisguiseEntity {
     private static void playerDisguise(String playerName, Entity entity) {
         PlayerDisguise playerDisguise = new PlayerDisguise(playerName);
         playerDisguise.setEntity(entity);
+        playerDisguise.setName(entity.getName());
+        playerDisguise.setDynamicName(true);
         playerDisguise.startDisguise();
     }
 
     private static void livingEntityDisguise(DisguiseType disguiseType, Entity entity) {
         MobDisguise mobDisguise = new MobDisguise(disguiseType);
         mobDisguise.setEntity(entity);
+        mobDisguise.setDisguiseName(entity.getName());
+        mobDisguise.setDynamicName(true);
         mobDisguise.startDisguise();
     }
 
     private static void miscEntityDisguise(DisguiseType disguiseType, Entity entity) {
         MiscDisguise miscDisguise = new MiscDisguise(disguiseType);
+        miscDisguise.setDisguiseName(entity.getName());
+        miscDisguise.setDynamicName(true);
         miscDisguise.setEntity(entity);
         miscDisguise.startDisguise();
+
+
+    }
+
+    private static void customDisguise(String customDisguise, Entity entity) {
+        Disguise disguise = DisguiseAPI.getCustomDisguise(customDisguise);
+        disguise.setEntity(entity);
+        disguise.setDisguiseName(entity.getName());
+        disguise.setDynamicName(true);
+        disguise.startDisguise();
     }
 
 }
