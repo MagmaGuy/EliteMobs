@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.thirdparty.worldguard;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.EntityTracker;
-import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

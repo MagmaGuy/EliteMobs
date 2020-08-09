@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.custombosses;
+package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import org.bukkit.entity.Entity;

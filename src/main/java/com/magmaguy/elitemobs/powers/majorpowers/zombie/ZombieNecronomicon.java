@@ -5,8 +5,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
@@ -36,7 +36,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
     private int chantIndex = 0;
 
-    private static HashSet<EliteMobEntity> chantingMobs = new HashSet<>();
+    private static final HashSet<EliteMobEntity> chantingMobs = new HashSet<>();
     //todo: Shouldn't this be static?
 
     public ZombieNecronomicon() {
@@ -66,7 +66,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
         new BukkitRunnable() {
             int counter = 0;
-            HashMap<Integer, List<Item>> fourTrack = new HashMap();
+            final HashMap<Integer, List<Item>> fourTrack = new HashMap();
 
             @Override
             public void run() {
@@ -149,7 +149,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
     private void nameScroller(LivingEntity livingEntity, ZombieNecronomicon zombieNecronomicon) {
 
         new BukkitRunnable() {
-            String fullChant = convert(PowersConfig.getPower("zombie_necronomicon.yml").getConfiguration().getString("summoningChant"));
+            final String fullChant = convert(PowersConfig.getPower("zombie_necronomicon.yml").getConfiguration().getString("summoningChant"));
 
             @Override
             public void run() {
@@ -177,7 +177,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
         new BukkitRunnable() {
 
-            ArrayList<Entity> entityList = new ArrayList<>();
+            final ArrayList<Entity> entityList = new ArrayList<>();
 
             @Override
             public void run() {

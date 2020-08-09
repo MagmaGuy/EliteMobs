@@ -4,15 +4,15 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
+import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.custombosses.PhaseBossEntity;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.powers.ElitePower;
@@ -164,7 +164,7 @@ public class EliteMobEntity {
      * @param location   location at which the elite mob will spawn
      * @param eliteLevel boss mob level, should be automatically generated based on the highest player tier online
      * @param name       the name for this boss mob, overrides the usual elite mob name format
-     * @see com.magmaguy.elitemobs.custombosses.CustomBossEntity
+     * @see com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity
      */
     public EliteMobEntity(EntityType entityType,
                           Location location,
