@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.combatsystem.displays;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByPlayerHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
@@ -23,9 +24,15 @@ import java.util.Random;
 public class DamageDisplay implements Listener {
 
     public static boolean isCriticalHit = false;
+    public static boolean isCustomDamage = false;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHit(EntityDamageEvent event) {
+
+        if (isCustomDamage) {
+            isCustomDamage = false;
+            return;
+        }
 
         if (EliteMobDamagedByPlayerHandler.display) {
             EliteMobDamagedByPlayerHandler.display = false;
@@ -51,6 +58,12 @@ public class DamageDisplay implements Listener {
         } else if (event.getDamage() > 0) displayDamage(event.getEntity(), event.getFinalDamage());
 
 
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEliteHit(EliteMobDamagedByPlayerEvent event) {
+        if (event.isCancelled()) return;
+        displayDamage(event.getEntity(), event.getDamage());
     }
 
     public static void displayDamage(Entity entity, double damage) {

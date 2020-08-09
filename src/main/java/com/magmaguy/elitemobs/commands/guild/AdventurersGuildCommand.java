@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.commands.guild;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
-import com.magmaguy.elitemobs.combattag.TeleportTag;
+import com.magmaguy.elitemobs.combatsystem.combattag.TeleportTag;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
 import org.bukkit.Bukkit;

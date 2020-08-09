@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByPlayerHandler;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
@@ -18,7 +19,6 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.custombosses.RegionalBossHandler;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
@@ -26,9 +26,13 @@ import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossHandler;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
-import com.magmaguy.elitemobs.mobscanner.SuperMobScanner;
+import com.magmaguy.elitemobs.mobs.passive.PassiveEliteMobDeathHandler;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
@@ -42,8 +46,6 @@ import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
-import me.clip.placeholderapi.PlaceholderAPI;
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -140,7 +142,7 @@ public class EliteMobs extends JavaPlugin {
         /*
         Scan for loaded SuperMobs
          */
-        SuperMobScanner.scanSuperMobs();
+        PassiveEliteMobDeathHandler.SuperMobScanner.scanSuperMobs();
 
         /*
         Check for new plugin version
@@ -204,9 +206,14 @@ public class EliteMobs extends JavaPlugin {
 
         validWorldList.clear();
         zoneBasedSpawningWorlds.clear();
+        RegionalBossEntity.getRegionalBossEntityList().clear();
+        PhaseBossEntity.phaseBosses.clear();
+        CustomBossEntity.getCustomBosses().clear();
+        CustomBossConfigFields.getRegionalElites().clear();
+        CustomBossConfigFields.getNaturallySpawnedElites().clear();
 
         if (this.placeholders != null)
-            PlaceholderAPI.unregisterExpansion((PlaceholderExpansion) this.placeholders);
+            ((Placeholders) placeholders).unregister();
 
         //save cached data
         PlayerData.closeConnection();
