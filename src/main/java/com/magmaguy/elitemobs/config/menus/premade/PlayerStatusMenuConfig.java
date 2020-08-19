@@ -117,13 +117,13 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         commandsLineCreator(12, "", "", "", fileConfiguration);
 
         questTrackerLineCreator(0, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
-        questTrackerLineCreator(1, "&3&lQuests:", "Click to abandon quest!", "", fileConfiguration);
+        questTrackerLineCreator(1, "&6&lQuests:", "Do /em quest to accept quests!", "", fileConfiguration);
         questTrackerLineCreator(2, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
 
         onQuestTrackHover = ConfigurationEngine.setString(fileConfiguration, "onQuestTrackHover", "Click to abandon!");
 
         bossTrackerLineCreator(0, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
-        bossTrackerLineCreator(1, "&4&lBoss Tracker:", "Click on entries to track!", "", fileConfiguration);
+        bossTrackerLineCreator(1, "&4&lBoss Tracker:", "Big bosses get displayed here!", "", fileConfiguration);
         bossTrackerLineCreator(2, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
 
         onBossTrackHover = ConfigurationEngine.setString(fileConfiguration, "onBossTrackHover", "Click to track/untrack!");
