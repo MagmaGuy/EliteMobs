@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class PlayerQuests implements Serializable {
 
-    private static PlayerQuests getData(Player player) {
+    public static PlayerQuests getData(Player player) {
         return PlayerData.getQuestStatus(player.getUniqueId());
     }
 
@@ -24,6 +24,10 @@ public class PlayerQuests implements Serializable {
             getData(player).quests = quests;
         }
         //todo: updateDatabase(player, getData(player));
+    }
+
+    public static void removeQuest(Player player, UUID uuid) {
+        PlayerData.removeQuest(player.getUniqueId(), uuid);
     }
 
     public static boolean hasQuest(Player player, EliteQuest eliteQuest) {

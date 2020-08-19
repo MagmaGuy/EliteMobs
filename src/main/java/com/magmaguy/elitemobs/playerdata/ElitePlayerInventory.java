@@ -142,4 +142,26 @@ public class ElitePlayerInventory {
         }
     }
 
+    /**
+     * Outputs the base damage of the player given the current gear. Does not take secondary enchantments into account,
+     * such as Smite
+     *
+     * @return Base damage value
+     */
+    public double baseDamage() {
+        if (getWeaponTier(true) == 0)
+            return 1;
+        return getWeaponTier(false);
+    }
+
+    /**
+     * Outputs the base damage reduction given the current gear. Does not take secondary enchantements into accounts,
+     * such as Blast Protection
+     *
+     * @return Base damage reduction value
+     */
+    public double baseDamageReduction() {
+        return getArmorTier(true);
+    }
+
 }
