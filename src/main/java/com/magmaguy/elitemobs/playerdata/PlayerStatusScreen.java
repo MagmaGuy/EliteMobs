@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.playerdata;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.quests.EliteQuest;
+import com.magmaguy.elitemobs.quests.PlayerQuests;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -46,16 +48,45 @@ public class PlayerStatusScreen implements Listener {
 
     private ItemStack generateBook(Player requestingPlayer, Player targetPlayer) {
         TextComponent[] pages = new TextComponent[50];
-        pages[0] = coverPage(targetPlayer);
-        pages[1] = statsPage(targetPlayer);
-        pages[2] = gearPage(targetPlayer);
-        pages[3] = commandsPage();
-        int bossCounter = 4;
-        for (TextComponent textComponent : bossTrackingPage(targetPlayer)) {
-            pages[bossCounter] = textComponent;
-            bossCounter++;
+        int pageCounter = 1;
+        pageCounter++;
+        int statsPage = -1;
+        int gearPage = -1;
+        int commandsPage = -1;
+        int questsPage = -1;
+        int bossTrackingPage = -1;
+        if (PlayerStatusMenuConfig.doStatsPage) {
+            statsPage = pageCounter;
+            pages[pageCounter] = statsPage(targetPlayer);
+            pageCounter++;
+        }
+        if (PlayerStatusMenuConfig.doGearPage) {
+            gearPage = pageCounter;
+            pages[pageCounter] = gearPage(targetPlayer);
+            pageCounter++;
+        }
+        if (PlayerStatusMenuConfig.doCommandsPage) {
+            commandsPage = pageCounter;
+            pages[pageCounter] = commandsPage();
+            pageCounter++;
+        }
+        if (PlayerStatusMenuConfig.doQuestTrackingPage) {
+            questsPage = pageCounter;
+            for (TextComponent textComponent : questsPage(targetPlayer)) {
+                pages[pageCounter] = textComponent;
+                pageCounter++;
+            }
         }
 
+        if (PlayerStatusMenuConfig.doBossTrackingPage) {
+            bossTrackingPage = pageCounter;
+            for (TextComponent textComponent : bossTrackingPage(targetPlayer)) {
+                pages[pageCounter] = textComponent;
+                pageCounter++;
+            }
+        }
+
+        pages[0] = coverPage(statsPage, gearPage, commandsPage, questsPage, bossTrackingPage);
 
         int counter = 0;
         for (TextComponent textComponent : pages) {
@@ -75,105 +106,69 @@ public class PlayerStatusScreen implements Listener {
         return BookMaker.generateBook(requestingPlayer, finalPages);
     }
 
-    private TextComponent coverPage(Player targetPlayer) {
+    private TextComponent coverPage(int statsPage, int gearPage, int commandsPage, int questsPage, int bossTrackingPage) {
+
         TextComponent textComponent = new TextComponent();
 
-        TextComponent adventurersGuild = new TextComponent(
-                ChatColorConverter.convert("&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
-                        "&5&l/ag &7- &6EliteMobs Hub\n" +
-                        "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
-        setHoverText(adventurersGuild,
-                "CLICK TO USE\n" +
-                        "The place where you can find\n" +
-                        "NPCs that give quests, buy and\n" +
-                        "sell items, give advice and more!");
-        adventurersGuild.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ag"));
-        textComponent.addExtra(adventurersGuild);
+        for (int i = 0; i < 13; i++) {
+            TextComponent line = new TextComponent(
+                    PlayerStatusMenuConfig.indexTextLines[i]
+                            .replace("$statsPage", statsPage + "")
+                            .replace("$gearPage", gearPage + "")
+                            .replace("$commandsPage", commandsPage + "")
+                            .replace("$questsPage", questsPage + "")
+                            .replace("$bossTrackingPage", bossTrackingPage + "")
+                            + "\n");
 
-        textComponent.addExtra("\n");
+            if (!PlayerStatusMenuConfig.indexHoverLines[i].isEmpty())
+                setHoverText(line, PlayerStatusMenuConfig.indexHoverLines[i]);
 
-        TextComponent index = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Index:\n\n");
-        textComponent.addExtra(index);
+            if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$statsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$statsPage", statsPage + "")));
+            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$gearPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$gearPage", gearPage + "")));
+            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$commandsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$commandsPage", commandsPage + "")));
+            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$questsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$questsPage", questsPage + "")));
+            else if (PlayerStatusMenuConfig.indexCommandLines[i].contains("$bossTrackingPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.indexCommandLines[i].replace("$bossTrackingPage", bossTrackingPage + "")));
 
-        TextComponent statsPage = new TextComponent(ChatColor.DARK_AQUA + "p. 2" + ChatColor.DARK_GRAY + " - " + ChatColor.GOLD + "Stats\n\n");
-        setHoverText(statsPage, "Click to go!");
-        statsPage.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "2"));
-        textComponent.addExtra(statsPage);
+            else
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.indexCommandLines[i]));
 
-        TextComponent gearComponent = new TextComponent(ChatColor.DARK_AQUA + "p. 3" + ChatColor.DARK_GRAY + " - " + ChatColor.GOLD + "Gear\n\n");
-        setHoverText(gearComponent, "Click to go!");
-        gearComponent.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "3"));
-        textComponent.addExtra(gearComponent);
-
-        TextComponent commandsComponent = new TextComponent(ChatColor.DARK_AQUA + "p. 4" + ChatColor.DARK_GRAY + " - " + ChatColor.GOLD + "Commands\n\n");
-        setHoverText(commandsComponent, "Click to go!");
-        commandsComponent.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "4"));
-        textComponent.addExtra(commandsComponent);
-
-        TextComponent trackingComponent = new TextComponent(ChatColor.DARK_AQUA + "p. 5" + ChatColor.DARK_GRAY + " - " + ChatColor.GOLD + "Boss Tracking\n\n");
-        setHoverText(trackingComponent, "Click to go!");
-        trackingComponent.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "5"));
-        textComponent.addExtra(trackingComponent);
+            textComponent.addExtra(line);
+        }
 
         return textComponent;
+
     }
 
     private TextComponent statsPage(Player targetPlayer) {
+
         TextComponent textComponent = new TextComponent();
 
-        TextComponent header = new TextComponent(
-                ChatColorConverter.convert("&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
-                        "&5&lPlayer Stats:\n" +
-                        "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n\n"));
-        textComponent.addExtra(header);
+        for (int i = 0; i < 13; i++) {
+            TextComponent line = new TextComponent(PlayerStatusMenuConfig.statsTextLines[i]
+                    .replace("$money", EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + "")
+                    .replace("$guildtier", AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer)))
+                    .replace("$kills", PlayerData.getKills(targetPlayer.getUniqueId()) + "")
+                    .replace("$highestkill", PlayerData.getHighestLevelKilled(targetPlayer.getUniqueId()) + "")
+                    .replace("$deaths", PlayerData.getDeaths(targetPlayer.getUniqueId()) + "")
+                    .replace("$quests", PlayerData.getQuestsCompleted(targetPlayer.getUniqueId()) + "")
+                    .replace("$score", PlayerData.getScore(targetPlayer.getUniqueId()) + "") + "\n");
 
-        TextComponent moneyComponent = new TextComponent(ChatColorConverter.convert("&2Money: &a") + EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + "\n\n");
-        setHoverText(moneyComponent,
-                "Kill Elite Mobs to loot currency or\n" +
-                        "sell their drops in /em shop or\n" +
-                        "complete quests in /em quest!");
-        textComponent.addExtra(moneyComponent);
-        TextComponent prestigeComponent = new TextComponent(ChatColorConverter.convert("&6Guild Tier: &3") + AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer)) + "\n");
-        setHoverText(prestigeComponent,
-                "Prestige Tier and Guild Rank:\n" +
-                        "Guild Rank determines how good your loot can " +
-                        "be, sets your bonus from the Prestige Tier, among " +
-                        "other things. The Prestige Tier unlocks extremely " +
-                        "powerful rewards, like increased max health, chance " +
-                        "to dodge/crit, increased currency rewards and more! " +
-                        "You can unlock Guild Ranks and Prestige Tiers at /ag!\n" +
-                        "⚜ = prestige rank, ✧ = guild rank!");
-        textComponent.addExtra(prestigeComponent);
-        TextComponent killsComponents = new TextComponent(ChatColorConverter.convert("&4Elite Kills: &c") + PlayerData.getKills(targetPlayer.getUniqueId()) + "\n");
-        setHoverText(killsComponents, "Amount of Elite Mobs killed.");
-        textComponent.addExtra(killsComponents);
-        TextComponent highestLevelKilledComponent = new TextComponent(ChatColorConverter.convert("&4Max Lvl Killed: &c") + PlayerData.getHighestLevelKilled(targetPlayer.getUniqueId()) + "\n");
-        setHoverText(highestLevelKilledComponent,
-                "Level of the highest Elite Mob killed.\n" +
-                        "Elite Mob levels are based on the tier\n" +
-                        "of your gear! Higher tiers, higher\n" +
-                        "Elite Mob levels!\n" +
-                        "Note: only non-exploity kills get counted!");
-        textComponent.addExtra(highestLevelKilledComponent);
-        TextComponent deathsComponent = new TextComponent(ChatColorConverter.convert("&4Elite Deaths: &c") + PlayerData.getDeaths(targetPlayer.getUniqueId()) + "\n");
-        setHoverText(deathsComponent, "Times killed by Elite Mobs.");
-        textComponent.addExtra(deathsComponent);
-        TextComponent questCompletedComponent = new TextComponent(ChatColorConverter.convert("&5Quests Completed: &d") + PlayerData.getQuestsCompleted(targetPlayer.getUniqueId()) + "\n\n");
-        setHoverText(questCompletedComponent,
-                "Amount of EliteMobs quests completed\n" +
-                        "You can take quests on at /em quest\n" +
-                        "CURRENTLY NOT IMPLEMENTED");
-        textComponent.addExtra(questCompletedComponent);
-        TextComponent scoreComponent = new TextComponent(ChatColorConverter.convert("&bScore: &3") + PlayerData.getScore(targetPlayer.getUniqueId()) + "\n");
-        setHoverText(scoreComponent,
-                "Your EliteMobs score. It goes up\n" +
-                        "when you kill and elite mob,\n" +
-                        "and it goes down when you die\n" +
-                        "to an elite. Higher level\n" +
-                        "elites give more score.");
-        textComponent.addExtra(scoreComponent);
+            if (!PlayerStatusMenuConfig.statsHoverLines[i].isEmpty())
+                setHoverText(line, PlayerStatusMenuConfig.statsHoverLines[i]);
+
+            if (!PlayerStatusMenuConfig.statsCommandLines[i].isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.statsCommandLines[i]));
+
+            textComponent.addExtra(line);
+        }
 
         return textComponent;
+
     }
 
     private void setHoverText(TextComponent textComponent, String text) {
@@ -182,61 +177,123 @@ public class PlayerStatusScreen implements Listener {
 
     private TextComponent gearPage(Player targetPlayer) {
 
-        TextComponent header = new TextComponent(
-                ChatColorConverter.convert("&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
-                        "&7&lArmor & Weapons:\n" +
-                        "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
-                        "&8&lGear Tiers:\n"));
 
-        TextComponent helmetString = new TextComponent("          ☠ - 0" + "\n");
-        TextComponent chestplateString = new TextComponent("          ▼ - 0" + "\n");
-        TextComponent leggingsString = new TextComponent("          Π - 0" + "\n");
-        TextComponent bootsString = new TextComponent("          ╯╰ - 0" + "\n");
-        TextComponent mainHandString = new TextComponent("    ⚔ - 0");
-        TextComponent offHandString = new TextComponent("    ⛨ - 0" + "\n");
+        TextComponent textComponent = new TextComponent();
 
-        if (targetPlayer.getEquipment() != null) {
-            if (targetPlayer.getEquipment().getHelmet() != null) {
-                helmetString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getHelmet().getType()) + "☠" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).helmet.getTier(targetPlayer.getInventory().getHelmet(), true) + "\n");
-                ShareItem.setItemHoverEvent(helmetString, targetPlayer.getEquipment().getHelmet());
+        for (int i = 0; i < 13; i++) {
+
+            TextComponent line;
+
+            if (!PlayerStatusMenuConfig.gearTextLines[i].contains("{")) {
+                line = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.gearTextLines[i], targetPlayer) + "\n");
+                gearMultiComponentLine(textComponent, line, i, targetPlayer, false, 0);
+            } else {
+                TextComponent prePlaceholderElements = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.gearTextLines[i].split("\\{")[0], targetPlayer));
+                gearMultiComponentLine(textComponent, prePlaceholderElements, i, targetPlayer, false, 0);
+                for (int j = 0; j < PlayerStatusMenuConfig.gearTextLines[i].split("\\{").length; j++) {
+                    TextComponent placeholderString = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.gearTextLines[i].split("\\{")[j].split("}")[0], targetPlayer));
+                    gearMultiComponentLine(textComponent, placeholderString, i, targetPlayer, true, j);
+                    if (PlayerStatusMenuConfig.gearTextLines[i].split("}").length > j
+                            && PlayerStatusMenuConfig.gearTextLines[i].split("}")[j].contains("{")) {
+                        TextComponent spaceBetweenPlaceholders = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.gearTextLines[i].split("}")[j].split("\\{")[0], targetPlayer));
+                        gearMultiComponentLine(textComponent, spaceBetweenPlaceholders, i, targetPlayer, false, 0);
+                    }
+                }
+                TextComponent spaceAfterPlaceholders = new TextComponent("\n");
+                gearMultiComponentLine(textComponent, spaceAfterPlaceholders, i, targetPlayer, false, 0);
             }
-            if (targetPlayer.getEquipment().getChestplate() != null) {
-                chestplateString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getChestplate().getType()) + "▼" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).chestplate.getTier(targetPlayer.getInventory().getChestplate(), true) + "\n");
-                ShareItem.setItemHoverEvent(chestplateString, targetPlayer.getEquipment().getChestplate());
-            }
-            if (targetPlayer.getEquipment().getLeggings() != null) {
-                leggingsString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getLeggings().getType()) + "Π" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).leggings.getTier(targetPlayer.getInventory().getLeggings(), true) + "\n");
-                ShareItem.setItemHoverEvent(leggingsString, targetPlayer.getEquipment().getLeggings());
-            }
-            if (targetPlayer.getEquipment().getBoots() != null) {
-                bootsString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getBoots().getType()) + "╯╰" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).boots.getTier(targetPlayer.getInventory().getBoots(), true) + "\n");
-                ShareItem.setItemHoverEvent(bootsString, targetPlayer.getEquipment().getBoots());
-            }
-            if (targetPlayer.getEquipment().getItemInMainHand() != null && !targetPlayer.getEquipment().getItemInMainHand().getType().equals(Material.AIR)) {
-                mainHandString = new TextComponent(unicodeColorizer(targetPlayer.getEquipment().getItemInMainHand().getType()) + "⚔" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).mainhand.getTier(targetPlayer.getInventory().getItemInMainHand(), true));
-                ShareItem.setItemHoverEvent(mainHandString, targetPlayer.getEquipment().getItemInMainHand());
-            }
-            if (targetPlayer.getEquipment().getItemInOffHand() != null && !targetPlayer.getEquipment().getItemInOffHand().getType().equals(Material.AIR)) {
-                offHandString = new TextComponent(" | " + unicodeColorizer(targetPlayer.getEquipment().getItemInOffHand().getType()) + "⛨" + ChatColor.BLACK + " - " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).offhand.getTier(targetPlayer.getInventory().getItemInOffHand(), true) + "\n");
-                ShareItem.setItemHoverEvent(offHandString, targetPlayer.getEquipment().getItemInOffHand());
-            }
+
+
         }
 
-        TextComponent finalComponent = new TextComponent();
-        finalComponent.addExtra(header);
-        finalComponent.addExtra(helmetString);
-        finalComponent.addExtra(chestplateString);
-        finalComponent.addExtra(leggingsString);
-        finalComponent.addExtra(bootsString);
-        finalComponent.addExtra(mainHandString);
-        finalComponent.addExtra(offHandString);
+        return textComponent;
+    }
 
-        finalComponent.addExtra("\n");
+    private String parseGearPlaceholders(String string, Player targetPlayer) {
 
-        finalComponent.addExtra("Armor tier: " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getArmorTier(true) + "\n");
-        finalComponent.addExtra("Weapon tier: " + ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).mainhand.getTier(targetPlayer.getInventory().getItemInMainHand(), true) + "\n");
+        if (string.contains("$helmettier"))
+            if (targetPlayer.getEquipment().getHelmet() != null)
+                return unicodeColorizer(targetPlayer.getEquipment().getHelmet().getType()) +
+                        string.replace("$helmettier",
+                                ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).helmet.getTier(targetPlayer.getInventory().getHelmet(), true) + "");
+            else
+                return string.replace("$helmettier",
+                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).helmet.getTier(targetPlayer.getInventory().getHelmet(), true) + "");
+        if (string.contains("$chestplatetier"))
+            if (targetPlayer.getEquipment().getChestplate() != null)
+                return unicodeColorizer(targetPlayer.getEquipment().getChestplate().getType()) +
+                        string.replace("$chestplatetier",
+                                ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).chestplate.getTier(targetPlayer.getInventory().getChestplate(), true) + "");
+            else
+                return string.replace("$chestplatetier",
+                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).chestplate.getTier(targetPlayer.getInventory().getChestplate(), true) + "");
+        if (string.contains("$leggingstier"))
+            if (targetPlayer.getEquipment().getLeggings() != null)
+                return unicodeColorizer(targetPlayer.getEquipment().getLeggings().getType()) +
+                        string.replace("$leggingstier",
+                                ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).leggings.getTier(targetPlayer.getInventory().getLeggings(), true) + "");
+            else
+                return string.replace("$leggingstier",
+                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).leggings.getTier(targetPlayer.getInventory().getLeggings(), true) + "");
+        if (string.contains("$bootstier"))
+            if (targetPlayer.getEquipment().getBoots() != null)
+                return unicodeColorizer(targetPlayer.getEquipment().getBoots().getType()) +
+                        string.replace("$bootstier",
+                                ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).boots.getTier(targetPlayer.getInventory().getBoots(), true) + "");
+            else
+                return string.replace("$bootstier",
+                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).boots.getTier(targetPlayer.getInventory().getBoots(), true) + "");
+        if (string.contains("$mainhandtier"))
+            return unicodeColorizer(targetPlayer.getEquipment().getItemInMainHand().getType()) +
+                    string.replace("$mainhandtier",
+                            ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).mainhand.getTier(targetPlayer.getInventory().getItemInMainHand(), true) + "");
+        if (string.contains("$offhandtier"))
+            return unicodeColorizer(targetPlayer.getEquipment().getItemInOffHand().getType()) +
+                    string.replace("$offhandtier",
+                            ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).offhand.getTier(targetPlayer.getInventory().getItemInOffHand(), true) + "");
+        if (string.contains("$damage"))
+            return string.replace("$damage", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamage() + "");
+        if (string.contains("$armor"))
+            return string.replace("$armor", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamageReduction() + "");
+        if (string.contains("$threat"))
+            return string.replace("$threat", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getNaturalMobSpawnLevel(true) + "");
 
-        return finalComponent;
+        return string;
+
+    }
+
+    private void gearMultiComponentLine(TextComponent textComponent, TextComponent line, int i, Player targetPlayer, boolean brackets, int bracketCount) {
+
+        if (!PlayerStatusMenuConfig.gearHoverLines[i].isEmpty()) {
+            String hoverLines = PlayerStatusMenuConfig.gearHoverLines[i];
+            if (hoverLines.contains("$helmet"))
+                ShareItem.setItemHoverEvent(line, targetPlayer.getInventory().getHelmet());
+            else if (hoverLines.contains("$chestplate"))
+                ShareItem.setItemHoverEvent(line, targetPlayer.getInventory().getChestplate());
+            else if (hoverLines.contains("$leggings"))
+                ShareItem.setItemHoverEvent(line, targetPlayer.getEquipment().getLeggings());
+            else if (hoverLines.contains("$boots"))
+                ShareItem.setItemHoverEvent(line, targetPlayer.getInventory().getBoots());
+            else if (brackets) {
+                if (hoverLines.contains("{") && hoverLines.contains("}"))
+                    for (int j = 0; j < hoverLines.split("\\{").length; j++)
+                        if (bracketCount == j) {
+                            String parsedLine = hoverLines.split("\\{")[j].split("}")[0];
+                            if (parsedLine.contains("$mainhand")) {
+                                ShareItem.setItemHoverEvent(line, targetPlayer.getInventory().getItemInMainHand());
+                            } else if (parsedLine.contains("$offhand")) {
+                                ShareItem.setItemHoverEvent(line, targetPlayer.getInventory().getItemInOffHand());
+                            } else
+                                setHoverText(line, parsedLine);
+                        }
+            } else if (!(hoverLines.contains("{") && hoverLines.contains("}")))
+                setHoverText(line, PlayerStatusMenuConfig.gearHoverLines[i]);
+
+        }
+        if (!PlayerStatusMenuConfig.gearHoverLines[i].isEmpty())
+            line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.gearHoverLines[i]));
+
+        textComponent.addExtra(line);
     }
 
     private ChatColor unicodeColorizer(Material material) {
@@ -310,6 +367,20 @@ public class PlayerStatusScreen implements Listener {
 
     private TextComponent[] bossTrackingPage(Player player) {
 
+        TextComponent configTextComponent = new TextComponent();
+
+        for (int i = 0; i < 3; i++) {
+
+            TextComponent line = new TextComponent(PlayerStatusMenuConfig.bossTrackerTextLines[i] + "\n");
+
+            if (!PlayerStatusMenuConfig.bossTrackerHoverLines[i].isEmpty())
+                setHoverText(line, PlayerStatusMenuConfig.bossTrackerHoverLines[i]);
+
+            if (!PlayerStatusMenuConfig.bossTrackerCommandLines[i].isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.bossTrackerCommandLines[i]));
+
+            configTextComponent.addExtra(line);
+        }
 
         ArrayList<TextComponent> textComponents = new ArrayList<>();
         int counter = 0;
@@ -322,7 +393,7 @@ public class PlayerStatusScreen implements Listener {
                 continue;
             }
             TextComponent message = new TextComponent(customBossEntity.bossBarMessage(player, customBossEntity.customBossConfigFields.getLocationMessage()) + "\n");
-            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to track/untrack!").create()));
+            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PlayerStatusMenuConfig.onBossTrackHover).create()));
             message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + player.getName() + " " + customBossEntity.uuid));
             textComponents.add(message);
 
@@ -331,20 +402,59 @@ public class PlayerStatusScreen implements Listener {
 
         if (counter == 0) {
             TextComponent[] textComponent = new TextComponent[1];
-            textComponent[0] = new TextComponent(ChatColorConverter.convert(
-                    "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
-                            "&4&lBoss Tracker:\n" +
-                            "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
+            textComponent[0] = configTextComponent;
             return textComponent;
         } else {
             TextComponent[] textComponent = new TextComponent[(int) Math.ceil(counter / 6d)];
             int internalCounter = 0;
             for (TextComponent text : textComponents) {
                 if (internalCounter % 6 == 0)
-                    textComponent[(int) Math.floor(internalCounter / 6d)] = new TextComponent(ChatColorConverter.convert(
-                            "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
-                                    "&4&lBoss Tracker:\n" +
-                                    "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
+                    textComponent[(int) Math.floor(internalCounter / 6d)] = configTextComponent;
+                textComponent[(int) Math.floor(internalCounter / 6d)].addExtra(text);
+                internalCounter++;
+            }
+            return textComponent;
+        }
+    }
+
+    private TextComponent[] questsPage(Player targetPlayer) {
+
+        TextComponent configTextComponent = new TextComponent();
+
+        for (int i = 0; i < 3; i++) {
+
+            TextComponent line = new TextComponent(PlayerStatusMenuConfig.questTrackerTextLines[i] + "\n");
+
+            if (!PlayerStatusMenuConfig.questTrackerHoverLines[i].isEmpty())
+                setHoverText(line, PlayerStatusMenuConfig.questTrackerHoverLines[i]);
+
+            if (!PlayerStatusMenuConfig.questTrackerCommandLines[i].isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.questTrackerCommandLines[i]));
+
+            configTextComponent.addExtra(line);
+        }
+
+        ArrayList<TextComponent> textComponents = new ArrayList<>();
+        int counter = 0;
+
+        for (EliteQuest eliteQuest : PlayerQuests.getData(targetPlayer).quests) {
+            TextComponent quest = new TextComponent(ChatColor.BLACK + ChatColor.stripColor(eliteQuest.getQuestStatus()) + " \n");
+            quest.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + eliteQuest.getUuid()));
+            setHoverText(quest, PlayerStatusMenuConfig.onQuestTrackHover);
+            textComponents.add(quest);
+            counter++;
+        }
+
+        if (counter == 0) {
+            TextComponent[] textComponent = new TextComponent[1];
+            textComponent[0] = configTextComponent;
+            return textComponent;
+        } else {
+            TextComponent[] textComponent = new TextComponent[(int) Math.ceil(counter / 6d)];
+            int internalCounter = 0;
+            for (TextComponent text : textComponents) {
+                if (internalCounter % 6 == 0)
+                    textComponent[(int) Math.floor(internalCounter / 6d)] = configTextComponent;
                 textComponent[(int) Math.floor(internalCounter / 6d)].addExtra(text);
                 internalCounter++;
             }
@@ -353,32 +463,21 @@ public class PlayerStatusScreen implements Listener {
     }
 
     private TextComponent commandsPage() {
-        TextComponent titleComponent = new TextComponent(ChatColorConverter.convert(
-                "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n" +
-                        "&3&lCommands:\n" +
-                        "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n\n"));
 
-        TextComponent clickToRun = new TextComponent(ChatColorConverter.convert("&8&lClick to run!\n\n"));
-
-        TextComponent adventurersGuild = new TextComponent(ChatColorConverter.convert("&5/ag\n\n"));
-        setHoverText(adventurersGuild,
-                "CLICK TO USE\n" +
-                        "The place where you can find\n" +
-                        "NPCs that give quests, buy and\n" +
-                        "sell items, give advice and more!");
-        adventurersGuild.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ag"));
-
-        TextComponent shareItem = new TextComponent(ChatColorConverter.convert("&5/shareitem\n"));
-        setHoverText(shareItem,
-                "CLICK TO USE\n" +
-                        "Shares the item you're holding\n" +
-                        "on chat!");
-        shareItem.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shareitem"));
         TextComponent textComponent = new TextComponent();
-        textComponent.addExtra(titleComponent);
-        textComponent.addExtra(clickToRun);
-        textComponent.addExtra(adventurersGuild);
-        textComponent.addExtra(shareItem);
+
+        for (int i = 0; i < 13; i++) {
+
+            TextComponent line = new TextComponent(PlayerStatusMenuConfig.commandsTextLines[i] + "\n");
+
+            if (!PlayerStatusMenuConfig.commandsHoverLines[i].isEmpty())
+                setHoverText(line, PlayerStatusMenuConfig.commandsHoverLines[i]);
+
+            if (!PlayerStatusMenuConfig.commandsCommandLines[i].isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.commandsCommandLines[i]));
+
+            textComponent.addExtra(line);
+        }
         return textComponent;
     }
 

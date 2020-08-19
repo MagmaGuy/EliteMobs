@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.utils.StringColorAnimator;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
@@ -134,6 +135,7 @@ public class QuestObjective implements Serializable {
         setComplete(true);
         sendQuestCompleteMessage(player);
         EliteQuest.removePlayersInQuests(player);
+        PlayerData.incrementQuestsCompleted(player.getUniqueId());
     }
 
 }

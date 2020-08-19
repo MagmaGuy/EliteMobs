@@ -156,6 +156,8 @@ public class SpiritWalk extends BossPower implements Listener {
             if (vehicle instanceof LivingEntity)
                 ((LivingEntity) vehicle).setAI(false);
             vehicle.setInvulnerable(true);
+            if (eliteMobEntity.phaseBossID != null)
+                vehicle.remove();
         }
 
         new BukkitRunnable() {

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.quests.EliteQuest;
 import com.magmaguy.elitemobs.quests.PlayerQuests;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -107,6 +108,15 @@ public class PlayerData {
         } catch (Exception ex) {
             return null;
         }
+    }
+
+    public static void removeQuest(UUID uuid, UUID questUUID) {
+        //todo: better handling, tie in to db
+        EliteQuest eliteQuest = null;
+        for (EliteQuest eliteQuest1 : playerDataHashMap.get(uuid).questStatus.quests)
+            if (eliteQuest1.getUuid().equals(questUUID))
+                eliteQuest = eliteQuest1;
+        playerDataHashMap.get(uuid).questStatus.quests.remove(eliteQuest);
     }
 
     public static void setQuestStatus(UUID uuid, PlayerQuests questStatus) {

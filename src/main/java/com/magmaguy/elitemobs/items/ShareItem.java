@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -27,6 +28,8 @@ public class ShareItem {
     }
 
     public static void setItemHoverEvent(TextComponent textComponent, ItemStack itemStack) {
+        if (!EliteMobsItemDetector.isEliteMobsItem(itemStack))
+            return;
         String stringList = itemStack.getItemMeta().getDisplayName();
         if (itemStack.getItemMeta().hasLore())
             for (String loreString : itemStack.getItemMeta().getLore())
