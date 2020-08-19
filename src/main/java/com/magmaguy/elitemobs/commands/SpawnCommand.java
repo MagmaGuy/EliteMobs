@@ -362,6 +362,9 @@ public class SpawnCommand {
                     case "flamepyre":
                         elitePowers.add(new FlamePyre());
                         break;
+                    case "attacklightning":
+                        elitePowers.add(new AttackLightning());
+                        break;
                     default:
                         commandSender.sendMessage(string + " is not a valid power.");
                         commandSender.sendMessage("Valid powers: attackarrow, attackblinding, attackconfusing," +

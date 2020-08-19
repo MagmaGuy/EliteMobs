@@ -53,6 +53,10 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
                 if (Material.SHIELD.getMaxDurability() < damageable.getDamage())
                     player.getInventory().setItemInOffHand(null);
             }
+
+            if (event.getEntityDamageByEntityEvent().getDamager() instanceof Projectile)
+                event.getEntityDamageByEntityEvent().getDamager().remove();
+
             return;
         }
 
