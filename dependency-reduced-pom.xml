@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.42.4</version>
+    <version>7.1.43</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -112,32 +112,32 @@
                     <artifactId>bukkit</artifactId>
                     <groupId>org.bukkit</groupId>
                 </exclusion>
-        <exclusion>
-          <artifactId>worldedit-bukkit</artifactId>
-          <groupId>com.sk89q.worldedit</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>worldguard-core</artifactId>
-          <groupId>com.sk89q.worldguard</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commandbook</artifactId>
+                <exclusion>
+                    <artifactId>worldedit-bukkit</artifactId>
+                    <groupId>com.sk89q.worldedit</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>worldguard-core</artifactId>
+                    <groupId>com.sk89q.worldguard</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commandbook</artifactId>
           <groupId>com.sk89q</groupId>
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>com.github.MilkBowl</groupId>
-        <artifactId>VaultAPI</artifactId>
-        <version>1.7</version>
-        <scope>provided</scope>
-        <exclusions>
-            <exclusion>
-                <artifactId>bukkit</artifactId>
-                <groupId>org.bukkit</groupId>
-            </exclusion>
-        </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bukkit</artifactId>
+                    <groupId>org.bukkit</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
@@ -160,16 +160,16 @@
                     <artifactId>JDA</artifactId>
                     <groupId>net.dv8tion</groupId>
                 </exclusion>
-        <exclusion>
-          <artifactId>nv-websocket-client</artifactId>
-          <groupId>com.neovisionaries</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>slf4j-jdk14</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>http-request</artifactId>
+                <exclusion>
+                    <artifactId>nv-websocket-client</artifactId>
+                    <groupId>com.neovisionaries</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-jdk14</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>http-request</artifactId>
           <groupId>com.github.kevinsawicki</groupId>
         </exclusion>
         <exclusion>
@@ -198,16 +198,16 @@
         </exclusion>
         <exclusion>
           <artifactId>json-simple</artifactId>
-          <groupId>com.googlecode.json-simple</groupId>
+            <groupId>com.googlecode.json-simple</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>emoji-java</artifactId>
-          <groupId>com.vdurmont</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>java-semver</artifactId>
-            <groupId>com.github.zafarkhaja</groupId>
-        </exclusion>
+                <exclusion>
+                    <artifactId>emoji-java</artifactId>
+                    <groupId>com.vdurmont</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>java-semver</artifactId>
+                    <groupId>com.github.zafarkhaja</groupId>
+                </exclusion>
                 <exclusion>
                     <artifactId>minidns-hla</artifactId>
                     <groupId>org.minidns</groupId>
