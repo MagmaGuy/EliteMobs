@@ -68,6 +68,7 @@ public class DefaultConfig {
         commandSender.sendMessage(ChatColorConverter.convert("&cYou can change this preference at any point in config.yml under \"Use permissions\""));
         commandSender.sendMessage(ChatColorConverter.convert("&4This message will not be shown again."));
         commandSender.sendMessage("----------------------------------------------------");
+        commandSender.sendMessage(ChatColorConverter.convert("&aNeed help?  &9https://discord.gg/9f5QSka"));
     }
 
 }

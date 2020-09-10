@@ -249,8 +249,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
         mountEntity();
         if (customBossConfigFields.getDisguise() != null)
-            if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
+            if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
                 DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity());
+                super.setName(customBossConfigFields.getName());
+            }
         if (customBossConfigFields.getFrozen()) {
             getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10));
             getLivingEntity().setCollidable(false);
@@ -262,7 +264,11 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
     private void spawnMessage() {
         if (customBossConfigFields.getSpawnMessage() == null) return;
         if (customBossConfigFields.getAnnouncementPriority() < 1) return;
-        Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
+        if (customBossConfigFields.getAnnouncementPriority() == 1)
+            Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
+        else
+            for (Player player : getLivingEntity().getWorld().getPlayers())
+                player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
         if (customBossConfigFields.getAnnouncementPriority() < 3) return;
         new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
     }

@@ -87,15 +87,16 @@ public class AdminCommands {
             //items
             case "getloot":
             case "gl":
-                if (CommandHandler.userPermCheck(CommandHandler.GETLOOT, commandSender) && args.length == 1) {
-                    getLootMenu getLootMenu = new getLootMenu();
-                    getLootMenu.lootGUI((Player) commandSender);
-                } else {
-                    if (GetLootCommandHandler.getLoot(((Player) commandSender), args[1]))
-                        return true;
-                    else
-                        ((Player) commandSender).sendTitle("", "Could not find that item name.");
-                }
+                if (CommandHandler.userPermCheck(CommandHandler.GETLOOT, commandSender))
+                    if (args.length == 1) {
+                        getLootMenu getLootMenu = new getLootMenu();
+                        getLootMenu.lootGUI((Player) commandSender);
+                    } else {
+                        if (GetLootCommandHandler.getLoot(((Player) commandSender), args[1]))
+                            return true;
+                        else
+                            ((Player) commandSender).sendTitle("", "Could not find that item name.");
+                    }
                 return true;
 
             case "checkmaxtier":

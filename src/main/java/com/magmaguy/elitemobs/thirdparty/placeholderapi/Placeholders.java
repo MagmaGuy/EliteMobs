@@ -99,6 +99,8 @@ public class Placeholders extends PlaceholderExpansion {
                 return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player));
             case "player_maximum_guild_rank_name":
                 return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getMaxGuildRank(player));
+            case "player_prestige_guild_rank_numerical":
+                return "" + GuildRank.getGuildPrestigeRank(player);
             case "player_money":
                 return "" + EconomyHandler.checkCurrency(player.getUniqueId());
             case "player_top_tier":
