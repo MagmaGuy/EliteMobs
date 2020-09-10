@@ -421,7 +421,8 @@ public class EliteMobEntity {
      * @param name String which defines the display name
      */
     public void setName(String name) {
-        this.name = ChatColorConverter.convert(name);
+        String parsedName = name.replace("$level", this.eliteLevel + "");
+        this.name = ChatColorConverter.convert(parsedName);
         this.getLivingEntity().setCustomName(this.name);
         if (DefaultConfig.alwaysShowNametags)
             livingEntity.setCustomNameVisible(true);

@@ -216,6 +216,8 @@ public class CommandHandler implements CommandExecutor {
             }
             if (silentPermCheck(SET_RANK, commandSender))
                 commandSender.sendMessage("/elitemobs setrank [player] [prestigeTier] [guildTier]");
+            if (silentPermCheck("elitemobs.*", commandSender))
+                commandSender.sendMessage("&aNeed help?  &9https://discord.gg/9f5QSka (only people with OP or elitemobs.* can see this)");
 
 
         } else if (commandSender instanceof ConsoleCommandSender) {
