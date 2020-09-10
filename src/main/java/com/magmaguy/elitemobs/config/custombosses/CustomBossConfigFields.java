@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -11,6 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -307,6 +309,8 @@ public class CustomBossConfigFields {
             this.isRegionalBoss = configuration.getBoolean("isRegionalBoss");
 
         if (this.isRegionalBoss) {
+
+            respawnSaveWatchdog();
 
             /*
             Legacy: convert old spawn locations to new spawn locations
@@ -621,16 +625,33 @@ public class CustomBossConfigFields {
         configRegionalEntities.get(uuid).respawnTimeLeft = (delayInMinutes * 60 * 1000) + System.currentTimeMillis();
     }
 
+    private boolean saveQueued = false;
+
     public void saveTicksBeforeRespawn() {
         List<String> convertedList = new ArrayList<>();
         for (ConfigRegionalEntity configRegionalEntity : configRegionalEntities.values())
             convertedList.add(ConfigurationLocation.serialize(configRegionalEntity.spawnLocation) + ":" + configRegionalEntity.respawnTimeLeft);
         fileConfiguration.set("spawnLocations", convertedList);
-        try {
-            fileConfiguration.save(file);
-        } catch (IOException ex) {
-            new WarningMessage("Failed to save Custom Boss data during shutdown! Let the dev know about this error!");
-        }
+        saveQueued = true;
+    }
+
+    /**
+     * This exists to avoid saving the same file multiple times
+     */
+    private void respawnSaveWatchdog() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (saveQueued) {
+                    try {
+                        fileConfiguration.save(file);
+                        saveQueued = false;
+                    } catch (IOException ex) {
+                        new WarningMessage("Failed to save Custom Boss data during shutdown! Let the dev know about this error!");
+                    }
+                }
+            }
+        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60, 20 * 60);
     }
 
     public String getMountedEntity() {

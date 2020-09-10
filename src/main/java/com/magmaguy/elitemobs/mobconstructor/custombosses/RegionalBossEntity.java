@@ -22,7 +22,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class RegionalBossEntity implements Listener {
 
@@ -224,7 +223,7 @@ public class RegionalBossEntity implements Listener {
 
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 30 + ThreadLocalRandom.current().nextInt(31));
+        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20, 20 * 60);
     }
 
     public CustomBossConfigFields getCustomBossConfigFields() {

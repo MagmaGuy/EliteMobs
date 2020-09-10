@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.43</version>
+    <version>7.1.43.2</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -122,10 +122,10 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>commandbook</artifactId>
-          <groupId>com.sk89q</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+                    <groupId>com.sk89q</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
@@ -170,16 +170,16 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>http-request</artifactId>
-          <groupId>com.github.kevinsawicki</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-io</artifactId>
-          <groupId>commons-io</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-collections</artifactId>
-          <groupId>commons-collections</groupId>
-        </exclusion>
+                    <groupId>com.github.kevinsawicki</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-io</artifactId>
+                    <groupId>commons-io</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-collections</artifactId>
+                    <groupId>commons-collections</groupId>
+                </exclusion>
         <exclusion>
           <artifactId>commons-lang3</artifactId>
           <groupId>org.apache.commons</groupId>
@@ -190,16 +190,16 @@
         </exclusion>
         <exclusion>
           <artifactId>configuralize</artifactId>
-          <groupId>github.scarsz</groupId>
+            <groupId>github.scarsz</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>trove4j</artifactId>
-          <groupId>net.sf.trove4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>json-simple</artifactId>
-            <groupId>com.googlecode.json-simple</groupId>
-        </exclusion>
+                <exclusion>
+                    <artifactId>trove4j</artifactId>
+                    <groupId>net.sf.trove4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>json-simple</artifactId>
+                    <groupId>com.googlecode.json-simple</groupId>
+                </exclusion>
                 <exclusion>
                     <artifactId>emoji-java</artifactId>
                     <groupId>com.vdurmont</groupId>

@@ -47,6 +47,7 @@ public class PermissionlessModeWarning implements Listener {
         event.getPlayer().spigot().sendMessage(optionsMessage);
         event.getPlayer().sendMessage(ChatColorConverter.convert("&7This message will only be sent to OPs"));
         event.getPlayer().sendMessage("----------------------------------------------------");
+        event.getPlayer().sendMessage("Need help?  https://discord.gg/9f5QSka");
 
     }
 
