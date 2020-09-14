@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 public class EffectEventHandlers implements Listener {
 
     @EventHandler
-
     public void playerPickupSafeguard(PlayerPickupItemEvent event) {
         if (EntityTracker.isItemVisualEffect(event.getItem()))
             event.setCancelled(true);

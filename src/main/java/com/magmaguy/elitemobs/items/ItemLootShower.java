@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -66,7 +66,7 @@ public class ItemLootShower implements Listener {
                 @Override
                 public void run() {
 
-                    if (!item.isValid() || !player.isValid() || !player.getWorld().equals(item.getWorld()) || counter > 20 * 4) {
+                    if (!item.isValid() || !player.isValid() || !player.getWorld().equals(item.getWorld()) || counter > 20 * 4 || item.getLocation().distance(player.getLocation()) > 30) {
                         cancel();
                         pickupable = true;
                         item.setGravity(true);
@@ -319,7 +319,7 @@ public class ItemLootShower implements Listener {
      */
     public static class ItemLootShowerEvents implements Listener {
         @EventHandler(priority = EventPriority.LOW)
-        public static void onItemPickup(InventoryPickupItemEvent event) {
+        public static void onItemPickup(PlayerPickupItemEvent event) {
             if (event.isCancelled()) return;
 
             //coins are soulbound so if someone can pick them up they can have it
@@ -330,10 +330,10 @@ public class ItemLootShower implements Listener {
             if (!coin.pickupable)
                 return;
 
-            if (event.getInventory().getHolder() instanceof Player) {
+            //if (event.getEntity() instanceof Player) {
                 coinValues.remove(event.getItem().getUniqueId());
-                double amountIncremented = coin.value;
-                Player player = (Player) event.getInventory().getHolder();
+            double amountIncremented = coin.value;
+            Player player = event.getPlayer();
                 event.getItem().remove();
                 EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
                 sendCurrencyNotification(player);
@@ -350,7 +350,7 @@ public class ItemLootShower implements Listener {
                                         .replace("$currency_name", EconomySettingsConfig.currencyName)
                                         .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
             }
-        }
+        //}
     }
 
 
