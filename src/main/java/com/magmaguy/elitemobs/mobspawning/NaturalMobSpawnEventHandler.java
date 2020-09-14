@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.PlayerScanner;
 import org.bukkit.Location;
@@ -130,6 +131,10 @@ public class NaturalMobSpawnEventHandler implements Listener {
         /*
         Check to see if they'll become a naturally spawned Custom Boss
          */
+        if (EliteMobs.worldguardIsEnabled)
+            if (!WorldGuardFlagChecker.checkFlag(entity.getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
+                return;
+
         for (CustomBossConfigFields customBossConfigFields : CustomBossConfigFields.getNaturallySpawnedElites())
             if (entity.getType().toString().equalsIgnoreCase(customBossConfigFields.getEntityType()))
                 if (ThreadLocalRandom.current().nextDouble() < customBossConfigFields.getSpawnChance()) {

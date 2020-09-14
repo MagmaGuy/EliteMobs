@@ -6,6 +6,13 @@ public class CombatSystem {
     //TODO: Handle thorns damage and potion effects
 
     public static final double PER_LEVEL_POWER_INCREASE = 0.5;
+
+    /**
+     * This determines how many hits it takes to kill a boss.
+     * Unfortunately, since it's flat, at a scale, all bosses tend to end up having the same amount of life.
+     * todo: make the increase based off of a % of the boss max health instead to bypass this issue, potentially
+     * It accomplishes this by adding this flat amount of health to bosses.
+     */
     public static final double TARGET_HITS_TO_KILL = 7; //affects max health assignment on EliteMobEntity.java
 
     public static final int TRIDENT = 9;

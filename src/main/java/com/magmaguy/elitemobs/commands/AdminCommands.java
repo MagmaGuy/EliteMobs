@@ -3,14 +3,9 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.commands.admin.DebugScreen;
 import com.magmaguy.elitemobs.commands.admin.StatsCommand;
 import com.magmaguy.elitemobs.commands.admin.npc.NPCCommands;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
-import org.bukkit.Bukkit;
-import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.io.File;
 
 public class AdminCommands {
 
@@ -19,32 +14,10 @@ public class AdminCommands {
         switch (args[0]) {
 
             //autosetup
-            case "autosetup":
-                if (!CommandHandler.permCheck(CommandHandler.AUTOSETUP, commandSender)) return true;
-                File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
-                File[] listOfFiles = folder.listFiles();
-                boolean worldFolderExists = false;
-
-                for (File listOfFile : listOfFiles) {
-                    if (listOfFile.isDirectory() &&
-                            listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName)) {
-                        commandSender.sendMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " found! Loading it in...");
-                        worldFolderExists = true;
-                        break;
-                    }
-                }
-
-                if (!worldFolderExists) {
-                    commandSender.sendMessage("[EliteMobs] Could not import world " + AdventurersGuildConfig.guildWorldName + " ! " +
-                            "It is not in your worlds directory. If you wish to use the default world, you can find the link to download it on the resource page over at https://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/");
-                    return true;
-                }
-
-                Bukkit.createWorld(new WorldCreator(AdventurersGuildConfig.guildWorldName));
-                commandSender.sendMessage("[EliteMobs] Successfully imported the world!");
-                commandSender.sendMessage("[EliteMobs] Now all you need to do is add the permission elitemobs.user to your users and you're all set!");
+            case "setup":
+                if (CommandHandler.userPermCheck("elitemobs.*", commandSender))
+                    new SetupHandler((Player) commandSender, args);
                 return true;
-
             //spawn
             case "spawn":
             case "spawnmob":
