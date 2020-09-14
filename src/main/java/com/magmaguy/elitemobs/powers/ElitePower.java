@@ -208,6 +208,7 @@ public class ElitePower {
 
     protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
         if (event.isCancelled()) return false;
+        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
         if (elitePower.isCooldown()) return false;
         return !event.getEliteMobEntity().isCooldown();
     }

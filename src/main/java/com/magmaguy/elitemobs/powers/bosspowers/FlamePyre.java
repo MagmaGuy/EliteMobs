@@ -102,7 +102,7 @@ public class FlamePyre extends BossPower implements Listener {
 
     private void doDamage(EliteMobEntity eliteMobEntity, double range1, double range2, double range3) {
         for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(range1, range2, range3))
-            if (entity instanceof LivingEntity && !entity.equals(eliteMobEntity.getLivingEntity()))
+            if (entity instanceof LivingEntity)
                 BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
     }
 
