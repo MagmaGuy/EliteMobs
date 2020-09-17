@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.43.3</version>
+    <version>7.1.44</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -267,8 +267,8 @@
             </exclusions>
         </dependency>
     </dependencies>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 </project>
 
