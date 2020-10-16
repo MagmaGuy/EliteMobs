@@ -93,7 +93,7 @@ public class MeteorEvent extends EliteEvent implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (getBossEntity() == null || !getBossEntity().getLivingEntity().isDead()) return;
+                if (getBossEntity() == null || !getBossEntity().advancedGetEntity().isDead()) return;
                 cancel();
                 silentCompleteEvent();
             }

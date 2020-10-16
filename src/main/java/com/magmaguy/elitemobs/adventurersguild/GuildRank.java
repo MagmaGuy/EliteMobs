@@ -21,12 +21,20 @@ public class GuildRank {
         return PlayerData.getGuildPrestigeLevel(player.getUniqueId());
     }
 
+    public static int getGuildPrestigeRank(Player player, boolean databaseAccess) {
+        return PlayerData.getGuildPrestigeLevel(player.getUniqueId(), databaseAccess);
+    }
+
     public static void setMaxGuildRank(Player player, int maxGuildRank) {
         PlayerData.setMaxGuildLevel(player.getUniqueId(), maxGuildRank);
     }
 
     public static int getMaxGuildRank(Player player) {
         return PlayerData.getMaxGuildLevel(player.getUniqueId());
+    }
+
+    public static int getMaxGuildRank(Player player, boolean databaseAccess) {
+        return PlayerData.getMaxGuildLevel(player.getUniqueId(), databaseAccess);
     }
 
     public static void setActiveGuildRank(Player player, int activeGuildRank) {
@@ -36,6 +44,10 @@ public class GuildRank {
 
     public static int getActiveGuildRank(Player player) {
         return PlayerData.getActiveGuildLevel(player.getUniqueId());
+    }
+
+    public static int getActiveGuildRank(Player player, boolean databaseAccess) {
+        return PlayerData.getActiveGuildLevel(player.getUniqueId(), databaseAccess);
     }
 
     /**

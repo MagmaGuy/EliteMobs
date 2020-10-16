@@ -8,6 +8,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -47,7 +48,8 @@ public class PermissionlessModeWarning implements Listener {
         event.getPlayer().spigot().sendMessage(optionsMessage);
         event.getPlayer().sendMessage(ChatColorConverter.convert("&7This message will only be sent to OPs"));
         event.getPlayer().sendMessage("----------------------------------------------------");
-        event.getPlayer().sendMessage("Need help?  https://discord.gg/9f5QSka");
+        event.getPlayer().sendMessage(ChatColor.GREEN + "A video on how to set EliteMobs up is available here: " + ChatColor.DARK_BLUE + "https://youtu.be/2u71JCyGj-E");
+        event.getPlayer().sendMessage(ChatColor.RED + "Need help?  https://discord.gg/9f5QSka");
 
     }
 

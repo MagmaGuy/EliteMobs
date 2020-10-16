@@ -21,7 +21,11 @@ public class DisguiseEntity {
         }
 
         if (disguiseName.contains("custom")) {
-            customDisguise(disguiseName.replace("custom:", ""), entity);
+            try {
+                customDisguise(disguiseName.replace("custom:", ""), entity);
+            } catch (Exception ex) {
+                new WarningMessage("Failed to assign custom disguise " + disguiseName + "! Did you configure the disguise correctly?");
+            }
             return;
         }
 

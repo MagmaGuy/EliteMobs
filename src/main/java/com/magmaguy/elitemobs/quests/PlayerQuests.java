@@ -46,9 +46,10 @@ public class PlayerQuests implements Serializable {
     }
 
     public boolean hasQuest(UUID uuid) {
-        for (EliteQuest eliteQuest : quests)
-            if (eliteQuest.getUuid().equals(uuid))
-                return true;
+        if (quests != null)
+            for (EliteQuest eliteQuest : quests)
+                if (eliteQuest.getUuid().equals(uuid))
+                    return true;
         return false;
     }
 

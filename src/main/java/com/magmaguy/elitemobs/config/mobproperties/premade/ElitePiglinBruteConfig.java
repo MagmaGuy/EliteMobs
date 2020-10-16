@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class ElitePiglinBruteConfig extends MobPropertiesConfigFields {
     public ElitePiglinBruteConfig() {
-        super("piglin_brute",
+        super("elite_piglin_brute",
                 EntityType.PIGLIN_BRUTE,
                 true,
                 "&fLvl &2$level &fElite &cPiglin Brute",
