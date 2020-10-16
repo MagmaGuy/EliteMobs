@@ -54,6 +54,16 @@ public class PlayerData {
         return playerDataHashMap.get(uuid).currency;
     }
 
+    public static double getCurrency(UUID uuid, boolean databaseAccess) {
+        if (!isInMemory(uuid))
+            if (databaseAccess)
+                return getDatabaseDouble(uuid, "Currency");
+            else
+                //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
+                return 0;
+        return playerDataHashMap.get(uuid).currency;
+    }
+
     public static void setCurrency(UUID uuid, double currency) {
         setDatabaseValue(uuid, "Currency", currency);
         if (playerDataHashMap.containsKey(uuid))
@@ -66,6 +76,16 @@ public class PlayerData {
         return playerDataHashMap.get(uuid).guildPrestigeLevel;
     }
 
+    public static int getGuildPrestigeLevel(UUID uuid, boolean databaseAccess) {
+        if (!isInMemory(uuid))
+            if (databaseAccess)
+                return getDatabaseInteger(uuid, "GuildPrestigeLevel");
+            else
+                //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
+                return 0;
+        return playerDataHashMap.get(uuid).guildPrestigeLevel;
+    }
+
     public static void setGuildPrestigeLevel(UUID uuid, int newPrestigeLevel) {
         setDatabaseValue(uuid, "GuildPrestigeLevel", newPrestigeLevel);
         if (playerDataHashMap.containsKey(uuid))
@@ -75,6 +95,17 @@ public class PlayerData {
     public static int getMaxGuildLevel(UUID uuid) {
         if (!isInMemory(uuid))
             return getDatabaseInteger(uuid, "GuildMaxLevel");
+
+        return playerDataHashMap.get(uuid).maxGuildLevel;
+    }
+
+    public static int getMaxGuildLevel(UUID uuid, boolean databaseAccess) {
+        if (!isInMemory(uuid))
+            if (databaseAccess)
+                return getDatabaseInteger(uuid, "GuildMaxLevel");
+            else
+                //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
+                return 0;
 
         return playerDataHashMap.get(uuid).maxGuildLevel;
     }
@@ -93,6 +124,17 @@ public class PlayerData {
         return playerDataHashMap.get(uuid).activeGuildLevel;
     }
 
+    public static int getActiveGuildLevel(UUID uuid, boolean databaseAccess) {
+        if (!isInMemory(uuid))
+            if (databaseAccess)
+                return getDatabaseInteger(uuid, "GuildActiveLevel");
+            else
+                //default fallback value for when PAPI suddenly decides to start querying the database thousands of times per second
+                return 0;
+
+        return playerDataHashMap.get(uuid).activeGuildLevel;
+    }
+
     public static void setActiveGuildLevel(UUID uuid, int activeGuildLevel) {
         setDatabaseValue(uuid, "GuildActiveLevel", activeGuildLevel);
 
@@ -102,8 +144,9 @@ public class PlayerData {
 
     public static PlayerQuests getQuestStatus(UUID uuid) {
         try {
-            if (!isInMemory(uuid))
-                return (PlayerQuests) getDatabaseBlob(uuid, "QuestStatus");
+            //todo: store quest progress long-term
+            //if (!isInMemory(uuid))
+            //return (PlayerQuests) getDatabaseBlob(uuid, "QuestStatus");
             return playerDataHashMap.get(uuid).questStatus;
         } catch (Exception ex) {
             return null;

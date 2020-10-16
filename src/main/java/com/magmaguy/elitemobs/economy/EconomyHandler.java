@@ -45,4 +45,11 @@ public class EconomyHandler {
         return PlayerData.getCurrency(user);
     }
 
+    public static double checkCurrency(UUID user, boolean databaseAccess) {
+        if (VaultCompatibility.VAULT_ENABLED)
+            return VaultCompatibility.checkCurrency(user);
+
+        return PlayerData.getCurrency(user, databaseAccess);
+    }
+
 }

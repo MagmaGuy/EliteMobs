@@ -51,7 +51,7 @@ public class CustomBossConfigFields {
     private ItemStack boots = null;
     private ItemStack mainHand = null;
     private ItemStack offHand = null;
-    private boolean isBaby;
+    private boolean isBaby = false;
     private final List<String> powers;
     private final String spawnMessage;
     private final String deathMessage;

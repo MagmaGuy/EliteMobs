@@ -141,6 +141,7 @@ public class TreasureChest {
             new WarningMessage("Custom Treasure Chest " + fileName + " has an invalid location and can not be placed.");
             return;
         }
+        //todo: this doesn't support non- chest block types like the ender chest
         Chest chest = (Chest) location.getBlock().getState();
         chest.setCustomName(this.key);
         //todo: add block face

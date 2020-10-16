@@ -17,7 +17,10 @@ import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.utils.*;
+import com.magmaguy.elitemobs.utils.CommandRunner;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -225,15 +228,11 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         super.setHasSpecialLoot(customBossConfigFields.getDropsEliteMobsLoot());
         this.customBossConfigFields = customBossConfigFields;
         setEquipment();
-        if (entityType.equals(EntityType.ZOMBIE))
-            ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        else if (entityType.equals(EntityType.DROWNED))
-            ((Drowned) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        else if (entityType.equals(EntityType.HUSK))
-            ((Husk) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        else if (!VersionChecker.currentVersionIsUnder(16, 0))
-            if (entityType.equals(EntityType.ZOMBIFIED_PIGLIN))
-                ((PigZombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
+        if (super.getLivingEntity() instanceof Ageable)
+            if (customBossConfigFields.isBaby())
+                ((Ageable) super.getLivingEntity()).setBaby();
+            else
+                ((Ageable) super.getLivingEntity()).setAdult();
         super.setPersistent(customBossConfigFields.getIsPersistent());
         if (customBossConfigFields.getTrails() != null) startBossTrails();
         if (customBossConfigFields.getAnnouncementPriority() > 1 && MobCombatSettingsConfig.showCustomBossLocation && customBossConfigFields.getLocationMessage() != null) {
