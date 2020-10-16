@@ -66,7 +66,11 @@ public class ItemLootShower implements Listener {
                 @Override
                 public void run() {
 
-                    if (!item.isValid() || !player.isValid() || !player.getWorld().equals(item.getWorld()) || counter > 20 * 4 || item.getLocation().distance(player.getLocation()) > 30) {
+                    if (!item.isValid() ||
+                            !player.isValid() ||
+                            !player.getWorld().equals(item.getWorld()) ||
+                            counter > 20 * 4 ||
+                            item.getLocation().distance(player.getLocation()) > 30) {
                         cancel();
                         pickupable = true;
                         item.setGravity(true);

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -68,6 +69,7 @@ public class DefaultConfig {
         commandSender.sendMessage(ChatColorConverter.convert("&cYou can change this preference at any point in config.yml under \"Use permissions\""));
         commandSender.sendMessage(ChatColorConverter.convert("&4This message will not be shown again."));
         commandSender.sendMessage("----------------------------------------------------");
+        commandSender.sendMessage(ChatColor.GREEN + "A video on how to set EliteMobs up is available here: " + ChatColor.DARK_BLUE + "https://youtu.be/2u71JCyGj-E");
         commandSender.sendMessage(ChatColorConverter.convert("&aNeed help?  &9https://discord.gg/9f5QSka"));
     }
 
