@@ -68,7 +68,7 @@ public class EliteMobs extends JavaPlugin {
     public void onEnable() {
 
         //Enable stats
-        Metrics metrics = new Metrics(this);
+        Metrics metrics = new Metrics(this, 1081);
 
         Bukkit.getLogger().info(" _____ _     _____ _____ ________  ______________  _____");
         Bukkit.getLogger().info("|  ___| |   |_   _|_   _|  ___|  \\/  |  _  | ___ \\/  ___|");
