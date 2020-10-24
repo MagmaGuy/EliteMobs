@@ -7,7 +7,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.1.45</version>
+    <version>7.2.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -37,7 +37,7 @@
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <!-- Replace this with your package! -->
-                            <shadedPattern>your.package</shadedPattern>
+                            <shadedPattern>com.magmaguy.elitemobs</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -108,7 +108,7 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>1.5</version>
+            <version>1.7</version>
             <scope>compile</scope>
         </dependency>
         <!--WorldGuard dependency-->
@@ -136,7 +136,8 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.31.1</version>
+            <version>3.32.3</version>
+            <scope>provided</scope>
         </dependency>
         <!-- DiscordSRV -->
         <dependency>
