@@ -1,11 +1,14 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,7 +24,9 @@ public class ItemConstructor {
                                           HashMap<String, Integer> customEnchantments,
                                           List<String> potionEffects,
                                           List<String> lore,
-                                          EliteMobEntity eliteMobEntity) {
+                                          EliteMobEntity eliteMobEntity,
+                                          Player player,
+                                          boolean showItemWorth) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;
@@ -69,13 +74,28 @@ public class ItemConstructor {
 
         ItemTagger.registerEliteItem(itemStack);
 
+        /*
+        Add soulbind if applicable
+         */
+        SoulbindEnchantment.addEnchantment(itemStack, player);
+
+        /*
+        Register item source for lore redraw
+         */
+        ItemTagger.registerItemSource(eliteMobEntity, itemStack);
+
+        /*
+        Update lore
+         */
+        new EliteItemLore(itemStack, showItemWorth);
+
         return itemStack;
     }
 
     /*
     For procedurally generated items
      */
-    public static ItemStack constructItem(double itemTier, EliteMobEntity killedMob) {
+    public static ItemStack constructItem(double itemTier, EliteMobEntity killedMob, Player player, boolean showItemWorth) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;
@@ -126,6 +146,21 @@ public class ItemConstructor {
         ItemQualityColorizer.dropQualityColorizer(itemStack);
 
         ItemTagger.registerEliteItem(itemStack);
+
+        /*
+        Add soulbind if applicable
+         */
+        SoulbindEnchantment.addEnchantment(itemStack, player);
+
+        /*
+        Register item source for lore redraw
+         */
+        ItemTagger.registerItemSource(killedMob, itemStack);
+
+        /*
+        Update lore
+         */
+        new EliteItemLore(itemStack, showItemWorth);
 
         return itemStack;
 

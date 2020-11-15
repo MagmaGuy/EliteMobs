@@ -104,7 +104,7 @@ public class GuildRank {
     }
 
     public static double currencyBonusMultiplier(int prestigeLevel) {
-        return 1 + prestigeLevel / 2D;
+        return 1 + prestigeLevel * 5;
     }
 
     /**

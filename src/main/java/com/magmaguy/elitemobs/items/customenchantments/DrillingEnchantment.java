@@ -24,7 +24,7 @@ public class DrillingEnchantment extends CustomEnchantment implements Listener {
     public static String key = "drilling";
 
     public DrillingEnchantment() {
-        super(key);
+        super(key, false);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

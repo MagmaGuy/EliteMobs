@@ -49,9 +49,9 @@ public class EliteMobEnterCombatEvent extends Event {
                                     continue;
                                 return;
                             }
-                            cancel();
-                            Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
                         }
+                        cancel();
+                        Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
                     }
 
             }

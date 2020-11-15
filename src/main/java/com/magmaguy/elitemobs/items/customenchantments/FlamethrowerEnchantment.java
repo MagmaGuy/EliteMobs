@@ -28,7 +28,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
     public static String key = "flamethrower";
 
     public FlamethrowerEnchantment() {
-        super(key);
+        super(key, false);
     }
 
     private static final ArrayList<Player> playersUsingFlamethrower = new ArrayList<>();

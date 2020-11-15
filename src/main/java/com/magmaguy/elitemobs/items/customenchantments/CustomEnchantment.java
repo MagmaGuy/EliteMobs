@@ -3,37 +3,33 @@ package com.magmaguy.elitemobs.items.customenchantments;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
-import com.magmaguy.elitemobs.config.enchantments.premade.CriticalStrikesConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public abstract class CustomEnchantment {
 
-    /*
-    Store key + custom enchantment
-     */
-    private static HashMap<String, CustomEnchantment> customEnchantments = new HashMap<>();
+    private static final ArrayList<CustomEnchantment> customEnchantments = new ArrayList<>();
 
-    public static HashMap<String, CustomEnchantment> getCustomEnchantments() {
+    public static ArrayList<CustomEnchantment> getCustomEnchantments() {
         return customEnchantments;
     }
 
-    public static CustomEnchantment getCustomEnchantment(String key) {
-        return customEnchantments.get(key);
-    }
+    private final String key;
+    private final boolean dynamic;
+    private final EnchantmentsConfigFields enchantmentsConfigFields;
+    private final Enchantment originalEnchantment = null;
 
-    private String key;
-    private EnchantmentsConfigFields enchantmentsConfigFields;
-
-    public CustomEnchantment(String key) {
+    public CustomEnchantment(String key, boolean dynamic) {
         this.key = key;
+        this.dynamic = dynamic;
         this.enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(key + ".yml");
-        customEnchantments.put(key, this);
+        customEnchantments.add(this);
     }
 
     public String getKey() {
@@ -47,7 +43,10 @@ public abstract class CustomEnchantment {
     public static void initializeCustomEnchantments() {
         new FlamethrowerEnchantment();
         new HunterEnchantment();
-        new CriticalStrikesConfig();
+        new CriticalStrikesEnchantment();
+        new DrillingEnchantment();
+        new IceBreakerEnchantment();
+        new MeteorShowerEnchantment();
     }
 
     /*

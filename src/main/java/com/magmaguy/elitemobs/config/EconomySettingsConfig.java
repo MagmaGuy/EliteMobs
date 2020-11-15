@@ -20,7 +20,8 @@ public class EconomySettingsConfig {
     public static double currencyShowerMultiplier;
     public static String chatCurrencyShowerMessage;
     public static String actionBarCurrencyShowerMessage;
-    public static String lootShowerMaterial1, lootShowerMaterial5, lootShowerMaterial10, lootShowerMaterial20, lootShowerMaterial50;
+    public static String lootShowerMaterial1, lootShowerMaterial5, lootShowerMaterial10, lootShowerMaterial20,
+            lootShowerMaterial50, lootShowerMaterial100, lootShowerMaterial500, lootShowerMaterial1000;
     public static String adventurersGuildNotificationMessage;
     public static double defaultMaterialWorth;
     private static FileConfiguration thisConfiguration;
@@ -31,7 +32,7 @@ public class EconomySettingsConfig {
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         double netheriteLevel = CombatSystem.NETHERITE_TIER_LEVEL + 10;
-        double tridentLevel = CombatSystem.TRIDENT + 10;
+        double tridentLevel = CombatSystem.TRIDENT_TIER_LEVEL + 10;
         double diamondLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10;
         double ironLevel = CombatSystem.IRON_TIER_LEVEL + 10;
         double stoneChainLevel = CombatSystem.STONE_CHAIN_TIER_LEVEL + 10;
@@ -50,6 +51,9 @@ public class EconomySettingsConfig {
         lootShowerMaterial10 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.10", Material.GOLD_BLOCK.name());
         lootShowerMaterial20 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.20", Material.EMERALD.name());
         lootShowerMaterial50 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.50", Material.EMERALD_BLOCK.name());
+        lootShowerMaterial100 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.100", Material.DIAMOND.name());
+        lootShowerMaterial500 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.500", Material.DIAMOND_BLOCK.name());
+        lootShowerMaterial1000 = ConfigurationEngine.setString(fileConfiguration, "lootShowerMaterial.1000", Material.NETHER_STAR.name());
         adventurersGuildNotificationMessage = ConfigurationEngine.setString(fileConfiguration, "adventurersGuildNotificationMessages", "&7[EM] Extra spending money? Try &a/em !");
 
         addMaterial(fileConfiguration, Material.DIAMOND_AXE, diamondLevel);
