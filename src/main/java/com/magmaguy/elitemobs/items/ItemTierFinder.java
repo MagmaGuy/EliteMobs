@@ -146,7 +146,7 @@ public class ItemTierFinder {
             case DIAMOND_AXE:
                 return DIAMOND_TIER + mainEnchantment;
             case TRIDENT:
-                return CombatSystem.TRIDENT + mainEnchantment;
+                return CombatSystem.TRIDENT_TIER_LEVEL + mainEnchantment;
             case DIAMOND_BOOTS:
             case DIAMOND_CHESTPLATE:
             case DIAMOND_HELMET:
@@ -232,7 +232,7 @@ public class ItemTierFinder {
             case DIAMOND_AXE:
                 return DIAMOND_TIER + mainEnchantment;
             case TRIDENT:
-                return CombatSystem.TRIDENT + mainEnchantment;
+                return CombatSystem.TRIDENT_TIER_LEVEL + mainEnchantment;
             case IRON_AXE:
             case IRON_SWORD:
                 return IRON_TIER + mainEnchantment;

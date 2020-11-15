@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.playerdata;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.quests.EliteQuest;
 import com.magmaguy.elitemobs.quests.PlayerQuests;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -447,7 +446,6 @@ public class PlayerData {
             statement.close();
             getConnection().commit();
             getConnection().close();
-            new DebugMessage("Created new database entry for player " + Bukkit.getPlayer(uuid).getDisplayName());
         } catch (Exception e) {
             new WarningMessage("Failed to generate an entry!");
             closeConnection();

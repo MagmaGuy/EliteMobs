@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import org.bukkit.Chunk;
@@ -18,8 +17,10 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.UUID;
 
 public class EntityTracker implements Listener {
 
@@ -27,7 +28,7 @@ public class EntityTracker implements Listener {
     These HashSets track basically everything for live plugin entities
      */
     private static final HashSet<LivingEntity> superMobs = new HashSet<>();
-    private static final HashSet<EliteMobEntity> eliteMobs = new HashSet<>();
+    private static final HashMap<UUID, EliteMobEntity> eliteMobs = new HashMap<>();
     private static final HashSet<LivingEntity> eliteMobsLivingEntities = new HashSet<>();
     private static final HashSet<NPCEntity> npcEntities = new HashSet<>();
 
@@ -51,7 +52,7 @@ public class EntityTracker implements Listener {
      *
      * @return HashSet of all living elite mobs
      */
-    public static HashSet<EliteMobEntity> getEliteMobs() {
+    public static HashMap<UUID, EliteMobEntity> getEliteMobs() {
         return eliteMobs;
     }
 
@@ -64,7 +65,7 @@ public class EntityTracker implements Listener {
     public static boolean registerEliteMob(EliteMobEntity eliteMobEntity) {
         EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteMobEntity.getLivingEntity(), eliteMobEntity, eliteMobEntity.getSpawnReason());
         if (eliteMobSpawnEvent.isCancelled()) return false;
-        eliteMobs.add(eliteMobEntity);
+        eliteMobs.put(eliteMobEntity.getLivingEntity().getUniqueId(), eliteMobEntity);
         eliteMobsLivingEntities.add(eliteMobEntity.getLivingEntity());
         registerCullableEntity(eliteMobEntity.getLivingEntity());
         eliteMobEntity.getLivingEntity().setMetadata(MetadataHandler.ELITE_MOB_METADATA, new FixedMetadataValue(MetadataHandler.PLUGIN, eliteMobEntity.getLevel()));
@@ -89,7 +90,6 @@ public class EntityTracker implements Listener {
      * @return if the entity is an elite mob
      */
     public static boolean isEliteMob(Entity entity) {
-        if (!EliteMobProperties.isValidEliteMobType(entity)) return false;
         return eliteMobsLivingEntities.contains(entity);
     }
 
@@ -101,11 +101,7 @@ public class EntityTracker implements Listener {
      * @return returns the EliteMob object or null if the entity isn't one
      */
     public static EliteMobEntity getEliteMobEntity(Entity entity) {
-        if (!EliteMobProperties.isValidEliteMobType(entity)) return null;
-        for (EliteMobEntity eliteMobEntity : eliteMobs)
-            if (eliteMobEntity.getLivingEntity().equals(entity))
-                return eliteMobEntity;
-        return null;
+        return eliteMobs.get(entity.getUniqueId());
     }
 
     /**
@@ -118,7 +114,7 @@ public class EntityTracker implements Listener {
         if (eliteMobEntity == null) return;
         if (eliteMobEntity.isRegionalBoss()) return;
         eliteMobEntity.getLivingEntity().remove();
-        eliteMobs.remove(eliteMobEntity);
+        eliteMobs.remove(entity.getUniqueId());
         eliteMobsLivingEntities.remove(eliteMobEntity.getLivingEntity());
     }
 
@@ -417,7 +413,7 @@ public class EntityTracker implements Listener {
                     }
                 }
 
-                for (Iterator<EliteMobEntity> iterator = eliteMobs.iterator(); iterator.hasNext(); ) {
+                for (Iterator<EliteMobEntity> iterator = eliteMobs.values().iterator(); iterator.hasNext(); ) {
                     EliteMobEntity eliteMobEntity = iterator.next();
                     if (eliteMobEntity == null || eliteMobEntity.getLivingEntity() == null && !eliteMobEntity.isRegionalBoss()
                             || eliteMobEntity.getLivingEntity().isDead() && !eliteMobEntity.isRegionalBoss()) {

@@ -11,7 +11,7 @@ public class GetLootCommandHandler {
     public static boolean getLoot(Player player, String args1) {
         CustomItem customItem = CustomItem.getCustomItem(args1);
         if (customItem == null) return false;
-        player.getInventory().addItem(customItem.generateDefaultsItemStack());
+        player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false));
         return true;
     }
 

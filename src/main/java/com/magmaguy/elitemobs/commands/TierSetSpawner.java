@@ -18,15 +18,15 @@ public class TierSetSpawner {
         ItemStack axe = new ItemStack(Material.NETHERITE_AXE);
         ItemStack bow = new ItemStack(Material.BOW);
 
-        if (tierLevel > 1) {
+        if (tierLevel > 8) {
 
-            applyEnchantment(helmet, Enchantment.PROTECTION_ENVIRONMENTAL, tierLevel);
-            applyEnchantment(chestplate, Enchantment.PROTECTION_ENVIRONMENTAL, tierLevel);
-            applyEnchantment(leggings, Enchantment.PROTECTION_ENVIRONMENTAL, tierLevel);
-            applyEnchantment(boots, Enchantment.PROTECTION_ENVIRONMENTAL, tierLevel);
-            applyEnchantment(sword, Enchantment.DAMAGE_ALL, tierLevel);
-            applyEnchantment(axe, Enchantment.DAMAGE_ALL, tierLevel);
-            applyEnchantment(bow, Enchantment.ARROW_DAMAGE, tierLevel);
+            applyEnchantment(helmet, Enchantment.PROTECTION_ENVIRONMENTAL, tierLevel - 8);
+            applyEnchantment(chestplate, Enchantment.PROTECTION_ENVIRONMENTAL, tierLevel - 8);
+            applyEnchantment(leggings, Enchantment.PROTECTION_ENVIRONMENTAL, tierLevel - 8);
+            applyEnchantment(boots, Enchantment.PROTECTION_ENVIRONMENTAL, tierLevel - 8);
+            applyEnchantment(sword, Enchantment.DAMAGE_ALL, tierLevel - 8);
+            applyEnchantment(axe, Enchantment.DAMAGE_ALL, tierLevel - 8);
+            applyEnchantment(bow, Enchantment.ARROW_DAMAGE, tierLevel - 8);
 
         }
 
@@ -37,8 +37,6 @@ public class TierSetSpawner {
         player.getInventory().addItem(sword);
         player.getInventory().addItem(axe);
         player.getInventory().addItem(bow);
-
-        return;
 
     }
 

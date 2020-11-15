@@ -337,8 +337,7 @@ public class GuildRankMenuHandler implements Listener {
         payout * 1000 = amount of elite mobs to kill before going up a rank
          */
         double eliteMobsToKillBeforeGuildRankup = 100 + 500 * (tier - 1) * 0.1;
-        return (int) (((tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup)
-                + (tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup * (prestigeLevel / 2));
+        return (int) ((tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup * (GuildRank.currencyBonusMultiplier(prestigeLevel)));
     }
 
 }

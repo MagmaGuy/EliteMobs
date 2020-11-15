@@ -80,9 +80,9 @@ public class CustomShopMenu implements Listener {
 
         for (int i : CustomShopMenuConfig.storeSlots) {
 
-            int itemEntryIndex = random.nextInt(CustomItem.getCustomItemStackList().size());
+            int itemEntryIndex = random.nextInt(CustomItem.getCustomItemStackShopList().size());
 
-            ItemStack itemStack = CustomItem.getCustomItemStackList().get(itemEntryIndex).clone();
+            ItemStack itemStack = CustomItem.getCustomItemStackShopList().get(itemEntryIndex).clone();
             ItemWorthSwitcher.switchToWorth(itemStack);
 
             shopInventory.setItem(i, itemStack);

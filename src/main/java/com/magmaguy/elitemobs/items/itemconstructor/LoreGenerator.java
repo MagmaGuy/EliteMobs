@@ -221,8 +221,10 @@ public class LoreGenerator {
 
     }
 
-    private static String itemResaleWorth(Material
-                                                  material, HashMap<Enchantment, Integer> enchantmentMap, HashMap<String, Integer> customEnchantments, List<String> potionList) {
+    private static String itemResaleWorth(Material material,
+                                          HashMap<Enchantment, Integer> enchantmentMap,
+                                          HashMap<String, Integer> customEnchantments,
+                                          List<String> potionList) {
 
         return ItemSettingsConfig.loreResale
                 .replace("$resale", ItemWorthCalculator.determineResaleWorth(material, enchantmentMap, potionList, customEnchantments) + "")

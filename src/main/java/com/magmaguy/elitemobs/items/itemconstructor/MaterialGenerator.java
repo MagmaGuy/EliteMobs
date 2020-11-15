@@ -28,7 +28,7 @@ public class MaterialGenerator {
         if (localValidMaterials.isEmpty()) initializeValidProceduralMaterials();
 
 
-        if (itemTier < CombatSystem.TRIDENT)
+        if (itemTier < CombatSystem.TRIDENT_TIER_LEVEL)
             localValidMaterials.remove(TRIDENT);
 
         if (VersionChecker.currentVersionIsUnder(16, 0) && itemTier < CombatSystem.NETHERITE_TIER_LEVEL)

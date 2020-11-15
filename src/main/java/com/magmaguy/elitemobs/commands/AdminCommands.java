@@ -3,9 +3,12 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.commands.admin.DebugScreen;
 import com.magmaguy.elitemobs.commands.admin.StatsCommand;
 import com.magmaguy.elitemobs.commands.admin.npc.NPCCommands;
+import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class AdminCommands {
 
@@ -157,6 +160,15 @@ public class AdminCommands {
                         if (i > 0)
                             message.append(args[i] + " ");
                     new DiscordSRVAnnouncement(message.toString());
+                }
+                return true;
+
+            case "unbind":
+                if (CommandHandler.userPermCheck("elitemobs.*", commandSender)) {
+                    Player player = (Player) commandSender;
+                    ItemStack itemStack = player.getInventory().getItemInMainHand();
+                    if (ItemTagger.isEliteItem(itemStack))
+                        SoulbindEnchantment.removeEnchantment(itemStack);
                 }
                 return true;
 

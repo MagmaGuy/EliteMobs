@@ -151,7 +151,7 @@ public class PlayerStatusScreen implements Listener {
         for (int i = 0; i < 13; i++) {
             TextComponent line = new TextComponent(PlayerStatusMenuConfig.statsTextLines[i]
                     .replace("$money", EconomyHandler.checkCurrency(targetPlayer.getUniqueId()) + "")
-                    .replace("$guildtier", AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer)))
+                    .replace("$guildtier", ChatColor.stripColor(AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(targetPlayer), GuildRank.getActiveGuildRank(targetPlayer))))
                     .replace("$kills", PlayerData.getKills(targetPlayer.getUniqueId()) + "")
                     .replace("$highestkill", PlayerData.getHighestLevelKilled(targetPlayer.getUniqueId()) + "")
                     .replace("$deaths", PlayerData.getDeaths(targetPlayer.getUniqueId()) + "")
@@ -437,13 +437,14 @@ public class PlayerStatusScreen implements Listener {
         ArrayList<TextComponent> textComponents = new ArrayList<>();
         int counter = 0;
 
-        for (EliteQuest eliteQuest : PlayerQuests.getData(targetPlayer).quests) {
-            TextComponent quest = new TextComponent(ChatColor.BLACK + ChatColor.stripColor(eliteQuest.getQuestStatus()) + " \n");
-            quest.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + eliteQuest.getUuid()));
-            setHoverText(quest, PlayerStatusMenuConfig.onQuestTrackHover);
-            textComponents.add(quest);
-            counter++;
-        }
+        if (PlayerQuests.getData(targetPlayer).quests != null)
+            for (EliteQuest eliteQuest : PlayerQuests.getData(targetPlayer).quests) {
+                TextComponent quest = new TextComponent(ChatColor.BLACK + ChatColor.stripColor(eliteQuest.getQuestStatus()) + " \n");
+                quest.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + eliteQuest.getUuid()));
+                setHoverText(quest, PlayerStatusMenuConfig.onQuestTrackHover);
+                textComponents.add(quest);
+                counter++;
+            }
 
         if (counter == 0) {
             TextComponent[] textComponent = new TextComponent[1];
