@@ -15,7 +15,7 @@ public class IceBreakerEnchantment extends CustomEnchantment {
     public static String key = "ice_breaker";
 
     public IceBreakerEnchantment() {
-        super(key);
+        super(key, false);
     }
 
     private static boolean isValidBlock(Block block) {

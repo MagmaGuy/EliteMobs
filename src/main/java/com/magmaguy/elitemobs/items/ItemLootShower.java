@@ -70,7 +70,7 @@ public class ItemLootShower implements Listener {
                             !player.isValid() ||
                             !player.getWorld().equals(item.getWorld()) ||
                             counter > 20 * 4 ||
-                            item.getLocation().distance(player.getLocation()) > 30) {
+                            item.getLocation().distanceSquared(player.getLocation()) > 900) {
                         cancel();
                         pickupable = true;
                         item.setGravity(true);
@@ -133,34 +133,35 @@ public class ItemLootShower implements Listener {
                     return;
                 }
 
-                if (currencyAmount >= 50) {
+                if (currencyAmount >= 1000) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
+                        dropOneThousand(location);
+                        currencyAmount -= 1000;
+                        return;
+                    }
+                }
+
+                if (currencyAmount >= 500) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
+                        dropFiveHundred(location);
+                        currencyAmount -= 500;
+                        return;
+                    }
+                }
+
+                if (currencyAmount >= 100) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
+                        dropOneHundred(location);
+                        currencyAmount -= 100;
+                        return;
+                    }
+
+                } else if (currencyAmount >= 50) {
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropFifty(location);
                         currencyAmount -= 50;
                         return;
                     }
-
-                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
-                        dropTwenty(location);
-                        currencyAmount -= 20;
-                        return;
-                    }
-
-                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
-                        dropTen(location);
-                        currencyAmount -= 10;
-                        return;
-                    }
-
-                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
-                        dropFive(location);
-                        currencyAmount -= 5;
-                        return;
-                    }
-
-                    dropOne(location);
-                    currencyAmount--;
-                    return;
 
                 } else if (currencyAmount >= 20) {
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
@@ -169,51 +170,19 @@ public class ItemLootShower implements Listener {
                         return;
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
-                        dropTen(location);
-                        currencyAmount -= 10;
-                        return;
-                    }
-
-                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
-                        dropFive(location);
-                        currencyAmount -= 5;
-                        return;
-                    }
-
-                    dropOne(location);
-                    currencyAmount--;
-                    return;
-
                 } else if (currencyAmount >= 10) {
-
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropTen(location);
                         currencyAmount -= 10;
                         return;
                     }
-
-                    if (ThreadLocalRandom.current().nextDouble() < 0.65) {
-                        dropFive(location);
-                        currencyAmount -= 5;
-                        return;
-                    }
-
-                    dropOne(location);
-                    currencyAmount--;
-                    return;
 
                 } else if (currencyAmount >= 5) {
-
                     if (ThreadLocalRandom.current().nextDouble() < 0.65) {
                         dropFive(location);
                         currencyAmount -= 5;
                         return;
                     }
-
-                    dropOne(location);
-                    currencyAmount--;
-                    return;
 
                 } else {
                     dropOne(location);
@@ -236,7 +205,7 @@ public class ItemLootShower implements Listener {
                 0.5,
                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 2));
 
-        SoulbindEnchantment.addEnchantment(currencyItem, this.player);
+        SoulbindEnchantment.addPhysicalDisplay(currencyItem, this.player);
 
         new Coin(value, player, currencyItem);
 
@@ -315,6 +284,45 @@ public class ItemLootShower implements Listener {
         currencyItem.setCustomNameVisible(true);
     }
 
+    private void dropOneHundred(Location location) {
+        Item currencyItem;
+        try {
+            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.lootShowerMaterial100), location, 100);
+        } catch (Exception ex) {
+            new WarningMessage("Material for EliteMob shower 100 is invalid. Defaulting to diamond.");
+            currencyItem = generateCurrencyItem(Material.DIAMOND, location, 100);
+        }
+
+        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 100 + " " + EconomySettingsConfig.currencyName));
+        currencyItem.setCustomNameVisible(true);
+    }
+
+    private void dropFiveHundred(Location location) {
+        Item currencyItem;
+        try {
+            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.lootShowerMaterial500), location, 500);
+        } catch (Exception ex) {
+            new WarningMessage("Material for EliteMob shower 500 is invalid. Defaulting to diamond block.");
+            currencyItem = generateCurrencyItem(Material.DIAMOND_BLOCK, location, 500);
+        }
+
+        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 500 + " " + EconomySettingsConfig.currencyName));
+        currencyItem.setCustomNameVisible(true);
+    }
+
+    private void dropOneThousand(Location location) {
+        Item currencyItem;
+        try {
+            currencyItem = generateCurrencyItem(Material.getMaterial(EconomySettingsConfig.lootShowerMaterial1000), location, 1000);
+        } catch (Exception ex) {
+            new WarningMessage("Material for EliteMob shower 1000 is invalid. Defaulting to nether star.");
+            currencyItem = generateCurrencyItem(Material.NETHER_STAR, location, 1000);
+        }
+
+        currencyItem.setCustomName(ChatColorConverter.convert("&2" + 1000 + " " + EconomySettingsConfig.currencyName));
+        currencyItem.setCustomNameVisible(true);
+    }
+
 
     private static final HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
 
@@ -335,25 +343,25 @@ public class ItemLootShower implements Listener {
                 return;
 
             //if (event.getEntity() instanceof Player) {
-                coinValues.remove(event.getItem().getUniqueId());
+            coinValues.remove(event.getItem().getUniqueId());
             double amountIncremented = coin.value;
             Player player = event.getPlayer();
-                event.getItem().remove();
-                EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
-                sendCurrencyNotification(player);
+            event.getItem().remove();
+            EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
+            sendCurrencyNotification(player);
 
-                //cache for counting how much coin they're getting over a short amount of time
-                if (playerCurrencyPickup.containsKey(player))
-                    playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + amountIncremented);
-                else
-                    playerCurrencyPickup.put(player, amountIncremented);
+            //cache for counting how much coin they're getting over a short amount of time
+            if (playerCurrencyPickup.containsKey(player))
+                playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + amountIncremented);
+            else
+                playerCurrencyPickup.put(player, amountIncremented);
 
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        TextComponent.fromLegacyText(
-                                ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
-                                        .replace("$currency_name", EconomySettingsConfig.currencyName)
-                                        .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
-            }
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    TextComponent.fromLegacyText(
+                            ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
+                                    .replace("$currency_name", EconomySettingsConfig.currencyName)
+                                    .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
+        }
         //}
     }
 

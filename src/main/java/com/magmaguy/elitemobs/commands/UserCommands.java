@@ -9,9 +9,11 @@ import com.magmaguy.elitemobs.commands.quest.QuestStatusCommand;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.PlayerStatusScreen;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -136,6 +138,10 @@ public class UserCommands {
                 }
                 return true;
 
+            case "updateitem":
+                new EliteItemLore(player.getItemInHand(), false);
+                new WarningMessage("Updated item!");
+                return true;
             default:
                 return false;
         }

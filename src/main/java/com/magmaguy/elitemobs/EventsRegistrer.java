@@ -94,6 +94,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PigHandler(), plugin);
         pluginManager.registerEvents(new SheepHandler(), plugin);
         pluginManager.registerEvents(new FindSuperMobs(), plugin);
+        pluginManager.registerEvents(new ItemEnchantmentPrevention(), plugin);
 
         //Mob damage
         pluginManager.registerEvents(new PlayerDamagedByEliteMobHandler(), plugin);

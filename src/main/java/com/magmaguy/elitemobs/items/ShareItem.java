@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -33,7 +34,7 @@ public class ShareItem {
         String stringList = itemStack.getItemMeta().getDisplayName();
         if (itemStack.getItemMeta().hasLore())
             for (String loreString : itemStack.getItemMeta().getLore())
-                stringList += "\n" + loreString;
+                stringList += "\n" + ChatColor.DARK_PURPLE + ChatColor.ITALIC + loreString;
         textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(stringList).create()));
     }
 

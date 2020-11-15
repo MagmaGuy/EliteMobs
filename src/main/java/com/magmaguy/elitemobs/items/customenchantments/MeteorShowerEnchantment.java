@@ -21,7 +21,7 @@ public class MeteorShowerEnchantment extends CustomEnchantment {
     public static String key = "meteor_shower";
 
     public MeteorShowerEnchantment() {
-        super(key);
+        super(key, false);
     }
 
     public static void doMeteorShower(Player player) {

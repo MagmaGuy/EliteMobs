@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.events.mobs;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.events.premade.KrakenEventConfig;
-import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.powers.ProjectileLocationGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -22,7 +21,7 @@ import java.util.UUID;
 
 public class Kraken implements Listener {
 
-    private static HashSet<Squid> krakens = new HashSet<>();
+    private static final HashSet<Squid> krakens = new HashSet<>();
 
     public static boolean isKraken(Squid kraken) {
         return krakens.contains(kraken);
@@ -32,7 +31,7 @@ public class Kraken implements Listener {
         krakens.remove(kraken);
     }
 
-    private static HashSet<Fireball> fireballs = new HashSet<>();
+    private static final HashSet<Fireball> fireballs = new HashSet<>();
 
     public static boolean isFireball(Fireball fireball) {
         return fireballs.contains(fireball);
@@ -137,7 +136,7 @@ public class Kraken implements Listener {
 
         new BukkitRunnable() {
 
-            UUID uuid = kraken.getUniqueId();
+            final UUID uuid = kraken.getUniqueId();
 
             @Override
             public void run() {
@@ -211,7 +210,7 @@ public class Kraken implements Listener {
         if (!event.getEntity().getType().equals(EntityType.SQUID)) return;
         if (!isKraken((Squid) event.getEntity())) return;
 
-        event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), CustomItem.getCustomItem("depths_seeker.yml").generateItemStack(10));
+        //event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), CustomItem.getCustomItem("depths_seeker.yml").generateItemStack(10));
         removeKraken((Squid) event.getEntity());
 
     }

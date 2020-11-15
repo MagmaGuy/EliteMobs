@@ -12,7 +12,7 @@ public class CriticalStrikesEnchantment extends CustomEnchantment {
     public static String key = "critical_strikes";
 
     public CriticalStrikesEnchantment() {
-        super(key);
+        super(key, true);
     }
 
     public static void criticalStrikePopupMessage(Entity entity, Vector offset) {

@@ -64,7 +64,7 @@ public class ProceduralShopMenu implements Listener {
 
             int randomTier = random.nextInt(balancedMax) + balancedMin;
 
-            ItemStack itemStack = ItemConstructor.constructItem(randomTier, null);
+            ItemStack itemStack = ItemConstructor.constructItem(randomTier, null, null, true);
             ItemWorthSwitcher.switchToWorth(itemStack);
 
             shopInventory.setItem(i, itemStack);

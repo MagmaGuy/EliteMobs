@@ -1,8 +1,11 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -12,15 +15,52 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ItemTagger {
 
     public static final NamespacedKey eliteMobsItemNamespacedKey = new NamespacedKey(MetadataHandler.PLUGIN, "EliteMobsItem");
+    public static final NamespacedKey customLore = new NamespacedKey(MetadataHandler.PLUGIN, "CustomLore");
 
     public static void registerEliteItem(ItemStack itemStack) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
         itemStack.setItemMeta(itemMeta);
+    }
+
+    /**
+     * Used to register custom lore as a string to the item. This is necessary for the lore updater as it redraws the custom
+     * lore portion of the item based on these contents.
+     *
+     * @param itemStack ItemStack to which custom lore should be added
+     * @param lore      Custom part of the lore to add
+     */
+    public static void registerCustomLore(ItemStack itemStack, List<String> lore) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        StringBuilder parsedLore = new StringBuilder();
+        for (int i = 0; i < lore.size(); i++) {
+            parsedLore.append(lore.get(i));
+            if (i < lore.size() - 1)
+                parsedLore.append("\n");
+        }
+        itemMeta.getPersistentDataContainer().set(customLore, PersistentDataType.STRING, parsedLore.toString());
+        itemStack.setItemMeta(itemMeta);
+    }
+
+    /**
+     * Returns any custom lore stored in an item. Returns null if there isn't any.
+     *
+     * @param itemMeta
+     * @return
+     */
+    public static List<String> getCustomLore(ItemMeta itemMeta) {
+        String rawLore = itemMeta.getPersistentDataContainer().get(customLore, PersistentDataType.STRING);
+        if (rawLore == null)
+            return new ArrayList<>();
+        ArrayList<String> parsedLore = new ArrayList();
+        for (String entry : rawLore.split("\n"))
+            parsedLore.add(entry);
+        return parsedLore;
     }
 
     public static boolean isEliteItem(ItemStack itemStack) {
@@ -32,7 +72,6 @@ public class ItemTagger {
     }
 
     /**
-     *
      * Registers all enchantments as they'd appear when constructing an item in EliteMobs
      *
      * @param itemMeta
@@ -76,6 +115,10 @@ public class ItemTagger {
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, enchantmentKey), PersistentDataType.STRING, uuid);
     }
 
+    public static int getEnchantment(ItemMeta itemMeta, String enchantmentKey) {
+        return getEnchantment(itemMeta, new NamespacedKey(MetadataHandler.PLUGIN, enchantmentKey));
+    }
+
     /**
      * Returns the level of that enchantment on the item. 0 means the enchantment is not present.
      *
@@ -107,6 +150,23 @@ public class ItemTagger {
 
     public static ArrayList<ElitePotionEffect> getPotionEffects(ItemMeta itemMeta, NamespacedKey namespacedKey) {
         return ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, namespacedKey);
+    }
+
+    public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
+
+    public static void registerItemSource(EliteMobEntity eliteMobEntity, ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (eliteMobEntity == null) {
+            itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.shopItemSource));
+            itemStack.setItemMeta(itemMeta);
+            return;
+        }
+        itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.mobItemSource.replace("$mob", eliteMobEntity.getName())));
+        itemStack.setItemMeta(itemMeta);
+    }
+
+    public static String getItemSource(ItemMeta itemMeta) {
+        return itemMeta.getPersistentDataContainer().get(itemSource, PersistentDataType.STRING);
     }
 
 }

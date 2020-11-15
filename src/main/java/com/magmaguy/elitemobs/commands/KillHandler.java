@@ -53,7 +53,7 @@ public class KillHandler {
 
             int counter = 0;
 
-            Iterator<EliteMobEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().iterator();
+            Iterator<EliteMobEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().values().iterator();
 
             while (eliteMobEntityIterator.hasNext()) {
                 EliteMobEntity eliteMobEntity = eliteMobEntityIterator.next();

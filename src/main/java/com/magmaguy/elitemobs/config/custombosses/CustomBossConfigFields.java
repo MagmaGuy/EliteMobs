@@ -369,7 +369,7 @@ public class CustomBossConfigFields {
 
         }
 
-        this.followRange = configuration.getInt("followRange");
+        this.followRange = configuration.getInt("followDistance");
 
         this.leashRadius = configuration.getDouble("leashRadius");
 

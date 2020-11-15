@@ -40,6 +40,16 @@ public class PlayerItem {
     private double critChance = 0;
     private double hunterChance = 0;
 
+
+    /**
+     * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
+     * of checks done by EliteMobs during combat and for passive potion effect applications. It should (largely) only update
+     * when necessary.
+     *
+     * @param itemStack     ItemStack in the equipment slot. Does not update.
+     * @param equipmentSlot Player's equipment slot. This is used to quickly access weapons and armor for the combat system. Updates when the ItemStack changes.
+     * @param player        Player associated to the gear. Does not update.
+     */
     public PlayerItem(ItemStack itemStack, EquipmentSlot equipmentSlot, Player player) {
         this.equipmentSlot = equipmentSlot; //equipment slot never updates
         this.player = player;
@@ -81,8 +91,9 @@ public class PlayerItem {
             this.damageArthropodsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_ARTHROPODS.getKey());
             this.damageUndeadLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_UNDEAD.getKey());
             this.critChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key)) / 10D;
-        } else if (!equipmentSlot.equals(EquipmentSlot.OFFHAND))
-            this.hunterChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, HunterEnchantment.key)) * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus");
+        }
+
+        this.hunterChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, HunterEnchantment.key)) * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus");
 
         return true;
 
