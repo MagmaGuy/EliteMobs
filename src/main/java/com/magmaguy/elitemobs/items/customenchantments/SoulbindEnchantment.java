@@ -56,6 +56,8 @@ public class SoulbindEnchantment extends CustomEnchantment {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (item == null)
+                    return;
                 ArmorStand soulboundPlayer = VisualArmorStand.VisualArmorStand(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
                         EnchantmentsConfig.getEnchantment("soulbind.yml")
                                 .getFileConfiguration().getString("hologramString").replace("$player", player.getDisplayName())));

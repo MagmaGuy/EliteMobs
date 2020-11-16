@@ -122,6 +122,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         if (getLivingEntity() != null)
             return getLivingEntity();
         else {
+            if (this.uuid == null)
+                return null;
             setLivingEntity((LivingEntity) Bukkit.getEntity(this.uuid));
             return (LivingEntity) Bukkit.getEntity(this.uuid);
         }
