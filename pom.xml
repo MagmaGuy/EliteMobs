@@ -7,7 +7,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.2</version>
+    <version>7.2.3</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -92,6 +92,7 @@
         <repository>
             <id>md_5-public</id>
             <url>http://repo.md-5.net/content/groups/public/</url>
+            <!--<url>file:C:\Users\Tiago\Documents\MineCraftProjects\EliteMobs\LibsDisguises.jar</url>-->
         </repository>
 
     </repositories>
@@ -101,6 +102,14 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.16.3-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- !!!Lib's Disguises currently requires this due to a Maven bug, remove when possible!!!-->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.16.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -150,7 +159,7 @@
         <dependency>
             <groupId>LibsDisguises</groupId>
             <artifactId>LibsDisguises</artifactId>
-            <version>10.0.15</version>
+            <version>10.0.18</version>
             <scope>provided</scope>
         </dependency>
 

@@ -5,7 +5,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NPCsConfigFields {
 
@@ -25,6 +27,8 @@ public class NPCsConfigFields {
     private final String interactionType;
     private FileConfiguration fileConfiguration = null;
     private File file;
+    private double timeout;
+    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -54,6 +58,7 @@ public class NPCsConfigFields {
         this.activationRadius = activationRadius;
         this.canSleep = canSleep;
         this.interactionType = interactionType;
+
     }
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -70,6 +75,8 @@ public class NPCsConfigFields {
         fileConfiguration.addDefault("activationRadius", activationRadius);
         fileConfiguration.addDefault("canSleep", canSleep);
         fileConfiguration.addDefault("interactionType", interactionType);
+        if (!additionalConfigOptions.isEmpty())
+            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     public NPCsConfigFields(FileConfiguration fileConfiguration, File file) {
@@ -89,6 +96,10 @@ public class NPCsConfigFields {
         this.activationRadius = fileConfiguration.getDouble("activationRadius");
         this.canSleep = fileConfiguration.getBoolean("canSleep");
         this.interactionType = fileConfiguration.getString("interactionType");
+        if (fileConfiguration.getString("timeout") != null)
+            this.timeout = fileConfiguration.getDouble("timeout");
+        else
+            this.timeout = 0;
     }
 
     public String getFileName() {
@@ -170,6 +181,14 @@ public class NPCsConfigFields {
         } catch (Exception ex) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }
+    }
+
+    public Map<String, Object> getAdditionalConfigOptions() {
+        return additionalConfigOptions;
+    }
+
+    public double getTimeout() {
+        return this.timeout;
     }
 
 }

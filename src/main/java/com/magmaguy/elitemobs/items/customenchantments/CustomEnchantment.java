@@ -20,7 +20,7 @@ public abstract class CustomEnchantment {
         return customEnchantments;
     }
 
-    private final String key;
+    public final String key;
     private final boolean dynamic;
     private final EnchantmentsConfigFields enchantmentsConfigFields;
     private final Enchantment originalEnchantment = null;
@@ -47,6 +47,7 @@ public abstract class CustomEnchantment {
         new DrillingEnchantment();
         new IceBreakerEnchantment();
         new MeteorShowerEnchantment();
+        new SummonMerchantEnchantment();
     }
 
     /*

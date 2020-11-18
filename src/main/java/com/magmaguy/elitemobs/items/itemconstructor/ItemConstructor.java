@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
+import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
@@ -50,10 +51,20 @@ public class ItemConstructor {
         if (!enchantments.isEmpty())
             itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantments);
 
+        itemStack.setItemMeta(itemMeta);
+
         /*
         Generate item lore
          */
-        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore, eliteMobEntity);
+        if (!lore.isEmpty())
+            ItemTagger.registerCustomLore(itemMeta, lore);
+        //itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore, eliteMobEntity);
+
+        //Tag the item
+        ItemTagger.registerEnchantments(itemMeta, enchantments);
+        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
+        //Tag the potion effects
+        new ElitePotionEffectContainer(itemMeta, potionEffects);
 
         /*
         Remove vanilla enchantments
@@ -126,7 +137,7 @@ public class ItemConstructor {
         /*
         Generate item lore
          */
-        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantmentMap, customEnchantmentMap, killedMob);
+        //itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantmentMap, customEnchantmentMap, killedMob);
 
         /*
         Remove vanilla enchantments
@@ -156,6 +167,10 @@ public class ItemConstructor {
         Register item source for lore redraw
          */
         ItemTagger.registerItemSource(killedMob, itemStack);
+
+        //Tag the item
+        ItemTagger.registerEnchantments(itemMeta, enchantmentMap);
+        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantmentMap);
 
         /*
         Update lore

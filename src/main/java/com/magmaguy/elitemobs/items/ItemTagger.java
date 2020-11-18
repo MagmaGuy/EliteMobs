@@ -35,8 +35,7 @@ public class ItemTagger {
      * @param itemStack ItemStack to which custom lore should be added
      * @param lore      Custom part of the lore to add
      */
-    public static void registerCustomLore(ItemStack itemStack, List<String> lore) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
+    public static void registerCustomLore(ItemMeta itemMeta, List<String> lore) {
         StringBuilder parsedLore = new StringBuilder();
         for (int i = 0; i < lore.size(); i++) {
             parsedLore.append(lore.get(i));
@@ -44,7 +43,6 @@ public class ItemTagger {
                 parsedLore.append("\n");
         }
         itemMeta.getPersistentDataContainer().set(customLore, PersistentDataType.STRING, parsedLore.toString());
-        itemStack.setItemMeta(itemMeta);
     }
 
     /**
