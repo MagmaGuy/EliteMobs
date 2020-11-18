@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
+import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -24,7 +25,8 @@ public class NPCInteractions implements Listener {
         BAR,
         ARENA,
         QUEST_GIVER,
-        NONE
+        NONE,
+        SELL
     }
 
     @EventHandler
@@ -86,7 +88,18 @@ public class NPCInteractions implements Listener {
                 break;
             case ARENA:
                 break;
+            case SELL:
+                if (event.getPlayer().hasPermission("elitemobs.shop.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            SellMenu sellMenu = new SellMenu();
+                            sellMenu.constructSellMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
             case NONE:
+            default:
                 break;
 
         }

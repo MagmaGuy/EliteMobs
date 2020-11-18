@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.2</version>
+    <version>7.2.3</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -101,6 +101,12 @@
                     <groupId>org.yaml</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.16.1-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
@@ -247,7 +253,7 @@
         <dependency>
             <groupId>LibsDisguises</groupId>
             <artifactId>LibsDisguises</artifactId>
-            <version>10.0.15</version>
+            <version>10.0.18</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -261,10 +267,6 @@
                 <exclusion>
                     <artifactId>ProtocolLib</artifactId>
                     <groupId>com.comphenix.protocol</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spigot</artifactId>
-                    <groupId>org.spigotmc</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>bungeecord-chat</artifactId>

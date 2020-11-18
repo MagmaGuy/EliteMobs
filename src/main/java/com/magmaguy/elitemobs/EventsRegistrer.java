@@ -269,6 +269,8 @@ public class EventsRegistrer {
 
         //Initialize items from custom events
         pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);
+        //if (EnchantmentsConfig.getEnchantment(SummonMerchantEnchantment.key + ".yml").isEnabled())
+        pluginManager.registerEvents(new SummonMerchantEnchantment.SummonMerchantEvents(), plugin);
         pluginManager.registerEvents(new MeteorShowerEnchantment.MeteorShowerEvents(), plugin);
         pluginManager.registerEvents(new DrillingEnchantment(), plugin);
         pluginManager.registerEvents(new IceBreakerEnchantment.IceBreakerEnchantmentEvent(), plugin);

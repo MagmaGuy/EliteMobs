@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands.admin.npc;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.items.customenchantments.SummonMerchantEnchantment;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Location;
@@ -30,6 +31,10 @@ public class NPCCommands {
             case "remove":
                 if (permCheck(CommandHandler.NPC, commandSender))
                     removeNPC((Player) commandSender, args);
+                break;
+            case "merchant":
+                if (permCheck(CommandHandler.NPC, commandSender))
+                    SummonMerchantEnchantment.doSummonMerchant(((Player) commandSender), false, null);
                 break;
             default:
         }

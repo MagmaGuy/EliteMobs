@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.items.customitems;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfigFields;
-import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
@@ -266,6 +265,13 @@ public class CustomItem {
                     Bukkit.getLogger().warning("[EliteMobs] The name should follow the API names and the level should be above 0.");
                     Bukkit.getLogger().warning("[EliteMobs] Defaulting " + name + " to level 1.");
                 }
+/*
+                for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantments())
+                    if (customEnchantment.key.equalsIgnoreCase(name)){
+                        customEnchantments.put(name.toLowerCase(), level);
+                        break;
+                    }
+*/
 
                 if (name.equalsIgnoreCase(HunterEnchantment.key) ||
                         name.equalsIgnoreCase(FlamethrowerEnchantment.key) ||
@@ -273,10 +279,12 @@ public class CustomItem {
                         name.equalsIgnoreCase(MeteorShowerEnchantment.key) ||
                         name.equalsIgnoreCase(SoulbindEnchantment.key) ||
                         name.equalsIgnoreCase(DrillingEnchantment.key) ||
-                        name.equalsIgnoreCase(IceBreakerEnchantment.key)) {
+                        name.equalsIgnoreCase(IceBreakerEnchantment.key) ||
+                        name.equalsIgnoreCase(SummonMerchantEnchantment.key)) {
                     customEnchantments.put(name.toLowerCase(), level);
                     continue;
                 }
+
 
                 Enchantment enchantment;
 
@@ -394,8 +402,6 @@ public class CustomItem {
                         player,
                         showItemWorth);
         parseCustomModelID(itemStack);
-        if (!lore.isEmpty())
-            ItemTagger.registerCustomLore(itemStack, lore);
         return itemStack;
     }
 

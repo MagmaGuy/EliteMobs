@@ -78,7 +78,7 @@ public class EntityTracker implements Listener {
      * @param eliteMobEntity unregisters this entity from the plugin
      */
     public static void unregisterEliteMob(EliteMobEntity eliteMobEntity) {
-        eliteMobs.remove(eliteMobEntity);
+        eliteMobs.remove(eliteMobEntity.getLivingEntity().getUniqueId());
         cullablePluginEntities.remove(eliteMobEntity.getLivingEntity());
         eliteMobEntity.getLivingEntity().removeMetadata(MetadataHandler.ELITE_MOB_METADATA, MetadataHandler.PLUGIN);
     }

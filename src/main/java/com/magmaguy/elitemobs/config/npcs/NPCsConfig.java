@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 public class NPCsConfig {
 
-    private static HashMap<String, NPCsConfigFields> NPCsList = new HashMap<>();
+    private static final HashMap<String, NPCsConfigFields> NPCsList = new HashMap<>();
 
     public static HashMap<String, NPCsConfigFields> getNPCsList() {
         return NPCsList;
@@ -25,13 +25,14 @@ public class NPCsConfig {
         NPCsList.put(fileName, npCsConfigFields);
     }
 
-    private static ArrayList<NPCsConfigFields> NPCsConfigFieldsList = new ArrayList<NPCsConfigFields>(Arrays.asList(
+    private static final ArrayList<NPCsConfigFields> NPCsConfigFieldsList = new ArrayList<NPCsConfigFields>(Arrays.asList(
             new BarkeepConfig(),
             new BlacksmithConfig(),
             new GuildAttendantConfig(),
             new QuestGiverConfig(),
             new SpecialBlacksmithConfig(),
-            new CombatInstructorConfig()
+            new CombatInstructorConfig(),
+            new TravellingMerchantConfig()
     ));
 
     public static void initializeConfigs() {

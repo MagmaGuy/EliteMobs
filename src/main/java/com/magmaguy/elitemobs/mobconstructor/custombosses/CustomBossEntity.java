@@ -218,13 +218,14 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                                       int mobLevel,
                                       HashSet<ElitePower> elitePowers) {
         if (super.getLivingEntity() == null) {
+            this.uuid = null;
             new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " . Cause for failure:" +
                     " Tried to spawn in a region that prevented it from spawning. This is probably not an EliteMobs issue," +
                     " but a region management issue. Check if mobs are allowed to spawn where you are trying to spawn it. Location: "
                     + location.toString());
             return;
         }
-        uuid = super.getLivingEntity().getUniqueId();
+        this.uuid = super.getLivingEntity().getUniqueId();
         super.setDamageMultiplier(customBossConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossConfigFields.getHealthMultiplier());
         super.setHasSpecialLoot(customBossConfigFields.getDropsEliteMobsLoot());
