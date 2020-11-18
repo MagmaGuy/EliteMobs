@@ -46,7 +46,7 @@ public class EnchantmentGenerator {
     Note: For procedurally generated items the enchantments only get applied to the item at the lore phase
     This only gathers the list of enchantments to be applied
      */
-    public static HashMap<Enchantment, Integer> generateEnchantments(double itemTier, Material material) {
+    public static HashMap<Enchantment, Integer> generateEnchantments(double itemTier, Material material, ItemMeta itemMeta) {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
@@ -288,6 +288,9 @@ public class EnchantmentGenerator {
             secondaryEnchantmentCount--;
 
         }
+
+        //this applies the vanilla enchants
+        generateEnchantments(itemMeta, enchantmentMap);
 
         return enchantmentMap;
 

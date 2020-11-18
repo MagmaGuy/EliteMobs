@@ -40,7 +40,6 @@ public class SoulbindEnchantment extends CustomEnchantment {
         itemMeta.getPersistentDataContainer().set(SOULBIND_KEY, PersistentDataType.STRING, player.getUniqueId().toString());
         setPrestigeLevel(itemMeta, GuildRank.getGuildPrestigeRank(player));
         itemStack.setItemMeta(itemMeta);
-        //todo: this might not be the best way of doing this
     }
 
     public static void removeEnchantment(ItemStack itemStack) {

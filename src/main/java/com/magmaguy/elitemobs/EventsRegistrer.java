@@ -272,7 +272,7 @@ public class EventsRegistrer {
         //if (EnchantmentsConfig.getEnchantment(SummonMerchantEnchantment.key + ".yml").isEnabled())
         pluginManager.registerEvents(new SummonMerchantEnchantment.SummonMerchantEvents(), plugin);
         pluginManager.registerEvents(new MeteorShowerEnchantment.MeteorShowerEvents(), plugin);
-        pluginManager.registerEvents(new DrillingEnchantment(), plugin);
+        pluginManager.registerEvents(new DrillingEnchantment.DrillingEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new IceBreakerEnchantment.IceBreakerEnchantmentEvent(), plugin);
 
         //Initialize adventurer's guild
