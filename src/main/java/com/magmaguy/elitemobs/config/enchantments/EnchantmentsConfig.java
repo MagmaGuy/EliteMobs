@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class EnchantmentsConfig {
 
-    private static HashMap<String, EnchantmentsConfigFields> enchantments = new HashMap();
+    private static final HashMap<String, EnchantmentsConfigFields> enchantments = new HashMap();
 
     public static void addPowers(String fileName, EnchantmentsConfigFields enchantmentsConfigFields) {
         enchantments.put(fileName, enchantmentsConfigFields);
@@ -34,7 +34,7 @@ public class EnchantmentsConfig {
         return null;
     }
 
-    private static ArrayList<EnchantmentsConfigFields> enchantmentsConfigFields = new ArrayList(Arrays.asList(
+    private static final ArrayList<EnchantmentsConfigFields> enchantmentsConfigFields = new ArrayList(Arrays.asList(
             new ArrowDamageConfig(),
             new ArrowFireConfig(),
             new ArrowInfiniteConfig(),
@@ -80,7 +80,8 @@ public class EnchantmentsConfig {
             new CriticalStrikesConfig(),
             new MeteorShowerConfig(),
             new DrillingConfig(),
-            new IceBreakerConfig()
+            new IceBreakerConfig(),
+            new SummonMerchantConfig()
     ));
 
     public static void initializeConfigs() {

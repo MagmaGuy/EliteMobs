@@ -1,24 +1,20 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.ItemSettingsConfig;
-import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
-import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
-import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+/*
+ * todo: This class is now redundant and has been replaced with EliteItemLore, which is able to parse and redraw items during runtime
+ * However, this class also applies a lot of things to items, and as such should be repurposed as a custom enchant and potion effect
+ * applier.
+ */
 
 public class LoreGenerator {
 
@@ -28,6 +24,7 @@ public class LoreGenerator {
                                         List<String> potionList, List<String> loreList,
                                         EliteMobEntity eliteMobEntity) {
 
+        /*
         List<String> lore = new ArrayList<>();
 
         for (Object object : ItemSettingsConfig.loreStructure) {
@@ -59,12 +56,14 @@ public class LoreGenerator {
 
         }
 
+         */
+
         //Tag the item
         ItemTagger.registerEnchantments(itemMeta, enchantmentMap);
         ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
         //Tag the potion effects
         new ElitePotionEffectContainer(itemMeta, potionList);
-        itemMeta.setLore(lore);
+        //itemMeta.setLore(lore);
 
         return itemMeta;
 
@@ -76,6 +75,7 @@ public class LoreGenerator {
                                         HashMap<String, Integer> customEnchantments,
                                         EliteMobEntity eliteMobEntity) {
 
+        /*
         List<String> lore = new ArrayList<>();
 
         itemMeta = applyVanillaEnchantments(enchantmentMap, itemMeta);
@@ -106,7 +106,10 @@ public class LoreGenerator {
 
         }
 
+
+
         itemMeta.setLore(lore);
+         */
 
         ItemTagger.registerEnchantments(itemMeta, enchantmentMap);
         ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
@@ -115,6 +118,7 @@ public class LoreGenerator {
 
     }
 
+    /*
     private static List<String> enchantmentLore(HashMap<Enchantment, Integer> enchantmentMap) {
 
         List<String> enchantmentsLore = new ArrayList<>();
@@ -256,5 +260,7 @@ public class LoreGenerator {
         return colorizedLore;
 
     }
+
+     */
 
 }

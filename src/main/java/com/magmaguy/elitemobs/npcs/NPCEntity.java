@@ -3,10 +3,12 @@ package com.magmaguy.elitemobs.npcs;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -41,6 +43,7 @@ public class NPCEntity {
     private boolean disappearsAtNight;
     private boolean isSleeping = false;
     private NPCInteractions.NPCInteractionType npcInteractionType;
+    private double timeout;
 
     /**
      * Returns the full list of NPCEntities currently registered, alive or not.
@@ -115,10 +118,64 @@ public class NPCEntity {
         setActivationRadius(npCsConfigFields.getActivationRadius());
         setDisappearsAtNight(npCsConfigFields.isCanSleep());
         setNpcInteractionType(npCsConfigFields.getInteractionType());
+        setTimeout();
 
         EntityTracker.registerNPCEntity(this);
         addNPCEntity(this);
-        dupeBuster();
+        //dupeBuster();
+
+    }
+
+    /**
+     * For the travelling merchant
+     *
+     * @param location
+     */
+    public NPCEntity(Location location) {
+
+        this.npCsConfigFields = NPCsConfig.getNPCsList().get("travelling_merchant.yml");
+        if (!npCsConfigFields.isEnabled()) return;
+
+        Location potentialLocation = location.clone();
+
+        potentialLocation.add(potentialLocation.getDirection().normalize()).setY(location.getY());
+
+        if (NonSolidBlockTypes.isNonSolidBlock(potentialLocation.getBlock().getType()))
+            this.spawnLocation = potentialLocation;
+        else
+            this.spawnLocation = location.clone();
+        this.spawnLocation.setDirection(this.spawnLocation.getDirection().multiply(-1));
+
+        WorldGuardSpawnEventBypasser.forceSpawn();
+        try {
+            this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+        } catch (Exception ex) {
+            new WarningMessage("NPC " + npCsConfigFields.getFileName() + " tried to spawn in an invalid location. " +
+                    "This may be due to region protection preventing it from spawning correctly. If not, delete the location" +
+                    " in its configuration file and try setting it up again.");
+            return;
+        }
+
+        this.villager.setRemoveWhenFarAway(false);
+
+        if (!villager.isValid()) return;
+
+        setName(npCsConfigFields.getName());
+        initializeRole(npCsConfigFields.getRole());
+        setProfession(npCsConfigFields.getProfession());
+        setGreetings(npCsConfigFields.getGreetings());
+        setDialog(npCsConfigFields.getDialog());
+        setFarewell(npCsConfigFields.getFarewell());
+        setCanMove(npCsConfigFields.isCanMove());
+        setCanTalk(npCsConfigFields.isCanTalk());
+        setActivationRadius(npCsConfigFields.getActivationRadius());
+        setDisappearsAtNight(npCsConfigFields.isCanSleep());
+        setNpcInteractionType(npCsConfigFields.getInteractionType());
+        setTimeout();
+
+        EntityTracker.registerNPCEntity(this);
+        addNPCEntity(this);
+        //dupeBuster();
 
     }
 
@@ -139,7 +196,7 @@ public class NPCEntity {
         villager.setAI(canMove);
         villager.setRemoveWhenFarAway(false);
         initializeRole(role);
-        dupeBuster();
+        //dupeBuster();
     }
 
 
@@ -452,6 +509,18 @@ public class NPCEntity {
         }
     }
 
+    public void setTimeout() {
+        this.timeout = npCsConfigFields.getTimeout();
+        if (timeout <= 0) return;
+        NPCEntity npcEntity = this;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                removeNPCEntity(npcEntity);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, (long) (20 * 60 * timeout));
+    }
+
     /**
      * Selects a message from the list to output through an NPCChatBubble to a player
      *
@@ -514,15 +583,16 @@ public class NPCEntity {
 
     /**
      * Busting makes me feel good!
-     */
+
     private void dupeBuster() {
         if (!villager.isValid())
-            return;
-        for (Entity entity : villager.getNearbyEntities(1.5, 3, 1.5))
-            if ((entity instanceof Villager && entity.getCustomName() != null) ||
+     return;
+     for (Entity entity : villager.getNearbyEntities(0.01, 0.01, 0.01))
+     if ((entity instanceof Villager && entity.getCustomName() != null) ||
                     (entity instanceof ArmorStand && !entity.equals(roleDisplay)))
                 entity.remove();
 
     }
+     */
 
 }
