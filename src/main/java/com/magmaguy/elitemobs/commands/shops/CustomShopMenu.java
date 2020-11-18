@@ -4,9 +4,10 @@ import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.CustomShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
-import com.magmaguy.elitemobs.items.ItemWorthSwitcher;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
@@ -51,7 +52,7 @@ public class CustomShopMenu implements Listener {
     public static void customShopConstructor(Player player) {
 
         Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
-        populateShop(shopInventory);
+        populateShop(shopInventory, player);
         player.openInventory(shopInventory);
 
     }
@@ -61,10 +62,10 @@ public class CustomShopMenu implements Listener {
      *
      * @param shopInventory Inventory to be filled
      */
-    private static void populateShop(Inventory shopInventory) {
+    private static void populateShop(Inventory shopInventory, Player player) {
 
         shopInventory.setItem(CustomShopMenuConfig.rerollSlot, CustomShopMenuConfig.rerollItem);
-        shopContents(shopInventory);
+        shopContents(shopInventory, player);
 
     }
 
@@ -73,7 +74,7 @@ public class CustomShopMenu implements Listener {
      *
      * @param shopInventory Inventory to be filled
      */
-    private static void shopContents(Inventory shopInventory) {
+    private static void shopContents(Inventory shopInventory, Player player) {
 
         //Anything after 8 is populated
         Random random = new Random();
@@ -83,7 +84,7 @@ public class CustomShopMenu implements Listener {
             int itemEntryIndex = random.nextInt(CustomItem.getCustomItemStackShopList().size());
 
             ItemStack itemStack = CustomItem.getCustomItemStackShopList().get(itemEntryIndex).clone();
-            ItemWorthSwitcher.switchToWorth(itemStack);
+            new EliteItemLore(itemStack, true);
 
             shopInventory.setItem(i, itemStack);
 
@@ -104,7 +105,7 @@ public class CustomShopMenu implements Listener {
 
         //reroll loot button
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(CustomShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
-            populateShop(event.getInventory());
+            populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
             event.setCancelled(true);
             return;
         }
@@ -118,7 +119,7 @@ public class CustomShopMenu implements Listener {
         ItemStack itemStack = event.getCurrentItem();
         String itemDisplayName = event.getCurrentItem().getItemMeta().getDisplayName();
 
-        double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
+        double itemValue = ItemWorthCalculator.determineItemWorth(itemStack, player);
 
         //These slots are for buying items
         if (CustomShopMenuConfig.storeSlots.contains(event.getSlot()) && event.getView().getTitle().equalsIgnoreCase(SHOP_NAME)) {
@@ -138,9 +139,10 @@ public class CustomShopMenu implements Listener {
             } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
                 //player has enough money
                 EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
-                ItemWorthSwitcher.switchToResaleValue(itemStack);
+                SoulbindEnchantment.addEnchantment(itemStack, player);
+                new EliteItemLore(itemStack, false);
                 player.getInventory().addItem(itemStack);
-                populateShop(event.getInventory());
+                populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
 
                 SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
 

@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
-import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
@@ -33,15 +33,12 @@ public class ItemConstructor {
         ItemMeta itemMeta;
 
         /*
-        Generate material
-         */
-        Material itemMaterial = MaterialGenerator.generateMaterial(material);
-
-        /*
         Construct initial item
          */
         itemStack = ItemStackGenerator.generateItemStack(material);
         itemMeta = itemStack.getItemMeta();
+
+        itemMeta.setDisplayName(ChatColorConverter.convert(rawName));
 
         /*
         Generate item enchantments
@@ -49,7 +46,7 @@ public class ItemConstructor {
         in the item lore and get interpreted by the combat system
          */
         if (!enchantments.isEmpty())
-            itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantments);
+            EnchantmentGenerator.generateEnchantments(itemMeta, enchantments);
 
         itemStack.setItemMeta(itemMeta);
 
@@ -58,49 +55,13 @@ public class ItemConstructor {
          */
         if (!lore.isEmpty())
             ItemTagger.registerCustomLore(itemMeta, lore);
-        //itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore, eliteMobEntity);
 
-        //Tag the item
-        ItemTagger.registerEnchantments(itemMeta, enchantments);
-        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
         //Tag the potion effects
         new ElitePotionEffectContainer(itemMeta, potionEffects);
 
-        /*
-        Remove vanilla enchantments
-         */
-        if (ItemSettingsConfig.useEliteEnchantments)
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-        /*
-        Generate item name last as it relies on material type and quality
-         */
-        itemMeta.setDisplayName(NameGenerator.generateName(rawName));
-
-        /*
-        Colorize with MMO colors
-         */
         itemStack.setItemMeta(itemMeta);
-        ItemQualityColorizer.dropQualityColorizer(itemStack);
 
-        ItemTagger.registerEliteItem(itemStack);
-
-        /*
-        Add soulbind if applicable
-         */
-        SoulbindEnchantment.addEnchantment(itemStack, player);
-
-        /*
-        Register item source for lore redraw
-         */
-        ItemTagger.registerItemSource(eliteMobEntity, itemStack);
-
-        /*
-        Update lore
-         */
-        new EliteItemLore(itemStack, showItemWorth);
-
-        return itemStack;
+        return commonFeatures(itemStack, eliteMobEntity, player, enchantments, customEnchantments, showItemWorth);
     }
 
     /*
@@ -126,24 +87,13 @@ public class ItemConstructor {
         Generate item enchantments
         Note: This only gets a list of enchantments to be applied later at the lore stage
          */
-        HashMap<Enchantment, Integer> enchantmentMap = EnchantmentGenerator.generateEnchantments(itemTier, itemMaterial);
+        HashMap<Enchantment, Integer> enchantmentMap = EnchantmentGenerator.generateEnchantments(itemTier, itemMaterial, itemMeta);
 
         /*
         Generate custom enchantments
         Note: This only gets a list of enchantments to be applied later at the lore stage
          */
         HashMap<String, Integer> customEnchantmentMap = EnchantmentGenerator.generateCustomEnchantments(itemTier, itemMaterial);
-
-        /*
-        Generate item lore
-         */
-        //itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantmentMap, customEnchantmentMap, killedMob);
-
-        /*
-        Remove vanilla enchantments
-         */
-        if (ItemSettingsConfig.useEliteEnchantments)
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         /*
         Generate item name
@@ -156,21 +106,44 @@ public class ItemConstructor {
         itemStack.setItemMeta(itemMeta);
         ItemQualityColorizer.dropQualityColorizer(itemStack);
 
-        ItemTagger.registerEliteItem(itemStack);
+        return commonFeatures(itemStack, killedMob, player, enchantmentMap, customEnchantmentMap, showItemWorth);
+
+    }
+
+    private static ItemStack commonFeatures(ItemStack itemStack,
+                                            EliteMobEntity eliteMobEntity,
+                                            Player player,
+                                            HashMap<Enchantment, Integer> enchantments,
+                                            HashMap<String, Integer> customEnchantments,
+                                            boolean showItemWorth) {
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        //hide default lore
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+
+        /*
+        Register elite item
+         */
+        ItemTagger.registerEliteItem(itemMeta);
+
+        /*
+        Register item source for lore redraw
+         */
+        ItemTagger.registerItemSource(eliteMobEntity, itemMeta);
+
+        //Tag the item
+        ItemTagger.registerEnchantments(itemMeta, enchantments);
+        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
+
+        itemStack.setItemMeta(itemMeta);
 
         /*
         Add soulbind if applicable
          */
         SoulbindEnchantment.addEnchantment(itemStack, player);
 
-        /*
-        Register item source for lore redraw
-         */
-        ItemTagger.registerItemSource(killedMob, itemStack);
-
-        //Tag the item
-        ItemTagger.registerEnchantments(itemMeta, enchantmentMap);
-        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantmentMap);
+        itemStack.setItemMeta(itemMeta);
 
         /*
         Update lore
@@ -180,6 +153,5 @@ public class ItemConstructor {
         return itemStack;
 
     }
-
 
 }

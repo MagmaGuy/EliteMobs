@@ -102,7 +102,7 @@ public class SellMenu implements Listener {
                 for (ItemStack itemStack : event.getClickedInventory()) {
                     if (validSlots.contains(positionCounter))
                         if (itemStack != null) {
-                            double amountDeduced = ItemWorthCalculator.determineResaleWorth(itemStack) * itemStack.getAmount();
+                            double amountDeduced = ItemWorthCalculator.determineResaleWorth(itemStack, Bukkit.getPlayer(event.getWhoClicked().getUniqueId())) * itemStack.getAmount();
                             EconomyHandler.addCurrency(event.getWhoClicked().getUniqueId(), amountDeduced);
                             event.getWhoClicked().sendMessage(
                                     ChatColorConverter.convert(
@@ -149,7 +149,7 @@ public class SellMenu implements Listener {
                 for (ItemStack itemStack : event.getInventory()) {
                     if (validSlots.contains(positionCounter))
                         if (itemStack != null)
-                            itemWorth += ItemWorthCalculator.determineResaleWorth(itemStack) * itemStack.getAmount();
+                            itemWorth += ItemWorthCalculator.determineResaleWorth(itemStack, Bukkit.getPlayer(event.getWhoClicked().getUniqueId())) * itemStack.getAmount();
                     positionCounter++;
                 }
 
@@ -189,7 +189,7 @@ public class SellMenu implements Listener {
         for (ItemStack itemStack : event.getInventory()) {
             if (validSlots.contains(positionCounter))
                 if (itemStack != null)
-                    itemWorth += ItemWorthCalculator.determineResaleWorth(itemStack) * itemStack.getAmount();
+                    itemWorth += ItemWorthCalculator.determineResaleWorth(itemStack, Bukkit.getPlayer(event.getWhoClicked().getUniqueId())) * itemStack.getAmount();
             positionCounter++;
         }
 

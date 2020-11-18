@@ -22,18 +22,16 @@ public class ItemTagger {
     public static final NamespacedKey eliteMobsItemNamespacedKey = new NamespacedKey(MetadataHandler.PLUGIN, "EliteMobsItem");
     public static final NamespacedKey customLore = new NamespacedKey(MetadataHandler.PLUGIN, "CustomLore");
 
-    public static void registerEliteItem(ItemStack itemStack) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
+    public static void registerEliteItem(ItemMeta itemMeta) {
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
-        itemStack.setItemMeta(itemMeta);
     }
 
     /**
      * Used to register custom lore as a string to the item. This is necessary for the lore updater as it redraws the custom
      * lore portion of the item based on these contents.
      *
-     * @param itemStack ItemStack to which custom lore should be added
-     * @param lore      Custom part of the lore to add
+     * @param itemMeta ItemStack to which custom lore should be added
+     * @param lore     Custom part of the lore to add
      */
     public static void registerCustomLore(ItemMeta itemMeta, List<String> lore) {
         StringBuilder parsedLore = new StringBuilder();
@@ -127,12 +125,10 @@ public class ItemTagger {
     public static int getEnchantment(ItemMeta itemMeta, NamespacedKey enchantmentKey) {
         if (itemMeta == null)
             return 0;
-        if (!hasEnchantment(itemMeta, enchantmentKey))
-            return 0;
-        //for legacy items
-        if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
-            return itemMeta.getCustomTagContainer().getCustomTag(enchantmentKey, ItemTagType.INTEGER);
-        return itemMeta.getPersistentDataContainer().get(enchantmentKey, PersistentDataType.INTEGER);
+        //if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
+        //    return itemMeta.getCustomTagContainer().getCustomTag(enchantmentKey, ItemTagType.INTEGER);
+        Integer level = itemMeta.getPersistentDataContainer().get(enchantmentKey, PersistentDataType.INTEGER);
+        return level == null ? 0 : level;
     }
 
     public static boolean hasEnchantment(ItemMeta itemMeta, NamespacedKey enchantmentKey) {
@@ -152,15 +148,12 @@ public class ItemTagger {
 
     public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
 
-    public static void registerItemSource(EliteMobEntity eliteMobEntity, ItemStack itemStack) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
+    public static void registerItemSource(EliteMobEntity eliteMobEntity, ItemMeta itemMeta) {
         if (eliteMobEntity == null) {
             itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.shopItemSource));
-            itemStack.setItemMeta(itemMeta);
             return;
         }
         itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.mobItemSource.replace("$mob", eliteMobEntity.getName())));
-        itemStack.setItemMeta(itemMeta);
     }
 
     public static String getItemSource(ItemMeta itemMeta) {

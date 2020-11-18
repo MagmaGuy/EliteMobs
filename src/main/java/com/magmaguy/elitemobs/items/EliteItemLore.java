@@ -38,6 +38,7 @@ public class EliteItemLore {
     String itemWorth = null;
     String itemSource = null;
     EliteMobEntity eliteMobEntity;
+    Player soulboundPlayer = null;
     List<String> customLore = new ArrayList<>();
     int prestigeLevel = 0;
 
@@ -63,6 +64,7 @@ public class EliteItemLore {
         constructCustomEnchantments();
 
         constructSoulbindEntry();
+        constructSoulboundOwner();
         constructItemWorth();
         constructItemSource();
         constructCustomLore();
@@ -101,8 +103,8 @@ public class EliteItemLore {
 
     private void parseEliteEnchantments(Enchantment enchantment) {
         int enchantmentLevel = ItemTagger.getEnchantment(itemMeta, enchantment.getKey());
-        if (enchantmentLevel > 0)
-            eliteVanillaEnchantments.put(enchantment, enchantmentLevel);
+        if (enchantmentLevel > enchantment.getMaxLevel())
+            eliteVanillaEnchantments.put(enchantment, enchantmentLevel - enchantment.getMaxLevel());
     }
 
     private void constructEliteEnchantments() {
@@ -152,12 +154,16 @@ public class EliteItemLore {
     private void constructItemWorth() {
         if (showItemWorth)
             itemWorth = ItemSettingsConfig.loreWorth
-                    .replace("$worth", ItemWorthCalculator.determineItemWorth(itemStack) + "")
+                    .replace("$worth", ItemWorthCalculator.determineItemWorth(itemStack, soulboundPlayer) + "")
                     .replace("$currencyName", EconomySettingsConfig.currencyName);
         else
             itemWorth = ItemSettingsConfig.loreResale
-                    .replace("$resale", ItemWorthCalculator.determineResaleWorth(itemStack) + "")
+                    .replace("$resale", ItemWorthCalculator.determineResaleWorth(itemStack, soulboundPlayer) + "")
                     .replace("$currencyName", EconomySettingsConfig.currencyName);
+    }
+
+    private void constructSoulboundOwner() {
+        this.soulboundPlayer = SoulbindEnchantment.getSoulboundPlayer(itemMeta);
     }
 
     private void constructItemSource() {
