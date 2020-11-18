@@ -4,9 +4,10 @@ import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ProceduralShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
-import com.magmaguy.elitemobs.items.ItemWorthSwitcher;
+import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
@@ -39,21 +40,21 @@ public class ProceduralShopMenu implements Listener {
     public static void shopConstructor(Player player) {
 
         Inventory shopInventory = Bukkit.createInventory(player, 54, SHOP_NAME);
-        populateShop(shopInventory);
+        populateShop(shopInventory, player);
         player.openInventory(shopInventory);
 
     }
 
-    private static void populateShop(Inventory shopInventory) {
+    private static void populateShop(Inventory shopInventory, Player player) {
 
         shopInventory.setItem(ProceduralShopMenuConfig.rerollSlot, ProceduralShopMenuConfig.rerollItem);
-        shopContents(shopInventory);
+        shopContents(shopInventory, player);
 
     }
 
     private static final List<Integer> validSlots = ProceduralShopMenuConfig.storeSlots;
 
-    private static void shopContents(Inventory shopInventory) {
+    private static void shopContents(Inventory shopInventory, Player player) {
 
         Random random = new Random();
 
@@ -65,7 +66,8 @@ public class ProceduralShopMenu implements Listener {
             int randomTier = random.nextInt(balancedMax) + balancedMin;
 
             ItemStack itemStack = ItemConstructor.constructItem(randomTier, null, null, true);
-            ItemWorthSwitcher.switchToWorth(itemStack);
+            SoulbindEnchantment.addEnchantment(itemStack, player);
+            new EliteItemLore(itemStack, true);
 
             shopInventory.setItem(i, itemStack);
 
@@ -86,7 +88,7 @@ public class ProceduralShopMenu implements Listener {
 
         //reroll loot button
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ProceduralShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
-            populateShop(event.getInventory());
+            populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
             event.setCancelled(true);
             return;
         }
@@ -100,7 +102,7 @@ public class ProceduralShopMenu implements Listener {
         ItemStack itemStack = event.getCurrentItem();
         String itemDisplayName = itemStack.getItemMeta().getDisplayName();
 
-        double itemValue = ItemWorthCalculator.determineItemWorth(itemStack);
+        double itemValue = ItemWorthCalculator.determineItemWorth(itemStack, player);
 
         boolean inventoryHasFreeSlots = false;
         for (ItemStack iteratedStack : player.getInventory().getStorageContents())
@@ -120,9 +122,9 @@ public class ProceduralShopMenu implements Listener {
             } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
                 //player has enough money
                 EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
-                ItemWorthSwitcher.switchToResaleValue(itemStack);
+                new EliteItemLore(itemStack, false);
                 player.getInventory().addItem(itemStack);
-                populateShop(event.getInventory());
+                populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
                 SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
 
             } else {

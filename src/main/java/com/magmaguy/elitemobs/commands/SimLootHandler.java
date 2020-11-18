@@ -39,7 +39,7 @@ public class SimLootHandler {
     }
 
     public static void simLoot(Player player, int level) {
-        ItemStack itemStack = ItemConstructor.constructItem(level, null, null, false);
+        ItemStack itemStack = ItemConstructor.constructItem(level, null, player, false);
         player.getWorld().dropItem(player.getLocation(), itemStack);
     }
 
