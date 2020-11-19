@@ -143,8 +143,6 @@ public class ItemConstructor {
          */
         SoulbindEnchantment.addEnchantment(itemStack, player);
 
-        itemStack.setItemMeta(itemMeta);
-
         /*
         Update lore
          */
