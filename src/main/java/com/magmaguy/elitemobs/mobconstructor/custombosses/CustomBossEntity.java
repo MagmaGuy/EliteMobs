@@ -151,7 +151,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     + location.toString());
             return;
         }
-        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+        initializeCustomBoss(customBossConfigFields, location);
         spawnMessage();
         if (customBossConfigFields.getPhases().size() > 0)
             new PhaseBossEntity(this);
@@ -181,7 +181,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     + location.toString());
             return;
         }
-        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+        initializeCustomBoss(customBossConfigFields, location);
         if (!isPhaseBossRespawn)
             spawnMessage();
         if (customBossConfigFields.getPhases().size() > 0) {
@@ -208,15 +208,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                             double health,
                             UUID phaseBossUUID) {
         super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM, health, phaseBossUUID);
-        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+        initializeCustomBoss(customBossConfigFields, location);
         this.setHealth(health * getMaxHealth());
     }
 
     private void initializeCustomBoss(CustomBossConfigFields customBossConfigFields,
-                                      EntityType entityType,
-                                      Location location,
-                                      int mobLevel,
-                                      HashSet<ElitePower> elitePowers) {
+                                      Location location) {
         if (super.getLivingEntity() == null) {
             this.uuid = null;
             new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " . Cause for failure:" +
@@ -261,6 +258,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             getLivingEntity().setGravity(false);
         }
         CommandRunner.runCommandFromList(customBossConfigFields.getOnSpawnCommands(), new ArrayList<>());
+        startEscapeMechanismDelay(customBossConfigFields.getTimeout());
     }
 
     private void spawnMessage() {
@@ -487,6 +485,39 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     " entity or boss " + customBossConfigFields.getMountedEntity() + " . Fix this in the configuration file.");
         }
     }
+
+    /**
+     * Starts the escape mechanic for bosses that have this feature. After a set time, in minutes, the boss will escape,
+     * potentially broadcasting an escape message.
+     */
+    private void startEscapeMechanismDelay(int timeout) {
+
+        if (timeout < 1) return;
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                LivingEntity livingEntity = advancedGetEntity();
+                if (livingEntity == null || livingEntity.isDead()) {
+                    remove();
+                    return;
+                }
+                remove();
+                if (customBossConfigFields.getAnnouncementPriority() < 1) return;
+                if (customBossConfigFields.getEscapeMessage() != null)
+                    for (Player player : Bukkit.getOnlinePlayers())
+                        if (player.getWorld().equals(livingEntity.getWorld()))
+                            player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
+                if (customBossConfigFields.getAnnouncementPriority() < 3) return;
+                new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
+
+            }
+
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * timeout);
+
+    }
+
 
     @Override
     public void remove() {
