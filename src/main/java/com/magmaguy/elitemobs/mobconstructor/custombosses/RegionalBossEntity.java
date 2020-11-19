@@ -185,8 +185,11 @@ public class RegionalBossEntity implements Listener {
             @Override
             public void run() {
                 LivingEntity livingEntity = customBossEntity.advancedGetEntity();
-                if (livingEntity == null) return;
-                if (livingEntity.isDead()) return;
+                if (livingEntity == null || livingEntity.isDead()) {
+                    customBossEntity.remove();
+                    return;
+                }
+                customBossEntity.remove();
                 if (customBossConfigFields.getAnnouncementPriority() < 1) return;
                 if (customBossConfigFields.getEscapeMessage() != null)
                     for (Player player : Bukkit.getOnlinePlayers())
@@ -194,7 +197,6 @@ public class RegionalBossEntity implements Listener {
                             player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
                 if (customBossConfigFields.getAnnouncementPriority() < 3) return;
                 new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
-                customBossEntity.remove();
 
             }
 

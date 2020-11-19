@@ -269,7 +269,6 @@ public class PlayerData {
                     statement.executeUpdate(sql);
                     statement.close();
 
-                    getConnection().commit();
                 } catch (Exception e) {
                     new WarningMessage("Failed to update database value.");
                     System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -443,7 +442,6 @@ public class PlayerData {
                     playerDataHashMap.put(uuid, playerData);
 
                     statement.close();
-                    getConnection().commit();
                 } catch (Exception e) {
                     new WarningMessage("Failed to generate an entry!");
                     System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -461,7 +459,7 @@ public class PlayerData {
         if (connection == null || connection.isClosed()) {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-            connection.setAutoCommit(false);
+            connection.setAutoCommit(true);
         }
         return connection;
     }
@@ -498,7 +496,6 @@ public class PlayerData {
                     " QuestsCompleted                    INT);";
             statement.executeUpdate(sql);
             statement.close();
-            getConnection().commit();
 
             for (Player player : Bukkit.getOnlinePlayers())
                 new PlayerData(player.getUniqueId());
