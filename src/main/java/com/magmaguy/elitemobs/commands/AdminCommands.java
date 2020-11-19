@@ -92,7 +92,7 @@ public class AdminCommands {
             case "simulatedrop":
                 if (commandSender instanceof Player) {
                     if (CommandHandler.userPermCheck(CommandHandler.SIMLOOT, commandSender))
-                        SimLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]));
+                        SimLootHandler.simLoot((Player) commandSender, Integer.parseInt(args[1]), args.length == 3 ? Integer.parseInt(args[2]) : 0);
                 } else if (CommandHandler.permCheck(CommandHandler.SIMLOOT, commandSender))
                     SimLootHandler.simLoot(commandSender, args);
                 return true;
