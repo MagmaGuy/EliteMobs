@@ -195,8 +195,8 @@ public class ItemLootShower implements Listener {
 
     private Item generateCurrencyItem(Material material, Location location, double value) {
 
-        ItemStack currencyItemStack = ItemStackGenerator.generateItemStack(material, "",
-                Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + ""));
+        ItemStack currencyItemStack = SoulbindEnchantment.addEnchantment(ItemStackGenerator.generateItemStack(material, "",
+                Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + "")), player);
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
         EntityTracker.registerItemVisualEffects(currencyItem);
 
