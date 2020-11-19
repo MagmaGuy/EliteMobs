@@ -43,6 +43,8 @@ public class TranslationConfig {
     public static final String TELEPORT_TIME_LEFT = "Teleport time left";
     public static final String TELEPORT_CANCELLED = "Teleport cancelled";
 
+    public static final String NPC_SLEEPING_MESSAGE = "npcSleepingMessage";
+
 
     public static final String CONFIG_NAME = "translation.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
@@ -76,6 +78,8 @@ public class TranslationConfig {
 
         configuration.addDefault(TELEPORT_TIME_LEFT, "&7[EM] Teleporting in &a$time &7seconds...");
         configuration.addDefault(TELEPORT_CANCELLED, "&7[EM] &cTeleport interrupted!");
+
+        configuration.addDefault(NPC_SLEEPING_MESSAGE, "&7<Sleeping>");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

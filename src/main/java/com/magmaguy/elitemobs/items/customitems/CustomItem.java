@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -115,7 +116,9 @@ public class CustomItem {
 
     // Adds weighed static items
     private static void addWeighedFixedItems(CustomItem customItem) {
-        weighedFixedItems.put(customItem.generateDefaultsItemStack(null, false), customItem.getDropWeight());
+        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false);
+        if (itemStack == null) new DebugMessage("Warning: null for " + customItem.getFileName());
+        weighedFixedItems.put(itemStack, customItem.getDropWeight());
     }
 
     private static final HashMap<Integer, ArrayList<ItemStack>> tieredLoot = new HashMap<>();

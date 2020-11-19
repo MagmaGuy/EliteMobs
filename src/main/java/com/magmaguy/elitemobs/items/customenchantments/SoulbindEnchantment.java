@@ -33,13 +33,14 @@ public class SoulbindEnchantment extends CustomEnchantment {
         super(key, true);
     }
 
-    public static void addEnchantment(ItemStack itemStack, Player player) {
-        if (!EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) return;
-        if (itemStack == null || player == null) return;
+    public static ItemStack addEnchantment(ItemStack itemStack, Player player) {
+        if (!EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) return null;
+        if (itemStack == null || player == null) return null;
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getPersistentDataContainer().set(SOULBIND_KEY, PersistentDataType.STRING, player.getUniqueId().toString());
         setPrestigeLevel(itemMeta, GuildRank.getGuildPrestigeRank(player));
         itemStack.setItemMeta(itemMeta);
+        return itemStack;
     }
 
     public static void removeEnchantment(ItemStack itemStack) {

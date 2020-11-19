@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
-import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;
 import org.bukkit.Bukkit;
@@ -65,8 +64,8 @@ public class ProceduralShopMenu implements Listener {
 
             int randomTier = random.nextInt(balancedMax) + balancedMin;
 
-            ItemStack itemStack = ItemConstructor.constructItem(randomTier, null, null, true);
-            SoulbindEnchantment.addEnchantment(itemStack, player);
+            ItemStack itemStack = ItemConstructor.constructItem(randomTier, null, player, true);
+            //SoulbindEnchantment.addEnchantment(itemStack, player);
             new EliteItemLore(itemStack, true);
 
             shopInventory.setItem(i, itemStack);
