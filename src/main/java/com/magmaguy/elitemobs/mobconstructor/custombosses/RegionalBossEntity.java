@@ -1,20 +1,15 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
-import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
@@ -106,8 +101,6 @@ public class RegionalBossEntity implements Listener {
         regionalBossWatchdog();
         customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
         customBossEntity.setIsRegionalBoss(true);
-        if (customBossConfigFields.getTimeout() > 0)
-            startEscapeMechanismDelay(customBossConfigFields.getTimeout());
 
     }
 
@@ -169,38 +162,6 @@ public class RegionalBossEntity implements Listener {
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 3);
-
-    }
-
-    /**
-     * Starts the escape mechanic for bosses that have this feature. After a set time, in minutes, the boss will escape,
-     * potentially broadcasting an escape message.
-     */
-    private void startEscapeMechanismDelay(int timeout) {
-
-        if (timeout < 1) return;
-
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                LivingEntity livingEntity = customBossEntity.advancedGetEntity();
-                if (livingEntity == null || livingEntity.isDead()) {
-                    customBossEntity.remove();
-                    return;
-                }
-                customBossEntity.remove();
-                if (customBossConfigFields.getAnnouncementPriority() < 1) return;
-                if (customBossConfigFields.getEscapeMessage() != null)
-                    for (Player player : Bukkit.getOnlinePlayers())
-                        if (player.getWorld().equals(livingEntity.getWorld()))
-                            player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
-                if (customBossConfigFields.getAnnouncementPriority() < 3) return;
-                new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getEscapeMessage()));
-
-            }
-
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * timeout);
 
     }
 
