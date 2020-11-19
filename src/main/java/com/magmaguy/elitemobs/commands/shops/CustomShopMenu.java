@@ -84,6 +84,7 @@ public class CustomShopMenu implements Listener {
             int itemEntryIndex = random.nextInt(CustomItem.getCustomItemStackShopList().size());
 
             ItemStack itemStack = CustomItem.getCustomItemStackShopList().get(itemEntryIndex).clone();
+            SoulbindEnchantment.addEnchantment(itemStack, player);
             new EliteItemLore(itemStack, true);
 
             shopInventory.setItem(i, itemStack);
@@ -139,7 +140,6 @@ public class CustomShopMenu implements Listener {
             } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
                 //player has enough money
                 EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
-                SoulbindEnchantment.addEnchantment(itemStack, player);
                 new EliteItemLore(itemStack, false);
                 player.getInventory().addItem(itemStack);
                 populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));

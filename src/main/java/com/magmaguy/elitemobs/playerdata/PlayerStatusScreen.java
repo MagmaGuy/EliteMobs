@@ -437,7 +437,7 @@ public class PlayerStatusScreen implements Listener {
         ArrayList<TextComponent> textComponents = new ArrayList<>();
         int counter = 0;
 
-        if (PlayerQuests.getData(targetPlayer).quests != null)
+        if (PlayerQuests.getData(targetPlayer) != null && PlayerQuests.getData(targetPlayer).quests != null)
             for (EliteQuest eliteQuest : PlayerQuests.getData(targetPlayer).quests) {
                 TextComponent quest = new TextComponent(ChatColor.BLACK + ChatColor.stripColor(eliteQuest.getQuestStatus()) + " \n");
                 quest.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + eliteQuest.getUuid()));
