@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
@@ -237,8 +238,19 @@ public class LootTables implements Listener {
 
         double totalWeight = 0;
 
+
         for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet())
-            totalWeight += CustomItem.getWeighedFixedItems().get(itemStack);
+            try {
+                totalWeight += CustomItem.getWeighedFixedItems().get(itemStack);
+            } catch (NullPointerException ex) {
+                new DebugMessage("Error generating loot");
+                new DebugMessage("totalweight: " + totalWeight);
+                new DebugMessage("itemStack is null: " + itemStack == null);
+                new DebugMessage("weighed items list is null:" + CustomItem.getWeighedFixedItems() == null);
+                new DebugMessage("Weight value is null: " + CustomItem.getWeighedFixedItems().get(itemStack) == null);
+                ex.printStackTrace();
+            }
+
 
         ItemStack generatedItemStack = null;
         double random = Math.random() * totalWeight;

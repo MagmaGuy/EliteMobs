@@ -37,7 +37,7 @@ public class NPCChatBubble {
 
                 @Override
                 public void run() {
-                    if (counter > 20 * 5) {
+                    if (counter > 20 * 5 || npcEntity.getVillager() == null || !npcEntity.getVillager().isValid()) {
                         visualArmorStand.remove();
                         cancel();
                         return;
