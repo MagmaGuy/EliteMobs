@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.*;
@@ -695,14 +694,16 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
         @EventHandler
         public void onChunkLoadEvent(ChunkLoadEvent event) {
-            for (Entity entity : event.getChunk().getEntities())
-                if (entity instanceof LivingEntity)
-                    if (CrashFix.isPersistentEntity(entity))
-                        if (isCustomBoss(entity.getUniqueId())) {
-                            CustomBossEntity customBossEntity = getCustomBoss(entity.getUniqueId());
-                            customBossEntity.setLivingEntity((LivingEntity) entity);
-                            customBossEntity.startBossTrails();
-                        }
+            for (Entity entity : event.getChunk().getEntities()) {
+                //if (entity instanceof LivingEntity)
+                //if (CrashFix.isPersistentEntity(entity))
+                //if (isCustomBoss(entity.getUniqueId())) {
+                CustomBossEntity customBossEntity = getCustomBoss(entity.getUniqueId());
+                if (customBossEntity == null) continue;
+                customBossEntity.setLivingEntity((LivingEntity) entity);
+                customBossEntity.startBossTrails();
+            }
+            //}
 
         }
 

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.combatsystem;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.api.DamageEliteMob;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
@@ -46,6 +47,12 @@ public class EliteMobDamagedByPlayerHandler implements Listener {
                 ((Projectile) event.getDamager()).getShooter() instanceof Player)
             player = (Player) ((Projectile) event.getDamager()).getShooter();
         if (player == null) return;
+
+        //citizens
+        if (player.hasMetadata("NPC")) {
+            DamageEliteMob.lowDamage(eliteMobEntity);
+            return;
+        }
 
         //From this point on, the event damage is handled by Elite Mobs
 

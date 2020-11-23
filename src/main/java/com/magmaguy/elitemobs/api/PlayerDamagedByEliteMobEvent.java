@@ -71,6 +71,11 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
             if (event.isCancelled()) return;
             if (!(event.getEntity() instanceof Player)) return;
             Player player = (Player) event.getEntity();
+
+            //citizens
+            if (player.hasMetadata("NPC"))
+                return;
+
             EliteMobEntity eliteMobEntity = null;
             if (event.getDamager() instanceof LivingEntity)
                 eliteMobEntity = EntityTracker.getEliteMobEntity(event.getDamager());

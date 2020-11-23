@@ -72,6 +72,10 @@ public class PlayerPotionEffects implements Listener {
         if (damager == null || !damager.getType().equals(EntityType.PLAYER)) return;
         Player player = (Player) damager;
 
+        //citizens
+        if (player.hasMetadata("NPC"))
+            return;
+
         LivingEntity damagee;
         if (event.getEntity() instanceof LivingEntity)
             damagee = (LivingEntity) event.getEntity();
