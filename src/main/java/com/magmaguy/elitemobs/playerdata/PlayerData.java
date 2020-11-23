@@ -512,13 +512,23 @@ public class PlayerData {
     public static class PlayerDataEvents implements Listener {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onPlayerLogin(PlayerJoinEvent event) {
-            new PlayerData(event.getPlayer().getUniqueId());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    new PlayerData(event.getPlayer().getUniqueId());
+                }
+            }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20);
         }
 
         @EventHandler
         public void onPlayerLogout(PlayerQuitEvent event) {
-            clearPlayerData(event.getPlayer().getUniqueId());
-            setDisplayName(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    clearPlayerData(event.getPlayer().getUniqueId());
+                    setDisplayName(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+                }
+            }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20);
         }
     }
 

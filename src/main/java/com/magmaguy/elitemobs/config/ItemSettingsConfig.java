@@ -24,7 +24,6 @@ public class ItemSettingsConfig {
     public static String eliteEnchantLoreString;
     public static boolean useHoesAsWeapons;
     public static boolean enableRareItemParticleEffects;
-    public static String prestigeName;
     public static String potionEffectOnHitTargetLore, potionEffectOnHitSelfLore, potionEffectContinuousLore;
     public static String eliteEnchantmentColor;
     public static String vanillaEnchantmentColor;
@@ -77,7 +76,6 @@ public class ItemSettingsConfig {
         eliteEnchantLoreString = ChatColorConverter.convert(ConfigurationEngine.setString(fileConfiguration, "eliteEnchantmentLoreStrings", "Elite"));
         useHoesAsWeapons = ConfigurationEngine.setBoolean(fileConfiguration, "useHoesAsWeapons", false);
         enableRareItemParticleEffects = ConfigurationEngine.setBoolean(fileConfiguration, "enableRareItemParticleEffects", true);
-        prestigeName = ConfigurationEngine.setString(fileConfiguration, "prestigeNameOnItems", "Prestige");
         potionEffectOnHitTargetLore = ConfigurationEngine.setString(fileConfiguration, "potionEffectOnHitTargetLore", "&4⚔☠");
         potionEffectOnHitSelfLore = ConfigurationEngine.setString(fileConfiguration, "potionEffectOnHitSelfLore", "&9⚔🛡");
         potionEffectContinuousLore = ConfigurationEngine.setString(fileConfiguration, "potionEffectContinuousLore", "&6⟲");

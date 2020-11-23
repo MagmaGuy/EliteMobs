@@ -93,6 +93,10 @@ public class NPCEntity {
         if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
         if (!npCsConfigFields.isEnabled()) return;
 
+        //this is how the wandering trader works
+        if (npCsConfigFields.getLocation().equalsIgnoreCase("null"))
+            return;
+
         WorldGuardSpawnEventBypasser.forceSpawn();
         try {
             this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);

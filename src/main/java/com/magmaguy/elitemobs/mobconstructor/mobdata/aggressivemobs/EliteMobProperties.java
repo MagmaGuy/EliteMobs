@@ -95,6 +95,7 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         new ElitePiglin();
         new EliteHoglin();
         new ElitePiglinBrute();
+        new EliteBee();
     }
 
     public static boolean isValidEliteMobType(Entity entity) {
