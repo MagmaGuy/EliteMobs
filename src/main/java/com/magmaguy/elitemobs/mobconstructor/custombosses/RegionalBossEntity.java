@@ -29,7 +29,8 @@ public class RegionalBossEntity implements Listener {
     public CustomBossEntity customBossEntity;
     private final CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity;
     public boolean isAlive;
-    private final Location spawnLocation;
+    public Location spawnLocation;
+    public final String spawnLocationString;
     private double leashRadius;
     private final int respawnCooldown;
     public boolean inCooldown = false;
@@ -38,19 +39,20 @@ public class RegionalBossEntity implements Listener {
     public RegionalBossEntity(CustomBossConfigFields customBossConfigFields, CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity) {
         this.configRegionalEntity = configRegionalEntity;
         this.spawnLocation = configRegionalEntity.spawnLocation;
+        this.spawnLocationString = configRegionalEntity.spawnLocationString;
         this.respawnCooldown = customBossConfigFields.getSpawnCooldown();
         this.customBossConfigFields = customBossConfigFields;
         this.leashRadius = customBossConfigFields.getLeashRadius();
+        regionalBossEntityList.add(this);
         if (spawnLocation == null || spawnLocation.getWorld() == null) {
             new WarningMessage("Spawn location for regional boss " + customBossConfigFields.getFileName() + " is not valid. Incorrect location: " + spawnLocation);
             new WarningMessage("EliteMobs will skip this entity's spawn.");
             return;
         }
         spawnRegionalBoss();
-        regionalBossEntityList.add(this);
     }
 
-    private void spawnRegionalBoss() {
+    public void spawnRegionalBoss() {
 
         EntityType entityType;
 
@@ -187,6 +189,15 @@ public class RegionalBossEntity implements Listener {
             }
 
         }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20, 20 * 60);
+    }
+
+    public void hardDelete() {
+        customBossConfigFields.removeSpawnLocation(configRegionalEntity);
+        regionalBossEntityList.remove(this);
+    }
+
+    public String getSpawnWorldName() {
+        return this.spawnLocationString.split(",")[0];
     }
 
     public CustomBossConfigFields getCustomBossConfigFields() {

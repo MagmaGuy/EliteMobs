@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import org.bukkit.enchantments.Enchantment;
@@ -20,7 +21,7 @@ public class ScalableItemConstructor {
     }
 
     public static ItemStack constructScalableItem(int itemTier, CustomItem customItem, Player player) {
-        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments(), itemTier);
+        HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments(), itemTier, false);
         return ItemConstructor.constructItem(
                 customItem.getName(),
                 customItem.getMaterial(),
@@ -34,7 +35,7 @@ public class ScalableItemConstructor {
         );
     }
 
-    private static HashMap<Enchantment, Integer> updateDynamicEnchantments(HashMap<Enchantment, Integer> enchantmentsList, int itemTier) {
+    private static HashMap<Enchantment, Integer> updateDynamicEnchantments(HashMap<Enchantment, Integer> enchantmentsList, int itemTier, boolean isLimited) {
 
         if (enchantmentsList.containsKey(Enchantment.PROTECTION_ENVIRONMENTAL) &&
                 enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL) > ItemSettingsConfig.maximumLootTier)
@@ -66,7 +67,8 @@ public class ScalableItemConstructor {
 
         if (itemTier < 2) return newEnchantmentList;
 
-        int secondaryEnchantmentPool = ThreadLocalRandom.current().nextInt((int) Math.ceil((double) itemTier / 2));
+
+        int secondaryEnchantmentPool = ThreadLocalRandom.current().nextInt(itemTier);
 
         for (int i = 0; i < secondaryEnchantmentPool; i++) {
 
@@ -75,18 +77,25 @@ public class ScalableItemConstructor {
             int randomIndex = ThreadLocalRandom.current().nextInt(secondaryEnchantmentList.size());
             Enchantment randomizedEnchantment = (Enchantment) secondaryEnchantmentList.keySet().toArray()[randomIndex];
 
-            if (newEnchantmentList.isEmpty() || !newEnchantmentList.containsKey(randomizedEnchantment)) {
-                newEnchantmentList.put(randomizedEnchantment, 1);
-            } else {
-                int newEnchantmentLevel = newEnchantmentList.get(randomizedEnchantment) + 1;
-                newEnchantmentList.put(randomizedEnchantment, newEnchantmentLevel);
+            int enchantmentLevel = 1;
+
+            if (!newEnchantmentList.isEmpty() && newEnchantmentList.containsKey(randomizedEnchantment)) {
+                enchantmentLevel = newEnchantmentList.get(randomizedEnchantment) + 1;
             }
 
-            int leftoverPoolEnchantment = secondaryEnchantmentList.get(randomizedEnchantment) - 1;
-            if (leftoverPoolEnchantment <= 0)
-                secondaryEnchantmentList.remove(randomizedEnchantment);
-            else
-                secondaryEnchantmentList.put(randomizedEnchantment, leftoverPoolEnchantment);
+            newEnchantmentList.put(randomizedEnchantment, enchantmentLevel);
+
+            if (isLimited) {
+                int leftoverPoolEnchantment = secondaryEnchantmentList.get(randomizedEnchantment) - 1;
+                if (leftoverPoolEnchantment <= 0)
+                    secondaryEnchantmentList.remove(randomizedEnchantment);
+                else
+                    secondaryEnchantmentList.put(randomizedEnchantment, leftoverPoolEnchantment);
+            } else {
+                if (EnchantmentsConfig.getEnchantment(randomizedEnchantment).getMaxLevel() == enchantmentLevel)
+                    secondaryEnchantmentList.remove(randomizedEnchantment);
+
+            }
 
         }
 
@@ -147,7 +156,7 @@ public class ScalableItemConstructor {
             itemTier = enchantmentsList.get(Enchantment.ARROW_DAMAGE);
 
 
-        return updateDynamicEnchantments(enchantmentsList, itemTier);
+        return updateDynamicEnchantments(enchantmentsList, itemTier, true);
 
     }
 

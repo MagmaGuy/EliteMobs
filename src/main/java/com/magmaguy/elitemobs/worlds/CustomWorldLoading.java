@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.worlds;
 
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 
@@ -17,8 +18,14 @@ public class CustomWorldLoading {
             if (listOfFile.isDirectory() &&
                     listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName)) {
                 new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " found! Loading it in...");
-                Bukkit.createWorld(new WorldCreator(AdventurersGuildConfig.guildWorldName));
-                new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " has been successfully loaded! It can be accessed through the '/ag' command, unless you changed that config option!");
+                try {
+                    WorldCreator worldCreator = new WorldCreator(AdventurersGuildConfig.guildWorldName);
+                    Bukkit.createWorld(worldCreator).setKeepSpawnInMemory(false);
+                    new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " has been successfully loaded! It can be accessed through the '/ag' command, unless you changed that config option!");
+                } catch (Exception ex) {
+                    new WarningMessage("Failed to generate Adventurer's Guild World!");
+                    ex.printStackTrace();
+                }
                 break;
             }
         }
