@@ -36,6 +36,8 @@ public class ConfigurationLocation {
             yaw = Float.parseFloat(getSubString(locationOnlyString, 4, ","));
             pitch = Float.parseFloat(getSubString(locationOnlyString, 5, ","));
         } catch (Exception ex) {
+            if (locationString == null || locationString.equals("null"))
+                return null;
             new WarningMessage("Attempted to deserialize an invalid location!");
             new WarningMessage("Expected location format: worldname,x,y,z,pitch,yaw");
             new WarningMessage("Real location format: " + locationString);

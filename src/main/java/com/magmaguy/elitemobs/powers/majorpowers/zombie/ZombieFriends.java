@@ -54,8 +54,8 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                         nameClearer(reinforcement2);
 
-                        reinforcement2.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("DeathMessage").
-                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("DeathMessage")
+                        reinforcement2.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("friendDeathMessage").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("friendDeathMessage")
                                         .size()))));
 
                     }

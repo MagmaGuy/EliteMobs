@@ -101,7 +101,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
         else if ((itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)).equals(player.getUniqueId().toString() + GuildRank.getGuildPrestigeRank(player)))
             return true;
         else
-            return getPrestigeLevel(itemMeta) == GuildRank.getGuildPrestigeRank(player);
+            return getPrestigeLevel(itemMeta) == GuildRank.getGuildPrestigeRank(player) && itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING).equals(player.getUniqueId().toString());
     }
 
     public static Player getSoulboundPlayer(ItemMeta itemMeta) {

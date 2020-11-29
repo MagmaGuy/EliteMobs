@@ -44,6 +44,9 @@ public class CustomBossCommandHandler {
                 return;
             case "setleashradius":
                 setLeashRadius(customBossConfigFields, player, args);
+                break;
+            case "remove":
+                break;
             default:
                 return;
         }
@@ -85,6 +88,10 @@ public class CustomBossCommandHandler {
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList())
             if (customBossConfigFields.getFileName().equals(regionalBossEntity.getCustomBossConfigFields().getFileName()))
                 regionalBossEntity.setLeashRadius(leashRadius);
+
+    }
+
+    private static void removeRegionalBoss() {
 
     }
 
