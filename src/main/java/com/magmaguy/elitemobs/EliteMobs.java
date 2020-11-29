@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
+import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
@@ -19,6 +20,7 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
@@ -213,6 +215,7 @@ public class EliteMobs extends JavaPlugin {
         CustomBossConfigFields.getRegionalElites().clear();
         CustomBossConfigFields.getNaturallySpawnedElites().clear();
         CustomEnchantment.getCustomEnchantments().clear();
+        Minidungeon.minidungeons.clear();
 
         if (this.placeholders != null)
             ((Placeholders) placeholders).unregister();
@@ -254,6 +257,7 @@ public class EliteMobs extends JavaPlugin {
         CommandsConfig.initializeConfigs();
         EventsConfig.initializeConfigs();
         DiscordSRVConfig.initializeConfig();
+        DungeonPackagerConfig.initializeConfigs();
     }
 
     public static void worldScanner() {

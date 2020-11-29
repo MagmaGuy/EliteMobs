@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.combatsystem.combattag.TeleportTag;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
 import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
 import com.magmaguy.elitemobs.commands.getLootMenu;
+import com.magmaguy.elitemobs.commands.setup.SetupMenu;
 import com.magmaguy.elitemobs.commands.shops.BuyOrSellMenu;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
@@ -221,6 +222,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new CustomShopMenu(), plugin);
         pluginManager.registerEvents(new BuyOrSellMenu(), plugin);
         pluginManager.registerEvents(new SellMenu(), plugin);
+        pluginManager.registerEvents(new SetupMenu.SetupMenuListeners(), plugin);
 
         //Minecraft behavior canceller
         pluginManager.registerEvents(new ChunkUnloadMetadataPurge(), plugin);
