@@ -165,11 +165,6 @@ public class EliteMobs extends JavaPlugin {
         //QuestRefresher.generateNewQuestMenus();
 
         /*
-        Spawn world bosses
-         */
-        RegionalBossHandler.initialize();
-
-        /*
         Initialize NPCs
          */
         new NPCInitializer();
@@ -257,6 +252,10 @@ public class EliteMobs extends JavaPlugin {
         CommandsConfig.initializeConfigs();
         EventsConfig.initializeConfigs();
         DiscordSRVConfig.initializeConfig();
+        /*
+        Spawn world bosses
+         */
+        RegionalBossHandler.initialize();
         DungeonPackagerConfig.initializeConfigs();
     }
 

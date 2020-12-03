@@ -48,20 +48,11 @@ public class ChickenHandler implements Listener {
     Use events to add and remove loaded chicken and use the scanner to update the list of active chicken
     */
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void superDrops(EntityDamageByEntityEvent event) {
 
-        if (event.isCancelled()) {
-
+        if (event.getFinalDamage() < 1)
             return;
-
-        }
-
-        if (event.getFinalDamage() < 1) {
-
-            return;
-
-        }
 
         if (event.getEntity() instanceof Chicken && EntityTracker.isSuperMob(event.getEntity())) {
 
@@ -103,7 +94,7 @@ public class ChickenHandler implements Listener {
 
     }
 
-    private List<String> lore = new ArrayList<>(Arrays.asList("SuperChicken Egg"));
+    private final List<String> lore = new ArrayList<>(Arrays.asList("SuperChicken Egg"));
 
     //Egg drop chance is based on the underlying timer
     public void dropEggs() {

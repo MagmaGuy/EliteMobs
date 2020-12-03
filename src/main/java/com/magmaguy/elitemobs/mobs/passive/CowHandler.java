@@ -22,7 +22,7 @@ import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
@@ -35,20 +35,11 @@ import static org.bukkit.Material.LEATHER;
  */
 public class CowHandler implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void superDrops(EntityDamageByEntityEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void superDrops(EntityDamageEvent event) {
 
-        if (event.isCancelled()) {
-
+        if (event.getFinalDamage() < 1)
             return;
-
-        }
-
-        if (event.getFinalDamage() < 1) {
-
-            return;
-
-        }
 
         if (event.getEntity() instanceof Cow && EntityTracker.isSuperMob(event.getEntity())) {
 

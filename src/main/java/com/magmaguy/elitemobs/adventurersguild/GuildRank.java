@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.utils.Round;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class GuildRank {
 
@@ -213,8 +215,15 @@ public class GuildRank {
 
     public static class GuildRankEvents implements Listener {
         @EventHandler
-        public void onPlayerLogin(PlayerJoinEvent event) {
-            setMaxHealth(event.getPlayer(), GuildRank.getActiveGuildRank(event.getPlayer()), GuildRank.getGuildPrestigeRank(event.getPlayer()));
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    setMaxHealth(event.getPlayer(),
+                            GuildRank.getActiveGuildRank(event.getPlayer(), true),
+                            GuildRank.getGuildPrestigeRank(event.getPlayer(), true));
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
         }
     }
 

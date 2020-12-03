@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.commands.setup;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -14,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.*;
@@ -134,8 +134,10 @@ public class SetupMenu {
     private Material getMaterial(Minidungeon minidungeon) {
         if (minidungeon.isInstalled)
             return Material.GREEN_STAINED_GLASS_PANE;
-        if (minidungeon.isDownloaded)
+        if (minidungeon.isDownloaded && minidungeon.bossesDownloaded)
             return Material.YELLOW_STAINED_GLASS_PANE;
+        if (!minidungeon.bossesDownloaded)
+            return Material.ORANGE_STAINED_GLASS_PANE;
         return Material.RED_STAINED_GLASS_PANE;
     }
 
@@ -154,18 +156,20 @@ public class SetupMenu {
             lore.add("&cClick to uninstall!");
             return;
         }
-        if (minidungeon.isDownloaded) {
-            lore.add(status + "&aready to install!");
-            lore.add("&2Click to install!");
-        } else {
+        if (!minidungeon.isDownloaded) {
             lore.add(status + "&4not downloaded!");
             lore.add("&4Download this at");
             lore.add("&9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink() + " &f!");
+            return;
         }
-    }
-
-    private void addEmptyCustomBossesCase(DungeonPackagerConfigFields dungeonPackagerConfigFields, int counter) {
-
+        if (!minidungeon.bossesDownloaded) {
+            lore.add("&4Minidungeon boss files are not downloaded!");
+            lore.add("&4Download this at");
+            lore.add("&9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink() + " &f!");
+            return;
+        }
+        lore.add(status + "&aready to install!");
+        lore.add("&2Click to install!");
     }
 
 
@@ -182,15 +186,27 @@ public class SetupMenu {
             Minidungeon minidungeon = setupMenu.minidungeonHashMap.get(event.getSlot());
             if (minidungeon != null) {
                 if (!minidungeon.isDownloaded) {
-                    player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink()));
+                    player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink() + " &4!"));
                     player.closeInventory();
-                    setupMenus.remove(player);
+                    setupMenus.remove(event.getInventory());
+                    return;
+                }
+                if (!minidungeon.bossesDownloaded) {
+                    player.sendMessage(ChatColorConverter.convert("&4You are missing the boss files for this minidungeon!"));
+                    player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink() + " &4!"));
+                    player.closeInventory();
+                    setupMenus.remove(event.getInventory());
                     return;
                 }
                 minidungeon.buttonToggleBehavior(player);
-                setupMenus.remove(player);
+                setupMenus.remove(event.getInventory());
                 player.closeInventory();
             }
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onInventoryClose(InventoryCloseEvent event) {
+            setupMenus.remove(event.getInventory());
         }
     }
 

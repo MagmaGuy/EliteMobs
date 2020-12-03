@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -86,6 +87,19 @@ public class ConfigurationEngine {
     public static List setList(FileConfiguration fileConfiguration, String key, List defaultValue) {
         fileConfiguration.addDefault(key, defaultValue);
         return fileConfiguration.getList(key);
+    }
+
+    public static void writeValue(Object value, File file, FileConfiguration fileConfiguration, String path) {
+        fileConfiguration.set(path, value);
+        try {
+            fileSaverCustomValues(fileConfiguration, file);
+        } catch (Exception exception) {
+            new WarningMessage("Failed to write value for " + path + " in file " + file.getName());
+        }
+    }
+
+    public static void removeValue(File file, FileConfiguration fileConfiguration, String path) {
+        writeValue(null, file, fileConfiguration, path);
     }
 
 }
