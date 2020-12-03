@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -568,9 +569,10 @@ public class CustomBossConfigFields {
     public ConfigRegionalEntity addSpawnLocation(Location location) {
         ConfigRegionalEntity newConfigRegionalEntity = new ConfigRegionalEntity(location, ConfigurationLocation.serialize(location), 0);
         configRegionalEntities.put(newConfigRegionalEntity.uuid, newConfigRegionalEntity);
+        new RegionalBossEntity(this, newConfigRegionalEntity);
         List<String> convertedList = new ArrayList<>();
         for (ConfigRegionalEntity configRegionalEntity : configRegionalEntities.values())
-            convertedList.add(ConfigurationLocation.serialize(configRegionalEntity.spawnLocation) + ":" + configRegionalEntity.respawnTimeLeft);
+            convertedList.add(configRegionalEntity.spawnLocationString);
         fileConfiguration.set("spawnLocations", convertedList);
         try {
             fileConfiguration.save(file);
@@ -585,12 +587,15 @@ public class CustomBossConfigFields {
         List<String> convertedList = new ArrayList<>();
         for (ConfigRegionalEntity iteratedConfigRegionalEntity : configRegionalEntities.values())
             convertedList.add(ConfigurationLocation.serialize(iteratedConfigRegionalEntity.spawnLocation) + ":" + iteratedConfigRegionalEntity.respawnTimeLeft);
-        fileConfiguration.set("spawnLocations", convertedList);
-        try {
-            fileConfiguration.save(file);
-        } catch (IOException ex) {
-            new WarningMessage("Failed to save new boss location! It will not show up in the right place after a restart. Report this to the dev.");
+        for (Iterator<RegionalBossEntity> regionalBossEntityIterator = RegionalBossEntity.getRegionalBossEntityList().iterator(); regionalBossEntityIterator.hasNext(); ) {
+            RegionalBossEntity regionalBossEntity = regionalBossEntityIterator.next();
+            if (regionalBossEntity.configRegionalEntity.equals(configRegionalEntity)) {
+                regionalBossEntity.softDelete();
+                regionalBossEntityIterator.remove();
+            }
+
         }
+        ConfigurationEngine.writeValue(convertedList, file, fileConfiguration, "spawnLocations");
     }
 
     public void setLeashRadius(double leashRadius) {

@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class PotionEffectsConfig {
 
-    private static HashMap<String, PotionEffectsConfigFields> potionEffects = new HashMap();
+    private static final HashMap<String, PotionEffectsConfigFields> potionEffects = new HashMap();
 
     public static void addPotionEffect(String fileName, PotionEffectsConfigFields powersConfigFields) {
         potionEffects.put(fileName, powersConfigFields);
@@ -24,10 +24,10 @@ public class PotionEffectsConfig {
         return potionEffects.get(fileName);
     }
 
-    private static ArrayList<PotionEffectsConfigFields> potionEffectsConfigFields = new ArrayList<>(Arrays.asList(
+    private static final ArrayList<PotionEffectsConfigFields> potionEffectsConfigFields = new ArrayList<>(Arrays.asList(
             new AbsorptionConfig(),
             new BlindnessConfig(),
-            new ConduitConfig(),
+            new ConduitPowerConfig(),
             new ConfusionConfig(),
             new DamageResistanceConfig(),
             new DolphinsGraceConfig(),
