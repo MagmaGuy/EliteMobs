@@ -151,7 +151,7 @@ public class NPCEntity {
         this.spawnLocation.setDirection(this.spawnLocation.getDirection().multiply(-1));
 
         //this is how the wandering trader works
-        if (npCsConfigFields.getLocation().equalsIgnoreCase("null"))
+        if (npCsConfigFields.getLocation() == null || npCsConfigFields.getLocation().equalsIgnoreCase("null"))
             return;
 
         WorldGuardSpawnEventBypasser.forceSpawn();

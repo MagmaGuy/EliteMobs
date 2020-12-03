@@ -21,7 +21,7 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -36,17 +36,11 @@ import static org.bukkit.Material.*;
  */
 public class SheepHandler implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void superDrops(EntityDamageByEntityEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void superDrops(EntityDamageEvent event) {
 
-        if (event.isCancelled())
+        if (event.getFinalDamage() < 1)
             return;
-
-        if (event.getFinalDamage() < 1) {
-
-            return;
-
-        }
 
         if (EntityTracker.isSuperMob(event.getEntity()) && event.getEntity() instanceof Sheep) {
 

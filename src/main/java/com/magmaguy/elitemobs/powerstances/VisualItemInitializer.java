@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public class VisualItemInitializer {
 
@@ -13,6 +15,7 @@ public class VisualItemInitializer {
         EntityTracker.registerItemVisualEffects(item);
         item.setGravity(false);
         item.setInvulnerable(true);
+        item.setMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
 
         return item;
     }

@@ -66,22 +66,22 @@ public class GenericRotationMatrixMath {
 
     }
 
-    private static Location rotateSpecificLocation(double a, double b, double c, double theta, Location location) {
-        double x = location.getX();
-        double y = location.getY();
-        double z = location.getZ();
+    private static Vector rotateSpecificLocation(double a, double b, double c, double theta, Vector relativeLocation) {
+        double x = relativeLocation.getX();
+        double y = relativeLocation.getY();
+        double z = relativeLocation.getZ();
         //Convert radian to degree
-        theta *= 180 / PI;
+        theta *= PI / 180;
 
         double newX = x * (cos(theta) + (1 - cos(theta)) * pow(a, 2)) + y * ((1 - cos(theta)) * a * b + (sin(theta)) * c) + z * ((1 - cos(theta)) * a * c - (sin(theta)) * b);
         double newY = x * ((1 - cos(theta)) * b * a - (sin(theta)) * c) + y * (cos(theta) + (1 - cos(theta)) * pow(b, 2)) + z * ((1 - cos(theta)) * b * c + (sin(theta)) * a);
         double newZ = x * ((1 - cos(theta)) * c * a + (sin(theta)) * b) + y * ((1 - cos(theta)) * c * b - (sin(theta)) * a) + z * (cos(theta) + (1 - cos(theta)) * pow(c, 2));
 
-        return new Location(location.getWorld(), newX, newY, newZ);
+        return new Vector(newX, newY, newZ);
     }
 
-    public static Location rotateLocationYAxis(double rotationAngleInDegrees, Location location) {
-        return rotateSpecificLocation(0, 1, 0, rotationAngleInDegrees, location);
+    public static Location rotateLocationYAxis(double rotationAngleInDegrees, Location anchorPoint, Vector relativeLocation) {
+        return anchorPoint.clone().add(rotateSpecificLocation(0, 1, 0, rotationAngleInDegrees, relativeLocation));
     }
 
 }

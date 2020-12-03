@@ -1,7 +1,10 @@
 package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -37,6 +40,8 @@ public class DungeonPackagerConfigFields {
     private World.Environment environment;
     private final Boolean protect;
     private File file;
+    private Location anchorPoint;
+    private double rotation;
 
     public DungeonPackagerConfigFields(String fileName,
                                        boolean isEnabled,
@@ -82,9 +87,11 @@ public class DungeonPackagerConfigFields {
             fileConfiguration.addDefault("environment", environment.toString());
         if (protect != null)
             fileConfiguration.addDefault("protect", protect);
+        fileConfiguration.addDefault("rotation", 0);
     }
 
     public DungeonPackagerConfigFields(FileConfiguration fileConfiguration, File file) {
+        this.file = file;
         this.fileName = file.getName();
         this.fileConfiguration = fileConfiguration;
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
@@ -108,7 +115,10 @@ public class DungeonPackagerConfigFields {
         if (fileConfiguration.contains("environment"))
             this.environment = World.Environment.valueOf(fileConfiguration.getString("environment"));
         this.protect = fileConfiguration.getBoolean("protect");
-        this.file = file;
+        if (fileConfiguration.contains("anchorPoint"))
+            this.anchorPoint = ConfigurationLocation.deserialize(fileConfiguration.getString("anchorPoint"));
+        if (fileConfiguration.contains("rotation"))
+            this.rotation = fileConfiguration.getDouble("rotation");
     }
 
     public String getFileName() {
@@ -121,12 +131,15 @@ public class DungeonPackagerConfigFields {
 
     public void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
-        fileConfiguration.set("isEnabled", isEnabled);
-        try {
-            fileConfiguration.save(file);
-        } catch (Exception ex) {
-            new WarningMessage("Failed to save dungeon state!");
-        }
+        ConfigurationEngine.writeValue(isEnabled, file, fileConfiguration, "isEnabled");
+    }
+
+    public void setEnabled(boolean isEnabled, Location anchorPoint) {
+        setEnabled(isEnabled);
+        if (isEnabled)
+            setAnchorPoint(anchorPoint);
+        else
+            removeAnchorPoint();
     }
 
     public String getName() {
@@ -171,6 +184,29 @@ public class DungeonPackagerConfigFields {
 
     public boolean getProtect() {
         return this.protect != null && this.protect;
+    }
+
+    public Location getAnchorPoint() {
+        return this.anchorPoint;
+    }
+
+    private void setAnchorPoint(Location location) {
+        this.anchorPoint = location;
+        ConfigurationEngine.writeValue(ConfigurationLocation.serialize(location), file, fileConfiguration, "anchorPoint");
+    }
+
+    private void removeAnchorPoint() {
+        ConfigurationEngine.removeValue(file, fileConfiguration, "anchorPoint");
+        this.anchorPoint = null;
+    }
+
+    public double getRotation() {
+        return this.rotation;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+        ConfigurationEngine.writeValue(rotation, file, fileConfiguration, "rotation");
     }
 
 }

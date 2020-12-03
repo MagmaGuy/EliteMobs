@@ -473,6 +473,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
+                            if (customBossEntity == null || customBossEntity.getLivingEntity() == null)
+                                return;
                             PreventMountExploit.bypass = true;
                             customBossEntity.getLivingEntity().addPassenger(getLivingEntity());
                         }
