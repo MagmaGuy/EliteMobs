@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.commands.setup.SetupMenu;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -26,6 +27,20 @@ public class SetupHandler {
         }
 
         //Syntax: /em setup area [regionName]
+
+        if (args[1].equals("minidungeon")) {
+            Minidungeon minidungeon = Minidungeon.minidungeons.get(args[2]);
+            minidungeon.finalizeMinidungeonInstallation(player);
+            player.performCommand("/rotate " + minidungeon.dungeonPackagerConfigFields.getRotation());
+            player.performCommand("/paste");
+            return;
+        }
+
+        if (args[1].equals("unminidungeon")) {
+            Minidungeon minidungeon = Minidungeon.minidungeons.get(args[2]);
+            minidungeon.uninstallSchematicMinidungeon(player);
+            player.performCommand("/undo");
+        }
 
         if (args.length < 3) {
             player.sendMessage("[EliteMobs] Invalid command syntax! Expected syntax:");

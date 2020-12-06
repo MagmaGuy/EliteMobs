@@ -573,12 +573,7 @@ public class CustomBossConfigFields {
         List<String> convertedList = new ArrayList<>();
         for (ConfigRegionalEntity configRegionalEntity : configRegionalEntities.values())
             convertedList.add(configRegionalEntity.spawnLocationString);
-        fileConfiguration.set("spawnLocations", convertedList);
-        try {
-            fileConfiguration.save(file);
-        } catch (IOException ex) {
-            new WarningMessage("Failed to save new boss location! It will not show up in the right place after a restart. Report this to the dev.");
-        }
+        ConfigurationEngine.writeValue(convertedList, file, fileConfiguration, "spawnLocations");
         return newConfigRegionalEntity;
     }
 

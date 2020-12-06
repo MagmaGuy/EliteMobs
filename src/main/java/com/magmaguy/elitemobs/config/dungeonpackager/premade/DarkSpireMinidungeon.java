@@ -21,6 +21,8 @@ public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
                 "elitemobs_hell_tower",
                 null,
                 World.Environment.NETHER,
-                true);
+                true,
+                null,
+                null);
     }
 }

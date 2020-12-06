@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
@@ -42,6 +43,12 @@ public class CustomBossCommandHandler {
                     player.sendMessage("Please refer to the EliteMobs wiki for documentation on World Bosses. If you're just trying to spawn a boss, use the command /em spawn");
                 }
                 return;
+            //command: /em customboss [filename.yml] addRelativeLocation [minidungeonName]
+            case "addrelativelocation":
+                if (addRelativeSpawnLocation(customBossConfigFields, player.getLocation().clone(), args[3]))
+                    player.sendMessage("[EliteMobs] Successfully added relative location!");
+                else
+                    player.sendMessage("[EliteMobs] Failed to add relative location!");
             case "setleashradius":
                 setLeashRadius(customBossConfigFields, player, args);
                 break;
@@ -63,6 +70,13 @@ public class CustomBossCommandHandler {
         CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity = customBossConfigFields.addSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
         new RegionalBossEntity(customBossConfigFields, configRegionalEntity);
         return true;
+    }
+
+    private static boolean addRelativeSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location, String minidungeonString) {
+        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonString);
+        if (minidungeon == null)
+            return false;
+        return minidungeon.initializeRelativeLocationAddition(customBossConfigFields, location);
     }
 
     private static void setLeashRadius(CustomBossConfigFields customBossConfigFields, Player player, String[] args) {

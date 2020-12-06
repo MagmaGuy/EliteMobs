@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
@@ -14,13 +15,15 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                         "&fmulti-phased battle, first mounted boss,",
                         "&ffirst disguised boss... a truly epic fight!",
                         "&6Credits: MagmaGuy & Maldini"),
-                Arrays.asList("colosseum_pit_master.yml:0,0,0,0,0"),
+                Arrays.asList("colosseum_pit_master.yml:-0.5,-1.5,47.5"),
                 Arrays.asList(),
                 "patreon.com/magmaguy",
                 DungeonSizeCategory.LAIR,
                 null,
                 "elitemobs_colosseum.schem",
                 null,
-                null);
+                null,
+                new Vector(-41, 14, 0),
+                new Vector(40, 40, 88));
     }
 }

@@ -84,4 +84,8 @@ public class GenericRotationMatrixMath {
         return anchorPoint.clone().add(rotateSpecificLocation(0, 1, 0, rotationAngleInDegrees, relativeLocation));
     }
 
+    public static Vector rotateVectorYAxis(double rotationAngleInDegrees, Location anchorPoint, Vector relativeLocation) {
+        return rotateLocationYAxis(rotationAngleInDegrees, anchorPoint, relativeLocation).toVector();
+    }
+
 }

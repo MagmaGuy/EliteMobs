@@ -20,6 +20,8 @@ public class HallosseumLair extends DungeonPackagerConfigFields {
                 "hallosseum",
                 null,
                 World.Environment.NETHER,
-                true);
+                true,
+                null,
+                null);
     }
 }

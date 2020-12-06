@@ -20,6 +20,8 @@ public class SewersMinidungeon extends DungeonPackagerConfigFields {
                 "elitemobs_sewer_maze",
                 null,
                 World.Environment.NORMAL,
-                true);
+                true,
+                null,
+                null);
     }
 }

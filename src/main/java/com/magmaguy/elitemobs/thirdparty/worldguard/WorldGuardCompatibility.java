@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.thirdparty.worldguard;
 
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.IntegerFlag;
@@ -10,10 +11,12 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 public class WorldGuardCompatibility {
 
@@ -184,6 +187,31 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.ENDERDRAGON_BLOCK_DAMAGE, deny);
         protectedRegion.setFlag(Flags.LIGHTER, deny);
         protectedRegion.setFlag(Flags.ENDERPEARL, deny);
+        protectedRegion.setFlag(Flags.GREET_MESSAGE, "Now entering");
+        protectedRegion.setFlag(Flags.FAREWELL_MESSAGE, "Now leaving");
+    }
+
+    /**
+     * Automatically creates a worldguard region protected as an EliteMobs minidungeon using two x y z vectors for the
+     * locations of the diagonally opposed locations
+     *
+     * @param corner1
+     * @param corner2
+     */
+    public static void defineMinidungeon(Vector corner1, Vector corner2, Location anchorLocation, String schematicName) {
+        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = regionContainer.get(BukkitAdapter.adapt(anchorLocation.getWorld()));
+        BlockVector3 min = BlockVector3.at(corner1.getBlockX(), corner1.getBlockY(), corner1.getBlockZ());
+        BlockVector3 max = BlockVector3.at(corner2.getBlockX(), corner2.getBlockY(), corner2.getBlockZ());
+        ProtectedRegion region = new ProtectedCuboidRegion(schematicName.replace(".schem", ""), min, max);
+        protectMinidungeonArea(region);
+        regionManager.addRegion(region);
+    }
+
+    public static void removeMinidungeon(String schematicName, Location anchorLocation) {
+        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = regionContainer.get(BukkitAdapter.adapt(anchorLocation.getWorld()));
+        regionManager.removeRegion(schematicName.replace(".schem", ""));
     }
 
 }
