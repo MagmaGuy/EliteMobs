@@ -41,6 +41,7 @@ import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
+import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
@@ -65,12 +66,10 @@ public class EliteMobs extends JavaPlugin {
     public static List<World> zoneBasedSpawningWorlds = new ArrayList<>();
     public static List<World> nightmareWorlds = new ArrayList<>();
     public Object placeholders = null;
+    public static Metrics metrics;
 
     @Override
     public void onEnable() {
-
-        //Enable stats
-        Metrics metrics = new Metrics(this, 1081);
 
         Bukkit.getLogger().info(" _____ _     _____ _____ ________  ______________  _____");
         Bukkit.getLogger().info("|  ___| |   |_   _|_   _|  ___|  \\/  |  _  | ___ \\/  ___|");
@@ -175,6 +174,11 @@ public class EliteMobs extends JavaPlugin {
             placeholders.register();
             this.placeholders = placeholders;
         }
+
+        //Enable stats
+        metrics = new Metrics(this, 1081);
+        //Initialize custom charts
+        new CustomCharts();
 
     }
 
