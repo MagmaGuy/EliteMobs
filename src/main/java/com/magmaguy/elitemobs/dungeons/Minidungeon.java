@@ -12,6 +12,8 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -70,7 +72,7 @@ public class Minidungeon {
         //Check if the world's been downloaded
         isDownloaded = Files.exists(Paths.get(Bukkit.getWorldContainer() + "/" + dungeonPackagerConfigFields.getWorldName()));
 
-        if (isDownloaded && !isInstalled)
+        if (isDownloaded && dungeonPackagerConfigFields.isEnabled())
             if (dungeonPackagerConfigFields.isEnabled())
                 MinidungeonWorldLoader.loadWorld(this);
 
@@ -330,41 +332,53 @@ public class Minidungeon {
 
     private void installSchematicMinidungeon(Player player) {
         player.performCommand("schematic load " + dungeonPackagerConfigFields.getSchematicName());
-        player.sendMessage(ChatColorConverter.convert("[EliteMobs] Ready to install " + dungeonPackagerConfigFields.getDungeonLocationType().toString().toLowerCase() + "!"));
-        TextComponent setupOptions = new TextComponent(ChatColorConverter.convert("&9Click here to paste the building into your world!"));
-        setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName()));
-        player.spigot().sendMessage(setupOptions);
+        player.sendMessage(ChatColorConverter.convert("&2-------------------------------------------------"));
+        player.sendMessage(ChatColorConverter.convert("&7[EliteMobs] &2Ready to install " + dungeonPackagerConfigFields.getDungeonSizeCategory().toString().toLowerCase() + "!"));
+        TextComponent pasteString = new TextComponent(ChatColorConverter.convert("&aClick here to place the &lbuilding and bosses &awhere you're standing!"));
+        pasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName()));
+        pasteString.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColorConverter.convert("&2Click me!")).create()));
+        TextComponent noPasteString = new TextComponent(ChatColorConverter.convert("&4&lOr &4click here to &lonly set the bosses with no building&4!"));
+        noPasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName() + " noPaste"));
+        noPasteString.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColorConverter.convert("&cOnly click if you're already standing at the bulding's anchor point!")).create()));
+        player.spigot().sendMessage(pasteString);
+        player.spigot().sendMessage(noPasteString);
+        player.sendMessage(ChatColorConverter.convert("&2-------------------------------------------------"));
     }
 
-    public void finalizeMinidungeonInstallation(Player player) {
+    public void finalizeMinidungeonInstallation(Player player, boolean pastedSchematic) {
         dungeonPackagerConfigFields.setEnabled(true, player.getLocation());
         this.realDungeonLocations = new RealDungeonLocations();
         commitLocations();
         this.isInstalled = true;
 
-        Vector realCorner1 = GenericRotationMatrixMath.rotateVectorYAxis(
-                dungeonPackagerConfigFields.getRotation(),
-                dungeonPackagerConfigFields.getAnchorPoint(),
-                dungeonPackagerConfigFields.getCorner1());
-        Vector realCorner2 = GenericRotationMatrixMath.rotateVectorYAxis(
-                dungeonPackagerConfigFields.getRotation(),
-                dungeonPackagerConfigFields.getAnchorPoint(),
-                dungeonPackagerConfigFields.getCorner2());
-
-        WorldGuardCompatibility.defineMinidungeon(realCorner1, realCorner2, dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getSchematicName());
+        if (dungeonPackagerConfigFields.getProtect()) {
+            Vector realCorner1 = GenericRotationMatrixMath.rotateVectorYAxis(
+                    dungeonPackagerConfigFields.getRotation(),
+                    dungeonPackagerConfigFields.getAnchorPoint(),
+                    dungeonPackagerConfigFields.getCorner1());
+            Vector realCorner2 = GenericRotationMatrixMath.rotateVectorYAxis(
+                    dungeonPackagerConfigFields.getRotation(),
+                    dungeonPackagerConfigFields.getAnchorPoint(),
+                    dungeonPackagerConfigFields.getCorner2());
+            WorldGuardCompatibility.defineMinidungeon(realCorner1, realCorner2, dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getSchematicName());
+        }
 
         player.sendMessage(ChatColorConverter.convert("&2" + dungeonPackagerConfigFields.getName() + " installed!"));
         TextComponent setupOptions = new TextComponent(ChatColorConverter.convert("&4Click here to uninstall!"));
-        setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFileName()));
+        if (pastedSchematic)
+            setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFileName()));
+        else
+            setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFileName() + " noPaste"));
         player.spigot().sendMessage(setupOptions);
 
     }
 
     public void uninstallSchematicMinidungeon(Player player) {
-        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
-            WorldGuardCompatibility.removeMinidungeon(
-                    dungeonPackagerConfigFields.getSchematicName(),
-                    dungeonPackagerConfigFields.getAnchorPoint());
+        if (dungeonPackagerConfigFields.getProtect())
+            if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
+                WorldGuardCompatibility.removeMinidungeon(
+                        dungeonPackagerConfigFields.getSchematicName(),
+                        dungeonPackagerConfigFields.getAnchorPoint());
         uncommitLocations();
         dungeonPackagerConfigFields.setEnabled(false, player.getLocation());
         this.isInstalled = false;

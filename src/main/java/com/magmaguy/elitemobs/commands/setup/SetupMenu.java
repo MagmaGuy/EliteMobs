@@ -81,17 +81,22 @@ public class SetupMenu {
         int counter = 2;
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
 
-            switch (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType()) {
-                case WORLD:
-                    addWorldDungeon(minidungeon, counter);
-                    break;
-                case SCHEMATIC:
-                    addSchematicDungeon(minidungeon, counter);
-                    break;
-                default:
-                    new WarningMessage("Dungeon " + minidungeon.dungeonPackagerConfigFields.getFileName() + " does not have a valid location type and therefore can't be set up automatically!");
-                    break;
-            }
+            if (!Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
+                inventory.setItem(validSlots.get(counter), ItemStackGenerator.generateItemStack(Material.RED_STAINED_GLASS_PANE,
+                        ChatColorConverter.convert("&4You need WorldGuard to install Minidungeons correctly!")));
+            else
+
+                switch (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType()) {
+                    case WORLD:
+                        addWorldDungeon(minidungeon, counter);
+                        break;
+                    case SCHEMATIC:
+                        addSchematicDungeon(minidungeon, counter);
+                        break;
+                    default:
+                        new WarningMessage("Dungeon " + minidungeon.dungeonPackagerConfigFields.getFileName() + " does not have a valid location type and therefore can't be set up automatically!");
+                        break;
+                }
             minidungeonHashMap.put(validSlots.get(counter), minidungeon);
             counter++;
 
@@ -136,7 +141,7 @@ public class SetupMenu {
             return Material.GREEN_STAINED_GLASS_PANE;
         if (minidungeon.isDownloaded && minidungeon.bossesDownloaded)
             return Material.YELLOW_STAINED_GLASS_PANE;
-        if (!minidungeon.bossesDownloaded)
+        if (minidungeon.isDownloaded && !minidungeon.bossesDownloaded)
             return Material.ORANGE_STAINED_GLASS_PANE;
         return Material.RED_STAINED_GLASS_PANE;
     }
