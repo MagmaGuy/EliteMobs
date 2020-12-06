@@ -15,15 +15,24 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                         "&fmulti-phased battle, first mounted boss,",
                         "&ffirst disguised boss... a truly epic fight!",
                         "&6Credits: MagmaGuy & Maldini"),
-                Arrays.asList("colosseum_pit_master.yml:-0.5,-1.5,47.5"),
+                Arrays.asList("colosseum_tier_70_boss_p1.yml:-0.5,-1.5,47.5",
+                        "colosseum_tier_70_gladiator.yml:5.5,-7.5,22.5",
+                        "colosseum_tier_70_gladiator.yml:1.5,-7.5,22.5",
+                        "colosseum_tier_70_gladiator.yml:0.5,-7.5,30.5",
+                        "colosseum_tier_70_gladiator.yml:-5.5,-7.5,41.5",
+                        "colosseum_tier_70_gladiator.yml:1.5,-7.5,41.5",
+                        "colosseum_tier_70_gladiator.yml:-11.5,-7.5,41.5",
+                        "colosseum_tier_70_gladiator.yml:-14.5,-7.5,23.5",
+                        "colosseum_tier_70_gladiator.yml:-30.5,-7.5,31.5",
+                        "colosseum_tier_70_gladiator.yml:-30.5,-7.5,31.5"),
                 Arrays.asList(),
                 "patreon.com/magmaguy",
                 DungeonSizeCategory.LAIR,
                 null,
                 "elitemobs_colosseum.schem",
                 null,
-                null,
-                new Vector(-41, 14, 0),
-                new Vector(40, 40, 88));
+                true,
+                new Vector(40, -14, 0),
+                new Vector(-41, 31, 88));
     }
 }

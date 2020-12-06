@@ -112,7 +112,7 @@ public class CustomTreasureChestConfigFields {
 
         String location = configuration.getString("location");
         if (location == null) {
-            new InfoMessage("Custom Treasure Chest in file " + fileName + "does not have a defined location! It will not spawn.");
+            new InfoMessage("Custom Treasure Chest in file " + fileName + " does not have a defined location! It will not spawn.");
         } else {
             this.location = ConfigurationLocation.deserialize(configuration.getString("location"));
         }

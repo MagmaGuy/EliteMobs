@@ -14,14 +14,14 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 Arrays.asList("&fThe first ever EliteMobs Lair!",
                         "&fA classic that all servers need!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                Arrays.asList("priest_of_cthulhu.yml:0.5,0.5,24.5"),
+                Arrays.asList("dark_cathedral_tier_75_boss.yml:0.5,0.5,24.5"),
                 Arrays.asList(""),
                 "https://discord.gg/vRW9wXhK",
                 DungeonSizeCategory.LAIR,
                 null,
                 "elitemobs_dark_cathedral.schem",
                 null,
-                null,
+                true,
                 new Vector(17, -27, 0),
                 new Vector(-19, 54, 32));
     }

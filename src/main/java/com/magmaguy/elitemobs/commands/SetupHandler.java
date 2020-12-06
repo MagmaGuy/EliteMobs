@@ -29,8 +29,14 @@ public class SetupHandler {
         //Syntax: /em setup area [regionName]
 
         if (args[1].equals("minidungeon")) {
+            if (args.length == 4 && args[3].equalsIgnoreCase("noPaste")) {
+                Minidungeon minidungeon = Minidungeon.minidungeons.get(args[2]);
+                minidungeon.finalizeMinidungeonInstallation(player, false);
+                return;
+            }
+
             Minidungeon minidungeon = Minidungeon.minidungeons.get(args[2]);
-            minidungeon.finalizeMinidungeonInstallation(player);
+            minidungeon.finalizeMinidungeonInstallation(player, true);
             player.performCommand("/rotate " + minidungeon.dungeonPackagerConfigFields.getRotation());
             player.performCommand("/paste");
             return;
@@ -39,7 +45,9 @@ public class SetupHandler {
         if (args[1].equals("unminidungeon")) {
             Minidungeon minidungeon = Minidungeon.minidungeons.get(args[2]);
             minidungeon.uninstallSchematicMinidungeon(player);
-            player.performCommand("/undo");
+            if (!(args.length == 4 && args[3].equalsIgnoreCase("noPaste")))
+                player.performCommand("/undo");
+            return;
         }
 
         if (args.length < 3) {
