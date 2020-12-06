@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.dungeons;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.internal.NewMinidungeonRelativeBossLocationEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
@@ -9,6 +11,8 @@ import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -238,6 +242,31 @@ public class Minidungeon {
         }
     }
 
+    public boolean initializeRelativeLocationAddition(CustomBossConfigFields customBossConfigFields, Location location) {
+        Location relativeLocation = addRelativeLocation(customBossConfigFields, location);
+        Bukkit.getPluginManager().callEvent(new NewMinidungeonRelativeBossLocationEvent(
+                this,
+                relativeLocation,
+                dungeonPackagerConfigFields.getAnchorPoint().clone().add(relativeLocation),
+                customBossConfigFields));
+        return relativeLocation != null;
+    }
+
+    private Location addRelativeLocation(CustomBossConfigFields customBossConfigFields, Location location) {
+        if (dungeonPackagerConfigFields.getAnchorPoint() == null)
+            return null;
+
+        Location relativeLocation = location.clone().subtract(dungeonPackagerConfigFields.getAnchorPoint());
+        relativeLocation.setX(relativeLocation.getBlockX() + 0.5);
+        relativeLocation.setY(relativeLocation.getBlockY() + 0.5);
+        relativeLocation.setZ(relativeLocation.getBlockZ() + 0.5);
+
+        if (dungeonPackagerConfigFields.setRelativeBossLocations(customBossConfigFields, relativeLocation))
+            return relativeLocation;
+        else
+            return null;
+    }
+
     public void buttonToggleBehavior(Player player) {
         //Cases where the map was not downloaded is already handled in SetupMenu since all it needs to do is post a download link
         switch (this.dungeonPackagerConfigFields.getDungeonLocationType()) {
@@ -293,15 +322,54 @@ public class Minidungeon {
 
     private void schematicButtonToggleBehavior(Player player) {
         if (!isInstalled) {
-            dungeonPackagerConfigFields.setEnabled(true, player.getLocation());
-            this.realDungeonLocations = new RealDungeonLocations();
-            commitLocations();
-            this.isInstalled = true;
+            installSchematicMinidungeon(player);
         } else {
-            dungeonPackagerConfigFields.setEnabled(false, player.getLocation());
-            uncommitLocations();
-            this.isInstalled = false;
+            uninstallSchematicMinidungeon(player);
         }
     }
+
+    private void installSchematicMinidungeon(Player player) {
+        player.performCommand("schematic load " + dungeonPackagerConfigFields.getSchematicName());
+        player.sendMessage(ChatColorConverter.convert("[EliteMobs] Ready to install " + dungeonPackagerConfigFields.getDungeonLocationType().toString().toLowerCase() + "!"));
+        TextComponent setupOptions = new TextComponent(ChatColorConverter.convert("&9Click here to paste the building into your world!"));
+        setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName()));
+        player.spigot().sendMessage(setupOptions);
+    }
+
+    public void finalizeMinidungeonInstallation(Player player) {
+        dungeonPackagerConfigFields.setEnabled(true, player.getLocation());
+        this.realDungeonLocations = new RealDungeonLocations();
+        commitLocations();
+        this.isInstalled = true;
+
+        Vector realCorner1 = GenericRotationMatrixMath.rotateVectorYAxis(
+                dungeonPackagerConfigFields.getRotation(),
+                dungeonPackagerConfigFields.getAnchorPoint(),
+                dungeonPackagerConfigFields.getCorner1());
+        Vector realCorner2 = GenericRotationMatrixMath.rotateVectorYAxis(
+                dungeonPackagerConfigFields.getRotation(),
+                dungeonPackagerConfigFields.getAnchorPoint(),
+                dungeonPackagerConfigFields.getCorner2());
+
+        WorldGuardCompatibility.defineMinidungeon(realCorner1, realCorner2, dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getSchematicName());
+
+        player.sendMessage(ChatColorConverter.convert("&2" + dungeonPackagerConfigFields.getName() + " installed!"));
+        TextComponent setupOptions = new TextComponent(ChatColorConverter.convert("&4Click here to uninstall!"));
+        setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFileName()));
+        player.spigot().sendMessage(setupOptions);
+
+    }
+
+    public void uninstallSchematicMinidungeon(Player player) {
+        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
+            WorldGuardCompatibility.removeMinidungeon(
+                    dungeonPackagerConfigFields.getSchematicName(),
+                    dungeonPackagerConfigFields.getAnchorPoint());
+        uncommitLocations();
+        dungeonPackagerConfigFields.setEnabled(false, player.getLocation());
+        this.isInstalled = false;
+        player.sendMessage("[EliteMobs] EliteMobs attempted to uninstall a minidungeon.Further WorldEdit commands might be required to remove the physical structure of the minidungeon.");
+    }
+
 
 }

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.internal.NewMinidungeonRelativeBossLocationEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
@@ -243,6 +244,11 @@ public class RegionalBossEntity implements Listener {
                     return;
                 regionalBossEntity.respawnRegionalBoss();
             }
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onNewMinidungeonRelativeBossLocationEvent(NewMinidungeonRelativeBossLocationEvent event) {
+            event.getCustomBossConfigFields().addSpawnLocation(event.getRealLocation());
         }
     }
 

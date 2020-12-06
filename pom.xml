@@ -7,7 +7,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.10</version>
+    <version>7.2.11</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -92,7 +92,6 @@
         <repository>
             <id>md_5-public</id>
             <url>http://repo.md-5.net/content/groups/public/</url>
-            <!--<url>file:C:\Users\Tiago\Documents\MineCraftProjects\EliteMobs\LibsDisguises.jar</url>-->
         </repository>
 
     </repositories>
