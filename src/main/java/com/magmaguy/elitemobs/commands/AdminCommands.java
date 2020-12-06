@@ -1,11 +1,14 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.admin.DebugScreen;
 import com.magmaguy.elitemobs.commands.admin.StatsCommand;
 import com.magmaguy.elitemobs.commands.admin.npc.NPCCommands;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -169,6 +172,20 @@ public class AdminCommands {
                     ItemStack itemStack = player.getInventory().getItemInMainHand();
                     if (ItemTagger.isEliteItem(itemStack))
                         SoulbindEnchantment.removeEnchantment(itemStack);
+                }
+                return true;
+
+            case "relativecoord":
+                if (CommandHandler.userPermCheck("elitemobs.*", commandSender)) {
+                    Minidungeon minidungeon = Minidungeon.minidungeons.get(args[1]);
+                    Location anchorpoint = minidungeon.dungeonPackagerConfigFields.getAnchorPoint();
+                    Player player = (Player) commandSender;
+                    String relativePosition = player.getLocation().clone().subtract(anchorpoint).getBlockX() + ", "
+                            + player.getLocation().clone().subtract(anchorpoint).getBlockY() + ", "
+                            + player.getLocation().clone().subtract(anchorpoint).getBlockZ();
+                    player.sendMessage(ChatColorConverter.convert(
+                            "[EliteMobs] Relative position to anchor point of " + minidungeon.dungeonPackagerConfigFields.getName() + ": " + relativePosition));
+
                 }
                 return true;
 

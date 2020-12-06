@@ -2,11 +2,14 @@ package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.util.List;
@@ -42,6 +45,7 @@ public class DungeonPackagerConfigFields {
     private File file;
     private Location anchorPoint;
     private double rotation;
+    private Vector corner1, corner2;
 
     public DungeonPackagerConfigFields(String fileName,
                                        boolean isEnabled,
@@ -55,7 +59,9 @@ public class DungeonPackagerConfigFields {
                                        String worldName,
                                        String schematicName,
                                        World.Environment environment,
-                                       Boolean protect) {
+                                       Boolean protect,
+                                       Vector corner1,
+                                       Vector corner2) {
         this.fileName = fileName + ".yml";
         this.isEnabled = isEnabled;
         this.name = name;
@@ -70,6 +76,8 @@ public class DungeonPackagerConfigFields {
         this.worldName = worldName;
         this.environment = environment;
         this.protect = protect;
+        this.corner1 = corner1;
+        this.corner2 = corner2;
     }
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -88,6 +96,10 @@ public class DungeonPackagerConfigFields {
         if (protect != null)
             fileConfiguration.addDefault("protect", protect);
         fileConfiguration.addDefault("rotation", 0);
+        if (corner1 != null)
+            fileConfiguration.addDefault("corner1", corner1.getBlockX() + "," + corner1.getBlockY() + "," + corner1.getBlockZ());
+        if (corner2 != null)
+            fileConfiguration.addDefault("corner2", corner2.getBlockX() + "," + corner2.getBlockY() + "," + corner2.getBlockZ());
     }
 
     public DungeonPackagerConfigFields(FileConfiguration fileConfiguration, File file) {
@@ -119,6 +131,19 @@ public class DungeonPackagerConfigFields {
             this.anchorPoint = ConfigurationLocation.deserialize(fileConfiguration.getString("anchorPoint"));
         if (fileConfiguration.contains("rotation"))
             this.rotation = fileConfiguration.getDouble("rotation");
+        if (fileConfiguration.contains("corner1"))
+            corner1 = new Vector(
+                    Integer.parseInt(fileConfiguration.getString("corner1").split(",")[0]),
+                    Integer.parseInt(fileConfiguration.getString("corner1").split(",")[1]),
+                    Integer.parseInt(fileConfiguration.getString("corner1").split(",")[2])
+            );
+
+        if (fileConfiguration.contains("corner2"))
+            corner2 = new Vector(
+                    Integer.parseInt(fileConfiguration.getString("corner2").split(",")[0]),
+                    Integer.parseInt(fileConfiguration.getString("corner2").split(",")[1]),
+                    Integer.parseInt(fileConfiguration.getString("corner2").split(",")[2])
+            );
     }
 
     public String getFileName() {
@@ -158,6 +183,12 @@ public class DungeonPackagerConfigFields {
         return relativeBossLocations;
     }
 
+    public boolean setRelativeBossLocations(CustomBossConfigFields customBossConfigFields, Location relativeLocation) {
+        String configurationLocation = customBossConfigFields.getFileName() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
+        relativeBossLocations.add(configurationLocation);
+        return ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
+    }
+
     public List<String> getRelativeTreasureChestLocations() {
         return relativeTreasureChestLocations;
     }
@@ -191,8 +222,24 @@ public class DungeonPackagerConfigFields {
     }
 
     private void setAnchorPoint(Location location) {
-        this.anchorPoint = location;
-        ConfigurationEngine.writeValue(ConfigurationLocation.serialize(location), file, fileConfiguration, "anchorPoint");
+        Location roundedLocation = location.clone();
+        roundedLocation.setX(roundedLocation.getBlockX() + 0.5);
+        roundedLocation.setY(roundedLocation.getBlockY() + 0.5);
+        roundedLocation.setZ(roundedLocation.getBlockZ() + 0.5);
+        float roundedYaw = roundedLocation.getYaw();
+        if (roundedYaw <= 45 && roundedYaw >= -45)
+            roundedYaw = 0;
+        else if (roundedYaw >= 45 && roundedYaw <= 135)
+            roundedYaw = 90;
+        else if (roundedYaw <= -45 && roundedYaw >= -135)
+            roundedYaw = -90;
+        else if (roundedYaw >= 135 || roundedYaw <= -135)
+            roundedYaw = 180;
+        roundedLocation.setPitch(roundedYaw);
+        this.anchorPoint = roundedLocation;
+        setRotation(roundedYaw);
+        ConfigurationEngine.writeValue(ConfigurationLocation.serialize(roundedLocation), file, fileConfiguration, "anchorPoint");
+        new DebugBlockLocation(roundedLocation);
     }
 
     private void removeAnchorPoint() {
@@ -204,9 +251,17 @@ public class DungeonPackagerConfigFields {
         return this.rotation;
     }
 
-    public void setRotation(double rotation) {
-        this.rotation = rotation;
+    public void setRotation(float roundedRotation) {
+        this.rotation = roundedRotation;
         ConfigurationEngine.writeValue(rotation, file, fileConfiguration, "rotation");
+    }
+
+    public Vector getCorner1() {
+        return corner1;
+    }
+
+    public Vector getCorner2() {
+        return corner2;
     }
 
 }

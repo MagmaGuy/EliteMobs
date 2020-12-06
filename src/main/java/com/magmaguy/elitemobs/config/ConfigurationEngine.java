@@ -89,13 +89,15 @@ public class ConfigurationEngine {
         return fileConfiguration.getList(key);
     }
 
-    public static void writeValue(Object value, File file, FileConfiguration fileConfiguration, String path) {
+    public static boolean writeValue(Object value, File file, FileConfiguration fileConfiguration, String path) {
         fileConfiguration.set(path, value);
         try {
             fileSaverCustomValues(fileConfiguration, file);
         } catch (Exception exception) {
             new WarningMessage("Failed to write value for " + path + " in file " + file.getName());
+            return false;
         }
+        return true;
     }
 
     public static void removeValue(File file, FileConfiguration fileConfiguration, String path) {
