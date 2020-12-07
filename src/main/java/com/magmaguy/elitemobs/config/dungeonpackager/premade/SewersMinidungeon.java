@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class SewersMinidungeon extends DungeonPackagerConfigFields {
     public SewersMinidungeon() {
         super("sewers_minidungeon",
-                true,
+                false,
                 "&8The Sewers",
                 DungeonLocationType.WORLD,
                 Arrays.asList("&fThe biggest minidungeon ever made!",

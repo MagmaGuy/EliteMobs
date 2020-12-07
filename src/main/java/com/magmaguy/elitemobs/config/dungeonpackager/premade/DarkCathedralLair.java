@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class DarkCathedralLair extends DungeonPackagerConfigFields {
     public DarkCathedralLair() {
         super("dark_cathedral_lair",
-                true,
+                false,
                 "&8The Dark Cathedral",
                 DungeonLocationType.SCHEMATIC,
                 Arrays.asList("&fThe first ever EliteMobs Lair!",
