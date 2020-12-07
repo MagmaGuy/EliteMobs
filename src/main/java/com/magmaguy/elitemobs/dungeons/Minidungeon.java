@@ -195,7 +195,13 @@ public class Minidungeon {
 
         public void uncommitLocations() {
             for (RealDungeonLocation realDungeonLocation : realDungeonLocations)
-                realDungeonLocation.customBossConfigFields.removeSpawnLocation(realDungeonLocation.configRegionalEntity);
+                try {
+                    realDungeonLocation.customBossConfigFields.removeSpawnLocation(realDungeonLocation.configRegionalEntity);
+                } catch (Exception exception) {
+                    new WarningMessage("Failed to remove a spawn location while unloading a boss!");
+                    if (realDungeonLocation != null && realDungeonLocation.configRegionalEntity != null && realDungeonLocation.configRegionalEntity.spawnLocationString != null && realDungeonLocation.customBossConfigFields != null)
+                        new WarningMessage("Failed to remove spawn location: " + realDungeonLocation.configRegionalEntity.spawnLocationString + " of boss " + realDungeonLocation.customBossConfigFields.getFileName());
+                }
         }
     }
 

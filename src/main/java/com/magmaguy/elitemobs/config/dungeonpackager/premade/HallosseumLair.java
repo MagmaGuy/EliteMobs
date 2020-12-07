@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class HallosseumLair extends DungeonPackagerConfigFields {
     public HallosseumLair() {
         super("hallosseum_lair",
-                true,
+                false,
                 "&fHallosseum",
                 DungeonLocationType.WORLD,
                 Arrays.asList("&fThe 2020 spooky halloween encounter!",
