@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
     public DarkSpireMinidungeon() {
         super("dark_spire_lair",
-                true,
+                false,
                 "&8The Dark Spire",
                 DungeonLocationType.WORLD,
                 Arrays.asList("&fThe first ever high level content!",

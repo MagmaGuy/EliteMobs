@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class ColosseumLair extends DungeonPackagerConfigFields {
     public ColosseumLair() {
         super("colosseum_lair",
-                true,
+                false,
                 "&6The Colosseum",
                 DungeonLocationType.SCHEMATIC,
                 Arrays.asList("&fFeaturing the first true World boss, first",

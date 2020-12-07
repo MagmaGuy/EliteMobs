@@ -24,7 +24,8 @@ public class DungeonPackagerConfig {
             new ColosseumLair(),
             new SewersMinidungeon(),
             new DarkSpireMinidungeon(),
-            new HallosseumLair()
+            new HallosseumLair(),
+            new CatacombsLair()
     ));
 
     public static void initializeConfigs() {
