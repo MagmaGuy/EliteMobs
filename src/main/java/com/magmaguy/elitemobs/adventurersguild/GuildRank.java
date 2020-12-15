@@ -219,9 +219,10 @@ public class GuildRank {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    setMaxHealth(event.getPlayer(),
-                            GuildRank.getActiveGuildRank(event.getPlayer(), true),
-                            GuildRank.getGuildPrestigeRank(event.getPlayer(), true));
+                    if (event.getPlayer().isOnline())
+                        setMaxHealth(event.getPlayer(),
+                                GuildRank.getActiveGuildRank(event.getPlayer(), true),
+                                GuildRank.getGuildPrestigeRank(event.getPlayer(), true));
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
         }

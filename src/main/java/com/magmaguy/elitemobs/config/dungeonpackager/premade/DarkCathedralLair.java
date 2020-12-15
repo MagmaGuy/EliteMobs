@@ -23,6 +23,14 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 null,
                 true,
                 new Vector(17, -27, 0),
-                new Vector(-19, 54, 32));
+                new Vector(-19, 54, 32),
+                new Vector(0, 0, 0),
+                null,
+                null,
+                3,
+                "Difficulty: &cHard\n" +
+                        "$bossCount level $highestTier Big Boss!\n" +
+                        "&cThe original minidungeon, a challenge for\n" +
+                        "&ca small group of players or for veterans!");
     }
 }

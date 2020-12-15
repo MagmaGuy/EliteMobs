@@ -33,6 +33,13 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                 null,
                 true,
                 new Vector(40, -14, 0),
-                new Vector(-41, 31, 88));
+                new Vector(-41, 31, 88),
+                new Vector(0, 0, 0),
+                null,
+                null,
+                2,
+                "Difficulty: &4Very Hard\n" +
+                        "$bossCount bosses, from level $lowestTier to $highestTier\n" +
+                        "&cA true challenge for big groups of players!");
     }
 }

@@ -28,13 +28,15 @@ import java.util.UUID;
 public class SoulbindEnchantment extends CustomEnchantment {
 
     public static String key = "soulbind";
+    public static boolean isEnabled;
 
     public SoulbindEnchantment() {
         super(key, true);
     }
 
     public static ItemStack addEnchantment(ItemStack itemStack, Player player) {
-        if (!EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) return null;
+        isEnabled = EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled();
+        if (!isEnabled) return null;
         if (itemStack == null || player == null) return null;
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getPersistentDataContainer().set(SOULBIND_KEY, PersistentDataType.STRING, player.getUniqueId().toString());
@@ -87,12 +89,9 @@ public class SoulbindEnchantment extends CustomEnchantment {
     private static final NamespacedKey PRESTIGE_KEY = new NamespacedKey(MetadataHandler.PLUGIN, "prestige");
 
     public static boolean isValidSoulbindUser(ItemMeta itemMeta, Player player) {
+        if (!isEnabled) return true;
         if (itemMeta == null)
             return true;
-        //for legacy items
-        //if (GuildRank.getGuildPrestigeRank(player) == 0)
-        //    if (itemMeta.getCustomTagContainer().hasCustomTag(namespacedKey, ItemTagType.STRING))
-        //        return itemMeta.getCustomTagContainer().getCustomTag(new NamespacedKey(MetadataHandler.PLUGIN, key), ItemTagType.STRING).equals(player.getUniqueId().toString());
         if (!itemMeta.getPersistentDataContainer().has(SOULBIND_KEY, PersistentDataType.STRING))
             return true;
         if (GuildRank.getGuildPrestigeRank(player) == 0)

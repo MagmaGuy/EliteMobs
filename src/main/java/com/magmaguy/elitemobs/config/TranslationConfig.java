@@ -34,6 +34,7 @@ public class TranslationConfig {
     public static final String SHOP_SELL_MESSAGE = "Shop sell message";
     public static final String SHOP_INSUFFICIENT_FUNDS_MESSAGE = "Shop insufficient funds message";
     public static final String SHOP_SALE_INSTRUCTIONS = "Shop sale instructions";
+    public static final String SHOP_SALE_OTHERS_ITEMS = "Shop sale player items warning";
     public static final String SHOP_CURRENT_BALANCE = "Shop current balance message";
     public static final String SHOP_ITEM_PRICE = "Shop item cost message";
 
@@ -74,6 +75,7 @@ public class TranslationConfig {
         configuration.addDefault(SHOP_INSUFFICIENT_FUNDS_MESSAGE, "&cYou don't have enough $currency_name!");
         configuration.addDefault(SHOP_ITEM_PRICE, "That item costs &c$item_value $currency_name.");
         configuration.addDefault(SHOP_SELL_MESSAGE, "&aYou have sold $item_name &afor $currency_amount $currency_name!");
+        configuration.addDefault(SHOP_SALE_OTHERS_ITEMS, "&cYou can't sell items that are not currently soulbound to you! This includes items from other prestige tiers!");
         configuration.addDefault(SHOP_SALE_INSTRUCTIONS, "&cYou can only sell EliteMobs loot here! (Armor / weapons dropped from elites showing a value on their lore)");
 
         configuration.addDefault(TELEPORT_TIME_LEFT, "&7[EM] Teleporting in &a$time &7seconds...");

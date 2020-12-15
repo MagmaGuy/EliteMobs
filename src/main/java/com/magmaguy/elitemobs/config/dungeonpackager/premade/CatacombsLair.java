@@ -26,6 +26,13 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                 null,
                 true,
                 new Vector(-13, -16, 0),
-                new Vector(-18, 17, 52));
+                new Vector(-18, 17, 52),
+                new Vector(0, 0, 0),
+                null,
+                null,
+                2,
+                "Difficulty: &aEasy\n" +
+                        "$bossCount bosses, from tier $lowestTier to $highestTier\n" +
+                        "&2The best minidungeon for beginners!");
     }
 }

@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
+import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class PlayerStatusMenuConfig extends MenusConfigFields {
@@ -9,14 +11,15 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         super("player_status_screen");
     }
 
-    public static boolean doIndexPage, doStatsPage, doGearPage, doCommandsPage, doQuestTrackingPage, doBossTrackingPage;
+    public static boolean doIndexPage, doStatsPage, doGearPage, doTeleportsPage, doCommandsPage, doQuestTrackingPage, doBossTrackingPage;
     public static String[] indexTextLines = new String[13], indexHoverLines = new String[13], indexCommandLines = new String[13];
     public static String[] statsTextLines = new String[13], statsHoverLines = new String[13], statsCommandLines = new String[13];
     public static String[] gearTextLines = new String[13], gearHoverLines = new String[13], gearCommandLines = new String[13];
+    public static String[] teleportTextLines = new String[13], teleportHoverLines = new String[13], teleportCommandLines = new String[13];
     public static String[] commandsTextLines = new String[13], commandsHoverLines = new String[13], commandsCommandLines = new String[13];
     public static String[] bossTrackerTextLines = new String[13], bossTrackerHoverLines = new String[13], bossTrackerCommandLines = new String[13];
     public static String[] questTrackerTextLines = new String[13], questTrackerHoverLines = new String[13], questTrackerCommandLines = new String[13];
-    public static String onBossTrackHover, onQuestTrackHover;
+    public static String onBossTrackHover, onQuestTrackHover, onTeleportHover;
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -24,6 +27,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         doIndexPage = ConfigurationEngine.setBoolean(fileConfiguration, "doIndexPage", true);
         doStatsPage = ConfigurationEngine.setBoolean(fileConfiguration, "doStatsPage", true);
         doGearPage = ConfigurationEngine.setBoolean(fileConfiguration, "doGearPage", true);
+        doTeleportsPage = ConfigurationEngine.setBoolean(fileConfiguration, "doTeleportsPage", true);
         doCommandsPage = ConfigurationEngine.setBoolean(fileConfiguration, "doCommandsPage", true);
         doQuestTrackingPage = ConfigurationEngine.setBoolean(fileConfiguration, "doQuestTrackingPage", true);
         doBossTrackingPage = ConfigurationEngine.setBoolean(fileConfiguration, "doBossTrackingPage", true);
@@ -41,10 +45,10 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         indexLineCreator(5, "", "", "", fileConfiguration);
         indexLineCreator(6, "&bp. $statsPage &8- &6Stats", "Click to go!", "$statsPage", fileConfiguration);
         indexLineCreator(7, "&bp. $gearPage &8- &6Gear", "Click to go!", "$gearPage", fileConfiguration);
-        indexLineCreator(8, "&bp. $commandsPage &8- &6Commands", "Click to go!", "$commandsPage", fileConfiguration);
-        indexLineCreator(9, "&bp. $questsPage &8- &6Quest Tracking", "Click to go!", "$questsPage", fileConfiguration);
-        indexLineCreator(10, "&bp. $bossTrackingPage &8- &6Boss Tracking", "Click to go!", "$bossTrackingPage", fileConfiguration);
-        indexLineCreator(11, "", "", "", fileConfiguration);
+        indexLineCreator(8, "&bp. $teleportsPage &8- &6Teleports", "Click to go!", "$teleportsPage", fileConfiguration);
+        indexLineCreator(9, "&bp. $commandsPage &8- &6Commands", "Click to go!", "$commandsPage", fileConfiguration);
+        indexLineCreator(10, "&bp. $questsPage &8- &6Quest Tracking", "Click to go!", "$questsPage", fileConfiguration);
+        indexLineCreator(11, "&bp. $bossTrackingPage &8- &6Boss Tracking", "Click to go!", "$bossTrackingPage", fileConfiguration);
         indexLineCreator(12, "", "", "", fileConfiguration);
 
 
@@ -97,6 +101,14 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                 "", fileConfiguration);
         gearLineCreator(12, "", "", "", fileConfiguration);
 
+        teleportLineCreator(0, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
+        teleportLineCreator(1, "&2&lTeleports", "", "", fileConfiguration);
+        teleportLineCreator(2, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
+        teleportLineCreator(3, "Spawn", "Teleport to spawn!", "/em spawntp", fileConfiguration);
+        teleportLineCreator(4, PlayerStatusScreen.convertLightColorsToBlack(AdventurersGuildConfig.adventurersGuildMenuName), "Teleport to the Adventurer's Guild Hub!", "/ag", fileConfiguration);
+
+        onTeleportHover = ConfigurationEngine.setString(fileConfiguration, "onTeleportsHover", "Click to teleport!");
+
         commandsLineCreator(0, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
         commandsLineCreator(1, "&3&lCommands:", "", "", fileConfiguration);
         commandsLineCreator(2, "&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
@@ -131,9 +143,9 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     }
 
     private static void indexLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
-        indexTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexText" + line, text);
-        indexHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexHover" + line, hover);
-        indexCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexCommand" + line, command);
+        indexTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexTexts" + line, text);
+        indexHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexHovers" + line, hover);
+        indexCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexCommands" + line, command);
     }
 
     private static void statsLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
@@ -146,6 +158,12 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         gearTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearText" + line, text);
         gearHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearHover" + line, hover);
         gearCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearCommand" + line, command);
+    }
+
+    private static void teleportLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
+        teleportTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportText" + line, text);
+        teleportHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportHover" + line, hover);
+        teleportCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportCommand" + line, command);
     }
 
     private static void commandsLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {

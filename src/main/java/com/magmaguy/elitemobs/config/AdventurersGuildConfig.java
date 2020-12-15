@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -23,6 +24,7 @@ public class AdventurersGuildConfig {
     public static boolean alwaysUseNpcs;
     public static List<String> onRankUpCommand, onPrestigeUpCommand;
     public static double dodge1, dodge2, dodge3, crit1, crit2, crit3, health1, health2, health3, health4;
+    public static String adventurersGuildMenuName;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
@@ -36,6 +38,7 @@ public class AdventurersGuildConfig {
         guildLocationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
         guildWorldLocation = null;
         agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);
+        adventurersGuildMenuName = ConfigurationEngine.setString(fileConfiguration, "adventurersGuildMenuName", "&6&lAdventurer's Hub");
 
         //iterate through all prestige tiers
         for (int prestigeRank = 0; prestigeRank < 11; prestigeRank++)
@@ -307,6 +310,9 @@ public class AdventurersGuildConfig {
         health2 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige4Bonus", 2.5);
         health3 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige7Bonus", 3);
         health4 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige10Bonus", 4);
+
+        //initializes the AG location
+        AdventurersGuildCommand.defineTeleportLocation();
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

@@ -276,6 +276,7 @@ public class EntityTracker implements Listener {
     public static void registerNPCEntity(NPCEntity npc) {
         npcEntities.add(npc);
         npc.getVillager().setMetadata(MetadataHandler.NPC_METADATA, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        CrashFix.persistentTracker(npc.getVillager());
         registerCullableEntity(npc.getVillager());
     }
 
