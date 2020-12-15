@@ -46,6 +46,11 @@ public class DungeonPackagerConfigFields {
     private Location anchorPoint;
     private double rotation;
     private Vector corner1, corner2;
+    private Vector teleportPoint;
+    private final Double teleportPointPitch;
+    private final Double teleportPointYaw;
+    private final int dungeonVersion;
+    private final String playerInfo;
 
     public DungeonPackagerConfigFields(String fileName,
                                        boolean isEnabled,
@@ -61,7 +66,12 @@ public class DungeonPackagerConfigFields {
                                        World.Environment environment,
                                        Boolean protect,
                                        Vector corner1,
-                                       Vector corner2) {
+                                       Vector corner2,
+                                       Vector teleportPoint,
+                                       Double teleportPointPitch,
+                                       Double teleportPointYaw,
+                                       int dungeonVersion,
+                                       String playerInfo) {
         this.fileName = fileName + ".yml";
         this.isEnabled = isEnabled;
         this.name = name;
@@ -78,6 +88,11 @@ public class DungeonPackagerConfigFields {
         this.protect = protect;
         this.corner1 = corner1;
         this.corner2 = corner2;
+        this.teleportPoint = teleportPoint;
+        this.teleportPointPitch = teleportPointPitch;
+        this.teleportPointYaw = teleportPointYaw;
+        this.dungeonVersion = dungeonVersion;
+        this.playerInfo = playerInfo;
     }
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -100,6 +115,12 @@ public class DungeonPackagerConfigFields {
             fileConfiguration.addDefault("corner1", corner1.getBlockX() + "," + corner1.getBlockY() + "," + corner1.getBlockZ());
         if (corner2 != null)
             fileConfiguration.addDefault("corner2", corner2.getBlockX() + "," + corner2.getBlockY() + "," + corner2.getBlockZ());
+        if (teleportPoint != null)
+            fileConfiguration.addDefault("teleportPoint", teleportPoint.getBlockX() + "," + teleportPoint.getBlockY() + "," + teleportPoint.getBlockZ());
+        fileConfiguration.addDefault("teleportPointPitch", teleportPointPitch);
+        fileConfiguration.addDefault("teleportPointYaw", teleportPointYaw);
+        fileConfiguration.addDefault("dungeonVersion", dungeonVersion);
+        fileConfiguration.addDefault("playerInfo", playerInfo);
     }
 
     public DungeonPackagerConfigFields(FileConfiguration fileConfiguration, File file) {
@@ -144,6 +165,16 @@ public class DungeonPackagerConfigFields {
                     Integer.parseInt(fileConfiguration.getString("corner2").split(",")[1]),
                     Integer.parseInt(fileConfiguration.getString("corner2").split(",")[2])
             );
+        if (fileConfiguration.contains("teleportPoint"))
+            teleportPoint = new Vector(
+                    Integer.parseInt(fileConfiguration.getString("teleportPoint").split(",")[0]),
+                    Integer.parseInt(fileConfiguration.getString("teleportPoint").split(",")[1]),
+                    Integer.parseInt(fileConfiguration.getString("teleportPoint").split(",")[2])
+            );
+        teleportPointPitch = fileConfiguration.getDouble("teleportPointPitch");
+        teleportPointYaw = fileConfiguration.getDouble("teleportPointYaw");
+        dungeonVersion = fileConfiguration.getInt("dungeonVersion");
+        playerInfo = fileConfiguration.getString("playerInfo");
     }
 
     public String getFileName() {
@@ -202,7 +233,7 @@ public class DungeonPackagerConfigFields {
     }
 
     public String getWorldName() {
-        return ChatColorConverter.convert(worldName);
+        return worldName;
     }
 
     public String getSchematicName() {
@@ -235,7 +266,7 @@ public class DungeonPackagerConfigFields {
             roundedYaw = -90;
         else if (roundedYaw >= 135 || roundedYaw <= -135)
             roundedYaw = 180;
-        roundedLocation.setPitch(roundedYaw);
+        roundedLocation.setYaw(roundedYaw);
         this.anchorPoint = roundedLocation;
         setRotation(roundedYaw);
         ConfigurationEngine.writeValue(ConfigurationLocation.serialize(roundedLocation), file, fileConfiguration, "anchorPoint");
@@ -264,4 +295,23 @@ public class DungeonPackagerConfigFields {
         return corner2;
     }
 
+    public Vector getTeleportOffset() {
+        return teleportPoint;
+    }
+
+    public Double getTeleportPointPitch() {
+        return teleportPointPitch;
+    }
+
+    public Double getTeleportPointYaw() {
+        return teleportPointYaw;
+    }
+
+    public int getDungeonVersion() {
+        return dungeonVersion;
+    }
+
+    public String getPlayerInfo() {
+        return playerInfo;
+    }
 }

@@ -107,7 +107,7 @@ public class NPCEntity {
             return;
         }
 
-        this.villager.setRemoveWhenFarAway(false);
+        this.villager.setRemoveWhenFarAway(true);
 
         if (!villager.isValid()) return;
 
@@ -126,7 +126,7 @@ public class NPCEntity {
 
         EntityTracker.registerNPCEntity(this);
         addNPCEntity(this);
-        //dupeBuster();
+        dupeBuster();
 
     }
 
@@ -150,10 +150,6 @@ public class NPCEntity {
             this.spawnLocation = location.clone();
         this.spawnLocation.setDirection(this.spawnLocation.getDirection().multiply(-1));
 
-        //this is how the wandering trader works
-        if (npCsConfigFields.getLocation() == null || npCsConfigFields.getLocation().equalsIgnoreCase("null"))
-            return;
-
         WorldGuardSpawnEventBypasser.forceSpawn();
         try {
             this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
@@ -164,7 +160,7 @@ public class NPCEntity {
             return;
         }
 
-        this.villager.setRemoveWhenFarAway(false);
+        this.villager.setRemoveWhenFarAway(true);
 
         if (!villager.isValid()) return;
 
@@ -183,7 +179,7 @@ public class NPCEntity {
 
         EntityTracker.registerNPCEntity(this);
         addNPCEntity(this);
-        //dupeBuster();
+        dupeBuster();
 
     }
 
@@ -202,9 +198,9 @@ public class NPCEntity {
         villager.setCustomNameVisible(true);
         villager.setProfession(profession);
         villager.setAI(canMove);
-        villager.setRemoveWhenFarAway(false);
+        villager.setRemoveWhenFarAway(true);
         initializeRole(role);
-        //dupeBuster();
+        dupeBuster();
     }
 
 
@@ -589,18 +585,16 @@ public class NPCEntity {
         return null;
     }
 
-    /**
-     * Busting makes me feel good!
 
+    //Busting makes me feel good!
+    //todo: remove due to potential annoyance with travelling merchant
     private void dupeBuster() {
         if (!villager.isValid())
-     return;
-     for (Entity entity : villager.getNearbyEntities(0.01, 0.01, 0.01))
-     if ((entity instanceof Villager && entity.getCustomName() != null) ||
+            return;
+        for (Entity entity : villager.getNearbyEntities(0.001, 0.001, 0.001))
+            if ((entity instanceof Villager && entity.getCustomName() != null) ||
                     (entity instanceof ArmorStand && !entity.equals(roleDisplay)))
                 entity.remove();
-
     }
-     */
 
 }

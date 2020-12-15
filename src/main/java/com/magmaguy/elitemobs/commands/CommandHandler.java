@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.items.ShareItem;
-import com.magmaguy.elitemobs.playerdata.PlayerStatusScreen;
+import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -99,6 +99,8 @@ public class CommandHandler implements CommandExecutor {
     public static boolean permCheck(String permission, CommandSender commandSender) {
 
         if (!DefaultConfig.usePermissions) {
+            if (commandSender.isOp())
+                return true;
             if (permission.equals(SHOP) ||
                     permission.equals(SHOP + ".command") ||
                     permission.equals(CUSTOMSHOP) ||
@@ -107,9 +109,12 @@ public class CommandHandler implements CommandExecutor {
                     permission.equals(CURRENCY_WALLET) ||
                     permission.equals(ADVENTURERS_GUILD) ||
                     permission.equals(QUEST) ||
-                    permission.equals("elitemobs.guild.npc"))
-                return true;
-            else if (commandSender.isOp())
+                    permission.equals("elitemobs.guild.npc") ||
+                    permission.equals("elitemobs.shop.npc") ||
+                    permission.equals("elitemobs.customshop.npc") ||
+                    permission.equals("elitemobs.back.npc") ||
+                    permission.equals("elitemobs.spawntp") ||
+                    permission.equals("elitemobs.dungeontp"))
                 return true;
         } else if (commandSender.hasPermission(permission)) return true;
 

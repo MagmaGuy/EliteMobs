@@ -32,7 +32,8 @@ public class NPCsConfig {
             new QuestGiverConfig(),
             new SpecialBlacksmithConfig(),
             new CombatInstructorConfig(),
-            new TravellingMerchantConfig()
+            new TravellingMerchantConfig(),
+            new BackTeleporter()
     ));
 
     public static void initializeConfigs() {

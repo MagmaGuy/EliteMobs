@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.playerdata.PlayerStatusScreen;
+import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
