@@ -35,6 +35,9 @@ public class Minidungeon {
     public DungeonPackagerConfigFields dungeonPackagerConfigFields;
     public RelativeDungeonLocations relativeDungeonLocations;
     public RealDungeonLocations realDungeonLocations;
+    public World world;
+    public Location teleportLocation;
+    public Integer lowestTier, highestTier, regionalBossCount = 0;
 
     public Minidungeon(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         minidungeons.put(dungeonPackagerConfigFields.getFileName(), this);
@@ -51,6 +54,7 @@ public class Minidungeon {
                 this.isDownloaded = this.isInstalled = false;
                 break;
         }
+
     }
 
     private void setupWorldBasedMinidungeon() {
@@ -63,6 +67,9 @@ public class Minidungeon {
         //Check if the world's been loaded
         if (Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName()) != null) {
             this.isDownloaded = this.isInstalled = true;
+            world = Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName());
+            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+            quantifyWorldBosses();
             return;
         }
 
@@ -74,8 +81,11 @@ public class Minidungeon {
 
         if (isDownloaded && dungeonPackagerConfigFields.isEnabled())
             if (dungeonPackagerConfigFields.isEnabled())
-                MinidungeonWorldLoader.loadWorld(this);
+                world = MinidungeonWorldLoader.loadWorld(this);
 
+        if (world != null) {
+            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+        }
     }
 
     private void setupSchematicBasedMinidungeon() {
@@ -112,6 +122,11 @@ public class Minidungeon {
             this.realDungeonLocations = new RealDungeonLocations();
 
         checkIfBossesInstalled();
+
+        if (isInstalled) {
+            this.teleportLocation = dungeonPackagerConfigFields.getAnchorPoint().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+            quantifySchematicBosses();
+        }
 
     }
 
@@ -306,9 +321,12 @@ public class Minidungeon {
             player.sendMessage("Minidungeon " + dungeonPackagerConfigFields.getWorldName() +
                     " has been loaded! The world is now loaded and the regional bosses are up.");
             isInstalled = true;
+            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
         } catch (Exception exception) {
             player.sendMessage("Warning: Failed to load the " + dungeonPackagerConfigFields.getWorldName() + " world!");
         }
+        if (isInstalled)
+            quantifyWorldBosses();
     }
 
     private void unloadWorld(Player player) {
@@ -326,6 +344,7 @@ public class Minidungeon {
         } catch (Exception exception) {
             player.sendMessage("Warning: Failed to unload the " + dungeonPackagerConfigFields.getWorldName() + " world!");
         }
+        regionalBossCount = 0;
     }
 
     private void schematicButtonToggleBehavior(Player player) {
@@ -369,6 +388,8 @@ public class Minidungeon {
             WorldGuardCompatibility.defineMinidungeon(realCorner1, realCorner2, dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getSchematicName());
         }
 
+        teleportLocation = dungeonPackagerConfigFields.getAnchorPoint().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+
         player.sendMessage(ChatColorConverter.convert("&2" + dungeonPackagerConfigFields.getName() + " installed!"));
         TextComponent setupOptions = new TextComponent(ChatColorConverter.convert("&4Click here to uninstall!"));
         if (pastedSchematic)
@@ -376,7 +397,7 @@ public class Minidungeon {
         else
             setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFileName() + " noPaste"));
         player.spigot().sendMessage(setupOptions);
-
+        quantifySchematicBosses();
     }
 
     public void uninstallSchematicMinidungeon(Player player) {
@@ -388,8 +409,41 @@ public class Minidungeon {
         uncommitLocations();
         dungeonPackagerConfigFields.setEnabled(false, player.getLocation());
         this.isInstalled = false;
+        this.regionalBossCount = 0;
         player.sendMessage("[EliteMobs] EliteMobs attempted to uninstall a minidungeon.Further WorldEdit commands might be required to remove the physical structure of the minidungeon.");
     }
 
+    private void quantifySchematicBosses() {
+        for (String regionalBossLocations : dungeonPackagerConfigFields.getRelativeBossLocations()) {
+            String bossFileName = regionalBossLocations.split(":")[0];
+            CustomBossConfigFields customBossConfigFields = CustomBossesConfig.getCustomBoss(bossFileName);
+            quantificationFilter(customBossConfigFields);
+            if (customBossConfigFields.isRegionalBoss())
+                regionalBossCount++;
+        }
+    }
+
+    private void quantifyWorldBosses() {
+        for (CustomBossConfigFields customBossConfigFields : CustomBossConfigFields.customBossConfigFields) {
+            for (CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity : customBossConfigFields.getConfigRegionalEntities().values()) {
+                if (configRegionalEntity.spawnLocationString.split(",")[0].equals(world.getName())) {
+                    regionalBossCount++;
+                    quantificationFilter(customBossConfigFields);
+                }
+            }
+        }
+    }
+
+    private void quantificationFilter(CustomBossConfigFields customBossConfigFields) {
+        try {
+            if (!customBossConfigFields.getLevel().equals("dynamic")) {
+                int level = Integer.parseInt(customBossConfigFields.getLevel());
+                lowestTier = lowestTier == null ? level : lowestTier < level ? lowestTier : level;
+                highestTier = highestTier == null ? level : highestTier > level ? highestTier : level;
+            }
+
+        } catch (Exception ex) {
+        }
+    }
 
 }

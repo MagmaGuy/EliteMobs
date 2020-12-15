@@ -244,11 +244,8 @@ public class LootTables implements Listener {
                 totalWeight += CustomItem.getWeighedFixedItems().get(itemStack);
             } catch (NullPointerException ex) {
                 new DebugMessage("Error generating loot");
-                new DebugMessage("totalweight: " + totalWeight);
-                new DebugMessage("itemStack is null: " + (itemStack == null));
                 if (itemStack != null)
                     new DebugMessage("itemStack is " + itemStack.getItemMeta().getDisplayName());
-                new DebugMessage("weighed items list is null:" + (CustomItem.getWeighedFixedItems() == null));
                 new DebugMessage("Weight value is null: " + (CustomItem.getWeighedFixedItems().get(itemStack) == null));
                 ex.printStackTrace();
             }

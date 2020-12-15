@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
@@ -23,6 +24,13 @@ public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
                 World.Environment.NETHER,
                 true,
                 null,
-                null);
+                null,
+                new Vector(0, 0, 0),
+                150D,
+                0D,
+                1,
+                "Difficulty: &cHard\n" +
+                        "$bossCount bosses, from level $lowestTier to $highestTier\n" +
+                        "&cA vast challenge for advanced players!");
     }
 }

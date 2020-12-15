@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.2.13
+version: 7.2.14
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -71,6 +71,9 @@ permissions:
       elitemobs.quest: true
       elitemobs.shop: true
       elitemobs.customshop: true
+      elitemobs.dungeontp: true
+      elitemobs.spawntp: true
+      elitemobs.back.npc: true
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
@@ -205,3 +208,13 @@ permissions:
     default: op
   elitemobs.setrank:
     description: Allows admins to use /em setrank [player] [prestigeTier] [guildTier]
+    default: op
+  elitemobs.dungeontp:
+    description: Allows players to teleport to an elitemobs-set location
+    default: op
+  elitemobs.spawntp:
+    description: Allows players to teleport to the default spawn location of the server.
+    default: op
+  elitemobs.back.npc:
+    description: Allows players to interact with an npc to go back to a previous location.
+    default: op
