@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import org.bukkit.entity.Item;
 
 public class VisualItemRemover {

@@ -15,7 +15,7 @@
 
 package com.magmaguy.elitemobs.mobs.passive;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Pig;

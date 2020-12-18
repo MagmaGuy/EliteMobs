@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.combatsystem.displays;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.DialogArmorStand;
 import org.bukkit.ChatColor;

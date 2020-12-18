@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import org.bukkit.Material;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.LivingEntity;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class DefaultDropsHandler implements Listener {
 
-    private List<ItemStack> wornItems = new ArrayList<>();
+    private final List<ItemStack> wornItems = new ArrayList<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath(EliteMobDeathEvent event) {

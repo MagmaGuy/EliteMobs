@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -11,10 +11,10 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    private EliteMobEntity damager;
-    private EliteMobEntity damagee;
+    private final EliteMobEntity damager;
+    private final EliteMobEntity damagee;
     private boolean isCancelled = false;
-    private EntityDamageByEntityEvent entityDamageByEntityEvent;
+    private final EntityDamageByEntityEvent entityDamageByEntityEvent;
 
     public EliteMobDamagedByEliteMobEvent(EliteMobEntity damager, EliteMobEntity damagee, EntityDamageByEntityEvent event) {
         this.damager = damager;

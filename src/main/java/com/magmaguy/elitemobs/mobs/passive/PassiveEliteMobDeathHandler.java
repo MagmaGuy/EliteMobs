@@ -15,9 +15,9 @@
 
 package com.magmaguy.elitemobs.mobs.passive;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import org.bukkit.World;

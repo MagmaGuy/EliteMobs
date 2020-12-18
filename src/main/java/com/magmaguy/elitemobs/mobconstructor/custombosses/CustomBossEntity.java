@@ -1,13 +1,13 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
@@ -248,7 +248,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         mountEntity();
         if (customBossConfigFields.getDisguise() != null)
             if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
-                DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity());
+                DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity(), customBossConfigFields);
                 super.setName(customBossConfigFields.getName());
             }
         if (customBossConfigFields.getFrozen()) {

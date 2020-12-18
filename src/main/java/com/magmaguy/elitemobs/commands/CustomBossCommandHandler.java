@@ -49,6 +49,7 @@ public class CustomBossCommandHandler {
                     player.sendMessage("[EliteMobs] Successfully added relative location!");
                 else
                     player.sendMessage("[EliteMobs] Failed to add relative location!");
+                return;
             case "setleashradius":
                 setLeashRadius(customBossConfigFields, player, args);
                 break;

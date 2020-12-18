@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.npcs;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

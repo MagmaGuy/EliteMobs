@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.combatsystem.combattag;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;

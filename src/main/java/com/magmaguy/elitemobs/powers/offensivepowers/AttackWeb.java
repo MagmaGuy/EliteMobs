@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.powers.offensivepowers;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
