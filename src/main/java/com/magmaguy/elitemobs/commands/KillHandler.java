@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;

@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;

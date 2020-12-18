@@ -25,7 +25,9 @@ public class DungeonPackagerConfig {
             new SewersMinidungeon(),
             new DarkSpireMinidungeon(),
             new HallosseumLair(),
-            new CatacombsLair()
+            new CatacombsLair(),
+            new PirateShipMinidungeon(),
+            new NorthPoleMinidungeon()
     ));
 
     public static void initializeConfigs() {

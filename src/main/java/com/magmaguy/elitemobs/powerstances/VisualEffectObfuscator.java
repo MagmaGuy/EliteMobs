@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.Player;

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.npcs;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
@@ -9,6 +8,7 @@ import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
 import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.commands.shops.SellMenu;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Location;
 import org.bukkit.Material;

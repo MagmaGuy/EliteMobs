@@ -79,6 +79,7 @@ public class CustomBossConfigFields {
     private String mountedEntity;
     private Integer announcementPriority = 0;
     private String disguise = null;
+    private String customDisguiseData = null;
     private Boolean frozen = false;
     private List<String> phases = new ArrayList<>();
 
@@ -392,6 +393,7 @@ public class CustomBossConfigFields {
             this.announcementPriority = 1;
 
         this.disguise = configuration.getString("disguise");
+        this.customDisguiseData = configuration.getString("customDisguiseData");
 
         this.frozen = configuration.getBoolean("frozen");
         if (frozen == null)
@@ -700,6 +702,10 @@ public class CustomBossConfigFields {
      */
     public String getDisguise() {
         return this.disguise;
+    }
+
+    public String getCustomDisguiseData() {
+        return customDisguiseData;
     }
 
     public Boolean getFrozen() {

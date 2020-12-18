@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
@@ -10,6 +9,7 @@ import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
@@ -23,6 +23,7 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -154,6 +155,11 @@ public class EliteMobEntity {
 
         this.livingEntity.setCanPickupItems(false);
 
+        if (!VersionChecker.currentVersionIsUnder(1, 15))
+            if (livingEntity instanceof Bee) {
+                ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
+            }
+
     }
 
     /**
@@ -255,6 +261,10 @@ public class EliteMobEntity {
         }
 
         livingEntity.setCanPickupItems(false);
+        if (!VersionChecker.currentVersionIsUnder(1, 15))
+            if (livingEntity instanceof Bee) {
+                ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
+            }
     }
 
     public void continueCustomBossCreation(LivingEntity livingEntity) {

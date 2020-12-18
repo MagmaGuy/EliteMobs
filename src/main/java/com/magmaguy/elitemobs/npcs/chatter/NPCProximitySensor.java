@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.npcs.chatter;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Entity;
@@ -16,7 +16,7 @@ import java.util.HashSet;
 
 public class NPCProximitySensor implements Listener {
 
-    private HashSet<Player> nearbyPlayers = new HashSet<>();
+    private final HashSet<Player> nearbyPlayers = new HashSet<>();
 
     public NPCProximitySensor() {
 

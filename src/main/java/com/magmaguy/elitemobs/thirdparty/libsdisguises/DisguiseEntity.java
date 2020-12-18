@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.thirdparty.libsdisguises;
 
+import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.*;
@@ -13,7 +14,7 @@ public class DisguiseEntity {
      *
      * @param disguiseName Raw name following config format
      */
-    public static void disguise(String disguiseName, Entity entity) {
+    public static void disguise(String disguiseName, Entity entity, CustomBossConfigFields customBossConfigFields) {
 
         if (disguiseName.contains("player:")) {
             playerDisguise(disguiseName.replace("player:", ""), entity);
@@ -22,7 +23,7 @@ public class DisguiseEntity {
 
         if (disguiseName.contains("custom")) {
             try {
-                customDisguise(disguiseName.replace("custom:", ""), entity);
+                customDisguise(disguiseName.replace("custom:", ""), entity, customBossConfigFields);
             } catch (Exception ex) {
                 new WarningMessage("Failed to assign custom disguise " + disguiseName + "! Did you configure the disguise correctly?");
             }
@@ -72,12 +73,19 @@ public class DisguiseEntity {
 
     }
 
-    private static void customDisguise(String customDisguise, Entity entity) {
+    private static void customDisguise(String customDisguise, Entity entity, CustomBossConfigFields customBossConfigFields) {
         Disguise disguise = DisguiseAPI.getCustomDisguise(customDisguise);
-        disguise.setEntity(entity);
-        disguise.setDisguiseName(entity.getName());
-        disguise.setDynamicName(true);
-        disguise.startDisguise();
+        try {
+            if (disguise == null)
+                if (customBossConfigFields.getCustomDisguiseData() != null)
+                    DisguiseAPI.addCustomDisguise(customDisguise, customBossConfigFields.getCustomDisguiseData());
+            disguise.setEntity(entity);
+            disguise.setDisguiseName(entity.getName());
+            disguise.setDynamicName(true);
+            disguise.startDisguise();
+        } catch (Exception ex) {
+            new WarningMessage("Failed to set custom disguise for boss " + customBossConfigFields.getFileName() + " !");
+        }
     }
 
 }

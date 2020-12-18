@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
