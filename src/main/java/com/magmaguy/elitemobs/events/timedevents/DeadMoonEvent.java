@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.events.timedevents;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.events.premade.DeadMoonEventConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.EventWorldFilter;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;

@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;

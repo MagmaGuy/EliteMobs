@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.combatsystem;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.DamageEliteMob;
@@ -8,6 +7,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import org.bukkit.Bukkit;

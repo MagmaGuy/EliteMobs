@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.treasurechest;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;

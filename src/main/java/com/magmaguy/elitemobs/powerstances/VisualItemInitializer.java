@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;

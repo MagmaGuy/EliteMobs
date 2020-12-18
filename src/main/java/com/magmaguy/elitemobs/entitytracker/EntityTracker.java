@@ -1,5 +1,7 @@
-package com.magmaguy.elitemobs;
+package com.magmaguy.elitemobs.entitytracker;
 
+import com.magmaguy.elitemobs.CrashFix;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.combatsystem;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.entity.Creeper;
 import org.bukkit.event.EventHandler;

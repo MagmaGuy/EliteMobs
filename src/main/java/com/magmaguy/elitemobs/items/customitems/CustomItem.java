@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -176,7 +177,12 @@ public class CustomItem {
      */
     public static void initializeCustomItems() {
         for (CustomLootConfigFields configFields : CustomLootConfigFields.getCustomLootConfigFields())
-            new CustomItem(configFields);
+            try {
+                new CustomItem(configFields);
+            } catch (Exception ex) {
+                new WarningMessage("Failed to generate custom item in file " + configFields.getFileName() + " !");
+                ex.printStackTrace();
+            }
     }
 
     private final CustomLootConfigFields customLootConfigFields;
