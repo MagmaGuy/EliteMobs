@@ -31,7 +31,11 @@ public class MetadataHandler implements Listener {
     //This value only stores if the passive mob is a Super Mob. The stored value is always true
     public final static String SUPER_MOB_METADATA = "Supermob";
     //Just tags an entity as an EliteMobs NPC
-    public final static String NPC_METADATA = "Elitemobs_NPC";
+    public final static String NPC_METADATA = "NPC";
+    //Tags an entity as an armor stand
+    public final static String ARMOR_STAND = "ArmorStand";
+    //Tags an entity as a visual effect
+    public final static String VISUAL_EFFECT = "VisualEffect";
 
 
 }

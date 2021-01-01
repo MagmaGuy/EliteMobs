@@ -6,13 +6,12 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class WorldGuardDungeonFlag implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
         if (!EliteMobs.worldguardIsEnabled) return;
         if (event.getEntity().getType().equals(EntityType.ARMOR_STAND) ||

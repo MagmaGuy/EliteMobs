@@ -57,6 +57,7 @@ public class MobCombatSettingsConfig {
         enableDeathMessages = ConfigurationEngine.setBoolean(fileConfiguration, "doCustomEliteMobsDeathMessages", true);
         displayHealthOnHit = ConfigurationEngine.setBoolean(fileConfiguration, "doDisplayMobHealthOnHit", true);
         displayDamageOnHit = ConfigurationEngine.setBoolean(fileConfiguration, "doDisplayMobDamageOnHit", true);
+        //todo: this option is currently dead
         onlyShowHealthForEliteMobs = ConfigurationEngine.setBoolean(fileConfiguration, "doEliteMobHealthDisplayOnly", true);
         onlyShowDamageForEliteMobs = ConfigurationEngine.setBoolean(fileConfiguration, "doEliteMobDamageDisplayOnly", true);
         increaseDifficultyWithSpawnDistance = ConfigurationEngine.setBoolean(fileConfiguration, "doIncreaseEliteMobLevelBasedOnSpawnDistance", false);

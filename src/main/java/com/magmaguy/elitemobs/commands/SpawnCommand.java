@@ -99,13 +99,15 @@ public class SpawnCommand {
             String configName = name;
             if (!configName.contains(".yml"))
                 configName += ".yml";
-            CustomBossEntity.constructCustomBoss(configName, location, mobLevel);
+            CustomBossEntity.constructCustomBossCommand(configName, location, mobLevel);
             return;
         }
 
         HashSet<ElitePower> mobPowers = getPowers(commandSender, args);
 
-        new EliteMobEntity(entityType, location, mobLevel, mobPowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        LivingEntity livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
+
+        new EliteMobEntity(livingEntity, mobLevel, mobPowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
 
     }
 

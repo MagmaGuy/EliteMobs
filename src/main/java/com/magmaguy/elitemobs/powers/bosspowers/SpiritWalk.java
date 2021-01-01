@@ -146,7 +146,6 @@ public class SpiritWalk extends BossPower implements Listener {
 
         eliteMobEntity.getLivingEntity().setAI(false);
         eliteMobEntity.getLivingEntity().setInvulnerable(true);
-        eliteMobEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 10, 1));
         Vector toDestination = finalLocation.clone().subtract(entityLocation.clone()).toVector().normalize().divide(new Vector(2, 2, 2));
 
         Entity vehicle = null;
@@ -197,7 +196,6 @@ public class SpiritWalk extends BossPower implements Listener {
                             }
                         }.runTaskLater(MetadataHandler.PLUGIN, 1);
                     }
-                    eliteMobEntity.getLivingEntity().removePotionEffect(PotionEffectType.GLOWING);
                     cancel();
 
                     Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));

@@ -40,14 +40,13 @@ public class DebugScreen {
 
         List<String> pages = new ArrayList<String>();
 
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList()) {
+        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet()) {
             if (!regionalBossEntity.getCustomBossConfigFields().getFileName().contains(args[1]) &&
                     !regionalBossEntity.getCustomBossConfigFields().getName().toLowerCase().contains(args[1].toLowerCase()))
                 continue;
             String page = regionalBossEntity.getCustomBossConfigFields().getFileName() + "\n";
             page += "Name: " + ChatColorConverter.convert(regionalBossEntity.getCustomBossConfigFields().getName()) + ChatColor.BLACK + "\n";
             page += "Level: " + regionalBossEntity.getCustomBossConfigFields().getLevel() + "\n";
-            page += "Is Alive (EM): " + regionalBossEntity.isAlive + "\n";
             if (regionalBossEntity.customBossEntity != null && regionalBossEntity.customBossEntity.advancedGetEntity() != null) {
                 page += "Is Alive (MC): " + !regionalBossEntity.customBossEntity.advancedGetEntity().isDead() + "\n";
                 page += "XYZ: " +
@@ -58,7 +57,6 @@ public class DebugScreen {
             } else
                 page += "Is Alive (MC): false\n";
             page += "Is Persistent: " + regionalBossEntity.getCustomBossConfigFields().getIsPersistent() + "\n";
-            page += "Respawning: " + regionalBossEntity.inCooldown;
             pages.add(page);
         }
 

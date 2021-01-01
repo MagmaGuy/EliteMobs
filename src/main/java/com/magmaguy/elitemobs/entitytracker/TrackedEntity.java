@@ -1,72 +1,106 @@
 package com.magmaguy.elitemobs.entitytracker;
 
+import com.magmaguy.elitemobs.CrashFix;
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import org.bukkit.entity.Entity;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * This class tracks Minecraft entities and links them to EliteMobs objects such as EliteMobEntities.
+ * This is necessary for the combat system
+ */
 public class TrackedEntity {
 
     public static HashMap<UUID, TrackedEntity> trackedEntities = new HashMap<>();
 
-    public static TrackedEntity getTrackedEntity(UUID uuid) {
-        return trackedEntities.get(uuid);
+    public UUID uuid;
+    public Entity entity;
+    public BukkitTask bukkitTask;
+    //these defaults only get overridden under certain circumstances
+    public boolean removeWhenFarAway, removeOnShutdown;
+    public HashMap trackedHashMap;
+
+    public TrackedEntity(UUID uuid, Entity entity, boolean removeWhenFarAway, boolean removeOnShutdown, HashMap trackedHashMap) {
+        this.uuid = uuid;
+        this.entity = entity;
+        this.removeWhenFarAway = removeWhenFarAway;
+        this.removeOnShutdown = removeOnShutdown;
+        if (removeOnShutdown)
+            if (entity != null)
+                CrashFix.persistentTracker(entity);
+        trackedEntities.put(uuid, this);
+        this.trackedHashMap = trackedHashMap;
+        startTrackableWatchdog();
     }
 
-    public static TrackedEntity getTrackedEntity(Entity entity) {
-        return trackedEntities.get(entity.getUniqueId());
+
+    /**
+     * Entities removed via the API .remove() call do not trigger any events. As such, this method checks if the entity
+     * still exists on repeat until it is removed. This is to prevent memory leaks.
+     * This runs in async to improve performance.
+     */
+    protected void startTrackableWatchdog() {
+        bukkitTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (entity == null) {
+                    remove(RemovalReason.OTHER);
+                    cancel();
+                    return;
+                }
+
+                if (!entity.isValid()) {
+                    doUnload(RemovalReason.CHUNK_UNLOAD);
+                    cancel();
+                    return;
+                }
+            }
+        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
     }
 
-    public static void doChunkUnload(UUID uuid) {
-        TrackedEntity trackedEntity = getTrackedEntity(uuid);
-        if (trackedEntity != null)
-            trackedEntity.doChunkUnload();
-    }
-
-    public static void doShutdown(UUID uuid) {
-
+    protected void remove(RemovalReason removalReason) {
+        if (entity != null)
+            entity.remove();
+        untrack(removalReason);
     }
 
     /**
-     * All types of entities that EliteMobs needs to keep track of.
-     * The following should despawn on chunk unload:
-     * VISUAL_EFFECT, ELITE_MOB, NPC, PROJECTILE
-     * The following should persist through chunk unloads:
-     * REGIONAL_BOSS, SUPER_MOB
+     * This is used by the child classes to make sure that the removal of the entity is completed correctly.
+     * NOTE: Entities which are simply untracked, like Super Mobs, also run this method at the end of their untracking.
      */
-    public enum EliteEntityType {
-        VISUAL_EFFECT,
-        ELITE_MOB,
-        SUPER_MOB,
-        REGIONAL_BOSS,
-        NPC,
-        PROJECTILE,
-        CUSTOM_BOSS_PERSISTENT,
-        CUSTOM_BOSS_NON_PERSISTENT
+    protected void specificRemoveHandling(RemovalReason removalReason) {
     }
 
-    public UUID uuid;
-    public EliteEntityType eliteEntityType;
-
-    public TrackedEntity(UUID uuid, EliteEntityType eliteEntityType) {
-
+    public void untrack(RemovalReason removalReason) {
+        trackedHashMap.remove(uuid);
+        //Don't remove on shutdown due to CME error, clear all tracked entities during shutdown globally
+        if (!removalReason.equals(RemovalReason.SHUTDOWN))
+            trackedEntities.remove(uuid);
+        bukkitTask.cancel();
+        specificRemoveHandling(removalReason);
     }
 
-    public void doChunkUnload() {
-        switch (eliteEntityType) {
-            case VISUAL_EFFECT:
-            case ELITE_MOB:
-            case NPC:
-            case PROJECTILE:
-            case CUSTOM_BOSS_NON_PERSISTENT:
-                //delete
-            case SUPER_MOB:
-            case REGIONAL_BOSS:
-            case CUSTOM_BOSS_PERSISTENT:
-            default:
-                return;
-            //don't do anything
-        }
+    protected void doUnload(RemovalReason removalReason) {
+        if (removeWhenFarAway)
+            remove(removalReason);
+        else
+            untrack(removalReason);
+    }
+
+    protected void doShutdown() {
+        if (removeOnShutdown)
+            remove(RemovalReason.SHUTDOWN);
+        else
+            untrack(RemovalReason.SHUTDOWN);
+    }
+
+    public void doDeath() {
+        remove(RemovalReason.DEATH);
     }
 
 }

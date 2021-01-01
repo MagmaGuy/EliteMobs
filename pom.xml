@@ -7,7 +7,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.15</version>
+    <version>7.2.17</version>
     <packaging>jar</packaging>
 
     <properties>

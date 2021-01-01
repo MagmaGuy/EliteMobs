@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -135,7 +136,7 @@ public class UserCommands {
             //track bosses
             case "trackcustomboss":
                 try {
-                    CustomBossEntity.getCustomBoss(UUID.fromString(args[2])).realTimeTracking(player);
+                    ((CustomBossEntity) EntityTracker.getEliteMobEntity(UUID.fromString(args[2]))).startBossBarTask(player, true);
                 } catch (Exception ex) {
                     //happens when players try to track an entity that has despawned for any reason
                     player.sendMessage("[EliteMobs] Sorry, this boss is already gone!");

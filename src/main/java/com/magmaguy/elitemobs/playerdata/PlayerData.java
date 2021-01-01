@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.playerdata;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.quests.EliteQuest;
 import com.magmaguy.elitemobs.quests.PlayerQuests;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -376,7 +375,6 @@ public class PlayerData {
 
                         resultSet.close();
                         statement.close();
-                        new DebugMessage("Successfully obtained player data!");
                         return;
                     } else {
                         currency = 0;
@@ -430,7 +428,6 @@ public class PlayerData {
                         statement.executeUpdate(sql);
 
                         statement.close();
-                        new DebugMessage("Successfully generated new player data entry!");
                         return;
                     }
                 } catch (Exception e) {

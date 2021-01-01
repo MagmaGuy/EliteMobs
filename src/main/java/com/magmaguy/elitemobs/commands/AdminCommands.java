@@ -177,15 +177,22 @@ public class AdminCommands {
 
             case "relativecoord":
                 if (CommandHandler.userPermCheck("elitemobs.*", commandSender)) {
-                    Minidungeon minidungeon = Minidungeon.minidungeons.get(args[1]);
-                    Location anchorpoint = minidungeon.dungeonPackagerConfigFields.getAnchorPoint();
-                    Player player = (Player) commandSender;
-                    String relativePosition = player.getLocation().clone().subtract(anchorpoint).getBlockX() + ", "
-                            + player.getLocation().clone().subtract(anchorpoint).getBlockY() + ", "
-                            + player.getLocation().clone().subtract(anchorpoint).getBlockZ();
-                    player.sendMessage(ChatColorConverter.convert(
-                            "[EliteMobs] Relative position to anchor point of " + minidungeon.dungeonPackagerConfigFields.getName() + ": " + relativePosition));
-
+                    if (args.length < 2) {
+                        commandSender.sendMessage("Syntax: /em relativecoord dungeonfilename");
+                        return true;
+                    }
+                    try {
+                        Minidungeon minidungeon = Minidungeon.minidungeons.get(args[1]);
+                        Location anchorpoint = minidungeon.dungeonPackagerConfigFields.getAnchorPoint();
+                        Player player = (Player) commandSender;
+                        String relativePosition = player.getLocation().clone().subtract(anchorpoint).getBlockX() + ", "
+                                + player.getLocation().clone().subtract(anchorpoint).getBlockY() + ", "
+                                + player.getLocation().clone().subtract(anchorpoint).getBlockZ();
+                        player.sendMessage(ChatColorConverter.convert(
+                                "[EliteMobs] Relative position to anchor point of " + minidungeon.dungeonPackagerConfigFields.getName() + ": " + relativePosition));
+                    } catch (Exception ex) {
+                        commandSender.sendMessage("[EliteMobs] Failed to run command! Syntax: /em relativecoord [filename]");
+                    }
                 }
                 return true;
 
