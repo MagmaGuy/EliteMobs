@@ -14,21 +14,21 @@ public class EliteChunk {
     }
 
     public static EliteChunk getEliteChunk(int xCoord, int zCoord) {
-        return eliteChunks.get(ChunkVectorizer.vectorize(xCoord, zCoord));
+        return eliteChunks.get(ChunkVectorizer.hash(xCoord, zCoord));
     }
 
     private static void registerChunkLocation(EliteChunk eliteChunk) {
-        eliteChunks.put(ChunkVectorizer.vectorize(eliteChunk.getxCoord(), eliteChunk.getzCoord()), eliteChunk);
+        eliteChunks.put(ChunkVectorizer.hash(eliteChunk.getxCoord(), eliteChunk.getzCoord()), eliteChunk);
     }
 
-    private static int gridSize = 50;
+    private static final int gridSize = 50;
 
     public static int getGridSize() {
         return gridSize;
     }
 
-    private int xCoord;
-    private int zCoord;
+    private final int xCoord;
+    private final int zCoord;
 
     public EliteChunk(int xCoord, int zCoord) {
         this.xCoord = xCoord;

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.treasurechest;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -331,7 +332,7 @@ public class TreasureChest {
                     @Override
                     public void run() {
                         item.remove();
-                        EntityTracker.wipeEntity(item);
+                        EntityTracker.wipeEntity(item, RemovalReason.EFFECT_TIMEOUT);
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20);
 

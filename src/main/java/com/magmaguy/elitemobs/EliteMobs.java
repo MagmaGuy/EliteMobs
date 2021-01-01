@@ -4,7 +4,7 @@ package com.magmaguy.elitemobs;
  * Created by MagmaGuy on 07/10/2016.
  */
 
-import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByPlayerHandler;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
+import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfig;
@@ -29,10 +30,9 @@ import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossHandler;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
 import com.magmaguy.elitemobs.mobs.passive.PassiveEliteMobDeathHandler;
@@ -80,8 +80,7 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
         Bukkit.getLogger().info("By MagmaGuy");
 
-        //Prevent memory leaks
-        EntityTracker.memoryWatchdog();
+        //Remove entities that should not exist
         CrashFix.startupCheck();
 
         /*
@@ -129,7 +128,7 @@ public class EliteMobs extends JavaPlugin {
         eventLauncher.eventRepeatingTask();
 
         //launch internal clock for attack cooldown
-        EliteMobDamagedByPlayerHandler.launchInternalClock();
+        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.launchInternalClock();
 
         /*
         Initialize mob values
@@ -181,6 +180,18 @@ public class EliteMobs extends JavaPlugin {
         //Initialize custom charts
         new CustomCharts();
 
+        //Load minidungeons, most of all load the worlds of minidungeons
+        DungeonPackagerConfig.initializeConfigs();
+        //Load all regional bosses
+        CustomBossesConfig.initializeConfigs();
+        //Find the stats of bosses in minidungeons
+        for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
+            if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
+                minidungeon.quantifyWorldBosses();
+            else if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
+                minidungeon.quantifySchematicBosses();
+        }
+
     }
 
     @Override
@@ -205,13 +216,15 @@ public class EliteMobs extends JavaPlugin {
 
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
 
-        EntityTracker.shutdownPurger();
+        //save all pending respawns
+        AbstractRegionalEntity.save();
+
+        EntityTracker.wipeShutdown();
 
         validWorldList.clear();
         zoneBasedSpawningWorlds.clear();
-        RegionalBossEntity.getRegionalBossEntityList().clear();
+        RegionalBossEntity.getRegionalBossEntitySet().clear();
         PhaseBossEntity.phaseBosses.clear();
-        CustomBossEntity.getCustomBosses().clear();
         CustomBossConfigFields.getRegionalElites().clear();
         CustomBossConfigFields.getNaturallySpawnedElites().clear();
         CustomEnchantment.getCustomEnchantments().clear();
@@ -240,7 +253,6 @@ public class EliteMobs extends JavaPlugin {
         EnchantmentsConfig.initializeConfigs();
         AntiExploitConfig.initializeConfig();
         CombatTagConfig.initializeConfig();
-        CustomBossesConfig.initializeConfigs();
         AntiExploitConfig.initializeConfig();
         AdventurersGuildConfig.initializeConfig();
         ValidWorldsConfig.initializeConfig();
@@ -257,11 +269,6 @@ public class EliteMobs extends JavaPlugin {
         CommandsConfig.initializeConfigs();
         EventsConfig.initializeConfigs();
         DiscordSRVConfig.initializeConfig();
-        /*
-        Spawn world bosses
-         */
-        RegionalBossHandler.initialize();
-        DungeonPackagerConfig.initializeConfigs();
     }
 
     public static void worldScanner() {
@@ -290,6 +297,8 @@ public class EliteMobs extends JavaPlugin {
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.superMobStackAmount > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         }
+        //save regional bosses when the files udpate
+        AbstractRegionalEntity.abstractRegionalEntityDataSaver();
     }
 
 }

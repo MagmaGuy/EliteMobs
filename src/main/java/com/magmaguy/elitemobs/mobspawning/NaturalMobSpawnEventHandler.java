@@ -47,17 +47,15 @@ public class NaturalMobSpawnEventHandler implements Listener {
         return ignoreMob;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
 
         if (getIgnoreMob()) {
             ignoreMob = false;
             storedEliteMobEntity.setLivingEntity(event.getEntity());
-            EntityTracker.registerEliteMob(storedEliteMobEntity);
             return;
         }
 
-        if (event.isCancelled()) return;
         /*
         Deal with entities spawned within the plugin
          */

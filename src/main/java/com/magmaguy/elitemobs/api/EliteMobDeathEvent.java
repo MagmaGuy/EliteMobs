@@ -1,8 +1,9 @@
 package com.magmaguy.elitemobs.api;
 
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -19,8 +20,6 @@ public class EliteMobDeathEvent extends Event {
 
     public EliteMobDeathEvent(EliteMobEntity eliteMobEntity, EntityDeathEvent entityDeathEvent) {
         this.entity = eliteMobEntity.getLivingEntity();
-        //todo: check if this prevents vanilla drop behavior
-        if (entity != null) entity.remove();
         this.eliteMobEntity = eliteMobEntity;
         this.entityDeathEvent = entityDeathEvent;
     }
@@ -51,10 +50,9 @@ public class EliteMobDeathEvent extends Event {
         public void onMobDeath(EntityDeathEvent event) {
             EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteMobEntity == null) return;
-
-            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDeathEvent(eliteMobEntity, event));
+            new EventCaller(new EliteMobDeathEvent(eliteMobEntity, event));
+            new EventCaller(new EliteMobRemoveEvent(eliteMobEntity, RemovalReason.DEATH));
         }
-
     }
 
 }

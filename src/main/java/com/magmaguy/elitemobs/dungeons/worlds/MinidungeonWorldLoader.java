@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -48,11 +47,9 @@ public class MinidungeonWorldLoader {
     public static World runtimeLoadWorld(Minidungeon minidungeon) {
         World world = loadWorld(minidungeon);
         if (world == null) return null;
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList())
-            if (regionalBossEntity.getSpawnWorldName().equals(world.getName())) {
-                regionalBossEntity.spawnLocation = ConfigurationLocation.deserialize(regionalBossEntity.spawnLocationString);
-                regionalBossEntity.spawnRegionalBoss();
-            }
+        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
+            if (regionalBossEntity.getSpawnWorldName().equals(world.getName()))
+                regionalBossEntity.worldLoad();
         return world;
     }
 }

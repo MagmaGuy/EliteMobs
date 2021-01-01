@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.EliteItemLore;
@@ -72,7 +73,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
                         counter++;
                         if (counter > 20 * 60 * 5 || !item.isValid()) {
                             cancel();
-                            EntityTracker.unregisterArmorStand(soulboundPlayer);
+                            EntityTracker.unregister(soulboundPlayer, RemovalReason.EFFECT_TIMEOUT);
                             return;
                         }
                         if (!lastLocation.equals(item.getLocation()))

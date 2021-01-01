@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -116,6 +118,12 @@ public class ScalableItemConstructor {
             if (CustomItem.getLimitedItem().containsKey(i))
                 localLootList.addAll(CustomItem.getLimitedItem().get(i));
 
+            /*
+            Currently elitemobs has no way of telling if there will be a limited item available for the specific asked tier
+            //todo: fix this
+             */
+        if (localLootList.size() == 0)
+            ItemStackGenerator.generateItemStack(Material.AIR);
 
         CustomItem customItem = localLootList.get(ThreadLocalRandom.current().nextInt(localLootList.size()));
 

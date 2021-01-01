@@ -2,11 +2,10 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
-import com.magmaguy.elitemobs.powers.ProjectileLocationGenerator;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -60,12 +59,8 @@ public class AttackFireball extends MinorPower implements Listener {
     }
 
     public static Fireball shootFireball(Entity entity, Player player) {
-        Location fireballLocation = ProjectileLocationGenerator.generateLocation((LivingEntity) entity, player);
-        Fireball repeatingFireball = (Fireball) entity.getWorld().spawnEntity(fireballLocation, EntityType.FIREBALL);
-        Vector targetterToTargetted = player.getLocation().toVector().subtract(repeatingFireball.getLocation().toVector()).normalize().multiply(0.01);
-        repeatingFireball.setShooter((ProjectileSource) entity);
-        repeatingFireball.setVelocity(targetterToTargetted);
-        repeatingFireball.setDirection(targetterToTargetted);
+        Vector targetterToTargetted = player.getLocation().toVector().subtract(entity.getLocation().toVector()).normalize().multiply(0.01);
+        Fireball repeatingFireball = (Fireball) EliteProjectile.create(EntityType.FIREBALL, entity, player, targetterToTargetted, true);
         repeatingFireball.setYield(3F);
         repeatingFireball.setIsIncendiary(true);
         repeatingFireball.setShooter((ProjectileSource) entity);

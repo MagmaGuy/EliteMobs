@@ -16,17 +16,14 @@
 package com.magmaguy.elitemobs.mobs.passive;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.SuperMobDamageEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.Material;
-import org.bukkit.entity.Chicken;
-import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -49,18 +46,18 @@ public class ChickenHandler implements Listener {
     */
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void superDrops(EntityDamageByEntityEvent event) {
+    public void superDrops(SuperMobDamageEvent event) {
 
-        if (event.getFinalDamage() < 1)
+        if (event.getEntityDamageEvent().getFinalDamage() < 1)
             return;
 
-        if (event.getEntity() instanceof Chicken && EntityTracker.isSuperMob(event.getEntity())) {
+        if (event.getLivingEntity().getType().equals(EntityType.CHICKEN)) {
 
             Random random = new Random();
 
-            Chicken chicken = (Chicken) event.getEntity();
+            Chicken chicken = (Chicken) event.getLivingEntity();
 
-            double damage = event.getFinalDamage();
+            double damage = event.getEntityDamageEvent().getFinalDamage();
             //health is hardcoded here, maybe change it at some point?
             double dropChance = damage / 4;
             double dropRandomizer = random.nextDouble();
@@ -104,7 +101,7 @@ public class ChickenHandler implements Listener {
         eggMeta.setLore(lore);
         eggStack.setItemMeta(eggMeta);
 
-        Iterator<LivingEntity> superChickenIterator = EntityTracker.getSuperMobs().iterator();
+        Iterator<LivingEntity> superChickenIterator = EntityTracker.getSuperMobs().values().iterator();
 
         while (superChickenIterator.hasNext()) {
 

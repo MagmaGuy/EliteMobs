@@ -166,8 +166,11 @@ public class WorldGuardCompatibility {
     }
 
     public static void protectMinidungeonArea(ProtectedRegion protectedRegion) {
+        //elitemobs events
         protectedRegion.setFlag(ELITEMOBS_DUNGEON, allow);
         protectedRegion.setFlag(ELITEMOBS_ANTIEXPLOIT, deny);
+        protectedRegion.setFlag(ELITEMOBS_EVENTS, deny);
+        //WG events
         protectedRegion.setFlag(Flags.INTERACT, deny);
         protectedRegion.setFlag(Flags.CREEPER_EXPLOSION, deny);
         protectedRegion.setFlag(Flags.FIRE_SPREAD, deny);

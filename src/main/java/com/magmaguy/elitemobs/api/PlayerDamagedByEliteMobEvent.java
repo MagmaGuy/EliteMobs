@@ -66,9 +66,9 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
     }
 
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
-        @EventHandler
-        public void onEliteMobAttack(EntityDamageByEntityEvent event) {
-            if (event.isCancelled()) return;
+
+        @EventHandler(ignoreCancelled = true)
+        public void onEliteMobAttack2(EntityDamageByEntityEvent event) {
             if (!(event.getEntity() instanceof Player)) return;
             Player player = (Player) event.getEntity();
 

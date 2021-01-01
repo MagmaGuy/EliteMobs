@@ -2,17 +2,19 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
-import com.magmaguy.elitemobs.powers.offensivepowers.AttackArrow;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -60,9 +62,8 @@ public class BulletHell extends BossPower implements Listener {
                     if (nearbyEntity instanceof Player)
                         if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
                                 ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)) {
-                            Arrow arrow = AttackArrow.shootArrow(eliteMobEntity.getLivingEntity(), (Player) nearbyEntity);
+                            Arrow arrow = (Arrow) EliteProjectile.create(EntityType.ARROW, eliteMobEntity.getLivingEntity(), (Player) nearbyEntity, false);
                             arrow.setVelocity(arrow.getVelocity().multiply(0.1));
-                            arrow.setGravity(false);
                             trackingArrowLoop((Player) nearbyEntity, arrow);
                         }
 
@@ -79,7 +80,6 @@ public class BulletHell extends BossPower implements Listener {
 
 
     private static void trackingArrowLoop(Player player, Arrow arrow) {
-        EntityTracker.registerCullableEntity(arrow);
         new BukkitRunnable() {
             int counter = 0;
 
@@ -92,11 +92,11 @@ public class BulletHell extends BossPower implements Listener {
                     arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.01, 0.01, 0.01, 0.01);
                 } else {
                     arrow.setGravity(true);
-                    EntityTracker.unregisterCullableEntity(arrow);
+                    EntityTracker.unregister(arrow, RemovalReason.EFFECT_TIMEOUT);
                     cancel();
                 }
                 if (counter > 20 * 10) {
-                    EntityTracker.unregisterCullableEntity(arrow);
+                    EntityTracker.unregister(arrow, RemovalReason.EFFECT_TIMEOUT);
                     arrow.setGravity(true);
                     cancel();
                 }
