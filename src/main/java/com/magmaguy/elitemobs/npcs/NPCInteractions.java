@@ -125,7 +125,7 @@ public class NPCInteractions implements Listener {
 
         if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
 
-        for (NPCEntity npcEntity : EntityTracker.getNPCEntities())
+        for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
             if (event.getView().getTitle().equals(npcEntity.getName())) {
                 event.setCancelled(true);
                 return;

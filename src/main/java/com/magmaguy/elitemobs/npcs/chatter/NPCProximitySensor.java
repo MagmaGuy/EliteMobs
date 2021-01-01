@@ -27,7 +27,7 @@ public class NPCProximitySensor implements Listener {
 
                 HashSet<Player> seenPlayerList = (HashSet<Player>) nearbyPlayers.clone();
 
-                for (NPCEntity npcEntity : EntityTracker.getNPCEntities())
+                for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
                     if (npcEntity.getVillager().isValid())
                         for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getActivationRadius(),
                                 npcEntity.getActivationRadius(), npcEntity.getActivationRadius()))
@@ -54,6 +54,7 @@ public class NPCProximitySensor implements Listener {
 
     }
 
+    //todo: optimize
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         if (event.getView().getTitle().length() > 0)

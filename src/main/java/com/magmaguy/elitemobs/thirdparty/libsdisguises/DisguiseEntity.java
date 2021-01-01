@@ -50,7 +50,7 @@ public class DisguiseEntity {
     private static void playerDisguise(String playerName, Entity entity) {
         PlayerDisguise playerDisguise = new PlayerDisguise(playerName);
         playerDisguise.setEntity(entity);
-        playerDisguise.setName(entity.getName());
+        playerDisguise.setName(entity.getCustomName());
         playerDisguise.setDynamicName(true);
         playerDisguise.startDisguise();
     }
@@ -58,14 +58,14 @@ public class DisguiseEntity {
     private static void livingEntityDisguise(DisguiseType disguiseType, Entity entity) {
         MobDisguise mobDisguise = new MobDisguise(disguiseType);
         mobDisguise.setEntity(entity);
-        mobDisguise.setDisguiseName(entity.getName());
+        mobDisguise.setDisguiseName(entity.getCustomName());
         mobDisguise.setDynamicName(true);
         mobDisguise.startDisguise();
     }
 
     private static void miscEntityDisguise(DisguiseType disguiseType, Entity entity) {
         MiscDisguise miscDisguise = new MiscDisguise(disguiseType);
-        miscDisguise.setDisguiseName(entity.getName());
+        miscDisguise.setDisguiseName(entity.getCustomName());
         miscDisguise.setDynamicName(true);
         miscDisguise.setEntity(entity);
         miscDisguise.startDisguise();
@@ -80,7 +80,7 @@ public class DisguiseEntity {
                 if (customBossConfigFields.getCustomDisguiseData() != null)
                     DisguiseAPI.addCustomDisguise(customDisguise, customBossConfigFields.getCustomDisguiseData());
             disguise.setEntity(entity);
-            disguise.setDisguiseName(entity.getName());
+            disguise.setDisguiseName(entity.getCustomName());
             disguise.setDynamicName(true);
             disguise.startDisguise();
         } catch (Exception ex) {

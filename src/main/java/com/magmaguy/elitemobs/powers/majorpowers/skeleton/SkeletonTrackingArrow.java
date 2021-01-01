@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.majorpowers.skeleton;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
@@ -58,7 +59,6 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
     }
 
     private static void trackingArrowLoop(Player player, Arrow arrow) {
-        EntityTracker.registerCullableEntity(arrow);
         new BukkitRunnable() {
             int counter = 0;
 
@@ -71,11 +71,11 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
                     arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.01, 0.01, 0.01, 0.01);
                 } else {
                     arrow.setGravity(true);
-                    EntityTracker.unregisterCullableEntity(arrow);
+                    EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
                     cancel();
                 }
                 if (counter > 20 * 60) {
-                    EntityTracker.unregisterCullableEntity(arrow);
+                    EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
                     arrow.setGravity(true);
                     cancel();
                 }

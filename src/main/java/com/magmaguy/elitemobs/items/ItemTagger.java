@@ -6,8 +6,10 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.PersistentVanillaData;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.tags.ItemTagType;
@@ -21,6 +23,7 @@ public class ItemTagger {
 
     public static final NamespacedKey eliteMobsItemNamespacedKey = new NamespacedKey(MetadataHandler.PLUGIN, "EliteMobsItem");
     public static final NamespacedKey customLore = new NamespacedKey(MetadataHandler.PLUGIN, "CustomLore");
+    public static String itemValue = "ItemValue";
 
     public static void registerEliteItem(ItemMeta itemMeta) {
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
@@ -159,5 +162,31 @@ public class ItemTagger {
     public static String getItemSource(ItemMeta itemMeta) {
         return itemMeta.getPersistentDataContainer().get(itemSource, PersistentDataType.STRING);
     }
+
+    /**
+     * Writes the value into the persistent data container. This is used to only ever calculate item worth once.
+     * The weakness with this system is that if admins change the price scaling, the changes will not affect older items.
+     * This is still worth it to only ever calculate the price of items once, as mass calculating item prices can be costly.
+     * Also, item values will be updated with each lore refresh.
+     * NOTE: This is the item value, not the resale value. These are two very different values!
+     *
+     * @param itemStack ItemStack to register the value onto.
+     * @param player    Player associated to the ItemStack. This is necessary because different prestige tiers will result in
+     *                  different prices.
+     */
+    public static void writeItemValue(ItemStack itemStack, Player player) {
+        PersistentVanillaData.write(itemStack, itemValue, ItemWorthCalculator.writeItemWorth(itemStack, player));
+    }
+
+    /**
+     * Gets the item value for the selected Elite Item.
+     *
+     * @param itemStack ItemStack to get value from
+     * @return Value. Will be -1 if no values is registered!
+     */
+    public static double getItemValue(ItemStack itemStack) {
+        return PersistentVanillaData.getDouble(itemStack, itemValue);
+    }
+
 
 }

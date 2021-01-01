@@ -6,42 +6,46 @@ import org.bukkit.entity.Player;
 
 public class DamageEliteMob {
 
-    public static void lowDamage(EliteMobEntity eliteMobEntity) {
-        damageFormula(eliteMobEntity, DamageAmount.LOW);
+    public static double lowDamage(EliteMobEntity eliteMobEntity) {
+        return damageFormula(eliteMobEntity, DamageAmount.LOW);
     }
 
-    public static void mediumDamage(EliteMobEntity eliteMobEntity) {
-        damageFormula(eliteMobEntity, DamageAmount.MEDIUM);
+    public static double mediumDamage(EliteMobEntity eliteMobEntity) {
+        return damageFormula(eliteMobEntity, DamageAmount.MEDIUM);
     }
 
-    public static void highDamage(EliteMobEntity eliteMobEntity) {
-        damageFormula(eliteMobEntity, DamageAmount.HIGH);
+    public static double highDamage(EliteMobEntity eliteMobEntity) {
+        return damageFormula(eliteMobEntity, DamageAmount.HIGH);
     }
 
-    public static void lowDamage(Player player, EliteMobEntity eliteMobEntity) {
-        damageFormula(player, eliteMobEntity, DamageAmount.LOW);
+    public static double lowDamage(Player player, EliteMobEntity eliteMobEntity) {
+        return damageFormula(player, eliteMobEntity, DamageAmount.LOW);
     }
 
-    public static void mediumDamage(Player player, EliteMobEntity eliteMobEntity) {
-        damageFormula(player, eliteMobEntity, DamageAmount.MEDIUM);
+    public static double mediumDamage(Player player, EliteMobEntity eliteMobEntity) {
+        return damageFormula(player, eliteMobEntity, DamageAmount.MEDIUM);
     }
 
-    public static void highDamage(Player player, EliteMobEntity eliteMobEntity) {
-        damageFormula(player, eliteMobEntity, DamageAmount.HIGH);
+    public static double highDamage(Player player, EliteMobEntity eliteMobEntity) {
+        return damageFormula(player, eliteMobEntity, DamageAmount.HIGH);
     }
 
-    private enum DamageAmount {
+    public enum DamageAmount {
         LOW,
         MEDIUM,
         HIGH
     }
 
-    private static void damageFormula(EliteMobEntity eliteMobEntity, DamageAmount damageAmount) {
-        eliteMobEntity.damage(tierCalc(eliteMobEntity, damageAmount));
+    private static double damageFormula(EliteMobEntity eliteMobEntity, DamageAmount damageAmount) {
+        return eliteMobEntity.damage(tierCalc(eliteMobEntity, damageAmount));
     }
 
-    private static void damageFormula(Player player, EliteMobEntity eliteMobEntity, DamageAmount damageAmount) {
-        BossCustomAttackDamage.dealCustomDamage(player, eliteMobEntity.getLivingEntity(), tierCalc(eliteMobEntity, damageAmount));
+    private static double damageFormula(Player player, EliteMobEntity eliteMobEntity, DamageAmount damageAmount) {
+        return BossCustomAttackDamage.dealCustomDamage(player, eliteMobEntity.getLivingEntity(), tierCalc(eliteMobEntity, damageAmount));
+    }
+
+    public static double getDamageValue(EliteMobEntity eliteMobEntity, DamageAmount damageAmount) {
+        return tierCalc(eliteMobEntity, damageAmount);
     }
 
     private static double tierCalc(EliteMobEntity eliteMobEntity, DamageAmount damageAmount) {

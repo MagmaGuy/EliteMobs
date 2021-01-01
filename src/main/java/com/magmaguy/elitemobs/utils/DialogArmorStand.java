@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,7 +39,7 @@ public class DialogArmorStand {
                 taskTimer++;
 
                 if (taskTimer > 15) {
-                    EntityTracker.unregisterArmorStand(armorStand);
+                    EntityTracker.unregister(armorStand, RemovalReason.EFFECT_TIMEOUT);
                     cancel();
                 }
 

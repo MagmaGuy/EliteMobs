@@ -1,28 +1,13 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.mobs.passive;
 
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.api.SuperMobDamageEvent;
 import com.magmaguy.elitemobs.items.ItemDropVelocity;
 import org.bukkit.entity.Cow;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
@@ -36,18 +21,18 @@ import static org.bukkit.Material.LEATHER;
 public class CowHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void superDrops(EntityDamageEvent event) {
+    public void superDrops(SuperMobDamageEvent event) {
 
-        if (event.getFinalDamage() < 1)
+        if (event.getEntityDamageEvent().getFinalDamage() < 1)
             return;
 
-        if (event.getEntity() instanceof Cow && EntityTracker.isSuperMob(event.getEntity())) {
+        if (event.getLivingEntity().getType().equals(EntityType.COW)) {
 
             Random random = new Random();
 
-            Cow cow = (Cow) event.getEntity();
+            Cow cow = (Cow) event.getLivingEntity();
 
-            double damage = event.getFinalDamage();
+            double damage = event.getEntityDamageEvent().getFinalDamage();
             //health is hardcoded here, maybe change it at some point?
             double dropChance = damage / 10;
             double dropRandomizer = random.nextDouble();

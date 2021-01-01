@@ -13,7 +13,7 @@ public class WorldGuardSpawnEventBypasser implements Listener {
         force = true;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
         if (!force) return;
         event.setCancelled(false);

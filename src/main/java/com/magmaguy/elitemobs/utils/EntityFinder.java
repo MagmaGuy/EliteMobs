@@ -10,14 +10,11 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 public class EntityFinder {
 
     public static LivingEntity filterRangedDamagers(Entity entity) {
-
         if (entity instanceof LivingEntity)
             return (LivingEntity) entity;
         else if (entity instanceof Projectile && ((Projectile) entity).getShooter() instanceof LivingEntity)
             return (LivingEntity) ((Projectile) entity).getShooter();
-
         return null;
-
     }
 
     public static LivingEntity getRealDamager(EntityDamageByEntityEvent event) {

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -80,19 +81,19 @@ public class PhaseBossEntity {
             regionalBossEntity.customBossEntity = customBossEntity;
 
         eliteMobEntity.getLivingEntity().remove();
-        EntityTracker.unregisterEliteMob(eliteMobEntity);
+        EntityTracker.unregister(eliteMobEntity.uuid, RemovalReason.PHASE_BOSS_PHASE_END);
     }
 
     public void fullHeal(EliteMobEntity eliteMobEntity) {
         if (eliteMobEntity.getLivingEntity().isInsideVehicle())
             eliteMobEntity.getLivingEntity().getVehicle().remove();
-        CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss(bossPhases.get(0).customBossConfigFields.getFileName(), eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), regionalBossEntity, true);
+        CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss(bossPhases.get(0).customBossConfigFields, eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), regionalBossEntity, true);
         if (regionalBossEntity != null) {
             regionalBossEntity.customBossEntity = customBossEntity;
             customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));
         }
-        eliteMobEntity.remove();
-        EntityTracker.unregisterEliteMob(eliteMobEntity);
+        eliteMobEntity.remove(true);
+        EntityTracker.unregister(eliteMobEntity.uuid, RemovalReason.PHASE_BOSS_RESET);
     }
 
     public static class PhaseBossEntityListener implements Listener {

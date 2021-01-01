@@ -3,11 +3,11 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 public class CustomBossCommandHandler {
 
@@ -68,8 +68,7 @@ public class CustomBossCommandHandler {
             new WarningMessage("Please refer to the EliteMobs wiki for documentation on World Bosses. If you're just trying to spawn a boss, use the command /em spawn");
             return false;
         }
-        CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity = customBossConfigFields.addSpawnLocation(location.clone().add(new Vector(0, 0.2, 0)));
-        new RegionalBossEntity(customBossConfigFields, configRegionalEntity);
+        new AbstractRegionalEntity(location, customBossConfigFields);
         return true;
     }
 
@@ -100,7 +99,7 @@ public class CustomBossCommandHandler {
         }
 
         customBossConfigFields.setLeashRadius(leashRadius);
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList())
+        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
             if (customBossConfigFields.getFileName().equals(regionalBossEntity.getCustomBossConfigFields().getFileName()))
                 regionalBossEntity.setLeashRadius(leashRadius);
 

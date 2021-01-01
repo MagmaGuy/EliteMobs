@@ -13,7 +13,7 @@ public class CombatSystem {
      * todo: make the increase based off of a % of the boss max health instead to bypass this issue, potentially
      * It accomplishes this by adding this flat amount of health to bosses.
      */
-    public static final double TARGET_HITS_TO_KILL = 7; //affects max health assignment on EliteMobEntity.java
+    public static final double TARGET_HITS_TO_KILL = 7D; //affects max health assignment on EliteMobEntity.java
 
     //this sets the tier of various materials
     public static final int TRIDENT_TIER_LEVEL = 9;

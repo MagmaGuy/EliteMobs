@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.utils.Round;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +18,12 @@ import static com.magmaguy.elitemobs.config.EconomySettingsConfig.resaleValue;
 public class ItemWorthCalculator {
 
     public static double determineItemWorth(ItemStack itemStack, Player player) {
+
+        if (itemStack == null || itemStack.getItemMeta() == null || itemStack.getType().equals(Material.AIR)) return 0;
+
+        //Check if value's already been written into the item. If it hasn't, the value will be -1
+        double value = ItemTagger.getItemValue(itemStack);
+        if (value != -1) return value;
 
         double prestigeMultiplier;
         if (player == null)
@@ -32,12 +39,15 @@ public class ItemWorthCalculator {
 
     }
 
+    public static double writeItemWorth(ItemStack itemStack, Player player) {
+        return determineItemWorth(itemStack, player);
+    }
+
     public static double determineResaleWorth(ItemStack itemStack, Player player) {
-
-        double resaleWorth = Round.twoDecimalPlaces(determineItemWorth(itemStack, player) * (resaleValue / 100));
-
-        return resaleWorth;
-
+        double value = ItemTagger.getItemValue(itemStack);
+        value = value == -1 ? Round.twoDecimalPlaces(determineItemWorth(itemStack, player) * (resaleValue / 100)) :
+                Round.twoDecimalPlaces(value * (resaleValue / 100));
+        return value;
     }
 
     private static double getAllEnchantmentValues(ItemStack itemStack) {

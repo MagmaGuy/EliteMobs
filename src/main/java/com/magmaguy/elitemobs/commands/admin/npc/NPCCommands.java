@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands.admin.npc;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.SummonMerchantEnchantment;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.Round;
@@ -70,7 +71,9 @@ public class NPCCommands {
                 + Round.twoDecimalPlaces(playerLocation.getPitch());
 
         try {
-            NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromFields(npCsConfigFields));
+            for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
+                if (npcEntity.npCsConfigFields.equals(npCsConfigFields))
+                    npcEntity.removeNPCEntity();
         } catch (Exception ex) {
         }
 
@@ -103,7 +106,9 @@ public class NPCCommands {
         }
 
         try {
-            NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromFields(npCsConfigFields));
+            for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
+                if (npcEntity.npCsConfigFields.equals(npCsConfigFields))
+                    npcEntity.removeNPCEntity();
             npCsConfigFields.setEnabled(false);
             new NPCEntity(npCsConfigFields);
         } catch (Exception e) {

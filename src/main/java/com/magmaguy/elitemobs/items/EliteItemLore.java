@@ -152,6 +152,10 @@ public class EliteItemLore {
     }
 
     private void constructItemWorth() {
+        //Note: This writes a new value every time. Value might not have changed. This is not really an issue.
+        itemStack.setItemMeta(itemMeta);
+        ItemTagger.writeItemValue(itemStack, soulboundPlayer);
+        itemMeta = itemStack.getItemMeta();
         if (showItemWorth)
             itemWorth = ItemSettingsConfig.loreWorth
                     .replace("$worth", ItemWorthCalculator.determineItemWorth(itemStack, soulboundPlayer) + "")

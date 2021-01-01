@@ -19,7 +19,6 @@ public class FindSuperMobs implements Listener {
                         SuperMobProperties.getDataInstance(entity).getSuperMobMaxHealth())
                     if (!EntityTracker.isSuperMob(entity))
                         EntityTracker.registerSuperMob((LivingEntity) entity);
-
     }
 
 }
