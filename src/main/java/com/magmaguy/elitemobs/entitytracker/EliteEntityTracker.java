@@ -12,10 +12,9 @@ public class EliteEntityTracker extends TrackedEntity implements AbstractTracked
 
     public static HashMap<UUID, EliteMobEntity> eliteMobEntities = new HashMap<>();
 
-    public UUID uuid;
     public EliteMobEntity eliteMobEntity;
 
-    public EliteEntityTracker(EliteMobEntity eliteMobEntity, boolean isPersistent, boolean removeOnShutdown) {
+    public EliteEntityTracker(EliteMobEntity eliteMobEntity, boolean isPersistent) {
         super(eliteMobEntity.uuid, eliteMobEntity.getLivingEntity(), !isPersistent, true, eliteMobEntities);
         this.eliteMobEntity = eliteMobEntity;
         eliteMobEntities.put(eliteMobEntity.uuid, eliteMobEntity);

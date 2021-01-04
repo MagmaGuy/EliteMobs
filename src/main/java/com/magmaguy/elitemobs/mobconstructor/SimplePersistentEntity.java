@@ -1,23 +1,24 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class SimplePersistentEntity {
 
     //Values are stored for the chunk load events
-    public static HashMap<Integer, ArrayList<SimplePersistentEntity>> persistentEntities = new HashMap<>();
+    public static ArrayListMultimap<Integer, SimplePersistentEntity> persistentEntities = ArrayListMultimap.create();
 
     /**
      * Used to add persistent entities to the list. This inserts an arbitrary amount of persistent entities into a chunk.
@@ -26,13 +27,7 @@ public class SimplePersistentEntity {
      * @param simplePersistentEntity
      */
     private static void addPersistentEntity(SimplePersistentEntity simplePersistentEntity) {
-        ArrayList<SimplePersistentEntity> persistentArray = persistentEntities.get(simplePersistentEntity.chunk);
-        if (persistentArray == null)
-            persistentEntities.put(simplePersistentEntity.chunk, new ArrayList<>(Collections.singletonList(simplePersistentEntity)));
-        else {
-            persistentArray.add(simplePersistentEntity);
-            persistentEntities.put(simplePersistentEntity.chunk, persistentArray);
-        }
+        persistentEntities.put(simplePersistentEntity.chunk, simplePersistentEntity);
     }
 
     public int chunk;
@@ -63,21 +58,6 @@ public class SimplePersistentEntity {
         addPersistentEntity(this);
     }
 
-    /**
-     * Removes a persistent entity from the list. Persistent entities are culled when their chunk loads, or when the custom
-     * boss associated to them is times out while the chunk is unloaded.
-     * Note: This method is only called when the entity custom boss associated to the persistent entity times out or is
-     * otherwise removed while in an unloaded chunk. For chunk loads, remove the entire key value from the map, as everything
-     * in it should get loaded and then deleted.
-     */
-    public void remove() {
-        ArrayList<SimplePersistentEntity> persistentArray = persistentEntities.get(chunk);
-        //this happens in chunk unloads, it mass clears entries. It's already handled elsewhere.
-        if (persistentArray == null) return;
-        persistentArray.remove(this);
-        persistentEntities.put(chunk, persistentArray);
-    }
-
     private static int chunkLocation(Chunk chunk) {
         return ChunkVectorizer.hash(chunk);
     }
@@ -89,14 +69,38 @@ public class SimplePersistentEntity {
         @EventHandler(ignoreCancelled = true)
         public void chunkLoadEvent(ChunkLoadEvent event) {
             if (ignore) return;
-            ArrayList<SimplePersistentEntity> arrayList = persistentEntities.get(chunkLocation(event.getChunk()));
-            if (arrayList == null) return;
-            for (SimplePersistentEntity simplePersistentEntity : arrayList)
-                if (simplePersistentEntity.customBossEntity != null)
-                    simplePersistentEntity.customBossEntity.chunkLoad();
-                else if (simplePersistentEntity.npcEntity != null)
-                    simplePersistentEntity.npcEntity.chunkLoad();
-            persistentEntities.remove(chunkLocation(event.getChunk()));
+            int chunkLocation = chunkLocation(event.getChunk());
+            if (persistentEntities.get(chunkLocation) == null) return;
+            try {
+                for (SimplePersistentEntity simplePersistentEntity : persistentEntities.get(chunkLocation)) {
+                    if (simplePersistentEntity.customBossEntity != null)
+                        simplePersistentEntity.customBossEntity.chunkLoad();
+                    else if (simplePersistentEntity.npcEntity != null)
+                        simplePersistentEntity.npcEntity.chunkLoad();
+                }
+            } catch (Exception ex) {
+                new DeveloperMessage("CME Fired!");
+                new DeveloperMessage("Chunk world: " + event.getWorld().getName());
+                new DeveloperMessage("Chunk ID: " + chunkLocation);
+                new DeveloperMessage("Entity count in chunk: " + persistentEntities.get(chunkLocation).size());
+                new DeveloperMessage("Trying again in 1 tick");
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            for (SimplePersistentEntity simplePersistentEntity : persistentEntities.get(chunkLocation)) {
+                                if (simplePersistentEntity.customBossEntity != null)
+                                    simplePersistentEntity.customBossEntity.chunkLoad();
+                                else if (simplePersistentEntity.npcEntity != null)
+                                    simplePersistentEntity.npcEntity.chunkLoad();
+                            }
+                        } catch (Exception ex) {
+                            new DeveloperMessage("Second attempt failed as well!");
+                        }
+                    }
+                }.runTaskLater(MetadataHandler.PLUGIN, 1);
+            }
+            persistentEntities.removeAll(chunkLocation);
         }
     }
 
