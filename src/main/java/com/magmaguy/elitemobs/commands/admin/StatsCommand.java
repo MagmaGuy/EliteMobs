@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.TrackedEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
@@ -95,7 +96,7 @@ public class StatsCommand {
                 "&7[EM] &2Average guild rank: &a" + Round.twoDecimalPlaces(guildRankAverage)));
         commandSender.sendMessage(ChatColorConverter.convert(
                 "§5§m-----------------------------------------------------"));
-
+        commandSender.sendMessage("Tracked entity count: " + TrackedEntity.trackedEntities.size());
     }
 
 }

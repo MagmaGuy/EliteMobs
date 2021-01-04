@@ -36,7 +36,7 @@ public class EntityTracker implements Listener {
         EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteMobEntity);
         new EventCaller(eliteMobSpawnEvent);
         if (eliteMobSpawnEvent.isCancelled()) return false;
-        new EliteEntityTracker(eliteMobEntity, eliteMobEntity.getPersistent(), true);
+        new EliteEntityTracker(eliteMobEntity, eliteMobEntity.getPersistent());
         return true;
     }
 
@@ -188,7 +188,6 @@ public class EntityTracker implements Listener {
         for (Block block : TemporaryBlockTracker.temporaryBlocks)
             block.setType(Material.AIR);
         TemporaryBlockTracker.temporaryBlocks.clear();
-
         SimplePersistentEntity.persistentEntities.clear();
         CustomBossEntity.trackableCustomBosses.clear();
         CrashFix.knownSessionChunks.clear();

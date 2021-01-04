@@ -1,13 +1,11 @@
 package com.magmaguy.elitemobs.entitytracker;
 
 import com.magmaguy.elitemobs.CrashFix;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -20,49 +18,26 @@ public class TrackedEntity {
 
     public static HashMap<UUID, TrackedEntity> trackedEntities = new HashMap<>();
 
-    public UUID uuid;
     public Entity entity;
-    public BukkitTask bukkitTask;
+    public UUID uuid;
     //these defaults only get overridden under certain circumstances
     public boolean removeWhenFarAway, removeOnShutdown;
     public HashMap trackedHashMap;
 
     public TrackedEntity(UUID uuid, Entity entity, boolean removeWhenFarAway, boolean removeOnShutdown, HashMap trackedHashMap) {
+        if (entity == null) {
+            new DeveloperMessage("Failed to register entity: was null");
+            return;
+        }
         this.uuid = uuid;
         this.entity = entity;
         this.removeWhenFarAway = removeWhenFarAway;
         this.removeOnShutdown = removeOnShutdown;
         if (removeOnShutdown)
-            if (entity != null)
-                CrashFix.persistentTracker(entity);
+            CrashFix.persistentTracker(entity);
         trackedEntities.put(uuid, this);
         this.trackedHashMap = trackedHashMap;
-        startTrackableWatchdog();
-    }
-
-
-    /**
-     * Entities removed via the API .remove() call do not trigger any events. As such, this method checks if the entity
-     * still exists on repeat until it is removed. This is to prevent memory leaks.
-     * This runs in async to improve performance.
-     */
-    protected void startTrackableWatchdog() {
-        bukkitTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (entity == null) {
-                    remove(RemovalReason.OTHER);
-                    cancel();
-                    return;
-                }
-
-                if (!entity.isValid()) {
-                    doUnload(RemovalReason.CHUNK_UNLOAD);
-                    cancel();
-                    return;
-                }
-            }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
+        //startTrackableWatchdog();
     }
 
     protected void remove(RemovalReason removalReason) {
@@ -71,7 +46,7 @@ public class TrackedEntity {
                 if (!entity.isValid() && !removeWhenFarAway) {
                     SimplePersistentEntity.PersistentEntityEvent.ignore = true;
                     entity.getLocation().getChunk();
-                    entity = Bukkit.getEntity(uuid);
+                    entity = Bukkit.getEntity(entity.getUniqueId());
                     SimplePersistentEntity.PersistentEntityEvent.ignore = false;
                 }
             if (entity != null)
@@ -92,7 +67,6 @@ public class TrackedEntity {
         //Don't remove on shutdown due to CME error, clear all tracked entities during shutdown globally
         if (!removalReason.equals(RemovalReason.SHUTDOWN))
             trackedEntities.remove(uuid);
-        bukkitTask.cancel();
         specificRemoveHandling(removalReason);
     }
 
