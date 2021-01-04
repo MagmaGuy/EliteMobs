@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -454,7 +455,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         softRemove();
         if (escapeMechanism != null) escapeMechanism.cancel();
         trackableCustomBosses.remove(this);
-        if (simplePersistentEntity != null) simplePersistentEntity.remove();
+        if (simplePersistentEntity != null) {
+            new DeveloperMessage("Running remove");
+            //This manually dereferences simpe persistent entities and doesn't remove them to avoid async conflicts
+            simplePersistentEntity.customBossEntity = null;
+            simplePersistentEntity = null;
+        }
         for (CustomBossBossBar customBossBossBar : customBossBossBars) customBossBossBar.remove();
         super.remove(removeEntity);
     }
@@ -475,7 +481,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     public void chunkLoad() {
         setNewLivingEntity(persistentLocation);
         //This bypasses the spawn event caller, since having it trigger the spawn message and so on every time a chunk gets loaded would be bad
-        new EliteEntityTracker(this, getPersistent(), true);
+        new EliteEntityTracker(this, getPersistent());
         customBossTrail.restartTrails();
         setDisguise();
     }
