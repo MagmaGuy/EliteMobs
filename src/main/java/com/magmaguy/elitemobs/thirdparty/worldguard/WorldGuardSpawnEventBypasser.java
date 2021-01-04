@@ -13,6 +13,10 @@ public class WorldGuardSpawnEventBypasser implements Listener {
         force = true;
     }
 
+    public static boolean isForcedSpawn() {
+        return force;
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(CreatureSpawnEvent event) {
         if (!force) return;

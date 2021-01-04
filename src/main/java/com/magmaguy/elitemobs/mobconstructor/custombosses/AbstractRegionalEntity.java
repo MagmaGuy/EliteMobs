@@ -165,6 +165,11 @@ public class AbstractRegionalEntity {
         this.fileConfiguration = customBossConfigFields.getFileConfiguration();
         this.respawnCoolDownInMinutes = 0;
         this.spawnLocation = location;
+        this.worldName = location.getWorld().getName();
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+        this.worldIsLoaded = true;
         this.unixRespawnTime = 0;
         constructRawString();
         customBossConfigFields.filesOutOfSync = true;
@@ -211,8 +216,8 @@ public class AbstractRegionalEntity {
      * Creates a spawnLocations entry for this regional boss
      */
     private void constructRawString() {
-        rawString = spawnLocation.getX() + "," + spawnLocation.getY() + "," + spawnLocation.getZ() + "," +
-                spawnLocation.getPitch() + "," + spawnLocation.getYaw() + ":" + unixRespawnTime;
+        rawString = spawnLocation.getWorld().getName() + "," + spawnLocation.getX() + "," + spawnLocation.getY() + "," +
+                spawnLocation.getZ() + "," + spawnLocation.getPitch() + "," + spawnLocation.getYaw() + ":" + unixRespawnTime;
     }
 
     /**

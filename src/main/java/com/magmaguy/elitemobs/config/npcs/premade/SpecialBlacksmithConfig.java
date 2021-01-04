@@ -28,7 +28,7 @@ public class SpecialBlacksmithConfig extends NPCsConfigFields {
                 Arrays.asList(
                         "Come back when you have\\nmore to spend",
                         "Don't get yourself killed,\\nwe want you to bring us\\nmore gear.",
-                        "Next time buy something \\mmore expensive.",
+                        "Next time buy something \\nmore expensive.",
                         "Don't forget, no refunds."),
                 false,
                 true,

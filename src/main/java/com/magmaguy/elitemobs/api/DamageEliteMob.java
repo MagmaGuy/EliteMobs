@@ -37,7 +37,7 @@ public class DamageEliteMob {
     }
 
     private static double damageFormula(EliteMobEntity eliteMobEntity, DamageAmount damageAmount) {
-        return eliteMobEntity.damage(tierCalc(eliteMobEntity, damageAmount));
+        return eliteMobEntity.damage(tierCalc(eliteMobEntity, damageAmount), true);
     }
 
     private static double damageFormula(Player player, EliteMobEntity eliteMobEntity, DamageAmount damageAmount) {

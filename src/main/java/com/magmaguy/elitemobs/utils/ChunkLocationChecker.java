@@ -24,10 +24,7 @@ public class ChunkLocationChecker {
     Checks if a given location is loaded
      */
     public static boolean locationIsLoaded(Location location) {
-        for (Chunk iteratedChunk : location.getWorld().getLoadedChunks())
-            if (chunkLocationCheck(location, iteratedChunk))
-                return true;
-        return false;
+        return location.getWorld().isChunkLoaded((int) Math.floor(location.getX()) >> 4, (int) Math.floor(location.getZ()) >> 4);
     }
 
 }

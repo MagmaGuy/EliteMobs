@@ -15,6 +15,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.PlayerScanner;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -35,26 +36,11 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
  */
 public class NaturalMobSpawnEventHandler implements Listener {
 
-    private static boolean ignoreMob = false;
-    private static EliteMobEntity storedEliteMobEntity = null;
-
-    public static void setIgnoreMob(boolean bool, EliteMobEntity eliteMobEntity) {
-        ignoreMob = bool;
-        storedEliteMobEntity = eliteMobEntity;
-    }
-
-    private static boolean getIgnoreMob() {
-        return ignoreMob;
-    }
-
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (getIgnoreMob()) {
-            ignoreMob = false;
-            storedEliteMobEntity.setLivingEntity(event.getEntity());
-            return;
-        }
+        //This fires for custom bosses, so don't override those spawns
+        if (WorldGuardSpawnEventBypasser.isForcedSpawn()) return;
 
         /*
         Deal with entities spawned within the plugin

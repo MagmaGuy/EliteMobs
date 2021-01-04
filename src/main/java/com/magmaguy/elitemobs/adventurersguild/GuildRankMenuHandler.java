@@ -336,7 +336,7 @@ public class GuildRankMenuHandler implements Listener {
         max mob tier / 2 = loot shower payout for killing 1 em at max level for that player
         payout * 1000 = amount of elite mobs to kill before going up a rank
          */
-        double eliteMobsToKillBeforeGuildRankup = 100 + 500 * (tier - 1) * 0.1;
+        double eliteMobsToKillBeforeGuildRankup = AdventurersGuildConfig.baseKillsForRankUp + AdventurersGuildConfig.additionalKillsForRankUpPerTier * (tier - 1);
         return (int) ((tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup * (GuildRank.currencyBonusMultiplier(prestigeLevel)));
     }
 

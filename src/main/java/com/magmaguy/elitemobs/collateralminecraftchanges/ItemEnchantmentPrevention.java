@@ -5,16 +5,19 @@ import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 
 public class ItemEnchantmentPrevention implements Listener {
     @EventHandler(ignoreCancelled = true)
-    public void onEnchant(EnchantItemEvent event) {
-        if (!ItemSettingsConfig.preventEliteItemEnchantment) {
-            new EliteItemLore(event.getItem(), false);
+    public void onCombine(InventoryClickEvent event) {
+        if (!event.getView().getTopInventory().getType().equals(InventoryType.ANVIL)) return;
+        if (!ItemTagger.isEliteItem(event.getCurrentItem())) return;
+        if (ItemSettingsConfig.preventEliteItemEnchantment) {
+            event.setCancelled(true);
             return;
         }
-        if (ItemTagger.isEliteItem(event.getItem()))
-            event.setCancelled(true);
+        if (event.getSlot() != 2) return;
+        new EliteItemLore(event.getCurrentItem(), false);
     }
 }

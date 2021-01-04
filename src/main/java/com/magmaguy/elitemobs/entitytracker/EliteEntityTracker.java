@@ -16,7 +16,7 @@ public class EliteEntityTracker extends TrackedEntity implements AbstractTracked
     public EliteMobEntity eliteMobEntity;
 
     public EliteEntityTracker(EliteMobEntity eliteMobEntity, boolean isPersistent, boolean removeOnShutdown) {
-        super(eliteMobEntity.uuid, eliteMobEntity.getLivingEntity(), !isPersistent, removeOnShutdown, eliteMobEntities);
+        super(eliteMobEntity.uuid, eliteMobEntity.getLivingEntity(), !isPersistent, true, eliteMobEntities);
         this.eliteMobEntity = eliteMobEntity;
         eliteMobEntities.put(eliteMobEntity.uuid, eliteMobEntity);
         if (eliteMobEntity.getLivingEntity() != null)

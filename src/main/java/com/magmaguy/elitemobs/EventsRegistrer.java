@@ -188,6 +188,7 @@ public class EventsRegistrer {
 
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
+        pluginManager.registerEvents(new CustomBossDeath(), plugin);
         pluginManager.registerEvents(new CustomBossBossBar.CustomBossBossBarEvent(), plugin);
         pluginManager.registerEvents(new SimplePersistentEntity.PersistentEntityEvent(), plugin);
         pluginManager.registerEvents(new CustomBossTaunts(), plugin);

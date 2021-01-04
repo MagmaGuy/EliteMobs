@@ -85,7 +85,7 @@ public class CustomBossTrail {
                     @Override
                     public void run() {
                         item.remove();
-                        EntityTracker.wipeEntity(item, RemovalReason.EFFECT_TIMEOUT);
+                        EntityTracker.unregister(item, RemovalReason.EFFECT_TIMEOUT);
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20);
 
@@ -94,8 +94,7 @@ public class CustomBossTrail {
     }
 
     public void terminateTrails() {
-        for (BukkitTask bukkitTask : bukkitTasks)
-            bukkitTask.cancel();
+        for (BukkitTask bukkitTask : bukkitTasks) bukkitTask.cancel();
         bukkitTasks.clear();
     }
 
