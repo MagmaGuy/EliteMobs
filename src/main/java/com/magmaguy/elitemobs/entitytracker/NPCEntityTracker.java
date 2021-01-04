@@ -29,7 +29,8 @@ public class NPCEntityTracker extends TrackedEntity implements AbstractTrackedEn
     public void specificRemoveHandling(RemovalReason removalReason) {
         npcEntity.getVillager().removeMetadata(MetadataHandler.NPC_METADATA, MetadataHandler.PLUGIN);
         new DebugMessage("Unregistering NPC spawn due to " + removalReason.toString());
-        npcEntity.chunkUnload();
+        if (!removalReason.equals(RemovalReason.SHUTDOWN))
+            npcEntity.chunkUnload();
     }
 
 }

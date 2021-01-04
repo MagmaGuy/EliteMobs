@@ -46,7 +46,7 @@ public class CustomBossBossBar {
             @Override
             public void run() {
                 if (!player.isOnline() ||
-                        !player.getWorld().equals(customBossEntity.getLivingEntity().getWorld()) ||
+                        !player.getWorld().equals(customBossEntity.getLocation().getWorld()) ||
                         !customBossEntity.trackingPlayer.contains(player) &&
                                 player.getLocation().distance(customBossEntity.getLocation()) > 20 ||
                         customBossEntity.getHealth() <= 0) {

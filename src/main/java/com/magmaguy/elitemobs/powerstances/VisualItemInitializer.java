@@ -16,7 +16,6 @@ public class VisualItemInitializer {
         item.setGravity(false);
         item.setInvulnerable(true);
         item.setMetadata(MetadataHandler.BETTERDROPS_COMPATIBILITY_MD, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
-
         return item;
     }
 

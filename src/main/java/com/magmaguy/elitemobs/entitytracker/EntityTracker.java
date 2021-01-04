@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.entitytracker;
 
+import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.NPCEntitySpawnEvent;
 import com.magmaguy.elitemobs.api.SuperMobSpawnEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Chunk;
@@ -186,18 +188,21 @@ public class EntityTracker implements Listener {
         for (Block block : TemporaryBlockTracker.temporaryBlocks)
             block.setType(Material.AIR);
         TemporaryBlockTracker.temporaryBlocks.clear();
+
         SimplePersistentEntity.persistentEntities.clear();
+        CustomBossEntity.trackableCustomBosses.clear();
+        CrashFix.knownSessionChunks.clear();
     }
 
 
     //Events
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onUnload(ChunkUnloadEvent event) {
         EntityTracker.wipeChunk(event.getChunk(), RemovalReason.CHUNK_UNLOAD);
     }
 
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         EntityTracker.wipeWorld(event.getWorld(), RemovalReason.WORLD_UNLOAD);
     }
@@ -209,7 +214,7 @@ public class EntityTracker implements Listener {
             trackedEntity.doDeath();
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onMine(BlockBreakEvent event) {
         if (!getIsTemporaryBlock(event.getBlock())) return;
         event.setDropItems(false);

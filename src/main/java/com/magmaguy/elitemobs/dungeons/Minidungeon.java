@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -25,7 +24,9 @@ import org.bukkit.util.Vector;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Minidungeon {
 
@@ -118,6 +119,9 @@ public class Minidungeon {
         if (dungeonPackagerConfigFields.getAnchorPoint() != null)
             this.isInstalled = true;
 
+    }
+
+    public void completeSchematicMinidungeonInitialization() {
         this.relativeDungeonLocations = new RelativeDungeonLocations(dungeonPackagerConfigFields.getRelativeBossLocations());
 
         if (isInstalled)
@@ -127,7 +131,6 @@ public class Minidungeon {
 
         if (isInstalled)
             this.teleportLocation = dungeonPackagerConfigFields.getAnchorPoint().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
-
     }
 
     /**
@@ -175,8 +178,6 @@ public class Minidungeon {
             }
         }
 
-        private final HashSet<UUID> usedUUIDs = new HashSet<>();
-
         public class RealDungeonLocation {
             public Location location;
             public CustomBossConfigFields customBossConfigFields;
@@ -190,22 +191,13 @@ public class Minidungeon {
             }
         }
 
-        //private CustomBossConfigFields.ConfigRegionalEntity getConfigRegionalEntity(Location spawnLocation, CustomBossConfigFields customBossConfigFields) {
-        //    for (CustomBossConfigFields.ConfigRegionalEntity configRegionalEntity : customBossConfigFields.getConfigRegionalEntities().values()) {
-        //        if (configRegionalEntity.spawnLocation.equals(spawnLocation) && !usedUUIDs.contains(configRegionalEntity.uuid)) {
-        //            usedUUIDs.add(configRegionalEntity.uuid);
-        //            return configRegionalEntity;
-        //        }
-        //    }
-        //    return null;
-        //}
-
         /**
          * This runs when an admin tries to install a dungeon
          */
         public void commitLocations() {
-            for (RealDungeonLocation realDungeonLocation : realDungeonLocations)
-                new AbstractRegionalEntity(realDungeonLocation.location, realDungeonLocation.customBossConfigFields);
+            for (RealDungeonLocation realDungeonLocation : realDungeonLocations) {
+                realDungeonLocation.abstractRegionalEntity = new AbstractRegionalEntity(realDungeonLocation.location, realDungeonLocation.customBossConfigFields);
+            }
         }
 
         public void uncommitLocations() {
@@ -252,7 +244,7 @@ public class Minidungeon {
                     //(float) vectorGetter(rawLocationString, 3),
                     //(float) vectorGetter(rawLocationString, 4));
                 } catch (Exception ex) {
-                    new DebugMessage("Failed to generate dungeon from raw " + rawLocationString);
+                    new WarningMessage("Failed to generate dungeon from raw " + rawLocationString);
                     ex.printStackTrace();
                 }
             }

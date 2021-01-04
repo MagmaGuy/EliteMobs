@@ -111,22 +111,37 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             Player player = (Player) livingEntity;
             EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity().getUniqueId());
             if (eliteMobEntity == null) return;
-            Strike strike = getDamage(player, eliteMobEntity, event);
-            EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteMobEntity,
-                    player,
-                    event,
-                    strike.damage,
-                    strike.criticalStrike,
-                    strike.customDamage);
+            //If the damage wasn't caused by an elite item, just allow the event to go as raw
+            EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent;
+            double damage;
+            if (EliteMobsItemDetector.isEliteMobsItem(player.getInventory().getItemInMainHand())) {
+                Strike strike = getDamage(player, eliteMobEntity, event);
+                eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteMobEntity,
+                        player,
+                        event,
+                        strike.damage,
+                        strike.criticalStrike,
+                        strike.customDamage);
+                damage = strike.damage;
+            } else {
+                eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteMobEntity,
+                        player,
+                        event,
+                        event.getFinalDamage(),
+                        false,
+                        false);
+                damage = event.getFinalDamage();
+            }
+
             new EventCaller(eliteMobDamagedByPlayerEvent);
             if (eliteMobDamagedByPlayerEvent.isCancelled) {
                 event.setCancelled(true);
                 return;
             }
             execute(eliteMobDamagedByPlayerEvent);
-            //This bypasses an issue where elites die too soon if the strike would've killed them in the natural hit
-            if (livingEntity.getHealth() - event.getDamage() * 2 <= 0)
-                event.setDamage(0);
+            event.setDamage(damage);
+            ////This bypasses an issue where elites die too soon if the strike would've killed them in the natural hit
+            //if (livingEntity.getHealth() - event.getDamage() * 2 <= 0) event.setDamage(0);
             //No antiexploit checks for dungeons
             if (!(EliteMobs.worldguardIsEnabled &&
                     !WorldGuardFlagChecker.checkFlag(
@@ -140,7 +155,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
         public static void execute(EliteMobDamagedByPlayerEvent event) {
             event.getEliteMobEntity().addDamager(event.getPlayer(), event.getDamage());
             playerHitCooldownHashMap.put(event.getPlayer(), clock);
-            event.getEliteMobEntity().damage(event.getDamage());
+            event.getEliteMobEntity().damage(event.getDamage(), false);
         }
 
         private class Strike {
@@ -181,21 +196,19 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
             if (event.getDamager() instanceof Arrow) {
                 //note: the arrow velocity amplitude at full load is about 2.8
-                double arrowSpeedMultiplier = Math.sqrt(Math.pow(event.getDamager().getVelocity().getX(), 2) +
-                        Math.pow(event.getDamager().getVelocity().getY(), 2) +
-                        Math.pow(event.getDamager().getVelocity().getZ(), 2));
-                arrowSpeedMultiplier = Math.min(arrowSpeedMultiplier, 2.8);
-                arrowSpeedMultiplier = arrowSpeedMultiplier / 2.8;
+                double arrowSpeedMultiplier = Math.sqrt(Math.pow(event.getDamager().getVelocity().getX(), 2D) +
+                        Math.pow(event.getDamager().getVelocity().getY(), 2D) +
+                        Math.pow(event.getDamager().getVelocity().getZ(), 2D));
+                arrowSpeedMultiplier = Math.min(arrowSpeedMultiplier, 2.8D);
+                arrowSpeedMultiplier = arrowSpeedMultiplier / 2.8D;
                 newDamage *= arrowSpeedMultiplier;
             }
 
             boolean criticalHit = isCriticalHit(player);
 
-            if (criticalHit)
-                newDamage += newDamage * 0.5;
+            if (criticalHit) newDamage += newDamage * 0.5;
 
-            if (eliteMobEntity.getHealth() - newDamage < 0)
-                newDamage = eliteMobEntity.getHealth();
+            //if (eliteMobEntity.getHealth() - newDamage < 0) newDamage = eliteMobEntity.getHealth();
 
             return new Strike(newDamage, criticalHit, false);
         }
@@ -215,7 +228,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             else
                 finalDamage = (playerWeaponTier + secondaryEnchantmentDamageIncrease(player, eliteMobEntity.getLivingEntity())) *
                         MobCombatSettingsConfig.damageToEliteMultiplier;
-            return finalDamage < 1 ? 1 : finalDamage;
+            return Math.max(finalDamage, 1D);
         }
 
         /**

@@ -16,12 +16,14 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -113,16 +115,15 @@ public class ItemLootShower implements Listener {
         if (!EconomySettingsConfig.enableCurrencyShower)
             return;
 
-        int adjustedEliteMobsTier = (int) (eliteMobTier - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
+        if (eliteMobTier - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) < -20) {
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
+                    ChatColorConverter.convert("&8EM] &4You are too well equipped to get coins for killing this Elite!")));
+            return;
+        }
 
-        adjustedEliteMobsTier = adjustedEliteMobsTier < 0 ? adjustedEliteMobsTier : Math.min(adjustedEliteMobsTier, 5);
-
-        adjustedEliteMobsTier += eliteMobTier;
-
-        int finalAdjustedEliteMobsTier = adjustedEliteMobsTier;
         new BukkitRunnable() {
 
-            int currencyAmount = (int) (finalAdjustedEliteMobsTier / 2 * EconomySettingsConfig.currencyShowerMultiplier *
+            int currencyAmount = (int) (eliteMobTier / 2 * EconomySettingsConfig.currencyShowerMultiplier *
                     GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
 
             @Override
@@ -330,22 +331,20 @@ public class ItemLootShower implements Listener {
      * Currency pickup event
      */
     public static class ItemLootShowerEvents implements Listener {
-        @EventHandler(priority = EventPriority.LOW)
-        public static void onItemPickup(PlayerPickupItemEvent event) {
-            if (event.isCancelled()) return;
-
+        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+        public static void onItemPickup(EntityPickupItemEvent event) {
             //coins are soulbound so if someone can pick them up they can have it
             if (!coinValues.containsKey(event.getItem().getUniqueId())) return;
             event.setCancelled(true);
+            if (!event.getEntity().getType().equals(EntityType.PLAYER)) return;
 
             Coin coin = coinValues.get(event.getItem().getUniqueId());
             if (!coin.pickupable)
                 return;
 
-            //if (event.getEntity() instanceof Player) {
             coinValues.remove(event.getItem().getUniqueId());
             double amountIncremented = coin.value;
-            Player player = event.getPlayer();
+            Player player = (Player) event.getEntity();
             event.getItem().remove();
             EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
             sendCurrencyNotification(player);
@@ -362,7 +361,12 @@ public class ItemLootShower implements Listener {
                                     .replace("$currency_name", EconomySettingsConfig.currencyName)
                                     .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
         }
-        //}
+
+        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+        public static void onItemPickup(InventoryPickupItemEvent event) {
+            if (!coinValues.containsKey(event.getItem().getUniqueId())) return;
+            event.setCancelled(true);
+        }
     }
 
 

@@ -6,10 +6,6 @@ import org.bukkit.command.CommandSender;
 public class ReloadHandler {
 
     public static void reload(CommandSender commandSender) {
-        //EliteMobs.validWorldList.clear();
-        //EliteMobs.worldScanner();
-        //EliteMobs.initializeConfigs();
-        //commandSender.sendMessage("[EliteMobs] Configuration files reloaded!");
         MetadataHandler.PLUGIN.onDisable();
         MetadataHandler.PLUGIN.onLoad();
         MetadataHandler.PLUGIN.onEnable();
