@@ -13,7 +13,6 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -150,14 +149,20 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
     @Override
     public void chunkUnload() {
-        simplePersistentEntity = new SimplePersistentEntity(this);
+        villager.remove();
+        if (timeout < 1)
+            simplePersistentEntity = new SimplePersistentEntity(this);
     }
 
     @Override
     public void chunkLoad() {
-        this.villager = (Villager) Bukkit.getEntity(uuid);
-        EntityTracker.registerNPCEntity(this);
+        this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+        this.uuid = villager.getUniqueId();
+        setName(npCsConfigFields.getName());
+        setProfession(npCsConfigFields.getProfession());
         initializeRole(role);
+        setCanMove(canMove);
+        EntityTracker.registerNPCEntity(this);
     }
 
     /**

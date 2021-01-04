@@ -118,8 +118,8 @@ public class Placeholders extends PlaceholderExpansion {
                     double currentTier = ElitePlayerInventory.playerInventories.get(iteratedPlayer.getUniqueId()).getFullPlayerTier(true);
                     if (currentTier > highestThreat)
                         highestThreat = currentTier;
-                    return "" + highestThreat;
                 }
+                return "" + highestThreat;
             case "player_top_guild_rank":
                 int highestGuildRank = 0;
                 String highestGuildUser = "";

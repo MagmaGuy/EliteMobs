@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.entitytracker;
 import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -64,8 +66,17 @@ public class TrackedEntity {
     }
 
     protected void remove(RemovalReason removalReason) {
-        if (entity != null)
-            entity.remove();
+        if (entity != null) {
+            if (removalReason.equals(RemovalReason.SHUTDOWN))
+                if (!entity.isValid() && !removeWhenFarAway) {
+                    SimplePersistentEntity.PersistentEntityEvent.ignore = true;
+                    entity.getLocation().getChunk();
+                    entity = Bukkit.getEntity(uuid);
+                    SimplePersistentEntity.PersistentEntityEvent.ignore = false;
+                }
+            if (entity != null)
+                entity.remove();
+        }
         untrack(removalReason);
     }
 

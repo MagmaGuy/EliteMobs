@@ -26,7 +26,6 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.VersionChecker;
-import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -286,17 +285,6 @@ public class EliteMobEntity {
     }
 
     /**
-     * Sets the level of the Elite Mob. Values below 1 default to 1
-     *
-     * @param newLevel Level of the Elite Mob
-     */
-    private void setEliteLevel(int newLevel) {
-        if (newLevel < 1)
-            newLevel = 1;
-        this.eliteLevel = newLevel;
-    }
-
-    /**
      * Sets the max health of the Elite Mob. This is calculated based on the Elite Mob level. Maxes out at 2000 due to
      * Minecraft restrictions
      */
@@ -305,9 +293,13 @@ public class EliteMobEntity {
         this.maxHealth = (eliteTier * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth);
         //7 is the base damage of a diamond sword
         this.health = this.maxHealth;
-        double vanillaValue = maxHealth > 2048 ? 2048 : maxHealth;
-        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(vanillaValue);
-        livingEntity.setHealth(vanillaValue);
+        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        livingEntity.setHealth(maxHealth);
+    }
+
+    public void resetMaxHealth() {
+        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        livingEntity.setHealth(maxHealth);
     }
 
     private void setMaxHealth(double healthMultiplier) {
@@ -315,49 +307,20 @@ public class EliteMobEntity {
         this.maxHealth = (eliteTier * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth) * healthMultiplier;
         //7 is the base damage of a diamond sword
         this.health = this.maxHealth;
-        double vanillaValue = Math.min(maxHealth, 2048D);
-        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(vanillaValue);
-        livingEntity.setHealth(vanillaValue);
+        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        livingEntity.setHealth(maxHealth);
     }
 
     public void setHealth(double health) {
-        health = Math.max(health, 0D);
-
         this.health = health;
-        if (this.maxHealth <= 2048)
-            livingEntity.setHealth(health);
-        else
-            livingEntity.setHealth(Math.ceil(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * this.health / this.maxHealth));
-
+        livingEntity.setHealth(health);
     }
 
-    public double damage(double damage) {
+    public double damage(double damage, boolean doRealDamage) {
         health = Math.max(0, health - damage);
-        try {
-            if (this.maxHealth <= 2048)
-                livingEntity.setHealth(health);
-            else {
-                double newHealth = Math.ceil(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * this.health / this.maxHealth);
-                if (newHealth < 1 && health > 0)
-                    newHealth = 1;
-                livingEntity.setHealth(newHealth);
-            }
-        } catch (Exception ex) {
-            new WarningMessage("Failed to correctly damage Elite Mob because some other plugin changed the maximum health of the mob after EliteMobs.");
-            new WarningMessage("This is probably caused by an incompatibility with another plugin.");
-            new WarningMessage("Name of the entity affected: " + getLivingEntity().getCustomName() + " - NOTE: DISABLING THIS ENTITY ON ELITEMOBS WILL NOT FIX THE ISSUE AT ALL");
-            new WarningMessage("Damage will be applied incorrectly for this entity and entities like it until the conflicting plugin is fixed or removed.");
-
-            double errorDamage = livingEntity.getHealth() - damage < 0D ? livingEntity.getHealth() : damage;
-            livingEntity.setHealth(errorDamage);
-            this.health = livingEntity.getHealth();
-            this.maxHealth = livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-        }
+        if (doRealDamage)
+            livingEntity.setHealth(health);
         return damage;
-    }
-
-    public void heal(double healValue) {
-        damage(-healValue);
     }
 
     public void fullHeal() {
@@ -536,32 +499,6 @@ public class EliteMobEntity {
     }
 
     /**
-     * Applies a HashSet of ElitePower to an Elite Mob
-     *
-     * @param elitePowers HashSet of Elite Powers to be applied
-     */
-    public void setCustomPowers(HashSet<ElitePower> elitePowers) {
-
-        this.powers = elitePowers;
-        for (ElitePower elitePower : elitePowers) {
-            elitePower.applyPowers(this.livingEntity);
-            if (elitePower instanceof MinorPower)
-                this.minorPowerCount++;
-            if (elitePower instanceof MajorPower)
-                this.majorPowerCount++;
-        }
-
-        if (this.minorPowerCount > 0) {
-            MinorPowerPowerStance minorPowerStanceMath = new MinorPowerPowerStance(this);
-        }
-
-        if (this.majorPowerCount > 0) {
-            MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance(this);
-        }
-
-    }
-
-    /**
      * Returns the living EliteMob
      *
      * @return LivingEntity associated to the Elite Mob
@@ -586,8 +523,8 @@ public class EliteMobEntity {
     public void setNewLivingEntity(Location location) {
         WorldGuardSpawnEventBypasser.forceSpawn();
         this.livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
+        this.livingEntity.setRemoveWhenFarAway(!this.isPersistent);
         this.uuid = livingEntity.getUniqueId();
-        EntityTracker.registerEliteMob(this);
         if (customBossEntity != null)
             customBossEntity.silentCustomBossInitialization();
     }
@@ -797,15 +734,6 @@ public class EliteMobEntity {
         return this.spawnReason;
     }
 
-    /**
-     * Sets the spawn reason for the Living Entity. Used for the API.
-     *
-     * @param spawnReason Spawn reason for the Living Entity.
-     */
-    public void setSpawnReason(CreatureSpawnEvent.SpawnReason spawnReason) {
-        this.spawnReason = spawnReason;
-    }
-
     public HashMap<Player, Double> getDamagers() {
         return this.damagers;
     }
@@ -826,10 +754,6 @@ public class EliteMobEntity {
 
     public boolean hasDamagers() {
         return !damagers.isEmpty();
-    }
-
-    public double getHealthMultiplier() {
-        return this.healthMultiplier;
     }
 
     public void setHealthMultiplier(double healthMultiplier) {
@@ -871,12 +795,14 @@ public class EliteMobEntity {
     public void remove(boolean removeEntity) {
         if (removeEntity)
             this.getLivingEntity().remove();
-        //EntityTracker.unregister(this.uuid, RemovalReason.OTHER);
         if (phaseBossID != null)
             PhaseBossEntity.phaseBosses.remove(phaseBossID);
     }
 
     public void remove(RemovalReason removalReason) {
+        if (removalReason.equals(RemovalReason.SHUTDOWN)) {
+            remove(true);
+        }
         if (removalReason.equals(RemovalReason.CHUNK_UNLOAD))
             if (isPersistent)
                 return;

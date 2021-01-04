@@ -46,7 +46,10 @@ import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
 import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
@@ -57,6 +60,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +84,18 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("| |___| |_____| |_  | | | |___| |  | \\ \\_/ / |_/ //\\__/ /");
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
         Bukkit.getLogger().info("By MagmaGuy");
+        if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < Double.MAX_VALUE) {
+            Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", Double.MAX_VALUE);
+            try {
+                new DeveloperMessage(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath().replace("/plugins/EliteMobs", ""));
+                File file = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath().replace("plugins/EliteMobs", "") + "spigot.yml");
+                Bukkit.getServer().spigot().getConfig().save(file);
+                new InfoMessage("New default max health set correctly!");
+            } catch (IOException e) {
+                new WarningMessage("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + Double.MAX_VALUE);
+            }
+        }
+
 
         //Remove entities that should not exist
         CrashFix.startupCheck();
@@ -188,8 +205,11 @@ public class EliteMobs extends JavaPlugin {
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
             if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
                 minidungeon.quantifyWorldBosses();
-            else if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
+            else if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC)) {
                 minidungeon.quantifySchematicBosses();
+                //Due to boot order this needs to run after the minidungeons and the custom bosses are initialized
+                minidungeon.completeSchematicMinidungeonInitialization();
+            }
         }
 
     }

@@ -25,6 +25,7 @@ public class AdventurersGuildConfig {
     public static List<String> onRankUpCommand, onPrestigeUpCommand;
     public static double dodge1, dodge2, dodge3, crit1, crit2, crit3, health1, health2, health3, health4;
     public static String adventurersGuildMenuName;
+    public static int baseKillsForRankUp, additionalKillsForRankUpPerTier;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
@@ -310,6 +311,9 @@ public class AdventurersGuildConfig {
         health2 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige4Bonus", 2.5);
         health3 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige7Bonus", 3);
         health4 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige10Bonus", 4);
+
+        baseKillsForRankUp = ConfigurationEngine.setInt(fileConfiguration, "baseKillsForRankUp", 100);
+        additionalKillsForRankUpPerTier = ConfigurationEngine.setInt(fileConfiguration, "additionalKillsForRankUpPerTier", 50);
 
         //initializes the AG location
         AdventurersGuildCommand.defineTeleportLocation();

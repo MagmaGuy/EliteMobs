@@ -51,7 +51,7 @@ public class LootTables implements Listener {
         for (Player player : eliteMobEntity.getDamagers().keySet()) {
 
             if (eliteMobEntity.getDamagers().get(player) / eliteMobEntity.getMaxHealth() < 0.1)
-                return;
+                continue;
 
             new ItemLootShower(eliteMobEntity.getTier(), eliteMobEntity.getLivingEntity().getLocation(), player);
 
@@ -82,7 +82,7 @@ public class LootTables implements Listener {
 
             SoulbindEnchantment.addPhysicalDisplay(item, player);
 
-            if (item == null) return;
+            if (item == null) continue;
 
             RareDropEffect.runEffect(item);
         }
@@ -238,18 +238,13 @@ public class LootTables implements Listener {
 
         double totalWeight = 0;
 
-
-        for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet())
-            try {
+        for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet()) {
+            Double shouldntBeNull = CustomItem.getWeighedFixedItems().get(itemStack);
+            if (shouldntBeNull != null)
                 totalWeight += CustomItem.getWeighedFixedItems().get(itemStack);
-            } catch (NullPointerException ex) {
-                new WarningMessage("Error generating loot");
-                if (itemStack != null)
-                    new WarningMessage("itemStack is " + itemStack.getItemMeta().getDisplayName());
-                new WarningMessage("Weight value is null: " + (CustomItem.getWeighedFixedItems().get(itemStack) == null));
-                ex.printStackTrace();
-            }
-
+            else
+                new WarningMessage("Item " + itemStack.getItemMeta().getDisplayName() + " reported a null weight!");
+        }
 
         ItemStack generatedItemStack = null;
         double random = Math.random() * totalWeight;

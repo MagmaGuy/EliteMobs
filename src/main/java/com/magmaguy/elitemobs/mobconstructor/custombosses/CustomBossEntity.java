@@ -15,6 +15,8 @@ import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
+import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -74,9 +76,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         if (!customBossConfigFields.isEnabled()) return null;
         if (!EliteMobEntity.validSpawnLocation(location)) return null;
         try {
+            WorldGuardSpawnEventBypasser.forceSpawn();
             return (LivingEntity) location.getWorld().spawnEntity(location, EntityType.valueOf(customBossConfigFields.getEntityType()));
         } catch (Exception ex) {
-            new WarningMessage("Failed to spawn a Custom Boss via command because the entity type for it is not valid!");
+            new WarningMessage("Failed to spawn a Custom Boss' living entity!");
             return null;
         }
     }
@@ -146,12 +149,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     private final HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
 
     public LivingEntity advancedGetEntity() {
-        if (getLivingEntity() != null)
-            return getLivingEntity();
-        else {
+        if (getLivingEntity() == null ||
+                !getLivingEntity().isValid() && !getLivingEntity().isDead())
             setLivingEntity((LivingEntity) Bukkit.getEntity(this.uuid));
-            return getLivingEntity();
-        }
+        return getLivingEntity();
     }
 
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
@@ -243,11 +244,11 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     public void silentCustomBossInitialization() {
         setEquipment();
         setBaby();
-        //startBossTrails();
         setFollowRange();
         mountEntity();
-        //setDisguise();
         setFrozen();
+        resetMaxHealth();
+        setHealth(getHealth());
     }
 
     private void setBaby() {
@@ -350,7 +351,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         }
     }
 
-
     private void sendLocation() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!player.getWorld().equals(getLivingEntity().getWorld())) continue;
@@ -360,7 +360,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             player.spigot().sendMessage(interactiveMessage);
         }
     }
-
 
     public final HashSet<Player> trackingPlayer = new HashSet<>();
     public HashMap<Player, BossBar> playerBossBars = new HashMap<>();
@@ -437,7 +436,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         mount = CustomBossMount.generateMount(this);
     }
 
-
     private BukkitTask escapeMechanism;
 
     /**
@@ -448,43 +446,34 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         escapeMechanism = CustomBossEscapeMechanism.startEscape(timeout, this);
     }
 
-
     /**
      * Removal method for when the custom boss dies or is otherwise entirely removed
      */
     @Override
     public void remove(boolean removeEntity) {
         softRemove();
-        if (escapeMechanism != null)
-            escapeMechanism.cancel();
+        if (escapeMechanism != null) escapeMechanism.cancel();
         trackableCustomBosses.remove(this);
-        if (simplePersistentEntity != null)
-            simplePersistentEntity.remove();
-        for (CustomBossBossBar customBossBossBar : customBossBossBars)
-            customBossBossBar.remove();
+        if (simplePersistentEntity != null) simplePersistentEntity.remove();
+        for (CustomBossBossBar customBossBossBar : customBossBossBars) customBossBossBar.remove();
         super.remove(removeEntity);
     }
-
 
     /**
      * Removal method for stopping tasks when the boss gets unloaded.
      * Should remove any ongoing effects which would malfunction if unloaded.
      */
     public void softRemove() {
-        if (customBossTrail != null)
-            customBossTrail.terminateTrails();
-        if (bossLocalScan != null)
-            bossLocalScan.cancel();
+        if (customBossTrail != null) customBossTrail.terminateTrails();
+        if (bossLocalScan != null) bossLocalScan.cancel();
     }
-
 
     /**
      * Runs on chunk load. Only for persistent entities.
      */
     @Override
     public void chunkLoad() {
-        if (advancedGetEntity() == null)
-            setNewLivingEntity(persistentLocation);
+        setNewLivingEntity(persistentLocation);
         //This bypasses the spawn event caller, since having it trigger the spawn message and so on every time a chunk gets loaded would be bad
         new EliteEntityTracker(this, getPersistent(), true);
         customBossTrail.restartTrails();
@@ -506,6 +495,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             remove(true);
             return;
         }
+
         //For some reason sometimes the living entities are nullified on chunk unload
         advancedGetEntity();
         if (getLivingEntity() == null) {
@@ -516,34 +506,26 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
                     null while it was still meant to be alive, and the location that the boss is mean to spawn in is still
                     loaded, meaning that it will instantly respawn at its spawn point.
                      */
-                if (persistentLocation.getWorld().isChunkLoaded(persistentLocation.getWorld().getChunkAt(persistentLocation))) {
+                if (ChunkLocationChecker.locationIsLoaded(persistentLocation)) {
+                    super.remove(true);
                     customBossEntity.regionalBossEntity.spawnRegionalBoss();
-                    remove(true);
                     return;
                 }
             } else {
                 new WarningMessage("Custom Boss Entity " + customBossConfigFields.getFileName() + " was null by the time the chunk unloaded!");
                 new WarningMessage("HP was: " + getHealth());
             }
-        } else
-            persistentLocation = getLivingEntity().getLocation();
+        } else persistentLocation = getLivingEntity().getLocation();
 
         simplePersistentEntity = new SimplePersistentEntity(this);
         softRemove();
+        super.remove(true);
     }
-
-    public void worldUnload() {
-        chunkUnload();
-    }
-
 
     public Location getLocation() {
-        if (advancedGetEntity() != null)
-            return advancedGetEntity().getLocation();
-        else
-            return persistentLocation;
+        if (advancedGetEntity() != null) return advancedGetEntity().getLocation();
+        else return persistentLocation;
     }
-
 
     /**
      * Runs on boss death. This is for true natural deaths.
@@ -552,7 +534,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     public void doDeath() {
         remove(false);
     }
-
 
     public static class CustomBossEntityEvents implements Listener {
         @EventHandler

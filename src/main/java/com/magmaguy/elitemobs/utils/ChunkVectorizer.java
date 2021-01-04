@@ -2,16 +2,13 @@ package com.magmaguy.elitemobs.utils;
 
 import org.bukkit.Chunk;
 
+import java.util.Objects;
 import java.util.Vector;
 
 public class ChunkVectorizer {
 
     public static int hash(Chunk chunk) {
-        Vector vector = new Vector(3);
-        vector.addElement(chunk.getWorld());
-        vector.addElement(chunk.getX());
-        vector.addElement(chunk.getZ());
-        return vector.hashCode();
+        return Objects.hash(chunk.getX(), chunk.getZ(), chunk.getWorld().getUID());
     }
 
     public static Vector hash(double x, double z) {

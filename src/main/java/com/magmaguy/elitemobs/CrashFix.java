@@ -25,14 +25,14 @@ public class CrashFix implements Listener {
         return PersistentVanillaData.hasString(entity, key);
     }
 
-    private static final HashSet<Integer> knownSessionChunks = new HashSet<>();
+    public static HashSet<Integer> knownSessionChunks = new HashSet<>();
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChunkLoad(ChunkLoadEvent event) {
         int hashedChunk = ChunkVectorizer.hash(event.getChunk());
         if (knownSessionChunks.contains(hashedChunk)) return;
-        chunkCheck(event.getChunk());
         knownSessionChunks.add(hashedChunk);
+        chunkCheck(event.getChunk());
     }
 
     public static void startupCheck() {
