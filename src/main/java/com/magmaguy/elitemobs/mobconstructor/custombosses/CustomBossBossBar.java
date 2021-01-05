@@ -50,7 +50,7 @@ public class CustomBossBossBar {
                         !customBossEntity.trackingPlayer.contains(player) &&
                                 player.getLocation().distance(customBossEntity.getLocation()) > 20 ||
                         customBossEntity.getHealth() <= 0) {
-                    remove();
+                    remove(false);
                     return;
                 }
 
@@ -63,11 +63,12 @@ public class CustomBossBossBar {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
     }
 
-    public void remove() {
+    public void remove(boolean isFullRemove) {
         bossBar.removeAll();
         bukkitTask.cancel();
         customBossEntity.playerBossBars.remove(player);
-        customBossEntity.customBossBossBars.remove(this);
+        if (!isFullRemove)
+            customBossEntity.customBossBossBars.remove(this);
     }
 
     public static class CustomBossBossBarEvent implements Listener {

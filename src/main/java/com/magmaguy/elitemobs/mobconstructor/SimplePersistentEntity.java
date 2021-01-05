@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 public class SimplePersistentEntity {
@@ -71,37 +72,35 @@ public class SimplePersistentEntity {
             if (ignore) return;
             int chunkLocation = chunkLocation(event.getChunk());
             if (persistentEntities.get(chunkLocation) == null) return;
-            try {
-                for (SimplePersistentEntity simplePersistentEntity : persistentEntities.get(chunkLocation)) {
-                    if (simplePersistentEntity.customBossEntity != null)
-                        simplePersistentEntity.customBossEntity.chunkLoad();
-                    else if (simplePersistentEntity.npcEntity != null)
-                        simplePersistentEntity.npcEntity.chunkLoad();
-                }
-            } catch (Exception ex) {
-                new DeveloperMessage("CME Fired!");
-                new DeveloperMessage("Chunk world: " + event.getWorld().getName());
-                new DeveloperMessage("Chunk ID: " + chunkLocation);
-                new DeveloperMessage("Entity count in chunk: " + persistentEntities.get(chunkLocation).size());
-                new DeveloperMessage("Trying again in 1 tick");
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            for (SimplePersistentEntity simplePersistentEntity : persistentEntities.get(chunkLocation)) {
-                                if (simplePersistentEntity.customBossEntity != null)
-                                    simplePersistentEntity.customBossEntity.chunkLoad();
-                                else if (simplePersistentEntity.npcEntity != null)
-                                    simplePersistentEntity.npcEntity.chunkLoad();
-                            }
-                        } catch (Exception ex) {
-                            new DeveloperMessage("Second attempt failed as well!");
-                        }
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 1);
+            if (chunkLocations.contains(chunkLocation)) {
+                new DeveloperMessage("Double chunk load prevented");
+                return;
             }
-            persistentEntities.removeAll(chunkLocation);
+            chunkLocations.add(chunkLocation);
+            loadChunk(chunkLocation);
         }
     }
 
+    private static final HashSet<Integer> chunkLocations = new HashSet<>();
+
+    //Something is causing a weird double chunk load issue... not sure what but it's also probably causing a CME
+    private static void loadChunk(int chunkLocation) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                try {
+                    for (SimplePersistentEntity simplePersistentEntity : persistentEntities.get(chunkLocation)) {
+                        if (simplePersistentEntity.customBossEntity != null)
+                            simplePersistentEntity.customBossEntity.chunkLoad();
+                        else if (simplePersistentEntity.npcEntity != null)
+                            simplePersistentEntity.npcEntity.chunkLoad();
+                    }
+                } catch (Exception ex) {
+                    new DeveloperMessage("CME Fired!");
+                }
+                persistentEntities.removeAll(chunkLocation);
+                chunkLocations.remove(chunkLocation);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 1);
+    }
 }

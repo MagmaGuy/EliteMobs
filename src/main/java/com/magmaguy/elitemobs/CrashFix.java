@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 
@@ -26,13 +27,27 @@ public class CrashFix implements Listener {
     }
 
     public static HashSet<Integer> knownSessionChunks = new HashSet<>();
+    private static final HashSet<Integer> temporarilyCachedChunks = new HashSet<>();
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChunkLoad(ChunkLoadEvent event) {
         int hashedChunk = ChunkVectorizer.hash(event.getChunk());
+        //For some reason there is double chunk loading going on, and entities aren't getting detected correctly
+        if (temporarilyCachedChunks.contains(hashedChunk)) return;
+        temporarilyCachedChunks.add(hashedChunk);
         if (knownSessionChunks.contains(hashedChunk)) return;
         knownSessionChunks.add(hashedChunk);
-        chunkCheck(event.getChunk());
+        laterChunkLoad(event.getChunk());
+    }
+
+    //Hopefully this scans for entities properly by giving the chunk a tick to load
+    private void laterChunkLoad(Chunk chunk) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                chunkCheck(chunk);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
 
     public static void startupCheck() {
