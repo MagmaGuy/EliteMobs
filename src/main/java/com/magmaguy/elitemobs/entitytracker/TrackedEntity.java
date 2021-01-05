@@ -37,7 +37,6 @@ public class TrackedEntity {
             CrashFix.persistentTracker(entity);
         trackedEntities.put(uuid, this);
         this.trackedHashMap = trackedHashMap;
-        //startTrackableWatchdog();
     }
 
     protected void remove(RemovalReason removalReason) {

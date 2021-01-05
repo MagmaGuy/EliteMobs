@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.entitytracker.TrackedEntity;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
@@ -88,7 +87,6 @@ public class EliteMobEntity {
     private boolean inCombatGracePeriod = false;
 
     public UUID uuid;
-    public UUID phaseBossID = null;
 
     public CustomBossEntity customBossEntity;
     public RegionalBossEntity regionalBossEntity;
@@ -111,7 +109,7 @@ public class EliteMobEntity {
     public EliteMobEntity(LivingEntity livingEntity,
                           int eliteLevel,
                           CreatureSpawnEvent.SpawnReason spawnReason) {
-        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason)) return;
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, false)) return;
 
         //Get correct instance of plugin data, necessary for settings names and health among other things
         EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
@@ -127,30 +125,33 @@ public class EliteMobEntity {
     }
 
     /**
-     * Spawning method for boss mobs.
+     * Spawning method for boss mobs / regional bosses.
      * Assumes custom powers and custom names.
      */
     public EliteMobEntity(LivingEntity livingEntity,
                           int eliteLevel,
                           String name,
                           HashSet<ElitePower> mobPowers,
-                          CreatureSpawnEvent.SpawnReason spawnReason) {
-        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason)) return;
+                          CreatureSpawnEvent.SpawnReason spawnReason,
+                          Boolean isPersistent) {
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, isPersistent)) return;
         initializeCustomBossEliteEntity(livingEntity, eliteLevel, name, mobPowers, spawnReason);
         //These have custom powers
         applyCustomPowers(mobPowers);
     }
 
+    /**
+     * For phase bosses
+     */
     public EliteMobEntity(LivingEntity livingEntity,
                           int eliteLevel,
                           String name,
                           HashSet<ElitePower> mobPowers,
                           CreatureSpawnEvent.SpawnReason spawnReason,
                           double healthPercentage,
-                          UUID phaseBossID) {
-        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason)) return;
+                          Boolean isPersistent) {
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, isPersistent)) return;
         initializeCustomBossEliteEntity(livingEntity, eliteLevel, name, mobPowers, spawnReason);
-        this.phaseBossID = phaseBossID;
         this.setHealth(healthPercentage * maxHealth);
         //These have custom powers
         applyCustomPowers(mobPowers);
@@ -164,7 +165,7 @@ public class EliteMobEntity {
                           HashSet<ElitePower> mobPowers,
                           CreatureSpawnEvent.SpawnReason spawnReason) {
 
-        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason)) return;
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, false)) return;
 
         //Get correct instance of plugin data, necessary for settings names and health among other things
         EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity.getType());
@@ -196,13 +197,16 @@ public class EliteMobEntity {
 
     }
 
+    /**
+     * Constructor for Custom Bosses
+     */
     private void initializeCustomBossEliteEntity(LivingEntity livingEntity,
                                                  int eliteLevel,
                                                  String name,
                                                  HashSet<ElitePower> mobPowers,
                                                  CreatureSpawnEvent.SpawnReason spawnReason) {
 
-        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason)) return;
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, isPersistent)) return;
 
         this.name = name;
 
@@ -220,7 +224,8 @@ public class EliteMobEntity {
 
     private boolean initializeBasicValues(LivingEntity livingEntity,
                                           int eliteLevel,
-                                          CreatureSpawnEvent.SpawnReason spawnReason) {
+                                          CreatureSpawnEvent.SpawnReason spawnReason,
+                                          boolean isPersistent) {
         //Run a WorldGuard check to see if the entity is allowed to get converted at this location
         if (!validSpawnLocation(livingEntity.getLocation())) return false;
 
@@ -324,11 +329,9 @@ public class EliteMobEntity {
     }
 
     public void fullHeal() {
-        if (phaseBossID != null) {
-            if (PhaseBossEntity.phaseBosses.containsKey(phaseBossID))
-                PhaseBossEntity.phaseBosses.get(phaseBossID).fullHeal(this);
-            return;
-        }
+        if (customBossEntity != null)
+            if (customBossEntity.phaseBossEntity != null)
+                customBossEntity.phaseBossEntity.fullHeal(this);
         setHealth(this.maxHealth);
         damagers.clear();
     }
@@ -675,13 +678,12 @@ public class EliteMobEntity {
      * @param bool Whether the Elite Mob will unload when far away.
      */
     public void setPersistent(Boolean bool) {
+        this.getLivingEntity().setRemoveWhenFarAway(false);
         if (bool != null) {
             this.isPersistent = bool;
-            this.getLivingEntity().setRemoveWhenFarAway(!this.isPersistent);
-            TrackedEntity.trackedEntities.get(getLivingEntity().getUniqueId()).removeWhenFarAway = !this.isPersistent;
+            //    TrackedEntity.trackedEntities.get(getLivingEntity().getUniqueId()).removeWhenFarAway = !this.isPersistent;
         } else {
             this.isPersistent = false;
-            this.getLivingEntity().setRemoveWhenFarAway(true);
         }
     }
 
@@ -791,12 +793,9 @@ public class EliteMobEntity {
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 15);
     }
 
-    //todo: this probably needs a remake - it's perhaps good for phase bosses and timeouts but it's not good for other things
     public void remove(boolean removeEntity) {
         if (removeEntity)
             this.getLivingEntity().remove();
-        if (phaseBossID != null)
-            PhaseBossEntity.phaseBosses.remove(phaseBossID);
     }
 
     public void remove(RemovalReason removalReason) {

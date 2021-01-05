@@ -156,6 +156,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
     @Override
     public void chunkLoad() {
+        WorldGuardSpawnEventBypasser.forceSpawn();
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         this.uuid = villager.getUniqueId();
         setName(npCsConfigFields.getName());
