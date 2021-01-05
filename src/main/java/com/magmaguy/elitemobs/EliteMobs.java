@@ -31,7 +31,6 @@ import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
 import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
@@ -244,7 +243,6 @@ public class EliteMobs extends JavaPlugin {
         validWorldList.clear();
         zoneBasedSpawningWorlds.clear();
         RegionalBossEntity.getRegionalBossEntitySet().clear();
-        PhaseBossEntity.phaseBosses.clear();
         CustomBossConfigFields.getRegionalElites().clear();
         CustomBossConfigFields.getNaturallySpawnedElites().clear();
         CustomEnchantment.getCustomEnchantments().clear();

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.19</version>
+    <version>7.2.20</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -81,16 +81,16 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-          <artifactId>commons-lang</artifactId>
-          <groupId>commons-lang</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>guava</artifactId>
-          <groupId>com.google.guava</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>gson</artifactId>
-          <groupId>com.google.code.gson</groupId>
+                    <artifactId>commons-lang</artifactId>
+                    <groupId>commons-lang</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>gson</artifactId>
+                    <groupId>com.google.code.gson</groupId>
         </exclusion>
         <exclusion>
           <artifactId>bungeecord-chat</artifactId>
@@ -152,16 +152,16 @@
       <exclusions>
         <exclusion>
           <artifactId>annotations</artifactId>
-          <groupId>org.jetbrains</groupId>
+            <groupId>org.jetbrains</groupId>
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.xerial</groupId>
-      <artifactId>sqlite-jdbc</artifactId>
-      <version>3.32.3</version>
-      <scope>provided</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.32.3</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.discordsrv</groupId>
             <artifactId>discordsrv</artifactId>
@@ -253,16 +253,16 @@
                     <groupId>com.google.guava</groupId>
                 </exclusion>
             </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>LibsDisguises</groupId>
-      <artifactId>LibsDisguises</artifactId>
-      <version>10.0.18</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>asm</artifactId>
-          <groupId>org.ow2.asm</groupId>
+        </dependency>
+        <dependency>
+            <groupId>LibsDisguises</groupId>
+            <artifactId>LibsDisguises</artifactId>
+            <version>10.0.18</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>asm</artifactId>
+                    <groupId>org.ow2.asm</groupId>
         </exclusion>
         <exclusion>
           <artifactId>lombok</artifactId>
