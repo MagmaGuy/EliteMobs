@@ -2,9 +2,10 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.utils.EntityFinder;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
@@ -15,11 +16,13 @@ public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable
     private final EliteMobEntity damagee;
     private boolean isCancelled = false;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
+    private final double damage;
 
-    public EliteMobDamagedByEliteMobEvent(EliteMobEntity damager, EliteMobEntity damagee, EntityDamageByEntityEvent event) {
+    public EliteMobDamagedByEliteMobEvent(EliteMobEntity damager, EliteMobEntity damagee, EntityDamageByEntityEvent event, double damage) {
         this.damager = damager;
         this.damagee = damagee;
         this.entityDamageByEntityEvent = event;
+        this.damage = damage;
     }
 
     public EliteMobEntity getDamager() {
@@ -32,6 +35,10 @@ public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable
 
     public EntityDamageByEntityEvent getEntityDamageByEntityEvent() {
         return entityDamageByEntityEvent;
+    }
+
+    public double getDamage() {
+        return damage;
     }
 
     @Override
@@ -56,21 +63,19 @@ public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable
 
     public static class EliteMobDamagedByEliteMobFilter implements Listener {
 
-        @EventHandler(priority = EventPriority.HIGH)
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-
-            if (event.isCancelled()) return;
             EliteMobEntity damagee = EntityTracker.getEliteMobEntity(event.getEntity());
             if (damagee == null) return;
-            EliteMobEntity damager = null;
-            if (event.getDamager() instanceof LivingEntity)
-                damager = EntityTracker.getEliteMobEntity(event.getDamager());
-            if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
-                damager = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getDamager()).getShooter());
+            LivingEntity livingEntity = EntityFinder.filterRangedDamagers(event.getDamager());
+            EliteMobEntity damager = EntityTracker.getEliteMobEntity(livingEntity);
             if (damager == null) return;
-
-            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedByEliteMobEvent(damager, damagee, event));
-
+            double damage = EliteMobProperties.getPluginData(damager.getLivingEntity().getType()).baseDamage +
+                    damager.getTier();
+            EliteMobDamagedByEliteMobEvent eliteMobDamagedByEliteMobEvent = new EliteMobDamagedByEliteMobEvent(damager, damagee, event, damage);
+            new EventCaller(eliteMobDamagedByEliteMobEvent);
+            if (eliteMobDamagedByEliteMobEvent.isCancelled) return;
+            event.setDamage(damage);
         }
 
     }

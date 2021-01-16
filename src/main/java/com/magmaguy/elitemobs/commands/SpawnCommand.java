@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.bosspowers.DeathSlice;
 import com.magmaguy.elitemobs.powers.bosspowers.FlamePyre;
 import com.magmaguy.elitemobs.powers.defensivepowers.*;
+import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
@@ -291,6 +292,9 @@ public class SpawnCommand {
                         break;
                     case "attackfireball":
                         elitePowers.add(new AttackFireball());
+                        break;
+                    case "trackingfireball":
+                        elitePowers.add(new TrackingFireball());
                         break;
                     case "attackfreeze":
                         elitePowers.add(new AttackFreeze());

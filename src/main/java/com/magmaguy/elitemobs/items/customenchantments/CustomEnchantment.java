@@ -48,6 +48,7 @@ public abstract class CustomEnchantment {
         new IceBreakerEnchantment();
         new MeteorShowerEnchantment();
         new SummonMerchantEnchantment();
+        new SummonWolfEnchantment();
     }
 
     /*
