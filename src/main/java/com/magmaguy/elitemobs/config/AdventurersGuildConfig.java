@@ -11,7 +11,6 @@ import java.util.List;
 
 public class AdventurersGuildConfig {
 
-    public static boolean enableAdventurersGuild;
     public static boolean addMaxHealth, addCrit, addDodge;
     public static String guildWorldName;
     public static String guildLocationString;
@@ -31,7 +30,6 @@ public class AdventurersGuildConfig {
         File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        enableAdventurersGuild = ConfigurationEngine.setBoolean(fileConfiguration, "Enable adventurer's guild", true);
         addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
         addCrit = ConfigurationEngine.setBoolean(fileConfiguration, "Add critical chance when unlocking higher guild ranks", true);
         addDodge = ConfigurationEngine.setBoolean(fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);

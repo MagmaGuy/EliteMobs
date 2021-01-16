@@ -70,7 +70,7 @@ public class ItemSettingsConfig {
         defaultLootMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "defaultLootMultiplier", 0);
         maxLevelForDefaultLootMultiplier = ConfigurationEngine.setInt(fileConfiguration, "levelCapForDefaultLootMultiplier", 200);
         defaultExperienceMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "defaultExperienceMultiplier", 1);
-        maximumLootTier = ConfigurationEngine.setInt(fileConfiguration, "maximumLootTier", 100);
+        maximumLootTier = ConfigurationEngine.setInt(fileConfiguration, "maximumLootTiers", 200);
         useEliteEnchantments = ConfigurationEngine.setBoolean(fileConfiguration, "useEliteEnchantments", true);
         doRareDropsEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doRareDropsEffect", true);
         eliteEnchantLoreString = ChatColorConverter.convert(ConfigurationEngine.setString(fileConfiguration, "eliteEnchantmentLoreStrings", "Elite"));

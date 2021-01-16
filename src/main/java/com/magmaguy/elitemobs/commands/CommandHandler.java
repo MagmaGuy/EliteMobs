@@ -254,6 +254,8 @@ public class CommandHandler implements CommandExecutor {
                         permission.equals(CURRENCY_PAY) ||
                         permission.equals(CURRENCY_WALLET) ||
                         permission.equals(ADVENTURERS_GUILD) ||
+                        permission.equals("elitemobs.guild.menu") ||
+                        permission.equals("elitemobs.guild.npc") ||
                         permission.equals(QUEST))
                     return true;
                 else if (commandSender.isOp())

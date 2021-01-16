@@ -29,6 +29,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -338,6 +339,13 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             getLivingEntity().getEquipment().setBoots(customBossConfigFields.getBoots());
             getLivingEntity().getEquipment().setItemInMainHand(customBossConfigFields.getMainHand());
             getLivingEntity().getEquipment().setItemInOffHand(customBossConfigFields.getOffHand());
+            if (getLivingEntity().getEquipment().getHelmet() != null) {
+                ItemMeta helmetMeta = getLivingEntity().getEquipment().getHelmet().getItemMeta();
+                if (helmetMeta != null) {
+                    helmetMeta.setUnbreakable(true);
+                    getLivingEntity().getEquipment().getHelmet().setItemMeta(helmetMeta);
+                }
+            }
         } catch (Exception ex) {
             new WarningMessage("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossConfigFields.getFileName());
         }
@@ -475,6 +483,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         new EliteEntityTracker(this, getPersistent());
         customBossTrail.restartTrails();
         setDisguise();
+        if (regionalBossEntity != null)
+            regionalBossEntity.chunkLoad();
     }
 
     public SimplePersistentEntity simplePersistentEntity;
@@ -494,26 +504,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         }
 
         //For some reason sometimes the living entities are nullified on chunk unload
-        advancedGetEntity();
-        //if (getLivingEntity() == null) {
-        //if (regionalBossEntity != null) {
-        //    persistentLocation = regionalBossEntity.spawnLocation;
-        //        /*
-        //        This is a specific case where this Custom Boss is a regional boss entity, the Living Entity became
-        //        null while it was still meant to be alive, and the location that the boss is meant to spawn in is still
-        //        loaded, meaning that it will instantly respawn at its spawn point.
-        //         */
-        //    if (ChunkLocationChecker.locationIsLoaded(persistentLocation)) {
-        //        super.remove(true);
-        //        customBossEntity.regionalBossEntity.spawnRegionalBoss();
-        //        return;
-        //    }
-        //} else {
-        //    new WarningMessage("Custom Boss Entity " + customBossConfigFields.getFileName() + " was null by the time the chunk unloaded!");
-        //    new WarningMessage("HP was: " + getHealth());
-        //}
-        //} else
-        if (getLivingEntity() == null)
+        if (advancedGetEntity() == null)
             if (regionalBossEntity != null)
                 persistentLocation = regionalBossEntity.spawnLocation;
             else

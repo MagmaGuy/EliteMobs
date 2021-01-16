@@ -112,7 +112,7 @@ public class ItemLootShower implements Listener {
 
         this.player = player;
 
-        if (!EconomySettingsConfig.enableCurrencyShower)
+        if (!EconomySettingsConfig.enableCurrencyShower || !SoulbindEnchantment.isEnabled)
             return;
 
         if (eliteMobTier - ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) < -20) {

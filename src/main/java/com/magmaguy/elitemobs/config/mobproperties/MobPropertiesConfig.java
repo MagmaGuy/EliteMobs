@@ -51,6 +51,7 @@ public class MobPropertiesConfig {
             new EliteWitherSkeletonConfig(),
             new EliteZombieConfig(),
             new EliteGhastConfig(),
+            new EliteWolfConfig(),
             new SuperChickenConfig(),
             new SuperCowConfig(),
             new SuperMushroomCowConfig(),

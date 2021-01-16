@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.nio.file.Files;
@@ -162,7 +163,7 @@ public class Minidungeon {
 
         public RealDungeonLocations() {
             for (RelativeDungeonLocations.RelativeDungeonLocation relativeDungeonLocation : relativeDungeonLocations.relativeDungeonLocations) {
-                if (dungeonPackagerConfigFields.getRotation() == 0)
+                if (dungeonPackagerConfigFields.getRotation() == 0F)
                     realDungeonLocations.add(
                             new RealDungeonLocation(
                                     dungeonPackagerConfigFields.getAnchorPoint().clone().add(relativeDungeonLocation.location),
@@ -352,17 +353,42 @@ public class Minidungeon {
 
     private void installSchematicMinidungeon(Player player) {
         player.performCommand("schematic load " + dungeonPackagerConfigFields.getSchematicName());
-        player.sendMessage(ChatColorConverter.convert("&2-------------------------------------------------"));
-        player.sendMessage(ChatColorConverter.convert("&7[EliteMobs] &2Ready to install " + dungeonPackagerConfigFields.getDungeonSizeCategory().toString().toLowerCase() + "!"));
-        TextComponent pasteString = new TextComponent(ChatColorConverter.convert("&aClick here to place the &lbuilding and bosses &awhere you're standing!"));
-        pasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName()));
-        pasteString.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColorConverter.convert("&2Click me!")).create()));
-        TextComponent noPasteString = new TextComponent(ChatColorConverter.convert("&4&lOr &4click here to &lonly set the bosses with no building&4!"));
-        noPasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName() + " noPaste"));
-        noPasteString.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColorConverter.convert("&cOnly click if you're already standing at the bulding's anchor point!")).create()));
-        player.spigot().sendMessage(pasteString);
-        player.spigot().sendMessage(noPasteString);
-        player.sendMessage(ChatColorConverter.convert("&2-------------------------------------------------"));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage("");
+                player.sendMessage(ChatColorConverter.convert("&2-------------------------------------------------"));
+                player.sendMessage(ChatColorConverter.convert("&7[EliteMobs] &2Ready to install " + dungeonPackagerConfigFields.getDungeonSizeCategory().toString().toLowerCase() + "!"));
+                TextComponent pasteString = new TextComponent(ChatColorConverter.convert("&aClick here to place the &lbuilding and bosses &awhere you're standing!"));
+                pasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName()));
+                pasteString.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColorConverter.convert("&2Click me!")).create()));
+                TextComponent noPasteString = new TextComponent(ChatColorConverter.convert("&4&lOr &4click here to &lonly set the bosses with no building&4!"));
+                noPasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName() + " noPaste"));
+                noPasteString.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColorConverter.convert("&cOnly click if you're already standing at the bulding's anchor point!")).create()));
+                player.spigot().sendMessage(pasteString);
+                player.spigot().sendMessage(noPasteString);
+                player.sendMessage(ChatColorConverter.convert("&2-------------------------------------------------"));
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, 20);
     }
 
     public void finalizeMinidungeonInstallation(Player player, boolean pastedSchematic) {
@@ -384,6 +410,27 @@ public class Minidungeon {
         }
 
         teleportLocation = dungeonPackagerConfigFields.getAnchorPoint().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
+        player.sendMessage("");
 
         player.sendMessage(ChatColorConverter.convert("&2" + dungeonPackagerConfigFields.getName() + " installed!"));
         TextComponent setupOptions = new TextComponent(ChatColorConverter.convert("&4Click here to uninstall!"));
@@ -414,7 +461,7 @@ public class Minidungeon {
             String bossFileName = regionalBossLocations.split(":")[0];
             CustomBossConfigFields customBossConfigFields = CustomBossesConfig.getCustomBoss(bossFileName);
             quantificationFilter(customBossConfigFields);
-            if (customBossConfigFields.isRegionalBoss())
+            if (customBossConfigFields != null && customBossConfigFields.isRegionalBoss())
                 regionalBossCount++;
         }
     }

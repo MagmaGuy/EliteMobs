@@ -53,6 +53,7 @@ import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFallDamage;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFire;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityKnockback;
+import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
@@ -148,6 +149,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new AttackBlinding(), plugin);
         pluginManager.registerEvents(new AttackFire(), plugin);
         pluginManager.registerEvents(new AttackFireball(), plugin);
+        pluginManager.registerEvents(new TrackingFireball.TrackingFireballEvents(), plugin);
         pluginManager.registerEvents(new AttackFreeze(), plugin);
         pluginManager.registerEvents(new AttackGravity(), plugin);
         pluginManager.registerEvents(new AttackLightning(), plugin);
@@ -274,6 +276,7 @@ public class EventsRegistrer {
         //Initialize items from custom events
         pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new SummonMerchantEnchantment.SummonMerchantEvents(), plugin);
+        pluginManager.registerEvents(new SummonWolfEnchantment.SummonWolfEnchantmentEvent(), plugin);
         pluginManager.registerEvents(new MeteorShowerEnchantment.MeteorShowerEvents(), plugin);
         pluginManager.registerEvents(new DrillingEnchantment.DrillingEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new IceBreakerEnchantment.IceBreakerEnchantmentEvent(), plugin);
@@ -293,7 +296,6 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new AggroPrevention(), plugin);
 
         //Player effect when a rare item is on the ground
-        if (ItemSettingsConfig.doRareDropsEffect)
             pluginManager.registerEvents(new RareDropEffect(), plugin);
 
         //NPCs

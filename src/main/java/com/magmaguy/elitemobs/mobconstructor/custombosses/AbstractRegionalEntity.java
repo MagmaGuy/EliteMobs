@@ -265,6 +265,15 @@ public class AbstractRegionalEntity {
     }
 
     /**
+     * Used to return the raw config string of the location.
+     *
+     * @return Raw config string associated to the location
+     */
+    public String getRawString() {
+        return this.rawString;
+    }
+
+    /**
      * Returns whether the world the regional boss is supposed to spawn in is loaded.
      *
      * @return If the world the regional boss is supposed to spawn in is loaded.

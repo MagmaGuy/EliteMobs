@@ -72,10 +72,7 @@ public class SimplePersistentEntity {
             if (ignore) return;
             int chunkLocation = chunkLocation(event.getChunk());
             if (persistentEntities.get(chunkLocation) == null) return;
-            if (chunkLocations.contains(chunkLocation)) {
-                new DeveloperMessage("Double chunk load prevented");
-                return;
-            }
+            if (chunkLocations.contains(chunkLocation)) return;
             chunkLocations.add(chunkLocation);
             loadChunk(chunkLocation);
         }

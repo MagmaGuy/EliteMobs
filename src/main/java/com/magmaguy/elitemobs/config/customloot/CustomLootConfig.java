@@ -35,7 +35,8 @@ public class CustomLootConfig {
             new VampiricCharmConfig(),
             new ZombieKingsAxeConfig(),
             new MeteorShowerScrollConfig(),
-            new SummonMerchantScrollConfig()
+            new SummonMerchantScrollConfig(),
+            new SummonWolfScrollConfig()
     ));
 
     public static void initializeConfigs() {

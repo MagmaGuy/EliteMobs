@@ -9,10 +9,8 @@ public class PreventItemPickupByMobs implements Listener {
 
     @EventHandler
     public void onItemPickup(EntityPickupItemEvent event) {
-
         if (EntityTracker.isEliteMob(event.getEntity()))
             event.setCancelled(true);
-
     }
 
 }

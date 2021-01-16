@@ -81,7 +81,8 @@ public class GenericRotationMatrixMath {
     }
 
     public static Location rotateLocationYAxis(double rotationAngleInDegrees, Location anchorPoint, Vector relativeLocation) {
-        return anchorPoint.clone().add(rotateSpecificLocation(0, 1, 0, rotationAngleInDegrees, relativeLocation));
+        Vector rotatedVector = relativeLocation.clone().rotateAroundY(Math.toRadians(rotationAngleInDegrees)).add(anchorPoint.toVector());
+        return new Location(anchorPoint.getWorld(), rotatedVector.getX(), rotatedVector.getY(), rotatedVector.getZ());
     }
 
     public static Vector rotateVectorYAxis(double rotationAngleInDegrees, Location anchorPoint, Vector relativeLocation) {

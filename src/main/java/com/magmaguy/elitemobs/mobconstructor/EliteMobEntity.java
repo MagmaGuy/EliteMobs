@@ -32,6 +32,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -258,6 +259,12 @@ public class EliteMobEntity {
 
         setMaxHealth();
 
+        if (entityType.equals(EntityType.WOLF)) {
+            Wolf wolf = (Wolf) livingEntity;
+            wolf.setAngry(true);
+            wolf.setBreed(false);
+        }
+
         //Stop creation if the creation was cancelled in the spawn event
         return EntityTracker.registerEliteMob(this);
     }
@@ -408,6 +415,13 @@ public class EliteMobEntity {
         if (eliteLevel >= 80)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 
+        if (livingEntity.getEquipment().getHelmet() != null) {
+            ItemMeta helmetMeta = livingEntity.getEquipment().getHelmet().getItemMeta();
+            if (helmetMeta != null) {
+                helmetMeta.setUnbreakable(true);
+                livingEntity.getEquipment().getHelmet().setItemMeta(helmetMeta);
+            }
+        }
     }
 
     /**

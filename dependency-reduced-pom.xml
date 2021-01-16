@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.20</version>
+    <version>7.2.22</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -91,16 +91,16 @@
                 <exclusion>
                     <artifactId>gson</artifactId>
                     <groupId>com.google.code.gson</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>bungeecord-chat</artifactId>
-          <groupId>net.md-5</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>snakeyaml</artifactId>
-          <groupId>org.yaml</groupId>
-        </exclusion>
-      </exclusions>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bungeecord-chat</artifactId>
+                    <groupId>net.md-5</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>snakeyaml</artifactId>
+                    <groupId>org.yaml</groupId>
+                </exclusion>
+            </exclusions>
     </dependency>
     <dependency>
       <groupId>org.spigotmc</groupId>
@@ -146,15 +146,15 @@
     </dependency>
     <dependency>
       <groupId>me.clip</groupId>
-      <artifactId>placeholderapi</artifactId>
-      <version>2.10.9</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>annotations</artifactId>
-            <groupId>org.jetbrains</groupId>
-        </exclusion>
-      </exclusions>
+        <artifactId>placeholderapi</artifactId>
+        <version>2.10.9</version>
+        <scope>provided</scope>
+        <exclusions>
+            <exclusion>
+                <artifactId>annotations</artifactId>
+                <groupId>org.jetbrains</groupId>
+            </exclusion>
+        </exclusions>
     </dependency>
         <dependency>
             <groupId>org.xerial</groupId>
@@ -263,16 +263,16 @@
                 <exclusion>
                     <artifactId>asm</artifactId>
                     <groupId>org.ow2.asm</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>lombok</artifactId>
-          <groupId>org.projectlombok</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>ProtocolLib</artifactId>
-          <groupId>com.comphenix.protocol</groupId>
-        </exclusion>
-        <exclusion>
+                </exclusion>
+                <exclusion>
+                    <artifactId>lombok</artifactId>
+                    <groupId>org.projectlombok</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ProtocolLib</artifactId>
+                    <groupId>com.comphenix.protocol</groupId>
+                </exclusion>
+                <exclusion>
           <artifactId>bungeecord-chat</artifactId>
           <groupId>net.md-5</groupId>
         </exclusion>
