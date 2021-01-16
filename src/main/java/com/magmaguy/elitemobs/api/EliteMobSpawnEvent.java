@@ -51,7 +51,7 @@ public class EliteMobSpawnEvent extends Event implements Cancellable {
     /**
      * Gets the reason for the Entity getting spawned
      *
-     * @return Reason for the Entity gettings spawned
+     * @return Reason for the Entity getting spawned
      */
     public CreatureSpawnEvent.SpawnReason getReason() {
         return this.spawnReason;

@@ -50,7 +50,7 @@ public class NPCInteractions implements Listener {
 
         switch (npcEntity.getInteractionType()) {
             case GUILD_GREETER:
-                if (event.getPlayer().hasPermission("elitemobs.guild.npc"))
+                if (CommandHandler.userPermCheck("elitemobs.guild.npc", event.getPlayer())) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -58,6 +58,7 @@ public class NPCInteractions implements Listener {
                             GuildRankMenuHandler.initializeGuildRankMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                }
                 break;
             case CHAT:
                 npcEntity.sayDialog(event.getPlayer());

@@ -81,7 +81,8 @@ public class EnchantmentsConfig {
             new MeteorShowerConfig(),
             new DrillingConfig(),
             new IceBreakerConfig(),
-            new SummonMerchantConfig()
+            new SummonMerchantConfig(),
+            new SummonWolfConfig()
     ));
 
     public static void initializeConfigs() {

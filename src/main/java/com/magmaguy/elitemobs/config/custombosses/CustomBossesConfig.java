@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 public class CustomBossesConfig {
 
-    private static HashMap<String, CustomBossConfigFields> customBosses = new HashMap<>();
+    private static final HashMap<String, CustomBossConfigFields> customBosses = new HashMap<>();
 
     public static HashMap<String, CustomBossConfigFields> getCustomBosses() {
         return customBosses;
@@ -25,7 +25,7 @@ public class CustomBossesConfig {
         return customBosses.get(fileName);
     }
 
-    private static ArrayList<CustomBossConfigFields> customBossConfigFieldsList = new ArrayList<>(Arrays.asList(
+    private static final ArrayList<CustomBossConfigFields> customBossConfigFieldsList = new ArrayList<>(Arrays.asList(
             new TestCustomBossConfig(),
             new ZombieKingConfig(),
             new TreasureGoblinConfig(),
@@ -41,7 +41,9 @@ public class CustomBossesConfig {
             new IceFaeConfig(),
             new LightningFaeConfig(),
             new BlayyzeConfig(),
-            new EmberConfig()
+            new EmberConfig(),
+            new SnoopyConfig(),
+            new SummonableWolfConfig()
     ));
 
     /**
