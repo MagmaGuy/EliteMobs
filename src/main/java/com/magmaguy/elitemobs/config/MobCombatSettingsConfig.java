@@ -11,7 +11,6 @@ public class MobCombatSettingsConfig {
     public static boolean doNaturalMobSpawning;
     public static boolean doSpawnersSpawnEliteMobs;
     public static double aggressiveMobConversionPercentage;
-    public static int perTierLevelIncrease;
     public static int superMobsStackRange;
     public static int naturalElitemobLevelCap;
     public static double eliteCreeperExplosionMultiplier;
@@ -45,7 +44,6 @@ public class MobCombatSettingsConfig {
         doNaturalMobSpawning = ConfigurationEngine.setBoolean(fileConfiguration, "doNaturalEliteMobSpawning", true);
         doSpawnersSpawnEliteMobs = ConfigurationEngine.setBoolean(fileConfiguration, "doSpawnersSpawnEliteMobs", false);
         aggressiveMobConversionPercentage = ConfigurationEngine.setDouble(fileConfiguration, "eliteMobsSpawnPercentage", 0.05);
-        perTierLevelIncrease = ConfigurationEngine.setInt(fileConfiguration, "mobTierLevelIncrease", 1);
         superMobsStackRange = ConfigurationEngine.setInt(fileConfiguration, "superMobStackRange", 15);
         naturalElitemobLevelCap = ConfigurationEngine.setInt(fileConfiguration, "naturalEliteMobsLevelCap", 250);
         eliteCreeperExplosionMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteCreeperExplosionsMultiplier", 10D);

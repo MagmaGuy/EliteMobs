@@ -18,5 +18,7 @@ public enum RemovalReason {
     EFFECT_TIMEOUT,
     BOSS_TIMEOUT,
     NPC_TIMEOUT,
-    OTHER
+    OTHER,
+    REMOVE_COMMAND,
+    KILL_COMMAND
 }

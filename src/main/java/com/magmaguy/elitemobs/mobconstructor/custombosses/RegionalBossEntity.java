@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.internal.NewMinidungeonRelativeBossLocationEve
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
@@ -57,23 +56,10 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
     }
 
     public void spawnRegionalBoss() {
-
-        int mobLevel;
-        if (customBossConfigFields.getLevel().equalsIgnoreCase("dynamic")) {
-            mobLevel = DynamicBossLevelConstructor.findDynamicBossLevel();
-        } else {
-            try {
-                mobLevel = Integer.valueOf(customBossConfigFields.getLevel());
-            } catch (Exception ex) {
-                new WarningMessage("Regional Elite Mob level for " + customBossConfigFields.getFileName() + " is neither numeric nor dynamic. Fix the configuration for it.");
-                return;
-            }
-        }
-
         this.customBossEntity = CustomBossEntity.constructCustomBoss(
                 customBossConfigFields,
                 spawnLocation,
-                mobLevel,
+                customBossConfigFields.getLevel(),
                 this,
                 false);
 

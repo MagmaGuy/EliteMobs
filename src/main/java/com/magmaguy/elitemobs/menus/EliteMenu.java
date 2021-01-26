@@ -25,7 +25,7 @@ public class EliteMenu implements Listener {
         return inventory.equals(event.getView().getTopInventory());
     }
 
-    public boolean isTopMenu(InventoryClickEvent event) {
+    public static boolean isTopMenu(InventoryClickEvent event) {
         return event.getClickedInventory().equals(event.getView().getTopInventory());
     }
 

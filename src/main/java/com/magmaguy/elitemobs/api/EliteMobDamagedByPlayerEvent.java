@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Bukkit;
@@ -19,6 +20,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -139,9 +141,18 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                 return;
             }
             execute(eliteMobDamagedByPlayerEvent);
+
+            //nullify vanilla reductions
+            for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
+                if (event.isApplicable(modifier))
+                    event.setDamage(modifier, 0);
+
             event.setDamage(damage);
-            ////This bypasses an issue where elites die too soon if the strike would've killed them in the natural hit
-            //if (livingEntity.getHealth() - event.getDamage() * 2 <= 0) event.setDamage(0);
+            new DeveloperMessage("Damage: " + event.getFinalDamage());
+            new DeveloperMessage("Health: " + eliteMobEntity.getHealth());
+            new DeveloperMessage("Vanilla Health: " + eliteMobEntity.getLivingEntity().getHealth());
+            //eliteMobEntity.damage(damage);
+
             //No antiexploit checks for dungeons
             if (!(EliteMobs.worldguardIsEnabled &&
                     !WorldGuardFlagChecker.checkFlag(
@@ -155,7 +166,6 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
         public static void execute(EliteMobDamagedByPlayerEvent event) {
             event.getEliteMobEntity().addDamager(event.getPlayer(), event.getDamage());
             playerHitCooldownHashMap.put(event.getPlayer(), clock);
-            event.getEliteMobEntity().damage(event.getDamage(), false);
         }
 
         private class Strike {
@@ -207,8 +217,6 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             boolean criticalHit = isCriticalHit(player);
 
             if (criticalHit) newDamage += newDamage * 0.5;
-
-            //if (eliteMobEntity.getHealth() - newDamage < 0) newDamage = eliteMobEntity.getHealth();
 
             return new Strike(newDamage, criticalHit, false);
         }

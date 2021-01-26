@@ -33,12 +33,21 @@ public class EliteEntityTracker extends TrackedEntity implements AbstractTracked
             if (eliteMobEntity.regionalBossEntity != null)
                 eliteMobEntity.regionalBossEntity.chunkUnload();
         }
+
         if (removalReason.equals(RemovalReason.SHUTDOWN))
             if (eliteMobEntity.customBossEntity != null)
                 eliteMobEntity.customBossEntity.remove(true);
+
         if (removalReason.equals(RemovalReason.DEATH))
             if (eliteMobEntity.regionalBossEntity != null)
                 eliteMobEntity.regionalBossEntity.respawnRegionalBoss();
+
+        if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
+            if (eliteMobEntity.customBossEntity != null)
+                eliteMobEntity.customBossEntity.remove(true);
+            if (eliteMobEntity.regionalBossEntity != null)
+                eliteMobEntity.regionalBossEntity.removePermanently();
+        }
     }
 
 }

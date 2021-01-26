@@ -47,7 +47,6 @@ public class EliteMobEntity {
     private int eliteLevel;
     private double eliteTier;
     private double maxHealth;
-    private double health;
     private String name;
     /*
     Store all powers in one set, makes no sense to access it in individual sets.
@@ -304,7 +303,6 @@ public class EliteMobEntity {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
         this.maxHealth = (eliteTier * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth);
         //7 is the base damage of a diamond sword
-        this.health = this.maxHealth;
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         livingEntity.setHealth(maxHealth);
     }
@@ -318,20 +316,21 @@ public class EliteMobEntity {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
         this.maxHealth = (eliteTier * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth) * healthMultiplier;
         //7 is the base damage of a diamond sword
-        this.health = this.maxHealth;
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         livingEntity.setHealth(maxHealth);
     }
 
     public void setHealth(double health) {
-        this.health = health;
         livingEntity.setHealth(health);
     }
 
-    public double damage(double damage, boolean doRealDamage) {
-        health = Math.max(0, health - damage);
-        if (doRealDamage)
-            livingEntity.setHealth(health);
+    public double getHealth() {
+        return livingEntity.getHealth();
+    }
+
+    public double damage(double damage) {
+        double health = Math.max(0, livingEntity.getHealth() - damage);
+        livingEntity.setHealth(health);
         return damage;
     }
 
@@ -341,10 +340,6 @@ public class EliteMobEntity {
                 customBossEntity.phaseBossEntity.fullHeal(this);
         setHealth(this.maxHealth);
         damagers.clear();
-    }
-
-    public double getHealth() {
-        return this.health;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands.admin;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.commands.premade.CheckTierOthersConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -9,20 +10,11 @@ import org.bukkit.entity.Player;
 
 public class CheckTierOthersCommand {
 
-    public CheckTierOthersCommand(CommandSender commandSender, String[] args) {
+    public CheckTierOthersCommand(CommandSender commandSender, String playerName) {
 
-        Player player = null;
-
-        for (Player iteratedPlayer : Bukkit.getServer().getOnlinePlayers())
-            if (iteratedPlayer.getName().equalsIgnoreCase(args[1])) {
-                player = iteratedPlayer;
-                break;
-            }
-
-
+        Player player = Bukkit.getPlayer(playerName);
         if (player == null) {
-            commandSender.sendMessage("&7[EliteMobs] &cInvalid command syntax - is &4" + args[1] + " &ca valid player name?");
-            commandSender.sendMessage("&7[EliteMobs] &cCorrect syntax: /em checktier [playername]");
+            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Invalid player name!"));
             return;
         }
 

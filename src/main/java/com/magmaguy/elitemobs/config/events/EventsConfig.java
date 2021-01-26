@@ -11,13 +11,13 @@ import java.util.HashMap;
 
 public class EventsConfig {
 
-    private static HashMap<String, EventsFieldConfig> eventFields = new HashMap<>();
+    public static HashMap<String, EventsFieldConfig> eventFields = new HashMap<>();
 
     public static EventsFieldConfig getEventFields(String fileName) {
         return eventFields.get(fileName);
     }
 
-    private static ArrayList<EventsFieldConfig> eventsFieldConfigs = new ArrayList<>(Arrays.asList(
+    private static final ArrayList<EventsFieldConfig> eventsFieldConfigs = new ArrayList<>(Arrays.asList(
             new DeadMoonEventConfig(),
             new SmallTreasureGoblinEventConfig(),
             new BalrogEventConfig(),
