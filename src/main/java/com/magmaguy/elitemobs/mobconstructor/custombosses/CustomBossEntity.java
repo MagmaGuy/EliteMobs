@@ -77,7 +77,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             WorldGuardSpawnEventBypasser.forceSpawn();
             return (LivingEntity) location.getWorld().spawnEntity(location, EntityType.valueOf(customBossConfigFields.getEntityType()));
         } catch (Exception ex) {
-            new WarningMessage("Failed to spawn a Custom Boss' living entity!");
+            new WarningMessage("Failed to spawn a Custom Boss' living entity! Is the region protected against spawns? Custom boss: " + customBossConfigFields.getFileName() + " entry: " + location.toString());
             return null;
         }
     }
@@ -97,6 +97,22 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
                 livingEntity,
                 mobLevel,
                 ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
+    }
+
+    /**
+     * Method used by commands
+     */
+    public static CustomBossEntity constructCustomBoss(String fileName,
+                                                       Location location) {
+        CustomBossConfigFields customBossConfigFields = CustomBossesConfig.getCustomBoss(fileName);
+        LivingEntity livingEntity = generateLivingEntity(location, customBossConfigFields);
+        if (livingEntity == null) return null;
+
+        return new CustomBossEntity(
+                customBossConfigFields,
+                livingEntity,
+                customBossConfigFields.getLevel(),
+                ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
     }
 
     /**
@@ -461,7 +477,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         }
         for (CustomBossBossBar customBossBossBar : customBossBossBars) customBossBossBar.remove(true);
         customBossBossBars.clear();
-        super.remove(removeEntity);
     }
 
     /**

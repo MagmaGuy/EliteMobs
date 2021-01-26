@@ -6,7 +6,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class SuperMobDamageEvent extends Event {
+public class SuperMobDamageEvent extends Event implements Cancellable {
     //todo: make canceleable
 
     public static void callEvent(LivingEntity livingEntity, EntityDamageEvent entityDamageEvent) {
@@ -16,6 +16,7 @@ public class SuperMobDamageEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private final LivingEntity livingEntity;
     private final EntityDamageEvent entityDamageEvent;
+    private boolean cancelled = false;
 
     public SuperMobDamageEvent(LivingEntity livingEntity, EntityDamageEvent entityDamageEvent) {
         this.livingEntity = livingEntity;
@@ -49,12 +50,24 @@ public class SuperMobDamageEvent extends Event {
         return handlers;
     }
 
+    @Override
+    public boolean isCancelled() {
+        return this.cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancel) {
+        this.cancelled = cancel;
+    }
+
     public static class SuperMobDamageEventFilter implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void superMobDamageFilter(EntityDamageEvent event) {
             LivingEntity livingEntity = SuperMobEntityTracker.superMobEntities.get(event.getEntity().getUniqueId());
-            if (livingEntity != null)
-                SuperMobDamageEvent.callEvent(livingEntity, event);
+            if (livingEntity == null) return;
+            SuperMobDamageEvent superMobDamageEvent = new SuperMobDamageEvent((LivingEntity) event.getEntity(), event);
+            new EventCaller(superMobDamageEvent);
+            if (superMobDamageEvent.isCancelled()) event.setCancelled(true);
         }
     }
 

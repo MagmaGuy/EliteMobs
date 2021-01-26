@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.commands.shops;
+package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;

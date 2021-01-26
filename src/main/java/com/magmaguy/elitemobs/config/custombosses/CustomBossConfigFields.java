@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -16,7 +17,7 @@ import java.util.*;
 
 public class CustomBossConfigFields {
 
-    public static HashSet<CustomBossConfigFields> customBossConfigFields = new HashSet<>();
+    public static HashMap<String, CustomBossConfigFields> customBossConfigFields = new HashMap<>();
 
     private static final HashSet<CustomBossConfigFields> naturallySpawnedElites = new HashSet<>();
 
@@ -24,11 +25,7 @@ public class CustomBossConfigFields {
         return naturallySpawnedElites;
     }
 
-    public static final HashSet<CustomBossConfigFields> regionalElites = new HashSet<>();
-
-    public static HashSet<CustomBossConfigFields> getRegionalElites() {
-        return regionalElites;
-    }
+    public static HashMap<String, CustomBossConfigFields> regionalElites = new HashMap<>();
 
     private final String fileName;
     private File file;
@@ -318,7 +315,7 @@ public class CustomBossConfigFields {
 
         this.mountedEntity = configuration.getString("mountedEntity");
 
-        customBossConfigFields.add(this);
+        customBossConfigFields.put(fileName, this);
 
         if (configuration.get("announcementPriority") != null)
             this.announcementPriority = configuration.getInt("announcementPriority");
@@ -335,8 +332,10 @@ public class CustomBossConfigFields {
         if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
         else this.spawnCooldown = configuration.getInt("spawnCooldown");
 
-        if (this.isRegionalBoss)
+        if (this.isRegionalBoss) {
+            regionalElites.put(fileName, this);
             AbstractRegionalEntity.initialize(this);
+        }
 
         this.phases = configuration.getStringList("phases");
 
@@ -384,8 +383,17 @@ public class CustomBossConfigFields {
         return this.name;
     }
 
-    public String getLevel() {
-        return this.level;
+    public int getLevel() {
+        if (level.equalsIgnoreCase("dynamic")) {
+            return DynamicBossLevelConstructor.findDynamicBossLevel();
+        } else {
+            try {
+                return Integer.valueOf(level);
+            } catch (Exception ex) {
+                new WarningMessage("Regional Elite Mob level for " + fileName + " is neither numeric nor dynamic. Fix the configuration for it.");
+                return 1;
+            }
+        }
     }
 
     public int getTimeout() {

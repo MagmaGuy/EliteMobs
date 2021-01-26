@@ -45,7 +45,7 @@ public class EntityTracker implements Listener {
     }
 
     public static EliteMobEntity getEliteMobEntity(Entity entity) {
-        return getEliteMobEntity(entity.getUniqueId());
+        return entity == null ? null : getEliteMobEntity(entity.getUniqueId());
     }
 
     public static EliteMobEntity getEliteMobEntity(UUID uuid) {

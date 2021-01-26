@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.gamemodes.zoneworld;
 
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -9,7 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Grid {
 
-    private static HashMap<EliteChunk, Integer> chunkMap = new HashMap<>();
+    private static final HashMap<EliteChunk, Integer> chunkMap = new HashMap<>();
 
     public static HashMap<EliteChunk, Integer> getChunkMap() {
         return chunkMap;
@@ -32,8 +31,6 @@ public class Grid {
                     if (ThreadLocalRandom.current().nextInt() < 0.05)
                         tier = ThreadLocalRandom.current().nextInt(value * 2) + value;
                 }
-                tier = tier > MobCombatSettingsConfig.naturalElitemobLevelCap / MobCombatSettingsConfig.perTierLevelIncrease ?
-                        MobCombatSettingsConfig.naturalElitemobLevelCap / MobCombatSettingsConfig.perTierLevelIncrease : tier;
                 registerChunk(eliteChunk, tier);
             }
     }

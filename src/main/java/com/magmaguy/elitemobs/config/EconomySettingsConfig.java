@@ -25,6 +25,7 @@ public class EconomySettingsConfig {
     public static String adventurersGuildNotificationMessage;
     public static double defaultMaterialWorth;
     private static FileConfiguration thisConfiguration;
+    public static double playerToPlayerTaxes;
 
     public static void initializeConfig() {
 
@@ -128,6 +129,7 @@ public class EconomySettingsConfig {
         }
 
         defaultMaterialWorth = ConfigurationEngine.setDouble(fileConfiguration, "materialWorth.defaultMaterialWorth", 1);
+        playerToPlayerTaxes = ConfigurationEngine.setDouble(fileConfiguration, "playerToPlayerPaymentTaxes", 0.2);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
         thisConfiguration = fileConfiguration;

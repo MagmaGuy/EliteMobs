@@ -489,6 +489,13 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         EntityTracker.unregister(villager, RemovalReason.NPC_TIMEOUT);
     }
 
+    public void deleteNPCEntity() {
+        roleDisplay.remove();
+        EntityTracker.unregister(villager, RemovalReason.NPC_TIMEOUT);
+        npCsConfigFields.setEnabled(false);
+        new NPCEntity(npCsConfigFields);
+    }
+
     /**
      * Selects a message from the list to output through an NPCChatBubble to a player
      *

@@ -234,7 +234,7 @@ public class LootTables implements Listener {
     }
 
 
-    private static Item dropWeighedFixedItem(Location location, Player player) {
+    public static Item dropWeighedFixedItem(Location location, Player player) {
 
         double totalWeight = 0;
 
@@ -252,7 +252,7 @@ public class LootTables implements Listener {
         for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet()) {
             random -= CustomItem.getWeighedFixedItems().get(itemStack);
             if (random <= 0) {
-                generatedItemStack = itemStack;
+                generatedItemStack = itemStack.clone();
                 break;
             }
         }

@@ -24,6 +24,10 @@ public class NPCEntityTracker extends TrackedEntity implements AbstractTrackedEn
     @Override
     public void specificRemoveHandling(RemovalReason removalReason) {
         npcEntity.getVillager().removeMetadata(MetadataHandler.NPC_METADATA, MetadataHandler.PLUGIN);
+        if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
+            npcEntity.deleteNPCEntity();
+            return;
+        }
         if (!removalReason.equals(RemovalReason.SHUTDOWN))
             npcEntity.chunkUnload();
     }

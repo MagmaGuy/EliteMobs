@@ -12,12 +12,8 @@ import com.magmaguy.elitemobs.combatsystem.antiexploit.*;
 import com.magmaguy.elitemobs.combatsystem.combattag.CombatTag;
 import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
 import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
-import com.magmaguy.elitemobs.commands.getLootMenu;
+import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.commands.setup.SetupMenu;
-import com.magmaguy.elitemobs.commands.shops.BuyOrSellMenu;
-import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
-import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
-import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -35,6 +31,7 @@ import com.magmaguy.elitemobs.initialsetup.PermissionlessModeWarning;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
+import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.*;
@@ -114,7 +111,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PlayerPotionEffects(), plugin);
 
         //getloot AdventurersGuildMenu
-        pluginManager.registerEvents(new getLootMenu(), plugin);
+        pluginManager.registerEvents(new GetLootMenu.GetLootMenuListener(), plugin);
 
         /*
         Register API events
@@ -296,7 +293,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new AggroPrevention(), plugin);
 
         //Player effect when a rare item is on the ground
-            pluginManager.registerEvents(new RareDropEffect(), plugin);
+        pluginManager.registerEvents(new RareDropEffect(), plugin);
 
         //NPCs
         pluginManager.registerEvents(new NPCDamageEvent(), plugin);
@@ -322,6 +319,9 @@ public class EventsRegistrer {
 
         //Player stuff
         pluginManager.registerEvents(new GuildRank.GuildRankEvents(), plugin);
+
+        //Commands
+        pluginManager.registerEvents(new RemoveCommand.RemoveCommandEvents(), plugin);
 
     }
 

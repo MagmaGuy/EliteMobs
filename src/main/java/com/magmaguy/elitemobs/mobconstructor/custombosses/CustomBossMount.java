@@ -22,23 +22,23 @@ public class CustomBossMount {
 
         } catch (Exception ex) {
             //This runs when it's not an API entity
-            for (CustomBossConfigFields iteratedField : CustomBossConfigFields.customBossConfigFields) {
-                if (iteratedField.getFileName().equalsIgnoreCase(customBossEntity.customBossConfigFields.getMountedEntity())) {
-                    CustomBossEntity mount = CustomBossEntity.constructCustomBoss(customBossEntity.customBossConfigFields.getMountedEntity(),
-                            customBossEntity.getLivingEntity().getLocation(), customBossEntity.getLevel());
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if (mount == null || mount.getLivingEntity() == null)
-                                return;
-                            PreventMountExploit.bypass = true;
-                            mount.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
-                        }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 2);
-                    mount.setPersistent(false);
-                    return mount;
-                }
+            CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.customBossConfigFields.get(customBossEntity.customBossConfigFields.getMountedEntity());
+            if (customBossConfigFields != null) {
+                CustomBossEntity mount = CustomBossEntity.constructCustomBoss(customBossEntity.customBossConfigFields.getMountedEntity(),
+                        customBossEntity.getLivingEntity().getLocation(), customBossEntity.getLevel());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (mount == null || mount.getLivingEntity() == null)
+                            return;
+                        PreventMountExploit.bypass = true;
+                        mount.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
+                    }
+                }.runTaskLater(MetadataHandler.PLUGIN, 2);
+                mount.setPersistent(false);
+                return mount;
             }
+
             new WarningMessage("Attempted to make Custom Boss " + customBossEntity.customBossConfigFields.getFileName() + " mount invalid" +
                     " entity or boss " + customBossEntity.customBossConfigFields.getMountedEntity() + " . Fix this in the configuration file.");
         }

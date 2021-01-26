@@ -13,14 +13,10 @@ import org.bukkit.entity.Player;
 
 public class AdventurersGuildCommand {
 
-    public AdventurersGuildCommand(Player player) {
-
+    public static void adventurersGuildCommand(Player player) {
         if (adventurersGuildTeleport(player)) return;
-
-        if (!player.hasPermission("elitemobs.guild.menu")) return;
-        GuildRankMenuHandler guildRankMenuHandler = new GuildRankMenuHandler();
+        if (!player.hasPermission("elitemobs.adventurersguild.teleport")) return;
         GuildRankMenuHandler.initializeGuildRankMenu(player);
-
     }
 
     public static boolean adventurersGuildTeleport(Player player) {

@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 public class NPCsConfig {
 
-    private static final HashMap<String, NPCsConfigFields> NPCsList = new HashMap<>();
+    public static final HashMap<String, NPCsConfigFields> NPCsList = new HashMap<>();
 
     public static HashMap<String, NPCsConfigFields> getNPCsList() {
         return NPCsList;

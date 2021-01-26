@@ -269,12 +269,7 @@ public class Minidungeon {
     private Location addRelativeLocation(CustomBossConfigFields customBossConfigFields, Location location) {
         if (dungeonPackagerConfigFields.getAnchorPoint() == null)
             return null;
-
         Location relativeLocation = location.clone().subtract(dungeonPackagerConfigFields.getAnchorPoint());
-        relativeLocation.setX(relativeLocation.getBlockX() + 0.5);
-        relativeLocation.setY(relativeLocation.getBlockY() + 0.5);
-        relativeLocation.setZ(relativeLocation.getBlockZ() + 0.5);
-
         if (dungeonPackagerConfigFields.setRelativeBossLocations(customBossConfigFields, relativeLocation))
             return relativeLocation;
         else
@@ -356,26 +351,8 @@ public class Minidungeon {
         new BukkitRunnable() {
             @Override
             public void run() {
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
-                player.sendMessage("");
+                for (int i = 0; i < 20; i++)
+                    player.sendMessage("");
                 player.sendMessage(ChatColorConverter.convert("&2-------------------------------------------------"));
                 player.sendMessage(ChatColorConverter.convert("&7[EliteMobs] &2Ready to install " + dungeonPackagerConfigFields.getDungeonSizeCategory().toString().toLowerCase() + "!"));
                 TextComponent pasteString = new TextComponent(ChatColorConverter.convert("&aClick here to place the &lbuilding and bosses &awhere you're standing!"));
@@ -411,26 +388,8 @@ public class Minidungeon {
 
         teleportLocation = dungeonPackagerConfigFields.getAnchorPoint().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
 
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
-        player.sendMessage("");
+        for (int i = 0; i < 20; i++)
+            player.sendMessage("");
 
         player.sendMessage(ChatColorConverter.convert("&2" + dungeonPackagerConfigFields.getName() + " installed!"));
         TextComponent setupOptions = new TextComponent(ChatColorConverter.convert("&4Click here to uninstall!"));
@@ -477,12 +436,9 @@ public class Minidungeon {
 
     private void quantificationFilter(CustomBossConfigFields customBossConfigFields) {
         try {
-            if (!customBossConfigFields.getLevel().equals("dynamic")) {
-                int level = Integer.parseInt(customBossConfigFields.getLevel());
-                lowestTier = lowestTier == null ? level : lowestTier < level ? lowestTier : level;
-                highestTier = highestTier == null ? level : highestTier > level ? highestTier : level;
-            }
-
+            int level = customBossConfigFields.getLevel();
+            lowestTier = lowestTier == null ? level : lowestTier < level ? lowestTier : level;
+            highestTier = highestTier == null ? level : highestTier > level ? highestTier : level;
         } catch (Exception ex) {
         }
     }

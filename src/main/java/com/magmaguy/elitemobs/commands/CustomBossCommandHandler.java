@@ -1,112 +1,76 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.DebugBlockLocation;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class CustomBossCommandHandler {
 
-    public static void handleCommand(Player player, String[] args) {
-
-        if (args.length < 2) {
-            player.sendMessage("[EliteMobs] Possible command syntax:");
-            player.sendMessage("- /elitemobs customboss [filename] addSpawnLocation");
-            player.sendMessage("- /elitemobs customboss [filename] setLeashRadius [radius]");
-            return;
-        }
-
-        //Check which Custom Boss will be edited
-        CustomBossConfigFields customBossConfigFields = CustomBossesConfig.getCustomBoss(args[1]);
-
-        if (customBossConfigFields == null) {
-            player.sendMessage("[EliteMobs] Invalid Custom Boss filename. List of valid Custom Bosses:");
-            StringBuilder stringBuilder = new StringBuilder();
-            for (CustomBossConfigFields customBossConfigFields1 : CustomBossesConfig.getCustomBosses().values())
-                stringBuilder.append(customBossConfigFields1.getFileName()).append(", ");
-            player.sendMessage(stringBuilder.toString());
-            player.sendMessage("[EliteMobs] File names are CaSe SeNsItIvE!");
-            return;
-        }
-
-        switch (args[2].toLowerCase()) {
-            case "addspawnlocation":
-                if (addSpawnLocation(customBossConfigFields, player.getLocation()))
-                    player.sendMessage("[EliteMobs] An additional spawn location was set to where you are standing!");
-                else {
-                    player.sendMessage("Attempted to run command /em customboss " + customBossConfigFields.getFileName() + " addSpawnLocation ");
-                    player.sendMessage("The file " + customBossConfigFields.getFileName() + " is not set to generate regional bosses and therefore no spawn locations can be added to the boss.");
-                    player.sendMessage("Please refer to the EliteMobs wiki for documentation on World Bosses. If you're just trying to spawn a boss, use the command /em spawn");
-                }
-                return;
-            //command: /em customboss [filename.yml] addRelativeLocation [minidungeonName]
-            case "addrelativelocation":
-                if (addRelativeSpawnLocation(customBossConfigFields, player.getLocation().clone(), args[3]))
-                    player.sendMessage("[EliteMobs] Successfully added relative location!");
-                else
-                    player.sendMessage("[EliteMobs] Failed to add relative location!");
-                return;
-            case "setleashradius":
-                setLeashRadius(customBossConfigFields, player, args);
-                break;
-            case "remove":
-                break;
-            default:
-                return;
-        }
-
+    public static Location autoSeekSafeSpawnLocation(Location originalLocation) {
+        Location newLocation = new Location(originalLocation.getWorld(),
+                originalLocation.getBlockX() + 0.5,
+                originalLocation.getBlockY() + 0.5,
+                originalLocation.getBlockZ() + 0.5);
+        for (int i = 0; i < 4; i++)
+            if (newLocation.clone().add(new Vector(0, i, 0)).getBlock().isPassable()) {
+                new DebugBlockLocation(newLocation);
+                return newLocation.clone().add(new Vector(0, i, 0));
+            }
+        return null;
     }
 
-    private static boolean addSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location) {
-        if (!customBossConfigFields.isRegionalBoss()) {
-            new WarningMessage("Attempted to run command /em customboss " + customBossConfigFields.getFileName() + " addSpawnLocation ");
-            new WarningMessage("The file " + customBossConfigFields.getFileName() + " is not set to generate regional bosses and therefore no spawn locations can be added to the boss.");
-            new WarningMessage("Please refer to the EliteMobs wiki for documentation on World Bosses. If you're just trying to spawn a boss, use the command /em spawn");
-            return false;
+    public static void addSpawnLocation(String customBossConfigFieldsString, Player player) {
+        CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.regionalElites.get(customBossConfigFieldsString);
+        for (String keys : CustomBossConfigFields.regionalElites.keySet())
+            new DeveloperMessage(keys);
+        if (customBossConfigFields == null)
+            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add spawn location! Custom Boss " + customBossConfigFieldsString + " is not valid regional boss!"));
+        else {
+            Location safeSpawnLocation = autoSeekSafeSpawnLocation(player.getLocation());
+            if (safeSpawnLocation == null)
+                player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
+            else
+                new AbstractRegionalEntity(safeSpawnLocation, customBossConfigFields);
         }
-        new AbstractRegionalEntity(location, customBossConfigFields);
-        return true;
     }
 
-    private static boolean addRelativeSpawnLocation(CustomBossConfigFields customBossConfigFields, Location location, String minidungeonString) {
+    public static void addRelativeSpawnLocation(Player player, String customBossConfigFieldsString, String minidungeonString) {
         Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonString);
-        if (minidungeon == null)
-            return false;
-        return minidungeon.initializeRelativeLocationAddition(customBossConfigFields, location);
+        if (minidungeon == null) {
+            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add relative location! Minidungeon is not valid!"));
+            return;
+        }
+        CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.regionalElites.get(customBossConfigFieldsString);
+        if (customBossConfigFields == null)
+            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add relative location! Custom boss is not valid!"));
+        else {
+            Location safeSpawnLocation = autoSeekSafeSpawnLocation(player.getLocation());
+            if (safeSpawnLocation == null)
+                player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
+            else
+                minidungeon.initializeRelativeLocationAddition(customBossConfigFields, player.getLocation());
+        }
     }
 
-    private static void setLeashRadius(CustomBossConfigFields customBossConfigFields, Player player, String[] args) {
-
-        if (args.length < 3) {
-            player.sendMessage("[EliteMobs] Possible command syntax:");
-            player.sendMessage("- /elitemobs customboss [filename] setLeashRadius [radius]");
+    public static void setLeashRadius(String customBossConfigFieldsString, CommandSender commandSender, int leashRadius) {
+        CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.regionalElites.get(customBossConfigFieldsString);
+        if (customBossConfigFields == null) {
+            commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed set the leash radius! Was the boss a valid regional boss?"));
             return;
         }
-
-        double leashRadius;
-
-        try {
-            leashRadius = Double.valueOf(args[3]);
-        } catch (Exception ex) {
-            player.sendMessage("[EliteMobs] Expected a number, got " + args[2] + " (not a valid number!)");
-            player.sendMessage("[EliteMobs] Possible command syntax:");
-            player.sendMessage("- /elitemobs customboss [filename] setLeashRadius [radius]");
-            return;
-        }
-
         customBossConfigFields.setLeashRadius(leashRadius);
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
             if (customBossConfigFields.getFileName().equals(regionalBossEntity.getCustomBossConfigFields().getFileName()))
                 regionalBossEntity.setLeashRadius(leashRadius);
-
     }
 
-    private static void removeRegionalBoss() {
-
-    }
 
 }
