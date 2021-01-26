@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.commands.shops;
+package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;

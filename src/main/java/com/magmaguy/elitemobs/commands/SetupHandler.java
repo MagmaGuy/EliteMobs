@@ -11,59 +11,39 @@ import org.bukkit.entity.Player;
 
 public class SetupHandler {
 
-    private String regionName = "";
-    private Player player;
+    public static void setupMenuCommand(Player player) {
+        new SetupMenu(player);
+    }
 
-    public SetupHandler(Player player, String[] args) {
+    public static void setupMinidungeonCommand(Player player, String minidungeonName) {
+        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        minidungeon.finalizeMinidungeonInstallation(player, true);
+        player.performCommand("/rotate " + minidungeon.dungeonPackagerConfigFields.getRotation());
+        player.performCommand("/paste");
+    }
 
-        if (args.length == 1) {
-            new SetupMenu(player);
-            return;
-        }
+    public static void setupMinidungeonNoPasteCommand(Player player, String minidungeonName) {
+        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        minidungeon.finalizeMinidungeonInstallation(player, false);
+    }
 
+    public static void setupUnminidungeonCommand(Player player, String minidungeonName) {
+        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        minidungeon.uninstallSchematicMinidungeon(player);
+        player.performCommand("/undo");
+    }
+
+    public static void setupUnminidungeonNoPasteCommand(Player player, String minidungeonName) {
+        Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
+        minidungeon.finalizeMinidungeonInstallation(player, false);
+    }
+
+    public static void setupAreaCommand(Player player, String regionName) {
         if (!EliteMobs.worldguardIsEnabled) {
             player.sendMessage("[EliteMobs] You don't have WorldGuard installed! It is not possible to correctly set " +
                     "up a lair/minidungeon/dungeon without that plugin!");
             return;
         }
-
-        //Syntax: /em setup area [regionName]
-
-        if (args[1].equals("minidungeon")) {
-            if (args.length == 4 && args[3].equalsIgnoreCase("noPaste")) {
-                Minidungeon minidungeon = Minidungeon.minidungeons.get(args[2]);
-                minidungeon.finalizeMinidungeonInstallation(player, false);
-                return;
-            }
-
-            Minidungeon minidungeon = Minidungeon.minidungeons.get(args[2]);
-            minidungeon.finalizeMinidungeonInstallation(player, true);
-            player.performCommand("/rotate " + minidungeon.dungeonPackagerConfigFields.getRotation());
-            player.performCommand("/paste");
-            return;
-        }
-
-        if (args[1].equals("unminidungeon")) {
-            Minidungeon minidungeon = Minidungeon.minidungeons.get(args[2]);
-            minidungeon.uninstallSchematicMinidungeon(player);
-            if (!(args.length == 4 && args[3].equalsIgnoreCase("noPaste")))
-                player.performCommand("/undo");
-            return;
-        }
-
-        if (args.length < 3) {
-            player.sendMessage("[EliteMobs] Invalid command syntax! Expected syntax:");
-            player.sendMessage("/em setup area [regionName]");
-            player.sendMessage("[regionName] is the name of your WorldGuard protected cuboid! Create the region first!");
-            return;
-        }
-
-        regionName = args[2];
-        this.player = player;
-        protectArea(player, regionName);
-    }
-
-    public static void protectArea(Player player, String regionName) {
         if (!WorldGuardCompatibility.protectMinidungeonArea(regionName, player.getLocation())) {
             player.sendMessage(ChatColorConverter.convert("&4[EliteMobs] Failed to protect region! Was the region name correct?"));
             //worldguardextraflags

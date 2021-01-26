@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.commands;
+package com.magmaguy.elitemobs.commands.admin;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class TierSetSpawner {
+public class GetTierCommand {
 
-    public static void spawnTierItem(int tierLevel, Player player) {
+    public static void get(Player player, int tierLevel) {
 
         ItemStack helmet = new ItemStack(Material.NETHERITE_HELMET);
         ItemStack chestplate = new ItemStack(Material.NETHERITE_CHESTPLATE);

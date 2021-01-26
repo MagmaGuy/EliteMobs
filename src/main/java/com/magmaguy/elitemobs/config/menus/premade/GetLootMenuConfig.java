@@ -22,7 +22,7 @@ public class GetLootMenuConfig extends MenusConfigFields {
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
 
-        menuName = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Procedural Item Shop");
+        menuName = ConfigurationEngine.setString(fileConfiguration, "Menu name", "[EM] Getloot menu");
 
         ItemStackSerializer.serialize(
                 "Info button",

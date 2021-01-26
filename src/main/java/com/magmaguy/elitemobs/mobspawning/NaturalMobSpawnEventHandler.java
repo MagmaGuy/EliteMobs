@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser
 import com.magmaguy.elitemobs.utils.PlayerScanner;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,6 +39,9 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
+
+        if (event.getEntity().getType().equals(EntityType.BEE))
+            return;
 
         //This fires for custom bosses, so don't override those spawns
         if (WorldGuardSpawnEventBypasser.isForcedSpawn()) return;
@@ -77,7 +81,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
             return;
 
         if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + livingEntity.getWorld().getName())) {
-            int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()) * MobCombatSettingsConfig.perTierLevelIncrease);
+            int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()));
             EliteMobEntity eliteMobEntity = new EliteMobEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
             if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
                 eliteMobEntity.setHasSpecialLoot(false);

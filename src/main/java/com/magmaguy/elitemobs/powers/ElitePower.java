@@ -24,7 +24,7 @@ import java.util.HashSet;
 
 public class ElitePower {
 
-    private static final HashSet<ElitePower> elitePowers = new HashSet(Arrays.asList(
+    public static final HashSet<ElitePower> elitePowers = new HashSet(Arrays.asList(
             //Boss powers
             new FlamePyre(),
             new Flamethrower(),

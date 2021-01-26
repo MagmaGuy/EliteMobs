@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.commands.setup;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -16,7 +15,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class SetupMenu {
 
@@ -31,35 +33,12 @@ public class SetupMenu {
     public SetupMenu(Player player) {
         this.inventory = Bukkit.createInventory(player, 54, "Setup menu");
         this.player = player;
-        //reserves the first slot
-        permissionsStatus();
         //reserve adventurer's guild
         adventurersGuildWorldStatus();
         //iterate through dungeons
         dungeonStatuses();
         setupMenus.put(inventory, this);
         player.openInventory(inventory);
-    }
-
-    private void permissionsStatus() {
-
-        String name = "Currently using";
-        String state;
-        if (DefaultConfig.usePermissions)
-            state = "Permissions!";
-        else
-            state = "Permissionless mode!";
-
-        Material material;
-        if (!DefaultConfig.setupDone) {
-            material = Material.RED_STAINED_GLASS_PANE;
-            state = ChatColor.RED + state;
-        } else {
-            material = Material.GREEN_STAINED_GLASS_PANE;
-            state = ChatColor.GREEN + state;
-        }
-
-        inventory.setItem(validSlots.get(0), ItemStackGenerator.generateItemStack(material, name, Collections.singletonList(state)));
     }
 
     private void adventurersGuildWorldStatus() {
@@ -73,12 +52,12 @@ public class SetupMenu {
             material = Material.GREEN_STAINED_GLASS_PANE;
             lore = ChatColor.GREEN + "Working correctly!";
         }
-        inventory.setItem(validSlots.get(1), ItemStackGenerator.generateItemStack(material, state, new ArrayList<>(Arrays.asList(lore))));
+        inventory.setItem(validSlots.get(0), ItemStackGenerator.generateItemStack(material, state, new ArrayList<>(Arrays.asList(lore))));
     }
 
     private void dungeonStatuses() {
         //continue counting from used inventory slots
-        int counter = 2;
+        int counter = 1;
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
 
             if (!Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
