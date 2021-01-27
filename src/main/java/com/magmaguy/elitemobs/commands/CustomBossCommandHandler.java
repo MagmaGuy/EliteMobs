@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.DebugBlockLocation;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,8 +28,6 @@ public class CustomBossCommandHandler {
 
     public static void addSpawnLocation(String customBossConfigFieldsString, Player player) {
         CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.regionalElites.get(customBossConfigFieldsString);
-        for (String keys : CustomBossConfigFields.regionalElites.keySet())
-            new DeveloperMessage(keys);
         if (customBossConfigFields == null)
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add spawn location! Custom Boss " + customBossConfigFieldsString + " is not valid regional boss!"));
         else {

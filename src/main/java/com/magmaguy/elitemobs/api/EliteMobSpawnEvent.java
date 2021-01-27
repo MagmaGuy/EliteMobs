@@ -68,7 +68,7 @@ public class EliteMobSpawnEvent extends Event implements Cancellable {
     }
 
     /**
-     * Cancels the event. This will cancel the formation of the Elite Mob and remove the living entity. Once cancelled it can't be uncancelled.
+     * Cancels the event. This will cancel the formation of the Elite Mob and remove the living entity. Once cancel\led it can't be uncancelled.
      *
      * @param cancel Cancels the event
      */
