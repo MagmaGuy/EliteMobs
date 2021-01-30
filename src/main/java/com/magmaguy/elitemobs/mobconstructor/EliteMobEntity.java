@@ -863,7 +863,7 @@ public class EliteMobEntity {
             public void run() {
                 inAntiExploitCooldown = false;
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
+        }.runTaskLater(MetadataHandler.PLUGIN, 20);
     }
 
     public boolean isRegionalBoss() {

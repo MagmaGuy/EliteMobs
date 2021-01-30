@@ -228,6 +228,7 @@ public class EventsRegistrer {
         //Minecraft behavior canceller
         if (DefaultConfig.preventCreeperDamageToPassiveMobs)
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
+        pluginManager.registerEvents(new PreventEliteBeeHiveEnter(), plugin);
 
         //Antiexploits
         pluginManager.registerEvents(new PreventMountExploit(), plugin);

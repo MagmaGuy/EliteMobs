@@ -40,6 +40,8 @@ public class DebugScreen {
             } else
                 page += "Is Alive (MC): false\n";
             page += "Is Persistent: " + regionalBossEntity.getCustomBossConfigFields().getIsPersistent() + "\n";
+            if (regionalBossEntity.getCustomBossConfigFields().getIsPersistent())
+                page += "Is Respawning: " + regionalBossEntity.isRespawning() + "\n";
             pages.add(page);
         }
 

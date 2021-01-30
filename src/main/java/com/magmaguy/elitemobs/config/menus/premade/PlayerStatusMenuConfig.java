@@ -34,9 +34,9 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
 
         indexLineCreator(0, "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);
         indexLineCreator(1, "&5&l/ag &7- &6EliteMobs Hub",
-                "CLICK TO USE\\n" +
-                        "The place where you can find\\n" +
-                        "NPCs that give quests, buy and\\n" +
+                "CLICK TO USE\n" +
+                        "The place where you can find\n" +
+                        "NPCs that give quests, buy and\n" +
                         "sell items, give advice and more!",
                 "/ag", fileConfiguration);
         indexLineCreator(2, "&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", "", "", fileConfiguration);

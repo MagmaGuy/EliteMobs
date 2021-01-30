@@ -14,10 +14,6 @@ import java.util.List;
 
 public class ItemTierFinder {
 
-    public static double findPlayerTier(Player player) {
-        return (4 * findArmorSetTier(player) + findWeaponTier(player)) / 5;
-    }
-
     public static double findArmorSetTier(Player player) {
 
         double totalArmorThreat = 0;
