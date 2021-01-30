@@ -446,7 +446,7 @@ public class AdminCommands {
         manager.command(builder.literal("money")
                 .literal("set")
                 .argument(onlinePlayers.copy(), ArgumentDescription.of("Player name"))
-                .argument(IntegerArgument.newBuilder("amount"), ArgumentDescription.of("Amount to be set"))
+                .argument(DoubleArgument.newBuilder("amount"), ArgumentDescription.of("Amount to be set"))
                 .meta(CommandMeta.DESCRIPTION, "Sets the total currency amount of a player")
                 .senderType(CommandSender.class)
                 .permission("elitemobs.*")

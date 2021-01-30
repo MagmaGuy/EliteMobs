@@ -15,7 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -143,10 +142,10 @@ public class TreasureChest {
             return;
         }
         //todo: this doesn't support non- chest block types like the ender chest
-        Chest chest = (Chest) location.getBlock().getState();
-        chest.setCustomName(this.key);
-        //todo: add block face
-        chest.update();
+        //Directional directional = (Directional) location.getBlock().getState();
+        //directional.setFacingDirection(facing);
+        //location.getBlock().setBlockData((BlockData) directional);
+        location.getBlock().getState().update();
 
         startEffects();
     }

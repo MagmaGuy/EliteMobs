@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -280,7 +282,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     private void spawnMessage() {
         if (customBossConfigFields.getSpawnMessage() == null) return;
         if (customBossConfigFields.getAnnouncementPriority() < 1) return;
-        if (customBossConfigFields.getAnnouncementPriority() == 1)
+        if (customBossConfigFields.getAnnouncementPriority() == 1 && !ConfigValues.eventsConfig.getBoolean(EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY))
             Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
         else
             for (Player player : getLivingEntity().getWorld().getPlayers())
@@ -477,6 +479,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         }
         for (CustomBossBossBar customBossBossBar : customBossBossBars) customBossBossBar.remove(true);
         customBossBossBars.clear();
+        if (removeEntity)
+            if (getLivingEntity() != null)
+                getLivingEntity().remove();
     }
 
     /**

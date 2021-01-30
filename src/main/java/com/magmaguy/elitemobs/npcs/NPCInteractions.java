@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.npcs;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
@@ -49,7 +50,7 @@ public class NPCInteractions implements Listener {
 
         switch (npcEntity.getInteractionType()) {
             case GUILD_GREETER:
-                if (event.getPlayer().hasPermission("elitemobs.guild.npc")) {
+                if (event.getPlayer().hasPermission("elitemobs.rank.npc")) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -107,7 +108,7 @@ public class NPCInteractions implements Listener {
                 if (event.getPlayer().hasPermission("elitemobs.back.npc")) {
                     Location previousLocation = PlayerTeleportEvent.previousLocations.get(event.getPlayer());
                     if (previousLocation == null)
-                        event.getPlayer().sendMessage("[EliteMobs] Couldn't send you back to your previous location - no previous location found!");
+                        event.getPlayer().sendMessage(ChatColorConverter.convert(npcEntity.npCsConfigFields.noPreviousLocationMessage));
                     else
                         PlayerPreTeleportEvent.teleportPlayer(event.getPlayer(), previousLocation);
                 }

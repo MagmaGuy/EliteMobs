@@ -9,7 +9,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class BossTrackingPage {
     protected static TextComponent[] bossTrackingPage(Player player) {
@@ -31,17 +30,10 @@ public class BossTrackingPage {
 
         ArrayList<TextComponent> textComponents = new ArrayList<>();
         int counter = 0;
-        for (Iterator<CustomBossEntity> customBossEntityIterator = CustomBossEntity.trackableCustomBosses.iterator(); customBossEntityIterator.hasNext(); ) {
-            CustomBossEntity customBossEntity = customBossEntityIterator.next();
-            if (customBossEntity == null ||
-                    customBossEntity.advancedGetEntity() == null ||
-                    customBossEntity.advancedGetEntity().isDead()) {
-                customBossEntityIterator.remove();
-                continue;
-            }
+        for (CustomBossEntity customBossEntity : CustomBossEntity.trackableCustomBosses) {
             TextComponent message = new TextComponent(customBossEntity.bossBarMessage(player, customBossEntity.customBossConfigFields.getLocationMessage()) + "\n");
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PlayerStatusMenuConfig.onBossTrackHover).create()));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + player.getName() + " " + customBossEntity.uuid));
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + customBossEntity.uuid));
             textComponents.add(message);
 
             counter++;

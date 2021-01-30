@@ -125,9 +125,10 @@ public class SheepHandler implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onShear(PlayerShearEntityEvent event) {
-        if (event.getEntity().getType().equals(EntityType.SHEEP)) return;
-        if (EntityTracker.isSuperMob(event.getEntity())) return;
+        if (!event.getEntity().getType().equals(EntityType.SHEEP)) return;
+        if (!EntityTracker.isSuperMob(event.getEntity())) return;
         Sheep sheep = (Sheep) event.getEntity();
+
         for (int i = 0; i < 50; i++)
             sheep.getWorld().dropItem(sheep.getLocation(), woolStackRandomizer(sheep)).setVelocity(ItemDropVelocity.ItemDropVelocity());
     }

@@ -28,6 +28,7 @@ public class NPCsConfigFields {
     private FileConfiguration fileConfiguration = null;
     private File file;
     private double timeout;
+    public String noPreviousLocationMessage;
     private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
 
     public NPCsConfigFields(String fileName,
@@ -100,6 +101,8 @@ public class NPCsConfigFields {
             this.timeout = fileConfiguration.getDouble("timeout");
         else
             this.timeout = 0;
+        if (fileConfiguration.getString("noPreviousLocationMessage") != null)
+            this.noPreviousLocationMessage = fileConfiguration.getString("noPreviousLocationMessage");
     }
 
     public String getFileName() {

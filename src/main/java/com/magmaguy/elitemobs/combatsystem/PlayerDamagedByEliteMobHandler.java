@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -95,8 +96,10 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
         double finalDamage = (baseDamage + bonusDamage - damageReduction - secondaryDamageReduction) *
                 MobCombatSettingsConfig.damageToPlayerMultiplier * customBossDamageMultiplier;
 
+        double playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+
         //Prevent 1-shots and players getting healed from hits
-        finalDamage = finalDamage < 1 ? 1 : finalDamage > 15 ? 15 : finalDamage;
+        finalDamage = finalDamage < 1 ? 1 : finalDamage > playerMaxHealth ? playerMaxHealth - 1 : finalDamage;
 
         return finalDamage;
 
@@ -108,12 +111,9 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
         for (ItemStack itemStack : player.getInventory().getArmorContents()) {
             if (itemStack == null) continue;
-            for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
+            for (Enchantment enchantment : itemStack.getEnchantments().keySet())
                 if (enchantment.getName().equals(Enchantment.PROTECTION_PROJECTILE.getName()) && event.getDamager() instanceof Projectile)
                     totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
-                if (enchantment.getName().equals(Enchantment.PROTECTION_EXPLOSIONS.getName()) && event.getCause().equals(EntityDamageByEntityEvent.DamageCause.ENTITY_EXPLOSION))
-                    totalReductionLevel += getDamageIncreasePercentage(enchantment, itemStack);
-            }
         }
 
         totalReductionLevel = totalReductionLevel / 4;
@@ -122,7 +122,7 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
     }
 
-    private double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
+    public static double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
         double maxEnchantmentLevel = EnchantmentsConfig.getEnchantment(enchantment).getMaxLevel();
         double currentEnchantmentLevel = weapon.getEnchantmentLevel(enchantment);
         return currentEnchantmentLevel / maxEnchantmentLevel <= 1 ? currentEnchantmentLevel / maxEnchantmentLevel : 1;
