@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.24</version>
+    <version>7.2.25</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -125,29 +125,29 @@
                 <exclusion>
                     <artifactId>worldedit-bukkit</artifactId>
                     <groupId>com.sk89q.worldedit</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>worldguard-core</artifactId>
-          <groupId>com.sk89q.worldguard</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commandbook</artifactId>
-          <groupId>com.sk89q</groupId>
-        </exclusion>
-      </exclusions>
+                </exclusion>
+                <exclusion>
+                    <artifactId>worldguard-core</artifactId>
+                    <groupId>com.sk89q.worldguard</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commandbook</artifactId>
+                    <groupId>com.sk89q</groupId>
+                </exclusion>
+            </exclusions>
     </dependency>
-    <dependency>
-      <groupId>com.github.MilkBowl</groupId>
-        <artifactId>VaultAPI</artifactId>
-        <version>1.7</version>
-        <scope>provided</scope>
-        <exclusions>
-            <exclusion>
-                <artifactId>bukkit</artifactId>
-                <groupId>org.bukkit</groupId>
-            </exclusion>
-        </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bukkit</artifactId>
+                    <groupId>org.bukkit</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>

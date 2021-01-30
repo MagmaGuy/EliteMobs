@@ -155,7 +155,7 @@ public class ElitePlayerInventory {
     }
 
     /**
-     * Outputs the base damage reduction given the current gear. Does not take secondary enchantements into accounts,
+     * Outputs the base damage reduction given the current gear. Does not take secondary enchantments into accounts,
      * such as Blast Protection
      *
      * @return Base damage reduction value

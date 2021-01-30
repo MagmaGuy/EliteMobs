@@ -106,6 +106,10 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
         abstractRegionalEntity.updateTicksBeforeRespawn();
     }
 
+    public boolean isRespawning() {
+        return isRespawning;
+    }
+
     public void setLeashRadius(double leashRadius) {
         this.leashRadius = leashRadius;
     }

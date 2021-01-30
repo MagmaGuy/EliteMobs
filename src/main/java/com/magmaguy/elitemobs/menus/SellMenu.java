@@ -114,7 +114,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
             //Do transfer
             shopInventory.addItem(currentItem);
-            playerInventory.remove(currentItem);
+            playerInventory.clear(event.getSlot());
 
             //Update worth of things to be sold, now using cached prices
             event.getInventory().setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));

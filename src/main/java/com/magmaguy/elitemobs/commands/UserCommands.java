@@ -148,7 +148,7 @@ public class UserCommands {
                 .permission("elitemobs.checktier.others")
                 .handler(commandContext -> new CheckTierOthersCommand(commandContext.getSender(), commandContext.get("onlinePlayer"))));
 
-        // /em track
+        // /em trackcustomboss uuid
         manager.command(builder.literal("trackcustomboss")
                 .argument(StringArgument.newBuilder("uuid"), ArgumentDescription.of("UUID of the custom boss to track."))
                 .meta(CommandMeta.DESCRIPTION, "Tracks a Custom Boss.")
