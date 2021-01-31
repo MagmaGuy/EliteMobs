@@ -251,7 +251,12 @@ public class Minidungeon {
             }
 
             private double vectorGetter(String rawLocationString, int position) {
-                return Double.parseDouble(rawLocationString.split(":")[1].split(",")[position]);
+                try {
+                    return Double.parseDouble(rawLocationString.split(":")[1].split(",")[position]);
+                } catch (Exception e) {
+                    new WarningMessage("Failed to parse relative location for " + rawLocationString);
+                    return 0;
+                }
             }
         }
     }
@@ -302,7 +307,7 @@ public class Minidungeon {
     private void loadWorld(Player player) {
         try {
             world = MinidungeonWorldLoader.runtimeLoadWorld(this);
-            WorldGuardCompatibility.protectWorldMinidugeonArea(world.getSpawnLocation());
+            WorldGuardCompatibility.protectWorldMinidugeonArea(world.getSpawnLocation(), this);
             player.teleport(world.getSpawnLocation());
             player.sendMessage("Minidungeon " + dungeonPackagerConfigFields.getWorldName() +
                     " has been loaded! The world is now loaded and the regional bosses are up.");
@@ -383,7 +388,7 @@ public class Minidungeon {
                     dungeonPackagerConfigFields.getRotation(),
                     dungeonPackagerConfigFields.getAnchorPoint(),
                     dungeonPackagerConfigFields.getCorner2());
-            WorldGuardCompatibility.defineMinidungeon(realCorner1, realCorner2, dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getSchematicName());
+            WorldGuardCompatibility.defineMinidungeon(realCorner1, realCorner2, dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getSchematicName(), this);
         }
 
         teleportLocation = dungeonPackagerConfigFields.getAnchorPoint().clone().add(dungeonPackagerConfigFields.getTeleportOffset());

@@ -63,7 +63,7 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
                 "patreon.com/magmaguy",
                 DungeonSizeCategory.MINIDUNGEON,
                 null,
-                "elitemobs_pirate_ship_minidungeon.schem",
+                "em_pirate_ship.schem",
                 null,
                 true,
                 new Vector(16, -6, -1),
@@ -75,6 +75,8 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6One of the best hunting grounds for" +
-                        "&6aspiring adventurers!");
+                        "&6aspiring adventurers!",
+                "&8[EM] &3Now boarding the Pirate Ship! &bPillage and plunder to yer' hearts content!",
+                "&8[EM] &3Player overboard! &bReturn when you've earned your sea-legs ye' landlubber!");
     }
 }

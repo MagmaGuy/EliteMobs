@@ -103,6 +103,7 @@ public class AbstractRegionalEntity {
     public static void save() {
         for (CustomBossConfigFields customBossConfigFields : abstractRegionalEntityHashMap.keySet()) {
             if (!customBossConfigFields.filesOutOfSync) continue;
+            customBossConfigFields.filesOutOfSync = false;
             List<String> spawnLocations = new ArrayList<>();
             for (AbstractRegionalEntity abstractRegionalEntity : abstractRegionalEntityHashMap.get(customBossConfigFields))
                 spawnLocations.add(abstractRegionalEntity.rawString);

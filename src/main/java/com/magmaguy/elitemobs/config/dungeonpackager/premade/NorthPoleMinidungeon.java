@@ -18,7 +18,7 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
                 null,
                 "https://discord.gg/vRW9wXhK",
                 DungeonSizeCategory.MINIDUNGEON,
-                "elitemobs_northpole",
+                "em_north_pole",
                 null,
                 World.Environment.NORMAL,
                 true,
@@ -30,6 +30,8 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
                 1,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
-                        "&6Christmas in a snow globe!");
+                        "&6Christmas in a snow globe!",
+                "&8[EM] &7You have reached the North Pole! &fHave you been naughty this year?",
+                "&8[EM] &7Come back and visit. &fThere are plenty of sweets and treats for next time!");
     }
 }

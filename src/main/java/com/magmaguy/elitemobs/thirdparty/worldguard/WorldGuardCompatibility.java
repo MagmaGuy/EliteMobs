@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.thirdparty.worldguard;
 
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -130,7 +131,7 @@ public class WorldGuardCompatibility {
     private static final StateFlag.State allow = StateFlag.State.ALLOW;
     private static final StateFlag.State deny = StateFlag.State.DENY;
 
-    public static void protectWorldMinidugeonArea(Location location) {
+    public static void protectWorldMinidugeonArea(Location location, Minidungeon minidungeon) {
         try {
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
@@ -142,10 +143,78 @@ public class WorldGuardCompatibility {
                 regions.addRegion(global);
             }
 
-            protectMinidungeonArea(global);
+            protectMinidungeonArea(global, minidungeon);
         } catch (Exception ex) {
             new WarningMessage("Failed to protect minidungeon world area!");
         }
+    }
+
+    public static boolean protectMinidungeonArea(String regionName, Location location, Minidungeon minidungeon) {
+        try {
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
+            ProtectedRegion protectedRegion = regions.getRegion(regionName);
+            if (protectedRegion == null) {
+                new WarningMessage("The region name picked did not exist!");
+                return false;
+            }
+            protectMinidungeonArea(protectedRegion, minidungeon);
+            return true;
+        } catch (Exception ex) {
+            new WarningMessage("Failed to protect region " + regionName + " !");
+            return false;
+        }
+    }
+
+    public static void protectMinidungeonArea(ProtectedRegion protectedRegion, Minidungeon minidungeon) {
+        //elitemobs events
+        protectedRegion.setFlag(ELITEMOBS_DUNGEON, allow);
+        protectedRegion.setFlag(ELITEMOBS_ANTIEXPLOIT, deny);
+        protectedRegion.setFlag(ELITEMOBS_EVENTS, deny);
+        //WG events
+        protectedRegion.setFlag(Flags.INTERACT, deny);
+        protectedRegion.setFlag(Flags.CREEPER_EXPLOSION, deny);
+        protectedRegion.setFlag(Flags.FIRE_SPREAD, deny);
+        protectedRegion.setFlag(Flags.LAVA_FIRE, deny);
+        protectedRegion.setFlag(Flags.LAVA_FLOW, deny);
+        protectedRegion.setFlag(Flags.SNOW_FALL, deny);
+        protectedRegion.setFlag(Flags.SNOW_MELT, deny);
+        protectedRegion.setFlag(Flags.ICE_FORM, deny);
+        protectedRegion.setFlag(Flags.ICE_MELT, deny);
+        protectedRegion.setFlag(Flags.FROSTED_ICE_FORM, deny);
+        protectedRegion.setFlag(Flags.FROSTED_ICE_MELT, deny);
+        protectedRegion.setFlag(Flags.LEAF_DECAY, deny);
+        protectedRegion.setFlag(Flags.GRASS_SPREAD, deny);
+        protectedRegion.setFlag(Flags.MYCELIUM_SPREAD, deny);
+        protectedRegion.setFlag(Flags.CROP_GROWTH, deny);
+        protectedRegion.setFlag(Flags.SOIL_DRY, deny);
+        //missing coral-fade
+        //missing ravager-grief
+        protectedRegion.setFlag(Flags.GHAST_FIREBALL, deny);
+        protectedRegion.setFlag(Flags.WITHER_DAMAGE, deny);
+        protectedRegion.setFlag(Flags.ENDER_BUILD, deny);
+        protectedRegion.setFlag(Flags.ITEM_FRAME_ROTATE, deny);
+        protectedRegion.setFlag(Flags.PLACE_VEHICLE, deny);
+        protectedRegion.setFlag(Flags.DESTROY_VEHICLE, deny);
+        protectedRegion.setFlag(Flags.PVP, deny);
+        protectedRegion.setFlag(Flags.OTHER_EXPLOSION, deny);
+        protectedRegion.setFlag(Flags.TRAMPLE_BLOCKS, deny);
+        protectedRegion.setFlag(Flags.VINE_GROWTH, deny);
+        protectedRegion.setFlag(Flags.MUSHROOMS, deny);
+        protectedRegion.setFlag(Flags.DAMAGE_ANIMALS, allow);
+        protectedRegion.setFlag(Flags.SLEEP, deny);
+        protectedRegion.setFlag(Flags.CHEST_ACCESS, allow);
+        protectedRegion.setFlag(Flags.ENTITY_ITEM_FRAME_DESTROY, deny);
+        protectedRegion.setFlag(Flags.ENTITY_PAINTING_DESTROY, deny);
+        protectedRegion.setFlag(Flags.MOB_SPAWNING, allow);
+        protectedRegion.setFlag(Flags.TNT, deny);
+        protectedRegion.setFlag(Flags.ENDERDRAGON_BLOCK_DAMAGE, deny);
+        protectedRegion.setFlag(Flags.LIGHTER, deny);
+        protectedRegion.setFlag(Flags.ENDERPEARL, deny);
+        protectedRegion.setFlag(Flags.GREET_MESSAGE, minidungeon.dungeonPackagerConfigFields.getRegionEnterMessage());
+        protectedRegion.setFlag(Flags.FAREWELL_MESSAGE, minidungeon.dungeonPackagerConfigFields.getRegionLeaveMessage());
+        protectedRegion.setFlag(Flags.BLOCK_PLACE, deny);
+        protectedRegion.setFlag(Flags.BLOCK_BREAK, deny);
     }
 
     public static boolean protectMinidungeonArea(String regionName, Location location) {
@@ -210,8 +279,6 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.ENDERDRAGON_BLOCK_DAMAGE, deny);
         protectedRegion.setFlag(Flags.LIGHTER, deny);
         protectedRegion.setFlag(Flags.ENDERPEARL, deny);
-        protectedRegion.setFlag(Flags.GREET_MESSAGE, "Now entering");
-        protectedRegion.setFlag(Flags.FAREWELL_MESSAGE, "Now leaving");
         protectedRegion.setFlag(Flags.BLOCK_PLACE, deny);
         protectedRegion.setFlag(Flags.BLOCK_BREAK, deny);
     }
@@ -223,14 +290,14 @@ public class WorldGuardCompatibility {
      * @param corner1
      * @param corner2
      */
-    public static void defineMinidungeon(Vector corner1, Vector corner2, Location anchorLocation, String schematicName) {
+    public static void defineMinidungeon(Vector corner1, Vector corner2, Location anchorLocation, String schematicName, Minidungeon minidungeon) {
         try {
             RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager regionManager = regionContainer.get(BukkitAdapter.adapt(anchorLocation.getWorld()));
             BlockVector3 min = BlockVector3.at(corner1.getBlockX(), corner1.getBlockY(), corner1.getBlockZ());
             BlockVector3 max = BlockVector3.at(corner2.getBlockX(), corner2.getBlockY(), corner2.getBlockZ());
             ProtectedRegion region = new ProtectedCuboidRegion(schematicName.replace(".schem", ""), min, max);
-            protectMinidungeonArea(region);
+            protectMinidungeonArea(region, minidungeon);
             regionManager.addRegion(region);
         } catch (Exception ex) {
             new WarningMessage("Failed to add Minidungeon WorldGuard zone!");

@@ -210,7 +210,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         this.role = role;
         this.roleDisplay = (ArmorStand) this.villager.getWorld().spawnEntity(villager.getLocation().add(new Vector(0, 1.72, 0)), EntityType.ARMOR_STAND);
         EntityTracker.registerArmorStands(this.roleDisplay);
-        this.roleDisplay.setCustomName(role);
+        this.roleDisplay.setCustomName(ChatColorConverter.convert(role));
         this.roleDisplay.setCustomNameVisible(true);
         this.roleDisplay.setMarker(true);
         this.roleDisplay.setVisible(false);

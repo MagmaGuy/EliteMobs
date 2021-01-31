@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -25,6 +26,8 @@ public class EliteMobExitCombatEvent extends Event {
         if (MobCombatSettingsConfig.regenerateCustomBossHealthOnCombatEnd)
             if (!eliteMobEntity.getLivingEntity().getType().equals(EntityType.PHANTOM))
                 eliteMobEntity.fullHeal();
+        if (!DefaultConfig.alwaysShowNametags)
+            eliteMobEntity.setNameVisible(false);
     }
 
     public EliteMobEntity getEliteMobEntity() {

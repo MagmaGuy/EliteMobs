@@ -22,7 +22,7 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                 "patreon.com/magmaguy",
                 DungeonSizeCategory.LAIR,
                 null,
-                "elitemobs_catacombs.schem",
+                "em_catacombs.schem",
                 null,
                 true,
                 new Vector(-13, -16, 0),
@@ -33,6 +33,8 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                 2,
                 "Difficulty: &aEasy\n" +
                         "$bossCount bosses, from tier $lowestTier to $highestTier\n" +
-                        "&2The best minidungeon for beginners!");
+                        "&2The best minidungeon for beginners!",
+                "&8[EM] &8Now entering the Catacombs. Be careful with what dwells below...",
+                "&8[EM] &8You have left the Catacombs. Was it worth it?");
     }
 }
