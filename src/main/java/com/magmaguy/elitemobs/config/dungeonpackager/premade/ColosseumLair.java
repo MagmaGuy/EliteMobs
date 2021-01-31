@@ -29,7 +29,7 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                 "patreon.com/magmaguy",
                 DungeonSizeCategory.LAIR,
                 null,
-                "elitemobs_colosseum.schem",
+                "em_colosseum.schem",
                 null,
                 true,
                 new Vector(40, -14, 0),
@@ -40,6 +40,8 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                 2,
                 "Difficulty: &4Very Hard\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
-                        "&cA true challenge for big groups of players!");
+                        "&cA true challenge for big groups of players!",
+                "&8[EM] &6Champions and challengers prepare! &eProve your worth against the most mighty of foes!",
+                "&8[EM] &6Farewell traveller! &eReturn soon to show your might once more!");
     }
 }

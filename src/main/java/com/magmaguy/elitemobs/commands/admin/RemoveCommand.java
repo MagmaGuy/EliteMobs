@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands.admin;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -29,6 +30,12 @@ public class RemoveCommand {
         @EventHandler(priority = EventPriority.LOWEST)
         public void otherDamageEvents(EntityDamageByEntityEvent event) {
             if (!removingPlayers.contains(event.getDamager().getUniqueId())) return;
+            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+            if (eliteMobEntity != null)
+                if (eliteMobEntity.regionalBossEntity != null)
+                    event.getDamager().sendMessage(ChatColorConverter.convert(
+                            "&8[EliteMobs] &cRemoved a spawn location for boss " +
+                                    eliteMobEntity.regionalBossEntity.getCustomBossConfigFields().getFileName()));
             EntityTracker.unregister(event.getEntity().getUniqueId(), RemovalReason.REMOVE_COMMAND);
             event.setCancelled(true);
         }

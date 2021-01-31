@@ -12,6 +12,7 @@ import java.util.List;
 public class AdventurersGuildConfig {
 
     public static boolean addMaxHealth, addCrit, addDodge;
+    public static boolean guildWorldIsEnabled;
     public static String guildWorldName;
     public static String guildLocationString;
     public static Location guildWorldLocation;
@@ -33,7 +34,8 @@ public class AdventurersGuildConfig {
         addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
         addCrit = ConfigurationEngine.setBoolean(fileConfiguration, "Add critical chance when unlocking higher guild ranks", true);
         addDodge = ConfigurationEngine.setBoolean(fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
-        guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name", "EliteMobs_adventurers_guild");
+        guildWorldIsEnabled = ConfigurationEngine.setBoolean(fileConfiguration, "guildHubIsEnabled", false);
+        guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name v2", "em_adventurers_guild");
         guildLocationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
         guildWorldLocation = null;
         agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);

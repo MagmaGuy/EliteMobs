@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.25</version>
+    <version>7.2.26</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -33,6 +33,14 @@
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>com.magmaguy.elitemobs</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>cloud.commandframework</pattern>
+                            <shadedPattern>com.magmaguy.elitemobs.shaded.cloud</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.leangen.geantyref</pattern>
+                            <shadedPattern>com.magmaguy.elitemobs.shaded.typetoken</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -135,7 +143,7 @@
                     <groupId>com.sk89q</groupId>
                 </exclusion>
             </exclusions>
-    </dependency>
+        </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>

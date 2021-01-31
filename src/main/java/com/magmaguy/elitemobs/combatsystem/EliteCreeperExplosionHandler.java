@@ -50,7 +50,7 @@ public class EliteCreeperExplosionHandler implements Listener {
                 finalDamage = finalDamage < 0 ? 0 : finalDamage;
                 player.damage(finalDamage, eliteMobEntity.getLivingEntity());
             } else if (entity instanceof LivingEntity)
-                ((LivingEntity) eliteMobEntity).damage(eliteMobEntity.getTier());
+                ((LivingEntity) entity).damage(eliteMobEntity.getTier());
 
     }
 

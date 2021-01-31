@@ -19,9 +19,9 @@ public class CustomBossCommandHandler {
                 originalLocation.getBlockY() + 0.5,
                 originalLocation.getBlockZ() + 0.5);
         for (int i = 0; i < 4; i++)
-            if (newLocation.clone().add(new Vector(0, i, 0)).getBlock().isPassable()) {
+            if (newLocation.add(new Vector(0, i, 0)).getBlock().isPassable()) {
                 new DebugBlockLocation(newLocation);
-                return newLocation.clone().add(new Vector(0, i, 0));
+                return newLocation;
             }
         return null;
     }
@@ -53,7 +53,7 @@ public class CustomBossCommandHandler {
             if (safeSpawnLocation == null)
                 player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
             else
-                minidungeon.initializeRelativeLocationAddition(customBossConfigFields, player.getLocation());
+                minidungeon.initializeRelativeLocationAddition(customBossConfigFields, safeSpawnLocation);
         }
     }
 

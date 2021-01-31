@@ -31,7 +31,7 @@ public class MinidungeonWorldLoader {
             new InfoMessage("Minidungeons world " + minidungeon.dungeonPackagerConfigFields.getWorldName() + " was loaded successfully!");
             minidungeon.isInstalled = true;
             if (EliteMobs.worldguardIsEnabled && minidungeon.dungeonPackagerConfigFields.getProtect())
-                WorldGuardCompatibility.protectWorldMinidugeonArea(world.getSpawnLocation());
+                WorldGuardCompatibility.protectWorldMinidugeonArea(world.getSpawnLocation(), minidungeon);
             return world;
         } catch (Exception exception) {
             new WarningMessage("Failed to load Minidungeon world " + minidungeon.dungeonPackagerConfigFields.getWorldName() + " !");
@@ -39,6 +39,7 @@ public class MinidungeonWorldLoader {
 
         return null;
     }
+
 
     public static void unloadWorld(Minidungeon minidungeon) {
         Bukkit.unloadWorld(minidungeon.dungeonPackagerConfigFields.getWorldName(), true);

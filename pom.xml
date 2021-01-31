@@ -7,7 +7,7 @@
 
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.25</version>
+    <version>7.2.26</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -28,12 +28,11 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-
+            <!-- Bstats shade-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.1.0</version>
-                <!-- Do not include the <configuration>...</configuration> part if you are using Sponge! -->
                 <configuration>
                     <relocations>
                         <relocation>
@@ -41,36 +40,6 @@
                             <!-- Replace this with your package! -->
                             <shadedPattern>com.magmaguy.elitemobs</shadedPattern>
                         </relocation>
-                    </relocations>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Cloud commands
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
-                    <relocations>
                         <relocation>
                             <pattern>cloud.commandframework</pattern>
                             <shadedPattern>com.magmaguy.elitemobs.shaded.cloud</shadedPattern>
@@ -81,8 +50,15 @@
                         </relocation>
                     </relocations>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-        -->
 
         </plugins>
     </build>
@@ -217,12 +193,12 @@
             <artifactId>cloud-brigadier</artifactId>
             <version>1.4.0</version>
         </dependency>
-        -->
         <dependency>
             <groupId>me.lucko</groupId>
             <artifactId>commodore</artifactId>
             <version>1.9</version>
         </dependency>
+        -->
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-bukkit</artifactId>

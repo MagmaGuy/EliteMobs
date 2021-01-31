@@ -373,7 +373,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!player.getWorld().equals(getLivingEntity().getWorld())) continue;
             TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.bossLocationMessage);
-            interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + player.getName() + " " + this.uuid));
+            interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + this.uuid));
             interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Track the " + getName()).create()));
             player.spigot().sendMessage(interactiveMessage);
         }
