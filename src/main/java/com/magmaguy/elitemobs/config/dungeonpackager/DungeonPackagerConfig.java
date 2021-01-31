@@ -27,7 +27,9 @@ public class DungeonPackagerConfig {
             new HallosseumLair(),
             new CatacombsLair(),
             new PirateShipMinidungeon(),
-            new NorthPoleMinidungeon()
+            new NorthPoleMinidungeon(),
+            new AirShipMinidungeon(),
+            new OasisAdventure()
     ));
 
     public static void initializeConfigs() {

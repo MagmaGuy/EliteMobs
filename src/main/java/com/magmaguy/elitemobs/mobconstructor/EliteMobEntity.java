@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -278,8 +279,7 @@ public class EliteMobEntity {
                 eliteMobProperties.getName().replace(
                         "$level", eliteLevel + ""));
         livingEntity.setCustomName(this.name);
-        if (DefaultConfig.alwaysShowNametags)
-            livingEntity.setCustomNameVisible(true);
+        livingEntity.setCustomNameVisible(DefaultConfig.alwaysShowNametags);
     }
 
     /**
@@ -288,11 +288,22 @@ public class EliteMobEntity {
      * @param name String which defines the display name
      */
     public void setName(String name) {
-        String parsedName = name.replace("$level", this.eliteLevel + "");
+        String parsedName = name.replace("$level", this.eliteLevel + "")
+                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + this.eliteLevel + "&2]&f"))
+                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + this.eliteLevel + "&6〗&f"))
+                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + this.eliteLevel + "&4』&f"))
+                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.eliteLevel + "&8〕&f");
         this.name = ChatColorConverter.convert(parsedName);
         this.getLivingEntity().setCustomName(this.name);
-        if (DefaultConfig.alwaysShowNametags)
-            livingEntity.setCustomNameVisible(true);
+        livingEntity.setCustomNameVisible(DefaultConfig.alwaysShowNametags);
+        if (customBossEntity != null)
+            DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.alwaysShowNametags, livingEntity);
+    }
+
+    public void setNameVisible(boolean isVisible) {
+        livingEntity.setCustomNameVisible(isVisible);
+        if (customBossEntity != null)
+            DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity);
     }
 
     /**
@@ -535,7 +546,7 @@ public class EliteMobEntity {
     public void setNewLivingEntity(Location location) {
         WorldGuardSpawnEventBypasser.forceSpawn();
         this.livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
-        this.livingEntity.setRemoveWhenFarAway(!this.isPersistent);
+        this.livingEntity.setRemoveWhenFarAway(false);
         this.uuid = livingEntity.getUniqueId();
         if (customBossEntity != null)
             customBossEntity.silentCustomBossInitialization();

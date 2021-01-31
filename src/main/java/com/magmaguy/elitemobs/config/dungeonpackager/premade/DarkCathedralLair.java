@@ -19,7 +19,7 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 "https://discord.gg/vRW9wXhK",
                 DungeonSizeCategory.LAIR,
                 null,
-                "elitemobs_dark_cathedral.schem",
+                "em_dark_cathedral.schem",
                 null,
                 true,
                 new Vector(17, -27, 0),
@@ -31,6 +31,8 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 "Difficulty: &cHard\n" +
                         "$bossCount level $highestTier Big Boss!\n" +
                         "&cThe original minidungeon, a challenge for\n" +
-                        "&ca small group of players or for veterans!");
+                        "&ca small group of players or for veterans!",
+                "&8[EM] &8Welcome to the Dark Cathedral. &4Death awaits inside...",
+                "&8[EM] &8Now leaving the Dark Cathedral. &4It awaits your return...");
     }
 }

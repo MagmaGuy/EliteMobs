@@ -18,7 +18,6 @@ public class VisualEffectObfuscator implements Listener {
         if (eliteMobEntity == null) return;
 
         eliteMobEntity.setHasVisualEffectObfuscated(false);
-        eliteMobEntity.getLivingEntity().setCustomNameVisible(true);
     }
 
     @EventHandler
@@ -28,7 +27,6 @@ public class VisualEffectObfuscator implements Listener {
         if (eliteMobEntity == null) return;
 
         eliteMobEntity.setHasVisualEffectObfuscated(false);
-        eliteMobEntity.getLivingEntity().setCustomNameVisible(true);
     }
 
 }
