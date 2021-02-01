@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -196,6 +197,11 @@ public class SetupMenu {
                             AdventurersGuildCommand.defineTeleportLocation();
                             AdventurersGuildConfig.toggleGuildInstall();
                             new NPCInitializer();
+                            if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+                                WorldGuardCompatibility.protectWorldMinidugeonArea(AdventurersGuildCommand.defineTeleportLocation());
+                                player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2The Adventurer's Guild Hub has been protected against griefing and mob spawning (among others)!"));
+                            } else
+                                player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4It is highly recommended you install WorldGuard to protect the Adventurer's Guild Hub World! Reinstall the hub through /em setup after installing WorldGuard in order to automatically protect the area!"));
                             PlayerTeleportEvent playerTeleportEvent = new PlayerTeleportEvent(player, AdventurersGuildConfig.guildWorldLocation);
                             new EventCaller(playerTeleportEvent);
                             if (!playerTeleportEvent.isCancelled())
