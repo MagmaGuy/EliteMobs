@@ -66,7 +66,7 @@ public class EliteMobEntity {
     This just defines default behavior
      */
     private boolean hasCustomPowers = false;
-    private Boolean isPersistent = true;
+    private Boolean isPersistent = false;
     private boolean hasVanillaLoot = true;
     private boolean hasEliteLoot = true;
     private CreatureSpawnEvent.SpawnReason spawnReason;
@@ -233,6 +233,8 @@ public class EliteMobEntity {
         //Register living entity to keep track of which entity this object is tied to
         this.livingEntity = livingEntity;
         this.entityType = livingEntity.getType();
+
+        setPersistent(isPersistent);
 
         //Register UUID to be used in trackers
         this.uuid = livingEntity.getUniqueId();

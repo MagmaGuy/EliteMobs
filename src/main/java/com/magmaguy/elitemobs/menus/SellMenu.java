@@ -141,7 +141,7 @@ public class SellMenu extends EliteMenu implements Listener {
                                     .replace("$item_name", itemStack.getItemMeta().getDisplayName())
                                     .replace("$currency_amount", itemValue + "")
                                     .replace("$currency_name", EconomySettingsConfig.currencyName)));
-                    shopInventory.remove(itemStack);
+                    shopInventory.clear(validSlot);
                 }
 
                 player.sendMessage(ChatColorConverter.convert(
