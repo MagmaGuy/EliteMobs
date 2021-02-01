@@ -93,6 +93,7 @@ public class DisguiseEntity {
     public static void setDisguiseNameVisibility(boolean disguiseNameVisibility, Entity entity) {
         Disguise disguise = DisguiseAPI.getDisguise(entity);
         if (disguise == null) return;
+        if (!(disguise.getWatcher() instanceof PlayerWatcher)) return;
         PlayerWatcher playerWatcher = (PlayerWatcher) disguise.getWatcher();
         playerWatcher.setCustomNameVisible(disguiseNameVisibility);
     }

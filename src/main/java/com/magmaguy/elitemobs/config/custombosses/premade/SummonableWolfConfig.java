@@ -10,7 +10,7 @@ public class SummonableWolfConfig extends CustomBossConfigFields {
         super("summonable_wolf",
                 EntityType.WOLF.toString(),
                 true,
-                "[$level] Wolfy",
+                "$normalLevel Wolfy",
                 "dynamic",
                 3,
                 false,

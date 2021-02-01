@@ -269,6 +269,10 @@ public class DungeonPackagerConfigFields {
         roundedLocation.setY(roundedLocation.getBlockY() + 0.5);
         roundedLocation.setZ(roundedLocation.getBlockZ() + 0.5);
         float roundedYaw = roundedLocation.getYaw();
+        while (roundedYaw < -225F)
+            roundedYaw += 360F;
+        while (roundedYaw > 225F)
+            roundedYaw += 360F;
         if (roundedYaw <= 45F && roundedYaw >= -45F)
             roundedYaw = 0F;
         else if (roundedYaw >= 45F && roundedYaw <= 135F)
