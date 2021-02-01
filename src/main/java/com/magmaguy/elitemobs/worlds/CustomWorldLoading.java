@@ -32,4 +32,15 @@ public class CustomWorldLoading {
 
     }
 
+    public static boolean adventurersGuildWorldExists() {
+        File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
+        File[] listOfFiles = folder.listFiles();
+
+        for (File listOfFile : listOfFiles)
+            if (listOfFile.isDirectory() &&
+                    listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName))
+                return true;
+        return false;
+    }
+
 }

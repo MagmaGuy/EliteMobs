@@ -11,7 +11,7 @@ public class SpecialBlacksmithConfig extends NPCsConfigFields {
                 "Grog",
                 "<Special Blacksmith>",
                 "WEAPONSMITH",
-                "EliteMobs_adventurers_guild,282.5,93,258.5,-90,0",
+                "em_adventurers_guild,282.5,93,258.5,-90,0",
                 Arrays.asList(
                         "Need something?",
                         "Got anything good?",

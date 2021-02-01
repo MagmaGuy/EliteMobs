@@ -26,16 +26,28 @@ public class AdventurersGuildConfig {
     public static double dodge1, dodge2, dodge3, crit1, crit2, crit3, health1, health2, health3, health4;
     public static String adventurersGuildMenuName;
     public static int baseKillsForRankUp, additionalKillsForRankUpPerTier;
+    private static File file;
+    private static FileConfiguration fileConfiguration;
+
+    public static void toggleGuildInstall() {
+        guildWorldIsEnabled = !guildWorldIsEnabled;
+        fileConfiguration.set("guildHubIsEnabledv2", guildWorldIsEnabled);
+        save();
+    }
+
+    public static void save() {
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+    }
 
     public static void initializeConfig() {
-        File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+        file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
+        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
         addCrit = ConfigurationEngine.setBoolean(fileConfiguration, "Add critical chance when unlocking higher guild ranks", true);
         addDodge = ConfigurationEngine.setBoolean(fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
-        guildWorldIsEnabled = ConfigurationEngine.setBoolean(fileConfiguration, "guildHubIsEnabled", false);
-        guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name v2", "em_adventurers_guild");
+        guildWorldIsEnabled = ConfigurationEngine.setBoolean(fileConfiguration, "guildHubIsEnabledv2", false);
+        guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name v3", "em_adventurers_guild");
         guildLocationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
         guildWorldLocation = null;
         agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);
@@ -318,7 +330,7 @@ public class AdventurersGuildConfig {
         //initializes the AG location
         AdventurersGuildCommand.defineTeleportLocation();
 
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+        save();
     }
 
     public static String getRankName(int prestigeTier, int rankTier) {

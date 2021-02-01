@@ -12,7 +12,7 @@ public class BarkeepConfig extends NPCsConfigFields {
                 "Bartley",
                 "<Barkeep>",
                 "BUTCHER",
-                "EliteMobs_adventurers_guild,285.5,91,209.5,0,0",
+                "em_adventurers_guild,285.5,91,209.5,0,0",
                 Arrays.asList(
                         "Need a drink?",
                         "Want a drink",
