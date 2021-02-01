@@ -28,6 +28,17 @@ public class DefaultConfig {
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
 
+    public static void toggleSetupDone() {
+        setupDone = !setupDone;
+        fileConfiguration.set("setupDoneV3", setupDone);
+        save();
+    }
+
+    public static void save() {
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+    }
+
+
     public static void initializeConfig() {
 
         file = ConfigurationEngine.fileCreator("config.yml");
@@ -42,7 +53,7 @@ public class DefaultConfig {
         nightmareWorldSpawnBonus = ConfigurationEngine.setDouble(fileConfiguration, "nightmareWorldSpawnBonus", 0.5);
         emLeadsToStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "emLeadsToStatusMenu", true);
         otherCommandsLeadToEMStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "otherCommandsLeadToEMStatusMenu", true);
-        setupDone = ConfigurationEngine.setBoolean(fileConfiguration, "setupDoneV2", false);
+        setupDone = ConfigurationEngine.setBoolean(fileConfiguration, "setupDoneV3", false);
         try {
             defaultSpawnLocation = ConfigurationLocation.deserialize(
                     ConfigurationEngine.setString(
@@ -53,7 +64,6 @@ public class DefaultConfig {
         }
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
-
     }
 
 }

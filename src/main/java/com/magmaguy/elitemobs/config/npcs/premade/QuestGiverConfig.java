@@ -11,7 +11,7 @@ public class QuestGiverConfig extends NPCsConfigFields {
                 "Qel'Thuzad",
                 "<Quest Giver>",
                 "FLETCHER",
-                "EliteMobs_adventurers_guild,278.5,91,215.5,0,0",
+                "em_adventurers_guild,278.5,91,215.5,0,0",
                 Arrays.asList(
                         "Greetings, adventurer!\\nFancy a quest?",
                         "You! I've got a quest!",

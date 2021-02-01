@@ -67,7 +67,7 @@ public class NPCsConfigFields {
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("role", role);
         fileConfiguration.addDefault("profession", profession);
-        fileConfiguration.addDefault("location", location);
+        fileConfiguration.addDefault("spawnLocation", location);
         fileConfiguration.addDefault("greetings", greetings);
         fileConfiguration.addDefault("dialog", dialog);
         fileConfiguration.addDefault("farewell", farewell);
@@ -88,7 +88,7 @@ public class NPCsConfigFields {
         this.name = fileConfiguration.getString("name");
         this.role = fileConfiguration.getString("role");
         this.profession = fileConfiguration.getString("profession");
-        this.location = fileConfiguration.getString("location");
+        this.location = fileConfiguration.getString("spawnLocation");
         this.greetings = fileConfiguration.getStringList("greetings");
         this.dialog = fileConfiguration.getStringList("dialog");
         this.farewell = fileConfiguration.getStringList("farewell");
@@ -178,7 +178,7 @@ public class NPCsConfigFields {
 
     public void setLocation(String location) {
         this.location = location;
-        this.fileConfiguration.set("location", location);
+        this.fileConfiguration.set("spawnLocation", location);
         try {
             ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
         } catch (Exception ex) {

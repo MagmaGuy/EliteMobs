@@ -12,7 +12,7 @@ public class GuildAttendantConfig extends NPCsConfigFields {
                 "Gillian",
                 "<Guild Attendant>",
                 "LIBRARIAN",
-                "EliteMobs_adventurers_guild,283.5,91,229.5,179,0",
+                "em_adventurers_guild,283.5,91,229.5,179,0",
                 Arrays.asList(
                         "Welcome to the\\nAdventurer's Guild!",
                         "Welcome!"),
