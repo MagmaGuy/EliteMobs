@@ -8,7 +8,7 @@ public class TheReturnedConfig extends CustomBossConfigFields {
         super("the_returned",
                 EntityType.HUSK.toString(),
                 true,
-                "&6The Returned",
+                "$reinforcementLevel &6The Returned",
                 "dynamic",
                 0,
                 false,

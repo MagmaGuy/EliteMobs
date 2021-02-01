@@ -8,7 +8,7 @@ public class NecronomiconZombieConfig extends CustomBossConfigFields {
         super("necronomicon_zombie",
                 EntityType.ZOMBIE.toString(),
                 true,
-                "&7Summoned Zombie",
+                "$reinforcementLevel &7Summoned Zombie",
                 "dynamic",
                 0,
                 false,

@@ -22,11 +22,11 @@ public class FirstTimeSetup implements Listener {
             public void run() {
                 if (!event.getPlayer().isOnline()) return;
                 event.getPlayer().sendMessage("----------------------------------------------------");
-                event.getPlayer().sendMessage(ChatColorConverter.convert("&7[EliteMobs] First time setup message:"));
-                event.getPlayer().sendMessage(ChatColorConverter.convert("&8Welcome to EliteMobs!" +
+                event.getPlayer().sendMessage(ChatColorConverter.convert("&7[EliteMobs] &fFirst time setup message:"));
+                event.getPlayer().sendMessage(ChatColorConverter.convert("&7Welcome to EliteMobs!" +
                         " &c&lIt looks like you haven't set up EliteMobs yet! &2To install EliteMobs, do &a/em setup &2!"));
-                event.getPlayer().sendMessage(ChatColorConverter.convert("&8Need command help? &6&l/em help"));
-                event.getPlayer().sendMessage(ChatColorConverter.convert("&8You can get support over at &9&nhttps://discord.gg/fB3YgwhpCU"));
+                event.getPlayer().sendMessage(ChatColorConverter.convert("&7Need command help? &6&l/em help"));
+                event.getPlayer().sendMessage(ChatColorConverter.convert("&7You can get support over at &9&nhttps://discord.gg/fB3YgwhpCU"));
                 TextComponent setupMessage = new TextComponent(ChatColorConverter.convert("&cDon't want to see this message again? "));
                 TextComponent setupDone = new TextComponent(ChatColorConverter.convert("&c&nClick here!"));
                 setupDone.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Never show this again!").create()));

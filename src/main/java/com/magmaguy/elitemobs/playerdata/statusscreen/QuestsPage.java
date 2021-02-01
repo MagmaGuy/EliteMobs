@@ -45,12 +45,14 @@ public class QuestsPage {
             textComponent[0] = configTextComponent;
             return textComponent;
         } else {
-            TextComponent[] textComponent = new TextComponent[(int) Math.ceil(counter / 6d)];
+            TextComponent[] textComponent = new TextComponent[(int) Math.floor(counter / 6D) + 1];
             int internalCounter = 0;
+            textComponent[0] = configTextComponent;
             for (TextComponent text : textComponents) {
-                if (internalCounter % 6 == 0)
-                    textComponent[(int) Math.floor(internalCounter / 6d)] = configTextComponent;
-                textComponent[(int) Math.floor(internalCounter / 6d)].addExtra(text);
+                int currentPage = (int) Math.floor(internalCounter / 6D);
+                if (textComponent[currentPage] == null)
+                    textComponent[currentPage] = new TextComponent();
+                textComponent[currentPage].addExtra(text);
                 internalCounter++;
             }
             return textComponent;

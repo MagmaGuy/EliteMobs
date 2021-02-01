@@ -11,7 +11,7 @@ public class LightningFaeConfig extends CustomBossConfigFields {
         super("lightning_fae",
                 EntityType.VEX.toString(),
                 true,
-                "&eLightning Fae",
+                "$eventBossLevel &eLightning Fae",
                 "dynamic",
                 0,
                 false,

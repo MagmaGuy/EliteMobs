@@ -11,7 +11,7 @@ public class IceFaeConfig extends CustomBossConfigFields {
         super("ice_fae",
                 EntityType.VEX.toString(),
                 true,
-                "&bIce Fae",
+                "$eventBossLevel &bIce Fae",
                 "dynamic",
                 0,
                 false,

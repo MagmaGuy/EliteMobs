@@ -11,7 +11,7 @@ public class EmberConfig extends CustomBossConfigFields {
         super("ember",
                 EntityType.BLAZE.toString(),
                 true,
-                "&cEmber",
+                "$reinforcementLevel &cEmber",
                 "dynamic",
                 0,
                 false,

@@ -265,6 +265,8 @@ public class EliteMobEntity {
             wolf.setBreed(false);
         }
 
+        this.getLivingEntity().setRemoveWhenFarAway(false);
+
         //Stop creation if the creation was cancelled in the spawn event
         return EntityTracker.registerEliteMob(this);
     }
@@ -292,7 +294,8 @@ public class EliteMobEntity {
                 .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + this.eliteLevel + "&2]&f"))
                 .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + this.eliteLevel + "&6〗&f"))
                 .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + this.eliteLevel + "&4』&f"))
-                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.eliteLevel + "&8〕&f");
+                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.eliteLevel + "&8〕&f")
+                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + this.eliteLevel + "&4」&f"));
         this.name = ChatColorConverter.convert(parsedName);
         this.getLivingEntity().setCustomName(this.name);
         livingEntity.setCustomNameVisible(DefaultConfig.alwaysShowNametags);
@@ -546,7 +549,6 @@ public class EliteMobEntity {
     public void setNewLivingEntity(Location location) {
         WorldGuardSpawnEventBypasser.forceSpawn();
         this.livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
-        this.livingEntity.setRemoveWhenFarAway(false);
         this.uuid = livingEntity.getUniqueId();
         if (customBossEntity != null)
             customBossEntity.silentCustomBossInitialization();
@@ -698,10 +700,8 @@ public class EliteMobEntity {
      * @param bool Whether the Elite Mob will unload when far away.
      */
     public void setPersistent(Boolean bool) {
-        this.getLivingEntity().setRemoveWhenFarAway(false);
         if (bool != null) {
             this.isPersistent = bool;
-            //    TrackedEntity.trackedEntities.get(getLivingEntity().getUniqueId()).removeWhenFarAway = !this.isPersistent;
         } else {
             this.isPersistent = false;
         }
