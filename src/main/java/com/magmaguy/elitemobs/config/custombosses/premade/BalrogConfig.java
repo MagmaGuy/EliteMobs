@@ -11,7 +11,7 @@ public class BalrogConfig extends CustomBossConfigFields {
         super("balrog",
                 EntityType.SILVERFISH.toString(),
                 true,
-                "&4Balrog",
+                "$eventBossLevel &4Balrog",
                 "dynamic",
                 0,
                 null,

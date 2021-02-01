@@ -8,7 +8,7 @@ public class ZombieFriendConfig extends CustomBossConfigFields {
         super("zombie_friends_friend",
                 EntityType.ZOMBIE.toString(),
                 true,
-                "&7Zombie Friend",
+                "$reinforcementLevel &7Zombie Friend",
                 "dynamic",
                 0,
                 false,

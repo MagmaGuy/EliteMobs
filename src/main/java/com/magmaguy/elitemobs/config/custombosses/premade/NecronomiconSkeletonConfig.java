@@ -8,7 +8,7 @@ public class NecronomiconSkeletonConfig extends CustomBossConfigFields {
         super("necronomicon_skeleton",
                 EntityType.SKELETON.toString(),
                 true,
-                "&7Summoned Skeleton",
+                "$reinforcementLevel &7Summoned Skeleton",
                 "dynamic",
                 0,
                 false,

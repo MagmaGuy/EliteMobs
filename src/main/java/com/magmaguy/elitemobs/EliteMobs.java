@@ -186,9 +186,17 @@ public class EliteMobs extends JavaPlugin {
         DungeonPackagerConfig.initializeConfigs();
         //Load Adventurer's Guild
         if (AdventurersGuildConfig.guildWorldIsEnabled) {
-            AdventurersGuildCommand.defineTeleportLocation();
-            CustomWorldLoading.startupWorldInitialization();
-            new NPCInitializer();
+            try {
+                CustomWorldLoading.startupWorldInitialization();
+                AdventurersGuildCommand.defineTeleportLocation();
+                if (AdventurersGuildConfig.guildWorldLocation == null)
+                    AdventurersGuildConfig.toggleGuildInstall();
+                new NPCInitializer();
+            } catch (Exception e) {
+                AdventurersGuildConfig.toggleGuildInstall();
+                new WarningMessage("Failed to initialize the Adventurer's Guild Hub! It is now disabled. You can try to" +
+                        "reenable it in /em setup");
+            }
         }
         //Load all regional bosses
         CustomBossesConfig.initializeConfigs();

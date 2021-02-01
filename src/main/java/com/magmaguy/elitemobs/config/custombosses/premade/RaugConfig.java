@@ -11,7 +11,7 @@ public class RaugConfig extends CustomBossConfigFields {
         super("raug",
                 EntityType.SILVERFISH.toString(),
                 true,
-                "&4Raug",
+                "$reinforcementLevel &4Raug",
                 "dynamic",
                 0,
                 false,

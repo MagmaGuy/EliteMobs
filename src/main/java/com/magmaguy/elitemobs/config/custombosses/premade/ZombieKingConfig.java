@@ -13,7 +13,7 @@ public class ZombieKingConfig extends CustomBossConfigFields {
         super("zombie_king",
                 EntityType.ZOMBIE.toString(),
                 true,
-                "&4Zombie King",
+                "$eventBossLevel &4Zombie King",
                 "dynamic",
                 30,
                 true,

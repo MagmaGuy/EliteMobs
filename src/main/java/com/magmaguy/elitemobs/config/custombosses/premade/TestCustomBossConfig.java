@@ -12,7 +12,7 @@ public class TestCustomBossConfig extends CustomBossConfigFields {
         super("test_boss",
                 EntityType.ZOMBIE.toString(),
                 true,
-                "&eTest boss",
+                "$eventBossLevel &eTest boss",
                 "dynamic",
                 10,
                 false,

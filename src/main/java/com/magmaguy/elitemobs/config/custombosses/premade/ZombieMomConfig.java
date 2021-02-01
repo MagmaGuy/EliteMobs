@@ -8,7 +8,7 @@ public class ZombieMomConfig extends CustomBossConfigFields {
         super("zombie_parents_mom",
                 EntityType.SKELETON.toString(),
                 true,
-                "&7Zombie Mom",
+                "$reinforcementLevel &7Zombie Mom",
                 "dynamic",
                 0,
                 false,
