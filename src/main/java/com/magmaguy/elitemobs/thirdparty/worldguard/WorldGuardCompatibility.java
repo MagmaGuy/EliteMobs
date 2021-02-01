@@ -149,6 +149,24 @@ public class WorldGuardCompatibility {
         }
     }
 
+    public static void protectWorldMinidugeonArea(Location location) {
+        try {
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionManager regions = container.get(BukkitAdapter.adapt(location.getWorld()));
+            ProtectedRegion global = regions.getRegion("__global__");
+
+            if (global == null) {
+                // But we want a __global__, so let's create one
+                global = new GlobalProtectedRegion("__global__");
+                regions.addRegion(global);
+            }
+
+            protectMinidungeonArea(global);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to protect minidungeon world area!");
+        }
+    }
+
     public static boolean protectMinidungeonArea(String regionName, Location location, Minidungeon minidungeon) {
         try {
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
