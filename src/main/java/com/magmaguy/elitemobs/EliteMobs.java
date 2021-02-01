@@ -6,6 +6,7 @@ package com.magmaguy.elitemobs;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.commands.CommandHandler;
+import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
@@ -102,11 +103,6 @@ public class EliteMobs extends JavaPlugin {
          */
         initializeConfigs();
 
-        /*
-        Load plugin worlds
-         */
-        CustomWorldLoading.startupWorldInitialization();
-
         if (worldguardIsEnabled)
             Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is enabled!");
         else
@@ -174,11 +170,6 @@ public class EliteMobs extends JavaPlugin {
          */
         //QuestRefresher.generateNewQuestMenus();
 
-        /*
-        Initialize NPCs
-         */
-        new NPCInitializer();
-
         // Small check to make sure that PlaceholderAPI is installed
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             Placeholders placeholders = new Placeholders();
@@ -193,6 +184,12 @@ public class EliteMobs extends JavaPlugin {
 
         //Load minidungeons, most of all load the worlds of minidungeons
         DungeonPackagerConfig.initializeConfigs();
+        //Load Adventurer's Guild
+        if (AdventurersGuildConfig.guildWorldIsEnabled) {
+            AdventurersGuildCommand.defineTeleportLocation();
+            CustomWorldLoading.startupWorldInitialization();
+            new NPCInitializer();
+        }
         //Load all regional bosses
         CustomBossesConfig.initializeConfigs();
         //Find the stats of bosses in minidungeons

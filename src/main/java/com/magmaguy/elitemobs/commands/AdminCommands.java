@@ -9,6 +9,7 @@ import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.admin.*;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
@@ -40,6 +41,21 @@ public class AdminCommands {
                 .senderType(Player.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> SetupHandler.setupMenuCommand((Player) commandContext.getSender())));
+
+        // /em setup done
+        manager.command(builder.literal("setup")
+                .literal("done")
+                .meta(CommandMeta.DESCRIPTION, "Stops showing messages on admin login.")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> {
+                    DefaultConfig.toggleSetupDone();
+                    if (DefaultConfig.setupDone)
+                        commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &aEliteMobs" +
+                                " will no longer send messages on login. You can do [/em setup done] again to revert this."));
+                    else commandContext.getSender().sendMessage(ChatColorConverter.convert("&8[EliteMobs] &aEliteMobs" +
+                            " will once again send messages on login. You can do [/em setup done] again to revert this."));
+                }));
 
         // /em setup minidungeon <minidungeonName>
         manager.command(builder.literal("setup")

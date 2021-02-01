@@ -12,7 +12,7 @@ public class BlacksmithConfig extends NPCsConfigFields {
                 "Greg",
                 "<Blacksmith>",
                 "TOOLSMITH",
-                "EliteMobs_adventurers_guild,285.5,93,261.5,179,0",
+                "em_adventurers_guild,285.5,93,261.5,179,0",
                 Arrays.asList(
                         "Welcome to our shop!",
                         "Sell your goods here!",
