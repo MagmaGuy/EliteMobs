@@ -15,7 +15,7 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                         "&6Credits: Realm of Lotheridon"),
                 Arrays.asList(
                         "catacombs_tier_5_evoker_guard_2.yml:2.5,0.5,13.5",
-                        "catacombs_tier_5_illusioner_guard_1.yml:-2.5,0.5,14.5",
+                        "catacombs_tier_5_illusioner_guard_1.yml:-2.5,2.5,16.5",
                         "catacombs_tier_15_boss.yml:0.5,-7.5,45.5",
                         "catacombs_tier_10_miniboss.yml:-8.5,-15.5,36.5"),
                 Arrays.asList(),
