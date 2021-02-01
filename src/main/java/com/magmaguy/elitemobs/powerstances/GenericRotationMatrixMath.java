@@ -81,6 +81,11 @@ public class GenericRotationMatrixMath {
     }
 
     public static Location rotateLocationYAxis(double rotationAngleInDegrees, Location anchorPoint, Vector relativeLocation) {
+        //todo: fix this
+        if (rotationAngleInDegrees == 90)
+            rotationAngleInDegrees = -90;
+        else if (rotationAngleInDegrees == -90)
+            rotationAngleInDegrees = 90;
         Vector rotatedVector = relativeLocation.clone().rotateAroundY(Math.toRadians(rotationAngleInDegrees)).add(anchorPoint.toVector());
         return new Location(anchorPoint.getWorld(), rotatedVector.getX(), rotatedVector.getY(), rotatedVector.getZ());
     }
