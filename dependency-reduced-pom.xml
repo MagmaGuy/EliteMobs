@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.magmaguy</groupId>
     <artifactId>EliteMobs</artifactId>
-    <version>7.2.31</version>
+    <version>7.2.32</version>
     <build>
         <defaultGoal>clean resources:resources package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
@@ -31,16 +31,16 @@
                 <configuration>
                     <relocations>
                         <relocation>
-              <pattern>org.bstats</pattern>
-              <shadedPattern>com.magmaguy.elitemobs</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>cloud.commandframework</pattern>
-              <shadedPattern>com.magmaguy.elitemobs.shaded.cloud</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>io.leangen.geantyref</pattern>
-              <shadedPattern>com.magmaguy.elitemobs.shaded.typetoken</shadedPattern>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>com.magmaguy.elitemobs</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>cloud.commandframework</pattern>
+                            <shadedPattern>com.magmaguy.elitemobs.shaded.cloud</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.leangen.geantyref</pattern>
+                            <shadedPattern>com.magmaguy.elitemobs.shaded.typetoken</shadedPattern>
             </relocation>
           </relocations>
         </configuration>

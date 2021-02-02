@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -266,7 +267,7 @@ public class EliteMobEntity {
             wolf.setBreed(false);
         }
 
-        this.getLivingEntity().setRemoveWhenFarAway(false);
+        this.getLivingEntity().setRemoveWhenFarAway(!isPersistent);
 
         //Stop creation if the creation was cancelled in the spawn event
         return EntityTracker.registerEliteMob(this);
@@ -551,7 +552,8 @@ public class EliteMobEntity {
         WorldGuardSpawnEventBypasser.forceSpawn();
         this.livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
         this.uuid = livingEntity.getUniqueId();
-        livingEntity.setRemoveWhenFarAway(false);
+        livingEntity.setRemoveWhenFarAway(!isPersistent);
+        new EliteEntityTracker(this, isPersistent);
         if (customBossEntity != null)
             customBossEntity.silentCustomBossInitialization();
     }
