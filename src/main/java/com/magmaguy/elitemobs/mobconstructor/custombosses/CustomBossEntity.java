@@ -500,7 +500,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     public void chunkLoad() {
         setNewLivingEntity(persistentLocation);
         //This bypasses the spawn event caller, since having it trigger the spawn message and so on every time a chunk gets loaded would be bad
-        new EliteEntityTracker(this, getPersistent());
+        new EliteEntityTracker(this, true);
         customBossTrail.restartTrails();
         setDisguise();
         if (regionalBossEntity != null)

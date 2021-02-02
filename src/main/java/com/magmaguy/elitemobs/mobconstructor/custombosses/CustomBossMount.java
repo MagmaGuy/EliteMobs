@@ -18,7 +18,6 @@ public class CustomBossMount {
             PreventMountExploit.bypass = true;
             livingEntity.addPassenger(customBossEntity.getLivingEntity());
             livingEntity.setPersistent(false);
-            livingEntity.setRemoveWhenFarAway(true);
 
         } catch (Exception ex) {
             //This runs when it's not an API entity
@@ -35,7 +34,6 @@ public class CustomBossMount {
                         mount.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 2);
-                mount.setPersistent(false);
                 return mount;
             }
 
