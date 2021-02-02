@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
-import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
@@ -499,8 +498,6 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     @Override
     public void chunkLoad() {
         setNewLivingEntity(persistentLocation);
-        //This bypasses the spawn event caller, since having it trigger the spawn message and so on every time a chunk gets loaded would be bad
-        new EliteEntityTracker(this, true);
         customBossTrail.restartTrails();
         setDisguise();
         if (regionalBossEntity != null)
