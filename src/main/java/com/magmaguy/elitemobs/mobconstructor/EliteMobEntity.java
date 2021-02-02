@@ -255,9 +255,8 @@ public class EliteMobEntity {
         livingEntity.getEquipment().setBootsDropChance(0);
 
         if (!VersionChecker.currentVersionIsUnder(1, 15))
-            if (livingEntity instanceof Bee) {
+            if (livingEntity instanceof Bee)
                 ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
-            }
 
         setMaxHealth();
 
@@ -552,6 +551,7 @@ public class EliteMobEntity {
         WorldGuardSpawnEventBypasser.forceSpawn();
         this.livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
         this.uuid = livingEntity.getUniqueId();
+        livingEntity.setRemoveWhenFarAway(false);
         if (customBossEntity != null)
             customBossEntity.silentCustomBossInitialization();
     }

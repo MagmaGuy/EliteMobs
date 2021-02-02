@@ -74,7 +74,6 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
                     customBossConfigFields.getFileName() + " seems to be inside of a solid block!");
 
         this.customBossEntity.regionalBossEntity = this;
-        this.customBossEntity.setPersistent(true);
 
         checkLeash();
         customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
