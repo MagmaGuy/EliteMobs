@@ -131,7 +131,10 @@ public class Minidungeon {
         checkIfBossesInstalled();
 
         if (isInstalled)
-            this.teleportLocation = dungeonPackagerConfigFields.getAnchorPoint().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+            this.teleportLocation = GenericRotationMatrixMath.rotateVectorYAxis(
+                    dungeonPackagerConfigFields.getRotation(),
+                    dungeonPackagerConfigFields.getAnchorPoint(),
+                    dungeonPackagerConfigFields.getTeleportOffset()).toLocation(dungeonPackagerConfigFields.getAnchorPoint().getWorld());
     }
 
     /**
@@ -391,7 +394,10 @@ public class Minidungeon {
             WorldGuardCompatibility.defineMinidungeon(realCorner1, realCorner2, dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getSchematicName(), this);
         }
 
-        teleportLocation = dungeonPackagerConfigFields.getAnchorPoint().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+        teleportLocation = GenericRotationMatrixMath.rotateVectorYAxis(
+                dungeonPackagerConfigFields.getRotation(),
+                dungeonPackagerConfigFields.getAnchorPoint(),
+                dungeonPackagerConfigFields.getTeleportOffset()).toLocation(player.getWorld());
 
         for (int i = 0; i < 20; i++)
             player.sendMessage("");

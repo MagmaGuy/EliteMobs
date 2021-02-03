@@ -238,7 +238,7 @@ public class AdminCommands {
                 .handler(commandContext -> RemoveCommand.remove((Player) commandContext.getSender())));
 
 
-        // /em debug
+        // /em debug <name>
         manager.command(builder.literal("debug", "d")
                 .argument(StringArgument.<CommandSender>newBuilder("argument").withSuggestionsProvider(((objectCommandContext, s) -> {
                             ArrayList<String> arrayList = new ArrayList<String>((Collection<? extends String>) regionalBosses.clone());
@@ -282,7 +282,7 @@ public class AdminCommands {
 
         // /em getloot
         manager.command(builder.literal("getloot")
-                .meta(CommandMeta.DESCRIPTION, "File name of the custom item")
+                .meta(CommandMeta.DESCRIPTION, "Opens a menu where you can get any Custom Loot")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> new GetLootMenu((Player) commandContext.getSender())));
@@ -363,7 +363,7 @@ public class AdminCommands {
         manager.command(builder.literal("killaggressive")
                 .argument(IntegerArgument.newBuilder("radius"),
                         ArgumentDescription.of("Distance to kill aggressive elite mobs in"))
-                .meta(CommandMeta.DESCRIPTION, "Kills all aggressive Elite Mobs.")
+                .meta(CommandMeta.DESCRIPTION, "Kills all aggressive Elite Mobs in a radius.")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> KillHandler.radiusKillAggressiveMobs((Player) commandContext.getSender(), commandContext.get("radius"))));
@@ -375,11 +375,11 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> KillHandler.killPassiveMobs(commandContext.getSender())));
 
-        // /em killpassive
+        // /em killpassive <radius>
         manager.command(builder.literal("killpassive")
                 .argument(IntegerArgument.newBuilder("radius"),
                         ArgumentDescription.of("Distance to kill aggressive elite mobs in"))
-                .meta(CommandMeta.DESCRIPTION, "Kills all passive Super Mobs")
+                .meta(CommandMeta.DESCRIPTION, "Kills all passive Super Mobs in a radius")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> KillHandler.radiusKillPassiveMobs((Player) commandContext.getSender(), commandContext.get("radius"))));
@@ -389,7 +389,7 @@ public class AdminCommands {
         manager.command(builder.literal("killtype")
                 .argument(EnumArgument.newBuilder(EntityType.class, "entityType"),
                         ArgumentDescription.of("Minecraft Entity Type to kill"))
-                .meta(CommandMeta.DESCRIPTION, "Kills all passive Super Mobs")
+                .meta(CommandMeta.DESCRIPTION, "Kills all elites of a specific type")
                 .senderType(CommandSender.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> KillHandler.killEntityType(commandContext.getSender(), commandContext.get("entityType"))));
@@ -400,7 +400,7 @@ public class AdminCommands {
                         ArgumentDescription.of("Minecraft Entity Type to kill"))
                 .argument(IntegerArgument.newBuilder("radius"),
                         ArgumentDescription.of("Distance to kill aggressive elite mobs in"))
-                .meta(CommandMeta.DESCRIPTION, "Kills all passive Super Mobs")
+                .meta(CommandMeta.DESCRIPTION, "Kills all elites of a specific type in a radius")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> KillHandler.radiusKillSpecificMobs((Player) commandContext.getSender(),
@@ -440,7 +440,7 @@ public class AdminCommands {
         manager.command(builder.literal("money")
                 .literal("addall")
                 .argument(IntegerArgument.newBuilder("amount"), ArgumentDescription.of("Amount of money to add"))
-                .meta(CommandMeta.DESCRIPTION, "Adds a set amount of money to all players")
+                .meta(CommandMeta.DESCRIPTION, "Adds a set amount of money to all online players")
                 .senderType(CommandSender.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> CurrencyCommandsHandler.addAllCommand(commandContext.getSender(),
@@ -507,6 +507,7 @@ public class AdminCommands {
         manager.command(builder.literal("unbind")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Unbinds a held soulbound item.")
                 .handler(commandContext -> {
                     ItemStack itemStack = ((Player) commandContext.getSender()).getInventory().getItemInMainHand();
                     if (ItemTagger.isEliteItem(itemStack))
@@ -519,6 +520,7 @@ public class AdminCommands {
                         ArgumentDescription.of("Minidungeon configuration file name"))
                 .senderType(Player.class)
                 .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Gets the relative coordinated to an installed dungeon.")
                 .handler(commandContext -> RelativeCoordinatesCommand.get((Player) commandContext.getSender(), commandContext.get("minidungeonFileName"))));
 
         // /em wallet <player>
@@ -526,6 +528,7 @@ public class AdminCommands {
                 .argument(onlinePlayers.copy(), ArgumentDescription.of("Player name"))
                 .senderType(CommandSender.class)
                 .permission("elitemobs.currency.check.others")
+                .meta(CommandMeta.DESCRIPTION, "Checks the currency of a specific player.")
                 .handler(commandContext -> CurrencyCommandsHandler.checkCommand(commandContext.getSender(), commandContext.get("onlinePlayer"))));
 
     }

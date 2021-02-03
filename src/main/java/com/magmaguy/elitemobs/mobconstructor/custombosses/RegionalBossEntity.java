@@ -63,10 +63,12 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
                 false);
 
         //todo: test this in intentionally protected areas
-        if (this.customBossEntity == null || customBossEntity.getLivingEntity() == null)
-            new WarningMessage("Regional boss " + customBossConfigFields.getFileConfiguration().getName() +
+        if (this.customBossEntity == null || customBossEntity.getLivingEntity() == null) {
+            new WarningMessage("Regional boss " + customBossConfigFields.getFile().getName() +
                     " failed to spawn in location " + spawnLocation.toString() + " ! Does the region prevent mobs" +
                     " from spawning?");
+            return;
+        }
 
         //Warn admins about bad spawn location
         if (!spawnLocation.getBlock().isPassable())
