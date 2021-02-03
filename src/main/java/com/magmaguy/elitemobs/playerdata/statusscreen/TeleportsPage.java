@@ -56,11 +56,11 @@ public class TeleportsPage {
             textComponent[0] = configTextComponent;
             return textComponent;
         } else {
-            TextComponent[] textComponent = new TextComponent[(int) Math.floor(counter / 6D) + 1];
+            TextComponent[] textComponent = new TextComponent[(int) Math.floor(counter / 10D) + 1];
             int internalCounter = 0;
             textComponent[0] = configTextComponent;
             for (TextComponent text : textComponents) {
-                int currentPage = (int) Math.floor(internalCounter / 6D);
+                int currentPage = (int) Math.floor(internalCounter / 10D);
                 if (textComponent[currentPage] == null)
                     textComponent[currentPage] = new TextComponent();
                 textComponent[currentPage].addExtra(text);

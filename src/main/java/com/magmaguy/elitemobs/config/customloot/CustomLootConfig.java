@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.customloot;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.customloot.premade.*;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -103,9 +104,14 @@ public class CustomLootConfig {
      * @return
      */
     private static FileConfiguration initializeConfiguration(File file) {
-        FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        CustomLootConfigFields.addCustomLootConfigField(new CustomLootConfigFields(file.getName(), fileConfiguration));
-        return fileConfiguration;
+        try {
+            FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
+            CustomLootConfigFields.addCustomLootConfigField(new CustomLootConfigFields(file.getName(), fileConfiguration));
+            return fileConfiguration;
+        } catch (Exception e) {
+            new WarningMessage("Warning: Custom Item " + file.getName() + " has an invalid configuration file and has therefore failed to load!");
+            return null;
+        }
     }
 
 
