@@ -25,7 +25,7 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                 "em_catacombs.schem",
                 null,
                 true,
-                new Vector(-13, -16, 0),
+                new Vector(13, -16, 0),
                 new Vector(-18, 17, 52),
                 new Vector(0, 0, 0),
                 null,

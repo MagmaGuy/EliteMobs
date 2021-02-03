@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.*;
 import me.libraryaddict.disguise.disguisetypes.watchers.PlayerWatcher;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 public class DisguiseEntity {
@@ -91,6 +92,7 @@ public class DisguiseEntity {
     }
 
     public static void setDisguiseNameVisibility(boolean disguiseNameVisibility, Entity entity) {
+        if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
         Disguise disguise = DisguiseAPI.getDisguise(entity);
         if (disguise == null) return;
         if (!(disguise.getWatcher() instanceof PlayerWatcher)) return;

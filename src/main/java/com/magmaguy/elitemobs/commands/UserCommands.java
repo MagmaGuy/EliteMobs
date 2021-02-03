@@ -132,7 +132,7 @@ public class UserCommands {
 
         // /em rank
         manager.command(builder.literal("checktier")
-                .meta(CommandMeta.DESCRIPTION, "Checks your equipped ELiteMobs gear tier.")
+                .meta(CommandMeta.DESCRIPTION, "Checks your equipped EliteMobs gear tier.")
                 .senderType(Player.class)
                 .handler(commandContext -> {
                     if (DefaultConfig.otherCommandsLeadToEMStatusMenu)
@@ -143,7 +143,7 @@ public class UserCommands {
         // /em checktier <username>
         manager.command(builder.literal("checktier")
                 .argument(onlinePlayers.copy(), ArgumentDescription.of("Player name"))
-                .meta(CommandMeta.DESCRIPTION, "Checks the equipped ELiteMobs gear tier of another player.")
+                .meta(CommandMeta.DESCRIPTION, "Checks the equipped EliteMobs gear tier of another player.")
                 .senderType(CommandSender.class)
                 .permission("elitemobs.checktier.others")
                 .handler(commandContext -> new CheckTierOthersCommand(commandContext.getSender(), commandContext.get("onlinePlayer"))));
@@ -184,7 +184,7 @@ public class UserCommands {
 
         // /em spawntp
         manager.command(builder.literal("spawntp")
-                .meta(CommandMeta.DESCRIPTION, "Teleports players to Lairs, Minidungeons and Dungeons.")
+                .meta(CommandMeta.DESCRIPTION, "Teleports players to the server spawn.")
                 .senderType(Player.class)
                 .permission("elitemobs.spawntp")
                 .handler(commandContext -> {

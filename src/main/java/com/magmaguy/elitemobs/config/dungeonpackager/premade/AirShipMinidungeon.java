@@ -92,7 +92,7 @@ public class AirShipMinidungeon extends DungeonPackagerConfigFields {
                 true,
                 new Vector(38, -2, 0),
                 new Vector(-40, 70, 146),
-                new Vector(0, 23, -35),
+                new Vector(12, 14, 56),
                 0D,
                 0D,
                 0,
