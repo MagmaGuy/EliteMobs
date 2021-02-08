@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;

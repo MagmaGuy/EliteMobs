@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.items.EliteItemLore;
+import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.BuyOrSellMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.CustomShopMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.items.EliteItemLore;
-import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.utils.ObfuscatedStringHandler;

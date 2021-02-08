@@ -1,10 +1,10 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;

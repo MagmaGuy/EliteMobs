@@ -4,11 +4,11 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.utils.*;
 import org.bukkit.Location;
@@ -108,8 +108,7 @@ public class TreasureChest {
         try {
             location.getChunk().load();
         } catch (Exception ex) {
-            new WarningMessage("Failed to load location " + location.toString() + " - this location can not be loaded");
-            new WarningMessage("Does the world " + location.getWorld() + " exist? Did the world name change or has the world been removed?");
+            new InfoMessage("Location " + customTreasureChestConfigFields.getLocationString() + " is not loaded, so a treasure chest will not be placed!");
             return;
         }
 

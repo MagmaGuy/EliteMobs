@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.utils.VersionChecker;

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
@@ -11,18 +12,19 @@ import cloud.commandframework.paper.PaperCommandManager;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.items.ShareItem;
+import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.items.ShareItem;
-import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -44,10 +46,18 @@ public class CommandHandler {
      */
 
     public CommandHandler() {
+        Function<CommandTree, CommandExecutionCoordinator> commandExecutionCoordinator = null;
+        try {
+            Class<?> c = Class.forName("cloud.commandframework.execution.CommandExecutionCoordinator");
+            Method method = c.getDeclaredMethod("simpleCoordinator");
+            commandExecutionCoordinator = (Function<CommandTree, CommandExecutionCoordinator>) method.invoke(Function.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         try {
             manager = new PaperCommandManager(
                     /* Owning plugin */ MetadataHandler.PLUGIN,
-                    /* Coordinator function */ CommandExecutionCoordinator.simpleCoordinator(),
+                    /* Coordinator function */ commandExecutionCoordinator,
                     /* Command Sender -> C */ Function.identity(),
                     /* C -> Command Sender */ Function.identity()
             );

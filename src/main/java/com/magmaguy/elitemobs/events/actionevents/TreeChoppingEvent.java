@@ -2,11 +2,11 @@ package com.magmaguy.elitemobs.events.actionevents;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.events.premade.FaeEventConfig;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.elitemobs.config.events.premade.FaeEventConfig;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.ActionDynamicBossLevelConstructor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;

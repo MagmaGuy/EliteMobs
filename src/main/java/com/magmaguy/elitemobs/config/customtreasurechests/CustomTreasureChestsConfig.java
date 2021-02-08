@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config.customtreasurechests;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.customtreasurechests.premade.TestCustomTreasureChestConfig;
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 

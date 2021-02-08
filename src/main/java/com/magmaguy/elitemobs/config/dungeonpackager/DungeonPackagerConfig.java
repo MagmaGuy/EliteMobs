@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.dungeonpackager.premade.*;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

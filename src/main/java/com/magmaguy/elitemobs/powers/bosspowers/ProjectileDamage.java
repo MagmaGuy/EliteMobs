@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;

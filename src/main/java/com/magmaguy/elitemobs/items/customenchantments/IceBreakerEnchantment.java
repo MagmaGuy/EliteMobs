@@ -30,7 +30,7 @@ public class IceBreakerEnchantment extends CustomEnchantment {
     }
 
     private static void freezeBlocks(Block block, ItemStack itemStack) {
-        switch (CustomEnchantment.getCustomEnchantmentLevel(itemStack, key)) {
+        switch (getCustomEnchantmentLevel(itemStack, key)) {
             case 1:
                 freezeBlocks1(block, itemStack);
                 break;

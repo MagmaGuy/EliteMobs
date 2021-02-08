@@ -5,9 +5,13 @@ package com.magmaguy.elitemobs;
  */
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.config.configurationimporter.ConfigurationImporter;
+import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
+import com.magmaguy.elitemobs.mobs.passive.PassiveEliteMobDeathHandler;
+import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.commands.CommandHandler;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
-import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -34,9 +38,6 @@ import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
-import com.magmaguy.elitemobs.mobs.passive.EggRunnable;
-import com.magmaguy.elitemobs.mobs.passive.PassiveEliteMobDeathHandler;
-import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
@@ -46,6 +47,7 @@ import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -55,12 +57,15 @@ import com.magmaguy.elitemobs.worlds.CustomWorldLoading;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.CommandMap;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,17 +88,16 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("| |___| |_____| |_  | | | |___| |  | \\ \\_/ / |_/ //\\__/ /");
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
         Bukkit.getLogger().info("By MagmaGuy");
-        if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < Double.MAX_VALUE) {
-            Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", Double.MAX_VALUE);
+        if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < 100000000) {
+            Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", 100000000);
             try {
-                File file = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath().replace("plugins/EliteMobs", "") + "spigot.yml");
+                File file = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath().replace("plugins/EliteMobs", "") + "spigot.yml").normalize().toString());
                 Bukkit.getServer().spigot().getConfig().save(file);
                 new InfoMessage("New default max health set correctly!");
             } catch (IOException e) {
-                new WarningMessage("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + Double.MAX_VALUE);
+                new WarningMessage("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + 100000000);
             }
         }
-
 
         //Remove entities that should not exist
         CrashFix.startupCheck();
@@ -181,6 +185,13 @@ public class EliteMobs extends JavaPlugin {
         metrics = new Metrics(this, 1081);
         //Initialize custom charts
         new CustomCharts();
+
+        //Imports custom configurations and mindungeons from the import folder
+        ConfigurationImporter.initializeConfigs();
+
+        //Import custom items after potentially importing new items
+        CustomLootConfig.initializeConfigs();
+        CustomItem.initializeCustomItems();
 
         //Load minidungeons, most of all load the worlds of minidungeons
         DungeonPackagerConfig.initializeConfigs();
@@ -280,8 +291,6 @@ public class EliteMobs extends JavaPlugin {
         MenusConfig.initializeConfigs();
         PowersConfig.initializeConfigs();
         MobPropertiesConfig.initializeConfigs();
-        CustomLootConfig.initializeConfigs();
-        CustomItem.initializeCustomItems();
         CustomEnchantment.initializeCustomEnchantments();
         CustomTreasureChestsConfig.initializeConfigs();
         TreasureChest.initializeTreasureChest();

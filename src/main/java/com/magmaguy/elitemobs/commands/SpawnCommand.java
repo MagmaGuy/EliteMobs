@@ -77,6 +77,24 @@ public class SpawnCommand {
 
     }
 
+    public static void spawnCustomBossCommand(CommandSender commandSender,
+                                              String fileName,
+                                              String world,
+                                              Vector coords,
+                                              int level) {
+        try {
+            Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
+            CustomBossEntity.constructCustomBoss(fileName, location, level);
+        } catch (Exception e) {
+            commandSender.sendMessage("[EliteMobs] World argument was not valid!");
+        }
+
+    }
+
+    public static void spawnCustomBossCommand(Player player, String fileName, int level) {
+        CustomBossEntity.constructCustomBoss(fileName, getLocation(player), level);
+    }
+
     public static void spawnCustomBossCommand(Player player, String fileName) {
         CustomBossEntity.constructCustomBoss(fileName, getLocation(player));
     }

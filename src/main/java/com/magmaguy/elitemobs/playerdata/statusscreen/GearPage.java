@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
-import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.items.ShareItem;
+import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import net.md_5.bungee.api.chat.ClickEvent;

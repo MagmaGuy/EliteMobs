@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;

@@ -2,11 +2,11 @@ package com.magmaguy.elitemobs.commands.setup;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
-import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;

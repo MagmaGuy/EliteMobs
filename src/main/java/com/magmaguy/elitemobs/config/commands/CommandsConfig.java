@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config.commands;
 
-import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.commands.premade.CheckTierConfig;
 import com.magmaguy.elitemobs.config.commands.premade.CheckTierOthersConfig;
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;

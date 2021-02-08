@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
-import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;

@@ -23,7 +23,7 @@ public class AbstractRegionalEntity {
     public static void initialize(CustomBossConfigFields customBossConfigFields) {
         List<String> locations = customBossConfigFields.getFileConfiguration().getStringList("spawnLocations");
         if (locations.size() < 1) {
-            new WarningMessage("Regional / World boss does not have a set location! It will not spawn. File name: " + customBossConfigFields.getFile().getName());
+            new InfoMessage(customBossConfigFields.getFile().getName() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
             return;
         }
         for (String string : locations)
@@ -178,6 +178,9 @@ public class AbstractRegionalEntity {
         addAbstractRegionalEntity(this);
     }
 
+    //This is used to make sure that console doesn't get spammed a billion times with the same world isn't present notification
+    public static ArrayList<String> worldNotifications = new ArrayList<>();
+
     /**
      * Parses the locations / respawn cooldown strings to be usable from in-game. The output does not always result in valid
      * locations, as this will store theoretical locations to be used later if the world loads.
@@ -199,9 +202,12 @@ public class AbstractRegionalEntity {
                 this.ticksBeforeRespawn = parseTicksBeforeRespawnFromConfig();
             }
 
-            if (Bukkit.getWorld(worldName) == null)
-                new InfoMessage("World " + worldName + " is not loaded, so a regional boss in " + fileConfiguration.getName() + " will not spawn!");
-            else
+            if (Bukkit.getWorld(worldName) == null) {
+                if (!worldNotifications.contains(worldName)) {
+                    worldNotifications.add(worldName);
+                    new InfoMessage("World " + worldName + " is not loaded, so a regional boss in " + fileConfiguration.getName() + " will not spawn!");
+                }
+            } else
                 this.spawnLocation = new Location(Bukkit.getWorld(worldName), x, y, z, pitch, yaw);
 
         } catch (Exception ex) {

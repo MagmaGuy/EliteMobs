@@ -2,10 +2,10 @@ package com.magmaguy.elitemobs.powers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;

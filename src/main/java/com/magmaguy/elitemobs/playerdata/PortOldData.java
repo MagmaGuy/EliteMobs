@@ -108,8 +108,8 @@ public class PortOldData {
 
             try {
                 Statement statement = null;
-                statement = com.magmaguy.elitemobs.playerdata.PlayerData.getConnection().createStatement();
-                String sql = "INSERT INTO " + com.magmaguy.elitemobs.playerdata.PlayerData.player_data_table_name +
+                statement = PlayerData.getConnection().createStatement();
+                String sql = "INSERT INTO " + PlayerData.player_data_table_name +
                         " (PlayerUUID, DisplayName, Currency, GuildPrestigeLevel, GuildMaxLevel, GuildActiveLevel) " +
                         //identifier
                         "VALUES ('" + uuid.toString() + "'," +
@@ -125,8 +125,8 @@ public class PortOldData {
                         " " + playerActiveGuildRank + ");";
                 statement.executeUpdate(sql);
                 statement.close();
-                com.magmaguy.elitemobs.playerdata.PlayerData.getConnection().commit();
-                com.magmaguy.elitemobs.playerdata.PlayerData.getConnection().close();
+                PlayerData.getConnection().commit();
+                PlayerData.getConnection().close();
             } catch (Exception e) {
                 new WarningMessage("Warning: Failed to write values from old config files to new database system. Tell the dev!");
                 System.err.println(e.getClass().getName() + ": " + e.getMessage());

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
-import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
