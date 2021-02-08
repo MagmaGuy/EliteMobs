@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
-import com.magmaguy.elitemobs.economy.EconomyHandler;
 import org.bukkit.entity.Player;
 
 import java.io.Serializable;

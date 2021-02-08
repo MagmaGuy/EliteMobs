@@ -1,10 +1,10 @@
 package com.magmaguy.elitemobs.events.timedevents;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.EventWorldFilter;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import org.bukkit.Location;
 import org.bukkit.WorldType;
 import org.bukkit.entity.EntityType;

@@ -1,13 +1,14 @@
 package com.magmaguy.elitemobs.powers.miscellaneouspowers;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -100,7 +101,7 @@ public class Taunt extends MinorPower implements Listener {
     public static void nametagProcessor(Entity entity, List<String> list) {
         int randomizedKey = ThreadLocalRandom.current().nextInt(list.size());
         String tempName = list.get(randomizedKey);
-        entity.setCustomName(convert(tempName));
+        entity.setCustomName(ChatColorConverter.convert(tempName));
         new BukkitRunnable() {
 
             @Override

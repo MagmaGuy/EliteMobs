@@ -8,18 +8,18 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.menus.GetLootMenu;
+import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.commands.admin.*;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
-import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.menus.GetLootMenu;
 import com.magmaguy.elitemobs.powers.ElitePower;
-import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -164,6 +164,19 @@ public class AdminCommands {
                         (Player) commandContext.getSender(),
                         commandContext.get("fileName"))));
 
+        // /em spawncustomlevel <fileName> <level>
+        manager.command(builder.literal("spawncustomlevel", "spawncustombosslevel")
+                .argument(StringArgument.<CommandSender>newBuilder("fileName").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
+                        ArgumentDescription.of("Custom Boss configuration file name"))
+                .argument(IntegerArgument.newBuilder("eliteLevel"), ArgumentDescription.of("Elite Mob level"))
+                .meta(CommandMeta.DESCRIPTION, "Spawns a Custom Boss at a specific level.")
+                .senderType(Player.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> SpawnCommand.spawnCustomBossCommand(
+                        (Player) commandContext.getSender(),
+                        commandContext.get("fileName"),
+                        commandContext.get("eliteLevel"))));
+
         // /em spawnlocationcustom <filename> <worldName> <x> <y> <z>
         manager.command(builder.literal("spawnlocationcustom", "spawnlocationcustomboss")
                 .argument(StringArgument.<CommandSender>newBuilder("fileName").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
@@ -183,6 +196,28 @@ public class AdminCommands {
                         commandContext.get("fileName"),
                         commandContext.get("worldName"),
                         commandContext.get("coords"))));
+
+        // /em spawnlocationcustomlevel <filename> <level> <worldName> <x> <y> <z>
+        manager.command(builder.literal("spawnlocationcustomlevel", "spawnlocationcustombosslevel")
+                .argument(StringArgument.<CommandSender>newBuilder("fileName").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
+                        ArgumentDescription.of("Custom Boss configuration file name"))
+                .argument(IntegerArgument.newBuilder("eliteLevel"), ArgumentDescription.of("Elite Mob level"))
+                .argument(StringArgument.newBuilder("worldName"), ArgumentDescription.of("Name of the world"))
+                .argumentTriplet("coords",
+                        TypeToken.get(Vector.class),
+                        Triplet.of("x", "y", "z"),
+                        Triplet.of(Integer.class, Integer.class, Integer.class),
+                        (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(), triplet.getThird()),
+                        ArgumentDescription.of("Coordinates"))
+                .meta(CommandMeta.DESCRIPTION, "Spawns an Elite based on the entity type and location.")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> SpawnCommand.spawnCustomBossCommand(
+                        commandContext.getSender(),
+                        commandContext.get("fileName"),
+                        commandContext.get("worldName"),
+                        commandContext.get("coords"),
+                        commandContext.get("eliteLevel"))));
 
         // /em spawnsuper <EntityType>
         manager.command(builder.literal("spawnsuper", "spawnsupermob")

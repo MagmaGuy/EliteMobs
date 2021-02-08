@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
+import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -10,10 +11,8 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.powers.ElitePower;
-import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.CommandRunner;
@@ -287,13 +286,16 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             for (Player player : getLivingEntity().getWorld().getPlayers())
                 player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
         if (customBossConfigFields.getAnnouncementPriority() < 3) return;
-        new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
+        //todo: fix new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
     }
 
     private void setDisguise() {
         if (customBossConfigFields.getDisguise() == null) return;
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
-        DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity(), customBossConfigFields);
+        try{
+        DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity(), customBossConfigFields);} catch (Exception ex){
+            new WarningMessage("Failed to load LibsDisguises disguise correctly!");
+        }
         super.setName(customBossConfigFields.getName());
     }
 

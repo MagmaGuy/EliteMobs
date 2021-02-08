@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.config.menus.premade;
 
+import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
-import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class PlayerStatusMenuConfig extends MenusConfigFields {

@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
 import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Chunk;

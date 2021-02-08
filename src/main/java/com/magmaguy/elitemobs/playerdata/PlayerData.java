@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.playerdata;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.quests.EliteQuest;
 import com.magmaguy.elitemobs.quests.PlayerQuests;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -477,7 +478,7 @@ public class PlayerData {
         Statement statement = null;
 
         try {
-            System.out.println("Opened database successfully");
+            new InfoMessage("Opened database successfully");
 
             statement = getConnection().createStatement();
             String sql = "CREATE TABLE IF NOT EXISTS " + player_data_table_name +

@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
-import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import com.magmaguy.elitemobs.mobs.passive.PassiveEliteMobDeathHandler;
+import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;

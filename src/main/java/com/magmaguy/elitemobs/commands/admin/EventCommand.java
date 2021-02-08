@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.commands.admin;
 
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
 import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

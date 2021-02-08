@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.entitytracker.TrackedEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -15,8 +17,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-
-import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
 
 /**
  * Created by MagmaGuy on 01/05/2017.
@@ -30,7 +30,7 @@ public class StatsCommand {
 
         HashMap<EntityType, Integer> entitiesCounted = new HashMap<>();
 
-        for (World world : validWorldList)
+        for (World world : EliteMobs.validWorldList)
             for (LivingEntity livingEntity : world.getLivingEntities())
                 if (EntityTracker.isEliteMob(livingEntity)) {
                     aggressiveCount++;
