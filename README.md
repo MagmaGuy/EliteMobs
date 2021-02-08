@@ -99,15 +99,15 @@ Used for listening to moments when players are damaged by an Elite. Uses:
 
 ## To add new item enchantments:
 1) Add new enchantment class to the `com.magmaguy.elitemobs.config.enchantments.premade` **extending** `EnchantmentsConfigFields` to initialize create its config file (naming convention: [EnchantmentName]Config)
-2) Initialize enchantment in `com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment` to initialize the config file
+2) Initialize enchantment in `CustomEnchantment` to initialize the config file
 3) Add enchantment class to `com.magmaguy.elitemobs.items.customenchantments` **extending** `CustomEnchantment` to write the logic for the enchantment (naming convention [EnchantmentName]Enchantment)
 4) Add a public static String called "key" to register using the ItemTagger class for persistent enchantment tracking
-5) Add an entry to the parseEnchantments() method in `com.magmaguy.elitemobs.items.customitems.CustomItem` so custom items detect it correctly
-6) (Alternative) Add an entry to `generateCustomEnchantments()` method in `com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator` if the enchantment should appear in procedurally generated items
+5) Add an entry to the parseEnchantments() method in `CustomItem` so custom items detect it correctly
+6) (Alternative) Add an entry to `generateCustomEnchantments()` method in `EnchantmentGenerator` if the enchantment should appear in procedurally generated items
 
 Note:
-- Don't forget to register events in `com.magmaguy.elitemobs.EventsRegistrer` if the part with logic in it requires events.
-- Don't forget to use the damage bypass if the power is supposed to deal custom damage. Damage dealt by the player to an elite can be overwritten in `com.magmaguy.elitemobs.combatsystem.CombatSystem` through the static "bypass" boolean field - it makes the next damage dealt to the elite use the raw damage value. For correctly assigning damage, use Bukkit's `Damageable#damage(double amount, Entity source)` and assign the source to your player.
+- Don't forget to register events in `EventsRegistrer` if the part with logic in it requires events.
+- Don't forget to use the damage bypass if the power is supposed to deal custom damage. Damage dealt by the player to an elite can be overwritten in `CombatSystem` through the static "bypass" boolean field - it makes the next damage dealt to the elite use the raw damage value. For correctly assigning damage, use Bukkit's `Damageable#damage(double amount, Entity source)` and assign the source to your player.
 
 ## To add new powers to elites:
 

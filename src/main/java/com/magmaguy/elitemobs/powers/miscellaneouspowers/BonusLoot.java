@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.powers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.items.LootTables;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -1,14 +1,14 @@
 package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
+import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
+import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.events.premade.DeadMoonEventConfig;
 import com.magmaguy.elitemobs.config.events.premade.MeteorEventConfig;
 import com.magmaguy.elitemobs.config.events.premade.SmallTreasureGoblinEventConfig;
-import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
-import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
-import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;

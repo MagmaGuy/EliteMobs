@@ -1,5 +1,9 @@
 package com.magmaguy.elitemobs;
 
+import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
+import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.api.*;
@@ -16,6 +20,7 @@ import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.commands.setup.SetupMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
@@ -27,7 +32,6 @@ import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
-import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
@@ -37,9 +41,6 @@ import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
-import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
-import com.magmaguy.elitemobs.npcs.NPCInteractions;
-import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
@@ -252,14 +253,14 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new SmallTreasureGoblinEvent(), plugin);
         pluginManager.registerEvents(new MeteorEvent(), plugin);
 
-        if (com.magmaguy.elitemobs.config.events.EventsConfig.getEventFields("kraken.yml").isEnabled()) {
+        if (EventsConfig.getEventFields("kraken.yml").isEnabled()) {
             pluginManager.registerEvents(new Kraken(), plugin);
             pluginManager.registerEvents(new KrakenEvent(), plugin);
         }
-        if (com.magmaguy.elitemobs.config.events.EventsConfig.getEventFields("balrog.yml").isEnabled()) {
+        if (EventsConfig.getEventFields("balrog.yml").isEnabled()) {
             pluginManager.registerEvents(new MiningEvent(), plugin);
         }
-        if (com.magmaguy.elitemobs.config.events.EventsConfig.getEventFields("fae.yml").isEnabled()) {
+        if (EventsConfig.getEventFields("fae.yml").isEnabled()) {
             pluginManager.registerEvents(new TreeChoppingEvent(), plugin);
         }
 

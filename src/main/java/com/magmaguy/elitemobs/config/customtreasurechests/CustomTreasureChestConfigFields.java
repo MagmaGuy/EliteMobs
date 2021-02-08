@@ -25,6 +25,7 @@ public class CustomTreasureChestConfigFields {
     private final String chestMaterial;
     private final String facing;
     private final int chestTier;
+    private String locationString;
     private Location location;
     private final String dropStyle;
     private final int restockTimer;
@@ -114,6 +115,7 @@ public class CustomTreasureChestConfigFields {
         if (location == null) {
             new InfoMessage("Custom Treasure Chest in file " + fileName + " does not have a defined location! It will not spawn.");
         } else {
+            this.locationString = configuration.getString("location");
             this.location = ConfigurationLocation.deserialize(configuration.getString("location"));
         }
 
@@ -153,6 +155,10 @@ public class CustomTreasureChestConfigFields {
 
     public int getChestTier() {
         return this.chestTier;
+    }
+
+    public String getLocationString(){
+        return locationString;
     }
 
     public Location getLocation() {

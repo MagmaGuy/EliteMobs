@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.commands.combat;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
-import com.magmaguy.elitemobs.config.commands.premade.CheckTierConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.config.commands.premade.CheckTierConfig;
 import org.bukkit.entity.Player;
 
 public class CheckTierCommand {

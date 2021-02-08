@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.events.mobs;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.events.premade.KrakenEventConfig;
 import com.magmaguy.elitemobs.powers.ProjectileLocationGenerator;
+import com.magmaguy.elitemobs.config.events.premade.KrakenEventConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;

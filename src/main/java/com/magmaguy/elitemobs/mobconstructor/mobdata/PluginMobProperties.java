@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata;
 
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import org.bukkit.entity.EntityType;
 
 public abstract class PluginMobProperties {

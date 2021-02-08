@@ -2,12 +2,12 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
@@ -79,14 +79,14 @@ public class SellMenu extends EliteMenu implements Listener {
         }
 
         player.openInventory(sellInventory);
-        EliteMenu.createEliteMenu(player, sellInventory, inventories);
+        createEliteMenu(player, sellInventory, inventories);
 
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
-        if (!EliteMenu.isEliteMenu(event, inventories)) return;
+        if (!isEliteMenu(event, inventories)) return;
         event.setCancelled(true);
 
         Player player = (Player) event.getWhoClicked();
@@ -209,13 +209,13 @@ public class SellMenu extends EliteMenu implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (!EliteMenu.onInventoryClose(event, inventories)) return;
+        if (!onInventoryClose(event, inventories)) return;
         cancel(event.getView().getBottomInventory(), event.getView().getTopInventory());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        EliteMenu.onPlayerQuit(event, inventories);
+        onPlayerQuit(event, inventories);
     }
 
 }

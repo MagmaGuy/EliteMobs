@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
