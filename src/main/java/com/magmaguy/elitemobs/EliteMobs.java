@@ -165,11 +165,6 @@ public class EliteMobs extends JavaPlugin {
             this.getServer().getPluginManager().registerEvents(new VersionWarner(), this);
 
         /*
-        Initialize anticheat block values
-         */
-        NonSolidBlockTypes.initializeNonSolidBlocks();
-
-        /*
         Launch quests
          */
         //QuestRefresher.generateNewQuestMenus();
@@ -298,6 +293,7 @@ public class EliteMobs extends JavaPlugin {
         CommandsConfig.initializeConfigs();
         EventsConfig.initializeConfigs();
         DiscordSRVConfig.initializeConfig();
+        ReadMeForTranslationsConfig.initialize();
     }
 
     public static void worldScanner() {

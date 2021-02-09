@@ -1,3 +1,7 @@
+[![Crowdin](https://badges.crowdin.net/elitemobs/localized.svg)](https://crowdin.com/project/elitemobs)
+
+[![BStats](https://bstats.org/signatures/bukkit/EliteMobs.svg)](https://bstats.org/plugin/bukkit/EliteMobs/1081)
+
 Thank you for using EliteMobs!
 
 This plugin is made to both work from the very start with no additional config work and to be highly customizable.
