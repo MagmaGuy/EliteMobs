@@ -108,7 +108,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
         potentialLocation.add(potentialLocation.getDirection().normalize()).setY(location.getY());
 
-        if (NonSolidBlockTypes.isNonSolidBlock(potentialLocation.getBlock().getType()))
+        if (NonSolidBlockTypes.isPassthrough(potentialLocation.getBlock().getType()))
             this.spawnLocation = potentialLocation;
         else
             this.spawnLocation = location.clone();

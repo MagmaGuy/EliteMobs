@@ -49,7 +49,7 @@ public class ArrowFireworks extends MinorPower implements Listener {
             for (int i = 0; i < 5; i++) {
                 Vector randomizedVector = new Vector(ThreadLocalRandom.current().nextInt(9) - 4, 0, ThreadLocalRandom.current().nextInt(9) - 4);
                 newLocation = centeredLocation.clone().add(randomizedVector);
-                if (NonSolidBlockTypes.isNonSolidBlock(newLocation.getBlock().getType())) {
+                if (NonSolidBlockTypes.isPassthrough(newLocation.getBlock().getType())) {
                     validBlockFound = true;
                     break;
                 }

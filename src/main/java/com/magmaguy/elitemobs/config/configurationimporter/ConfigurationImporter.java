@@ -2,8 +2,10 @@ package com.magmaguy.elitemobs.config.configurationimporter;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.UnzipFile;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -15,7 +17,7 @@ import java.nio.file.StandardCopyOption;
 public class ConfigurationImporter {
 
     public static void initializeConfigs() {
-        Path configurationsPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getPath());
+        Path configurationsPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath());
         if (!Files.isDirectory(Paths.get(configurationsPath.normalize().toString() + "/imports"))) {
             try {
                 Files.createDirectory(Paths.get(configurationsPath.normalize().toString() + "/imports"));
@@ -32,7 +34,9 @@ public class ConfigurationImporter {
         for (File zippedFile : (new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/imports")).listFiles()) {
             File unzippedFile;
             try {
-                unzippedFile = UnzipFile.run(zippedFile.getName());
+                if (zippedFile.getName().contains(".zip"))
+                    unzippedFile = UnzipFile.run(zippedFile.getName());
+                else unzippedFile = zippedFile;
             } catch (Exception e) {
                 new WarningMessage("Failed to unzip config file " + zippedFile.getName() + " ! Tell the dev!");
                 e.printStackTrace();
@@ -57,10 +61,10 @@ public class ConfigurationImporter {
                             moveWorlds(file);
                             break;
                         case "schematics":
-                            if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
-                                moveFiles(file,  Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + "/WorldEdit/schematics"));
-                            } else if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
+                            if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
                                 moveFiles(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + "/FastAsyncWorldEdit/schematics"));
+                            } else if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
+                                moveFiles(file, Paths.get(file.getParentFile().getParentFile().getParentFile().getParentFile().toString() + "/WorldEdit/schematics"));
                             } else
                                 new WarningMessage("You need WorldGuard or FastAsyncWorldEdit to install schematic-based minidungeons!");
                             break;
@@ -86,17 +90,26 @@ public class ConfigurationImporter {
     }
 
     private static void deleteDirectory(File file) {
-        for (File iteratedFile : file.listFiles())
-            if (iteratedFile != null)
-                deleteDirectory(iteratedFile);
-        if (file != null)
-            file.delete();
+        if (file == null)
+            return;
+        if (file.listFiles() != null)
+            for (File iteratedFile : file.listFiles())
+                if (iteratedFile != null)
+                    deleteDirectory(iteratedFile);
+        new InfoMessage("Cleaning up " + file.getPath());
+        file.delete();
     }
 
-    private static void moveWorlds(File worldcontainerFile){
+    private static void moveWorlds(File worldcontainerFile) {
         for (File file : worldcontainerFile.listFiles())
             try {
-            Files.move(file.toPath(), Paths.get(Bukkit.getWorldContainer().getAbsolutePath() + "/" + file.getName()));
+                if ((new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + file.getName()).normalize().toString())).exists()) {
+                    new InfoMessage("Overriding existing directory " + (new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString())).getPath());
+                    new DeveloperMessage(file.getName());
+                    new DeveloperMessage(Bukkit.getWorldContainer().getCanonicalPath());
+                    deleteDirectory(new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString()));
+                }
+                FileUtils.moveDirectory(file, new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString()));
             } catch (Exception exception) {
                 new WarningMessage("Failed to move worlds for " + file.getName() + "! Tell the dev!");
                 exception.printStackTrace();
@@ -104,8 +117,14 @@ public class ConfigurationImporter {
     }
 
     private static void moveFiles(File unzippedDirectory, Path targetPath) {
+        //File targetFile = new File(targetPath.normalize().toString());
+        //if (targetFile.exists()) {
+        //    new InfoMessage("Overriding existing directory " + targetFile.getPath());
+        //    deleteDirectory(targetFile);
+        //}
         for (File file : unzippedDirectory.listFiles())
             try {
+                new InfoMessage("Adding " + file.getPath());
                 Files.move(file.toPath(), Paths.get(targetPath.normalize().toString() + "/" + file.getName()), StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception exception) {
                 new WarningMessage("Failed to move directories for " + file.getName() + "! Tell the dev!");

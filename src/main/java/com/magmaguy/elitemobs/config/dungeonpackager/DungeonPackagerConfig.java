@@ -4,11 +4,13 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.dungeonpackager.premade.*;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,21 +21,21 @@ public class DungeonPackagerConfig {
 
     public static final HashMap<String, DungeonPackagerConfigFields> dungeonPackages = new HashMap<>();
 
-    private static final ArrayList<DungeonPackagerConfigFields> dungeonPackagerConfigFields = new ArrayList(Arrays.asList(
-            new DarkCathedralLair(),
-            new ColosseumLair(),
-            new SewersMinidungeon(),
-            new DarkSpireMinidungeon(),
-            new HallosseumLair(),
-            new CatacombsLair(),
-            new PirateShipMinidungeon(),
-            new NorthPoleMinidungeon(),
-            new AirShipMinidungeon(),
-            new OasisAdventure()
-    ));
+    private static final ArrayList<DungeonPackagerConfigFields> dungeonPackagerConfigFields = new ArrayList<>();
 
     public static void initializeConfigs() {
 
+        dungeonPackagerConfigFields.addAll(Arrays.asList(
+                new DarkCathedralLair(),
+                new ColosseumLair(),
+                new SewersMinidungeon(),
+                new DarkSpireMinidungeon(),
+                new HallosseumLair(),
+                new CatacombsLair(),
+                new PirateShipMinidungeon(),
+                new NorthPoleMinidungeon(),
+                new AirShipMinidungeon(),
+                new OasisAdventure()));
 
         if (!Files.isDirectory(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/dungeonpackages"))) {
             generateFreshConfigurations();

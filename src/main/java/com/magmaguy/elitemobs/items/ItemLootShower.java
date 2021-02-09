@@ -54,10 +54,10 @@ public class ItemLootShower implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (coinValues.containsValue(this)) {
+                    if (coinValues.containsKey(item.getUniqueId())) {
                         if (Bukkit.getEntity(item.getUniqueId()) != null)
                             Bukkit.getEntity(item.getUniqueId()).remove();
-                        coinValues.remove(item);
+                        coinValues.remove(item.getUniqueId());
                     }
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * 5);
@@ -97,7 +97,7 @@ public class ItemLootShower implements Listener {
                                         ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
                                                 .replace("$currency_name", EconomySettingsConfig.currencyName)
                                                 .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
-                        coinValues.remove(this);
+                        coinValues.remove(item.getUniqueId());
                         cancel();
                         return;
                     }
