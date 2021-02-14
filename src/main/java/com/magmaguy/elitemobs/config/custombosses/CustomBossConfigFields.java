@@ -35,7 +35,7 @@ public class CustomBossConfigFields {
     private final String name;
     private final String level;
     private final int timeout;
-    private final Boolean isPersistent;
+    private Boolean isPersistent;
     private final double healthMultiplier;
     private final double damageMultiplier;
     private ItemStack helmet = null;
@@ -402,6 +402,11 @@ public class CustomBossConfigFields {
 
     public Boolean getIsPersistent() {
         return this.isPersistent;
+    }
+
+    //Used to override the persistent behavior of mounted entites, in the future also of regional bosses
+    public void setIsPersistent(boolean isPersistent){
+        this.isPersistent = isPersistent;
     }
 
     public double getHealthMultiplier() {

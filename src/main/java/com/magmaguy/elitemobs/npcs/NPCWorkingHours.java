@@ -16,6 +16,8 @@ public class NPCWorkingHours {
             @Override
             public void run() {
                 for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values()) {
+                    if (npcEntity.sleepScheduled) continue;
+                    npcEntity.sleepScheduled = true;
                     if (!npcEntity.getDisappearsAtNight()) continue;
                     if (npcEntity.getVillager().getWorld().getTime() < 24000 &&
                             npcEntity.getVillager().getWorld().getTime() > 12000) {

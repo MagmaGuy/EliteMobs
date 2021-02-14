@@ -68,10 +68,16 @@ public class PhaseBossEntity {
         currentPhase = nextBossPhase;
 
         CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss(currentPhase.customBossConfigFields.getFileName(), eliteMobEntity.getLivingEntity().getLocation(), eliteMobEntity.getLevel(), currentPhase.healthPercentage);
+        if (customBossEntity == null) {
+            new WarningMessage("Phase boss failed to transition into phase " + currentPhase + " ! It was generated from file " + currentPhase.customBossConfigFields.getFileName() + " . The boss won't spawn! Fix the phase file, the region settings or report this to the dev!");
+            return;
+        }
         customBossEntity.addDamagers(eliteMobEntity.getDamagers());
 
         if (regionalBossEntity != null)
             regionalBossEntity.customBossEntity = customBossEntity;
+
+        customBossEntity.phaseBossEntity = this;
 
         eliteMobEntity.getLivingEntity().remove();
         EntityTracker.unregister(eliteMobEntity.uuid, RemovalReason.PHASE_BOSS_PHASE_END);
