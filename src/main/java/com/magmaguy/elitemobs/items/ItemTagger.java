@@ -128,10 +128,15 @@ public class ItemTagger {
     public static int getEnchantment(ItemMeta itemMeta, NamespacedKey enchantmentKey) {
         if (itemMeta == null)
             return 0;
-        //if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
-        //    return itemMeta.getCustomTagContainer().getCustomTag(enchantmentKey, ItemTagType.INTEGER);
         Integer level = itemMeta.getPersistentDataContainer().get(enchantmentKey, PersistentDataType.INTEGER);
-        return level == null ? 0 : level;
+        if (level == null){
+            Enchantment enchantment = Enchantment.getByKey(enchantmentKey);
+            if (enchantment != null)
+                return itemMeta.getEnchantLevel(enchantment);
+            else
+                return 0;
+        } else
+            return level;
     }
 
     public static boolean hasEnchantment(ItemMeta itemMeta, NamespacedKey enchantmentKey) {

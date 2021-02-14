@@ -100,4 +100,8 @@ public class SimplePersistentEntity {
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
+
+    public void remove(){
+        persistentEntities.remove(this.chunk, this);
+    }
 }

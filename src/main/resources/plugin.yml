@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.2.35
+version: 7.2.36
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -68,7 +68,7 @@ permissions:
     description: Allows players to access the /em rank menu through NPCs
     default: true
   elitemobs.quest:
-    description: Allows players to take on do quests
+    description: Allows players to take on quests
     default: true
   elitemobs.dungeontp:
     description: Allows players to teleport to an elitemobs-set location

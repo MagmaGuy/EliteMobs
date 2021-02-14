@@ -32,6 +32,11 @@ public class TrackedEntity {
         memoryWatchdog = new BukkitRunnable() {
             @Override
             public void run() {
+                //sometimes this seems to not get cancelled properly, so first check if it's still even registered
+                if (!trackedEntities.containsKey(uuid)) {
+                    cancel();
+                    return;
+                }
                 if (entity == null || !entity.isValid())
                     remove(RemovalReason.OTHER);
             }

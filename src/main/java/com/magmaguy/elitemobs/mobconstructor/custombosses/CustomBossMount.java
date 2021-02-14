@@ -17,13 +17,14 @@ public class CustomBossMount {
                     .spawnEntity(customBossEntity.getLivingEntity().getLocation(), entityType);
             PreventMountExploit.bypass = true;
             livingEntity.addPassenger(customBossEntity.getLivingEntity());
-            livingEntity.setPersistent(false);
+            livingEntity.setRemoveWhenFarAway(false);
+            customBossEntity.livingEntityMount = livingEntity;
 
         } catch (Exception ex) {
             //This runs when it's not an API entity
             CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.customBossConfigFields.get(customBossEntity.customBossConfigFields.getMountedEntity());
             if (customBossConfigFields != null) {
-                CustomBossEntity mount = CustomBossEntity.constructCustomBoss(customBossEntity.customBossConfigFields.getMountedEntity(),
+                CustomBossEntity mount = CustomBossEntity.constructCustomBossMount(customBossEntity.customBossConfigFields.getMountedEntity(),
                         customBossEntity.getLivingEntity().getLocation(), customBossEntity.getLevel());
                 new BukkitRunnable() {
                     @Override
@@ -32,6 +33,7 @@ public class CustomBossMount {
                             return;
                         PreventMountExploit.bypass = true;
                         mount.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
+                        customBossEntity.customBossMount = mount;
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 2);
                 return mount;
