@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.entitytracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;

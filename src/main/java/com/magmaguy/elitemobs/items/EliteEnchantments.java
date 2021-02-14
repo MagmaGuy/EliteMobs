@@ -12,7 +12,8 @@ public class EliteEnchantments {
                 enchantment.getKey().equals(Enchantment.DAMAGE_UNDEAD.getKey()) ||
                 enchantment.getKey().equals(Enchantment.PROTECTION_EXPLOSIONS.getKey()) ||
                 enchantment.getKey().equals(Enchantment.PROTECTION_FIRE.getKey()) ||
-                enchantment.getKey().equals(Enchantment.PROTECTION_PROJECTILE.getKey());
+                enchantment.getKey().equals(Enchantment.PROTECTION_PROJECTILE.getKey()) ||
+                enchantment.getKey().equals(Enchantment.THORNS.getKey());
     }
 
 }

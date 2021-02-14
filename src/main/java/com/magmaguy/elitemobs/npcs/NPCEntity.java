@@ -48,6 +48,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     private boolean isSleeping = false;
     private NPCInteractions.NPCInteractionType npcInteractionType;
     private double timeout;
+    public boolean sleepScheduled = false;
 
     /**
      * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.

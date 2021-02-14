@@ -7,7 +7,7 @@ public class ThornsConfig extends EnchantmentsConfigFields {
         super("thorns",
                 true,
                 "Thorns",
-                3,
+                100,
                 6);
     }
 }

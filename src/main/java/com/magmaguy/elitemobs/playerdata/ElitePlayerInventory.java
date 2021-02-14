@@ -164,4 +164,12 @@ public class ElitePlayerInventory {
         return getArmorTier(true);
     }
 
+    /**
+     * Outputs the total level of the thorns enchantment across all armor
+     *
+     * @return Total thorns enchantment level
+     */
+    public int getThornsLevel() {
+        return helmet.thornsLevel + chestplate.thornsLevel + leggings.thornsLevel + boots.thornsLevel;
+    }
 }

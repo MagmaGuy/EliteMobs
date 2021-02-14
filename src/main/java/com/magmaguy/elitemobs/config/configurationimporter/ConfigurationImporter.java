@@ -69,7 +69,7 @@ public class ConfigurationImporter {
                                 new WarningMessage("You need WorldGuard or FastAsyncWorldEdit to install schematic-based minidungeons!");
                             break;
                         default:
-                            new WarningMessage("Directory " + file.getName() + " for zipped file " + zippedFile.getName() + " was not valid!");
+                            new WarningMessage("Directory " + file.getName() + " for zipped file " + zippedFile.getName() + " was not a recognized directory for the file import system! Was the zipped file packaged correctly?");
                     }
                     deleteDirectory(file);
                 }
@@ -105,8 +105,10 @@ public class ConfigurationImporter {
             try {
                 if ((new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + file.getName()).normalize().toString())).exists()) {
                     new InfoMessage("Overriding existing directory " + (new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString())).getPath());
-                    new DeveloperMessage(file.getName());
-                    new DeveloperMessage(Bukkit.getWorldContainer().getCanonicalPath());
+                    if (Bukkit.getWorld(file.getName()) != null){
+                        Bukkit.unloadWorld(file.getName(), false);
+                        new InfoMessage("Unloaded world " + file.getName() + " for safe replacement!");
+                    }
                     deleteDirectory(new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString()));
                 }
                 FileUtils.moveDirectory(file, new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString()));

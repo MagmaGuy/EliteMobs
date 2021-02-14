@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
-import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -11,6 +10,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
@@ -71,7 +71,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
      */
     private static LivingEntity generateLivingEntity(Location location,
                                                      CustomBossConfigFields customBossConfigFields) {
-        if (!customBossConfigFields.isEnabled()) return null;
+        if (!customBossConfigFields.isEnabled()) {
+            new WarningMessage("Attempted to spawn a boss which had its configuration file disabled! Boss file: " + customBossConfigFields.getFileName());
+            return null;
+        }
         if (!EliteMobEntity.validSpawnLocation(location)) return null;
         try {
             WorldGuardSpawnEventBypasser.forceSpawn();
@@ -97,6 +100,33 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
                 livingEntity,
                 mobLevel,
                 ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
+    }
+
+    /**
+     * Method used by mounts
+     * @param fileName
+     * @param location
+     * @param mobLevel
+     * @return
+     */
+    public static CustomBossEntity constructCustomBossMount(String fileName,
+                                                       Location location,
+                                                       int mobLevel) {
+        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
+        customBossMobsConfigAttributes.setIsPersistent(false);
+        LivingEntity livingEntity = generateLivingEntity(location, customBossMobsConfigAttributes);
+        if (livingEntity == null) return null;
+
+        CustomBossEntity mount =  new CustomBossEntity(
+                customBossMobsConfigAttributes,
+                livingEntity,
+                mobLevel,
+                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
+
+        //prevent the mount from despawning based on distance, does not mount unloading based on chunks
+        mount.getLivingEntity().setRemoveWhenFarAway(false);
+
+        return mount;
     }
 
     /**
@@ -158,6 +188,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     public static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
 
     public CustomBossConfigFields customBossConfigFields;
+    public CustomBossEntity customBossMount = null;
+    public LivingEntity livingEntityMount = null;
     private final HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
 
     public LivingEntity advancedGetEntity() {
@@ -292,8 +324,9 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     private void setDisguise() {
         if (customBossConfigFields.getDisguise() == null) return;
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
-        try{
-        DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity(), customBossConfigFields);} catch (Exception ex){
+        try {
+            DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity(), customBossConfigFields);
+        } catch (Exception ex) {
             new WarningMessage("Failed to load LibsDisguises disguise correctly!");
         }
         super.setName(customBossConfigFields.getName());
@@ -480,9 +513,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
         }
         for (CustomBossBossBar customBossBossBar : customBossBossBars) customBossBossBar.remove(true);
         customBossBossBars.clear();
-        if (removeEntity)
+        if (removeEntity){
             if (getLivingEntity() != null)
                 getLivingEntity().remove();
+            if (simplePersistentEntity != null)
+                simplePersistentEntity.remove();
+        }
     }
 
     /**
@@ -492,6 +528,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     public void softRemove() {
         if (customBossTrail != null) customBossTrail.terminateTrails();
         if (bossLocalScan != null) bossLocalScan.cancel();
+        if (livingEntityMount != null)
+            livingEntityMount.remove();
+        if (customBossMount != null)
+            customBossMount.remove(true);
     }
 
     /**
