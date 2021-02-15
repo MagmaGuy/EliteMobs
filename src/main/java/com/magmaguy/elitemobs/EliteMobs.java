@@ -215,6 +215,9 @@ public class EliteMobs extends JavaPlugin {
             }
         }
 
+        //Initialize npcs
+        new NPCInitializer();
+
         //Commands
         new CommandHandler();
     }

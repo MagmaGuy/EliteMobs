@@ -34,6 +34,5 @@ public class TravellingMerchantConfig extends NPCsConfigFields {
                 "SELL"
         );
         super.getAdditionalConfigOptions().put("timeout", 2);
-        super.getAdditionalConfigOptions().put("noPreviousLocationMessage", "&8[EliteMobs] &cCouldn't send you back to your previous location - no previous location found!");
     }
 }

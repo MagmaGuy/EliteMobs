@@ -21,4 +21,13 @@ public class NPCInitializer {
         }
     }
 
+    public NPCInitializer() {
+        for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList().values()) {
+            Location location = ConfigurationLocation.deserialize(npCsConfigFields.getLocation());
+            if (location != null)
+                new NPCEntity(npCsConfigFields);
+            new NPCWorkingHours();
+        }
+    }
+
 }

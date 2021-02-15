@@ -8,12 +8,15 @@ import com.magmaguy.elitemobs.utils.ChunkVectorizer;
 import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class SimplePersistentEntity {
@@ -76,6 +79,11 @@ public class SimplePersistentEntity {
             chunkLocations.add(chunkLocation);
             loadChunk(chunkLocation);
         }
+
+        @EventHandler(ignoreCancelled = true)
+        public void worldUnloadEvent(WorldUnloadEvent event){
+            unloadWorld(event.getWorld());
+        }
     }
 
     private static final HashSet<Integer> chunkLocations = new HashSet<>();
@@ -99,6 +107,10 @@ public class SimplePersistentEntity {
                 chunkLocations.remove(chunkLocation);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);
+    }
+
+    private static void unloadWorld(World world){
+        persistentEntities.values().removeIf(simplePersistentEntity -> simplePersistentEntity.location.getWorld().equals(world));
     }
 
     public void remove(){
