@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
-import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -292,7 +292,8 @@ public class CustomBossConfigFields {
         if (configuration.get("spawnChance") != null) {
             this.spawnChance = configuration.getDouble("spawnChance");
             if (this.spawnChance > 0)
-                naturallySpawnedElites.add(this);
+                if (isEnabled)
+                    naturallySpawnedElites.add(this);
         } else
             this.spawnChance = 0;
 
@@ -405,7 +406,7 @@ public class CustomBossConfigFields {
     }
 
     //Used to override the persistent behavior of mounted entites, in the future also of regional bosses
-    public void setIsPersistent(boolean isPersistent){
+    public void setIsPersistent(boolean isPersistent) {
         this.isPersistent = isPersistent;
     }
 

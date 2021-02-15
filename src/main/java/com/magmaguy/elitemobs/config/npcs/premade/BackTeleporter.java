@@ -24,6 +24,7 @@ public class BackTeleporter extends NPCsConfigFields {
                 3,
                 false,
                 "TELEPORT_BACK");
+        super.getAdditionalConfigOptions().put("noPreviousLocationMessage", "&8[EliteMobs] &cCouldn't send you back to your previous location - no previous location found!");
     }
 
 }
