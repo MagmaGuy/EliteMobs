@@ -28,6 +28,10 @@ public class NPCEntityTracker extends TrackedEntity implements AbstractTrackedEn
             npcEntity.deleteNPCEntity();
             return;
         }
+        if (removalReason.equals(RemovalReason.WORLD_UNLOAD)){
+            npcEntity.removeNPCEntity();
+            return;
+        }
         if (!removalReason.equals(RemovalReason.SHUTDOWN))
             npcEntity.chunkUnload();
     }

@@ -108,9 +108,8 @@ public class NPCInteractions implements Listener {
                 if (event.getPlayer().hasPermission("elitemobs.back.npc")) {
                     Location previousLocation = PlayerTeleportEvent.previousLocations.get(event.getPlayer());
                     if (previousLocation == null) {
-                        if (npcEntity.npCsConfigFields.noPreviousLocationMessage != null) {
+                        if (npcEntity.npCsConfigFields.noPreviousLocationMessage != null)
                             event.getPlayer().sendMessage(ChatColorConverter.convert(npcEntity.npCsConfigFields.noPreviousLocationMessage));
-                        }
                     } else
                         PlayerPreTeleportEvent.teleportPlayer(event.getPlayer(), previousLocation);
                 }

@@ -103,15 +103,16 @@ public class ConfigurationImporter {
     private static void moveWorlds(File worldcontainerFile) {
         for (File file : worldcontainerFile.listFiles())
             try {
-                if ((new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + file.getName()).normalize().toString())).exists()) {
-                    new InfoMessage("Overriding existing directory " + (new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString())).getPath());
+                File destinationFile = new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString());
+                if (destinationFile.exists()) {
+                    new InfoMessage("Overriding existing directory " + destinationFile.getPath());
                     if (Bukkit.getWorld(file.getName()) != null){
                         Bukkit.unloadWorld(file.getName(), false);
-                        new InfoMessage("Unloaded world " + file.getName() + " for safe replacement!");
+                        new WarningMessage("Unloaded world " + file.getName() + " for safe replacement!");
                     }
-                    deleteDirectory(new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString()));
+                    deleteDirectory(destinationFile);
                 }
-                FileUtils.moveDirectory(file, new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString()));
+                FileUtils.moveDirectory(file, destinationFile);
             } catch (Exception exception) {
                 new WarningMessage("Failed to move worlds for " + file.getName() + "! Tell the dev!");
                 exception.printStackTrace();
@@ -119,11 +120,6 @@ public class ConfigurationImporter {
     }
 
     private static void moveFiles(File unzippedDirectory, Path targetPath) {
-        //File targetFile = new File(targetPath.normalize().toString());
-        //if (targetFile.exists()) {
-        //    new InfoMessage("Overriding existing directory " + targetFile.getPath());
-        //    deleteDirectory(targetFile);
-        //}
         for (File file : unzippedDirectory.listFiles())
             try {
                 new InfoMessage("Adding " + file.getPath());
