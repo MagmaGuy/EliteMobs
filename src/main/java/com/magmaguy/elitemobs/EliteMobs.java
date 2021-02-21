@@ -29,6 +29,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
+import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
@@ -183,6 +184,7 @@ public class EliteMobs extends JavaPlugin {
         //Import custom items after potentially importing new items
         CustomLootConfig.initializeConfigs();
         CustomItem.initializeCustomItems();
+        LootTables.initialize();
 
         //Load minidungeons, most of all load the worlds of minidungeons
         DungeonPackagerConfig.initializeConfigs();

@@ -216,6 +216,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         this.roleDisplay.setMarker(true);
         this.roleDisplay.setVisible(false);
         this.roleDisplay.setGravity(false);
+        this.roleDisplay.setPersistent(false);
     }
 
     /**

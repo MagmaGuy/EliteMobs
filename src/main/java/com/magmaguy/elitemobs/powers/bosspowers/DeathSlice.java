@@ -32,7 +32,7 @@ public class DeathSlice extends BossPower implements Listener {
         if (deathSlice.isCooldown()) return;
 
         if (ThreadLocalRandom.current().nextDouble() > 0.10) return;
-        deathSlice.doCooldown(20 * 10);
+        deathSlice.doCooldown(20 * 20);
 
         doDeathSlice(event.getEliteMobEntity());
     }
