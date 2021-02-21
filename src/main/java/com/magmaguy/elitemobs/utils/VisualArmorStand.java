@@ -18,6 +18,7 @@ public class VisualArmorStand {
         visualArmorStand.setCustomNameVisible(true);
         visualArmorStand.setGravity(false);
         visualArmorStand.setRemoveWhenFarAway(true);
+        visualArmorStand.setPersistent(false);
         return visualArmorStand;
     }
 

@@ -33,7 +33,6 @@ public class PhaseBossEntity {
     public PhaseBossEntity(CustomBossEntity customBossEntity, RegionalBossEntity regionalBossEntity) {
         this.regionalBossEntity = regionalBossEntity;
         initializePhaseBossEntity(customBossEntity);
-
     }
 
     public PhaseBossEntity(CustomBossEntity customBossEntity) {
@@ -93,6 +92,16 @@ public class PhaseBossEntity {
         }
         eliteMobEntity.remove(true);
         EntityTracker.unregister(eliteMobEntity.uuid, RemovalReason.PHASE_BOSS_RESET);
+    }
+
+    /**
+     * Phase bosses tend to die on a phase different from the first one. This means that the plugin is unable to detect
+     * that bosses have died. As such, regional bosses have to be informed that they died.
+     */
+    public void deathHandler(){
+        if (regionalBossEntity == null) return;
+        if (currentPhase == bossPhases.get(0)) return;
+        regionalBossEntity.respawnRegionalBoss();
     }
 
     public static class PhaseBossEntityListener implements Listener {
