@@ -13,6 +13,7 @@ public class NPCInitializer {
      */
     public NPCInitializer(World world) {
         for (NPCsConfigFields npCsConfigFields : NPCsConfig.getNPCsList().values()) {
+            if (npCsConfigFields.getLocation() == null) continue;
             Location location = ConfigurationLocation.deserialize(npCsConfigFields.getLocation());
             if (location != null)
                 if (location.getWorld().equals(world))

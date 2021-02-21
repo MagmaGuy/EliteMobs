@@ -28,10 +28,18 @@ public class ConfigurationImporter {
             return;
         }
 
-        if ((new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/imports")).length() == 0)
+
+        File importsFile = null;
+        try {
+            importsFile = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getCanonicalPath() + "/imports").toString());
+        } catch (Exception ex) {
+            new WarningMessage("Failed to get imports folder! Report this to the dev!");
+            return;
+        }
+        if (importsFile.listFiles().length == 0)
             return;
 
-        for (File zippedFile : (new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/imports")).listFiles()) {
+        for (File zippedFile : importsFile.listFiles()) {
             File unzippedFile;
             try {
                 if (zippedFile.getName().contains(".zip"))
@@ -106,7 +114,7 @@ public class ConfigurationImporter {
                 File destinationFile = new File(Paths.get(Bukkit.getWorldContainer().getCanonicalPath() + "/" + file.getName()).normalize().toString());
                 if (destinationFile.exists()) {
                     new InfoMessage("Overriding existing directory " + destinationFile.getPath());
-                    if (Bukkit.getWorld(file.getName()) != null){
+                    if (Bukkit.getWorld(file.getName()) != null) {
                         Bukkit.unloadWorld(file.getName(), false);
                         new WarningMessage("Unloaded world " + file.getName() + " for safe replacement!");
                     }
@@ -122,7 +130,7 @@ public class ConfigurationImporter {
     private static void moveFiles(File unzippedDirectory, Path targetPath) {
         for (File file : unzippedDirectory.listFiles())
             try {
-                new InfoMessage("Adding " + file.getPath());
+                new InfoMessage("Adding " + file.getCanonicalPath());
                 Files.move(file.toPath(), Paths.get(targetPath.normalize().toString() + "/" + file.getName()), StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception exception) {
                 new WarningMessage("Failed to move directories for " + file.getName() + "! Tell the dev!");

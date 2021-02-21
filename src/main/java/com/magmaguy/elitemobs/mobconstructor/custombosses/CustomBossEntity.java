@@ -44,30 +44,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class CustomBossEntity extends EliteMobEntity implements Listener, SimplePersistentEntityInterface {
 
     /**
-     * Constructs a custom boss from a player command
-     */
-    public static CustomBossEntity constructCustomBossCommand(String fileName,
-                                                              Location location,
-                                                              int mobLevel) {
-        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
-        if (!customBossMobsConfigAttributes.isEnabled()) return null;
-
-        try {
-            LivingEntity livingEntity = (LivingEntity) location.getWorld()
-                    .spawnEntity(location, EntityType.valueOf(customBossMobsConfigAttributes.getEntityType()));
-            return new CustomBossEntity(
-                    customBossMobsConfigAttributes,
-                    livingEntity,
-                    mobLevel,
-                    ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
-        } catch (Exception ex) {
-            new WarningMessage("Failed to spawn a Custom Boss via command because the entity type for it is not valid!");
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * Generates a living entity for all custom bosses. Player command bypasses this check in order to bypass spawn restrictions.
      */
     private static LivingEntity generateLivingEntity(Location location,
