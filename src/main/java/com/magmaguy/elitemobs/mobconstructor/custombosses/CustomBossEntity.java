@@ -48,7 +48,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
      */
     private static LivingEntity generateLivingEntity(Location location,
                                                      CustomBossConfigFields customBossConfigFields) {
-        if (!customBossConfigFields.isEnabled()) {
+        if (customBossConfigFields == null || !customBossConfigFields.isEnabled()) {
             new WarningMessage("Attempted to spawn a boss which had its configuration file disabled! Boss file: " + customBossConfigFields.getFileName());
             return null;
         }

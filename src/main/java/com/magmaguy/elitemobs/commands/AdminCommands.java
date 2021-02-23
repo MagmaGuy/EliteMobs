@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -524,7 +525,7 @@ public class AdminCommands {
                 .senderType(CommandSender.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> commandContext.getSender().sendMessage(
-                        ChatColorConverter.convert("&8[EliteMobs] &6Discord room for support & downloads: &9https://discord.gg/9f5QSka"))));
+                        ChatColorConverter.convert("&8[EliteMobs] &6Discord room for support & downloads: &9" + DiscordLinks.mainLink))));
 
         // /em discord <message>
         manager.command(builder.literal("discord")
