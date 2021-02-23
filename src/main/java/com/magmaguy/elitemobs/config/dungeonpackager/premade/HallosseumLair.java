@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
@@ -16,7 +17,7 @@ public class HallosseumLair extends DungeonPackagerConfigFields {
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
                 Arrays.asList(""),
                 Arrays.asList(""),
-                "https://discord.gg/vRW9wXhK",
+                DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_hallosseum",
                 null,

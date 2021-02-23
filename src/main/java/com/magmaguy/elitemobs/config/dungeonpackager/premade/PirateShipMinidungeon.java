@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -45,7 +46,7 @@ public class PirateShipMinidungeon extends DungeonPackagerConfigFields {
                         "pirate_ship_tier_40_miniboss_1.yml:11.5,10.5,78.5",
                         "pirate_ship_tier_45_boss.yml:-13.5,10.5,79.5"),
                 Arrays.asList(),
-                "patreon.com/magmaguy",
+                DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 null,
                 "em_pirate_ship.schem",
