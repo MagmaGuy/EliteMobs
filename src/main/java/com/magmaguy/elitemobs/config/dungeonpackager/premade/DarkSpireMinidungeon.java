@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
@@ -17,7 +18,7 @@ public class DarkSpireMinidungeon extends DungeonPackagerConfigFields {
                         "&6Credits: 69OzCanOfBepis"),
                 Arrays.asList(""),
                 Arrays.asList(""),
-                "patreon.com/magmaguy",
+                DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 "em_dark_spire",
                 null,

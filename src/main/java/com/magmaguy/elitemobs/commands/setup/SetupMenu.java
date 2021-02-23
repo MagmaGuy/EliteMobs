@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -189,7 +190,7 @@ public class SetupMenu {
                     player.sendMessage("----------------------------------------------------");
                     player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Adventurer's Guild Hub download link: &9&nhttps://magmaguy.com/downloads/em_adventurers_guild.zip"));
                     player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &aOnce downloaded, unzip and put it in your worlds folder! Run /em reload after that."));
-                    player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Need help? &9https://discord.gg/fB3YgwhpCU"));
+                    player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Need help? " + DiscordLinks.mainLink));
                     player.sendMessage("----------------------------------------------------");
                 } else {
                     //case for install
@@ -211,7 +212,7 @@ public class SetupMenu {
                             if (!playerTeleportEvent.isCancelled())
                                 player.teleport(AdventurersGuildConfig.guildWorldLocation);
                             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Successfully installed Adventurer's Guild Hub! Do &a/ag &2to go there and talk to the transporter or open the Teleports page in /em to go back!"));
-                            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Need help? &9&nhttps://discord.gg/fB3YgwhpCU"));
+                            player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2Need help? &9&n" + DiscordLinks.mainLink));
                             player.sendMessage("----------------------------------------------------");
                         } catch (Exception e) {
                             player.closeInventory();

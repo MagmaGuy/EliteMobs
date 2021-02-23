@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.initialsetup;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -26,7 +27,7 @@ public class FirstTimeSetup implements Listener {
                 event.getPlayer().sendMessage(ChatColorConverter.convert("&7Welcome to EliteMobs!" +
                         " &c&lIt looks like you haven't set up EliteMobs yet! &2To install EliteMobs, do &a/em setup &2!"));
                 event.getPlayer().sendMessage(ChatColorConverter.convert("&7Need command help? &6&l/em help"));
-                event.getPlayer().sendMessage(ChatColorConverter.convert("&7You can get support over at &9&nhttps://discord.gg/fB3YgwhpCU"));
+                event.getPlayer().sendMessage(ChatColorConverter.convert("&7You can get support over at &9&n" + DiscordLinks.mainLink));
                 TextComponent setupMessage = new TextComponent(ChatColorConverter.convert("&cDon't want to see this message again? "));
                 TextComponent setupDone = new TextComponent(ChatColorConverter.convert("&c&nClick here!"));
                 setupDone.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Never show this again!").create()));

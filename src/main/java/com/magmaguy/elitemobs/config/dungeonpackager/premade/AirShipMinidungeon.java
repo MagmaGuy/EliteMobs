@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -84,7 +85,7 @@ public class AirShipMinidungeon extends DungeonPackagerConfigFields {
                         "airship_tier_45_knockback.yml:1.0,21.5,98.0",
                         "airship_tier_65_bodyguard.yml:-3.0,14.5,109.0"),
                 Arrays.asList(""),
-                "patreon.com/magmaguy",
+                DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 null,
                 "em_airship.schem",

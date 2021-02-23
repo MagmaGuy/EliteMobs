@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.dungeonpackager.premade;
 
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
+import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -19,7 +20,7 @@ public class CatacombsLair extends DungeonPackagerConfigFields {
                         "catacombs_tier_15_boss.yml:0.5,-7.5,45.5",
                         "catacombs_tier_10_miniboss.yml:-8.5,-15.5,36.5"),
                 Arrays.asList(),
-                "patreon.com/magmaguy",
+                DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
                 null,
                 "em_catacombs.schem",
