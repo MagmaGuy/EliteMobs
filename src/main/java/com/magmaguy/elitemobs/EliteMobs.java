@@ -48,6 +48,7 @@ import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
@@ -62,6 +63,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,11 +87,12 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("| |___| |_____| |_  | | | |___| |  | \\ \\_/ / |_/ //\\__/ /");
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
         Bukkit.getLogger().info("By MagmaGuy");
+        MetadataHandler.PLUGIN = this;
         if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < 100000000) {
             Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", 100000000);
             try {
-                File file = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath().replace("plugins/EliteMobs", "") + "spigot.yml").normalize().toString());
-                Bukkit.getServer().spigot().getConfig().save(file);
+                File spigotConfigContainer = new File(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getParentFile().getCanonicalFile().getParentFile().toString() + "/spigot.yml").toString());
+                Bukkit.getServer().spigot().getConfig().save(spigotConfigContainer);
                 new InfoMessage("New default max health set correctly!");
             } catch (IOException e) {
                 new WarningMessage("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + 100000000);

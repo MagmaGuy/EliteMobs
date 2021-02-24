@@ -19,7 +19,7 @@ public class MetadataHandler implements Listener {
     public final static String ELITE_MOBS = "EliteMobs";
 
     //plugin getter
-    public final static Plugin PLUGIN = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
+    public static Plugin PLUGIN = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
 
     //third party compatibility
     public final static String BETTERDROPS_COMPATIBILITY_MD = "betterdrops_ignore";
