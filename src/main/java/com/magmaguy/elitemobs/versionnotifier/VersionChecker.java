@@ -20,6 +20,8 @@ public class VersionChecker {
             @Override
             public void run() {
                 String currentVersion = MetadataHandler.PLUGIN.getDescription().getVersion();
+                if (currentVersion.contains("SNAPSHOT"))
+                    currentVersion = currentVersion.split("-")[0];
                 String publicVersion = "";
 
                 try {
