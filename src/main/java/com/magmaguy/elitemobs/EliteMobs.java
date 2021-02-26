@@ -86,8 +86,9 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("|  __|| |     | |   | | |  __|| |\\/| | | | | ___ \\ `--. \\");
         Bukkit.getLogger().info("| |___| |_____| |_  | | | |___| |  | \\ \\_/ / |_/ //\\__/ /");
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
-        Bukkit.getLogger().info("By MagmaGuy");
         MetadataHandler.PLUGIN = this;
+        Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
+
         if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < 100000000) {
             Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", 100000000);
             try {

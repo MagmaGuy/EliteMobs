@@ -1,15 +1,10 @@
 name: EliteMobs
-version: 7.2.40-SNAPSHOT-1
+version: 7.2.40
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
 softdepend: [ Multiverse-Core, WorldGuard, Vault, PlaceholderAPI, HolographicDisplays, DiscordSRV, LibsDisguises, WorldEdit ]
 
-##commands:
-##  elitemobs:
-##    description: Catch-all command
-##    usage: /elitemobs
-##    aliases: [em, adventurerguild, adventurersguild, ag, shareitem]
 permissions:
   elitemobs.*:
     description: Gives access to all elitemobs commands
