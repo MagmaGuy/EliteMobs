@@ -83,9 +83,10 @@ public class TrackedEntity {
 
     public void untrack(RemovalReason removalReason) {
         memoryWatchdog.cancel();
-        trackedHashMap.remove(uuid);
+        if (!removalReason.equals(RemovalReason.KILL_COMMAND))
+            trackedHashMap.remove(uuid);
         //Don't remove on shutdown due to CME error, clear all tracked entities during shutdown globally
-        if (!removalReason.equals(RemovalReason.SHUTDOWN))
+        if (!removalReason.equals(RemovalReason.SHUTDOWN) && !removalReason.equals(RemovalReason.KILL_COMMAND))
             trackedEntities.remove(uuid);
         specificRemoveHandling(removalReason);
     }
