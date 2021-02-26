@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.npcs;
 
+import com.magmaguy.elitemobs.entitytracker.NPCEntityTracker;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -63,6 +64,10 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         //this is how the wandering trader works
         if (npCsConfigFields.getLocation().equalsIgnoreCase("null"))
             return;
+
+        for (NPCEntity npcEntity : NPCEntityTracker.npcEntities.values())
+            if (npcEntity.getSpawnLocation().equals(spawnLocation))
+                npcEntity.removeNPCEntity();
 
         WorldGuardSpawnEventBypasser.forceSpawn();
         try {

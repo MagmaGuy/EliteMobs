@@ -26,7 +26,7 @@ public class VersionChecker {
 
                 try {
                     Bukkit.getLogger().info("[EliteMobs] Latest public release is " + VersionChecker.readStringFromURL());
-                    Bukkit.getLogger().info("[EliteMobs] Your version is " + currentVersion);
+                    Bukkit.getLogger().info("[EliteMobs] Your version is " + MetadataHandler.PLUGIN.getDescription().getVersion());
                     publicVersion = VersionChecker.readStringFromURL();
                 } catch (IOException e) {
                     Bukkit.getLogger().warning("[EliteMobs] Couldn't check latest version");
