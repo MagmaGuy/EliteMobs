@@ -1,15 +1,15 @@
 package com.magmaguy.elitemobs.npcs;
 
-import com.magmaguy.elitemobs.entitytracker.NPCEntityTracker;
-import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.NPCEntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
+import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -65,9 +66,14 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         if (npCsConfigFields.getLocation().equalsIgnoreCase("null"))
             return;
 
+        ArrayList<NPCEntity> npcEntitiesToCull = new ArrayList<>();
+
         for (NPCEntity npcEntity : NPCEntityTracker.npcEntities.values())
             if (npcEntity.getSpawnLocation().equals(spawnLocation))
-                npcEntity.removeNPCEntity();
+                npcEntitiesToCull.add(npcEntity);
+
+        for (NPCEntity npcEntity : npcEntitiesToCull)
+            npcEntity.removeNPCEntity();
 
         WorldGuardSpawnEventBypasser.forceSpawn();
         try {
