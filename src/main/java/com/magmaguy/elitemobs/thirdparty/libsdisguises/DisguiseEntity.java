@@ -81,12 +81,15 @@ public class DisguiseEntity {
                     DisguiseAPI.addCustomDisguise(customDisguise, customBossConfigFields.getCustomDisguiseData());
                     disguise = DisguiseAPI.getCustomDisguise(customDisguise);
                 }
+            if (disguise == null)
+                throw new NullPointerException();
             disguise.setEntity(entity);
             disguise.setDisguiseName(entity.getCustomName());
             disguise.setDynamicName(true);
             disguise.startDisguise();
         } catch (Exception ex) {
             new WarningMessage("Failed to set custom disguise for boss " + customBossConfigFields.getFileName() + " !");
+            new WarningMessage("Does the disguise exist?");
             ex.printStackTrace();
         }
     }

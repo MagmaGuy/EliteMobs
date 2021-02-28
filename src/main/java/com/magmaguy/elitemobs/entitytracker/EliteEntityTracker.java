@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.entitytracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;
@@ -28,6 +29,9 @@ public class EliteEntityTracker extends TrackedEntity implements AbstractTracked
     public void specificRemoveHandling(RemovalReason removalReason) {
         eliteMobEntity.remove(removalReason);
 
+        //new DeveloperMessage("Reason: " + removalReason);
+        //new DeveloperMessage("Name: " + eliteMobEntity.getName());
+
         if (removalReason.equals(RemovalReason.CHUNK_UNLOAD)) {
             if (eliteMobEntity.customBossEntity != null)
                 eliteMobEntity.customBossEntity.chunkUnload();
@@ -39,7 +43,7 @@ public class EliteEntityTracker extends TrackedEntity implements AbstractTracked
             if (eliteMobEntity.customBossEntity != null)
                 eliteMobEntity.customBossEntity.remove(true);
 
-        if (removalReason.equals(RemovalReason.DEATH)) {
+        if (removalReason.equals(RemovalReason.DEATH) || removalReason.equals(RemovalReason.BOSS_TIMEOUT)) {
             if (eliteMobEntity.regionalBossEntity != null)
                 eliteMobEntity.regionalBossEntity.respawnRegionalBoss();
             if (eliteMobEntity.phaseBossEntity != null)
@@ -53,8 +57,9 @@ public class EliteEntityTracker extends TrackedEntity implements AbstractTracked
                 eliteMobEntity.regionalBossEntity.removePermanently();
         }
 
-        if (removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) || removalReason.equals(RemovalReason.PHASE_BOSS_RESET))
+        if (removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END))
             eliteMobEntity.customBossEntity.remove(true);
+
     }
 
 }

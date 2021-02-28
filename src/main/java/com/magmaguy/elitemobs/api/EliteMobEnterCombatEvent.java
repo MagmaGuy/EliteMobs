@@ -58,7 +58,7 @@ public class EliteMobEnterCombatEvent extends Event {
                     }
 
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
     }
 
     public Player getTargetEntity() {
