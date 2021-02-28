@@ -9,7 +9,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.2.41'
+version '7.3.0-SNAPSHOT-1'
 
 repositories {
     mavenCentral()
