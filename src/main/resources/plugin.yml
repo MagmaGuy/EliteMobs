@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.2.41
+version: 7.3.0-SNAPSHOT-1
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
