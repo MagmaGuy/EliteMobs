@@ -73,6 +73,7 @@ public class CustomBossConfigFields {
     private String customDisguiseData = null;
     private Boolean frozen = false;
     private List<String> phases = new ArrayList<>();
+    private HashMap<Material, Double> damageModifiers = new HashMap();
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -340,6 +341,31 @@ public class CustomBossConfigFields {
 
         this.phases = configuration.getStringList("phases");
 
+        for (String rawDamageModifier : configuration.getStringList("damageModifiers")) {
+            String[] parsedStrings = rawDamageModifier.split(",");
+            Material material = null;
+            Double multiplier = null;
+            for (String parsedDamageModifier : parsedStrings) {
+                if (parsedDamageModifier.contains("material:"))
+                    try {
+                        material = Material.getMaterial(parsedDamageModifier.replace("material:", ""));
+                    } catch (Exception ex) {
+                        new WarningMessage("Boss " + fileName + " has invalid entry " + parsedDamageModifier + " !");
+                    }
+                else if (parsedDamageModifier.contains("multiplier:"))
+                    try {
+                        multiplier = Double.parseDouble(parsedDamageModifier.replace("multiplier:", ""));
+                    } catch (Exception ex) {
+                        new WarningMessage("Boss " + fileName + " has invalid entry " + parsedDamageModifier + " !");
+                    }
+                else new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + fileName + " !");
+            }
+
+            if (material != null && multiplier != null)
+                damageModifiers.put(material, multiplier);
+
+        }
+
     }
 
     private ItemStack parseItem(String materialString) {
@@ -588,9 +614,14 @@ public class CustomBossConfigFields {
         return file;
     }
 
+    public double getDamageModifier(Material material ){
+        return damageModifiers.get(material) == null ? 1 : damageModifiers.get(material);
+    }
+
     public FileConfiguration getFileConfiguration() {
         return fileConfiguration;
     }
 
     public boolean filesOutOfSync = false;
+
 }

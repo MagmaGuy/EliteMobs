@@ -24,6 +24,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
@@ -556,6 +557,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     public Location getLocation() {
         if (advancedGetEntity() != null) return advancedGetEntity().getLocation();
         else return persistentLocation;
+    }
+
+    public double getDamageModifier(Material material){
+        return customBossConfigFields.getDamageModifier(material);
     }
 
     /**
