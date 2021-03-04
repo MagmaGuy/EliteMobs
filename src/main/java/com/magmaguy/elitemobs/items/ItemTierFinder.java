@@ -14,10 +14,6 @@ import java.util.List;
 
 public class ItemTierFinder {
 
-    public static double findPlayerTier(Player player) {
-        return (4 * findArmorSetTier(player) + findWeaponTier(player)) / 5;
-    }
-
     public static double findArmorSetTier(Player player) {
 
         double totalArmorThreat = 0;
@@ -146,7 +142,7 @@ public class ItemTierFinder {
             case DIAMOND_AXE:
                 return DIAMOND_TIER + mainEnchantment;
             case TRIDENT:
-                return CombatSystem.TRIDENT + mainEnchantment;
+                return CombatSystem.TRIDENT_TIER_LEVEL + mainEnchantment;
             case DIAMOND_BOOTS:
             case DIAMOND_CHESTPLATE:
             case DIAMOND_HELMET:
@@ -232,7 +228,7 @@ public class ItemTierFinder {
             case DIAMOND_AXE:
                 return DIAMOND_TIER + mainEnchantment;
             case TRIDENT:
-                return CombatSystem.TRIDENT + mainEnchantment;
+                return CombatSystem.TRIDENT_TIER_LEVEL + mainEnchantment;
             case IRON_AXE:
             case IRON_SWORD:
                 return IRON_TIER + mainEnchantment;

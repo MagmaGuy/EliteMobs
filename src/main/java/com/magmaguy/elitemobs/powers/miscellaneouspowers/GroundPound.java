@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import org.bukkit.Location;
@@ -58,7 +58,7 @@ public class GroundPound extends MinorPower implements Listener {
             @Override
             public void run() {
                 counter++;
-                if (!NonSolidBlockTypes.isNonSolidBlock(eliteMobEntity.getLivingEntity().getLocation().clone().subtract(new Vector(0, 0.2, 0)).getBlock().getType())) {
+                if (!NonSolidBlockTypes.isPassthrough(eliteMobEntity.getLivingEntity().getLocation().clone().subtract(new Vector(0, 0.2, 0)).getBlock().getType())) {
 
                     eliteMobEntity.getLivingEntity().setVelocity(new Vector(0, -2, 0));
                     cloudParticle(eliteMobEntity.getLivingEntity().getLocation());

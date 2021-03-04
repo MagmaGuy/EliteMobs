@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.playerdata.PlayerStatusScreen;
+import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,41 +13,23 @@ import java.util.List;
 
 public class DebugScreen {
 
-    public DebugScreen(Player player, String[] args) {
-        if (args.length < 2) {
-            player.sendMessage("[EliteMobs] Correct command syntax: /em debug [customBossFilename] OR /em debug [playerName]");
-            player.sendMessage("Currently only works with regional bosses!");
-            player.sendMessage("Also works with fragments of filenames (i.e. 'pirate' instead of 'pirate_1.yml')");
-            player.sendMessage("Also works with fragments of boss names (as they show up in-game, careful with color codes)");
-            return;
-        }
-
-        if (Bukkit.getPlayer(args[1]) != null)
-            new PlayerStatusScreen(player, Bukkit.getPlayer(args[1]));
-        else CustomBossDebugScreen(player, args);
-
+    public static void open(Player player, String argument) {
+        if (Bukkit.getPlayer(argument) != null)
+            new PlayerStatusScreen(player, Bukkit.getPlayer(argument));
+        else openBossScreen(player, argument);
     }
 
-    public void CustomBossDebugScreen(Player player, String[] args) {
-
-        if (args.length < 2) {
-            player.sendMessage("[EliteMobs] Correct command syntax: /em debug [filename]");
-            player.sendMessage("Currently only works with regional bosses!");
-            player.sendMessage("Also works with fragments of filenames (i.e. 'pirate' instead of 'pirate_1.yml')");
-            player.sendMessage("Also works with fragments of boss names (as they show up in-game, careful with color codes)");
-            return;
-        }
+    private static void openBossScreen(Player player, String argument) {
 
         List<String> pages = new ArrayList<String>();
 
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntityList()) {
-            if (!regionalBossEntity.getCustomBossConfigFields().getFileName().contains(args[1]) &&
-                    !regionalBossEntity.getCustomBossConfigFields().getName().toLowerCase().contains(args[1].toLowerCase()))
+        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet()) {
+            if (!regionalBossEntity.getCustomBossConfigFields().getFileName().contains(argument) &&
+                    !regionalBossEntity.getCustomBossConfigFields().getName().toLowerCase().contains(argument.toLowerCase()))
                 continue;
             String page = regionalBossEntity.getCustomBossConfigFields().getFileName() + "\n";
             page += "Name: " + ChatColorConverter.convert(regionalBossEntity.getCustomBossConfigFields().getName()) + ChatColor.BLACK + "\n";
             page += "Level: " + regionalBossEntity.getCustomBossConfigFields().getLevel() + "\n";
-            page += "Is Alive (EM): " + regionalBossEntity.isAlive + "\n";
             if (regionalBossEntity.customBossEntity != null && regionalBossEntity.customBossEntity.advancedGetEntity() != null) {
                 page += "Is Alive (MC): " + !regionalBossEntity.customBossEntity.advancedGetEntity().isDead() + "\n";
                 page += "XYZ: " +
@@ -58,7 +40,8 @@ public class DebugScreen {
             } else
                 page += "Is Alive (MC): false\n";
             page += "Is Persistent: " + regionalBossEntity.getCustomBossConfigFields().getIsPersistent() + "\n";
-            page += "Respawning: " + regionalBossEntity.inCooldown;
+            if (regionalBossEntity.getCustomBossConfigFields().getIsPersistent())
+                page += "Is Respawning: " + regionalBossEntity.isRespawning() + "\n";
             pages.add(page);
         }
 

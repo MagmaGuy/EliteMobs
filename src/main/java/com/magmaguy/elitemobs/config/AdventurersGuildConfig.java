@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -10,8 +11,8 @@ import java.util.List;
 
 public class AdventurersGuildConfig {
 
-    public static boolean enableAdventurersGuild;
     public static boolean addMaxHealth, addCrit, addDodge;
+    public static boolean guildWorldIsEnabled;
     public static String guildWorldName;
     public static String guildLocationString;
     public static Location guildWorldLocation;
@@ -23,19 +24,34 @@ public class AdventurersGuildConfig {
     public static boolean alwaysUseNpcs;
     public static List<String> onRankUpCommand, onPrestigeUpCommand;
     public static double dodge1, dodge2, dodge3, crit1, crit2, crit3, health1, health2, health3, health4;
+    public static String adventurersGuildMenuName;
+    public static int baseKillsForRankUp, additionalKillsForRankUpPerTier;
+    private static File file;
+    private static FileConfiguration fileConfiguration;
+
+    public static void toggleGuildInstall() {
+        guildWorldIsEnabled = !guildWorldIsEnabled;
+        fileConfiguration.set("guildHubIsEnabledv2", guildWorldIsEnabled);
+        save();
+    }
+
+    public static void save() {
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+    }
 
     public static void initializeConfig() {
-        File file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
+        file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
+        fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        enableAdventurersGuild = ConfigurationEngine.setBoolean(fileConfiguration, "Enable adventurer's guild", true);
         addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
         addCrit = ConfigurationEngine.setBoolean(fileConfiguration, "Add critical chance when unlocking higher guild ranks", true);
         addDodge = ConfigurationEngine.setBoolean(fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
-        guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name", "EliteMobs_adventurers_guild");
+        guildWorldIsEnabled = ConfigurationEngine.setBoolean(fileConfiguration, "guildHubIsEnabledv2", false);
+        guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name v3", "em_adventurers_guild");
         guildLocationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
         guildWorldLocation = null;
         agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);
+        adventurersGuildMenuName = ConfigurationEngine.setString(fileConfiguration, "adventurersGuildMenuName", "&6&lAdventurer's Hub");
 
         //iterate through all prestige tiers
         for (int prestigeRank = 0; prestigeRank < 11; prestigeRank++)
@@ -308,7 +324,13 @@ public class AdventurersGuildConfig {
         health3 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige7Bonus", 3);
         health4 = ConfigurationEngine.setDouble(fileConfiguration, "healthPrestige10Bonus", 4);
 
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+        baseKillsForRankUp = ConfigurationEngine.setInt(fileConfiguration, "baseKillsForRankUp", 100);
+        additionalKillsForRankUpPerTier = ConfigurationEngine.setInt(fileConfiguration, "additionalKillsForRankUpPerTier", 50);
+
+        //initializes the AG location
+        AdventurersGuildCommand.defineTeleportLocation();
+
+        save();
     }
 
     public static String getRankName(int prestigeTier, int rankTier) {

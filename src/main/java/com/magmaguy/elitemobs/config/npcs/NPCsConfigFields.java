@@ -5,7 +5,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NPCsConfigFields {
 
@@ -25,6 +27,9 @@ public class NPCsConfigFields {
     private final String interactionType;
     private FileConfiguration fileConfiguration = null;
     private File file;
+    private double timeout;
+    public String noPreviousLocationMessage;
+    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -54,6 +59,7 @@ public class NPCsConfigFields {
         this.activationRadius = activationRadius;
         this.canSleep = canSleep;
         this.interactionType = interactionType;
+
     }
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -61,7 +67,7 @@ public class NPCsConfigFields {
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("role", role);
         fileConfiguration.addDefault("profession", profession);
-        fileConfiguration.addDefault("location", location);
+        fileConfiguration.addDefault("spawnLocation", location);
         fileConfiguration.addDefault("greetings", greetings);
         fileConfiguration.addDefault("dialog", dialog);
         fileConfiguration.addDefault("farewell", farewell);
@@ -70,6 +76,8 @@ public class NPCsConfigFields {
         fileConfiguration.addDefault("activationRadius", activationRadius);
         fileConfiguration.addDefault("canSleep", canSleep);
         fileConfiguration.addDefault("interactionType", interactionType);
+        if (!additionalConfigOptions.isEmpty())
+            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     public NPCsConfigFields(FileConfiguration fileConfiguration, File file) {
@@ -80,7 +88,7 @@ public class NPCsConfigFields {
         this.name = fileConfiguration.getString("name");
         this.role = fileConfiguration.getString("role");
         this.profession = fileConfiguration.getString("profession");
-        this.location = fileConfiguration.getString("location");
+        this.location = fileConfiguration.getString("spawnLocation");
         this.greetings = fileConfiguration.getStringList("greetings");
         this.dialog = fileConfiguration.getStringList("dialog");
         this.farewell = fileConfiguration.getStringList("farewell");
@@ -89,6 +97,12 @@ public class NPCsConfigFields {
         this.activationRadius = fileConfiguration.getDouble("activationRadius");
         this.canSleep = fileConfiguration.getBoolean("canSleep");
         this.interactionType = fileConfiguration.getString("interactionType");
+        if (fileConfiguration.getString("timeout") != null)
+            this.timeout = fileConfiguration.getDouble("timeout");
+        else
+            this.timeout = 0;
+        if (fileConfiguration.getString("noPreviousLocationMessage") != null)
+            this.noPreviousLocationMessage = fileConfiguration.getString("noPreviousLocationMessage");
     }
 
     public String getFileName() {
@@ -164,12 +178,20 @@ public class NPCsConfigFields {
 
     public void setLocation(String location) {
         this.location = location;
-        this.fileConfiguration.set("location", location);
+        this.fileConfiguration.set("spawnLocation", location);
         try {
             ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
         } catch (Exception ex) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }
+    }
+
+    public Map<String, Object> getAdditionalConfigOptions() {
+        return additionalConfigOptions;
+    }
+
+    public double getTimeout() {
+        return this.timeout;
     }
 
 }

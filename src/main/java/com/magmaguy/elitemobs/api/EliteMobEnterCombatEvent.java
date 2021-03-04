@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.CommandRunner;
@@ -28,6 +29,8 @@ public class EliteMobEnterCombatEvent extends Event {
         this.targetEntity = targetEntity;
         this.eliteMobEntity = eliteMobEntity;
         eliteMobEntity.setIsInCombat(true);
+        if (!DefaultConfig.alwaysShowNametags)
+            eliteMobEntity.setNameVisible(true);
         if (eliteMobEntity instanceof CustomBossEntity)
             CommandRunner.runCommandFromList(((CustomBossEntity) eliteMobEntity).customBossConfigFields.getOnCombatEnterCommands(), new ArrayList<>());
         new BukkitRunnable() {
@@ -49,13 +52,13 @@ public class EliteMobEnterCombatEvent extends Event {
                                     continue;
                                 return;
                             }
-                            cancel();
-                            Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
                         }
+                        cancel();
+                        Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
                     }
 
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
     }
 
     public Player getTargetEntity() {
@@ -76,25 +79,23 @@ public class EliteMobEnterCombatEvent extends Event {
     }
 
     public static class EliteMobEnterCombatEventFilter implements Listener {
-        @EventHandler
+        @EventHandler(ignoreCancelled = true)
         public void onEliteMobDamaged(EliteMobDamagedByPlayerEvent event) {
-            if (event.isCancelled()) return;
             if (event.getEliteMobEntity().isInCombat()) return;
             if (!(event.getEliteMobEntity().getLivingEntity() instanceof Mob)) return;
             if (event.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || event.getPlayer().getGameMode().equals(GameMode.ADVENTURE))
                 Bukkit.getServer().getPluginManager().callEvent(new EliteMobEnterCombatEvent(event.getEliteMobEntity(), event.getPlayer()));
         }
 
-        @EventHandler
+        @EventHandler(ignoreCancelled = true)
         public void onEliteMobDamage(PlayerDamagedByEliteMobEvent event) {
-            if (event.isCancelled()) return;
             if (event.getEliteMobEntity().isInCombat()) return;
             if (!(event.getEliteMobEntity().getLivingEntity() instanceof Mob)) return;
             if (event.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || event.getPlayer().getGameMode().equals(GameMode.ADVENTURE))
                 Bukkit.getServer().getPluginManager().callEvent(new EliteMobEnterCombatEvent(event.getEliteMobEntity(), event.getPlayer()));
         }
 
-        @EventHandler
+        @EventHandler(ignoreCancelled = true)
         public void onEliteMobTarget(EliteMobTargetPlayerEvent event) {
             if (event.getEliteMobEntity().isInCombat()) return;
             if (!(event.getEliteMobEntity().getLivingEntity() instanceof Mob)) return;

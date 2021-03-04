@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.powers.majorpowers.skeleton;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MajorPower;
-import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

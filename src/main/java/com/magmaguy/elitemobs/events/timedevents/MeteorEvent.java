@@ -2,11 +2,11 @@ package com.magmaguy.elitemobs.events.timedevents;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.config.events.premade.MeteorEventConfig;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.EventWorldFilter;
 import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
@@ -93,7 +93,7 @@ public class MeteorEvent extends EliteEvent implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (getBossEntity() == null || !getBossEntity().getLivingEntity().isDead()) return;
+                if (getBossEntity() == null || !getBossEntity().advancedGetEntity().isDead()) return;
                 cancel();
                 silentCompleteEvent();
             }

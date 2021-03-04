@@ -3,9 +3,9 @@ package com.magmaguy.elitemobs.powers.majorpowers.zombie;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -54,8 +54,8 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                         nameClearer(reinforcement2);
 
-                        reinforcement2.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("DeathMessage").
-                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("DeathMessage")
+                        reinforcement2.getLivingEntity().setCustomName(ChatColorConverter.convert(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("friendDeathMessage").
+                                get(ThreadLocalRandom.current().nextInt(PowersConfig.getPower("zombie_friends.yml").getConfiguration().getStringList("friendDeathMessage")
                                         .size()))));
 
                     }

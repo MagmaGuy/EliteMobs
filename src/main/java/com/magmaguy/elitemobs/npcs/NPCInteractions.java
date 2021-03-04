@@ -1,11 +1,16 @@
 package com.magmaguy.elitemobs.npcs;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
-import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
-import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
+import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
+import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.menus.CustomShopMenu;
+import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
+import com.magmaguy.elitemobs.menus.SellMenu;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,7 +29,9 @@ public class NPCInteractions implements Listener {
         BAR,
         ARENA,
         QUEST_GIVER,
-        NONE
+        NONE,
+        SELL,
+        TELEPORT_BACK
     }
 
     @EventHandler
@@ -43,7 +50,7 @@ public class NPCInteractions implements Listener {
 
         switch (npcEntity.getInteractionType()) {
             case GUILD_GREETER:
-                if (event.getPlayer().hasPermission("elitemobs.guild.npc"))
+                if (event.getPlayer().hasPermission("elitemobs.rank.npc")) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -51,6 +58,7 @@ public class NPCInteractions implements Listener {
                             GuildRankMenuHandler.initializeGuildRankMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                }
                 break;
             case CHAT:
                 npcEntity.sayDialog(event.getPlayer());
@@ -86,7 +94,28 @@ public class NPCInteractions implements Listener {
                 break;
             case ARENA:
                 break;
+            case SELL:
+                if (event.getPlayer().hasPermission("elitemobs.shop.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            SellMenu sellMenu = new SellMenu();
+                            sellMenu.constructSellMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
+            case TELEPORT_BACK:
+                if (event.getPlayer().hasPermission("elitemobs.back.npc")) {
+                    Location previousLocation = PlayerTeleportEvent.previousLocations.get(event.getPlayer());
+                    if (previousLocation == null) {
+                        if (npcEntity.npCsConfigFields.noPreviousLocationMessage != null)
+                            event.getPlayer().sendMessage(ChatColorConverter.convert(npcEntity.npCsConfigFields.noPreviousLocationMessage));
+                    } else
+                        PlayerPreTeleportEvent.teleportPlayer(event.getPlayer(), previousLocation);
+                }
+                break;
             case NONE:
+            default:
                 break;
 
         }
@@ -98,7 +127,7 @@ public class NPCInteractions implements Listener {
 
         if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
 
-        for (NPCEntity npcEntity : EntityTracker.getNPCEntities())
+        for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
             if (event.getView().getTitle().equals(npcEntity.getName())) {
                 event.setCancelled(true);
                 return;

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.config.customtreasurechests;
 
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,28 +12,29 @@ import java.util.List;
 
 public class CustomTreasureChestConfigFields {
 
-    private static HashSet<CustomTreasureChestConfigFields> customTreasureChestConfigFields = new HashSet<>();
+    private static final HashSet<CustomTreasureChestConfigFields> customTreasureChestConfigFields = new HashSet<>();
 
     public static HashSet<CustomTreasureChestConfigFields> getCustomTreasureChestConfigFields() {
         return customTreasureChestConfigFields;
     }
 
-    private String fileName;
+    private final String fileName;
     private File file;
     private FileConfiguration fileConfiguration;
-    private boolean isEnabled;
-    private String chestMaterial;
-    private String facing;
-    private int chestTier;
+    private final boolean isEnabled;
+    private final String chestMaterial;
+    private final String facing;
+    private final int chestTier;
+    private String locationString;
     private Location location;
-    private String dropStyle;
-    private int restockTimer;
-    private List<String> lootList;
-    private double mimicChance;
-    private List<String> mimicCustomBossesList;
+    private final String dropStyle;
+    private final int restockTimer;
+    private final List<String> lootList;
+    private final double mimicChance;
+    private final List<String> mimicCustomBossesList;
     private long restockTime;
-    private List<String> restockTimers;
-    private List<String> effects;
+    private final List<String> restockTimers;
+    private final List<String> effects;
 
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
@@ -112,8 +113,9 @@ public class CustomTreasureChestConfigFields {
 
         String location = configuration.getString("location");
         if (location == null) {
-            new WarningMessage("Custom Treasure Chest does not have a defined location! It will not spawn.");
+            new InfoMessage("Custom Treasure Chest in file " + fileName + " does not have a defined location! It will not spawn.");
         } else {
+            this.locationString = configuration.getString("location");
             this.location = ConfigurationLocation.deserialize(configuration.getString("location"));
         }
 
@@ -153,6 +155,10 @@ public class CustomTreasureChestConfigFields {
 
     public int getChestTier() {
         return this.chestTier;
+    }
+
+    public String getLocationString(){
+        return locationString;
     }
 
     public Location getLocation() {

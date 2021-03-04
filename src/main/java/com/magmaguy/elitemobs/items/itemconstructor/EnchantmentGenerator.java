@@ -4,11 +4,11 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
-import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.MaterialTier;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.items.EliteEnchantments;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -46,7 +46,7 @@ public class EnchantmentGenerator {
     Note: For procedurally generated items the enchantments only get applied to the item at the lore phase
     This only gathers the list of enchantments to be applied
      */
-    public static HashMap<Enchantment, Integer> generateEnchantments(double itemTier, Material material) {
+    public static HashMap<Enchantment, Integer> generateEnchantments(double itemTier, Material material, ItemMeta itemMeta) {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
@@ -288,6 +288,9 @@ public class EnchantmentGenerator {
             secondaryEnchantmentCount--;
 
         }
+
+        //this applies the vanilla enchants
+        generateEnchantments(itemMeta, enchantmentMap);
 
         return enchantmentMap;
 

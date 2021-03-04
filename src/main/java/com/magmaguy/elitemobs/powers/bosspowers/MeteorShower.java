@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -86,6 +86,7 @@ public class MeteorShower extends BossPower implements Listener {
             newLocation = newLocation.setDirection(new Vector(ThreadLocalRandom.current().nextDouble() - 0.5, -0.5, ThreadLocalRandom.current().nextDouble() - 0.5));
             Fireball fireball = (Fireball) location.getWorld().spawnEntity(newLocation, EntityType.FIREBALL);
             fireball.setShooter(eliteMobEntity.getLivingEntity());
+            fireball.setDirection(fireball.getDirection().multiply(0.5));
         }
     }
 

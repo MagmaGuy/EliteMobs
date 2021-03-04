@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.powers.bosspowers;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -146,7 +146,6 @@ public class SpiritWalk extends BossPower implements Listener {
 
         eliteMobEntity.getLivingEntity().setAI(false);
         eliteMobEntity.getLivingEntity().setInvulnerable(true);
-        eliteMobEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 10, 1));
         Vector toDestination = finalLocation.clone().subtract(entityLocation.clone()).toVector().normalize().divide(new Vector(2, 2, 2));
 
         Entity vehicle = null;
@@ -156,6 +155,8 @@ public class SpiritWalk extends BossPower implements Listener {
             if (vehicle instanceof LivingEntity)
                 ((LivingEntity) vehicle).setAI(false);
             vehicle.setInvulnerable(true);
+            if (eliteMobEntity.phaseBossEntity != null)
+                vehicle.remove();
         }
 
         new BukkitRunnable() {
@@ -195,7 +196,6 @@ public class SpiritWalk extends BossPower implements Listener {
                             }
                         }.runTaskLater(MetadataHandler.PLUGIN, 1);
                     }
-                    eliteMobEntity.getLivingEntity().removePotionEffect(PotionEffectType.GLOWING);
                     cancel();
 
                     Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));

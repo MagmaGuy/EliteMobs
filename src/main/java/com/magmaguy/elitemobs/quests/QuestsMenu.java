@@ -86,7 +86,7 @@ public class QuestsMenu implements Listener {
     }
 
     private static void populateQuests() {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 21; i++) {
             ArrayList<EliteQuest> questList = new ArrayList();
             for (int j = 0; j < 4; j++) {
                 questList.add(new EliteQuest(i));

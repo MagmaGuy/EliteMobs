@@ -1,260 +1,171 @@
 package com.magmaguy.elitemobs.commands;
 
+import cloud.commandframework.Command;
+import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
+import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
+import cloud.commandframework.paper.PaperCommandManager;
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.items.ShareItem;
+import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.items.ShareItem;
-import com.magmaguy.elitemobs.playerdata.PlayerStatusScreen;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import com.magmaguy.elitemobs.utils.WarningMessage;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
+import static net.kyori.adventure.text.Component.text;
 
 /**
  * Created by MagmaGuy on 21/01/2017.
  */
 
-public class CommandHandler implements CommandExecutor {
+public class CommandHandler {
 
-    public final static String STATS = "elitemobs.stats";
-    public final static String VERSION = "elitemobs.version";
-    public final static String GETLOOT = "elitemobs.getloot";
-    public final static String SIMLOOT = "elitemobs.simloot";
-    public final static String RELOAD = "elitemobs.reload";
-    public final static String GIVELOOT = "elitemobs.giveloot";
-    public final static String SPAWNMOB = "elitemobs.spawnmob";
-    public final static String KILLALL_AGGRESSIVEELITES = "elitemobs.killall.aggressiveelites";
-    public final static String KILLALL_PASSIVEELITES = "elitemobs.killall.passiveelites";
-    public final static String KILLALL_SPECIFICENTITY = "elitemobs.killall.specificentity";
-    public final static String SHOP = "elitemobs.shop";
-    public final static String CUSTOMSHOP = "elitemobs.customshop";
-    public final static String CURRENCY_PAY = "elitemobs.currency.pay";
-    public final static String CURRENCY_ADD = "elitemobs.currency.add";
-    public final static String CURRENCY_SUBTRACT = "elitemobs.currency.subtract";
-    public final static String CURRENCY_SET = "elitemobs.currency.set";
-    public final static String CURRENCY_WALLET = "elitemobs.currency.check";
-    public final static String CURRENCY_CHECK = "elitemobs.currency.check.others";
-    public final static String EVENTS = "elitemobs.events";
-    public final static String CHECK_TIER = "elitemobs.checktier";
-    public final static String CHECK_TIER_OTHERS = "elitemobs.checktier.others";
-    public final static String CHECK_MAX_TIER = "elitemobs.checkmaxtier";
-    public final static String GET_TIER = "elitemobs.gettier";
-    public final static String ADVENTURERS_GUILD = "elitemobs.adventurersguild";
-    public static final String NPC = "elitemobs.npc";
-    public static final String AUTOSETUP = "elitemobs.autosetup";
-    public static final String QUEST = "elitemobs.quest";
-    public static final String CUSTOMBOSS = "elitemobs.customboss";
-    public static final String DISCORD = "elitemobs.discord";
-    public static final String DEBUG = "elitemobs.debug";
-    public static final String SET_RANK = "elitemobs.maxrank";
+    private PaperCommandManager<CommandSender> manager;
+    private CommandConfirmationManager<CommandSender> paymentConfirmationManager;
+    private MinecraftHelp<CommandSender> minecraftHelp;
+    private BukkitAudiences bukkitAudiences;
 
-    @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+    /*
+    Commands powered by Cloud
+     */
 
-        switch (label) {
-            case "ag":
-            case "adventurersguild":
-            case "adventurerguild":
-                new AdventurersGuildCommand((Player) commandSender);
-                return true;
-            case "shareitem":
-                ShareItem.showOnChat((Player) commandSender);
-                return true;
+    public CommandHandler() {
+        Function<CommandTree, CommandExecutionCoordinator> commandExecutionCoordinator = null;
+        try {
+            Class<?> c = Class.forName("cloud.commandframework.execution.CommandExecutionCoordinator");
+            Method method = c.getDeclaredMethod("simpleCoordinator");
+            commandExecutionCoordinator = (Function<CommandTree, CommandExecutionCoordinator>) method.invoke(Function.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            manager = new PaperCommandManager(
+                    /* Owning plugin */ MetadataHandler.PLUGIN,
+                    /* Coordinator function */ commandExecutionCoordinator,
+                    /* Command Sender -> C */ Function.identity(),
+                    /* C -> Command Sender */ Function.identity()
+            );
+        } catch (final Exception e) {
+            new WarningMessage("Failed to initialize the command manager");
+            /* Disable the plugin */
+            MetadataHandler.PLUGIN.getServer().getPluginManager().disablePlugin(MetadataHandler.PLUGIN);
+            return;
         }
 
-        if (args.length == 0) {
-            if (commandSender instanceof Player && DefaultConfig.emLeadsToStatusMenu) {
-                new PlayerStatusScreen((Player) commandSender);
-                return true;
-            }
-            validCommands(commandSender);
-            return true;
-        }
+        //try {
+        //    manager.registerBrigadier();
+        //} catch (final Exception e) {
+        //    new WarningMessage("Failed to initialize Brigadier support: " + e.getMessage());
+        //}
 
-        args[0] = args[0].toLowerCase();
+        // Create a BukkitAudiences instance (adventure) in order to use the minecraft-extras help system
+        bukkitAudiences = BukkitAudiences.create(MetadataHandler.PLUGIN);
 
-        if (commandSender instanceof Player && UserCommands.parseUserCommand((Player) commandSender, args))
-            return true;
+        minecraftHelp = new MinecraftHelp<CommandSender>(
+                "/elitemobs help",
+                bukkitAudiences::sender,
+                manager
+        );
 
-        if (AdminCommands.parseAdminCommand(commandSender, args))
-            return true;
+        // Create the confirmation manager. This allows us to require certain commands to be
+        // confirmed before they can be executed
+        paymentConfirmationManager = new CommandConfirmationManager<>(
+                /* Timeout */ 30L,
+                /* Timeout unit */ TimeUnit.SECONDS,
+                /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
+                ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.ECONOMY_TAX_MESSAGE)
+                        .replace("$command", "/em confirm")
+                        .replace("$percentage", (EconomySettingsConfig.playerToPlayerTaxes * 100) + ""))),
+                /* Action when no confirmation is pending */ sender -> sender.sendMessage(
+                ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.NO_PENDING_COMMANDS)))
+        );
 
-        if (commandSender.isOp())
-            switch (args[0]) {
-                case "usepermissions":
-                    DefaultConfig.setUsePermissions(true, commandSender);
-                    return true;
-                case "dontusepermissions":
-                    DefaultConfig.setUsePermissions(false, commandSender);
-                    return true;
-            }
+        // Register the confirmation processor. This will enable confirmations for commands that require it
+        paymentConfirmationManager.registerConfirmationProcessor(manager);
 
-        validCommands(commandSender);
-        return true;
+        // Override the default exception handlers
+        new MinecraftExceptionHandler<CommandSender>()
+                .withInvalidSyntaxHandler()
+                .withInvalidSenderHandler()
+                .withNoPermissionHandler()
+                .withArgumentParsingHandler()
+                .withCommandExecutionHandler()
+                .withDecorator(
+                        component -> text()
+                                .append(text("[", NamedTextColor.DARK_GRAY))
+                                .append(text("Example", NamedTextColor.GOLD))
+                                .append(text("] ", NamedTextColor.DARK_GRAY))
+                                .append(component).build()
+                ).apply(manager, bukkitAudiences::sender);
 
+        constructCommands();
     }
 
-    public static boolean permCheck(String permission, CommandSender commandSender) {
+    public void constructCommands() {
 
-        if (!DefaultConfig.usePermissions) {
-            if (permission.equals(SHOP) ||
-                    permission.equals(SHOP + ".command") ||
-                    permission.equals(CUSTOMSHOP) ||
-                    permission.equals(CUSTOMSHOP + ".command") ||
-                    permission.equals(CURRENCY_PAY) ||
-                    permission.equals(CURRENCY_WALLET) ||
-                    permission.equals(ADVENTURERS_GUILD) ||
-                    permission.equals(QUEST))
-                return true;
-            else if (commandSender.isOp())
-                return true;
-        } else if (commandSender.hasPermission(permission)) return true;
+        // /ag
+        final Command.Builder<CommandSender> agBuilder = manager.commandBuilder("adventurersguild", "ag");
+        manager.command(agBuilder.meta(CommandMeta.DESCRIPTION, "Teleports players to the Adventurers' Guild Hub")
+                .senderType(Player.class)
+                //permission is dealt inside of the command
+                .handler(commandContext -> {
+                    if (DefaultConfig.emLeadsToStatusMenu)
+                        AdventurersGuildCommand.adventurersGuildCommand((Player) commandContext.getSender());
+                }));
 
-        if (commandSender instanceof Player && DefaultConfig.doPermissionTitles) {
+        // /shareitem
+        final Command.Builder<CommandSender> shareItemBuilder = manager.commandBuilder("shareitem");
+        manager.command(shareItemBuilder.meta(CommandMeta.DESCRIPTION, "Shares a held Elite item on chat.")
+                .senderType(Player.class)
+                //permission is dealt inside of the command
+                .permission("elitemobs.shareitem")
+                .handler(commandContext -> ShareItem.showOnChat((Player) commandContext.getSender())));
 
-            Player player = (Player) commandSender;
+        // Base command builder
+        final Command.Builder<CommandSender> builder = manager.commandBuilder("elitemobs", "em");
 
-            player.sendTitle(ConfigValues.translationConfig.getString(TranslationConfig.MISSING_PERMISSION_TITLE).replace("$username", player.getDisplayName()),
-                    ConfigValues.translationConfig.getString(TranslationConfig.MISSING_PERMISSION_SUBTITLE).replace("$permission", permission));
+        manager.command(builder.literal("help")
+                .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
+                .handler(context -> {
+                    minecraftHelp.queryCommands(context.getOrDefault("query", ""), context.getSender());
+                }));
 
-        } else {
+        // Add a confirmation command
+        manager.command(builder.literal("confirm")
+                .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
+                .handler(paymentConfirmationManager.createConfirmationExecutionHandler()));
 
-            commandSender.sendMessage("[EliteMobs] You may not run this command.");
-            commandSender.sendMessage("[EliteMobs] You don't have the permission " + permission);
+        //// Create a world argument
+        //final CommandArgument<CommandSender, World> worldArgument = WorldArgument.of("world");
 
-        }
+        // /em
+        manager.command(builder
+                .meta(CommandMeta.DESCRIPTION, "Opens the main player interface")
+                .senderType(Player.class)
+                .handler(commandContext -> {
+                    if (DefaultConfig.emLeadsToStatusMenu)
+                        new PlayerStatusScreen((Player) commandContext.getSender());
+                }));
 
-        return false;
-
-    }
-
-    public static boolean userPermCheck(String permission, CommandSender commandSender) {
-        if (commandSender instanceof Player)
-            return permCheck(permission, commandSender);
-
-        commandSender.sendMessage("[EliteMobs] You may not run this command.");
-        commandSender.sendMessage("[EliteMobs] This is a user command.");
-        return false;
-    }
-
-    public static void validCommands(CommandSender commandSender) {
-
-        if (commandSender instanceof Player) {
-
-            Player player = (Player) commandSender;
-
-            player.sendMessage("[EliteMobs] " + ConfigValues.translationConfig.getString(TranslationConfig.VALID_COMMANDS));
-            player.sendMessage("/em");
-            if (silentPermCheck(STATS, commandSender))
-                player.sendMessage("/elitemobs stats");
-            if (silentPermCheck(VERSION, commandSender))
-                player.sendMessage("/elitemobs version");
-            if (silentPermCheck(GETLOOT, commandSender))
-                player.sendMessage(
-                        "/elitemobs getloot [loot name (no loot name = AdventurersGuildMenu)]");
-            if (silentPermCheck(SIMLOOT, commandSender))
-                player.sendMessage("/elitemobs simloot [mob level]");
-            if (silentPermCheck(RELOAD, commandSender))
-                player.sendMessage("/elitemobs reload");
-            if (silentPermCheck(GIVELOOT, commandSender))
-                player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
-            if (silentPermCheck(SPAWNMOB, commandSender))
-                player.sendMessage("/elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
-            if (silentPermCheck(KILLALL_AGGRESSIVEELITES, commandSender))
-                player.sendMessage("/elitemobs kill aggressive");
-            if (silentPermCheck(KILLALL_PASSIVEELITES, commandSender))
-                player.sendMessage("/elitemobs kill passive");
-            if (silentPermCheck(KILLALL_SPECIFICENTITY, commandSender))
-                player.sendMessage("/elitemobs kill [entityType] [radius]");
-            if (silentPermCheck(SHOP, commandSender))
-                player.sendMessage("/elitemobs shop");
-            if (silentPermCheck(CUSTOMSHOP, commandSender))
-                player.sendMessage("/elitemobs customshop");
-            if (silentPermCheck(CURRENCY_PAY, commandSender))
-                player.sendMessage("/elitemobs pay [username]");
-            if (silentPermCheck(CURRENCY_ADD, commandSender))
-                player.sendMessage("/elitemobs add [username]");
-            if (silentPermCheck(CURRENCY_SUBTRACT, commandSender))
-                player.sendMessage("/elitemobs subtract [username]");
-            if (silentPermCheck(CURRENCY_SET, commandSender))
-                player.sendMessage("/elitemobs set [username]");
-            if (silentPermCheck(CURRENCY_WALLET, commandSender))
-                player.sendMessage("/elitemobs wallet");
-            if (silentPermCheck(CURRENCY_CHECK, commandSender))
-                player.sendMessage("/elitemobs check [username]");
-            if (silentPermCheck(EVENTS, commandSender))
-                player.sendMessage("/elitemobs event [eventName]");
-            if (silentPermCheck(CHECK_TIER, commandSender))
-                player.sendMessage("/elitemobs checktier");
-            if (silentPermCheck(CHECK_TIER_OTHERS, commandSender))
-                player.sendMessage("/elitemobs checktier [player]");
-            if (silentPermCheck(CHECK_MAX_TIER, commandSender))
-                player.sendMessage("elitemobs checkmaxtier");
-            if (silentPermCheck(ADVENTURERS_GUILD, commandSender))
-                player.sendMessage("/ag");
-            if (silentPermCheck(NPC, commandSender))
-                player.sendMessage("/elitemobs npc");
-            if (silentPermCheck(AUTOSETUP, commandSender))
-                player.sendMessage("/elitemobs autosetup");
-            if (silentPermCheck(QUEST, commandSender))
-                player.sendMessage("/elitemobs quest");
-            if (silentPermCheck(CUSTOMBOSS, commandSender))
-                player.sendMessage("/elitemobs customboss");
-            if (silentPermCheck(DISCORD, commandSender))
-                player.sendMessage("/elitemobs discord");
-            if (silentPermCheck(DISCORD, commandSender))
-                player.sendMessage("/elitemobs discord [message]");
-            if (silentPermCheck(DEBUG, commandSender))
-                player.sendMessage("/elitemobs debug");
-            if (silentPermCheck(GET_TIER, commandSender))
-                commandSender.sendMessage("/elitemobs gettier [tier]");
-            if (silentPermCheck(QUEST, commandSender)) {
-                commandSender.sendMessage("/elitemobs quest");
-                commandSender.sendMessage("/elitemobs quest status");
-            }
-            if (silentPermCheck(SET_RANK, commandSender))
-                commandSender.sendMessage("/elitemobs setrank [player] [prestigeTier] [guildTier]");
-
-
-        } else if (commandSender instanceof ConsoleCommandSender) {
-
-            commandSender.sendMessage("[EliteMobs] " + ConfigValues.translationConfig.getString(TranslationConfig.INVALID_COMMAND));
-            commandSender.sendMessage("elitemobs stats");
-            commandSender.sendMessage("elitemobs reload");
-            commandSender.sendMessage("elitemobs check [username]");
-            commandSender.sendMessage("elitemobs set [username]");
-            commandSender.sendMessage("elitemobs add [username]");
-            commandSender.sendMessage("elitemobs subtract [username]");
-            commandSender.sendMessage("elitemobs killall passiveelites");
-            commandSender.sendMessage("elitemobs killall aggressiveelites");
-            commandSender.sendMessage("elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
-            commandSender.sendMessage("elitemobs SpawnMob [worldName] [x] [y] [z] [mobType] [mobLevel] [mobPower] [mobPower2(keep adding as many as you'd like)]");
-
-        }
+        new AdminCommands(manager, builder);
+        new UserCommands(manager, builder, paymentConfirmationManager);
 
     }
-
-    private static boolean silentPermCheck(String permission, CommandSender commandSender) {
-        if (!DefaultConfig.usePermissions) {
-            if (commandSender instanceof Player) {
-                if (permission.equals(SHOP) ||
-                        permission.equals(SHOP + ".command") ||
-                        permission.equals(CUSTOMSHOP) ||
-                        permission.equals(CUSTOMSHOP + ".command") ||
-                        permission.equals(CURRENCY_PAY) ||
-                        permission.equals(CURRENCY_WALLET) ||
-                        permission.equals(ADVENTURERS_GUILD) ||
-                        permission.equals(QUEST))
-                    return true;
-                else if (commandSender.isOp())
-                    return true;
-            }
-        }
-
-        return commandSender.hasPermission(permission);
-    }
-
 
 }

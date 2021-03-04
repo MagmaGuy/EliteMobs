@@ -1,182 +1,217 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.CrashFix;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.*;
-import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
+import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
+import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
+import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
+import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.powers.ElitePower;
-import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
-import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.utils.*;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
+import com.magmaguy.elitemobs.utils.CommandRunner;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
+import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CustomBossEntity extends EliteMobEntity implements Listener {
+public class CustomBossEntity extends EliteMobEntity implements Listener, SimplePersistentEntityInterface {
 
-    public static CustomBossEntity constructCustomBoss(String fileName, Location location, int mobLevel) {
-        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
-        if (!customBossMobsConfigAttributes.isEnabled()) return null;
-
-        return new CustomBossEntity(
-                customBossMobsConfigAttributes,
-                EntityType.valueOf(customBossMobsConfigAttributes.getEntityType()),
-                location,
-                mobLevel,
-                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
-    }
-
-    public static CustomBossEntity constructCustomBoss(String fileName, Location location, int mobLevel, RegionalBossEntity regionalBossEntity, boolean isPhaseBossRespawn) {
-        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
-        if (!customBossMobsConfigAttributes.isEnabled()) return null;
-
-        return new CustomBossEntity(
-                customBossMobsConfigAttributes,
-                EntityType.valueOf(customBossMobsConfigAttributes.getEntityType()),
-                location,
-                mobLevel,
-                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()),
-                regionalBossEntity,
-                isPhaseBossRespawn);
-    }
-
-    public static CustomBossEntity constructCustomBoss(String fileName, Location location, int mobLevel, double health, UUID phaseBossUUID) {
-        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
-        if (!customBossMobsConfigAttributes.isEnabled()) return null;
-
-        return new CustomBossEntity(
-                customBossMobsConfigAttributes,
-                EntityType.valueOf(customBossMobsConfigAttributes.getEntityType()),
-                location,
-                mobLevel,
-                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()),
-                health,
-                phaseBossUUID);
-    }
-
-    private static final HashMap<UUID, CustomBossEntity> customBosses = new HashMap<>();
-
-    private static void addCustomBoss(CustomBossEntity customBossEntity) {
-        customBosses.put(customBossEntity.uuid, customBossEntity);
-    }
-
-    public static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
-
-    private static void removeCustomBoss(UUID uuid) {
-        customBosses.remove(uuid);
-    }
-
-    private static boolean isCustomBoss(UUID uuid) {
-        return customBosses.containsKey(uuid);
-    }
-
-    public static CustomBossEntity getCustomBoss(UUID uuid) {
-        return customBosses.get(uuid);
-    }
-
-    public static HashMap<UUID, CustomBossEntity> getCustomBosses() {
-        return customBosses;
-    }
-
-    public CustomBossConfigFields customBossConfigFields;
-    private final HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
-    public UUID uuid;
-    private boolean trailIsActive = false;
-    private boolean trackable = false;
-
-    public LivingEntity advancedGetEntity() {
-        if (getLivingEntity() != null)
-            return getLivingEntity();
-        else {
-            setLivingEntity((LivingEntity) Bukkit.getEntity(this.uuid));
-            return (LivingEntity) Bukkit.getEntity(this.uuid);
+    /**
+     * Generates a living entity for all custom bosses. Player command bypasses this check in order to bypass spawn restrictions.
+     */
+    private static LivingEntity generateLivingEntity(Location location,
+                                                     CustomBossConfigFields customBossConfigFields) {
+        if (customBossConfigFields == null || !customBossConfigFields.isEnabled()) {
+            new WarningMessage("Attempted to spawn a boss which had its configuration file disabled! Boss file: " + customBossConfigFields.getFileName());
+            return null;
+        }
+        if (!EliteMobEntity.validSpawnLocation(location)) return null;
+        try {
+            WorldGuardSpawnEventBypasser.forceSpawn();
+            return (LivingEntity) location.getWorld().spawnEntity(location, EntityType.valueOf(customBossConfigFields.getEntityType()));
+        } catch (Exception ex) {
+            new WarningMessage("Failed to spawn a Custom Boss' living entity! Is the region protected against spawns? Custom boss: " + customBossConfigFields.getFileName() + " entry: " + location.toString());
+            return null;
         }
     }
 
     /**
-     * For normal Custom Bosses (not regional and not phase bosses)
-     *
-     * @param customBossConfigFields
-     * @param entityType
+     * Method used most of the time for generating custom bosses.
+     */
+    public static CustomBossEntity constructCustomBoss(String fileName,
+                                                       Location location,
+                                                       int mobLevel) {
+        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
+        LivingEntity livingEntity = generateLivingEntity(location, customBossMobsConfigAttributes);
+        if (livingEntity == null) return null;
+
+        return new CustomBossEntity(
+                customBossMobsConfigAttributes,
+                livingEntity,
+                mobLevel,
+                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
+    }
+
+    /**
+     * Method used by mounts
+     * @param fileName
      * @param location
      * @param mobLevel
-     * @param elitePowers
+     * @return
+     */
+    public static CustomBossEntity constructCustomBossMount(String fileName,
+                                                       Location location,
+                                                       int mobLevel) {
+        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
+        customBossMobsConfigAttributes.setIsPersistent(false);
+        LivingEntity livingEntity = generateLivingEntity(location, customBossMobsConfigAttributes);
+        if (livingEntity == null) return null;
+
+        CustomBossEntity mount =  new CustomBossEntity(
+                customBossMobsConfigAttributes,
+                livingEntity,
+                mobLevel,
+                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()));
+
+        //prevent the mount from despawning based on distance, does not mount unloading based on chunks
+        mount.getLivingEntity().setRemoveWhenFarAway(false);
+
+        return mount;
+    }
+
+    /**
+     * Method used by commands
+     */
+    public static CustomBossEntity constructCustomBoss(String fileName,
+                                                       Location location) {
+        CustomBossConfigFields customBossConfigFields = CustomBossesConfig.getCustomBoss(fileName);
+        LivingEntity livingEntity = generateLivingEntity(location, customBossConfigFields);
+        if (livingEntity == null) return null;
+
+        return new CustomBossEntity(
+                customBossConfigFields,
+                livingEntity,
+                customBossConfigFields.getLevel(),
+                ElitePowerParser.parsePowers(customBossConfigFields.getPowers()));
+    }
+
+    /**
+     * Method used to generate a custom boss for phase and regional boss entities
+     */
+    public static CustomBossEntity constructCustomBoss(CustomBossConfigFields customBossConfigFields,
+                                                       Location location,
+                                                       int mobLevel,
+                                                       RegionalBossEntity regionalBossEntity,
+                                                       boolean isPhaseBossRespawn) {
+        LivingEntity livingEntity = generateLivingEntity(location, customBossConfigFields);
+        if (livingEntity == null) return null;
+
+        return new CustomBossEntity(
+                customBossConfigFields,
+                livingEntity,
+                mobLevel,
+                ElitePowerParser.parsePowers(customBossConfigFields.getPowers()),
+                regionalBossEntity,
+                isPhaseBossRespawn);
+    }
+
+    /**
+     * Constructs a custom boss for the phase boss system at a specific phase
+     */
+    public static CustomBossEntity constructCustomBoss(String fileName,
+                                                       Location location,
+                                                       int mobLevel,
+                                                       double health) {
+        CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
+        LivingEntity livingEntity = generateLivingEntity(location, customBossMobsConfigAttributes);
+        if (livingEntity == null) return null;
+
+        return new CustomBossEntity(
+                customBossMobsConfigAttributes,
+                livingEntity,
+                mobLevel,
+                ElitePowerParser.parsePowers(customBossMobsConfigAttributes.getPowers()),
+                health);
+    }
+
+
+    public static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
+
+    public CustomBossConfigFields customBossConfigFields;
+    public CustomBossEntity customBossMount = null;
+    public LivingEntity livingEntityMount = null;
+    private final HashMap<CustomItem, Double> uniqueLootList = new HashMap<>();
+
+    public LivingEntity advancedGetEntity() {
+        if (getLivingEntity() == null ||
+                !getLivingEntity().isValid() && !getLivingEntity().isDead())
+            setLivingEntity((LivingEntity) Bukkit.getEntity(this.uuid));
+        return getLivingEntity();
+    }
+
+    /**
+     * Main custom boss constructor
      */
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
-                            EntityType entityType,
-                            Location location,
+                            LivingEntity livingEntity,
                             int mobLevel,
                             HashSet<ElitePower> elitePowers) {
-        super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
-        if (super.getLivingEntity() == null) {
-            new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " . Cause for failure:" +
-                    " Tried to spawn in a region that prevented it from spawning. This is probably not an EliteMobs issue," +
-                    " but a region management issue. Check if mobs are allowed to spawn where you are trying to spawn it. Location: "
-                    + location.toString());
-            return;
-        }
-        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+        super(livingEntity,
+                mobLevel,
+                customBossConfigFields.getName(),
+                elitePowers,
+                CreatureSpawnEvent.SpawnReason.CUSTOM,
+                customBossConfigFields.getIsPersistent());
+        initializeCustomBoss(customBossConfigFields);
         spawnMessage();
         if (customBossConfigFields.getPhases().size() > 0)
             new PhaseBossEntity(this);
     }
 
     /**
-     * For regional bosses
-     *
-     * @param customBossConfigFields
-     * @param entityType
-     * @param location
-     * @param mobLevel
-     * @param elitePowers
+     * For regional & phase bosses
      */
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
-                            EntityType entityType,
-                            Location location,
+                            LivingEntity livingEntity,
                             int mobLevel,
                             HashSet<ElitePower> elitePowers,
                             RegionalBossEntity regionalBossEntity,
                             boolean isPhaseBossRespawn) {
-        super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
-        if (super.getLivingEntity() == null) {
-            new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " . Cause for failure:" +
-                    " Tried to spawn in a region that prevented it from spawning. This is probably not an EliteMobs issue," +
-                    " but a region management issue. Check if mobs are allowed to spawn where you are trying to spawn it. Location: "
-                    + location.toString());
-            return;
-        }
-        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+        super(livingEntity,
+                mobLevel,
+                customBossConfigFields.getName(),
+                elitePowers,
+                CreatureSpawnEvent.SpawnReason.CUSTOM,
+                //regional & phase bosses HAVE to be persistent
+                true);
+        initializeCustomBoss(customBossConfigFields);
         if (!isPhaseBossRespawn)
             spawnMessage();
         if (customBossConfigFields.getPhases().size() > 0) {
@@ -186,151 +221,121 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     /**
      * For Custom bosses spawned by the phase boss system
-     *
-     * @param customBossConfigFields
-     * @param entityType
-     * @param location
-     * @param mobLevel
-     * @param elitePowers
-     * @param health
-     * @param phaseBossUUID
      */
     public CustomBossEntity(CustomBossConfigFields customBossConfigFields,
-                            EntityType entityType,
-                            Location location,
+                            LivingEntity livingEntity,
                             int mobLevel,
                             HashSet<ElitePower> elitePowers,
-                            double health,
-                            UUID phaseBossUUID) {
-        super(entityType, location, mobLevel, customBossConfigFields.getName(), elitePowers, CreatureSpawnEvent.SpawnReason.CUSTOM, health, phaseBossUUID);
-        initializeCustomBoss(customBossConfigFields, entityType, location, mobLevel, elitePowers);
+                            double health) {
+        super(livingEntity,
+                mobLevel,
+                customBossConfigFields.getName(),
+                elitePowers,
+                CreatureSpawnEvent.SpawnReason.CUSTOM,
+                health,
+                //todo: phase bosses currently have to be persistent for safety reasons, this might not adapt to every setup
+                true);
+        initializeCustomBoss(customBossConfigFields);
         this.setHealth(health * getMaxHealth());
     }
 
-    private void initializeCustomBoss(CustomBossConfigFields customBossConfigFields,
-                                      EntityType entityType,
-                                      Location location,
-                                      int mobLevel,
-                                      HashSet<ElitePower> elitePowers) {
+    private void initializeCustomBoss(CustomBossConfigFields customBossConfigFields) {
         if (super.getLivingEntity() == null) {
-            new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " . Cause for failure:" +
-                    " Tried to spawn in a region that prevented it from spawning. This is probably not an EliteMobs issue," +
-                    " but a region management issue. Check if mobs are allowed to spawn where you are trying to spawn it. Location: "
-                    + location.toString());
+            this.uuid = null;
+            new WarningMessage("Failed to spawn boss " + customBossConfigFields.getFileName() + " .");
             return;
         }
-        uuid = super.getLivingEntity().getUniqueId();
         super.setDamageMultiplier(customBossConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossConfigFields.getHealthMultiplier());
         super.setHasSpecialLoot(customBossConfigFields.getDropsEliteMobsLoot());
         this.customBossConfigFields = customBossConfigFields;
         setEquipment();
-        if (entityType.equals(EntityType.ZOMBIE))
-            ((Zombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        else if (entityType.equals(EntityType.DROWNED))
-            ((Drowned) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        else if (entityType.equals(EntityType.HUSK))
-            ((Husk) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        else if (!VersionChecker.currentVersionIsUnder(16, 0))
-            if (entityType.equals(EntityType.ZOMBIFIED_PIGLIN))
-                ((PigZombie) super.getLivingEntity()).setBaby(customBossConfigFields.isBaby());
-        super.setPersistent(customBossConfigFields.getIsPersistent());
-        if (customBossConfigFields.getTrails() != null) startBossTrails();
-        if (customBossConfigFields.getAnnouncementPriority() > 1 && MobCombatSettingsConfig.showCustomBossLocation && customBossConfigFields.getLocationMessage() != null) {
-            this.trackable = true;
-            trackableCustomBosses.add(this);
-            sendLocation();
-        }
-        if (customBossConfigFields.getDropsVanillaLoot())
-            super.setHasVanillaLoot(customBossConfigFields.getDropsVanillaLoot());
+        setBaby();
+        startBossTrails();
+        setVanillaLoot();
         parseUniqueLootList();
-        addCustomBoss(this);
-        if (customBossConfigFields.getFollowRange() != null && customBossConfigFields.getFollowRange() > 0 && getLivingEntity() instanceof Mob)
-            getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
+        setTracking();
+        setFollowRange();
         mountEntity();
-        if (customBossConfigFields.getDisguise() != null)
-            if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
-                DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity());
-        if (customBossConfigFields.getFrozen()) {
-            getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10));
-            getLivingEntity().setCollidable(false);
-            getLivingEntity().setGravity(false);
-        }
+        setDisguise();
+        setFrozen();
         CommandRunner.runCommandFromList(customBossConfigFields.getOnSpawnCommands(), new ArrayList<>());
+        startEscapeMechanismDelay(customBossConfigFields.getTimeout());
+        super.customBossEntity = this;
+    }
+
+    /**
+     * This runs when a persistent Custom Boss has been nullified by something during runtime in order to respawn it.
+     */
+    public void silentCustomBossInitialization() {
+        setEquipment();
+        setBaby();
+        setFollowRange();
+        mountEntity();
+        setFrozen();
+        resetMaxHealth();
+        setHealth(getHealth());
+        setName(customBossConfigFields.getName());
+    }
+
+    private void setBaby() {
+        if (super.getLivingEntity() instanceof Ageable)
+            if (customBossConfigFields.isBaby())
+                ((Ageable) super.getLivingEntity()).setBaby();
+            else
+                ((Ageable) super.getLivingEntity()).setAdult();
     }
 
     private void spawnMessage() {
         if (customBossConfigFields.getSpawnMessage() == null) return;
         if (customBossConfigFields.getAnnouncementPriority() < 1) return;
-        Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
+        if (customBossConfigFields.getAnnouncementPriority() == 1 && !ConfigValues.eventsConfig.getBoolean(EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY))
+            Bukkit.broadcastMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
+        else
+            for (Player player : getLivingEntity().getWorld().getPlayers())
+                player.sendMessage(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
         if (customBossConfigFields.getAnnouncementPriority() < 3) return;
         new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossConfigFields.getSpawnMessage()));
     }
 
-    public void startBossTrails() {
-        //todo: this is not good
-        if (trailIsActive) return;
-        trailIsActive = true;
-        for (String string : this.customBossConfigFields.getTrails()) {
-            try {
-                Particle particle = Particle.valueOf(string);
-                doParticleTrail(particle);
-            } catch (Exception ex) {
-            }
-            try {
-                Material material = Material.valueOf(string);
-                doItemTrail(material);
-            } catch (Exception ex) {
-            }
+    private void setDisguise() {
+        if (customBossConfigFields.getDisguise() == null) return;
+        if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
+        try {
+            DisguiseEntity.disguise(customBossConfigFields.getDisguise(), getLivingEntity(), customBossConfigFields);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to load LibsDisguises disguise correctly!");
+        }
+        super.setName(customBossConfigFields.getName());
+    }
+
+    private void setFrozen() {
+        if (!customBossConfigFields.getFrozen()) return;
+        getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10));
+        getLivingEntity().setCollidable(false);
+        getLivingEntity().setGravity(false);
+    }
+
+    private void setTracking() {
+        if (customBossConfigFields.getAnnouncementPriority() > 1 &&
+                MobCombatSettingsConfig.showCustomBossLocation &&
+                customBossConfigFields.getLocationMessage() != null) {
+            trackableCustomBosses.add(this);
+            sendLocation();
         }
     }
 
-    private void doParticleTrail(Particle particle) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                //In case of boss death or chunk unload, stop the effect
-                if (!getLivingEntity().isValid()) {
-                    cancel();
-                    trailIsActive = false;
-                    return;
-                }
-                //All conditions cleared, do the boss flair effect
-                Location entityCenter = getLivingEntity().getLocation().clone().add(0, getLivingEntity().getHeight() / 2, 0);
-                getLivingEntity().getWorld().spawnParticle(particle, entityCenter, 1, 0.1, 0.1, 0.1, 0.05);
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+    private void setFollowRange() {
+        if (customBossConfigFields.getFollowRange() != null &&
+                customBossConfigFields.getFollowRange() > 0 &&
+                getLivingEntity() instanceof Mob)
+            getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
     }
 
-    private void doItemTrail(Material material) {
-        new BukkitRunnable() {
+    private CustomBossTrail customBossTrail;
 
-            @Override
-            public void run() {
-                //In case of boss death, stop the effect
-                if (!getLivingEntity().isValid()) {
-                    cancel();
-                    trailIsActive = false;
-                    return;
-                }
-                //All conditions cleared, do the boss flair effect
-                Location entityCenter = getLivingEntity().getLocation().clone().add(0, getLivingEntity().getHeight() / 2, 0);
-                Item item = VisualItemInitializer.initializeItem(ItemStackGenerator.generateItemStack
-                        (material, "visualItem", Arrays.asList(ThreadLocalRandom.current().nextDouble() + "")), entityCenter);
-                item.setVelocity(new Vector(
-                        ThreadLocalRandom.current().nextDouble() / 5 - 0.10,
-                        ThreadLocalRandom.current().nextDouble() / 5 - 0.10,
-                        ThreadLocalRandom.current().nextDouble() / 5 - 0.10));
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        item.remove();
-                        EntityTracker.wipeEntity(item);
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 20);
-
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
+    private void startBossTrails() {
+        customBossTrail = new CustomBossTrail(this);
     }
 
     private void parseUniqueLootList() {
@@ -346,6 +351,11 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
         }
     }
 
+    private void setVanillaLoot() {
+        if (customBossConfigFields.getDropsVanillaLoot())
+            super.setHasVanillaLoot(customBossConfigFields.getDropsVanillaLoot());
+    }
+
     private HashMap<CustomItem, Double> getUniqueLootList() {
         return this.uniqueLootList;
     }
@@ -358,79 +368,76 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
             getLivingEntity().getEquipment().setBoots(customBossConfigFields.getBoots());
             getLivingEntity().getEquipment().setItemInMainHand(customBossConfigFields.getMainHand());
             getLivingEntity().getEquipment().setItemInOffHand(customBossConfigFields.getOffHand());
+            if (getLivingEntity().getEquipment().getHelmet() != null) {
+                ItemMeta helmetMeta = getLivingEntity().getEquipment().getHelmet().getItemMeta();
+                if (helmetMeta != null) {
+                    helmetMeta.setUnbreakable(true);
+                    getLivingEntity().getEquipment().getHelmet().setItemMeta(helmetMeta);
+                }
+            }
         } catch (Exception ex) {
             new WarningMessage("Tried to assign a material slot to an invalid entity! Boss is from file" + customBossConfigFields.getFileName());
         }
     }
 
-    private final HashSet<Player> trackingPlayer = new HashSet<>();
-
     private void sendLocation() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!player.getWorld().equals(getLivingEntity().getWorld())) continue;
             TextComponent interactiveMessage = new TextComponent(MobCombatSettingsConfig.bossLocationMessage);
-            interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + player.getName() + " " + this.uuid));
+            interactiveMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + this.uuid));
             interactiveMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Track the " + getName()).create()));
             player.spigot().sendMessage(interactiveMessage);
         }
     }
 
-    public void realTimeTracking(Player player) {
-        if (trackingPlayer.contains(player)) {
-            trackingPlayer.remove(player);
-            return;
-        }
-        if (!getLivingEntity().getWorld().equals(player.getWorld())) {
-            player.sendMessage("You're not in the right world to track this boss!");
-        }
-        trackingPlayer.add(player);
-        startBossBarTask(player);
+    public final HashSet<Player> trackingPlayer = new HashSet<>();
+    public HashMap<Player, BossBar> playerBossBars = new HashMap<>();
+    public HashSet<CustomBossBossBar> customBossBossBars = new HashSet<>();
 
+    public void startBossBarTask(Player player, boolean persistentTracking) {
+        if (trackingPlayer.contains(player))
+            if (persistentTracking) {
+                //in case a player untracks a boss
+                trackingPlayer.remove(player);
+                return;
+            } else
+                //In case non-persistent tracking is activated for someone already doing persistent tracking
+                return;
+        //in case non-persistent tracking is activated for someone already under the effect of non-persistent tracking
+        if (playerBossBars.containsKey(player)) return;
+        //In case a new custom boss bar needs to be created, persistent or not
+        customBossBossBars.add(new CustomBossBossBar(this, player, persistentTracking));
     }
 
-    HashMap<Player, BossBar> playerBossbars = new HashMap<>();
+    private BukkitTask bossLocalScan;
 
-    public void startBossBarTask(Player player) {
-
-        if (playerBossbars.containsKey(player))
-            return;
-
-        String locationString = (int) getLivingEntity().getLocation().getX() +
-                ", " + (int) getLivingEntity().getLocation().getY() +
-                ", " + (int) getLivingEntity().getLocation().getZ();
-        BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-        bossBar.setProgress(getHealth() / getMaxHealth());
-        bossBar.addPlayer(player);
-
-        playerBossbars.put(player, bossBar);
-
-
-        new BukkitRunnable() {
+    public void startBossBarLocalScan() {
+        CustomBossEntity customBossEntity = this;
+        bossLocalScan = new BukkitRunnable() {
             @Override
             public void run() {
-                if (getLivingEntity().isDead() ||
-                        !player.isOnline() ||
-                        !player.getWorld().equals(getLivingEntity().getWorld()) ||
-                        !trackingPlayer.contains(player) && player.getLocation().distance(getLivingEntity().getLocation()) > 20) {
-                    bossBar.removeAll();
+                if (!customBossEntity.isInCombat()) {
                     cancel();
-                    playerBossbars.remove(player);
                     return;
                 }
-
-                String locationString = (int) getLivingEntity().getLocation().getX() +
-                        ", " + (int) getLivingEntity().getLocation().getY() +
-                        ", " + (int) getLivingEntity().getLocation().getZ();
-                bossBar.setTitle(bossBarMessage(player, locationString));
-                bossBar.setProgress(getHealth() / getMaxHealth());
-
+                for (Entity entity : getLivingEntity().getNearbyEntities(20, 20, 20))
+                    if (entity.getType().equals(EntityType.PLAYER))
+                        customBossEntity.startBossBarTask((Player) entity, false);
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
     }
 
+    /**
+     * Used not only for generating the boss bar message, but also the message that appears on the tracking screen for players
+     *
+     * @param player
+     * @param locationString
+     * @return
+     */
     public String bossBarMessage(Player player, String locationString) {
-        if (customBossConfigFields.getLocationMessage().contains("$distance") || customBossConfigFields.getLocationMessage().contains("$location")) {
-            if (!player.getLocation().getWorld().equals(advancedGetEntity().getWorld()))
+        if (customBossConfigFields.getLocationMessage().contains("$distance") ||
+                customBossConfigFields.getLocationMessage().contains("$location")) {
+            if (!player.getLocation().getWorld().equals(getLivingEntity().getWorld()))
                 return ChatColorConverter.convert(MobCombatSettingsConfig.defaultOtherWorldBossLocationMessage
                         .replace("$name", getName()));
 
@@ -443,7 +450,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
 
     }
 
-    private void dropLoot(Player player) {
+    public void dropLoot(Player player) {
 
         if (getUniqueLootList().isEmpty()) return;
 
@@ -452,258 +459,123 @@ public class CustomBossEntity extends EliteMobEntity implements Listener {
                 CustomItem.dropPlayerLoot(player, (int) getTier(), customItem.getFileName(), getLivingEntity().getLocation());
     }
 
-    private void mountEntity() {
-        if (customBossConfigFields.getMountedEntity() == null) return;
-        try {
-            EntityType entityType = EntityType.valueOf(customBossConfigFields.getMountedEntity());
-            LivingEntity livingEntity = (LivingEntity) getLivingEntity().getWorld().spawnEntity(getLivingEntity().getLocation(), entityType);
-            PreventMountExploit.bypass = true;
-            livingEntity.addPassenger(getLivingEntity());
+    public CustomBossEntity mount;
 
-        } catch (Exception ex) {
-            //This runs when it's not an API entity
-            for (CustomBossConfigFields iteratedField : CustomBossConfigFields.customBossConfigFields) {
-                if (iteratedField.getFileName().equalsIgnoreCase(customBossConfigFields.getMountedEntity())) {
-                    CustomBossEntity customBossEntity = constructCustomBoss(customBossConfigFields.getMountedEntity(), getLivingEntity().getLocation(), getLevel());
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            PreventMountExploit.bypass = true;
-                            customBossEntity.getLivingEntity().addPassenger(getLivingEntity());
-                        }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 2);
-                    return;
-                }
-            }
-            new WarningMessage("Attempted to make Custom Boss " + customBossConfigFields.getFileName() + " mount invalid" +
-                    " entity or boss " + customBossConfigFields.getMountedEntity() + " . Fix this in the configuration file.");
+    private void mountEntity() {
+        mount = CustomBossMount.generateMount(this);
+    }
+
+    private BukkitTask escapeMechanism;
+
+    /**
+     * Starts the escape mechanic for bosses that have this feature. After a set time, in minutes, the boss will escape,
+     * potentially broadcasting an escape message.
+     */
+    private void startEscapeMechanismDelay(int timeout) {
+        escapeMechanism = CustomBossEscapeMechanism.startEscape(timeout, this);
+    }
+
+    /**
+     * Removal method for when the custom boss dies or is otherwise entirely removed
+     */
+    @Override
+    public void remove(boolean removeEntity) {
+        softRemove();
+        if (escapeMechanism != null) escapeMechanism.cancel();
+        trackableCustomBosses.remove(this);
+        if (simplePersistentEntity != null) {
+            //This manually dereferences simple persistent entities and doesn't remove them to avoid async conflicts
+            simplePersistentEntity.customBossEntity = null;
+            simplePersistentEntity = null;
+        }
+        for (CustomBossBossBar customBossBossBar : customBossBossBars) customBossBossBar.remove(true);
+        customBossBossBars.clear();
+        if (removeEntity){
+            if (getLivingEntity() != null)
+                getLivingEntity().remove();
+            if (simplePersistentEntity != null)
+                simplePersistentEntity.remove();
         }
     }
 
+    /**
+     * Removal method for stopping tasks when the boss gets unloaded.
+     * Should remove any ongoing effects which would malfunction if unloaded.
+     */
+    public void softRemove() {
+        if (customBossTrail != null) customBossTrail.terminateTrails();
+        if (bossLocalScan != null) bossLocalScan.cancel();
+        if (livingEntityMount != null)
+            livingEntityMount.remove();
+        if (customBossMount != null)
+            customBossMount.remove(true);
+    }
+
+    /**
+     * Runs on chunk load. Only for persistent entities.
+     */
     @Override
-    public void remove() {
-        super.remove();
-        trackableCustomBosses.remove(this);
+    public void chunkLoad() {
+        setNewLivingEntity(persistentLocation);
+        customBossTrail.restartTrails();
+        setDisguise();
+        if (regionalBossEntity != null)
+            regionalBossEntity.chunkLoad();
+    }
+
+    public SimplePersistentEntity simplePersistentEntity;
+    public Location persistentLocation;
+
+    /**
+     * Runs on chunk unload.
+     * If the custom boss isn't persistent, this removes the entity.
+     * If the boss is persistent, this removes the LivingEntity instance, caches the location data to later spawn a
+     * LivingEntity at the location this dropped off.
+     */
+    @Override
+    public void chunkUnload() {
+        if (!getPersistent()) {
+            remove(true);
+            return;
+        }
+
+        //For some reason sometimes the living entities are nullified on chunk unload
+        if (advancedGetEntity() == null)
+            if (regionalBossEntity != null)
+                persistentLocation = regionalBossEntity.spawnLocation;
+            else
+                new WarningMessage("Failed to register persistent location before chunk unload! Boss: " + getName());
+        else
+            persistentLocation = getLivingEntity().getLocation();
+
+        simplePersistentEntity = new SimplePersistentEntity(this);
+        softRemove();
+        super.remove(true);
+    }
+
+    public Location getLocation() {
+        if (advancedGetEntity() != null) return advancedGetEntity().getLocation();
+        else return persistentLocation;
+    }
+
+    /**
+     * Runs on boss death. This is for true natural deaths.
+     * Note: Most death handling is done in the CustomBossDeath class, this is just here to unregister the active tasks.
+     */
+    public void doDeath() {
+        remove(false);
     }
 
     public static class CustomBossEntityEvents implements Listener {
-
-        public static HashMap<Chunk, Spawnable> spawnableEntities = new HashMap<>();
-
         @EventHandler
-        public void onSpawn(ChunkLoadEvent event) {
-            if (spawnableEntities.isEmpty()) return;
-            if (!spawnableEntities.containsKey(event.getChunk())) return;
-            Spawnable spawnable = spawnableEntities.get(event.getChunk());
-            spawnableEntities.remove(event.getChunk());
-            spawnable.eliteMobEntity.continueCustomBossCreation((LivingEntity) spawnable.location.getWorld().spawnEntity(spawnable.location, spawnable.entityType));
-        }
-
-        @EventHandler
-        public void onEliteMobDeath(EliteMobDeathEvent event) {
-            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
-
-            if (customBossEntity.trackable)
-                trackableCustomBosses.remove(customBossEntity);
-
-            //Do death message
-            String playersList = "";
-            for (Player player : event.getEliteMobEntity().getDamagers().keySet()) {
-                if (playersList.isEmpty())
-                    playersList += player.getDisplayName();
-                else
-                    playersList += ", &f" + player.getDisplayName();
-
-                //Do loot
-                if (!customBossEntity.getTriggeredAntiExploit())
-                    customBossEntity.dropLoot(player);
-            }
-
-            playersList = ChatColorConverter.convert(playersList);
-
-            if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 0 && customBossEntity.hasDamagers())
-                if (customBossEntity.customBossConfigFields.getDeathMessages() != null && customBossEntity.customBossConfigFields.getDeathMessages().size() > 0) {
-                    Player topDamager = null, secondDamager = null, thirdDamager = null;
-
-                    HashMap<Player, Double> sortedMap = sortByComparator(customBossEntity.getDamagers(), false);
-
-                    Iterator<Player> sortedMapIterator = sortedMap.keySet().iterator();
-                    for (int i = 1; i < 4; i++) {
-                        if (i > sortedMap.size())
-                            break;
-                        Player nextPlayer = sortedMapIterator.next();
-                        switch (i) {
-                            case 1:
-                                topDamager = nextPlayer;
-                                break;
-                            case 2:
-                                secondDamager = nextPlayer;
-                                break;
-                            case 3:
-                                thirdDamager = nextPlayer;
-                                break;
-                        }
-                    }
-
-                    for (String string : customBossEntity.customBossConfigFields.getDeathMessages()) {
-                        if (string.contains("$damager1name"))
-                            if (topDamager != null)
-                                string = string.replace("$damager1name", topDamager.getDisplayName());
-                            else
-                                string = "";
-                        if (string.contains("$damager1damage"))
-                            if (topDamager != null)
-                                string = string.replace("$damager1damage", Round.twoDecimalPlaces(customBossEntity.getDamagers().get(topDamager)) + "");
-                            else
-                                string = "";
-                        if (string.contains("$damager2name"))
-                            if (secondDamager != null)
-                                string = string.replace("$damager2name", secondDamager.getDisplayName());
-                            else
-                                string = "";
-                        if (string.contains("$damager2damage"))
-                            if (secondDamager != null)
-                                string = string.replace("$damager2damage", Round.twoDecimalPlaces(customBossEntity.getDamagers().get(secondDamager)) + "");
-                            else
-                                string = "";
-                        if (string.contains("$damager3name"))
-                            if (thirdDamager != null)
-                                string = string.replace("$damager3name", thirdDamager.getDisplayName());
-                            else
-                                string = "";
-                        if (string.contains("$damager3damage"))
-                            if (thirdDamager != null)
-                                string = string.replace("$damager3damage", Round.twoDecimalPlaces(customBossEntity.getDamagers().get(thirdDamager)) + "");
-                            else
-                                string = "";
-                        if (string.contains("$players"))
-                            string = string.replace("$players", playersList);
-                        Bukkit.broadcastMessage(ChatColorConverter.convert(string));
-                        if (string.length() > 0)
-                            if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 2)
-                                new DiscordSRVAnnouncement(ChatColorConverter.convert(string));
-                    }
-
-                    for (Player player : Bukkit.getOnlinePlayers())
-                        if (customBossEntity.getDamagers().containsKey(player))
-                            player.sendMessage(
-                                    ChatColorConverter.convert(
-                                            MobCombatSettingsConfig.bossKillParticipationMessage.replace(
-                                                    "$playerDamage",
-                                                    Round.twoDecimalPlaces(customBossEntity.getDamagers().get(player)) + "")));
-
-                } else {
-                    if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 0 && customBossEntity.customBossConfigFields.getDeathMessage() != null)
-                        Bukkit.broadcastMessage(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
-                    if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 2)
-                        new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
-                }
-
-            removeCustomBoss(customBossEntity.uuid);
-
-            if (customBossEntity.customBossConfigFields.getOnDeathCommands() != null && !customBossEntity.customBossConfigFields.getOnDeathCommands().isEmpty())
-                OnDeathCommands.parseConsoleCommand(customBossEntity.customBossConfigFields.getOnDeathCommands(), event);
-
-            if (!customBossEntity.customBossConfigFields.getDropsVanillaLoot()) {
-                event.getEntityDeathEvent().setDroppedExp(0);
-                for (ItemStack itemStack : event.getEntityDeathEvent().getDrops())
-                    itemStack.setAmount(0);
-            }
-
-        }
-
-        private static HashMap<Player, Double> sortByComparator(HashMap<Player, Double> unsortMap, final boolean order) {
-
-            List<Entry<Player, Double>> list = new LinkedList<Entry<Player, Double>>(unsortMap.entrySet());
-
-            // Sorting the list based on values
-            Collections.sort(list, new Comparator<Entry<Player, Double>>() {
-                public int compare(Entry<Player, Double> o1,
-                                   Entry<Player, Double> o2) {
-                    if (order) {
-                        return o1.getValue().compareTo(o2.getValue());
-                    } else {
-                        return o2.getValue().compareTo(o1.getValue());
-                    }
-                }
-            });
-
-            // Maintaining insertion order with the help of LinkedList
-            HashMap<Player, Double> sortedMap = new LinkedHashMap<Player, Double>();
-            for (Entry<Player, Double> entry : list) {
-                sortedMap.put(entry.getKey(), entry.getValue());
-            }
-
-            return sortedMap;
-        }
-
-        @EventHandler
-        public void onDamagedMessages(EliteMobDamagedEvent eliteMobDamagedEvent) {
-            if (!(eliteMobDamagedEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            CustomBossEntity customBossEntity = (CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity();
-            if (customBossEntity.customBossConfigFields.getOnDamagedMessages().isEmpty()) return;
-            Taunt.nametagProcessor(customBossEntity.getLivingEntity(), customBossEntity.customBossConfigFields.getOnDamagedMessages());
-        }
-
-        @EventHandler
-        public void onDamageMessages(PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent) {
-            if (!(playerDamagedByEliteMobEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            CustomBossEntity customBossEntity = (CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity();
-            if (customBossEntity.customBossConfigFields.getOnDamageMessages().isEmpty()) return;
-            Taunt.nametagProcessor(customBossEntity.getLivingEntity(), customBossEntity.customBossConfigFields.getOnDamageMessages());
-        }
-
-        @EventHandler
-        public void onChunkLoadEvent(ChunkLoadEvent event) {
-            for (Entity entity : event.getChunk().getEntities())
-                if (entity instanceof LivingEntity)
-                    if (CrashFix.isPersistentEntity(entity))
-                        if (isCustomBoss(entity.getUniqueId())) {
-                            CustomBossEntity customBossEntity = getCustomBoss(entity.getUniqueId());
-                            customBossEntity.setLivingEntity((LivingEntity) entity);
-                            customBossEntity.startBossTrails();
-                        }
-
-        }
-
-        @EventHandler
-        public void removeSlowEvent(EliteMobEnterCombatEvent event) {
-            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            if (event.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW) == null) return;
-            event.getEliteMobEntity().getLivingEntity().removePotionEffect(PotionEffectType.SLOW);
-        }
-
-        @EventHandler
-        public void onCombatExitEvent(EliteMobExitCombatEvent event) {
-            if (!MobCombatSettingsConfig.regenerateCustomBossHealthOnCombatEnd) return;
-            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-
-        }
-
-        @EventHandler
-        public void displayBossBar(EliteMobEnterCombatEvent event) {
-            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
-            if (customBossEntity.customBossConfigFields.getLocationMessage() == null || customBossEntity.customBossConfigFields.getLocationMessage().length() == 0)
+        public void removeSlowEvent(EliteMobEnterCombatEvent eliteMobEnterCombatEvent) {
+            if (eliteMobEnterCombatEvent.getEliteMobEntity().customBossEntity == null) return;
+            if (eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW) == null)
                 return;
-
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!event.getEliteMobEntity().getLivingEntity().isValid() || !customBossEntity.isInCombat()) {
-                        cancel();
-                        return;
-                    }
-
-                    for (Entity entity : event.getEliteMobEntity().getLivingEntity().getNearbyEntities(20, 20, 20))
-                        if (entity.getType().equals(EntityType.PLAYER))
-                            customBossEntity.startBossBarTask((Player) entity);
-
-                }
-            }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
+            if (eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW).getAmplifier() == 10)
+                return;
+            eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().removePotionEffect(PotionEffectType.SLOW);
         }
-
     }
 
 }

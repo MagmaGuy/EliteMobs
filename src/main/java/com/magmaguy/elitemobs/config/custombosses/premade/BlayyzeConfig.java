@@ -11,7 +11,7 @@ public class BlayyzeConfig extends CustomBossConfigFields {
         super("blayyze",
                 EntityType.BLAZE.toString(),
                 true,
-                "&6Blayyze",
+                "$eventBossLevel &6Blayyze",
                 "dynamic",
                 30,
                 true,

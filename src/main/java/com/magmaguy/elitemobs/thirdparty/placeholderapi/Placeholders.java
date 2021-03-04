@@ -88,17 +88,28 @@ public class Placeholders extends PlaceholderExpansion {
         if (player == null)
             return "Only online players!";
 
+        /*
+        There is a weird bug with PAPI where, under certain circumstances, it seems to fail to see cached values and
+        queries the database. This is usually fine for something like chat, but it quickly becomes a massive issue for
+        tablists, scoreboards and other places that might display several placeholders simultaneously and update them
+        every tick, quickly racking up hundreds or thousands of queries per tick, on top of the normal runtime accesses
+        that EliteMobs does. At scale, this causes large issues. Hence, at least for now, PAPI does not have access to the
+        databases for safety purposes. All of the queries should be in memory regardless.
+         */
+
         switch (identifier) {
             case "player_combat_tier":
                 return "" + ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);
             case "player_active_guild_rank_numerical":
-                return "" + GuildRank.getActiveGuildRank(player);
+                return "" + GuildRank.getActiveGuildRank(player, false);
             case "player_maximum_guild_rank_numerical":
-                return "" + GuildRank.getMaxGuildRank(player);
+                return "" + GuildRank.getMaxGuildRank(player, false);
             case "player_active_guild_rank_name":
-                return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player));
+                return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getActiveGuildRank(player, false));
             case "player_maximum_guild_rank_name":
-                return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getMaxGuildRank(player));
+                return GuildRank.getRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getMaxGuildRank(player, false));
+            case "player_prestige_guild_rank_numerical":
+                return "" + GuildRank.getGuildPrestigeRank(player, false);
             case "player_money":
                 return "" + EconomyHandler.checkCurrency(player.getUniqueId());
             case "player_top_tier":
@@ -107,13 +118,13 @@ public class Placeholders extends PlaceholderExpansion {
                     double currentTier = ElitePlayerInventory.playerInventories.get(iteratedPlayer.getUniqueId()).getFullPlayerTier(true);
                     if (currentTier > highestThreat)
                         highestThreat = currentTier;
-                    return "" + highestThreat;
                 }
+                return "" + highestThreat;
             case "player_top_guild_rank":
                 int highestGuildRank = 0;
                 String highestGuildUser = "";
                 for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
-                    int currentGuildRank = GuildRank.getMaxGuildRank(iteratedPlayer);
+                    int currentGuildRank = GuildRank.getMaxGuildRank(iteratedPlayer, false);
                     if (currentGuildRank > highestGuildRank) {
                         highestGuildRank = currentGuildRank;
                         highestGuildUser = iteratedPlayer.getDisplayName();
@@ -121,7 +132,7 @@ public class Placeholders extends PlaceholderExpansion {
                 }
                 return highestGuildUser;
             case "player_shortened_guild_rank":
-                return AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player));
+                return AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getActiveGuildRank(player, false));
         }
 
         // We return null if an invalid placeholder (f.e. %someplugin_placeholder3%)

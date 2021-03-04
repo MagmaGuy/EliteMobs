@@ -2,28 +2,31 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.items.MobTierCalculator;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
-import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
+import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
+import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +34,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -45,7 +49,6 @@ public class EliteMobEntity {
     private int eliteLevel;
     private double eliteTier;
     private double maxHealth;
-    private double health;
     private String name;
     /*
     Store all powers in one set, makes no sense to access it in individual sets.
@@ -59,11 +62,12 @@ public class EliteMobEntity {
     private boolean hasMajorVisualEffect = false;
     private boolean hasVisualEffectObfuscated = true;
     private boolean isNaturalEntity;
+    private EntityType entityType;
     /*
     This just defines default behavior
      */
     private boolean hasCustomPowers = false;
-    private Boolean isPersistent = true;
+    private Boolean isPersistent = false;
     private boolean hasVanillaLoot = true;
     private boolean hasEliteLoot = true;
     private CreatureSpawnEvent.SpawnReason spawnReason;
@@ -84,16 +88,17 @@ public class EliteMobEntity {
     private boolean inCombat = false;
     private boolean inCombatGracePeriod = false;
 
-    public UUID phaseBossID = null;
+    public UUID uuid;
+
+    public CustomBossEntity customBossEntity;
+    public RegionalBossEntity regionalBossEntity;
+    public PhaseBossEntity phaseBossEntity;
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
      * the Elite Mob conversion
-     *
-     * @param location Location to be checked
-     * @return Whether the location is valid
      */
-    private static boolean validSpawnLocation(Location location) {
+    public static boolean validSpawnLocation(Location location) {
         if (!EliteMobs.worldguardIsEnabled)
             return true;
         if (!Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) return true;
@@ -102,260 +107,82 @@ public class EliteMobEntity {
 
     /**
      * This is the generic constructor used in most instances of natural elite mob generation
-     *
-     * @param livingEntity Minecraft entity associated to this elite mob
-     * @param eliteLevel   Level of the mob, can be modified during runtime. Dynamically assigned.
      */
-    public EliteMobEntity(LivingEntity livingEntity, int eliteLevel, CreatureSpawnEvent.SpawnReason spawnReason) {
+    public EliteMobEntity(LivingEntity livingEntity,
+                          int eliteLevel,
+                          CreatureSpawnEvent.SpawnReason spawnReason) {
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, false)) return;
 
-        /*
-        Run a WorldGuard check to see if the entity is allowed to get converted at this location
-         */
-        if (!validSpawnLocation(livingEntity.getLocation())) return;
-
-        /*
-        Register living entity to keep track of which entity this object is tied to
-         */
-        this.livingEntity = livingEntity;
-        /*
-        Register level, this is variable as per stacking rules
-         */
-        setEliteLevel(eliteLevel);
-        eliteTier = MobTierCalculator.findMobTier(eliteLevel);
-        /*
-        Sets the spawn reason
-         */
-        setSpawnReason(spawnReason);
-        /*
-        Start tracking the entity
-         */
-        if (!EntityTracker.registerEliteMob(this)) return;
-        /*
-        Get correct instance of plugin data, necessary for settings names and health among other things
-         */
+        //Get correct instance of plugin data, necessary for settings names and health among other things
         EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
-        /*
-        Handle name, variable as per stacking rules
-         */
+
+        //Handle name, variable as per stacking rules
         setName(eliteMobProperties);
-        /*
-        Handle health, max is variable as per stacking rules
-        Currently #setHealth() resets the health back to maximum
-         */
-        setMaxHealth();
-        /*
-        Set the armor
-         */
+
+        //Set the armor
         setArmor();
-        /*
-        Set the power list
-         */
+
+        //Set the power list
         randomizePowers(eliteMobProperties);
-
-        this.livingEntity.setCanPickupItems(false);
-
     }
 
     /**
-     * Spawning method for boss mobs.
+     * Spawning method for boss mobs / regional bosses.
      * Assumes custom powers and custom names.
-     *
-     * @param entityType type of mob that this entity is slated to become
-     * @param location   location at which the elite mob will spawn
-     * @param eliteLevel boss mob level, should be automatically generated based on the highest player tier online
-     * @param name       the name for this boss mob, overrides the usual elite mob name format
-     * @see com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity
      */
-    public EliteMobEntity(EntityType entityType,
-                          Location location,
+    public EliteMobEntity(LivingEntity livingEntity,
                           int eliteLevel,
                           String name,
                           HashSet<ElitePower> mobPowers,
-                          CreatureSpawnEvent.SpawnReason spawnReason) {
-        initializeCustomBossEliteEntity(entityType, location, eliteLevel, name, mobPowers, spawnReason);
-
+                          CreatureSpawnEvent.SpawnReason spawnReason,
+                          Boolean isPersistent) {
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, isPersistent)) return;
+        initializeCustomBossEliteEntity(livingEntity, eliteLevel, name, mobPowers, spawnReason);
+        //These have custom powers
+        applyCustomPowers(mobPowers);
     }
 
-    public EliteMobEntity(EntityType entityType,
-                          Location location,
+    /**
+     * For phase bosses
+     */
+    public EliteMobEntity(LivingEntity livingEntity,
                           int eliteLevel,
                           String name,
                           HashSet<ElitePower> mobPowers,
                           CreatureSpawnEvent.SpawnReason spawnReason,
                           double healthPercentage,
-                          UUID phaseBossID) {
-        initializeCustomBossEliteEntity(entityType, location, eliteLevel, name, mobPowers, spawnReason);
-        this.phaseBossID = phaseBossID;
+                          Boolean isPersistent) {
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, isPersistent)) return;
+        initializeCustomBossEliteEntity(livingEntity, eliteLevel, name, mobPowers, spawnReason);
         this.setHealth(healthPercentage * maxHealth);
-    }
-
-    private void initializeCustomBossEliteEntity(EntityType entityType,
-                                                 Location location,
-                                                 int eliteLevel,
-                                                 String name,
-                                                 HashSet<ElitePower> mobPowers,
-                                                 CreatureSpawnEvent.SpawnReason spawnReason) {
-        if (!EliteMobProperties.isValidEliteMobType(entityType)) {
-            new WarningMessage("Attempted to spawn custom boss with of type " + entityType + " which is not a valid type for Elite Mobs. The boss will not be spawned.");
-            return;
-        }
-        this.eliteLevel = eliteLevel;
-        this.name = name;
-        this.powers = mobPowers;
-        this.spawnReason = spawnReason;
-        /*
-        Run a WorldGuard check to see if the entity is allowed to get converted at this location
-         */
-        if (!validSpawnLocation(location)) return;
-        /*
-        Register living entity to keep track of which entity this object is tied to
-         */
-        this.livingEntity = spawnBossMobLivingEntity(entityType, location, this);
-        /*
-        This is null for entities spawn in unloaded chunks. It gets picked back up in another method.
-         */
-        if (this.livingEntity == null)
-            return;
-        /*
-        Register level, this is variable as per stacking rules
-         */
-        setEliteLevel(eliteLevel);
-        eliteTier = MobTierCalculator.findMobTier(eliteLevel);
-        /*
-        Sets the spawn reason
-         */
-        setSpawnReason(spawnReason);
-        /*
-        Start tracking the entity
-         */
-        if (!EntityTracker.registerEliteMob(this)) return;
-        /*
-        Get correct instance of plugin data, necessary for settings names and health among other things
-         */
-        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(entityType);
-        /*
-        Handle name, variable as per stacking rules
-         */
-        setName(name);
-        /*
-        Handle health, max is variable as per stacking rules
-         */
-        setMaxHealth();
-        /*
-        These have custom powers
-         */
-        this.hasCustomPowers = true;
-        this.powers = mobPowers;
-        for (ElitePower elitePower : powers) {
-            elitePower.applyPowers(livingEntity);
-            if (elitePower instanceof MajorPower)
-                this.majorPowerCount++;
-            if (elitePower instanceof MinorPower)
-                this.minorPowerCount++;
-        }
-
-        livingEntity.setCanPickupItems(false);
-    }
-
-    public void continueCustomBossCreation(LivingEntity livingEntity) {
-        this.livingEntity = livingEntity;
-        /*
-        Register level, this is variable as per stacking rules
-         */
-        setEliteLevel(eliteLevel);
-        eliteTier = MobTierCalculator.findMobTier(eliteLevel);
-        /*
-        Sets the spawn reason
-         */
-        setSpawnReason(spawnReason);
-        /*
-        Start tracking the entity
-         */
-        if (!EntityTracker.registerEliteMob(this)) return;
-        /*
-        Get correct instance of plugin data, necessary for settings names and health among other things
-         */
-        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity.getType());
-        /*
-        Handle name, variable as per stacking rules
-         */
-        setName(name);
-        /*
-        Handle health, max is variable as per stacking rules
-         */
-        setMaxHealth();
-        /*
-        These have custom powers
-         */
-        this.hasCustomPowers = true;
-        for (ElitePower elitePower : powers) {
-            elitePower.applyPowers(livingEntity);
-            if (elitePower instanceof MajorPower)
-                this.majorPowerCount++;
-            if (elitePower instanceof MinorPower)
-                this.minorPowerCount++;
-        }
-
-        livingEntity.setCanPickupItems(false);
+        //These have custom powers
+        applyCustomPowers(mobPowers);
     }
 
     /**
      * Constructor for Elite Mobs spawned via command
-     *
-     * @param entityType Type of entity to be spawned
-     * @param location   Location at which the entity will spawn
-     * @param eliteLevel Level of the Elite Mob
-     * @param mobPowers  HashSet of ElitePower that the entity will have (can be empty)
      */
-    public EliteMobEntity(EntityType entityType, Location location, int eliteLevel, HashSet<ElitePower> mobPowers, CreatureSpawnEvent.SpawnReason spawnReason) {
+    public EliteMobEntity(LivingEntity livingEntity,
+                          int eliteLevel,
+                          HashSet<ElitePower> mobPowers,
+                          CreatureSpawnEvent.SpawnReason spawnReason) {
 
-        /*
-        Run a WorldGuard check to see if the entity is allowed to get converted at this location
-         */
-        if (!validSpawnLocation(location)) return;
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, false)) return;
 
-        /*
-        Register living entity to keep track of which entity this object is tied to
-         */
-        this.livingEntity = spawnBossMobLivingEntity(entityType, location, this);
-        /*
-        Register level, this is variable as per stacking rules
-         */
-        setEliteLevel(eliteLevel);
-        eliteTier = MobTierCalculator.findMobTier(eliteLevel);
-        /*
-        Sets the spawn reason
-         */
-        setSpawnReason(spawnReason);
-        /*
-        Start tracking the entity
-         */
-        if (!EntityTracker.registerEliteMob(this)) return;
-        /*
-        Get correct instance of plugin data, necessary for settings names and health among other things
-         */
-        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(entityType);
-        /*
-        Handle name, variable as per stacking rules
-         */
+        //Get correct instance of plugin data, necessary for settings names and health among other things
+        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity.getType());
+
+        //Handle name, variable as per stacking rules
         setName(eliteMobProperties);
-        /*
-        Handle health, max is variable as per stacking rules
-        Currently #setHealth() resets the health back to maximum
-         */
-        setMaxHealth();
-        /*
-        Set the armor
-         */
+
+        //Set the armor
         setArmor();
-        /*
-        Register whether or not the elite mob is natural
-        All mobs spawned via commands are considered natural
-         */
+
+        //Register whether or not the elite mob is natural
+        //All mobs spawned via commands are considered natural
         this.isNaturalEntity = true;
-        /*
-        Set the power list
-         */
+
+        //Set the power list
         if (!mobPowers.isEmpty()) {
             this.powers = mobPowers;
             for (ElitePower elitePower : powers) {
@@ -367,38 +194,83 @@ public class EliteMobEntity {
             }
             new MinorPowerPowerStance(this);
             new MajorPowerPowerStance(this);
-        } else {
+        } else
             randomizePowers(eliteMobProperties);
-        }
-
-        livingEntity.setCanPickupItems(false);
 
     }
 
     /**
-     * This avoids accidentally assigning an elite mob to an entity spawned specifically to be a boss mob or reinforcement
+     * Constructor for Custom Bosses
      */
-    private static LivingEntity spawnBossMobLivingEntity(EntityType entityType, Location location, EliteMobEntity eliteMobEntity) {
-        if (ChunkLocationChecker.locationIsLoaded(location)) {
-            NaturalMobSpawnEventHandler.setIgnoreMob(true, eliteMobEntity);
-            return (LivingEntity) location.getWorld().spawnEntity(location, entityType);
-        } else {
-            Spawnable newSpawnable = new Spawnable();
-            newSpawnable.location = location;
-            newSpawnable.entityType = entityType;
-            newSpawnable.eliteMobEntity = eliteMobEntity;
-            CustomBossEntity.CustomBossEntityEvents.spawnableEntities.put(location.getChunk(), newSpawnable);
-            return null;
-        }
+    private void initializeCustomBossEliteEntity(LivingEntity livingEntity,
+                                                 int eliteLevel,
+                                                 String name,
+                                                 HashSet<ElitePower> mobPowers,
+                                                 CreatureSpawnEvent.SpawnReason spawnReason) {
+
+        if (!initializeBasicValues(livingEntity, eliteLevel, spawnReason, isPersistent)) return;
+
+        this.name = name;
+
+        //Stop creation if the creation was cancelled in the spawn event
+        //if (!EntityTracker.registerEliteMob(this)) return;
+
+
+        //Handle name, variable as per stacking rules
+        setName(name);
+
+        //These have custom powers
+        applyCustomPowers(mobPowers);
+
     }
 
-    /*
-    todo: this probably does not work when it needs to be instantiated ?
-     */
-    public static class Spawnable {
-        public Location location;
-        public EntityType entityType;
-        public EliteMobEntity eliteMobEntity;
+    private boolean initializeBasicValues(LivingEntity livingEntity,
+                                          int eliteLevel,
+                                          CreatureSpawnEvent.SpawnReason spawnReason,
+                                          boolean isPersistent) {
+        //Run a WorldGuard check to see if the entity is allowed to get converted at this location
+        if (!validSpawnLocation(livingEntity.getLocation())) return false;
+
+        //Register living entity to keep track of which entity this object is tied to
+        this.livingEntity = livingEntity;
+        this.entityType = livingEntity.getType();
+
+        setPersistent(isPersistent);
+
+        //Register UUID to be used in trackers
+        this.uuid = livingEntity.getUniqueId();
+
+        //Sets the spawn reason
+        this.spawnReason = spawnReason;
+
+        //Register level, this is variable as per stacking rules
+        this.eliteLevel = eliteLevel;
+        this.eliteTier = MobTierCalculator.findMobTier(eliteLevel);
+
+        this.livingEntity.setCanPickupItems(false);
+        livingEntity.getEquipment().setItemInMainHandDropChance(0);
+        livingEntity.getEquipment().setItemInOffHandDropChance(0);
+        livingEntity.getEquipment().setHelmetDropChance(0);
+        livingEntity.getEquipment().setChestplateDropChance(0);
+        livingEntity.getEquipment().setLeggingsDropChance(0);
+        livingEntity.getEquipment().setBootsDropChance(0);
+
+        if (!VersionChecker.currentVersionIsUnder(1, 15))
+            if (livingEntity instanceof Bee)
+                ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
+
+        setMaxHealth();
+
+        if (entityType.equals(EntityType.WOLF)) {
+            Wolf wolf = (Wolf) livingEntity;
+            wolf.setAngry(true);
+            wolf.setBreed(false);
+        }
+
+        this.getLivingEntity().setRemoveWhenFarAway(!isPersistent);
+
+        //Stop creation if the creation was cancelled in the spawn event
+        return EntityTracker.registerEliteMob(this);
     }
 
     /**
@@ -411,8 +283,7 @@ public class EliteMobEntity {
                 eliteMobProperties.getName().replace(
                         "$level", eliteLevel + ""));
         livingEntity.setCustomName(this.name);
-        if (DefaultConfig.alwaysShowNametags)
-            livingEntity.setCustomNameVisible(true);
+        livingEntity.setCustomNameVisible(DefaultConfig.alwaysShowNametags);
     }
 
     /**
@@ -421,21 +292,23 @@ public class EliteMobEntity {
      * @param name String which defines the display name
      */
     public void setName(String name) {
-        this.name = ChatColorConverter.convert(name);
+        String parsedName = name.replace("$level", this.eliteLevel + "")
+                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + this.eliteLevel + "&2]&f"))
+                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + this.eliteLevel + "&6〗&f"))
+                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + this.eliteLevel + "&4』&f"))
+                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.eliteLevel + "&8〕&f")
+                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + this.eliteLevel + "&4」&f"));
+        this.name = ChatColorConverter.convert(parsedName);
         this.getLivingEntity().setCustomName(this.name);
-        if (DefaultConfig.alwaysShowNametags)
-            livingEntity.setCustomNameVisible(true);
+        livingEntity.setCustomNameVisible(DefaultConfig.alwaysShowNametags);
+        if (customBossEntity != null)
+            DisguiseEntity.setDisguiseNameVisibility(DefaultConfig.alwaysShowNametags, livingEntity);
     }
 
-    /**
-     * Sets the level of the Elite Mob. Values below 1 default to 1
-     *
-     * @param newLevel Level of the Elite Mob
-     */
-    private void setEliteLevel(int newLevel) {
-        if (newLevel < 1)
-            newLevel = 1;
-        this.eliteLevel = newLevel;
+    public void setNameVisible(boolean isVisible) {
+        livingEntity.setCustomNameVisible(isVisible);
+        if (customBossEntity != null)
+            DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity);
     }
 
     /**
@@ -446,70 +319,43 @@ public class EliteMobEntity {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
         this.maxHealth = (eliteTier * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth);
         //7 is the base damage of a diamond sword
-        this.health = this.maxHealth;
-        double vanillaValue = maxHealth > 2048 ? 2048 : maxHealth;
-        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(vanillaValue);
-        livingEntity.setHealth(vanillaValue);
+        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        livingEntity.setHealth(maxHealth);
+    }
+
+    public void resetMaxHealth() {
+        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        livingEntity.setHealth(maxHealth);
     }
 
     private void setMaxHealth(double healthMultiplier) {
         this.defaultMaxHealth = EliteMobProperties.getPluginData(this.getLivingEntity().getType()).getDefaultMaxHealth();
         this.maxHealth = (eliteTier * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth) * healthMultiplier;
         //7 is the base damage of a diamond sword
-        this.health = this.maxHealth;
-        double vanillaValue = maxHealth > 2048 ? 2048 : maxHealth;
-        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(vanillaValue);
-        livingEntity.setHealth(vanillaValue);
+        livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        livingEntity.setHealth(maxHealth);
     }
 
     public void setHealth(double health) {
-        health = health < 0 ? 0 : health;
-
-        this.health = health;
-        if (this.maxHealth <= 2048)
-            livingEntity.setHealth(health);
-        else
-            livingEntity.setHealth(Math.ceil(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * this.health / this.maxHealth));
-
-    }
-
-    public void damage(double damage) {
-        health = health - damage < 0 ? 0 : health - damage;
-
-        try {
-            if (this.maxHealth <= 2048)
-                livingEntity.setHealth(health);
-            else
-                livingEntity.setHealth(Math.ceil(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * this.health / this.maxHealth));
-        } catch (Exception ex) {
-            new WarningMessage("Failed to correctly damage Elite Mob because some other plugin changed the maximum health of the mob after EliteMobs.");
-            new WarningMessage("This is probably caused by an incompatibility with another plugin.");
-            new WarningMessage("Name of the entity affected: " + getLivingEntity().getCustomName() + " - NOTE: DISABLING THIS ENTITY ON ELITEMOBS WILL NOT FIX THE ISSUE AT ALL");
-            new WarningMessage("Damage will be applied incorrectly for this entity and entities like it until the conflicting plugin is fixed or removed.");
-
-            double errorDamage = livingEntity.getHealth() - damage < 0 ? livingEntity.getHealth() : damage;
-            livingEntity.setHealth(errorDamage);
-            this.health = livingEntity.getHealth();
-            this.maxHealth = livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-        }
-    }
-
-    public void heal(double healValue) {
-        damage(-healValue);
-    }
-
-    public void fullHeal() {
-        if (phaseBossID != null) {
-            if (PhaseBossEntity.phaseBosses.containsKey(phaseBossID))
-                PhaseBossEntity.phaseBosses.get(phaseBossID).fullHeal(this);
-            return;
-        }
-        setHealth(this.maxHealth);
-        damagers.clear();
+        livingEntity.setHealth(health);
     }
 
     public double getHealth() {
-        return this.health;
+        return livingEntity.getHealth();
+    }
+
+    public double damage(double damage) {
+        double health = Math.max(0, livingEntity.getHealth() - damage);
+        livingEntity.setHealth(health);
+        return damage;
+    }
+
+    public void fullHeal() {
+        if (customBossEntity != null)
+            if (customBossEntity.phaseBossEntity != null)
+                customBossEntity.phaseBossEntity.fullHeal(this);
+        setHealth(this.maxHealth);
+        damagers.clear();
     }
 
     /**
@@ -519,12 +365,6 @@ public class EliteMobEntity {
     private void setArmor() {
 
         if (!MobCombatSettingsConfig.doEliteArmor) return;
-
-        livingEntity.getEquipment().setItemInMainHandDropChance(0);
-        livingEntity.getEquipment().setHelmetDropChance(0);
-        livingEntity.getEquipment().setChestplateDropChance(0);
-        livingEntity.getEquipment().setLeggingsDropChance(0);
-        livingEntity.getEquipment().setBootsDropChance(0);
 
         if (!(livingEntity instanceof Zombie || livingEntity instanceof PigZombie ||
                 livingEntity instanceof Skeleton || livingEntity instanceof WitherSkeleton)) return;
@@ -586,6 +426,13 @@ public class EliteMobEntity {
         if (eliteLevel >= 80)
             livingEntity.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 
+        if (livingEntity.getEquipment().getHelmet() != null) {
+            ItemMeta helmetMeta = livingEntity.getEquipment().getHelmet().getItemMeta();
+            if (helmetMeta != null) {
+                helmetMeta.setUnbreakable(true);
+                livingEntity.getEquipment().getHelmet().setItemMeta(helmetMeta);
+            }
+        }
     }
 
     /**
@@ -630,6 +477,18 @@ public class EliteMobEntity {
 
     }
 
+    private void applyCustomPowers(HashSet<ElitePower> elitePowers) {
+        this.hasCustomPowers = true;
+        this.powers = elitePowers;
+        for (ElitePower elitePower : powers) {
+            elitePower.applyPowers(livingEntity);
+            if (elitePower instanceof MajorPower)
+                this.majorPowerCount++;
+            if (elitePower instanceof MinorPower)
+                this.minorPowerCount++;
+        }
+    }
+
     /**
      * Applies the power to the Elite Mob based on a HashSet of powers
      *
@@ -668,32 +527,6 @@ public class EliteMobEntity {
     }
 
     /**
-     * Applies a HashSet of ElitePower to an Elite Mob
-     *
-     * @param elitePowers HashSet of Elite Powers to be applied
-     */
-    public void setCustomPowers(HashSet<ElitePower> elitePowers) {
-
-        this.powers = elitePowers;
-        for (ElitePower elitePower : elitePowers) {
-            elitePower.applyPowers(this.livingEntity);
-            if (elitePower instanceof MinorPower)
-                this.minorPowerCount++;
-            if (elitePower instanceof MajorPower)
-                this.majorPowerCount++;
-        }
-
-        if (this.minorPowerCount > 0) {
-            MinorPowerPowerStance minorPowerStanceMath = new MinorPowerPowerStance(this);
-        }
-
-        if (this.majorPowerCount > 0) {
-            MajorPowerPowerStance majorPowerPowerStance = new MajorPowerPowerStance(this);
-        }
-
-    }
-
-    /**
      * Returns the living EliteMob
      *
      * @return LivingEntity associated to the Elite Mob
@@ -707,6 +540,22 @@ public class EliteMobEntity {
      */
     public void setLivingEntity(LivingEntity livingEntity) {
         this.livingEntity = livingEntity;
+    }
+
+    /**
+     * Used by the Custom Boss Entity to respawn entities that are known to be supposed to be alive but whose LivingEntity
+     * has been nullified for whatever reason.
+     *
+     * @param location
+     */
+    public void setNewLivingEntity(Location location) {
+        WorldGuardSpawnEventBypasser.forceSpawn();
+        this.livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
+        this.uuid = livingEntity.getUniqueId();
+        livingEntity.setRemoveWhenFarAway(!isPersistent);
+        new EliteEntityTracker(this, isPersistent);
+        if (customBossEntity != null)
+            customBossEntity.silentCustomBossInitialization();
     }
 
     /**
@@ -857,10 +706,8 @@ public class EliteMobEntity {
     public void setPersistent(Boolean bool) {
         if (bool != null) {
             this.isPersistent = bool;
-            this.getLivingEntity().setRemoveWhenFarAway(!this.isPersistent);
         } else {
             this.isPersistent = false;
-            this.getLivingEntity().setRemoveWhenFarAway(true);
         }
     }
 
@@ -913,15 +760,6 @@ public class EliteMobEntity {
         return this.spawnReason;
     }
 
-    /**
-     * Sets the spawn reason for the Living Entity. Used for the API.
-     *
-     * @param spawnReason Spawn reason for the Living Entity.
-     */
-    public void setSpawnReason(CreatureSpawnEvent.SpawnReason spawnReason) {
-        this.spawnReason = spawnReason;
-    }
-
     public HashMap<Player, Double> getDamagers() {
         return this.damagers;
     }
@@ -942,10 +780,6 @@ public class EliteMobEntity {
 
     public boolean hasDamagers() {
         return !damagers.isEmpty();
-    }
-
-    public double getHealthMultiplier() {
-        return this.healthMultiplier;
     }
 
     public void setHealthMultiplier(double healthMultiplier) {
@@ -983,11 +817,22 @@ public class EliteMobEntity {
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 15);
     }
 
-    public void remove() {
-        this.getLivingEntity().remove();
-        EntityTracker.unregisterEliteMob(this);
-        if (phaseBossID != null)
-            PhaseBossEntity.phaseBosses.remove(phaseBossID);
+    public void remove(boolean removeEntity) {
+        if (removeEntity)
+            this.getLivingEntity().remove();
+    }
+
+    public void remove(RemovalReason removalReason) {
+        if (removalReason.equals(RemovalReason.SHUTDOWN)) {
+            remove(true);
+        }
+        if (removalReason.equals(RemovalReason.CHUNK_UNLOAD))
+            if (isPersistent)
+                return;
+        if (livingEntity != null) {
+            livingEntity.removeMetadata(MetadataHandler.ELITE_MOB_METADATA, MetadataHandler.PLUGIN);
+            livingEntity.remove();
+        }
     }
 
     public void setHasVanillaLoot(boolean hasVanillaLoot) {
@@ -1033,7 +878,7 @@ public class EliteMobEntity {
             public void run() {
                 inAntiExploitCooldown = false;
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
+        }.runTaskLater(MetadataHandler.PLUGIN, 20);
     }
 
     public boolean isRegionalBoss() {
@@ -1065,5 +910,4 @@ public class EliteMobEntity {
     public boolean isInCombatGracePeriod() {
         return this.inCombatGracePeriod;
     }
-
 }

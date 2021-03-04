@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import org.bukkit.entity.Item;
 
 public class VisualItemRemover {
@@ -11,7 +12,7 @@ public class VisualItemRemover {
                 if (!(multiDimensionalTrailTracker[i][j] instanceof Item)) continue;
                 Item item = (Item) multiDimensionalTrailTracker[i][j];
                 item.remove();
-                EntityTracker.unregisterItemVisualEffects(item);
+                EntityTracker.unregister(item, RemovalReason.EFFECT_TIMEOUT);
             }
     }
 

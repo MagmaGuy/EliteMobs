@@ -1,8 +1,9 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.command.CommandSender;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -21,11 +22,22 @@ public class DefaultConfig {
     public static double nightmareWorldSpawnBonus;
     public static boolean emLeadsToStatusMenu;
     public static boolean otherCommandsLeadToEMStatusMenu;
-    public static boolean usePermissions;
     public static boolean setupDone;
+    public static Location defaultSpawnLocation;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
+
+    public static void toggleSetupDone() {
+        setupDone = !setupDone;
+        fileConfiguration.set("setupDoneV3", setupDone);
+        save();
+    }
+
+    public static void save() {
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
+    }
+
 
     public static void initializeConfig() {
 
@@ -41,33 +53,17 @@ public class DefaultConfig {
         nightmareWorldSpawnBonus = ConfigurationEngine.setDouble(fileConfiguration, "nightmareWorldSpawnBonus", 0.5);
         emLeadsToStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "emLeadsToStatusMenu", true);
         otherCommandsLeadToEMStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "otherCommandsLeadToEMStatusMenu", true);
-        usePermissions = ConfigurationEngine.setBoolean(fileConfiguration, "Use permissions", false);
-        setupDone = ConfigurationEngine.setBoolean(fileConfiguration, "setupDone", false);
-
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
-
-    }
-
-    public static void setUsePermissions(boolean bool, CommandSender commandSender) {
-        usePermissions = bool;
-        fileConfiguration.set("Use permissions", bool);
-        setupDone = true;
-        fileConfiguration.set("setupDone", true);
+        setupDone = ConfigurationEngine.setBoolean(fileConfiguration, "setupDoneV3", false);
         try {
-            fileConfiguration.save(file);
+            defaultSpawnLocation = ConfigurationLocation.deserialize(
+                    ConfigurationEngine.setString(
+                            fileConfiguration, "defaultSpawnLocation",
+                            ConfigurationLocation.serialize(Bukkit.getWorlds().get(0).getSpawnLocation())));
         } catch (Exception ex) {
-            new WarningMessage("Failed to save config.yml!");
+            new WarningMessage("There is an issue with your defaultSpawnLocation in the config.yml configuration file! Fix it!");
         }
 
-        commandSender.sendMessage("----------------------------------------------------");
-        commandSender.sendMessage(ChatColorConverter.convert("&2[EliteMobs] Preference registered! Use of permissions is " + usePermissions));
-        if (usePermissions)
-            commandSender.sendMessage(ChatColorConverter.convert("&cReminder: Recommended user permissions is elitemobs.user"));
-        else
-            commandSender.sendMessage(ChatColorConverter.convert("&aPlayers will be able to access all the recommended features. OPs will have global access."));
-        commandSender.sendMessage(ChatColorConverter.convert("&cYou can change this preference at any point in config.yml under \"Use permissions\""));
-        commandSender.sendMessage(ChatColorConverter.convert("&4This message will not be shown again."));
-        commandSender.sendMessage("----------------------------------------------------");
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
 }

@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.commands.guild;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
-import com.magmaguy.elitemobs.combatsystem.combattag.TeleportTag;
+import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
+import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -11,14 +13,10 @@ import org.bukkit.entity.Player;
 
 public class AdventurersGuildCommand {
 
-    public AdventurersGuildCommand(Player player) {
-
+    public static void adventurersGuildCommand(Player player) {
         if (adventurersGuildTeleport(player)) return;
-
-        if (!player.hasPermission("elitemobs.guild.menu")) return;
-        GuildRankMenuHandler guildRankMenuHandler = new GuildRankMenuHandler();
+        if (!player.hasPermission("elitemobs.adventurersguild.teleport")) return;
         GuildRankMenuHandler.initializeGuildRankMenu(player);
-
     }
 
     public static boolean adventurersGuildTeleport(Player player) {
@@ -30,9 +28,9 @@ public class AdventurersGuildCommand {
         if (AdventurersGuildConfig.guildWorldLocation == null) return false;
 
         if (CombatTagConfig.enableCombatTag)
-            TeleportTag.initializePlayerTeleport(player, CombatTagConfig.teleportTimerDuration, AdventurersGuildConfig.guildWorldLocation);
+            new EventCaller(new PlayerPreTeleportEvent(player, AdventurersGuildConfig.guildWorldLocation));
         else
-            player.teleport(AdventurersGuildConfig.guildWorldLocation);
+            new EventCaller(new PlayerTeleportEvent(player, AdventurersGuildConfig.guildWorldLocation));
 
         return true;
 

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powers.miscellaneouspowers;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.Material;

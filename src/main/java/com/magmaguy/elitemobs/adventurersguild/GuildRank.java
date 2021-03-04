@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.adventurersguild;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.utils.Round;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class GuildRank {
 
@@ -21,12 +23,20 @@ public class GuildRank {
         return PlayerData.getGuildPrestigeLevel(player.getUniqueId());
     }
 
+    public static int getGuildPrestigeRank(Player player, boolean databaseAccess) {
+        return PlayerData.getGuildPrestigeLevel(player.getUniqueId(), databaseAccess);
+    }
+
     public static void setMaxGuildRank(Player player, int maxGuildRank) {
         PlayerData.setMaxGuildLevel(player.getUniqueId(), maxGuildRank);
     }
 
     public static int getMaxGuildRank(Player player) {
         return PlayerData.getMaxGuildLevel(player.getUniqueId());
+    }
+
+    public static int getMaxGuildRank(Player player, boolean databaseAccess) {
+        return PlayerData.getMaxGuildLevel(player.getUniqueId(), databaseAccess);
     }
 
     public static void setActiveGuildRank(Player player, int activeGuildRank) {
@@ -36,6 +46,10 @@ public class GuildRank {
 
     public static int getActiveGuildRank(Player player) {
         return PlayerData.getActiveGuildLevel(player.getUniqueId());
+    }
+
+    public static int getActiveGuildRank(Player player, boolean databaseAccess) {
+        return PlayerData.getActiveGuildLevel(player.getUniqueId(), databaseAccess);
     }
 
     /**
@@ -81,7 +95,7 @@ public class GuildRank {
     }
 
     public static void setMaxHealth(Player player, int activeGuildRank, int prestigeRank) {
-        if (!AdventurersGuildConfig.enableAdventurersGuild || !AdventurersGuildConfig.addMaxHealth) return;
+        if (!AdventurersGuildConfig.addMaxHealth) return;
         double guildRankBonus = healthBonusValue(prestigeRank, activeGuildRank);
         double newMaxHealth = 20 + guildRankBonus;
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(newMaxHealth);
@@ -92,7 +106,7 @@ public class GuildRank {
     }
 
     public static double currencyBonusMultiplier(int prestigeLevel) {
-        return 1 + prestigeLevel / 2D;
+        return 1 + prestigeLevel * 5;
     }
 
     /**
@@ -201,8 +215,16 @@ public class GuildRank {
 
     public static class GuildRankEvents implements Listener {
         @EventHandler
-        public void onPlayerLogin(PlayerJoinEvent event) {
-            setMaxHealth(event.getPlayer(), GuildRank.getActiveGuildRank(event.getPlayer()), GuildRank.getGuildPrestigeRank(event.getPlayer()));
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (event.getPlayer().isOnline())
+                        setMaxHealth(event.getPlayer(),
+                                GuildRank.getActiveGuildRank(event.getPlayer(), true),
+                                GuildRank.getGuildPrestigeRank(event.getPlayer(), true));
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
         }
     }
 

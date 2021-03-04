@@ -12,7 +12,7 @@ public class TreasureGoblinConfig extends CustomBossConfigFields {
         super("treasure_goblin",
                 EntityType.ZOMBIE.toString(),
                 true,
-                "&eTreasure Goblin",
+                "$eventBossLevel &eTreasure Goblin",
                 "dynamic",
                 30,
                 true,

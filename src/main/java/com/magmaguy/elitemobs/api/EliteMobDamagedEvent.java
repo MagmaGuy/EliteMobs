@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
@@ -24,6 +24,7 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
         this.entityDamageEvent = event;
         if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK))
             return;
+        //todo: this shouldn't need doRealDamage
         eliteMobEntity.damage(event.getDamage());
         event.setDamage(0);
     }

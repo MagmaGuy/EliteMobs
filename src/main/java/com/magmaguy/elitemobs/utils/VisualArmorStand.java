@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -18,6 +18,7 @@ public class VisualArmorStand {
         visualArmorStand.setCustomNameVisible(true);
         visualArmorStand.setGravity(false);
         visualArmorStand.setRemoveWhenFarAway(true);
+        visualArmorStand.setPersistent(false);
         return visualArmorStand;
     }
 

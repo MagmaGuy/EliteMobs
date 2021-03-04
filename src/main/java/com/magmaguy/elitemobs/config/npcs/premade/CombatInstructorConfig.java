@@ -11,7 +11,7 @@ public class CombatInstructorConfig extends NPCsConfigFields {
                 "Charles",
                 "<Combat Instructor>",
                 "NITWIT",
-                "EliteMobs_adventurers_guild,277.41,90.0,286.23,-214.85,-1.95",
+                "em_adventurers_guild,277.41,90.0,286.23,-214.85,-1.95",
                 Arrays.asList(
                         "Want to learn about combat?",
                         "Need a combat lesson?",

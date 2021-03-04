@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.GroundPound;
 import org.bukkit.entity.EntityType;
 
 public class EliteVex extends EliteMobProperties {
@@ -11,6 +12,7 @@ public class EliteVex extends EliteMobProperties {
         this.defaultMaxHealth = 14;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.VEX).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.VEX).isEnabled();
+        super.removeDefensivePower(new GroundPound());
         if (this.isEnabled)
             eliteMobData.add(this);
     }

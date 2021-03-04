@@ -2,16 +2,17 @@ package com.magmaguy.elitemobs.powers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.powers.bosspowers.*;
-import com.magmaguy.elitemobs.powers.defensivepowers.*;
+import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieFriends;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.powers.bosspowers.*;
+import com.magmaguy.elitemobs.powers.defensivepowers.*;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,7 +24,7 @@ import java.util.HashSet;
 
 public class ElitePower {
 
-    private static final HashSet<ElitePower> elitePowers = new HashSet(Arrays.asList(
+    public static final HashSet<ElitePower> elitePowers = new HashSet(Arrays.asList(
             //Boss powers
             new FlamePyre(),
             new Flamethrower(),
@@ -45,6 +46,7 @@ public class ElitePower {
             new ZombieFriends(),
             new ZombieNecronomicon(),
             new ZombieParents(),
+            new TrackingFireball(),
 
             //Defensive powers
             new Invisibility(),
@@ -208,6 +210,7 @@ public class ElitePower {
 
     protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
         if (event.isCancelled()) return false;
+        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
         if (elitePower.isCooldown()) return false;
         return !event.getEliteMobEntity().isCooldown();
     }

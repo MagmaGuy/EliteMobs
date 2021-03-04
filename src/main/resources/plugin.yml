@@ -1,158 +1,51 @@
 name: EliteMobs
-version: 7.1.42.3
+version: 7.2.41
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
-softdepend: [Multiverse-Core, WorldGuard, Vault, PlaceholderAPI, HolographicDisplays, DiscordSRV, LibsDisguises]
+softdepend: [ Multiverse-Core, WorldGuard, Vault, PlaceholderAPI, HolographicDisplays, DiscordSRV, LibsDisguises, WorldEdit ]
 
-commands:
-  elitemobs:
-    description: Catch-all command
-    usage: /elitemobs
-    aliases: [em, adventurerguild, adventurersguild, ag, shareitem]
 permissions:
   elitemobs.*:
     description: Gives access to all elitemobs commands
     children:
       elitemobs.stats: true
-      elitemobs.getloot: true
-      elitemobs.simloot: true
-      elitemobs.reload.configs: true
-      elitemobs.reload.loot: true
-      elitemobs.giveloot: true
-      elitemobs.spawnmob: true
-      elitemobs.killall.aggressiveelites: true
-      elitemobs.killall.passiveelites: true
-      elitemobs.killall.specificentity: true
-      elitemobs.currency.user: true
-      elitemobs.currency.admin: true
-      elitemobs.events.*: true
-      elitemobs.checktier: true
       elitemobs.checktier.others: true
-      elitemobs.npc: true
-      elitemobs.customboss: true
-      elitemobs.debug: true
-      elitemobs.discord: true
-      elitemobs.autosetup: true
       elitemobs.versionnotification: true
-      elitemobs.user: true
-    default: op
-  elitemobs.currency.user:
-    description: Gives access to the commands users need to use the economy features (shops, paying other players)
-    children:
-      elitemobs.shop: true
-      elitemobs.customshop: true
-      elitemobs.currency.pay: true
-      elitemobs.currency.check: true
-  elitemobs.currency.admin:
-    description: Gives access to the commands admins need to set economy values
-    children:
-      elitemobs.currency.subtract: true
-      elitemobs.currency.set: true
       elitemobs.currency.check.others: true
-      elitemobs.currency.add: true
-  elitemobs.killall.*:
-    description: Allows players to run all /elitemobs kill variations
-    children:
-      elitemobs.killall.aggressiveelites: true
-      elitemobs.killall.passiveelites: true
-      elitemobs.killall.specificentity: true
-  elitemobs.user:
-    description: Gives access to all recommended user commands
-    children:
-      elitemobs.events.kraken: true
-      elitemobs.events.balrog: true
-      elitemobs.events.fae: true
-      elitemobs.checktier: true
-      elitemobs.adventurersguild: true
-      elitemobs.currency.user: true
-      elitemobs.guild: true
-      elitemobs.quest: true
-      elitemobs.shop: true
-      elitemobs.customshop: true
+    default: op
   elitemobs.stats:
     description: Allows players to run /elitemobs stats
     default: op
   elitemobs.version:
     description: Allows players to run /elitemobs version
     default: true
-  elitemobs.getloot:
-    description: Allow players to run /elitemobs getloot
-    default: op
-  elitemobs.simloot:
-    description: Allow players to run /elitemobs simloot
-    default: op
-  elitemobs.reload:
-    decription: Allow players to run /elitemobs reload config
-    default: op
-  elitemobs.giveloot:
-    description: Allow players to run /elitemobs giveloot [playername] random/[loot name]
-    default: op
-  elitemobs.spawnmob:
-    description: Allow players to run /elitemobs SpawnMob [mobType] [mobLevel] [mobPower] [mobPower(just keep adding until done)]
-    default: op
-  elitemobs.killall.aggressiveelites:
-    description: Allows players to run /elitemobs kill aggressive
-    default: op
-  elitemobs.killall.passiveelites:
-    description: Allows players to run /elitemobs kill passive
-    default: op
-  elitemobs.killall.specificentity:
-    description: Allows players to run /elitemobs kill [entityType]
-    default: op
-  elitemobs.shop:
-    description: Allows players to run /elitemobs shop and interact with npcs
-    children:
-      elitemobs.shop.npc: true
-      elitemobs.shop.command: true
-    default: op
   elitemobs.shop.npc:
     description: Allows players to interact with NPCs for dynamic shops
-    default: op
+    default: true
   elitemobs.shop.command:
     description: Allows players to open the dynamic shop menu through commands
-    default: op
-  elitemobs.customshop:
-    decription: Allows players to run /elitemobs customshop
-    children:
-      elitemobs.customshop.npc: true
-      elitemobs.customshop.command: true
-    default: op
+    default: true
   elitemobs.customshop.npc:
     description: Allows players to interact with NPCs for dynamic shops
-    default: op
+    default: true
   elitemobs.customshop.command:
     description: Allows players to open the dynamic shop menu through commands
-    default: op
+    default: true
   elitemobs.currency.pay:
     description: Allows players to run /elitemobs pay [username] [amount]
-    default: op
-  elitemobs.currency.add:
-    description: Allows players to run /elitemobs add [username] [amount]
-    default: op
-  elitemobs.currency.subtract:
-    description: Allows players to run /elitemobs subtract [username] [amount]
-    default: op
-  elitemobs.currency.set:
-    description: Allows players to run /elitemobs set [username] [amount]
-    default: op
+    default: true
   elitemobs.currency.check:
     description: Allows players to run /elitemobs wallet
-    default: op
+    default: true
   elitemobs.currency.check.others:
     description: Allows players to run /elitemobs check [username]
     default: op
   elitemobs.events:
     description: Allows players to launch all events
-    default: op
-  elitemobs.checktier:
-    description: Allows players to run /elitemobs checktier
-    default: op
+    default: true
   elitemobs.checktier.others:
     description: Allows players to run /elitemobs checktier [player]
-    default: op
-  elitemobs.checkmaxtier:
-    description: Allows players to run /elitemobs checkmaxtier
     default: op
   elitemobs.gettier:
     description: Allows players tu run /elitemobs gettier [tier]
@@ -160,47 +53,27 @@ permissions:
   elitemobs.versionnotification:
     description: Allows players to get notified about plugin updates
     default: op
-  elitemobs.adventurersguild:
-    description: Allows players to use the /ag command to set their difficultyTranslation level and get quests
-    children:
-      elitemobs.adventurersguild.teleport: true
-      elitemobs.adventurersguild.menu: true
-    default: op
   elitemobs.adventurersguild.teleport:
     description: Allows players to teleport to the adventurer's guild hub using /ag
-    default: op
-  elitemobs.adventurersguild.menu:
-    description: Allows players to open the adventurer's guild menu through /ag
-    default: op
-  elitemobs.npc:
-    description: Allows players to set the location of a specific NPC
-    default: op
-  elitemobs.autosetup:
-    description: Allows players to run /em autosetup. This is used for setting up the adventurer's guild map
-    default: op
-  elitemobs.guild:
-    description:  Allows players to run /em guild. This is used to set the difficulty level.
-    default: op
-    children:
-      elitemobs.guild.menu: true
-      elitemobs.guild.npc: true
-  elitemobs.guild.menu:
-    description: Allows players to access the /em guild menu through a command.
-    default: op
-  elitemobs.guild.npc:
-    description: Allows players to access the /em guild menu through NPCs
-    default: op
+    default: true
+  elitemobs.rank.command:
+    description: Allows players to open the rank menu through /em rank
+    default: true
+  elitemobs.rank.npc:
+    description: Allows players to access the /em rank menu through NPCs
+    default: true
   elitemobs.quest:
-    description: Allows players to take on do quests
-    default: op
-  elitemobs.customboss:
-    description: Allows admins to edit Custom Boss settings
-    default: op
-  elitemobs.discord:
-    description: Allows admins to see the link to the EliteMobs discord channel and to send messages to the linked Discord channel for testing announcements
-    defaut: op
-  elitemobs.debug:
-    description: Allows admins to the the various debug screens in EliteMobs
-    default: op
-  elitemobs.setrank:
-    description: Allows admins to use /em setrank [player] [prestigeTier] [guildTier]
+    description: Allows players to take on quests
+    default: true
+  elitemobs.dungeontp:
+    description: Allows players to teleport to an elitemobs-set location
+    default: true
+  elitemobs.spawntp:
+    description: Allows players to teleport to the default spawn location of the server.
+    default: true
+  elitemobs.back.npc:
+    description: Allows players to interact with an npc to go back to a previous location.
+    default: true
+  elitemobs.shareitem:
+    description: Shares a held Elite Item on chat.
+    default: true

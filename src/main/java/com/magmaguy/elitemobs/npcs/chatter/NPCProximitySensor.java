@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.npcs.chatter;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.entity.Entity;
@@ -16,7 +16,7 @@ import java.util.HashSet;
 
 public class NPCProximitySensor implements Listener {
 
-    private HashSet<Player> nearbyPlayers = new HashSet<>();
+    private final HashSet<Player> nearbyPlayers = new HashSet<>();
 
     public NPCProximitySensor() {
 
@@ -27,7 +27,7 @@ public class NPCProximitySensor implements Listener {
 
                 HashSet<Player> seenPlayerList = (HashSet<Player>) nearbyPlayers.clone();
 
-                for (NPCEntity npcEntity : EntityTracker.getNPCEntities())
+                for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
                     if (npcEntity.getVillager().isValid())
                         for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getActivationRadius(),
                                 npcEntity.getActivationRadius(), npcEntity.getActivationRadius()))
@@ -54,6 +54,7 @@ public class NPCProximitySensor implements Listener {
 
     }
 
+    //todo: optimize
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         if (event.getView().getTitle().length() > 0)

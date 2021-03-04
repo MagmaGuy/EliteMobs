@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -66,11 +66,16 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
     }
 
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
-        @EventHandler
-        public void onEliteMobAttack(EntityDamageByEntityEvent event) {
-            if (event.isCancelled()) return;
+
+        @EventHandler(ignoreCancelled = true)
+        public void onEliteMobAttack2(EntityDamageByEntityEvent event) {
             if (!(event.getEntity() instanceof Player)) return;
             Player player = (Player) event.getEntity();
+
+            //citizens
+            if (player.hasMetadata("NPC"))
+                return;
+
             EliteMobEntity eliteMobEntity = null;
             if (event.getDamager() instanceof LivingEntity)
                 eliteMobEntity = EntityTracker.getEliteMobEntity(event.getDamager());

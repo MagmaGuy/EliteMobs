@@ -1,8 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -11,23 +10,20 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 public class EliteMobSpawnEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    private Entity entity;
-    private EliteMobEntity eliteMobEntity;
-    private CreatureSpawnEvent.SpawnReason spawnReason;
+    private final LivingEntity livingEntity;
+    private final EliteMobEntity eliteMobEntity;
+    private final CreatureSpawnEvent.SpawnReason spawnReason;
     private boolean isCancelled = false;
 
     /**
-     * Cancelling this event will prevent the Elite Mob from being constructed.
+     * Cancelling this event will prevent the Elite Mob from being constructed by removing it and the entity it would've converted
      *
-     * @param entity         Entity associated to the Elite Mob
      * @param eliteMobEntity EliteMobEntity being formed
-     * @param spawnReason    Reason for the Entity's spawn
      */
-    public EliteMobSpawnEvent(Entity entity, EliteMobEntity eliteMobEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
-        this.entity = entity;
+    public EliteMobSpawnEvent(EliteMobEntity eliteMobEntity) {
+        this.livingEntity = eliteMobEntity.getLivingEntity();
         this.eliteMobEntity = eliteMobEntity;
-        this.spawnReason = spawnReason;
-        Bukkit.getServer().getPluginManager().callEvent(this);
+        this.spawnReason = eliteMobEntity.getSpawnReason();
     }
 
     public static HandlerList getHandlerList() {
@@ -39,8 +35,8 @@ public class EliteMobSpawnEvent extends Event implements Cancellable {
      *
      * @return Entity being converted into an Elite Mob
      */
-    public Entity getEntity() {
-        return this.entity;
+    public LivingEntity getEntity() {
+        return this.livingEntity;
     }
 
     /**
@@ -55,7 +51,7 @@ public class EliteMobSpawnEvent extends Event implements Cancellable {
     /**
      * Gets the reason for the Entity getting spawned
      *
-     * @return Reason for the Entity gettings spawned
+     * @return Reason for the Entity getting spawned
      */
     public CreatureSpawnEvent.SpawnReason getReason() {
         return this.spawnReason;
@@ -72,13 +68,15 @@ public class EliteMobSpawnEvent extends Event implements Cancellable {
     }
 
     /**
-     * Cancels the event. This will cancel the formation of the Elite Mob/
+     * Cancels the event. This will cancel the formation of the Elite Mob and remove the living entity. Once cancel\led it can't be uncancelled.
      *
-     * @param cancel Cancels teh event
+     * @param cancel Cancels the event
      */
     @Override
     public void setCancelled(boolean cancel) {
         this.isCancelled = cancel;
+        if (isCancelled)
+            eliteMobEntity.remove(true);
     }
 
     /**

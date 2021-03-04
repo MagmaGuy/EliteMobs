@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;

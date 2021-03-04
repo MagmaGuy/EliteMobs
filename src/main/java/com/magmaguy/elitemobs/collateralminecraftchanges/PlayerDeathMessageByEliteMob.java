@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

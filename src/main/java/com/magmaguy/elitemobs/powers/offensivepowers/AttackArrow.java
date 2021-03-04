@@ -2,18 +2,15 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.MinorPower;
-import com.magmaguy.elitemobs.powers.ProjectileLocationGenerator;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 /**
  * Created by MagmaGuy on 06/05/2017.
@@ -61,17 +58,7 @@ public class AttackArrow extends MinorPower implements Listener {
     }
 
     public static Arrow shootArrow(Entity entity, Player player) {
-
-        Location offsetLocation = ProjectileLocationGenerator.generateLocation((LivingEntity) entity, player);
-        Arrow repeatingArrow = (Arrow) entity.getWorld().spawnEntity(offsetLocation, EntityType.ARROW);
-        Vector targetterToTargetted = player.getEyeLocation().subtract(repeatingArrow.getLocation()).toVector()
-                .normalize().multiply(2);
-
-        repeatingArrow.setVelocity(targetterToTargetted);
-        repeatingArrow.setShooter((ProjectileSource) entity);
-
-        return repeatingArrow;
-
+        return (Arrow) EliteProjectile.create(EntityType.ARROW, entity, player, true);
     }
 
 }

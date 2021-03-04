@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
-import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.DynamicBossLevelConstructor;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -13,12 +13,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class CustomBossConfigFields {
 
-    public static HashSet<CustomBossConfigFields> customBossConfigFields = new HashSet<>();
+    public static HashMap<String, CustomBossConfigFields> customBossConfigFields = new HashMap<>();
 
     private static final HashSet<CustomBossConfigFields> naturallySpawnedElites = new HashSet<>();
 
@@ -26,11 +25,7 @@ public class CustomBossConfigFields {
         return naturallySpawnedElites;
     }
 
-    public static final HashSet<CustomBossConfigFields> regionalElites = new HashSet<>();
-
-    public static HashSet<CustomBossConfigFields> getRegionalElites() {
-        return regionalElites;
-    }
+    public static HashMap<String, CustomBossConfigFields> regionalElites = new HashMap<>();
 
     private final String fileName;
     private File file;
@@ -40,7 +35,7 @@ public class CustomBossConfigFields {
     private final String name;
     private final String level;
     private final int timeout;
-    private final Boolean isPersistent;
+    private Boolean isPersistent;
     private final double healthMultiplier;
     private final double damageMultiplier;
     private ItemStack helmet = null;
@@ -49,7 +44,7 @@ public class CustomBossConfigFields {
     private ItemStack boots = null;
     private ItemStack mainHand = null;
     private ItemStack offHand = null;
-    private boolean isBaby;
+    private boolean isBaby = false;
     private final List<String> powers;
     private final String spawnMessage;
     private final String deathMessage;
@@ -65,7 +60,6 @@ public class CustomBossConfigFields {
     private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
     private double spawnChance;
     private boolean isRegionalBoss;
-    private final HashMap<UUID, ConfigRegionalEntity> configRegionalEntities = new HashMap<>();
     private int spawnCooldown;
     private double leashRadius;
     private Integer followRange;
@@ -76,6 +70,7 @@ public class CustomBossConfigFields {
     private String mountedEntity;
     private Integer announcementPriority = 0;
     private String disguise = null;
+    private String customDisguiseData = null;
     private Boolean frozen = false;
     private List<String> phases = new ArrayList<>();
 
@@ -297,7 +292,8 @@ public class CustomBossConfigFields {
         if (configuration.get("spawnChance") != null) {
             this.spawnChance = configuration.getDouble("spawnChance");
             if (this.spawnChance > 0)
-                naturallySpawnedElites.add(this);
+                if (isEnabled)
+                    naturallySpawnedElites.add(this);
         } else
             this.spawnChance = 0;
 
@@ -306,66 +302,7 @@ public class CustomBossConfigFields {
         else
             this.isRegionalBoss = configuration.getBoolean("isRegionalBoss");
 
-        if (this.isRegionalBoss) {
-
-            /*
-            Legacy: convert old spawn locations to new spawn locations
-             */
-            if (configuration.contains("spawnLocation") && !configuration.contains("spawnLocations")) {
-                List<String> newSpawnLocations = new ArrayList<>();
-                newSpawnLocations.add(configuration.getString("spawnLocation"));
-                fileConfiguration.set("spawnLocation", null);
-                fileConfiguration.set("spawnLocations", newSpawnLocations);
-                try {
-                    fileConfiguration.save(file);
-                } catch (IOException ex) {
-                    new WarningMessage("Failed to save Custom Boss data during shutdown! Let the dev know about this error!");
-                }
-
-                try {
-                    fileConfiguration.save(file);
-                } catch (IOException ex) {
-                    new WarningMessage("Failed to save data conversion of file " + fileName + " to new location format. Tell the developer!");
-                }
-                new WarningMessage("Converted old spawn location to new spawn location for " + fileName);
-            }
-
-            if (configuration.contains("spawnLocation") && configuration.contains("spawnLocations")) {
-                configuration.set("spawnLocation", null);
-                try {
-                    fileConfiguration.save(file);
-                } catch (IOException ex) {
-                    new WarningMessage("Failed to save data conversion of file " + fileName + " to new location format. Tell the developer!");
-                }
-                new WarningMessage("Safely cleared deprecated file location for " + fileName);
-            }
-
-            List<String> locations = configuration.getStringList("spawnLocations");
-            if (locations.size() < 1)
-                new WarningMessage("Regional / World boss does not have a set location! It will not spawn. File name: " + this.fileName);
-
-            if (locations.size() > 0) {
-                Location deserializedLocation = null;
-                long respawnTime = 0L;
-                for (String string : locations) {
-                    deserializedLocation = ConfigurationLocation.deserialize(string);
-                    if (deserializedLocation == null)
-                        new WarningMessage("Warning: file " + fileName + " has an invalid location " + string);
-                    if (string.contains(":"))
-                        respawnTime = Long.parseLong(string.substring(string.indexOf(":") + 1));
-                    ConfigRegionalEntity configRegionalEntity = new ConfigRegionalEntity(deserializedLocation, respawnTime);
-                    this.configRegionalEntities.put(configRegionalEntity.uuid, configRegionalEntity);
-                }
-
-                if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
-                else this.spawnCooldown = configuration.getInt("spawnCooldown");
-
-                regionalElites.add(this);
-            }
-
-        }
-
-        this.followRange = configuration.getInt("followRange");
+        this.followRange = configuration.getInt("followDistance");
 
         this.leashRadius = configuration.getDouble("leashRadius");
 
@@ -379,7 +316,7 @@ public class CustomBossConfigFields {
 
         this.mountedEntity = configuration.getString("mountedEntity");
 
-        customBossConfigFields.add(this);
+        customBossConfigFields.put(fileName, this);
 
         if (configuration.get("announcementPriority") != null)
             this.announcementPriority = configuration.getInt("announcementPriority");
@@ -387,24 +324,21 @@ public class CustomBossConfigFields {
             this.announcementPriority = 1;
 
         this.disguise = configuration.getString("disguise");
+        this.customDisguiseData = configuration.getString("customDisguiseData");
 
         this.frozen = configuration.getBoolean("frozen");
         if (frozen == null)
             frozen = false;
 
-        this.phases = configuration.getStringList("phases");
+        if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
+        else this.spawnCooldown = configuration.getInt("spawnCooldown");
 
-    }
-
-    public class ConfigRegionalEntity {
-        public UUID uuid = UUID.randomUUID();
-        public long respawnTimeLeft = 0;
-        public Location spawnLocation;
-
-        public ConfigRegionalEntity(Location spawnLocation, long cooldown) {
-            this.spawnLocation = spawnLocation;
-            this.respawnTimeLeft = cooldown;
+        if (this.isRegionalBoss) {
+            regionalElites.put(fileName, this);
+            AbstractRegionalEntity.initialize(this);
         }
+
+        this.phases = configuration.getStringList("phases");
 
     }
 
@@ -450,8 +384,17 @@ public class CustomBossConfigFields {
         return this.name;
     }
 
-    public String getLevel() {
-        return this.level;
+    public int getLevel() {
+        if (level.equalsIgnoreCase("dynamic")) {
+            return DynamicBossLevelConstructor.findDynamicBossLevel();
+        } else {
+            try {
+                return Integer.valueOf(level);
+            } catch (Exception ex) {
+                new WarningMessage("Regional Elite Mob level for " + fileName + " is neither numeric nor dynamic. Fix the configuration for it.");
+                return 1;
+            }
+        }
     }
 
     public int getTimeout() {
@@ -460,6 +403,11 @@ public class CustomBossConfigFields {
 
     public Boolean getIsPersistent() {
         return this.isPersistent;
+    }
+
+    //Used to override the persistent behavior of mounted entites, in the future also of regional bosses
+    public void setIsPersistent(boolean isPersistent) {
+        this.isPersistent = isPersistent;
     }
 
     public double getHealthMultiplier() {
@@ -554,25 +502,6 @@ public class CustomBossConfigFields {
         return isRegionalBoss;
     }
 
-    public HashMap<UUID, ConfigRegionalEntity> getConfigRegionalEntities() {
-        return configRegionalEntities;
-    }
-
-    public ConfigRegionalEntity addSpawnLocation(Location location) {
-        ConfigRegionalEntity newConfigRegionalEntity = new ConfigRegionalEntity(location, 0);
-        configRegionalEntities.put(newConfigRegionalEntity.uuid, newConfigRegionalEntity);
-        List<String> convertedList = new ArrayList<>();
-        for (ConfigRegionalEntity configRegionalEntity : configRegionalEntities.values())
-            convertedList.add(ConfigurationLocation.serialize(configRegionalEntity.spawnLocation) + ":" + configRegionalEntity.respawnTimeLeft);
-        fileConfiguration.set("spawnLocations", convertedList);
-        try {
-            fileConfiguration.save(file);
-        } catch (IOException ex) {
-            new WarningMessage("Failed to save new boss location! It will not show up in the right place after a restart. Report this to the dev.");
-        }
-        return newConfigRegionalEntity;
-    }
-
     public void setLeashRadius(double leashRadius) {
         this.leashRadius = leashRadius;
         this.fileConfiguration.set("leashRadius", leashRadius);
@@ -611,28 +540,6 @@ public class CustomBossConfigFields {
         return additionalConfigOptions;
     }
 
-    public long getTicksBeforeRespawn(UUID uuid) {
-        return (configRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20 < 0 ?
-                0 :
-                (configRegionalEntities.get(uuid).respawnTimeLeft - System.currentTimeMillis()) / 1000 * 20;
-    }
-
-    public void updateTicksBeforeRespawn(UUID uuid, int delayInMinutes) {
-        configRegionalEntities.get(uuid).respawnTimeLeft = (delayInMinutes * 60 * 1000) + System.currentTimeMillis();
-    }
-
-    public void saveTicksBeforeRespawn() {
-        List<String> convertedList = new ArrayList<>();
-        for (ConfigRegionalEntity configRegionalEntity : configRegionalEntities.values())
-            convertedList.add(ConfigurationLocation.serialize(configRegionalEntity.spawnLocation) + ":" + configRegionalEntity.respawnTimeLeft);
-        fileConfiguration.set("spawnLocations", convertedList);
-        try {
-            fileConfiguration.save(file);
-        } catch (IOException ex) {
-            new WarningMessage("Failed to save Custom Boss data during shutdown! Let the dev know about this error!");
-        }
-    }
-
     public String getMountedEntity() {
         return this.mountedEntity;
     }
@@ -665,6 +572,10 @@ public class CustomBossConfigFields {
         return this.disguise;
     }
 
+    public String getCustomDisguiseData() {
+        return customDisguiseData;
+    }
+
     public Boolean getFrozen() {
         return this.frozen;
     }
@@ -673,4 +584,13 @@ public class CustomBossConfigFields {
         return this.phases;
     }
 
+    public File getFile() {
+        return file;
+    }
+
+    public FileConfiguration getFileConfiguration() {
+        return fileConfiguration;
+    }
+
+    public boolean filesOutOfSync = false;
 }

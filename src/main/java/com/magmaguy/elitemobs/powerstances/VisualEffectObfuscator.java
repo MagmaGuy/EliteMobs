@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.entity.Player;
@@ -18,7 +18,6 @@ public class VisualEffectObfuscator implements Listener {
         if (eliteMobEntity == null) return;
 
         eliteMobEntity.setHasVisualEffectObfuscated(false);
-        eliteMobEntity.getLivingEntity().setCustomNameVisible(true);
     }
 
     @EventHandler
@@ -28,7 +27,6 @@ public class VisualEffectObfuscator implements Listener {
         if (eliteMobEntity == null) return;
 
         eliteMobEntity.setHasVisualEffectObfuscated(false);
-        eliteMobEntity.getLivingEntity().setCustomNameVisible(true);
     }
 
 }

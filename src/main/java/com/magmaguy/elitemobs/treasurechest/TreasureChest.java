@@ -1,20 +1,20 @@
 package com.magmaguy.elitemobs.treasurechest;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.utils.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -108,8 +108,7 @@ public class TreasureChest {
         try {
             location.getChunk().load();
         } catch (Exception ex) {
-            new WarningMessage("Failed to load location " + location.toString() + " - this location can not be loaded");
-            new WarningMessage("Does the world " + location.getWorld() + " exist? Did the world name change or has the world been removed?");
+            new InfoMessage("Location " + customTreasureChestConfigFields.getLocationString() + " is not loaded, so a treasure chest will not be placed!");
             return;
         }
 
@@ -141,10 +140,11 @@ public class TreasureChest {
             new WarningMessage("Custom Treasure Chest " + fileName + " has an invalid location and can not be placed.");
             return;
         }
-        Chest chest = (Chest) location.getBlock().getState();
-        chest.setCustomName(this.key);
-        //todo: add block face
-        chest.update();
+        //todo: this doesn't support non- chest block types like the ender chest
+        //Directional directional = (Directional) location.getBlock().getState();
+        //directional.setFacingDirection(facing);
+        //location.getBlock().setBlockData((BlockData) directional);
+        location.getBlock().getState().update();
 
         startEffects();
     }
@@ -330,7 +330,7 @@ public class TreasureChest {
                     @Override
                     public void run() {
                         item.remove();
-                        EntityTracker.wipeEntity(item);
+                        EntityTracker.wipeEntity(item, RemovalReason.EFFECT_TIMEOUT);
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20);
 

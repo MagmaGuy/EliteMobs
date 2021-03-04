@@ -6,8 +6,9 @@ import com.magmaguy.elitemobs.config.customloot.CustomLootConfigFields;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
-import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.items.customenchantments.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,19 +53,19 @@ public class CustomItem {
         switch (customItem.getScalability()) {
             case LIMITED:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructLimitedItem(itemTier, customItem));
+                        ScalableItemConstructor.constructLimitedItem(itemTier, customItem, player));
                 break;
             case SCALABLE:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem));
+                        ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem, player));
                 break;
             case FIXED:
                 loot = location.getWorld().dropItem(location,
-                        customItem.generateItemStack(itemTier + 1));
+                        customItem.generateItemStack(itemTier + 1, player));
             default:
         }
 
-        SoulbindEnchantment.addEnchantment(loot, player);
+        SoulbindEnchantment.addPhysicalDisplay(loot, player);
         loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
         loot.setCustomNameVisible(true);
 
@@ -78,6 +79,13 @@ public class CustomItem {
     // Used to get loot via commands
     private static final ArrayList<ItemStack> customItemStackList = new ArrayList<>();
 
+    // Used to get loot via custom shop, used for efficiency (avoids the double calc of the lore)
+    private static final ArrayList<ItemStack> customItemStackShopList = new ArrayList<>();
+
+    public static ArrayList<ItemStack> getCustomItemStackShopList() {
+        return customItemStackShopList;
+    }
+
     /**
      * Returns a full list of custom items using their configuration settings
      *
@@ -89,8 +97,9 @@ public class CustomItem {
 
     // Adds custom items to the list used by the getloot GUI
     private static void addCustomItem(CustomItem customItem) {
+        customItemStackList.add(customItem.generateDefaultsItemStack(null, false));
         if (customItem.getItemType().equals(ItemType.UNIQUE)) return;
-        customItemStackList.add(customItem.generateDefaultsItemStack());
+        customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true));
     }
 
     // Used to drop static loot using the weighed chance system
@@ -107,7 +116,8 @@ public class CustomItem {
 
     // Adds weighed static items
     private static void addWeighedFixedItems(CustomItem customItem) {
-        weighedFixedItems.put(customItem.generateDefaultsItemStack(), customItem.getDropWeight());
+        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false);
+        weighedFixedItems.put(itemStack, customItem.getDropWeight());
     }
 
     private static final HashMap<Integer, ArrayList<ItemStack>> tieredLoot = new HashMap<>();
@@ -117,7 +127,7 @@ public class CustomItem {
     }
 
     public static void addTieredLoot(CustomItem customItem) {
-        ItemStack itemStack = customItem.generateDefaultsItemStack();
+        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false);
         int itemTier = customItem.getItemTier();
 
         if (tieredLoot.get(itemTier) == null)
@@ -167,7 +177,12 @@ public class CustomItem {
      */
     public static void initializeCustomItems() {
         for (CustomLootConfigFields configFields : CustomLootConfigFields.getCustomLootConfigFields())
-            new CustomItem(configFields);
+            try {
+                new CustomItem(configFields);
+            } catch (Exception ex) {
+                new WarningMessage("Failed to generate custom item in file " + configFields.getFileName() + " !");
+                ex.printStackTrace();
+            }
     }
 
     private final CustomLootConfigFields customLootConfigFields;
@@ -257,6 +272,13 @@ public class CustomItem {
                     Bukkit.getLogger().warning("[EliteMobs] The name should follow the API names and the level should be above 0.");
                     Bukkit.getLogger().warning("[EliteMobs] Defaulting " + name + " to level 1.");
                 }
+/*
+                for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantments())
+                    if (customEnchantment.key.equalsIgnoreCase(name)){
+                        customEnchantments.put(name.toLowerCase(), level);
+                        break;
+                    }
+*/
 
                 if (name.equalsIgnoreCase(HunterEnchantment.key) ||
                         name.equalsIgnoreCase(FlamethrowerEnchantment.key) ||
@@ -264,10 +286,13 @@ public class CustomItem {
                         name.equalsIgnoreCase(MeteorShowerEnchantment.key) ||
                         name.equalsIgnoreCase(SoulbindEnchantment.key) ||
                         name.equalsIgnoreCase(DrillingEnchantment.key) ||
-                        name.equalsIgnoreCase(IceBreakerEnchantment.key)) {
+                        name.equalsIgnoreCase(IceBreakerEnchantment.key) ||
+                        name.equalsIgnoreCase(SummonMerchantEnchantment.key) ||
+                        name.equalsIgnoreCase(SummonWolfEnchantment.key)) {
                     customEnchantments.put(name.toLowerCase(), level);
                     continue;
                 }
+
 
                 Enchantment enchantment;
 
@@ -369,10 +394,10 @@ public class CustomItem {
     }
 
     private void parseItemTier() {
-        this.itemTier = (int) ItemTierFinder.findBattleTier(generateDefaultsItemStack());
+        this.itemTier = ItemTierFinder.findBattleTier(generateDefaultsItemStack(null, false));
     }
 
-    public ItemStack generateDefaultsItemStack() {
+    public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth) {
         ItemStack itemStack =
                 ItemConstructor.constructItem(
                         getName(),
@@ -381,22 +406,24 @@ public class CustomItem {
                         getCustomEnchantments(),
                         getPotionEffects(),
                         getLore(),
-                        null);
+                        null,
+                        player,
+                        showItemWorth);
         parseCustomModelID(itemStack);
         return itemStack;
     }
 
-    public ItemStack generateItemStack(int itemTier) {
+    public ItemStack generateItemStack(int itemTier, Player player) {
         ItemStack itemStack = null;
         switch (this.scalability) {
             case FIXED:
-                itemStack = generateDefaultsItemStack();
+                itemStack = generateDefaultsItemStack(player, false);
                 break;
             case LIMITED:
-                itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this);
+                itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this, player);
                 break;
             case SCALABLE:
-                itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this);
+                itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player);
         }
         parseCustomModelID(itemStack);
         return itemStack;
