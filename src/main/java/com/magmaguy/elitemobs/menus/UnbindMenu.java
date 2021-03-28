@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -136,7 +137,7 @@ public class UnbindMenu extends EliteMenu {
 
                 //cancel button
                 if (event.getSlot() == UnbinderMenuConfig.cancelSlot) {
-                    cancel(unbinderInventory, player);
+                    player.closeInventory();
                     return;
                 }
 
@@ -158,7 +159,7 @@ public class UnbindMenu extends EliteMenu {
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             if (!EliteMenu.onInventoryClose(event, inventories)) return;
-            cancel(event.getView().getTopInventory(), (Player) event.getPlayer());
+            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
         }
 
     }
@@ -170,14 +171,6 @@ public class UnbindMenu extends EliteMenu {
         }
         ItemStack outputItem = UnbinderInventory.getItem(UnbinderMenuConfig.eliteItemInputSlot).clone();
         UnbinderInventory.setItem(outputSlot, UnbindEnchantment.unbindItem(outputItem));
-    }
-
-    private static void cancel(Inventory inventory, Player player) {
-        if (inventory.getItem(eliteItemInputSlot) != null)
-            player.getInventory().addItem(inventory.getItem(eliteItemInputSlot));
-        if (inventory.getItem(scrapItemInputSlot) != null)
-            player.getInventory().addItem(inventory.getItem(scrapItemInputSlot));
-        player.closeInventory();
     }
 
 }

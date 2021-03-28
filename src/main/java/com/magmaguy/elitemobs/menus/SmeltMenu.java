@@ -125,7 +125,7 @@ public class SmeltMenu extends EliteMenu {
             } else if (isTopMenu(event)) {
 
                 if (event.getSlot() == SmeltMenuConfig.cancelSlot) {
-                    cancel(smeltInventory, player);
+                    player.closeInventory();
                     return;
                 }
 
@@ -172,7 +172,7 @@ public class SmeltMenu extends EliteMenu {
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             if (!EliteMenu.onInventoryClose(event, inventories)) return;
-            cancel(event.getInventory(), (Player) event.getPlayer());
+            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), SmeltMenu.inputSlots);
         }
 
     }
@@ -212,13 +212,6 @@ public class SmeltMenu extends EliteMenu {
         }
 
         return itemStacks;
-    }
-
-    private static void cancel(Inventory inventory, Player player) {
-        for (int slot : SmeltMenuConfig.inputSlots)
-            if (inventory.getItem(slot) != null)
-                player.getInventory().addItem(inventory.getItem(slot));
-        player.closeInventory();
     }
 
 }

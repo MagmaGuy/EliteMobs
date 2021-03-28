@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -115,8 +116,12 @@ public class RefinerMenu extends EliteMenu {
                 if (isFull) return;
 
                 //Do transfer
-                shopInventory.addItem(currentItem);
-                playerInventory.clear(event.getSlot());
+                for (int slot : RefinerMenu.inputSlots)
+                    if (shopInventory.getItem(slot) == null){
+                        shopInventory.setItem(slot, currentItem);
+                        playerInventory.clear(event.getSlot());
+                        break;
+                    }
 
                 refreshOutputVisuals(shopInventory, RefinerMenuConfig.outputSlots, player);
 
@@ -144,14 +149,12 @@ public class RefinerMenu extends EliteMenu {
 
                 //cancel, transfer items back to player inv and exit
                 if (event.getSlot() == SellMenuConfig.cancelSlot) {
-                    cancel(playerInventory, shopInventory);
-                    event.getWhoClicked().closeInventory();
+                    player.closeInventory();
                     return;
                 }
 
                 //If player clicks on a border glass pane, do nothing
                 if (!inputSlots.contains(event.getSlot())) return;
-
 
                 //If player clicks on one of the items already in the shop, return to their inventory
                 playerInventory.addItem(event.getCurrentItem());
@@ -165,17 +168,7 @@ public class RefinerMenu extends EliteMenu {
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             if (!EliteMenu.onInventoryClose(event, inventories)) return;
-            cancel(event.getView().getBottomInventory(), event.getView().getTopInventory());
-        }
-
-        private static void cancel(Inventory playerInventory, Inventory shopInventory) {
-            for (Integer validSlot : inputSlots) {
-                ItemStack itemStack = shopInventory.getItem(validSlot);
-                if (itemStack != null) {
-                    playerInventory.addItem(itemStack);
-                    shopInventory.remove(itemStack);
-                }
-            }
+            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), inputSlots);
         }
 
     }

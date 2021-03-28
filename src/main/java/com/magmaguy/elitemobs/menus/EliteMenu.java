@@ -7,8 +7,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class EliteMenu implements Listener {
 
@@ -39,6 +41,14 @@ public class EliteMenu implements Listener {
         if (inventory == null) return false;
         inventories.remove(player);
         return event.getView().getTopInventory().equals(inventory);
+    }
+
+    public static void cancel(Inventory eliteInventory, Inventory playerInventory, List<Integer> inputSlots){
+        for (int slot : inputSlots)
+            if (eliteInventory.getItem(slot) != null){
+                playerInventory.addItem(eliteInventory.getItem(slot));
+                eliteInventory.remove(eliteInventory.getItem(slot));
+            }
     }
 
     public static void onPlayerQuit(PlayerQuitEvent event, HashMap<Player, Inventory> inventories) {
