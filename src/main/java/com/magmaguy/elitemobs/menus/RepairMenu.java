@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -138,7 +139,7 @@ public class RepairMenu extends EliteMenu {
 
                 //cancel button
                 if (event.getSlot() == RepairMenuConfig.cancelSlot) {
-                    cancel(repairInventory, player);
+                    player.closeInventory();
                     return;
                 }
 
@@ -160,7 +161,7 @@ public class RepairMenu extends EliteMenu {
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             if (!EliteMenu.onInventoryClose(event, inventories)) return;
-            cancel(event.getView().getTopInventory(), (Player) event.getPlayer());
+            EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
         }
 
     }
@@ -179,14 +180,6 @@ public class RepairMenu extends EliteMenu {
         itemMeta = (ItemMeta) damageable;
         outputItem.setItemMeta(itemMeta);
         repairInventory.setItem(outputSlot, outputItem);
-    }
-
-    private static void cancel(Inventory inventory, Player player) {
-        if (inventory.getItem(eliteItemInputSlot) != null)
-            player.getInventory().addItem(inventory.getItem(eliteItemInputSlot));
-        if (inventory.getItem(scrapItemInputSlot) != null)
-            player.getInventory().addItem(inventory.getItem(scrapItemInputSlot));
-        player.closeInventory();
     }
 
 }
