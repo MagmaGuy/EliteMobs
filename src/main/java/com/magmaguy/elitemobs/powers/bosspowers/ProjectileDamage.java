@@ -38,8 +38,7 @@ public class ProjectileDamage {
                     }
                     boolean removed = false;
                     for (Entity entity : goldNugget.getNearbyEntities(0.1, 0.1, 0.1))
-                        if (entity instanceof LivingEntity)
-                            if (entity.getType().equals(EntityType.PLAYER)) {
+                        if (entity instanceof LivingEntity){
                                 BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
                                 iterator.remove();
                                 goldNugget.remove();

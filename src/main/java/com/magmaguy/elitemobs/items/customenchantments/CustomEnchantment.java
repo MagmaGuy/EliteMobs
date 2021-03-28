@@ -49,6 +49,7 @@ public abstract class CustomEnchantment {
         new MeteorShowerEnchantment();
         new SummonMerchantEnchantment();
         new SummonWolfEnchantment();
+        new UnbindEnchantment();
     }
 
     /*
@@ -62,7 +63,7 @@ public abstract class CustomEnchantment {
     }
 
     public static boolean hasCustomEnchantment(ItemMeta itemMeta, String key) {
-        return ItemTagger.getEnchantment(itemMeta, new NamespacedKey(MetadataHandler.PLUGIN, key)) != 0;
+        return ItemTagger.getEnchantment(itemMeta, new NamespacedKey(MetadataHandler.PLUGIN, key)) > 0;
     }
 
     /*

@@ -33,7 +33,13 @@ public class NPCsConfig {
             new SpecialBlacksmithConfig(),
             new CombatInstructorConfig(),
             new TravellingMerchantConfig(),
-            new BackTeleporter()
+            new BackTeleporter(),
+            new ScrapperConfig(),
+            new SmelterConfig(),
+            new RepairmanConfig(),
+            new RefinerConfig(),
+            new EnhancerConfig(),
+            new UnbinderConfig()
     ));
 
     public static void initializeConfigs() {

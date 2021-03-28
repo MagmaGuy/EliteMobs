@@ -226,6 +226,12 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new BuyOrSellMenu(), plugin);
         pluginManager.registerEvents(new SellMenu(), plugin);
         pluginManager.registerEvents(new SetupMenu.SetupMenuListeners(), plugin);
+        pluginManager.registerEvents(new ScrapperMenu.ScrapperMenuEvents(), plugin);
+        pluginManager.registerEvents(new SmeltMenu.SmeltMenuEvents(), plugin);
+        pluginManager.registerEvents(new RepairMenu.RepairMenuEvents(), plugin);
+        pluginManager.registerEvents(new RefinerMenu.RefinerMenuEvents(), plugin);
+        pluginManager.registerEvents(new EnhancementMenu.EnhancementMenuEvents(), plugin);
+        pluginManager.registerEvents(new UnbindMenu.UnbinderMenuEvents(), plugin);
 
         //Minecraft behavior canceller
         if (DefaultConfig.preventCreeperDamageToPassiveMobs)
@@ -278,6 +284,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new MeteorShowerEnchantment.MeteorShowerEvents(), plugin);
         pluginManager.registerEvents(new DrillingEnchantment.DrillingEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new IceBreakerEnchantment.IceBreakerEnchantmentEvent(), plugin);
+        //pluginManager.registerEvents(new UnbindEnchantment.UnbindEvents(), plugin);
 
         //Initialize adventurer's guild
         pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);

@@ -82,7 +82,8 @@ public class EnchantmentsConfig {
             new DrillingConfig(),
             new IceBreakerConfig(),
             new SummonMerchantConfig(),
-            new SummonWolfConfig()
+            new SummonWolfConfig(),
+            new UnbindConfig()
     ));
 
     public static void initializeConfigs() {

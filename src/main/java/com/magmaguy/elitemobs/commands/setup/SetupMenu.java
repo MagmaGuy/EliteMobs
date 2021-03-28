@@ -201,7 +201,7 @@ public class SetupMenu {
                             CustomWorldLoading.startupWorldInitialization();
                             AdventurersGuildCommand.defineTeleportLocation();
                             AdventurersGuildConfig.toggleGuildInstall();
-                            //new NPCInitializer();
+                            new NPCInitializer();
                             if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
                                 WorldGuardCompatibility.protectWorldMinidugeonArea(AdventurersGuildCommand.defineTeleportLocation());
                                 player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2The Adventurer's Guild Hub has been protected against griefing and mob spawning (among others)!"));

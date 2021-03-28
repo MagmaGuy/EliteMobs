@@ -147,6 +147,15 @@ public class ItemTagger {
         return itemMeta.getPersistentDataContainer().has(enchantmentKey, PersistentDataType.INTEGER);
     }
 
+    public static boolean hasEnchantment(ItemMeta itemMeta, String keyString) {
+        NamespacedKey enchantmentKey = new NamespacedKey(MetadataHandler.PLUGIN, keyString);
+        if (!itemMeta.hasLore()) //early performance tweak
+            return false;
+        if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
+            return true;
+        return itemMeta.getPersistentDataContainer().has(enchantmentKey, PersistentDataType.INTEGER);
+    }
+
     public static NamespacedKey onHitPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "onHitPotionEffect");
     public static NamespacedKey continuousPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "continuousPotionEffect");
 
