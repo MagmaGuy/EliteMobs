@@ -1,23 +1,19 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
-import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 
 public class ItemEnchantmentPrevention implements Listener {
-    @EventHandler(ignoreCancelled = true)
-    public void onCombine(InventoryClickEvent event) {
-        if (!event.getView().getTopInventory().getType().equals(InventoryType.ANVIL)) return;
-        if (!ItemTagger.isEliteItem(event.getCurrentItem())) return;
-        if (ItemSettingsConfig.preventEliteItemEnchantment) {
-            event.setCancelled(true);
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onResultGeneration(PrepareAnvilEvent event) {
+        if (!(ItemTagger.isEliteItem(event.getInventory().getItem(0)) && ItemTagger.isEliteItem(event.getInventory().getItem(1))))
             return;
-        }
-        if (event.getSlot() != 2) return;
-        new EliteItemLore(event.getCurrentItem(), false);
+        event.setResult(ItemStackGenerator.generateItemStack(Material.AIR));
+        event.getInventory().setRepairCost(300);
     }
 }
