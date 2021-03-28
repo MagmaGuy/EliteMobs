@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -61,8 +62,11 @@ public class ItemWorthCalculator {
             } else
                 value += EnchantmentsConfig.getEnchantment(enchantment).getValue() * itemStack.getEnchantments().get(enchantment);
         }
-        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantments())
-            value += customEnchantment.getEnchantmentsConfigFields().getValue() * ItemTagger.getEnchantment(itemStack.getItemMeta(), customEnchantment.key);
+        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantments()) {
+            int enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), customEnchantment.key);
+            if (enchantmentLevel > 0)
+                value += customEnchantment.getEnchantmentsConfigFields().getValue() * ItemTagger.getEnchantment(itemStack.getItemMeta(), customEnchantment.key);
+        }
         return value;
     }
 

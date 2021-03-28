@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class MenusConfig {
 
-    private static final ArrayList<MenusConfigFields> menusConfigFieldsList = new ArrayList<>(Arrays.asList(
+    private static final ArrayList<MenusConfigFields> menusConfigFieldsList = new ArrayList<MenusConfigFields>(Arrays.asList(
             new ProceduralShopMenuConfig(),
             new CustomShopMenuConfig(),
             new BuyOrSellMenuConfig(),
@@ -18,7 +18,13 @@ public class MenusConfig {
             new GetLootMenuConfig(),
             new GuildRankMenuConfig(),
             new QuestMenuConfig(),
-            new PlayerStatusMenuConfig()
+            new PlayerStatusMenuConfig(),
+            new ScrapperMenuConfig(),
+            new SmeltMenuConfig(),
+            new RepairMenuConfig(),
+            new RefinerMenuConfig(),
+            new EnhancementMenuConfig(),
+            new UnbinderMenuConfig()
     ));
 
     public static void initializeConfigs() {

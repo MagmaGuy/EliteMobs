@@ -6,9 +6,9 @@ import com.magmaguy.elitemobs.config.customloot.CustomLootConfigFields;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
+import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import com.magmaguy.elitemobs.items.customenchantments.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -288,7 +288,8 @@ public class CustomItem {
                         name.equalsIgnoreCase(DrillingEnchantment.key) ||
                         name.equalsIgnoreCase(IceBreakerEnchantment.key) ||
                         name.equalsIgnoreCase(SummonMerchantEnchantment.key) ||
-                        name.equalsIgnoreCase(SummonWolfEnchantment.key)) {
+                        name.equalsIgnoreCase(SummonWolfEnchantment.key) ||
+                        name.equalsIgnoreCase(UnbindEnchantment.key)) {
                     customEnchantments.put(name.toLowerCase(), level);
                     continue;
                 }

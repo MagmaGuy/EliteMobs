@@ -6,9 +6,7 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.menus.CustomShopMenu;
-import com.magmaguy.elitemobs.menus.ProceduralShopMenu;
-import com.magmaguy.elitemobs.menus.SellMenu;
+import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +29,13 @@ public class NPCInteractions implements Listener {
         QUEST_GIVER,
         NONE,
         SELL,
-        TELEPORT_BACK
+        TELEPORT_BACK,
+        SCRAPPER,
+        SMELTER,
+        REPAIRMAN,
+        ENHANCER,
+        REFINER,
+        UNBINDER
     }
 
     @EventHandler
@@ -112,6 +116,72 @@ public class NPCInteractions implements Listener {
                             event.getPlayer().sendMessage(ChatColorConverter.convert(npcEntity.npCsConfigFields.noPreviousLocationMessage));
                     } else
                         PlayerPreTeleportEvent.teleportPlayer(event.getPlayer(), previousLocation);
+                }
+                break;
+            case SCRAPPER:
+                if (event.getPlayer().hasPermission("elitemobs.scrap.npc")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            ScrapperMenu scrapperMenu = new ScrapperMenu();
+                            scrapperMenu.constructScrapMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                }
+                break;
+            case SMELTER:
+                if (event.getPlayer().hasPermission("elitemobs.smelt.npc")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            SmeltMenu smeltMenu = new SmeltMenu();
+                            smeltMenu.constructSmeltMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                }
+                break;
+            case REPAIRMAN:
+                if (event.getPlayer().hasPermission("elitemobs.repair.npc")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            RepairMenu repairMenu = new RepairMenu();
+                            repairMenu.constructRepairMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                }
+                break;
+            case ENHANCER:
+                if (event.getPlayer().hasPermission("elitemobs.enhancer.npc")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            EnhancementMenu enhancementMenu = new EnhancementMenu();
+                            enhancementMenu.constructEnhancementMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                }
+                break;
+            case REFINER:
+                if (event.getPlayer().hasPermission("elitemobs.refiner.npc")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            RefinerMenu refinerMenu = new RefinerMenu();
+                            refinerMenu.constructRefinerMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                }
+                break;
+            case UNBINDER:
+                if (event.getPlayer().hasPermission("elitemobs.unbind.npc")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            UnbindMenu unbindMenu = new UnbindMenu();
+                            unbindMenu.constructUnbinderMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
                 break;
             case NONE:

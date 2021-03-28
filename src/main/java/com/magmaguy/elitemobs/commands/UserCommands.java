@@ -179,6 +179,7 @@ public class UserCommands {
         manager.command(builder.literal("dungeontp")
                 .argument(StringArgument.newBuilder("dungeonid"), ArgumentDescription.of("ID of the dungeon to teleport to."))
                 .meta(CommandMeta.DESCRIPTION, "Teleports players to Lairs, Minidungeons and Dungeons.")
+                .permission("elitemobs.dungeontp")
                 .senderType(Player.class)
                 .handler(commandContext -> DungeonCommands.teleport((Player) commandContext.getSender(), commandContext.get("dungeonid"))));
 

@@ -1,0 +1,192 @@
+package com.magmaguy.elitemobs.menus;
+
+import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
+import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
+import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+public class RepairMenu extends EliteMenu {
+    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+    private static final int eliteItemInputSlot = RepairMenuConfig.eliteItemInputSlot;
+    private static final int scrapItemInputSlot = RepairMenuConfig.eliteScrapInputSlot;
+    private static final int outputSlot = RepairMenuConfig.outputSlot;
+    private static final int eliteItemInformationInputSlot = RepairMenuConfig.eliteItemInputInformationSlot;
+    private static final int eliteScrapInformationInputSlot = RepairMenuConfig.eliteScrapInputInformationSlot;
+    private static final int informationOutputSlot = RepairMenuConfig.outputInformationSlot;
+
+    /**
+     * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
+     *
+     * @param player Player for whom the inventory will be created
+     */
+    public void constructRepairMenu(Player player) {
+        Inventory repairInventory = Bukkit.createInventory(player, 54, RepairMenuConfig.shopName);
+
+        for (int i = 0; i < repairInventory.getSize(); i++) {
+
+            if (i == RepairMenuConfig.infoSlot) {
+                repairInventory.setItem(i, RepairMenuConfig.infoButton);
+                continue;
+            }
+
+            if (i == RepairMenuConfig.cancelSlot) {
+                repairInventory.setItem(i, RepairMenuConfig.cancelButton);
+                continue;
+            }
+
+            if (i == eliteItemInformationInputSlot) {
+                repairInventory.setItem(i, RepairMenuConfig.eliteItemInputInfoButton);
+                continue;
+            }
+
+            if (i == eliteScrapInformationInputSlot) {
+                repairInventory.setItem(i, RepairMenuConfig.eliteScrapInputInfoButton);
+                continue;
+            }
+
+            if (i == informationOutputSlot) {
+                repairInventory.setItem(i, RepairMenuConfig.outputInfoButton);
+                continue;
+            }
+
+
+            if (i == RepairMenuConfig.confirmSlot) {
+
+                ItemStack clonedConfirmButton = RepairMenuConfig.confirmButton.clone();
+
+                List<String> lore = new ArrayList<>();
+                for (String string : RepairMenuConfig.confirmButton.getItemMeta().getLore())
+                    lore.add(string);
+                RepairMenuConfig.confirmButton.getItemMeta().setLore(lore);
+                ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
+                clonedMeta.setLore(lore);
+                clonedConfirmButton.setItemMeta(clonedMeta);
+                repairInventory.setItem(i, clonedConfirmButton);
+                continue;
+
+            }
+
+
+            if (i == RepairMenuConfig.eliteItemInputSlot || i == RepairMenuConfig.eliteScrapInputSlot || i == RepairMenuConfig.outputSlot)
+                continue;
+            repairInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
+
+        }
+
+        player.openInventory(repairInventory);
+        createEliteMenu(player, repairInventory, inventories);
+    }
+
+    public static class RepairMenuEvents implements Listener {
+        @EventHandler
+        public void onInteract(InventoryClickEvent event) {
+            if (!isEliteMenu(event, inventories)) return;
+            event.setCancelled(true);
+
+            Player player = (Player) event.getWhoClicked();
+            ItemStack currentItem = event.getCurrentItem();
+            Inventory repairInventory = event.getView().getTopInventory();
+            Inventory playerInventory = event.getView().getBottomInventory();
+
+            if (isBottomMenu(event)) {
+                //Item is scrap
+                if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), "EliteScrap")) {
+                    int scrapLevel = ItemTagger.getEnchantment(currentItem.getItemMeta(), "EliteScrap");
+                    if (scrapLevel >= 0) {
+                        if (repairInventory.getItem(scrapItemInputSlot) == null) {
+                            repairInventory.setItem(scrapItemInputSlot, currentItem);
+                            playerInventory.remove(currentItem);
+                            calculateOutput(repairInventory);
+                        }
+                        return;
+                    }
+                }
+
+                //Item is elite item
+                if (EliteMobsItemDetector.isEliteMobsItem(currentItem))
+                    if (currentItem.getItemMeta() instanceof Damageable)
+                        if (repairInventory.getItem(eliteItemInputSlot) == null) {
+                            repairInventory.setItem(eliteItemInputSlot, currentItem);
+                            playerInventory.remove(currentItem);
+                            calculateOutput(repairInventory);
+                        }
+
+            } else if (isTopMenu(event)) {
+
+                //return item to inventory
+                if (event.getSlot() == scrapItemInputSlot || event.getSlot() == eliteItemInputSlot) {
+                    playerInventory.addItem(currentItem);
+                    repairInventory.remove(currentItem);
+                    calculateOutput(repairInventory);
+                    return;
+                }
+
+                //cancel button
+                if (event.getSlot() == RepairMenuConfig.cancelSlot) {
+                    cancel(repairInventory, player);
+                    return;
+                }
+
+                //confirm button
+                if (event.getSlot() == RepairMenuConfig.confirmSlot) {
+                    if (repairInventory.getItem(outputSlot) != null) {
+                        repairInventory.setItem(RepairMenuConfig.eliteItemInputSlot, null);
+                        repairInventory.setItem(RepairMenuConfig.eliteScrapInputSlot, null);
+                        playerInventory.addItem(repairInventory.getItem(outputSlot));
+                        repairInventory.remove(repairInventory.getItem(outputSlot));
+                        repairInventory.setItem(outputSlot, null);
+                    }
+                }
+
+            }
+
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event) {
+            if (!EliteMenu.onInventoryClose(event, inventories)) return;
+            cancel(event.getView().getTopInventory(), (Player) event.getPlayer());
+        }
+
+    }
+
+    private static void calculateOutput(Inventory repairInventory) {
+        if (repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot) == null || repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot) == null) {
+            repairInventory.setItem(RepairMenuConfig.outputSlot, null);
+            return;
+        }
+        int repairScore = ItemTagger.getEnchantment(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot).getItemMeta(), "EliteScrap");
+        ItemStack outputItem = repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot).clone();
+        ItemMeta itemMeta = outputItem.getItemMeta();
+        Damageable damageable = (Damageable) itemMeta;
+        int damage = Math.max(damageable.getDamage() - repairScore, 0);
+        damageable.setDamage(damage);
+        itemMeta = (ItemMeta) damageable;
+        outputItem.setItemMeta(itemMeta);
+        repairInventory.setItem(outputSlot, outputItem);
+    }
+
+    private static void cancel(Inventory inventory, Player player) {
+        if (inventory.getItem(eliteItemInputSlot) != null)
+            player.getInventory().addItem(inventory.getItem(eliteItemInputSlot));
+        if (inventory.getItem(scrapItemInputSlot) != null)
+            player.getInventory().addItem(inventory.getItem(scrapItemInputSlot));
+        player.closeInventory();
+    }
+
+}

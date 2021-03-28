@@ -12,9 +12,11 @@ import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -31,7 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity implements SimplePersistentEntityInterface {
 
-    private Villager villager;
+    private Villager villager = null;
     public UUID uuid;
     public final NPCsConfigFields npCsConfigFields;
     private String name;
@@ -50,7 +52,6 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     private boolean isSleeping = false;
     private NPCInteractions.NPCInteractionType npcInteractionType;
     private double timeout;
-    public boolean sleepScheduled = false;
 
     /**
      * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
@@ -74,6 +75,8 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
         for (NPCEntity npcEntity : npcEntitiesToCull)
             npcEntity.removeNPCEntity();
+
+        if (this.villager != null) return;
 
         WorldGuardSpawnEventBypasser.forceSpawn();
         try {
@@ -168,6 +171,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
     @Override
     public void chunkLoad() {
+        if (villager != null && villager.isValid()) return;
         WorldGuardSpawnEventBypasser.forceSpawn();
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
         this.uuid = villager.getUniqueId();
@@ -176,6 +180,12 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         initializeRole(role);
         setCanMove(canMove);
         EntityTracker.registerNPCEntity(this);
+    }
+
+    public void worldLoad(World world){
+        if (!(spawnLocation != null && spawnLocation.getWorld().getName().equalsIgnoreCase(world.getName()))) return;
+        if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
+        spawnLocation.getChunk().load();
     }
 
     /**

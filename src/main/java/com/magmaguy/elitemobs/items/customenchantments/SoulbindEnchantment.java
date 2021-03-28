@@ -86,8 +86,8 @@ public class SoulbindEnchantment extends CustomEnchantment {
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
     }
 
-    private static final NamespacedKey SOULBIND_KEY = new NamespacedKey(MetadataHandler.PLUGIN, key);
-    private static final NamespacedKey PRESTIGE_KEY = new NamespacedKey(MetadataHandler.PLUGIN, "prestige");
+    public static final NamespacedKey SOULBIND_KEY = new NamespacedKey(MetadataHandler.PLUGIN, key);
+    public static final NamespacedKey PRESTIGE_KEY = new NamespacedKey(MetadataHandler.PLUGIN, "prestige");
 
     public static boolean isValidSoulbindUser(ItemMeta itemMeta, Player player) {
         if (!isEnabled) return true;
@@ -115,6 +115,10 @@ public class SoulbindEnchantment extends CustomEnchantment {
         }
         return null;
         //return Bukkit.getPlayer(UUID.fromString(itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)));
+    }
+
+    public static boolean itemHasSoulbindEnchantment(ItemMeta itemMeta){
+        return itemMeta.getPersistentDataContainer().has(SOULBIND_KEY, PersistentDataType.STRING);
     }
 
     private static void setPrestigeLevel(ItemMeta itemMeta, int prestigeLevel) {

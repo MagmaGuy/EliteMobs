@@ -1,12 +1,13 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.ItemUpgradeSystemConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
+import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
-import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -150,6 +152,110 @@ public class ItemConstructor {
 
         return itemStack;
 
+    }
+
+    public static ItemStack constructScrapItem(int scrapLevel,
+                                               Player player,
+                                               boolean showItemWorth) {
+
+        ItemStack itemStack;
+        ItemMeta itemMeta;
+
+        /*
+        Construct initial item
+         */
+        itemStack = ItemStackGenerator.generateItemStack(getScrapMaterial(scrapLevel));
+        itemMeta = itemStack.getItemMeta();
+
+        itemMeta.setDisplayName(ChatColorConverter.convert(ItemUpgradeSystemConfig.scrapItemName.replace("$level", scrapLevel + "")));
+
+        /*
+        Register the elite scrap level
+         */
+        ItemTagger.registerCustomEnchantment(itemMeta, "EliteScrap", scrapLevel);
+
+        itemStack.setItemMeta(itemMeta);
+
+        /*
+        Generate item lore
+         */
+        ItemTagger.registerCustomLore(itemMeta, ItemUpgradeSystemConfig.scrapItemLore);
+
+        itemStack.setItemMeta(itemMeta);
+
+        return commonFeatures(itemStack, null, player, new HashMap<>(), new HashMap<>(), showItemWorth);
+    }
+
+    public static ItemStack constructUpgradeItem(int upgradeLevel,
+                                                 Player player,
+                                                 boolean showItemWorth) {
+
+        ItemStack itemStack;
+        ItemMeta itemMeta;
+
+        /*
+        Construct initial item
+         */
+        itemStack = ItemStackGenerator.generateItemStack(Material.HEART_OF_THE_SEA);
+        itemMeta = itemStack.getItemMeta();
+
+        itemMeta.setDisplayName(ChatColorConverter.convert(ItemUpgradeSystemConfig.upgradeItemName.replace("$level", upgradeLevel + "")));
+
+        /*
+        Register the elite scrap level
+         */
+        ItemTagger.registerCustomEnchantment(itemMeta, "EliteUpgradeItem", upgradeLevel);
+
+        itemStack.setItemMeta(itemMeta);
+
+        /*
+        Generate item lore
+         */
+        List<String> parsedLore = new ArrayList<>();
+        for (String string : ItemUpgradeSystemConfig.upgradeItemLore)
+            parsedLore.add(string.replace("$orbLevel", upgradeLevel + "").replace("$itemLevel", (upgradeLevel - 1) + ""));
+        ItemTagger.registerCustomLore(itemMeta, parsedLore);
+
+        itemStack.setItemMeta(itemMeta);
+
+        return commonFeatures(itemStack, null, player, new HashMap<>(), new HashMap<>(), showItemWorth);
+    }
+
+    private static Material getScrapMaterial(int scrapLevel) {
+        int dyeTier = (int) Math.floor(scrapLevel / 13.0);
+        switch (dyeTier) {
+            case 0:
+                return Material.WHITE_DYE;
+            case 1:
+                return Material.LIGHT_GRAY_DYE;
+            case 2:
+                return Material.GRAY_DYE;
+            case 3:
+                return Material.GREEN_DYE;
+            case 4:
+                return Material.LIGHT_BLUE_DYE;
+            case 5:
+                return Material.BLUE_DYE;
+            case 6:
+                return Material.CYAN_DYE;
+            case 7:
+                return Material.YELLOW_DYE;
+            case 8:
+                return Material.ORANGE_DYE;
+            case 9:
+                return Material.RED_DYE;
+            case 10:
+                return Material.PINK_DYE;
+            case 11:
+                return Material.MAGENTA_DYE;
+            case 12:
+                return Material.PURPLE_DYE;
+            case 13:
+                return Material.BROWN_DYE;
+            case 14:
+            default:
+                return Material.BLACK_DYE;
+        }
     }
 
 }
