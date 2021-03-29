@@ -112,6 +112,7 @@ public class ScrapperMenu extends EliteMenu {
                     if (shopInventory.getItem(slot) == null){
                         shopInventory.setItem(slot, currentItem);
                         playerInventory.clear(event.getSlot());
+                        break;
                     }
 
             } else if (EliteMenu.isTopMenu(event)) {
