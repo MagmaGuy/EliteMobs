@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -21,12 +22,14 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
     private final Player player;
     private boolean isCancelled = false;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
+    private final Projectile projectile;
 
-    public PlayerDamagedByEliteMobEvent(EliteMobEntity eliteMobEntity, Player player, EntityDamageByEntityEvent event) {
+    public PlayerDamagedByEliteMobEvent(EliteMobEntity eliteMobEntity, Player player, EntityDamageByEntityEvent event, Projectile projectile) {
         this.entity = event.getEntity();
         this.eliteMobEntity = eliteMobEntity;
         this.player = player;
         this.entityDamageByEntityEvent = event;
+        this.projectile = projectile;
     }
 
     public Entity getEntity() {
@@ -39,6 +42,10 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
     public Player getPlayer() {
         return this.player;
+    }
+
+    public Projectile getProjectile() {
+        return projectile;
     }
 
     public EntityDamageByEntityEvent getEntityDamageByEntityEvent() {
@@ -76,20 +83,26 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
             if (player.hasMetadata("NPC"))
                 return;
 
+            Projectile projectile = null;
+
             EliteMobEntity eliteMobEntity = null;
             if (event.getDamager() instanceof LivingEntity)
                 eliteMobEntity = EntityTracker.getEliteMobEntity(event.getDamager());
-            else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity)
+            else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity) {
                 eliteMobEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getDamager()).getShooter());
-            if (eliteMobEntity == null) return;
+                projectile = (Projectile) event.getDamager();
+            }if (eliteMobEntity == null) return;
 
             //dodge chance
             if (ThreadLocalRandom.current().nextDouble() < GuildRank.dodgeBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100) {
                 player.sendTitle("", "Dodged!");
                 event.setCancelled(true);
+                return;
             }
 
-            Bukkit.getServer().getPluginManager().callEvent(new PlayerDamagedByEliteMobEvent(eliteMobEntity, player, event));
+            PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteMobEntity, player, event, projectile);
+            if (!playerDamagedByEliteMobEvent.isCancelled)
+                new EventCaller(playerDamagedByEliteMobEvent);
         }
     }
 

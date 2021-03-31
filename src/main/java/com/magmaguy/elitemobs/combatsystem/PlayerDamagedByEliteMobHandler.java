@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.powers.ProjectileTagger;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -64,6 +65,19 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
         //if the damage source is custom , the damage is final
         if (bypass) {
             bypass = false;
+            //Deal with the player getting killed
+            if (player.getHealth() - event.getEntityDamageByEntityEvent().getDamage() <= 0)
+                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, event.getEliteMobEntity().getLivingEntity()));
+            return;
+        }
+
+        //if the projectile deals custom damage
+        if (event.getProjectile() != null && ProjectileTagger.projectileHasCustomDamage(event.getProjectile())){
+            double damage = ProjectileTagger.getProjectileCustomDamage(event.getProjectile());
+            if (damage < 0) return;
+            //Set the final damage value
+            event.getEntityDamageByEntityEvent().setDamage(EntityDamageEvent.DamageModifier.BASE, damage);
+
             //Deal with the player getting killed
             if (player.getHealth() - event.getEntityDamageByEntityEvent().getDamage() <= 0)
                 PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, event.getEliteMobEntity().getLivingEntity()));
