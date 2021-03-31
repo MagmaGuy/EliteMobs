@@ -259,6 +259,7 @@ public class EliteMobs extends JavaPlugin {
         CustomBossConfigFields.regionalElites.clear();
         CustomBossConfigFields.getNaturallySpawnedElites().clear();
         CustomEnchantment.getCustomEnchantments().clear();
+        CustomItem.getCustomItems().clear();
         Minidungeon.minidungeons.clear();
 
         if (this.placeholders != null)

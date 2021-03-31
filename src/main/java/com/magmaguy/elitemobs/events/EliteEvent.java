@@ -195,9 +195,8 @@ public class EliteEvent extends AbstractEliteEvent {
     }
 
     public static class AbstractEliteEventEvents implements Listener {
-        @EventHandler(priority = EventPriority.HIGH)
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onSpawn(CreatureSpawnEvent event) {
-            if (event.isCancelled()) return;
             if (getActiveEvents().isEmpty()) return;
             if (!EliteMobs.validWorldList.contains(event.getLocation().getWorld())) return;
             if (!(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
