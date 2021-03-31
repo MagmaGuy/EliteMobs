@@ -73,7 +73,11 @@ public class PowersConfig {
             new ArrowRainConfig(),
             new GroundPoundConfig(),
             new DeathSliceConfig(),
-            new TrackingFireballConfig()
+            new TrackingFireballConfig(),
+            new LightningBoltsConfig(),
+            new FrostConeConfig(),
+            new ThunderstormConfig(),
+            new FirestormConfig()
 
     ));
 
