@@ -19,7 +19,7 @@ public class AttackLightning extends MinorPower implements Listener {
     }
 
     @EventHandler
-    public void onTarget(EliteMobDamagedByPlayerEvent event) {
+    public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
         AttackLightning attackLightning = (AttackLightning) event.getEliteMobEntity().getPower(this);
         if (attackLightning == null) return;
         if (attackLightning.isCooldown()) return;

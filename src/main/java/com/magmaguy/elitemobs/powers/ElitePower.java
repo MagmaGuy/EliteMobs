@@ -38,6 +38,10 @@ public class ElitePower {
             new BulletHell(),
             new SummonEmbers(),
             new DeathSlice(),
+            new LightningBolts(),
+            new FrostCone(),
+            new Thunderstorm(),
+            new Firestorm(),
 
             //major powers
             new SkeletonPillar(),

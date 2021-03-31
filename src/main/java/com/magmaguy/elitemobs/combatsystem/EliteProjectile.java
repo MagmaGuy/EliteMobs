@@ -25,8 +25,22 @@ public class EliteProjectile {
         return create(entityType, shooter, victim, targetterToTargetted, gravity);
     }
 
+    public static Projectile create(EntityType entityType, Entity shooter, Vector targetterToTargetted, boolean gravity) {
+        Location projectileLocation = generateLocation(shooter, targetterToTargetted);
+        Projectile projectile = (Projectile) projectileLocation.getWorld().spawnEntity(projectileLocation, entityType);
+        projectile.setShooter((ProjectileSource) shooter);
+        projectile.setVelocity(targetterToTargetted);
+        projectile.setGravity(gravity);
+        EntityTracker.registerProjectileEntity(projectile);
+        return projectile;
+    }
+
     private static Location generateLocation(Entity shooter, Entity victim) {
         Vector vector = victim.getLocation().clone().subtract(shooter.getLocation().clone()).toVector().normalize();
         return shooter.getLocation().clone().add(0, 1, 0).add(vector).setDirection(vector);
+    }
+
+    private static Location generateLocation(Entity shooter, Vector targetterToTargetted) {
+        return shooter.getLocation().clone().add(targetterToTargetted).setDirection(targetterToTargetted).add(new Vector(0,1,0));
     }
 }

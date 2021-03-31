@@ -158,6 +158,10 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new AttackVacuum(), plugin);
         pluginManager.registerEvents(new ArrowRain(), plugin);
         pluginManager.registerEvents(new GroundPound(), plugin);
+        pluginManager.registerEvents(new LightningBolts(), plugin);
+        pluginManager.registerEvents(new FrostCone(), plugin);
+        pluginManager.registerEvents(new Thunderstorm(), plugin);
+        pluginManager.registerEvents(new Firestorm(), plugin);
 
         //Major mob powers
         pluginManager.registerEvents(new SkeletonPillar(), plugin);
