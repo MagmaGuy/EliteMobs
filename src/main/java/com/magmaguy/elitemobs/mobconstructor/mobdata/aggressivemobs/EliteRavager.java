@@ -10,7 +10,6 @@ public class EliteRavager extends EliteMobProperties {
         this.defaultMaxHealth = 100;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.RAVAGER).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.RAVAGER).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 }

@@ -29,12 +29,19 @@ public class EnhancementMenuConfig extends MenusConfigFields {
     public static int confirmSlot;
 
     public EnhancementMenuConfig() {
-        super("repair_menu");
+        super("enhancement_menu");
     }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
         shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Enhancement menu!");
+        infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
+        eliteItemInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputInformationSlot", 20);
+        eliteItemInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputSlot", 29);
+        eliteUpgradeOrbInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteUpgradeOrbInputInformationSlot", 22);
+        eliteUpgradeOrbInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteUpgradeOrbInputSlot", 31);
+        outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 24);
+        outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 33);
         ItemStackSerializer.serialize(
                 "infoButton",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
@@ -42,28 +49,18 @@ public class EnhancementMenuConfig extends MenusConfigFields {
                         Arrays.asList("&8Support the plugins you enjoy!",
                                 "&aUse Item Upgrade Orbs one level higher", " than your Elite Item in order to", "upgrade Elite Items!")),
                 fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
-        infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
-        eliteItemInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputInformationSlot", 20);
-        eliteItemInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputSlot", 29);
         ItemStackSerializer.serialize(
                 "eliteItemInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Elite Item Input slots",
                         Arrays.asList("&aThis slot is for your elite item!")),
                 fileConfiguration);
-        eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration);
-        eliteUpgradeOrbInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteUpgradeOrbInputInformationSlot", 22);
-        eliteUpgradeOrbInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteUpgradeOrbInputSlot", 31);
         ItemStackSerializer.serialize(
                 "eliteUpgradeOrbInputInformationButton",
                 ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
                         "&2Upgrade Orb Input slot",
                         Arrays.asList("&aThis slot is for your Elite Item Upgrade Orb!")),
                 fileConfiguration);
-        eliteUpgradeOrbInputInfoButton = ItemStackSerializer.deserialize("eliteUpgradeOrbInputInformationButton", fileConfiguration);
-        outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 24);
-        outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 33);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,
                 "&4Cancel", Arrays.asList("&cCancel upgrade!")), fileConfiguration);
         ItemStackSerializer.serialize(
@@ -74,7 +71,10 @@ public class EnhancementMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         outputInfoButton = ItemStackSerializer.deserialize("outputInformationButton", fileConfiguration);
         cancelButton = ItemStackSerializer.deserialize("cancelButton", fileConfiguration);
+        eliteUpgradeOrbInputInfoButton = ItemStackSerializer.deserialize("eliteUpgradeOrbInputInformationButton", fileConfiguration);
+        eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration);
         cancelSlot = ConfigurationEngine.setInt(fileConfiguration, "cancelButtonSlot", 27);
+        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration);
         ItemStackSerializer.serialize("confirmButton", ItemStackGenerator.generateItemStack(Material.EMERALD,
                 "&2Confirm!", Arrays.asList("&aUpgrade items!")), fileConfiguration);
         confirmButton = ItemStackSerializer.deserialize("confirmButton", fileConfiguration);

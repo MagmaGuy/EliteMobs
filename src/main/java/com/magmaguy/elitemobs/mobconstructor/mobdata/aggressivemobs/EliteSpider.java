@@ -11,7 +11,6 @@ public class EliteSpider extends EliteMobProperties {
         this.defaultMaxHealth = 16;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.SPIDER).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.SPIDER).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

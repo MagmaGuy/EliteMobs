@@ -71,7 +71,7 @@ public class TranslationConfig {
         configuration.addDefault(ECONOMY_PAYMENT_INSUFICIENT_CURRENCY, "&cYou don't have enough $currency_name to do that!");
         configuration.addDefault(ECONOMY_INVALID_PAY_COMMAND_SYNTAX, "&cInput not valid. Command format: &e/em pay [playerName] [amount]");
         configuration.addDefault(ECONOMY_WALLET_COMMAND, "You have &2$balance $currency_name");
-        configuration.addDefault(ECONOMY_TAX_MESSAGE, "&cSending a payment will cost $percentage% in taxes. \\n&aDo &9$command &ato proceed!");
+        configuration.addDefault(ECONOMY_TAX_MESSAGE, "&cSending a payment will cost $percentage% in taxes. &aDo &9$command &ato proceed!");
 
         //shop messages
         configuration.addDefault(SHOP_BUY_MESSAGE, "&aYou have bought $item_name &afor $item_value $currency_name!");

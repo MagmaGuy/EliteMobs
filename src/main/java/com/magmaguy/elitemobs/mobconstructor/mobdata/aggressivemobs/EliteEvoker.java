@@ -10,7 +10,6 @@ public class EliteEvoker extends EliteMobProperties {
         this.defaultMaxHealth = 24;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.EVOKER).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.EVOKER).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 }

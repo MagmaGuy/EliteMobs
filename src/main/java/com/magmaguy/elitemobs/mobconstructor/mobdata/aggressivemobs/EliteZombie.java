@@ -15,7 +15,6 @@ public class EliteZombie extends EliteMobProperties {
         super.addMajorPower("zombie_necronomicon.yml");
         super.addMajorPower("zombie_parents.yml");
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.ZOMBIE).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

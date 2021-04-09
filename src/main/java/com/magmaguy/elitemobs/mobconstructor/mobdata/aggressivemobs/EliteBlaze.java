@@ -12,8 +12,7 @@ public class EliteBlaze extends EliteMobProperties {
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.BLAZE).getBaseDamage();
         super.addMajorPower("tracking_fireball.yml");
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.BLAZE).isEnabled();
-        if (this.isEnabled)
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 
 }
