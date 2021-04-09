@@ -11,7 +11,6 @@ public class EliteWitch extends EliteMobProperties {
         this.defaultMaxHealth = 26;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.WITCH).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.WITCH).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

@@ -10,7 +10,6 @@ public class EliteGhast extends EliteMobProperties {
         this.defaultMaxHealth = 10;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.GHAST).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.GHAST).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 }

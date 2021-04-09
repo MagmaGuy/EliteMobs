@@ -11,7 +11,6 @@ public class EliteWolf extends EliteMobProperties {
         this.defaultMaxHealth = 8;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.WOLF).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.WOLF).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

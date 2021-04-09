@@ -13,7 +13,6 @@ public class EliteVex extends EliteMobProperties {
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.VEX).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.VEX).isEnabled();
         super.removeDefensivePower(new GroundPound());
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

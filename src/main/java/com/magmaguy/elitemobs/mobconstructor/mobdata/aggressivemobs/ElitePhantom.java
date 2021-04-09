@@ -15,7 +15,6 @@ public class ElitePhantom extends EliteMobProperties {
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.PHANTOM).isEnabled();
         removeOffensivePower(new AttackLightning());
         super.removeDefensivePower(new GroundPound());
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

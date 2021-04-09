@@ -10,7 +10,6 @@ public class ElitePillager extends EliteMobProperties {
         this.defaultMaxHealth = 24;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.PILLAGER).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.PILLAGER).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 }

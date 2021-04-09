@@ -79,7 +79,7 @@ public class CurrencyCommandsHandler {
                 ChatColorConverter.convert(
                         ConfigValues.translationConfig
                                 .getString(TranslationConfig.ECONOMY_CURRENCY_LEFT_MESSAGE)
-                                .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(sender.getUniqueId())))
+                                .replace("$amount_left", String.valueOf(EconomyHandler.checkCurrency(recipient.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
     }

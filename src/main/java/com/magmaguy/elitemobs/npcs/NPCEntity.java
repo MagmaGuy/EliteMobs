@@ -500,7 +500,12 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     public void setTimeout() {
         this.timeout = npCsConfigFields.getTimeout();
         if (timeout <= 0) return;
-        removeNPCEntity();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                removeNPCEntity();
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, (long) (timeout*20*60));
     }
 
 
