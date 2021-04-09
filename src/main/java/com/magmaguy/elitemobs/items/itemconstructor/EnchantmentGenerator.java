@@ -4,11 +4,11 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
+import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.MaterialTier;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.utils.VersionChecker;
-import com.magmaguy.elitemobs.items.EliteEnchantments;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -65,9 +65,11 @@ public class EnchantmentGenerator {
          */
         switch (material) {
             case TRIDENT:
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOYALTY"));
+                if (ThreadLocalRandom.current().nextDouble() < 0.5)
+                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("LOYALTY"));
+                else
+                    validSecondaryEnchantments.putAll(validateSecondaryEnchantments("CHANNELING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("RIPTIDE"));
-                validSecondaryEnchantments.putAll(validateSecondaryEnchantments("CHANNELING"));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("IMPALING"));
             case DIAMOND_SWORD:
             case GOLDEN_SWORD:

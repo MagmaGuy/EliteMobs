@@ -125,8 +125,6 @@ public class GearPage {
                 PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.gearHoverLines[i]);
 
         }
-        if (!PlayerStatusMenuConfig.gearHoverLines[i].isEmpty())
-            line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.gearHoverLines[i]));
 
         textComponent.addExtra(line);
     }

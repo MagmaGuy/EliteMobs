@@ -11,7 +11,6 @@ public class EliteStray extends EliteMobProperties {
         this.defaultMaxHealth = 20;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.STRAY).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.STRAY).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

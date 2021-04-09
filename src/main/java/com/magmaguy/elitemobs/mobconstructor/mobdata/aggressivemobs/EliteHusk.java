@@ -11,7 +11,6 @@ public class EliteHusk extends EliteMobProperties {
         this.defaultMaxHealth = 20;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.HUSK).getBaseDamage();
         isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.HUSK).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

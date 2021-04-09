@@ -11,8 +11,7 @@ public class EliteCaveSpider extends EliteMobProperties {
         this.defaultMaxHealth = 12;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.CAVE_SPIDER).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.CAVE_SPIDER).isEnabled();
-        if (this.isEnabled)
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 
 }

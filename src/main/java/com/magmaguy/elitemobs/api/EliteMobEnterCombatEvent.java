@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.CommandRunner;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
@@ -26,6 +27,7 @@ public class EliteMobEnterCombatEvent extends Event {
     private final EliteMobEntity eliteMobEntity;
 
     public EliteMobEnterCombatEvent(EliteMobEntity eliteMobEntity, Player targetEntity) {
+        new DeveloperMessage("Entering combat, range = " + eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue());
         this.targetEntity = targetEntity;
         this.eliteMobEntity = eliteMobEntity;
         eliteMobEntity.setIsInCombat(true);
@@ -39,8 +41,8 @@ public class EliteMobEnterCombatEvent extends Event {
                 if (!eliteMobEntity.getLivingEntity().isValid()) {
                     cancel();
                     Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
+                    new DeveloperMessage("Exit reason 1");
                 }
-                //todo: combat isn't ending when no players are nearby
                 if (!eliteMobEntity.isInCombatGracePeriod())
                     if (((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null) {
                         for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(
@@ -48,13 +50,14 @@ public class EliteMobEnterCombatEvent extends Event {
                                 eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
                                 eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue())) {
                             if (entity instanceof Player) {
-                                if (!(((Player) entity).getGameMode().equals(GameMode.SURVIVAL) || ((Player) entity).getGameMode().equals(GameMode.ADVENTURE)))
+                                if (((Player) entity).getGameMode().equals(GameMode.SPECTATOR))
                                     continue;
                                 return;
                             }
                         }
                         cancel();
                         Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
+                        new DeveloperMessage("Exit reason 2");
                     }
 
             }
@@ -83,16 +86,14 @@ public class EliteMobEnterCombatEvent extends Event {
         public void onEliteMobDamaged(EliteMobDamagedByPlayerEvent event) {
             if (event.getEliteMobEntity().isInCombat()) return;
             if (!(event.getEliteMobEntity().getLivingEntity() instanceof Mob)) return;
-            if (event.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || event.getPlayer().getGameMode().equals(GameMode.ADVENTURE))
-                Bukkit.getServer().getPluginManager().callEvent(new EliteMobEnterCombatEvent(event.getEliteMobEntity(), event.getPlayer()));
+            Bukkit.getServer().getPluginManager().callEvent(new EliteMobEnterCombatEvent(event.getEliteMobEntity(), event.getPlayer()));
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onEliteMobDamage(PlayerDamagedByEliteMobEvent event) {
             if (event.getEliteMobEntity().isInCombat()) return;
             if (!(event.getEliteMobEntity().getLivingEntity() instanceof Mob)) return;
-            if (event.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || event.getPlayer().getGameMode().equals(GameMode.ADVENTURE))
-                Bukkit.getServer().getPluginManager().callEvent(new EliteMobEnterCombatEvent(event.getEliteMobEntity(), event.getPlayer()));
+            Bukkit.getServer().getPluginManager().callEvent(new EliteMobEnterCombatEvent(event.getEliteMobEntity(), event.getPlayer()));
         }
 
         @EventHandler(ignoreCancelled = true)

@@ -1,18 +1,17 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
-import com.magmaguy.elitemobs.config.enchantments.premade.UnbindConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 
 import java.util.Arrays;
 
 public class UnbinderConfig extends NPCsConfigFields {
-    public UnbinderConfig(){
+    public UnbinderConfig() {
         super("unbinder.yml",
                 true,
-                "",
+                "Ulfric",
                 "<Unbinder>",
                 "WEAPONSMITH",
-                "em_adventurers_guild,292.5,81,251.5,90,0",
+                "em_adventurers_guild,296.5,81,253.5,90,0",
                 Arrays.asList(
                         "Greetings.",
                         "Well met.",

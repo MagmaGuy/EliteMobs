@@ -11,7 +11,6 @@ public class EliteEnderman extends EliteMobProperties {
         this.defaultMaxHealth = 40;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.ENDERMAN).getBaseDamage();
         isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.ENDERMAN).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 

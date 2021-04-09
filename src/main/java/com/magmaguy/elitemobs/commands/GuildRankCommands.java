@@ -15,7 +15,7 @@ public class GuildRankCommands {
             return;
         }
 
-        if (activeLevel < 0 || activeLevel > 10 + prestigeLevel) {
+        if (activeLevel < 0 || activeLevel > 10 + prestigeLevel || prestigeLevel > 10 || activeLevel > 20) {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4The prestige rank / guild rank combination you picked is not valid!"));
             return;
         }

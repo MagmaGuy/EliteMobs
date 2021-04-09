@@ -11,7 +11,7 @@ public class SmelterConfig extends NPCsConfigFields {
                 "Sam",
                 "<Smelter>",
                 "WEAPONSMITH",
-                "em_adventurers_guild,276.5,77,242.5,0,0",
+                "em_adventurers_guild,276.5,77,243.5,0,0",
                 Arrays.asList(
                         "Got scrap?",
                         "Got extra scrap?",

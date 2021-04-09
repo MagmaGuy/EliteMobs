@@ -14,7 +14,6 @@ public class EliteZoglin extends EliteMobProperties {
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.ZOGLIN).getBaseDamage();
         this.defaultMaxHealth = 40;
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.ZOGLIN).isEnabled();
-        if (this.isEnabled)
             eliteMobData.add(this);
     }
 }
