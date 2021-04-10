@@ -45,7 +45,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
             return;
 
         if (MobPropertiesConfig.getMobProperties().get(event.getEntityType()) == null ||
-                MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled())
+                !MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled())
             return;
 
         //This fires for custom bosses, so don't override those spawns

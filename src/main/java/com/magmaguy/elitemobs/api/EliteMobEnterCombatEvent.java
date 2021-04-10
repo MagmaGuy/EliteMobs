@@ -27,7 +27,6 @@ public class EliteMobEnterCombatEvent extends Event {
     private final EliteMobEntity eliteMobEntity;
 
     public EliteMobEnterCombatEvent(EliteMobEntity eliteMobEntity, Player targetEntity) {
-        new DeveloperMessage("Entering combat, range = " + eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue());
         this.targetEntity = targetEntity;
         this.eliteMobEntity = eliteMobEntity;
         eliteMobEntity.setIsInCombat(true);
@@ -41,7 +40,6 @@ public class EliteMobEnterCombatEvent extends Event {
                 if (!eliteMobEntity.getLivingEntity().isValid()) {
                     cancel();
                     Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
-                    new DeveloperMessage("Exit reason 1");
                 }
                 if (!eliteMobEntity.isInCombatGracePeriod())
                     if (((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null) {
@@ -57,7 +55,6 @@ public class EliteMobEnterCombatEvent extends Event {
                         }
                         cancel();
                         Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
-                        new DeveloperMessage("Exit reason 2");
                     }
 
             }
