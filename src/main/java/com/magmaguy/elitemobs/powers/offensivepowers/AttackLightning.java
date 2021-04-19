@@ -54,27 +54,4 @@ public class AttackLightning extends MinorPower implements Listener {
 
     }
 
-    //public void lightningScan(AttackLightning attackLightning, EliteMobEntity eliteMobEntity) {
-    //    new BukkitRunnable() {
-    //        @Override
-    //        public void run() {
-    //            if (!eliteMobEntity.getLivingEntity().isValid() || ((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null) {
-    //                cancel();
-    //                attackLightning.setIsFiring(false);
-    //                return;
-    //            }
-    //            for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
-    //                if (entity instanceof Player)
-    //                    lightningUUIDs.add(entity.getWorld().strikeLightning(entity.getLocation()).getUniqueId());
-    //        }
-    //    }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * PowersConfig.getPower("attack_lightning.yml").getConfiguration().getInt("delayBetweenStrikes"));
-    //}
-//
-    //@EventHandler
-    //public void onDamage(EntityDamageByEntityEvent event) {
-    //    if (!lightningUUIDs.contains(event.getDamager().getUniqueId())) return;
-    //    lightningUUIDs.remove(event.getDamager().getUniqueId());
-    //    event.setDamage(1);
-    //}
-
 }
