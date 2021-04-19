@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.versionnotifier;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,8 +22,11 @@ public class VersionChecker {
             @Override
             public void run() {
                 String currentVersion = MetadataHandler.PLUGIN.getDescription().getVersion();
-                if (currentVersion.contains("SNAPSHOT"))
+                boolean snapshot = false;
+                if (currentVersion.contains("SNAPSHOT")) {
+                    snapshot = true;
                     currentVersion = currentVersion.split("-")[0];
+                }
                 String publicVersion = "";
 
                 try {
@@ -37,22 +42,26 @@ public class VersionChecker {
                     outOfDateHandler();
                     return;
                 }
-                if (Double.parseDouble(currentVersion.split("\\.")[0]) > Double.parseDouble(publicVersion.split("\\.")[0])) {
-                    return;
-                }
-                if (Double.parseDouble(currentVersion.split("\\.")[1]) < Double.parseDouble(publicVersion.split("\\.")[1])) {
-                    outOfDateHandler();
-                    return;
-                }
-                if (Double.parseDouble(currentVersion.split("\\.")[1]) > Double.parseDouble(publicVersion.split("\\.")[0])) {
-                    return;
-                }
-                if (Double.parseDouble(currentVersion.split("\\.")[2]) < Double.parseDouble(publicVersion.split("\\.")[2])) {
-                    outOfDateHandler();
-                    return;
+
+                if (Double.parseDouble(currentVersion.split("\\.")[0]) == Double.parseDouble(publicVersion.split("\\.")[0])) {
+
+                    if (Double.parseDouble(currentVersion.split("\\.")[1]) < Double.parseDouble(publicVersion.split("\\.")[1])) {
+                        outOfDateHandler();
+                        return;
+                    }
+
+                    if (Double.parseDouble(currentVersion.split("\\.")[1]) == Double.parseDouble(publicVersion.split("\\.")[1])) {
+                        if (Double.parseDouble(currentVersion.split("\\.")[2]) < Double.parseDouble(publicVersion.split("\\.")[2])) {
+                            outOfDateHandler();
+                            return;
+                        }
+                    }
                 }
 
-                Bukkit.getLogger().info("[EliteMobs] You are running the latest version!");
+                if (!snapshot)
+                    Bukkit.getLogger().info("[EliteMobs] You are running the latest version!");
+                else
+                    new InfoMessage("You are running a snapshot version! You can check for updated in the #releases channel on the EliteMobs Discord!");
 
                 pluginIsUpToDate = true;
             }

@@ -179,7 +179,7 @@ public class EnhancementMenu extends EliteMenu {
         int enhancementScore = ItemTagger.getEnchantment(EnhancementInventory.getItem(EnhancementMenuConfig.eliteUpgradeOrbInputSlot).getItemMeta(), "EliteUpgradeItem");
         int itemScore = ItemTierFinder.findBattleTier(EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot));
 
-        if (enhancementScore != itemScore + 1) {
+        if (enhancementScore <= itemScore) {
             EnhancementInventory.setItem(EnhancementMenuConfig.outputSlot, null);
             return;
         }

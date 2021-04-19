@@ -1,10 +1,12 @@
 package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -50,6 +52,10 @@ public class CustomSummonPower extends ElitePower implements Listener {
         customBossReinforcement.summonType = SummonType.ONCE;
         String[] strings = powerString.split(":");
         customBossReinforcement.bossFileName = strings[2];
+        if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
+            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
+            return;
+        }
         customBossReinforcements.add(customBossReinforcement);
     }
 
@@ -59,6 +65,10 @@ public class CustomSummonPower extends ElitePower implements Listener {
         String[] strings = powerString.split(":");
         customBossReinforcement.summonChance = Double.parseDouble(strings[2]);
         customBossReinforcement.bossFileName = strings[3];
+        if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
+            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
+            return;
+        }
         customBossReinforcements.add(customBossReinforcement);
     }
 

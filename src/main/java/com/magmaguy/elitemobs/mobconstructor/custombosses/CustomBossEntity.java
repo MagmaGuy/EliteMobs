@@ -38,6 +38,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,7 +50,12 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
      */
     private static LivingEntity generateLivingEntity(Location location,
                                                      CustomBossConfigFields customBossConfigFields) {
-        if (customBossConfigFields == null || !customBossConfigFields.isEnabled()) {
+        if (customBossConfigFields == null) {
+            new WarningMessage("Attempted to spawn a boss but it was null! The error's been prevented, but here's what lead up to this:");
+            Arrays.stream(Thread.currentThread().getStackTrace()).forEach(stackTraceElement -> new WarningMessage(stackTraceElement.toString()));
+            return null;
+        }
+        if (!customBossConfigFields.isEnabled()) {
             new WarningMessage("Attempted to spawn a boss which had its configuration file disabled! Boss file: " + customBossConfigFields.getFileName());
             return null;
         }
