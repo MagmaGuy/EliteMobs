@@ -26,7 +26,7 @@ public class ItemUpgradeSystemConfig {
         upgradeItemName = ConfigurationEngine.setString(fileConfiguration, "upgradeItemName", "&2Level $level Upgrade Orb");
         upgradeItemLore = ConfigurationEngine.setList(fileConfiguration, "upgradeItemLore", Arrays.asList(
                 "&aUse at at the Enhancer NPC to upgrade",
-                "&aitems from level $itemLevel to level $orbLevel!"));
+                "&aitems up to level $orbLevel!"));
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 

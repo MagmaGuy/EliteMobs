@@ -18,7 +18,9 @@ public class AttackVacuum extends MinorPower implements Listener {
         AttackVacuum attackVacuum = (AttackVacuum) event.getEliteMobEntity().getPower(this);
         if (attackVacuum == null) return;
 
-        event.getPlayer().setVelocity(event.getEliteMobEntity().getLivingEntity().getLocation().clone().subtract(event.getPlayer().getLocation()).toVector().normalize());
+        if (event.getPlayer().isValid() && event.getEliteMobEntity().getLivingEntity().isValid() &&
+                event.getPlayer().getWorld().equals(event.getEliteMobEntity().getLivingEntity().getWorld()))
+            event.getPlayer().setVelocity(event.getEliteMobEntity().getLivingEntity().getLocation().clone().subtract(event.getPlayer().getLocation()).toVector().normalize());
     }
 
 }
