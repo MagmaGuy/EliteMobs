@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.utils.CooldownHandler;
 import org.bukkit.Location;
@@ -58,6 +59,8 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
         @EventHandler
         public void onInteract(PlayerInteractEvent event) {
+
+            if (!EnchantmentsConfig.getEnchantment("flamethrower.yml").isEnabled()) return;
 
             Player player = event.getPlayer();
 

@@ -31,6 +31,8 @@ public class PlayerQuests implements Serializable {
     }
 
     public static boolean hasQuest(Player player, EliteQuest eliteQuest) {
+        if (player == null) return false;
+        if (getData(player) == null) return false;
         return getData(player).hasQuest(eliteQuest.getUuid());
     }
 
