@@ -4,11 +4,6 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
-import com.magmaguy.elitemobs.items.MobTierCalculator;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
 import com.magmaguy.elitemobs.config.AntiExploitConfig;
@@ -17,6 +12,11 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.powers.MinorPower;
@@ -26,7 +26,9 @@ import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -93,6 +95,8 @@ public class EliteMobEntity {
     public CustomBossEntity customBossEntity;
     public RegionalBossEntity regionalBossEntity;
     public PhaseBossEntity phaseBossEntity;
+
+    public ArrayList<CustomBossEntity> reinforcementEntities = new ArrayList<>();
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
@@ -255,7 +259,7 @@ public class EliteMobEntity {
         livingEntity.getEquipment().setLeggingsDropChance(0);
         livingEntity.getEquipment().setBootsDropChance(0);
 
-        if (!VersionChecker.currentVersionIsUnder(1, 15))
+        if (!VersionChecker.currentVersionIsUnder(15, 0))
             if (livingEntity instanceof Bee)
                 ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
 
@@ -515,13 +519,17 @@ public class EliteMobEntity {
                 break;
             else {
                 ElitePower selectedPower = localPowers.get(ThreadLocalRandom.current().nextInt(localPowers.size()));
-                this.powers.add(selectedPower);
-                selectedPower.applyPowers(this.livingEntity);
-                localPowers.remove(selectedPower);
-                if (selectedPower instanceof MajorPower)
-                    this.majorPowerCount++;
-                if (selectedPower instanceof MinorPower)
-                    this.minorPowerCount++;
+                try {
+                    this.powers.add(selectedPower.getClass().newInstance());
+                    selectedPower.applyPowers(this.livingEntity);
+                    localPowers.remove(selectedPower);
+                    if (selectedPower instanceof MajorPower)
+                        this.majorPowerCount++;
+                    if (selectedPower instanceof MinorPower)
+                        this.minorPowerCount++;
+                } catch (Exception ex) {
+                    new WarningMessage("Failed to instance new power!");
+                }
             }
 
     }
@@ -619,9 +627,10 @@ public class EliteMobEntity {
     }
 
     public ElitePower getPower(String elitePower) {
-        for (ElitePower iteratedPower : getPowers())
+        for (ElitePower iteratedPower : getPowers()) {
             if (iteratedPower.getFileName().equals(elitePower))
                 return iteratedPower;
+        }
         return null;
     }
 
@@ -815,6 +824,16 @@ public class EliteMobEntity {
                 setCooldown(false);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 15);
+    }
+
+    public void doGlobalPowerCooldown(int ticks) {
+        setCooldown(true);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                setCooldown(false);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
 
     public void remove(boolean removeEntity) {

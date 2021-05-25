@@ -30,10 +30,10 @@ public class ZombieBloat extends MajorPower implements Listener {
     public void onHit(EliteMobDamagedByPlayerEvent event) {
         ZombieBloat zombieBloat = (ZombieBloat) event.getEliteMobEntity().getPower(this);
         if (zombieBloat == null) return;
-        if (zombieBloat.isCooldown()) return;
+        if (zombieBloat.getGlobalCooldownActive()) return;
 
         if (ThreadLocalRandom.current().nextDouble() > 0.20) return;
-        zombieBloat.doCooldown(20 * 10);
+        zombieBloat.doGlobalCooldown(20 * 10);
 
         /*
         Create early warning that entity is about to bloat

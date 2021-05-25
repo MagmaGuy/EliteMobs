@@ -22,7 +22,6 @@ public class VersionWarner implements Listener {
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
 
-
     }
 
 }

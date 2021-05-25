@@ -35,7 +35,7 @@ public class BulletHell extends BossPower implements Listener {
         if (!eventIsValid(event, bulletHell)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        bulletHell.doCooldown(20 * 20, event.getEliteMobEntity());
+        bulletHell.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doBulletHell(event.getEliteMobEntity());
 
     }

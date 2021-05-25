@@ -183,7 +183,7 @@ public class SpiritWalk extends BossPower implements Listener {
                             ((LivingEntity) vehicle).setAI(true);
                             EliteMobEntity vehicleBoss = EntityTracker.getEliteMobEntity(vehicle);
                             if (vehicleBoss != null)
-                                Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(vehicleBoss));
+                                Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(vehicleBoss, EliteMobExitCombatEvent.EliteMobExitCombatReason.SPIRIT_WALK));
 
                         }
 
@@ -198,7 +198,7 @@ public class SpiritWalk extends BossPower implements Listener {
                     }
                     cancel();
 
-                    Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
+                    Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.SPIRIT_WALK));
                     if (eliteMobEntity.getLivingEntity() instanceof Mob)
                         if (((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null)
                             eliteMobEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2));

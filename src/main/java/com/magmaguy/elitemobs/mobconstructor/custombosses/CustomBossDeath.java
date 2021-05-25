@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
@@ -138,13 +138,14 @@ public class CustomBossDeath implements Listener {
                                                 Round.twoDecimalPlaces(customBossEntity.getDamagers().get(player)) + "")));
 
             } else {
-                if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 0 &&
-                        customBossEntity.customBossConfigFields.getDeathMessage() != null)
-                    Bukkit.broadcastMessage(ChatColorConverter.convert(
-                            customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
-                if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 2)
-                    new DiscordSRVAnnouncement(ChatColorConverter.convert(
-                            customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
+                if (customBossEntity.customBossConfigFields.getDeathMessage() != null) {
+                    if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 0)
+                        Bukkit.broadcastMessage(ChatColorConverter.convert(
+                                customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
+                    if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 2)
+                        new DiscordSRVAnnouncement(ChatColorConverter.convert(
+                                customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
+                }
             }
     }
 

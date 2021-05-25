@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.entity.Player;
 
 import java.io.Serializable;
@@ -15,6 +16,10 @@ public class PlayerQuests implements Serializable {
 
     public static void addQuest(Player player, EliteQuest eliteQuest) {
         EliteQuest.addPlayerInQuests(player, eliteQuest);
+        if (getData(player) == null) {
+            new WarningMessage("Player data not initialized correctly! Restart the server and let the developer know!");
+            return;
+        }
         if (getData(player).quests != null) {
             getData(player).quests.add(eliteQuest);
             //todo check if this modifies it or is a deep copy

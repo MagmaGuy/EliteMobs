@@ -28,7 +28,7 @@ public class MeteorShower extends BossPower implements Listener {
         if (!eventIsValid(event, meteorShower)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        meteorShower.doCooldown(20 * 20, event.getEliteMobEntity());
+        meteorShower.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doMeteorShower(event.getEliteMobEntity());
 
     }

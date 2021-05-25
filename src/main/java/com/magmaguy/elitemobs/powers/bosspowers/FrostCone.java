@@ -36,9 +36,9 @@ public class FrostCone extends BossPower implements Listener {
     public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
         FrostCone frostCone = (FrostCone) event.getEliteMobEntity().getPower(this);
         if (frostCone == null) return;
-        if (frostCone.isCooldown()) return;
+        if (frostCone.getGlobalCooldownActive()) return;
 
-        frostCone.doCooldown(20 * 10, event.getEliteMobEntity());
+        frostCone.doGlobalCooldown(20 * 10, event.getEliteMobEntity());
 
         frostCone.setIsFiring(true);
         startFrostCone(event.getEliteMobEntity(), event.getPlayer().getLocation().clone());
@@ -56,13 +56,13 @@ public class FrostCone extends BossPower implements Listener {
                 counter++;
 
                 //ending phase
-                if (counter > 20 * 6 || !eliteMobEntity.getLivingEntity().isValid()) {
+                if (counter > 20 * 6 || !isPowerStillValid(eliteMobEntity, damager)) {
                     cancel();
                     if (!eliteMobEntity.getLivingEntity().isDead())
                         eliteMobEntity.getLivingEntity().setAI(true);
                     return;
                 }
-
+                
                 //warning phase
                 if (counter < 20 * 3) {
                     doSmokeEffect(eliteMobEntity, damager);
@@ -89,6 +89,13 @@ public class FrostCone extends BossPower implements Listener {
                     shotVector.getZ(),
                     0.75);
         }
+    }
+
+    private static boolean isPowerStillValid(EliteMobEntity eliteMobEntity, Location playerLocation){
+        if (!eliteMobEntity.getLivingEntity().isValid())
+            return false;
+        if (!eliteMobEntity.getLivingEntity().getWorld().equals(playerLocation.getWorld())) return false;
+        return true;
     }
 
     private static Vector getShotVector(EliteMobEntity eliteMobEntity, Location location) {

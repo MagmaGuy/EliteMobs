@@ -1,9 +1,5 @@
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
-import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
-import com.magmaguy.elitemobs.npcs.NPCInteractions;
-import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.adventurersguild.GuildRankMenuHandler;
 import com.magmaguy.elitemobs.api.*;
@@ -30,8 +26,10 @@ import com.magmaguy.elitemobs.events.mobs.Kraken;
 import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
 import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
+import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
+import com.magmaguy.elitemobs.initialsetup.FirstTimeSetup;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects;
@@ -41,6 +39,9 @@ import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
+import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
@@ -52,6 +53,9 @@ import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFallDamage;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFire;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityKnockback;
 import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
+import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
+import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.MajorCombatEnterScanningPower;
+import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments.Bombardment;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
@@ -68,6 +72,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -103,6 +108,9 @@ public class EventsRegistrer {
         if (MobCombatSettingsConfig.enableDeathMessages)
             pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
 
+        //explosion regenerator
+        pluginManager.registerEvents(new Explosion.ExplosionEvent(), plugin);
+
         //Mob loot
         pluginManager.registerEvents(new DefaultDropsHandler(), plugin);
         pluginManager.registerEvents(new ItemLootShower.ItemLootShowerEvents(), plugin);
@@ -126,6 +134,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PlayerTeleportEvent.PlayerTeleportEventExecutor(), plugin);
         pluginManager.registerEvents(new SuperMobDamageEvent.SuperMobDamageEventFilter(), plugin);
         pluginManager.registerEvents(new EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter(), plugin);
+        pluginManager.registerEvents(new EliteExplosionEvent.EliteExplosionEvents(), plugin);
 
 
         /*
@@ -162,6 +171,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FrostCone(), plugin);
         pluginManager.registerEvents(new Thunderstorm(), plugin);
         pluginManager.registerEvents(new Firestorm(), plugin);
+        pluginManager.registerEvents(new Bombardment.BombardmentEvents(), plugin);
 
         //Major mob powers
         pluginManager.registerEvents(new SkeletonPillar(), plugin);
@@ -188,6 +198,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new BulletHell(), plugin);
         pluginManager.registerEvents(new DeathSlice(), plugin);
         pluginManager.registerEvents(new CustomSummonPower.CustomSummonPowerEvent(), plugin);
+        pluginManager.registerEvents(new EnderDragonEmpoweredLightning.EnderDragonEmpoweredLightningEvents(), plugin);
+        pluginManager.registerEvents(new MajorCombatEnterScanningPower.MajorCombatEnterScanningPowerEvents(), plugin);
 
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
@@ -240,7 +252,8 @@ public class EventsRegistrer {
         //Minecraft behavior canceller
         if (DefaultConfig.preventCreeperDamageToPassiveMobs)
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
-        pluginManager.registerEvents(new PreventEliteBeeHiveEnter(), plugin);
+        if (!VersionChecker.currentVersionIsUnder(15, 0))
+            pluginManager.registerEvents(new PreventEliteBeeHiveEnter(), plugin);
 
         //Antiexploits
         pluginManager.registerEvents(new PreventMountExploit(), plugin);
