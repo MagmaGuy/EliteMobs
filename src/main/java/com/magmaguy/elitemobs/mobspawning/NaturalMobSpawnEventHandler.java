@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.PlayerScanner;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -41,8 +42,10 @@ public class NaturalMobSpawnEventHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (event.getEntity().getType().equals(EntityType.BEE))
-            return;
+        if (!VersionChecker.currentVersionIsUnder(15, 0)) 
+            if (event.getEntity().getType().equals(EntityType.BEE))
+                return;
+
 
         if (MobPropertiesConfig.getMobProperties().get(event.getEntityType()) == null ||
                 !MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled())

@@ -77,8 +77,14 @@ public class PowersConfig {
             new LightningBoltsConfig(),
             new FrostConeConfig(),
             new ThunderstormConfig(),
-            new FirestormConfig()
-
+            new FirestormConfig(),
+            new EnderDragonPotionBombardmentConfig(),
+            new EnderDragonArrowBombardmentConfig(),
+            new EnderDragonEndermiteBombardmentConfig(),
+            new EnderDragonFireballBombardment(),
+            new EnderDragonEnderFireballBombardmentConfig(),
+            new EnderDragonEmpoweredLightningConfig(),
+            new EnderDragonShockwaveConfig()
     ));
 
     public static void initializeConfigs() {

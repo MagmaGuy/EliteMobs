@@ -22,9 +22,9 @@ public class AttackLightning extends MinorPower implements Listener {
     public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
         AttackLightning attackLightning = (AttackLightning) event.getEliteMobEntity().getPower(this);
         if (attackLightning == null) return;
-        if (attackLightning.isCooldown()) return;
+        if (attackLightning.getGlobalCooldownActive()) return;
 
-        attackLightning.doCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getConfiguration().getInt("delayBetweenStrikes"));
+        attackLightning.doGlobalCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getConfiguration().getInt("delayBetweenStrikes"));
 
         attackLightning.setIsFiring(true);
         fireLightning(event.getEliteMobEntity());

@@ -27,7 +27,7 @@ public class SummonEmbers extends BossPower implements Listener {
         if (!eventIsValid(event, summonEmbers)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        summonEmbers.doCooldown(20 * 20, event.getEliteMobEntity());
+        summonEmbers.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doSummonParticles(event.getEliteMobEntity());
 
     }

@@ -2,19 +2,23 @@ package com.magmaguy.elitemobs.powers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.powers.bosspowers.*;
+import com.magmaguy.elitemobs.powers.defensivepowers.*;
 import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
+import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
+import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonShockwave;
+import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments.*;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieFriends;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
-import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
-import com.magmaguy.elitemobs.powers.bosspowers.*;
-import com.magmaguy.elitemobs.powers.defensivepowers.*;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -51,6 +55,13 @@ public class ElitePower {
             new ZombieNecronomicon(),
             new ZombieParents(),
             new TrackingFireball(),
+            new EnderDragonEnderFireballBombardment(),
+            new EnderDragonPotionBombardment(),
+            new EnderDragonArrowBombardment(),
+            new EnderDragonEndermiteBombardment(),
+            new EnderDragonFireballBombardment(),
+            new EnderDragonEmpoweredLightning(),
+            new EnderDragonShockwave(),
 
             //Defensive powers
             new Invisibility(),
@@ -94,7 +105,11 @@ public class ElitePower {
     public static ElitePower getElitePower(String elitePowerName) {
         for (ElitePower elitePower : getElitePowers())
             if (elitePower.getFileName().equalsIgnoreCase(elitePowerName)) {
-                return elitePower;
+                try {
+                    return elitePower.getClass().newInstance();
+                } catch (Exception ex) {
+                    new DeveloperMessage("Failed to instance power");
+                }
             }
         return null;
     }
@@ -146,9 +161,11 @@ public class ElitePower {
     }
 
     private boolean cooldown = false;
+    private boolean powerCooldownActive = false;
     private final String fileName;
     private final String trail;
     private final String name;
+    private int powerCooldownTime, globalCooldownTime;
     private boolean isFiring = false;
     private final FileConfiguration configuration;
 
@@ -165,6 +182,8 @@ public class ElitePower {
         this.name = powersConfigFields.getName();
         this.trail = powersConfigFields.getEffect();
         this.configuration = powersConfigFields.getConfiguration();
+        this.powerCooldownTime = powersConfigFields.getPowerCooldown();
+        this.globalCooldownTime = powersConfigFields.getGlobalCooldown();
     }
 
     public String getFileName() {
@@ -183,31 +202,48 @@ public class ElitePower {
         return configuration;
     }
 
-    public boolean isCooldown() {
+    public boolean getGlobalCooldownActive() {
         return this.cooldown;
     }
 
-    private void setCooldown(boolean cooldown) {
+    public boolean isInCooldown(EliteMobEntity eliteMobEntity) {
+        return this.powerCooldownActive || eliteMobEntity.isCooldown();
+    }
+
+    public void doCooldown(EliteMobEntity eliteMobEntity) {
+        this.powerCooldownActive = true;
+        eliteMobEntity.doGlobalPowerCooldown(globalCooldownTime * 20);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                powerCooldownActive = false;
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, powerCooldownTime * 20L);
+
+    }
+
+    private void setGlobalCooldownTime(boolean cooldown) {
         this.cooldown = cooldown;
     }
 
-    protected void doCooldown(int ticks, EliteMobEntity eliteMobEntity) {
-        setCooldown(true);
+    protected void doGlobalCooldown(int ticks, EliteMobEntity eliteMobEntity) {
+        setGlobalCooldownTime(true);
         eliteMobEntity.doCooldown();
         new BukkitRunnable() {
             @Override
             public void run() {
-                setCooldown(false);
+                setGlobalCooldownTime(false);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
 
-    protected void doCooldown(int ticks) {
-        setCooldown(true);
+    protected void doGlobalCooldown(int ticks) {
+        setGlobalCooldownTime(true);
         new BukkitRunnable() {
             @Override
             public void run() {
-                setCooldown(false);
+                setGlobalCooldownTime(false);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
@@ -215,7 +251,7 @@ public class ElitePower {
     protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
         if (event.isCancelled()) return false;
         if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
-        if (elitePower.isCooldown()) return false;
+        if (elitePower.getGlobalCooldownActive()) return false;
         return !event.getEliteMobEntity().isCooldown();
     }
 
@@ -225,6 +261,14 @@ public class ElitePower {
 
     public void setIsFiring(boolean isFiring) {
         this.isFiring = isFiring;
+    }
+
+    public int getPowerCooldownTime() {
+        return powerCooldownTime;
+    }
+
+    public int getGlobalCooldown() {
+        return globalCooldownTime;
     }
 
 }

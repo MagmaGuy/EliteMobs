@@ -35,7 +35,7 @@ public class GoldShotgun extends BossPower implements Listener {
         if (!eventIsValid(event, goldShotgun)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        goldShotgun.doCooldown(20 * 20, event.getEliteMobEntity());
+        goldShotgun.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         goldShotgun.doGoldShotgun(event.getEliteMobEntity(), event.getPlayer());
 
     }

@@ -328,8 +328,6 @@ public class CustomBossConfigFields {
         this.customDisguiseData = configuration.getString("customDisguiseData");
 
         this.frozen = configuration.getBoolean("frozen");
-        if (frozen == null)
-            frozen = false;
 
         if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
         else this.spawnCooldown = configuration.getInt("spawnCooldown");
@@ -358,7 +356,8 @@ public class CustomBossConfigFields {
                     } catch (Exception ex) {
                         new WarningMessage("Boss " + fileName + " has invalid entry " + parsedDamageModifier + " !");
                     }
-                else new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + fileName + " !");
+                else
+                    new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + fileName + " !");
             }
 
             if (material != null && multiplier != null)
@@ -614,7 +613,7 @@ public class CustomBossConfigFields {
         return file;
     }
 
-    public double getDamageModifier(Material material ){
+    public double getDamageModifier(Material material) {
         return damageModifiers.get(material) == null ? 1 : damageModifiers.get(material);
     }
 
@@ -623,5 +622,10 @@ public class CustomBossConfigFields {
     }
 
     public boolean filesOutOfSync = false;
+
+    public boolean getCullReinforcements() {
+        if (fileConfiguration.get("cullReinforcements") == null) return false;
+        return fileConfiguration.getBoolean("cullReinforcements");
+    }
 
 }

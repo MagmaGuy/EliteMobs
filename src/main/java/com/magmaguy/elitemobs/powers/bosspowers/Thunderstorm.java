@@ -29,7 +29,7 @@ public class Thunderstorm extends BossPower implements Listener {
         if (!eventIsValid(event, thunderstorm)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        thunderstorm.doCooldown(20 * 20, event.getEliteMobEntity());
+        thunderstorm.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doThunderstorm(event.getEliteMobEntity());
 
     }

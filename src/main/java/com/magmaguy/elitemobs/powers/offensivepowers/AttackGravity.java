@@ -22,9 +22,9 @@ public class AttackGravity extends MinorPower implements Listener {
         if (event.isCancelled()) return;
         AttackGravity attackGravity = (AttackGravity) event.getEliteMobEntity().getPower(this);
         if (attackGravity == null) return;
-        if (attackGravity.isCooldown()) return;
+        if (attackGravity.getGlobalCooldownActive()) return;
 
-        attackGravity.doCooldown(20 * 10);
+        attackGravity.doGlobalCooldown(20 * 10);
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 3));
     }
 

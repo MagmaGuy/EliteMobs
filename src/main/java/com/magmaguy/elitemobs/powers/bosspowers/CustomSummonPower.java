@@ -75,12 +75,14 @@ public class CustomSummonPower extends ElitePower implements Listener {
     private void summonReinforcement(EliteMobEntity spawningEntity) {
         for (CustomBossReinforcement customBossReinforcement : customBossReinforcements) {
             if (customBossReinforcement.summonType.equals(SummonType.ONCE) && !customBossReinforcement.isSummoned) {
-                CustomBossEntity.constructCustomBoss(customBossReinforcement.bossFileName, spawningEntity.getLivingEntity().getLocation(), spawningEntity.getLevel());
+                CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss(customBossReinforcement.bossFileName, spawningEntity.getLivingEntity().getLocation(), spawningEntity.getLevel());
                 customBossReinforcement.isSummoned = true;
+                spawningEntity.reinforcementEntities.add(customBossEntity);
             }
 
             if (customBossReinforcement.summonType.equals(SummonType.ON_HIT) && ThreadLocalRandom.current().nextDouble() < customBossReinforcement.summonChance) {
-                CustomBossEntity.constructCustomBoss(customBossReinforcement.bossFileName, spawningEntity.getLivingEntity().getLocation(), spawningEntity.getLevel());
+                CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss(customBossReinforcement.bossFileName, spawningEntity.getLivingEntity().getLocation(), spawningEntity.getLevel());
+                spawningEntity.reinforcementEntities.add(customBossEntity);
             }
         }
     }

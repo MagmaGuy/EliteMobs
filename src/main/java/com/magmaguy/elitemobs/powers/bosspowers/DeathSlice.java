@@ -29,10 +29,10 @@ public class DeathSlice extends BossPower implements Listener {
     public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
         DeathSlice deathSlice = (DeathSlice) event.getEliteMobEntity().getPower(this);
         if (deathSlice == null) return;
-        if (deathSlice.isCooldown()) return;
+        if (deathSlice.getGlobalCooldownActive()) return;
 
         if (ThreadLocalRandom.current().nextDouble() > 0.10) return;
-        deathSlice.doCooldown(20 * 20);
+        deathSlice.doGlobalCooldown(20 * 20);
 
         doDeathSlice(event.getEliteMobEntity());
     }

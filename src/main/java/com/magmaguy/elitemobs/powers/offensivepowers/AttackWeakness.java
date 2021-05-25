@@ -22,9 +22,9 @@ public class AttackWeakness extends MinorPower implements Listener {
         if (event.isCancelled()) return;
         AttackWeakness attackWeakness = (AttackWeakness) event.getEliteMobEntity().getPower(this);
         if (attackWeakness == null) return;
-        if (attackWeakness.isCooldown()) return;
+        if (attackWeakness.getGlobalCooldownActive()) return;
 
-        attackWeakness.doCooldown(20 * 10);
+        attackWeakness.doGlobalCooldown(20 * 10);
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 3, 0));
     }
 

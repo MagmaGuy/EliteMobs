@@ -43,7 +43,8 @@ public class CustomBossesConfig {
             new BlayyzeConfig(),
             new EmberConfig(),
             new SnoopyConfig(),
-            new SummonableWolfConfig()
+            new SummonableWolfConfig(),
+            new BinderOfWorldsPhase1EndermiteReinforcementConfig()
     ));
 
     /**

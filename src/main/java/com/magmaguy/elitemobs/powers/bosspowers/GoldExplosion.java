@@ -34,7 +34,7 @@ public class GoldExplosion extends BossPower implements Listener {
         if (!eventIsValid(event, goldExplosion)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        goldExplosion.doCooldown(20 * 20, event.getEliteMobEntity());
+        goldExplosion.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doGoldExplosion(event.getEliteMobEntity());
 
     }
