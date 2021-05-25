@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
@@ -39,7 +38,8 @@ public class EliteMobEnterCombatEvent extends Event {
             public void run() {
                 if (!eliteMobEntity.getLivingEntity().isValid()) {
                     cancel();
-                    Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
+                    Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity,
+                            EliteMobExitCombatEvent.EliteMobExitCombatReason.ELITE_NOT_VALID));
                 }
                 if (!eliteMobEntity.isInCombatGracePeriod())
                     if (((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null) {
@@ -54,7 +54,7 @@ public class EliteMobEnterCombatEvent extends Event {
                             }
                         }
                         cancel();
-                        Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity));
+                        Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.NO_NEARBY_PLAYERS));
                     }
 
             }

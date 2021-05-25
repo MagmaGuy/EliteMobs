@@ -1,11 +1,14 @@
 package com.magmaguy.elitemobs.combatsystem;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
@@ -41,6 +44,15 @@ public class EliteProjectile {
     }
 
     private static Location generateLocation(Entity shooter, Vector targetterToTargetted) {
-        return shooter.getLocation().clone().add(targetterToTargetted).setDirection(targetterToTargetted).add(new Vector(0,1,0));
+        return shooter.getLocation().clone().add(targetterToTargetted).setDirection(targetterToTargetted).add(new Vector(0, 1, 0));
     }
+
+    public static void signExplosiveWithPower(Projectile projectile, String powerName) {
+        projectile.getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, "detonationPower"), PersistentDataType.STRING, powerName);
+    }
+
+    public static String readExplosivePower(Projectile projectile) {
+        return projectile.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, "detonationPower"), PersistentDataType.STRING);
+    }
+
 }

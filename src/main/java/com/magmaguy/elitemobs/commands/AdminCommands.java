@@ -8,23 +8,25 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
-import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.menus.GetLootMenu;
-import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.commands.admin.*;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.menus.GetLootMenu;
 import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -567,6 +569,22 @@ public class AdminCommands {
                 .meta(CommandMeta.DESCRIPTION, "Checks the currency of a specific player.")
                 .handler(commandContext -> CurrencyCommandsHandler.checkCommand(commandContext.getSender(), commandContext.get("onlinePlayer"))));
 
+        // /em fireball
+        manager.command(builder.literal("fireball")
+                .senderType(Player.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Fires a test Elite Fireball for explosion protection and regeneration testing purposes.")
+                .handler(commandContext -> testFireball((Player) commandContext.getSender())));
+
+
+    }
+
+    private void testFireball(Player player) {
+        Fireball fireball = (Fireball) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREBALL);
+        fireball.setDirection(player.getLocation().getDirection().normalize());
+        fireball.setShooter(player);
+        fireball.setYield(3F);
+        EntityTracker.registerProjectileEntity(fireball);
     }
 
 }

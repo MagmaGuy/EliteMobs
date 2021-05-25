@@ -30,7 +30,7 @@ public class ArrowRain extends MinorPower implements Listener {
         if (!eventIsValid(event, arrowRain)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.15) return;
 
-        arrowRain.doCooldown(20 * 15, event.getEliteMobEntity());
+        arrowRain.doGlobalCooldown(20 * 15, event.getEliteMobEntity());
         doArrowRain(event.getEliteMobEntity());
 
     }

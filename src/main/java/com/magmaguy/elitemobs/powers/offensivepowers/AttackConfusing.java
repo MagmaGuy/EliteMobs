@@ -22,9 +22,9 @@ public class AttackConfusing extends MinorPower implements Listener {
         if (event.isCancelled()) return;
         AttackConfusing attackConfusing = (AttackConfusing) event.getEliteMobEntity().getPower(this);
         if (attackConfusing == null) return;
-        if (attackConfusing.isCooldown()) return;
+        if (attackConfusing.getGlobalCooldownActive()) return;
 
-        attackConfusing.doCooldown(20 * 10);
+        attackConfusing.doGlobalCooldown(20 * 10);
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 10, 3));
     }
 

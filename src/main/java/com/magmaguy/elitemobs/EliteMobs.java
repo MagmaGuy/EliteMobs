@@ -27,6 +27,7 @@ import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.EventLauncher;
+import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.LootTables;
@@ -245,6 +246,8 @@ public class EliteMobs extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
+        Explosion.regenerateAllPendingBlocks();
 
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
 

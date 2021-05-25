@@ -29,7 +29,7 @@ public class SummonTheReturned extends BossPower implements Listener {
         if (!eventIsValid(event, summonTheReturned)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        summonTheReturned.doCooldown(20 * 20, event.getEliteMobEntity());
+        summonTheReturned.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doSummonParticles(event.getEliteMobEntity());
     }
 

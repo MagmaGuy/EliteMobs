@@ -30,7 +30,7 @@ public class Firestorm extends BossPower implements Listener {
         if (!eventIsValid(event, firestorm)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        firestorm.doCooldown(20 * 20, event.getEliteMobEntity());
+        firestorm.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doFirestorm(event.getEliteMobEntity());
 
     }

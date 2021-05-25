@@ -15,9 +15,12 @@ public class EliteMobExitCombatEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private final EliteMobEntity eliteMobEntity;
+    private final EliteMobExitCombatReason eliteMobExitCombatReason;
 
-    public EliteMobExitCombatEvent(EliteMobEntity eliteMobEntity) {
+
+    public EliteMobExitCombatEvent(EliteMobEntity eliteMobEntity, EliteMobExitCombatReason reason) {
         this.eliteMobEntity = eliteMobEntity;
+        this.eliteMobExitCombatReason = reason;
         eliteMobEntity.setIsInCombat(false);
         if (eliteMobEntity.getLivingEntity().isDead()) return;
         //only run commands if the reason for leaving combat isn't death, onDeath commands exist for that case
@@ -34,6 +37,10 @@ public class EliteMobExitCombatEvent extends Event {
         return this.eliteMobEntity;
     }
 
+    public EliteMobExitCombatReason getEliteMobExitCombatReason() {
+        return eliteMobExitCombatReason;
+    }
+
     @Override
     public HandlerList getHandlers() {
         return handlers;
@@ -41,6 +48,12 @@ public class EliteMobExitCombatEvent extends Event {
 
     public static HandlerList getHandlerList() {
         return handlers;
+    }
+
+    public enum EliteMobExitCombatReason{
+        NO_NEARBY_PLAYERS,
+        SPIRIT_WALK,
+        ELITE_NOT_VALID
     }
 
 }

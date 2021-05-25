@@ -28,9 +28,9 @@ public class AttackFreeze extends MinorPower implements Listener {
         if (event.isCancelled()) return;
         AttackFreeze attackFreeze = (AttackFreeze) event.getEliteMobEntity().getPower(this);
         if (attackFreeze == null) return;
-        if (attackFreeze.isCooldown()) return;
+        if (attackFreeze.getGlobalCooldownActive()) return;
 
-        attackFreeze.doCooldown(20 * 15);
+        attackFreeze.doGlobalCooldown(20 * 15);
 
         /*
         Slow player down

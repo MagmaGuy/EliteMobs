@@ -25,13 +25,13 @@ public class SkeletonPillar extends MajorPower implements Listener {
     public void onHit(EliteMobDamagedByPlayerEvent event) {
         SkeletonPillar skeletonPillar = (SkeletonPillar) event.getEliteMobEntity().getPower(this);
         if (skeletonPillar == null) return;
-        if (skeletonPillar.isCooldown()) return;
+        if (skeletonPillar.getGlobalCooldownActive()) return;
 
         /*
         Run random check to see if the power should activate
          */
         if (ThreadLocalRandom.current().nextDouble() > 0.20) return;
-        skeletonPillar.doCooldown(20 * 27);
+        skeletonPillar.doGlobalCooldown(20 * 27);
 
         event.getEliteMobEntity().getLivingEntity().setAI(false);
         playPillarSong(event.getEntity().getLocation());

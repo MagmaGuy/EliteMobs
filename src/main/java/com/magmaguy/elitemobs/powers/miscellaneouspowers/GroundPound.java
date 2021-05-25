@@ -29,10 +29,10 @@ public class GroundPound extends MinorPower implements Listener {
     public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
         GroundPound groundPound = (GroundPound) event.getEliteMobEntity().getPower(this);
         if (groundPound == null) return;
-        if (groundPound.isCooldown()) return;
+        if (groundPound.getGlobalCooldownActive()) return;
 
         if (ThreadLocalRandom.current().nextDouble() > 0.10) return;
-        groundPound.doCooldown(20 * 10);
+        groundPound.doGlobalCooldown(20 * 10);
 
         doGroundPound(event.getEliteMobEntity());
 

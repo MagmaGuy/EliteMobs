@@ -61,7 +61,7 @@ public class Flamethrower extends BossPower implements Listener {
         if (!eventIsValid(event, flameThrower)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        flameThrower.doCooldown(20 * 20, event.getEliteMobEntity());
+        flameThrower.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doFlamethrowerPhase1(event.getEliteMobEntity(), event.getPlayer().getLocation().clone());
 
     }

@@ -30,7 +30,7 @@ public class FlamePyre extends BossPower implements Listener {
         if (!eventIsValid(event, flamePyre)) return;
         if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
 
-        flamePyre.doCooldown(20 * 20, event.getEliteMobEntity());
+        flamePyre.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
         doFlamePyrePhase1(event.getEliteMobEntity());
 
     }

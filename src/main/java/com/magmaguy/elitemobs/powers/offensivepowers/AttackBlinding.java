@@ -22,9 +22,9 @@ public class AttackBlinding extends MinorPower implements Listener {
         if (event.isCancelled()) return;
         AttackBlinding attackBlinding = (AttackBlinding) event.getEliteMobEntity().getPower(this);
         if (attackBlinding == null) return;
-        if (attackBlinding.isCooldown()) return;
+        if (attackBlinding.getGlobalCooldownActive()) return;
 
-        attackBlinding.doCooldown(20 * 10);
+        attackBlinding.doGlobalCooldown(20 * 10);
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 3));
     }
 
