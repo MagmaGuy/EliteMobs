@@ -64,6 +64,7 @@ import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
+import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.QuestsMenu;
@@ -200,6 +201,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new CustomSummonPower.CustomSummonPowerEvent(), plugin);
         pluginManager.registerEvents(new EnderDragonEmpoweredLightning.EnderDragonEmpoweredLightningEvents(), plugin);
         pluginManager.registerEvents(new MajorCombatEnterScanningPower.MajorCombatEnterScanningPowerEvents(), plugin);
+
+        //special powers
+        pluginManager.registerEvents(new EnderCrystalLightningRod.EnderCrystalLightningRodEvents(), plugin);
 
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);

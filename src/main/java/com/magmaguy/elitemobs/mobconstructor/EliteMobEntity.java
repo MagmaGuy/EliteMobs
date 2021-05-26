@@ -96,7 +96,9 @@ public class EliteMobEntity {
     public RegionalBossEntity regionalBossEntity;
     public PhaseBossEntity phaseBossEntity;
 
-    public ArrayList<CustomBossEntity> reinforcementEntities = new ArrayList<>();
+    public ArrayList<CustomBossEntity> eliteReinforcementEntities = new ArrayList<>();
+    //currently used to store ender crystals for the dragon boss fight
+    public ArrayList<Entity> nonEliteReinforcementEntities = new ArrayList<>();
 
     /**
      * Check through WorldGuard if the location is valid. Regions flagged with the elitemob-spawning deny tag will cancel
