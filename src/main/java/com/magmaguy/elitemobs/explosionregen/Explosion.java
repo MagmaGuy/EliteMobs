@@ -163,11 +163,13 @@ public class Explosion {
 
         EliteExplosionEvent eliteExplosionEvent = null;
 
+        ElitePower elitePower;
+
         //for projectiles
         if (entity instanceof Projectile) {
             eliteExplosionEvent = new EliteExplosionEvent(
                     eliteMobEntity,
-                    ElitePower.getElitePower(EliteProjectile.readExplosivePower((Projectile) entity)),
+                    elitePower = ElitePower.getElitePower(EliteProjectile.readExplosivePower((Projectile) entity)),
                     entity.getLocation(),
                     blockStates);
             if (eliteExplosionEvent.isCancelled()) return;
@@ -175,13 +177,13 @@ public class Explosion {
         } else {
             eliteExplosionEvent = new EliteExplosionEvent(
                     eliteMobEntity,
-                    null,
+                    elitePower = null,
                     entity.getLocation(),
                     blockStates);
             if (eliteExplosionEvent.isCancelled()) return;
         }
 
-        eliteExplosionEvent.visualExplosionEffect();
+        eliteExplosionEvent.visualExplosionEffect(elitePower);
 
         for (BlockState blockState : blockStates) {
             blockState.getBlock().setType(Material.AIR);

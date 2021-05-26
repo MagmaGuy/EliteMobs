@@ -5,6 +5,8 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.*;
@@ -22,11 +24,6 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
         this.entity = eliteMobEntity.getLivingEntity();
         this.eliteMobEntity = eliteMobEntity;
         this.entityDamageEvent = event;
-        if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK))
-            return;
-        //todo: this shouldn't need doRealDamage
-        eliteMobEntity.damage(event.getDamage());
-        event.setDamage(0);
     }
 
     public Entity getEntity() {
@@ -71,8 +68,15 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
             EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteMobEntity == null) return;
 
-            Bukkit.getServer().getPluginManager().callEvent(new EliteMobDamagedEvent(eliteMobEntity, event));
-            if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(), WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
+            EliteMobDamagedEvent eliteMobDamagedEvent = new EliteMobDamagedEvent(eliteMobEntity, event);
+            new EventCaller(eliteMobDamagedEvent);
+            if (eliteMobDamagedEvent.isCancelled) {
+                eliteMobDamagedEvent.setCancelled(true);
+                return;
+            }
+
+            if (EliteMobs.worldguardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(),
+                    WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
                 return;
             Bukkit.getServer().getPluginManager().callEvent(new GenericAntiExploitEvent(eliteMobEntity, event));
 

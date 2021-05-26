@@ -78,6 +78,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             return livingEntity;
         } catch (Exception ex) {
             new WarningMessage("Failed to spawn a Custom Boss' living entity! Is the region protected against spawns? Custom boss: " + customBossConfigFields.getFileName() + " entry: " + location.toString());
+            ex.printStackTrace();
             return null;
         }
     }
@@ -592,7 +593,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     }
 
     public static class CustomBossEntityEvents implements Listener {
-        @EventHandler (ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true)
         public void removeSlowEvent(EliteMobEnterCombatEvent eliteMobEnterCombatEvent) {
             if (eliteMobEnterCombatEvent.getEliteMobEntity().customBossEntity == null) return;
             if (eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().getPotionEffect(PotionEffectType.SLOW) == null)
@@ -602,12 +603,15 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             eliteMobEnterCombatEvent.getEliteMobEntity().getLivingEntity().removePotionEffect(PotionEffectType.SLOW);
         }
 
-        @EventHandler (ignoreCancelled = true)
-        public void onExitCombat(EliteMobExitCombatEvent event){
+        @EventHandler(ignoreCancelled = true)
+        public void onExitCombat(EliteMobExitCombatEvent event) {
             if (event.getEliteMobEntity().customBossEntity == null) return;
-            if (event.getEliteMobEntity().customBossEntity.customBossConfigFields.getCullReinforcements())
-                for (CustomBossEntity customBossEntity : event.getEliteMobEntity().reinforcementEntities)
+            if (event.getEliteMobEntity().customBossEntity.customBossConfigFields.getCullReinforcements()) {
+                for (CustomBossEntity customBossEntity : event.getEliteMobEntity().eliteReinforcementEntities)
                     customBossEntity.remove(true);
+                for (Entity entity : event.getEliteMobEntity().nonEliteReinforcementEntities)
+                    entity.remove();
+            }
         }
     }
 
