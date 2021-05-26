@@ -43,6 +43,7 @@ public class PhaseBossEntity {
 
     private void initializePhaseBossEntity(CustomBossEntity customBossEntity) {
         customBossEntity.phaseBossEntity = this;
+        customBossEntity.regionalBossEntity = regionalBossEntity;
         try {
             ArrayList<BossPhases> unsortedBossPhases = new ArrayList<>();
             unsortedBossPhases.add(new BossPhases(customBossEntity.customBossConfigFields, 1));
@@ -75,8 +76,10 @@ public class PhaseBossEntity {
         }
         customBossEntity.addDamagers(eliteMobEntity.getDamagers());
 
-        if (regionalBossEntity != null)
+        if (regionalBossEntity != null) {
             regionalBossEntity.customBossEntity = customBossEntity;
+            customBossEntity.regionalBossEntity = regionalBossEntity;
+        }
 
         customBossEntity.phaseBossEntity = this;
 

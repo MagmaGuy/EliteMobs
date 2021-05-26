@@ -214,7 +214,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                         customBossEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
 
-                        eliteMobEntity.reinforcementEntities.add(customBossEntity);
+                        eliteMobEntity.eliteReinforcementEntities.add(customBossEntity);
 
                         entityList.add(customBossEntity.getLivingEntity());
 
@@ -225,7 +225,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                         customBossEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
 
-                        eliteMobEntity.reinforcementEntities.add(customBossEntity);
+                        eliteMobEntity.eliteReinforcementEntities.add(customBossEntity);
 
                         entityList.add(customBossEntity.getLivingEntity());
 

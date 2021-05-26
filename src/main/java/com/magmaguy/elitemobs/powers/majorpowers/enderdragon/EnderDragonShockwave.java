@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -148,7 +147,7 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
 
         while (pieBlockIterator.hasNext()) {
             PieBlock pieBlock = pieBlockIterator.next();
-            if (pieBlock.distance < warningPhaseCounter / 2) {
+            if (pieBlock.distance < warningPhaseCounter) {
                 Location rawPieBlock = eliteMobEntity.customBossEntity.getLocation().clone().add(pieBlock.vector);
 
                 pieBlockIterator.remove();
@@ -172,7 +171,7 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
         while (pieBlockIterator.hasNext()) {
             PieBlock pieBlock = pieBlockIterator.next();
 
-            if (pieBlock.distance < damagePhaseCounter / 2) {
+            if (pieBlock.distance < damagePhaseCounter) {
                 Location rawPieBlock = eliteMobEntity.customBossEntity.getLocation().clone().add(pieBlock.vector);
 
                 if (rawPieBlock.getBlock().isPassable()) continue;
