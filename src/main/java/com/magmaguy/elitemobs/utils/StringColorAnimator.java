@@ -17,8 +17,8 @@ public class StringColorAnimator {
             int counter = 0;
             int titleIndex = 0;
             int subtitleIndex = 0;
-            int titleSize = title.length();
-            int subtitleSize = finalSubtitle.length();
+            final int titleSize = title.length();
+            final int subtitleSize = finalSubtitle.length();
 
             @Override
             public void run() {

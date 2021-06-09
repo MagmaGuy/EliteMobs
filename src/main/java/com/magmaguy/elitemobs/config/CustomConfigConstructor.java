@@ -18,8 +18,8 @@ import java.io.InputStreamReader;
 public class CustomConfigConstructor extends YamlConfiguration {
 
     Plugin plugin = Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS);
-    private File file;
-    private String defaults;
+    private final File file;
+    private final String defaults;
 
     /**
      * Creates new PluginFile, without defaults
@@ -39,7 +39,7 @@ public class CustomConfigConstructor extends YamlConfiguration {
     public CustomConfigConstructor(String fileName, String defaultsName) {
         this.defaults = defaultsName;
         File newFile = new File(plugin.getDataFolder().getPath()+"/data");
-        Bukkit.getLogger().info("ATTENTION: " + newFile.toString());
+        Bukkit.getLogger().info("ATTENTION: " + newFile);
         this.file = new File(newFile, fileName);
         reload();
     }

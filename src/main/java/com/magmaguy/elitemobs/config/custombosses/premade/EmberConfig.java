@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 public class EmberConfig extends CustomBossConfigFields {
     public EmberConfig() {
@@ -12,35 +12,10 @@ public class EmberConfig extends CustomBossConfigFields {
                 EntityType.BLAZE.toString(),
                 true,
                 "$reinforcementLevel &cEmber",
-                "dynamic",
-                0,
-                false,
-                0.3,
-                0.3,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                Arrays.asList(),
-                null,
-                null,
-                null,
-                null,
-                null,
-                Arrays.asList(),
-                false,
-                true,
-                Arrays.asList(Particle.SPELL_WITCH.toString()),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "dynamic");
+        setHealthMultiplier(0.3);
+        setDamageMultiplier(0.3);
+        setDropsEliteMobsLoot(false);
+        setTrails(Collections.singletonList(Particle.SPELL_WITCH.toString()));
     }
 }

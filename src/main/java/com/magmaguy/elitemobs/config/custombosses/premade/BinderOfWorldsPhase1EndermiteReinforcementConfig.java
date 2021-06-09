@@ -9,35 +9,11 @@ public class BinderOfWorldsPhase1EndermiteReinforcementConfig extends CustomBoss
                 EntityType.ENDERMITE.toString(),
                 true,
                 "$reinforcementLevel &5Reality Corruptor",
-                "250",
-                2,
-                false,
-                0.1,
-                0.5,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "250");
+        setTimeout(2);
+        setDropsVanillaLoot(false);
+        setDropsEliteMobsLoot(false);
+        setHealthMultiplier(0.1);
+        setDamageMultiplier(0.5);
     }
 }

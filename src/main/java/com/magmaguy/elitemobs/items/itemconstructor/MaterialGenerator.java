@@ -31,7 +31,7 @@ public class MaterialGenerator {
         if (itemTier < CombatSystem.TRIDENT_TIER_LEVEL)
             localValidMaterials.remove(TRIDENT);
 
-        if (VersionChecker.currentVersionIsUnder(16, 0) && itemTier < CombatSystem.NETHERITE_TIER_LEVEL)
+        if (VersionChecker.serverVersionOlderThan(16, 0) && itemTier < CombatSystem.NETHERITE_TIER_LEVEL)
 
             if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL) {
                 localValidMaterials.remove(DIAMOND_AXE);

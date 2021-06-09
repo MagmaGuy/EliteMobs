@@ -479,7 +479,7 @@ public class EnchantmentGenerator {
     private static boolean enchantmentBackwardsCompatibility(int version, int subVersion, String
             actualEnchantement, String enchantmentToAvoid) {
 
-        return !VersionChecker.currentVersionIsUnder(version, subVersion) && actualEnchantement.equalsIgnoreCase(enchantmentToAvoid);
+        return !VersionChecker.serverVersionOlderThan(version, subVersion) && actualEnchantement.equalsIgnoreCase(enchantmentToAvoid);
 
     }
 

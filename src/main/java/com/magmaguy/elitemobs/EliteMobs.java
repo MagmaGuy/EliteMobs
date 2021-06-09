@@ -70,7 +70,7 @@ import java.util.List;
 public class EliteMobs extends JavaPlugin {
 
     public static List<World> validWorldList = new ArrayList();
-    public static boolean worldguardIsEnabled = false;
+    public static boolean worldGuardIsEnabled = false;
     public static List<World> zoneBasedSpawningWorlds = new ArrayList<>();
     public static List<World> nightmareWorlds = new ArrayList<>();
     public Object placeholders = null;
@@ -107,7 +107,7 @@ public class EliteMobs extends JavaPlugin {
          */
         initializeConfigs();
 
-        if (worldguardIsEnabled)
+        if (worldGuardIsEnabled)
             Bukkit.getLogger().info("[EliteMobs] WorldGuard compatibility is enabled!");
         else
             Bukkit.getLogger().warning("[EliteMobs] WorldGuard compatibility is not enabled!");
@@ -232,15 +232,15 @@ public class EliteMobs extends JavaPlugin {
         //WorldGuard hook
         //todo: fix
         try {
-            worldguardIsEnabled = WorldGuardCompatibility.initialize();
+            worldGuardIsEnabled = WorldGuardCompatibility.initialize();
         } catch (NoClassDefFoundError | IllegalStateException ex) {
             Bukkit.getLogger().warning("[EliteMobs] Error loading WorldGuard. EliteMob-specific flags will not work." +
                     " Except if you just reloaded the plugin, in which case they will totally work.");
-            worldguardIsEnabled = false;
+            worldGuardIsEnabled = false;
         }
-        if (!worldguardIsEnabled)
+        if (!worldGuardIsEnabled)
             if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null)
-                worldguardIsEnabled = true;
+                worldGuardIsEnabled = true;
 
     }
 
@@ -263,6 +263,13 @@ public class EliteMobs extends JavaPlugin {
         CustomBossConfigFields.getNaturallySpawnedElites().clear();
         CustomEnchantment.getCustomEnchantments().clear();
         CustomItem.getCustomItems().clear();
+        CustomItem.getCustomItemStackList().clear();
+        CustomItem.getCustomItemStackShopList().clear();
+        CustomItem.getLimitedItem().clear();
+        CustomItem.getScalableItems().clear();
+        CustomItem.getFixedItems().clear();
+        CustomItem.getTieredLoot().clear();
+        CustomItem.getWeighedFixedItems().clear();
         Minidungeon.minidungeons.clear();
 
         if (this.placeholders != null)
@@ -332,7 +339,7 @@ public class EliteMobs extends JavaPlugin {
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.superMobStackAmount > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         }
-        //save regional bosses when the files udpate
+        //save regional bosses when the files update
         AbstractRegionalEntity.abstractRegionalEntityDataSaver();
     }
 

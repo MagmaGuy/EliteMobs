@@ -10,8 +10,6 @@ import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
-import com.magmaguy.elitemobs.utils.DebugMessage;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Bukkit;
@@ -166,7 +164,7 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             event.setDamage(damage);
 
             //No antiexploit checks for dungeons
-            if (!(EliteMobs.worldguardIsEnabled &&
+            if (!(EliteMobs.worldGuardIsEnabled &&
                     !WorldGuardFlagChecker.checkFlag(
                             eliteMobEntity.getLivingEntity().getLocation(),
                             WorldGuardCompatibility.getEliteMobsAntiExploitFlag())))

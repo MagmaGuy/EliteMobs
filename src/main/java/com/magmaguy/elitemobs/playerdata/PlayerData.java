@@ -405,7 +405,7 @@ public class PlayerData {
                                 " Deaths," +
                                 " QuestsCompleted) " +
                                 //identifier
-                                "VALUES ('" + uuid.toString() + "'," +
+                                "VALUES ('" + uuid + "'," +
                                 //display name
                                 " '" + Bukkit.getPlayer(uuid).getName() + "'," +
                                 //currency

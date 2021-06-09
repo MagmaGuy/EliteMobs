@@ -9,35 +9,10 @@ public class ZombieDadConfig extends CustomBossConfigFields {
                 EntityType.SKELETON.toString(),
                 true,
                 "$reinforcementLevel &7Zombie Dad",
-                "dynamic",
-                0,
-                false,
-                0.5,
-                0.5,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "dynamic");
+        setHealthMultiplier(0.5);
+        setDamageMultiplier(0.5);
+        setDropsVanillaLoot(false);
+        setDropsEliteMobsLoot(false);
     }
 }

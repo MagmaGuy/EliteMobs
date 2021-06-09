@@ -4,23 +4,25 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.utils.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -35,14 +37,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureChest {
 
-    private static final HashMap<String, TreasureChest> treasureChestHashMap = new HashMap<>();
+    private static final HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
 
-    public static HashMap<String, TreasureChest> getTreasureChestHashMap() {
+    public static HashMap<Location, TreasureChest> getTreasureChestHashMap() {
         return treasureChestHashMap;
     }
 
-    public static TreasureChest getTreasureChest(String key) {
-        return getTreasureChestHashMap().get(key);
+    public static TreasureChest getTreasureChest(Location location) {
+        return getTreasureChestHashMap().get(location);
     }
 
     public static void initializeTreasureChest() {
@@ -63,6 +65,7 @@ public class TreasureChest {
     private BlockFace facing;
     private int chestTier;
     private Location location;
+    private List<String> locations;
     private DropStyle dropStyle;
     private int restockTimer;
     private List<String> lootList;
@@ -128,7 +131,7 @@ public class TreasureChest {
 
         generateChest();
 
-        treasureChestHashMap.put(this.key, this);
+        treasureChestHashMap.put(location, this);
 
     }
 
@@ -141,9 +144,9 @@ public class TreasureChest {
             return;
         }
         //todo: this doesn't support non- chest block types like the ender chest
-        //Directional directional = (Directional) location.getBlock().getState();
-        //directional.setFacingDirection(facing);
-        //location.getBlock().setBlockData((BlockData) directional);
+        Chest chest = (Chest) location.getBlock().getBlockData();
+        chest.setFacing(facing);
+        location.getBlock().setBlockData(chest);
         location.getBlock().getState().update();
 
         startEffects();
@@ -211,13 +214,11 @@ public class TreasureChest {
                 double odds = Double.valueOf(string.split(":")[1]);
                 if (ThreadLocalRandom.current().nextDouble() < odds)
                     CustomItem.dropPlayerLoot(player, randomizeTier(), filename, location);
-
             } catch (Exception ex) {
-                if (string.equalsIgnoreCase("hyper_loot.yml"))
-
-                    new WarningMessage("Malformed loot entry for " + this.fileName + " !");
+                new WarningMessage("Malformed loot entry for " + this.fileName + " !");
                 new WarningMessage("Entry: " + string);
                 new WarningMessage("Correct format: filename.yml:odds");
+                ex.printStackTrace();
             }
     }
 
@@ -251,7 +252,7 @@ public class TreasureChest {
     }
 
     private String cooldownStringConstructor(Player player) {
-        return player.getUniqueId().toString() + ":" + cooldownTime();
+        return player.getUniqueId() + ":" + cooldownTime();
     }
 
     private long cooldownTime() {
@@ -340,15 +341,16 @@ public class TreasureChest {
 
 
     public static class TreasureChestEvents implements Listener {
-        @EventHandler
-        public void onPlayerInteract(InventoryOpenEvent event) {
-            if (!getTreasureChestHashMap().containsKey(event.getView().getTitle())) return;
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        public void onPlayerInteract(PlayerInteractEvent event) {
+            if (event.getClickedBlock() == null) return;
+            TreasureChest treasureChest = getTreasureChest(event.getClickedBlock().getLocation());
+            if (treasureChest == null) return;
             event.setCancelled(true);
-            TreasureChest treasureChest = getTreasureChest(event.getView().getTitle());
-            if (GuildRank.getMaxGuildRank((Player) event.getPlayer()) < treasureChest.chestTier)
-                treasureChest.lowRankMessage((Player) event.getPlayer());
+            if (GuildRank.getMaxGuildRank(event.getPlayer()) < treasureChest.chestTier)
+                treasureChest.lowRankMessage(event.getPlayer());
             else
-                treasureChest.doInteraction((Player) event.getPlayer());
+                treasureChest.doInteraction(event.getPlayer());
         }
 
         @EventHandler

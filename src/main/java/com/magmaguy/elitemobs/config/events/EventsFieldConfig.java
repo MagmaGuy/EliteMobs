@@ -6,8 +6,8 @@ import java.io.File;
 
 public class EventsFieldConfig {
 
-    private String fileName;
-    private boolean isEnabled;
+    private final String fileName;
+    private final boolean isEnabled;
 
     public EventsFieldConfig(String fileName,
                              boolean isEnabled) {

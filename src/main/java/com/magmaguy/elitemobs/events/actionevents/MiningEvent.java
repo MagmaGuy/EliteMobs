@@ -26,7 +26,7 @@ public class MiningEvent implements Listener {
         if (event.isCancelled()) return;
         if (!BalrogEventConfig.isEnabled) return;
         if (!EliteMobs.validWorldList.contains(event.getPlayer().getWorld())) return;
-        if (EliteMobs.worldguardIsEnabled &&
+        if (EliteMobs.worldGuardIsEnabled &&
                 !WorldGuardFlagChecker.checkFlag(event.getPlayer().getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
             return;
         if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)

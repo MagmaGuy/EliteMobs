@@ -9,35 +9,9 @@ public class TheReturnedConfig extends CustomBossConfigFields {
                 EntityType.HUSK.toString(),
                 true,
                 "$reinforcementLevel &6The Returned",
-                "dynamic",
-                0,
-                false,
-                0.5,
-                0.5,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                true,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "dynamic");
+        setHealthMultiplier(0.5);
+        setDamageMultiplier(0.5);
+        setDropsEliteMobsLoot(false);
     }
 }

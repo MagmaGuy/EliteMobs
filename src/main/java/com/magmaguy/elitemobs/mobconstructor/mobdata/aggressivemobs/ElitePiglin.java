@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 
 public class ElitePiglin extends EliteMobProperties {
     public ElitePiglin() {
-        if (VersionChecker.currentVersionIsUnder(16, 0)) {
+        if (VersionChecker.serverVersionOlderThan(16, 0)) {
             return;
         }
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.PIGLIN).getName();

@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 public class CustomTreasureChestsConfig {
 
-    private static HashMap<String, CustomTreasureChestConfigFields> customTreasureChestConfigFields = new HashMap<>();
+    private static final HashMap<String, CustomTreasureChestConfigFields> customTreasureChestConfigFields = new HashMap<>();
 
     public static HashMap<String, CustomTreasureChestConfigFields> getCustomTreasureChestConfigFields() {
         return customTreasureChestConfigFields;
@@ -25,7 +25,7 @@ public class CustomTreasureChestsConfig {
         return customTreasureChestConfigFields.get(fileName);
     }
 
-    private static ArrayList<CustomTreasureChestConfigFields> customBossConfigFieldsList = new ArrayList(Arrays.asList(
+    private static final ArrayList<CustomTreasureChestConfigFields> customBossConfigFieldsList = new ArrayList(Arrays.asList(
             new TestCustomTreasureChestConfig()
     ));
 

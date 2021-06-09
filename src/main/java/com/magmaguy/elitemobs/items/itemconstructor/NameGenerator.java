@@ -111,7 +111,7 @@ public class NameGenerator {
             return ProceduralItemGenerationSettingsConfig.fileConfiguration.getString("materialNames." + material.toString().toLowerCase());
 
         Bukkit.getLogger().warning("[EliteMobs] Found unexpected material type in procedurally generated loot. Can't generate item type name.");
-        Bukkit.getLogger().warning("[EliteMobs] Material name: " + material.toString());
+        Bukkit.getLogger().warning("[EliteMobs] Material name: " + material);
         new WarningMessage("If you're trying to set a non-default item type, you need to add the name format like this under materialNames: " + material.toString().toLowerCase() + ": Name");
         return "";
 

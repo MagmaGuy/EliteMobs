@@ -9,13 +9,13 @@ import java.util.Map;
 
 public class EnchantmentsConfigFields {
 
-    private String fileName;
-    private boolean isEnabled;
-    private String name;
-    private int maxLevel;
+    private final String fileName;
+    private final boolean isEnabled;
+    private final String name;
+    private final int maxLevel;
     private Enchantment enchantment;
-    private double value;
-    private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
+    private final double value;
+    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
     private FileConfiguration fileConfiguration;
 
     public EnchantmentsConfigFields(String fileName,
