@@ -39,7 +39,7 @@ public class SetupHandler {
     }
 
     public static void setupAreaCommand(Player player, String regionName) {
-        if (!EliteMobs.worldguardIsEnabled) {
+        if (!EliteMobs.worldGuardIsEnabled) {
             player.sendMessage("[EliteMobs] You don't have WorldGuard installed! It is not possible to correctly set " +
                     "up a lair/minidungeon/dungeon without that plugin!");
             return;

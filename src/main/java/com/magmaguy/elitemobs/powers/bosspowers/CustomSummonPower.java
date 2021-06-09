@@ -35,7 +35,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
 
     private class CustomBossReinforcement {
         private boolean isSummoned = false;
-        private SummonType summonType;
+        private final SummonType summonType;
         public double summonChance;
         public String bossFileName = null;
         public Vector spawnLocationOffset;

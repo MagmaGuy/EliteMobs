@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.MajorPower;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.EnderDragonPhaseSimplifier;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -30,7 +30,6 @@ public abstract class Bombardment extends MajorPower implements Listener {
     private boolean isActive = false;
     private boolean firing = false;
     private BukkitTask task = null;
-
 
     public void activate(EliteMobEntity eliteMobEntity) {
 
@@ -91,14 +90,15 @@ public abstract class Bombardment extends MajorPower implements Listener {
             return true;
         }
 
-        if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
-            EnderDragon.Phase enderDragonPhase = ((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase();
-            if (enderDragonPhase.equals(EnderDragon.Phase.LAND_ON_PORTAL) ||
-                    enderDragonPhase.equals(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET))
-                return true;
-        }
+        if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
+            return !EnderDragonPhaseSimplifier.isFlying(
+                    ((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase(),
+                    false);
+
         return false;
     }
+
+    public int firingTimer = 0;
 
     private void fire(EliteMobEntity eliteMobEntity) {
 
@@ -106,13 +106,14 @@ public abstract class Bombardment extends MajorPower implements Listener {
 
         isActive = true;
 
+        firingTimer = 0;
+
         new BukkitRunnable() {
-            int counter = 0;
 
             @Override
             public void run() {
-                counter++;
-                if (stopCondition(eliteMobEntity) || counter > 20 * 5) {
+                firingTimer++;
+                if (stopCondition(eliteMobEntity) || firingTimer > 20 * 5) {
                     cancel();
                     firing = false;
                     return;

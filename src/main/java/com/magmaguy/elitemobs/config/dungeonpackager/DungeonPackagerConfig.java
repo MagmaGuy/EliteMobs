@@ -35,7 +35,8 @@ public class DungeonPackagerConfig {
                 new PirateShipMinidungeon(),
                 new NorthPoleMinidungeon(),
                 new AirShipMinidungeon(),
-                new OasisAdventure()));
+                new OasisAdventure(),
+                new BinderOfWorldsLair()));
 
         if (!Files.isDirectory(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/dungeonpackages"))) {
             generateFreshConfigurations();

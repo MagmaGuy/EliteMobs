@@ -116,7 +116,7 @@ public class EconomySettingsConfig {
         addMaterial(fileConfiguration, Material.ELYTRA, diamondLevel);
         addMaterial(fileConfiguration, Material.TURTLE_HELMET, goldWoodLeatherLevel);
 
-        if (!VersionChecker.currentVersionIsUnder(16, 0)) {
+        if (!VersionChecker.serverVersionOlderThan(16, 0)) {
             addMaterial(fileConfiguration, Material.NETHERITE_AXE, netheriteLevel);
             addMaterial(fileConfiguration, Material.NETHERITE_PICKAXE, netheriteLevel);
             addMaterial(fileConfiguration, Material.NETHERITE_SHOVEL, netheriteLevel);

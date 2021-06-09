@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 public class RaugConfig extends CustomBossConfigFields {
     public RaugConfig() {
@@ -12,35 +12,9 @@ public class RaugConfig extends CustomBossConfigFields {
                 EntityType.SILVERFISH.toString(),
                 true,
                 "$reinforcementLevel &4Raug",
-                "dynamic",
-                0,
-                false,
-                0.1,
-                0.1,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                Arrays.asList(Particle.SMOKE_LARGE.toString()),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "dynamic");
+        setHealthMultiplier(0.1);
+        setDamageMultiplier(0.1);
+        setTrails(Collections.singletonList(Particle.SMOKE_LARGE.toString()));
     }
 }

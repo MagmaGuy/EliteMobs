@@ -202,7 +202,7 @@ public class EliteEvent extends AbstractEliteEvent {
             if (!(event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL) ||
                     event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.CUSTOM)))
                 return;
-            if (EliteMobs.worldguardIsEnabled &&
+            if (EliteMobs.worldGuardIsEnabled &&
                     !WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
                 return;
             for (EliteEvent eliteEvent : getActiveEvents().values()) {

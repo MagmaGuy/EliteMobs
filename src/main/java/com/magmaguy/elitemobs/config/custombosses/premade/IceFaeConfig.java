@@ -5,6 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class IceFaeConfig extends CustomBossConfigFields {
     public IceFaeConfig() {
@@ -12,35 +13,11 @@ public class IceFaeConfig extends CustomBossConfigFields {
                 EntityType.VEX.toString(),
                 true,
                 "$eventBossLevel &bIce Fae",
-                "dynamic",
-                0,
-                false,
-                0.3,
-                0.3,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                Arrays.asList("attack_freeze.yml"),
-                null,
-                null,
-                null,
-                null,
-                null,
-                Arrays.asList("the_feller.yml:0.3"),
-                true,
-                true,
-                Arrays.asList(Particle.WATER_DROP.toString()),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "dynamic");
+        setHealthMultiplier(0.3);
+        setDamageMultiplier(0.3);
+        setPowers(Collections.singletonList("attack_freeze.yml"));
+        setUniqueLootList(Collections.singletonList("the_feller.yml:0.3"));
+        setTrails(Collections.singletonList(Particle.WATER_DROP.toString()));
     }
 }

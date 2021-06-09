@@ -62,7 +62,7 @@ public class AbstractRegionalEntity {
             }
         }
         abstractRegionalEntityHashMap.put(abstractRegionalEntity.customBossConfigFields, abstractRegionalEntities);
-        abstractRegionalEntity.customBossConfigFields.filesOutOfSync = true;
+        abstractRegionalEntity.customBossConfigFields.setFilesOutOfSync(true);
     }
 
     /**
@@ -102,8 +102,8 @@ public class AbstractRegionalEntity {
 
     public static void save() {
         for (CustomBossConfigFields customBossConfigFields : abstractRegionalEntityHashMap.keySet()) {
-            if (!customBossConfigFields.filesOutOfSync) continue;
-            customBossConfigFields.filesOutOfSync = false;
+            if (!customBossConfigFields.isFilesOutOfSync()) continue;
+            customBossConfigFields.setFilesOutOfSync(false);
             List<String> spawnLocations = new ArrayList<>();
             for (AbstractRegionalEntity abstractRegionalEntity : abstractRegionalEntityHashMap.get(customBossConfigFields))
                 spawnLocations.add(abstractRegionalEntity.rawString);
@@ -173,7 +173,7 @@ public class AbstractRegionalEntity {
         this.worldIsLoaded = true;
         this.unixRespawnTime = 0;
         constructRawString();
-        customBossConfigFields.filesOutOfSync = true;
+        customBossConfigFields.setFilesOutOfSync(true);
         regionalBossEntity = new RegionalBossEntity(this);
         addAbstractRegionalEntity(this);
     }
@@ -243,7 +243,7 @@ public class AbstractRegionalEntity {
     public void updateTicksBeforeRespawn() {
         unixRespawnTime = (respawnCoolDownInMinutes * 60L * 1000L) + System.currentTimeMillis();
         rawString = worldName + "," + x + "," + y + "," + z + "," + pitch + "," + yaw + ":" + unixRespawnTime;
-        customBossConfigFields.filesOutOfSync = true;
+        customBossConfigFields.setFilesOutOfSync(true);
     }
 
     /**

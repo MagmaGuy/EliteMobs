@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class VisualItemProcessor {
 
-    private boolean hasValidEffect;
+    private final boolean hasValidEffect;
 
     public VisualItemProcessor(Object[][] multiDimensionalTrailTracker, Vector[][] cachedVectorPositions,
                                boolean visualEffectBoolean, int pointsPerRotation, EliteMobEntity eliteMobEntity) {
@@ -31,7 +31,7 @@ public class VisualItemProcessor {
         new BukkitRunnable() {
 
             int counter = 0;
-            boolean isObfuscated = eliteMobEntity.getHasVisualEffectObfuscated();
+            final boolean isObfuscated = eliteMobEntity.getHasVisualEffectObfuscated();
 
             @Override
             public void run() {

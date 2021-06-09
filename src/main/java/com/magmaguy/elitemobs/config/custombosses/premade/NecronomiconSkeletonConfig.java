@@ -9,35 +9,10 @@ public class NecronomiconSkeletonConfig extends CustomBossConfigFields {
                 EntityType.SKELETON.toString(),
                 true,
                 "$reinforcementLevel &7Summoned Skeleton",
-                "dynamic",
-                0,
-                false,
-                0.3,
-                0.1,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "dynamic");
+        setHealthMultiplier(0.3);
+        setDamageMultiplier(0.1);
+        setDropsVanillaLoot(false);
+        setDropsEliteMobsLoot(false);
     }
 }

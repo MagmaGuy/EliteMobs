@@ -18,7 +18,6 @@ import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -112,7 +111,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
                                                             Location location,
                                                             int mobLevel) {
         CustomBossConfigFields customBossMobsConfigAttributes = CustomBossesConfig.getCustomBoss(fileName);
-        customBossMobsConfigAttributes.setIsPersistent(false);
+        customBossMobsConfigAttributes.setPersistent(false);
         LivingEntity livingEntity = generateLivingEntity(location, customBossMobsConfigAttributes);
         if (livingEntity == null) return null;
 
@@ -210,7 +209,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
                 customBossConfigFields.getName(),
                 elitePowers,
                 CreatureSpawnEvent.SpawnReason.CUSTOM,
-                customBossConfigFields.getIsPersistent());
+                customBossConfigFields.isPersistent());
         initializeCustomBoss(customBossConfigFields);
         spawnMessage();
         if (customBossConfigFields.getPhases().size() > 0)
@@ -302,7 +301,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
 
     private void setBaby() {
         if (super.getLivingEntity() instanceof Ageable)
-            if (customBossConfigFields.isBaby())
+            if (customBossConfigFields.getBaby())
                 ((Ageable) super.getLivingEntity()).setBaby();
             else
                 ((Ageable) super.getLivingEntity()).setAdult();
@@ -348,10 +347,10 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
     }
 
     private void setFollowRange() {
-        if (customBossConfigFields.getFollowRange() != null &&
-                customBossConfigFields.getFollowRange() > 0 &&
+        if (customBossConfigFields.getFollowDistance() != null &&
+                customBossConfigFields.getFollowDistance() > 0 &&
                 getLivingEntity() instanceof Mob)
-            getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowRange());
+            getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(customBossConfigFields.getFollowDistance());
     }
 
     private CustomBossTrail customBossTrail;

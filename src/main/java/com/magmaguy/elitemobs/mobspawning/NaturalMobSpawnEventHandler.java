@@ -42,7 +42,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (!VersionChecker.currentVersionIsUnder(15, 0)) 
+        if (!VersionChecker.serverVersionOlderThan(15, 0))
             if (event.getEntity().getType().equals(EntityType.BEE))
                 return;
 
@@ -100,7 +100,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         int eliteMobLevel = getNaturalMobLevel(livingEntity.getLocation(), nearbyPlayers);
 
         //Takes worldguard minimum and maximum level flags into account
-        if (EliteMobs.worldguardIsEnabled) {
+        if (EliteMobs.worldGuardIsEnabled) {
             Integer minLevel = WorldGuardFlagChecker.getRegionMinimumLevel(livingEntity.getLocation());
             Integer maxLevel = WorldGuardFlagChecker.getRegionMaximumLevel(livingEntity.getLocation());
             if (minLevel != null)
@@ -127,7 +127,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         /*
         Check to see if they'll become a naturally spawned Custom Boss
          */
-        if (EliteMobs.worldguardIsEnabled)
+        if (EliteMobs.worldGuardIsEnabled)
             if (!WorldGuardFlagChecker.checkFlag(entity.getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
                 return;
 

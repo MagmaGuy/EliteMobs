@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class SummonableWolfConfig extends CustomBossConfigFields {
     public SummonableWolfConfig() {
@@ -11,35 +13,13 @@ public class SummonableWolfConfig extends CustomBossConfigFields {
                 EntityType.WOLF.toString(),
                 true,
                 "$normalLevel Wolfy",
-                "dynamic",
-                3,
-                false,
-                3,
-                1,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                Arrays.asList("Woof!"),
-                Arrays.asList("Woof!"),
-                0D,
-                false,
-                0,
-                0D,
-                null,
-                0);
+                "dynamic");
+        setTimeout(3);
+        setHealthMultiplier(3);
+        setDropsVanillaLoot(false);
+        setDropsEliteMobsLoot(false);
+        setTrails(Collections.singletonList(Material.BONE.toString()));
+        setOnDamagedMessages(Collections.singletonList("Woof!"));
+        setOnDamageMessages(Collections.singletonList("Woof!"));
     }
 }
