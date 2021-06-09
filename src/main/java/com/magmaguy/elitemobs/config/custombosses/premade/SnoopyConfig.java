@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * In the loving memory of Snoopy, the best boy
@@ -17,35 +17,17 @@ public class SnoopyConfig extends CustomBossConfigFields {
                 EntityType.WOLF.toString(),
                 true,
                 "&6{&4☠&6} &fSnoopy",
-                "dynamic",
-                3,
-                false,
-                10,
-                5,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                Arrays.asList("invulnerability_fire.yml"),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                Arrays.asList(Material.BONE.toString()),
-                Arrays.asList("Woof!"),
-                Arrays.asList("Woof!"),
-                0D,
-                false,
-                0,
-                0D,
-                null,
-                0);
+                "dynamic");
+        setTimeout(3);
+        setHealthMultiplier(10);
+        setDamageMultiplier(5);
+        setPowers(Collections.singletonList("invulnerability_fire.yml"));
+        setDropsVanillaLoot(false);
+        setDropsEliteMobsLoot(false);
+        setTrails(Collections.singletonList(Material.BONE.toString()));
+        setOnDamagedMessages(Collections.singletonList("Woof!"));
+        setOnDamageMessages(Collections.singletonList("Woof!"));
+        setSpawnMessage("&aAn extremely rare Snoopy has been sighted!");
+        setAnnouncementPriority(3);
     }
 }

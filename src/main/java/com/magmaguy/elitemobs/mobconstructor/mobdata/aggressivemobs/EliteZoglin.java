@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 
 public class EliteZoglin extends EliteMobProperties {
     public EliteZoglin() {
-        if (VersionChecker.currentVersionIsUnder(16, 0)) {
+        if (VersionChecker.serverVersionOlderThan(16, 0)) {
             return;
         }
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.ZOGLIN).getName();

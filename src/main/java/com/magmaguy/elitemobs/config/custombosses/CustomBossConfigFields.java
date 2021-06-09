@@ -18,7 +18,6 @@ import java.util.*;
 public class CustomBossConfigFields {
 
     public static HashMap<String, CustomBossConfigFields> customBossConfigFields = new HashMap<>();
-
     private static final HashSet<CustomBossConfigFields> naturallySpawnedElites = new HashSet<>();
 
     public static HashSet<CustomBossConfigFields> getNaturallySpawnedElites() {
@@ -27,152 +26,558 @@ public class CustomBossConfigFields {
 
     public static HashMap<String, CustomBossConfigFields> regionalElites = new HashMap<>();
 
-    private final String fileName;
-    private File file;
-    private FileConfiguration fileConfiguration;
-    private final String entityType;
-    private final boolean isEnabled;
-    private final String name;
-    private final String level;
-    private final int timeout;
-    private Boolean isPersistent;
-    private final double healthMultiplier;
-    private final double damageMultiplier;
-    private ItemStack helmet = null;
-    private ItemStack chestplate = null;
-    private ItemStack leggings = null;
-    private ItemStack boots = null;
-    private ItemStack mainHand = null;
-    private ItemStack offHand = null;
-    private boolean isBaby = false;
-    private final List<String> powers;
-    private final String spawnMessage;
-    private final String deathMessage;
-    private final List<String> deathMessages;
-    private final String escapeMessage;
-    private final String locationMessage;
-    private final List<String> uniqueLootList;
-    private final boolean dropsEliteMobsLoot;
-    private final boolean dropsVanillaLoot;
-    private final List<String> trails;
-    private final List<String> onDamageMessages;
-    private final List<String> onDamagedMessages;
-    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
-    private double spawnChance;
-    private boolean isRegionalBoss;
-    private int spawnCooldown;
-    private double leashRadius;
-    private Integer followRange;
-    private List<String> onDeathCommands;
-    private List<String> onSpawnCommands;
-    private List<String> onCombatEnterCommands;
-    private List<String> onCombatLeaveCommands;
-    private String mountedEntity;
-    private Integer announcementPriority = 0;
-    private String disguise = null;
-    private String customDisguiseData = null;
-    private Boolean frozen = false;
-    private List<String> phases = new ArrayList<>();
-    private HashMap<Material, Double> damageModifiers = new HashMap();
-
     /**
-     * Called to write defaults for a new Custom Boss Mob Entity
+     * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
+     *
+     * @param fileName
+     * @param entityType
+     * @param isEnabled
+     * @param name
+     * @param level
      */
     public CustomBossConfigFields(String fileName,
                                   String entityType,
                                   boolean isEnabled,
                                   String name,
-                                  String level,
-                                  Integer timeout,
-                                  Boolean isPersistent,
-                                  double healthMultiplier,
-                                  double damageMultiplier,
-                                  Material helmet,
-                                  Material chestplate,
-                                  Material leggings,
-                                  Material boots,
-                                  Material mainHand,
-                                  Material offHand,
-                                  Boolean isBaby,
-                                  List<String> powers,
-                                  String spawnMessage,
-                                  String deathMessage,
-                                  List<String> deathMessages,
-                                  String escapeMessage,
-                                  String locationMessage,
-                                  List<String> uniqueLootList,
-                                  Boolean dropsEliteMobsLoot,
-                                  Boolean dropsVanillaLoot,
-                                  List<String> trails,
-                                  List<String> onDamageMessages,
-                                  List<String> onDamagedMessages,
-                                  Double spawnChance,
-                                  Boolean isRegionalBoss,
-                                  Integer spawnCooldown,
-                                  Double leashRadius,
-                                  List<String> onDeathCommands,
-                                  Integer announcementPriority) {
+                                  String level) {
         this.fileName = fileName + ".yml";
         this.entityType = entityType;
-        this.isEnabled = isEnabled;
+        this.enabled = isEnabled;
         this.name = name;
         this.level = level;
+    }
+
+    public int getTimeout() {
+        return this.timeout;
+    }
+
+    public void setTimeout(int timeout) {
         this.timeout = timeout;
-        this.isPersistent = isPersistent;
+    }
+
+    private int timeout = 0;
+
+    public boolean isPersistent() {
+        return persistent;
+    }
+
+    public void setPersistent(boolean persistent) {
+        this.persistent = persistent;
+    }
+
+    private boolean persistent = false;
+
+    public double getHealthMultiplier() {
+        return this.healthMultiplier;
+    }
+
+    public void setHealthMultiplier(double healthMultiplier) {
         this.healthMultiplier = healthMultiplier;
+    }
+
+    private double healthMultiplier = 1;
+
+    public double getDamageMultiplier() {
+        return this.damageMultiplier;
+    }
+
+    public void setDamageMultiplier(double damageMultiplier) {
         this.damageMultiplier = damageMultiplier;
-        if (helmet != null)
-            this.helmet = parseItem(helmet.toString());
-        if (chestplate != null)
-            this.chestplate = parseItem(chestplate.toString());
-        if (leggings != null)
-            this.leggings = parseItem(leggings.toString());
-        if (boots != null)
-            this.boots = parseItem(boots.toString());
-        if (mainHand != null)
-            this.mainHand = parseItem(mainHand.toString());
-        if (offHand != null)
-            this.offHand = parseItem(offHand.toString());
-        if (isBaby != null)
-            this.isBaby = isBaby;
+    }
+
+    private double damageMultiplier = 1;
+
+    public ItemStack getHelmet() {
+        return this.helmet;
+    }
+
+    public void setHelmet(ItemStack helmet) {
+        this.helmet = helmet;
+    }
+
+    private ItemStack helmet = null;
+
+    public ItemStack getChestplate() {
+        return this.chestplate;
+    }
+
+    public void setChestplate(ItemStack chestplate) {
+        this.chestplate = chestplate;
+    }
+
+    private ItemStack chestplate = null;
+
+    public ItemStack getLeggings() {
+        return this.leggings;
+    }
+
+    public void setLeggings(ItemStack leggings) {
+        this.leggings = leggings;
+    }
+
+    private ItemStack leggings = null;
+
+    public ItemStack getBoots() {
+        return this.boots;
+    }
+
+    public void setBoots(ItemStack boots) {
+        this.boots = boots;
+    }
+
+    private ItemStack boots = null;
+
+    public ItemStack getMainHand() {
+        return this.mainHand;
+    }
+
+    public void setMainHand(ItemStack mainHand) {
+        this.mainHand = mainHand;
+    }
+
+    private ItemStack mainHand = null;
+
+    public ItemStack getOffHand() {
+        return this.offHand;
+    }
+
+    public void setOffHand(ItemStack offHand) {
+        this.offHand = offHand;
+    }
+
+    private ItemStack offHand = null;
+
+    public boolean getBaby() {
+        return this.baby;
+    }
+
+    public void setBaby(boolean baby) {
+        this.baby = baby;
+    }
+
+    private boolean baby = false;
+
+    public List<String> getPowers() {
+        return this.powers;
+    }
+
+    public void setPowers(List<String> powers) {
         this.powers = powers;
+    }
+
+    private List<String> powers = new ArrayList<>();
+
+    public String getSpawnMessage() {
+        return this.spawnMessage;
+    }
+
+    public void setSpawnMessage(String spawnMessage) {
         this.spawnMessage = spawnMessage;
+    }
+
+    private String spawnMessage = null;
+
+    public String getDeathMessage() {
+        return this.deathMessage;
+    }
+
+    public void setDeathMessage(String deathMessage) {
         this.deathMessage = deathMessage;
+    }
+
+    private String deathMessage = null;
+
+    public List<String> getDeathMessages() {
+        return this.deathMessages;
+    }
+
+    public void setDeathMessages(List<String> deathMessages) {
         this.deathMessages = deathMessages;
+    }
+
+    private List<String> deathMessages = new ArrayList<>();
+
+    public String getEscapeMessage() {
+        return this.escapeMessage;
+    }
+
+    public void setEscapeMessage(String escapeMessage) {
         this.escapeMessage = escapeMessage;
+    }
+
+    private String escapeMessage = null;
+
+    public String getLocationMessage() {
+        return this.locationMessage;
+    }
+
+    public void setLocationMessage(String locationMessage) {
         this.locationMessage = locationMessage;
+    }
+
+    private String locationMessage = null;
+
+    public List<String> getUniqueLootList() {
+        return this.uniqueLootList;
+    }
+
+    public void setUniqueLootList(List<String> uniqueLootList) {
         this.uniqueLootList = uniqueLootList;
+    }
+
+    private List<String> uniqueLootList = new ArrayList<>();
+
+    public boolean getDropsEliteMobsLoot() {
+        return dropsEliteMobsLoot;
+    }
+
+    public void setDropsEliteMobsLoot(boolean dropsEliteMobsLoot) {
         this.dropsEliteMobsLoot = dropsEliteMobsLoot;
+    }
+
+    private boolean dropsEliteMobsLoot = true;
+
+    public boolean getDropsVanillaLoot() {
+        return dropsVanillaLoot;
+    }
+
+    public void setDropsVanillaLoot(boolean dropsVanillaLoot) {
         this.dropsVanillaLoot = dropsVanillaLoot;
+    }
+
+    private boolean dropsVanillaLoot = true;
+
+    public List<String> getTrails() {
+        return this.trails;
+    }
+
+    public void setTrails(List<String> trails) {
         this.trails = trails;
+    }
+
+    private List<String> trails = new ArrayList<>();
+
+    public List<String> getOnDamageMessages() {
+        return onDamageMessages;
+    }
+
+    public void setOnDamageMessages(List<String> onDamageMessages) {
         this.onDamageMessages = onDamageMessages;
+    }
+
+    private List<String> onDamageMessages = new ArrayList<>();
+
+    public List<String> getOnDamagedMessages() {
+        return onDamagedMessages;
+    }
+
+    public void setOnDamagedMessages(List<String> onDamagedMessages) {
         this.onDamagedMessages = onDamagedMessages;
-        if (spawnChance != null)
-            this.spawnChance = spawnChance;
-        if (isRegionalBoss != null)
-            this.isRegionalBoss = isRegionalBoss;
-        if (spawnCooldown != null)
-            this.spawnCooldown = spawnCooldown;
-        if (leashRadius != null)
-            this.leashRadius = leashRadius;
-        if (onDeathCommands != null)
-            this.onDeathCommands = onDeathCommands;
+    }
+
+    private List<String> onDamagedMessages = new ArrayList<>();
+
+    public double getLeashRadius() {
+        return leashRadius;
+    }
+
+    public void runtimeSetLeashRadius(double leashRadius) {
+        this.leashRadius = leashRadius;
+        this.fileConfiguration.set("leashRadius", leashRadius);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+    }
+
+    public void setLeashRadius(double leashRadius) {
+        this.leashRadius = leashRadius;
+    }
+
+    private double leashRadius = 0;
+
+    public Integer getFollowDistance() {
+        return this.followDistance;
+    }
+
+    public void setFollowDistance(Integer followDistance) {
+        this.followDistance = followDistance;
+    }
+
+    private Integer followDistance = 0;
+
+    public double getSpawnChance() {
+        return spawnChance;
+    }
+
+    public void setSpawnChance(double spawnChance) {
+        this.spawnChance = spawnChance;
+    }
+
+    private double spawnChance = 0;
+
+    public boolean isRegionalBoss() {
+        return regionalBoss;
+    }
+
+    public void setRegionalBoss(boolean regionalBoss) {
+        this.regionalBoss = regionalBoss;
+    }
+
+    private boolean regionalBoss = false;
+
+    public int getSpawnCooldown() {
+        return spawnCooldown;
+    }
+
+    public void setSpawnCooldown(int spawnCooldown) {
+        this.spawnCooldown = spawnCooldown;
+    }
+
+    private int spawnCooldown = 0;
+
+    public List<String> getOnDeathCommands() {
+        return onDeathCommands;
+    }
+
+    public void setOnDeathCommands(List<String> onDeathCommands) {
+        this.onDeathCommands = onDeathCommands;
+    }
+
+    private List<String> onDeathCommands = new ArrayList<>();
+
+    public List<String> getOnSpawnCommands() {
+        return onSpawnCommands;
+    }
+
+    public void setOnSpawnCommands(List<String> onSpawnCommands) {
+        this.onSpawnCommands = onSpawnCommands;
+    }
+
+    private List<String> onSpawnCommands = new ArrayList<>();
+
+    public List<String> getOnCombatEnterCommands() {
+        return onCombatEnterCommands;
+    }
+
+    public void setOnCombatEnterCommands(List<String> onCombatEnterCommands) {
+        this.onCombatEnterCommands = onCombatEnterCommands;
+    }
+
+    private List<String> onCombatEnterCommands = new ArrayList<>();
+
+    public List<String> getOnCombatLeaveCommands() {
+        return onCombatLeaveCommands;
+    }
+
+    public void setOnCombatLeaveCommands(List<String> onCombatLeaveCommands) {
+        this.onCombatLeaveCommands = onCombatLeaveCommands;
+    }
+
+    private List<String> onCombatLeaveCommands = new ArrayList<>();
+
+    public String getMountedEntity() {
+        return this.mountedEntity;
+    }
+
+    public void setMountedEntity(String mountedEntity) {
+        this.mountedEntity = mountedEntity;
+    }
+
+    private String mountedEntity = null;
+
+    /**
+     * Announcement priority:
+     * 0 - no messages
+     * 1 - spawn/kill/escape messages
+     * 2 - spawn/kill/escape messages + player tracking
+     * 3 - spawn/kill/escape messages + player tracking + DiscordSRV discord notifications
+     * <p>
+     * Default is 1 since the spawn messages have to be added to config files intentionally and it's weird to have to
+     * enabled them elsewhere on purpose
+     *
+     * @return
+     */
+    public int getAnnouncementPriority() {
+        return this.announcementPriority;
+    }
+
+    public void setAnnouncementPriority(int announcementPriority) {
         this.announcementPriority = announcementPriority;
     }
 
+    private int announcementPriority = 0;
+
+    /**
+     * Integration with LibsDisguises
+     * Only used if that plugin is loaded.
+     *
+     * @return The string with which to form the DisguiseType
+     */
+    public String getDisguise() {
+        return this.disguise;
+    }
+
+    public void setDisguise(String disguise) {
+        this.disguise = disguise;
+    }
+
+    private String disguise = null;
+
+    public String getCustomDisguiseData() {
+        return customDisguiseData;
+    }
+
+    public void setCustomDisguiseData(String customDisguiseData) {
+        this.customDisguiseData = customDisguiseData;
+    }
+
+    private String customDisguiseData = null;
+
+    public Boolean getFrozen() {
+        return this.frozen;
+    }
+
+    public void setFrozen(Boolean frozen) {
+        this.frozen = frozen;
+    }
+
+    private boolean frozen = false;
+
+    public List<String> getPhases() {
+        return this.phases;
+    }
+
+    public void setPhases(List<String> phases) {
+        this.phases = phases;
+    }
+
+    private List<String> phases = new ArrayList<>();
+
+    public double getDamageModifier(Material material) {
+        return damageModifiers.get(material) == null ? 1 : damageModifiers.get(material);
+    }
+
+    public HashMap<Material, Double> getDamageModifiers() {
+        return damageModifiers;
+    }
+
+    private final HashMap<Material, Double> damageModifiers = new HashMap();
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    private File file = null;
+
+    public String getFileName() {
+        return this.fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    private String fileName = null;
+
+    public FileConfiguration getFileConfiguration() {
+        return fileConfiguration;
+    }
+
+    public void setFileConfiguration(FileConfiguration fileConfiguration) {
+        this.fileConfiguration = fileConfiguration;
+    }
+
+    private FileConfiguration fileConfiguration = null;
+
+    public String getEntityType() {
+        return this.entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    private String entityType = null;
+
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    private boolean enabled = true;
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private String name = null;
+
+    public int getLevel() {
+        if (level.equalsIgnoreCase("dynamic")) {
+            return DynamicBossLevelConstructor.findDynamicBossLevel();
+        } else {
+            try {
+                return Integer.valueOf(level);
+            } catch (Exception ex) {
+                new WarningMessage("Regional Elite Mob level for " + fileName + " is neither numeric nor dynamic. Fix the configuration for it.");
+                return 1;
+            }
+        }
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    private String level = null;
+
+    public boolean getCullReinforcements() {
+        return cullReinforcements;
+    }
+
+    public void setCullReinforcements(boolean cullReinforcements) {
+        this.cullReinforcements = cullReinforcements;
+    }
+
+    private boolean cullReinforcements = true;
+
+    public boolean isFilesOutOfSync() {
+        return filesOutOfSync;
+    }
+
+    public void setFilesOutOfSync(boolean filesOutOfSync) {
+        this.filesOutOfSync = filesOutOfSync;
+    }
+
+    private boolean filesOutOfSync = false;
 
     /**
      * Generates config defaults to be used by CustomBossesConfig
      */
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
+        //initialize core defaults
+        fileConfiguration.addDefault("isEnabled", enabled);
         fileConfiguration.addDefault("entityType", entityType);
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("level", level);
-        fileConfiguration.addDefault("timeout", timeout);
-        fileConfiguration.addDefault("isPersistent", isPersistent);
-        fileConfiguration.addDefault("healthMultiplier", healthMultiplier);
-        fileConfiguration.addDefault("damageMultiplier", damageMultiplier);
+        //All defaults below this point are optional
+        if (timeout != 0)
+            fileConfiguration.addDefault("timeout", timeout);
+        if (persistent)
+            fileConfiguration.addDefault("isPersistent", persistent);
+        if (healthMultiplier != 1)
+            fileConfiguration.addDefault("healthMultiplier", healthMultiplier);
+        if (damageMultiplier != 1)
+            fileConfiguration.addDefault("damageMultiplier", damageMultiplier);
         //warning: this makes it so defaults can't use custom model data, which doesn't really matter right now for defaults
         if (helmet != null)
             fileConfiguration.addDefault("helmet", helmet.getType().toString());
@@ -186,76 +591,143 @@ public class CustomBossConfigFields {
             fileConfiguration.addDefault("mainHand", mainHand.getType().toString());
         if (offHand != null)
             fileConfiguration.addDefault("offHand", offHand.getType().toString());
-        fileConfiguration.addDefault("isBaby", isBaby);
-        fileConfiguration.addDefault("powers", powers);
-        fileConfiguration.addDefault("spawnMessage", spawnMessage);
-        fileConfiguration.addDefault("deathMessage", deathMessage);
-        fileConfiguration.addDefault("deathMessages", deathMessages);
-        fileConfiguration.addDefault("escapeMessage", escapeMessage);
-        fileConfiguration.addDefault("locationMessage", locationMessage);
-        fileConfiguration.addDefault("uniqueLootList", uniqueLootList);
-        fileConfiguration.addDefault("dropsEliteMobsLoot", dropsEliteMobsLoot);
-        fileConfiguration.addDefault("dropsVanillaLoot", dropsVanillaLoot);
-        fileConfiguration.addDefault("trails", trails);
-        fileConfiguration.addDefault("onDamageMessages", onDamageMessages);
-        fileConfiguration.addDefault("onDamagedMessages", onDamagedMessages);
-        fileConfiguration.addDefault("spawnChance", spawnChance);
-        fileConfiguration.addDefault("isRegionalBoss", isRegionalBoss);
-        fileConfiguration.addDefault("spawnCooldown", spawnCooldown);
-        fileConfiguration.addDefault("leashRadius", leashRadius);
-        fileConfiguration.addDefault("onDeathCommands", onDeathCommands);
-        if (!additionalConfigOptions.isEmpty())
-            fileConfiguration.addDefaults(additionalConfigOptions);
-        fileConfiguration.addDefault("announcementPriority", announcementPriority);
+        if (baby)
+            fileConfiguration.addDefault("isBaby", baby);
+        if (!powers.isEmpty())
+            fileConfiguration.addDefault("powers", powers);
+        if (spawnMessage != null)
+            fileConfiguration.addDefault("spawnMessage", spawnMessage);
+        if (deathMessage != null)
+            fileConfiguration.addDefault("deathMessage", deathMessage);
+        if (!deathMessages.isEmpty())
+            fileConfiguration.addDefault("deathMessages", deathMessages);
+        if (escapeMessage != null)
+            fileConfiguration.addDefault("escapeMessage", escapeMessage);
+        if (locationMessage != null)
+            fileConfiguration.addDefault("locationMessage", locationMessage);
+        if (!uniqueLootList.isEmpty())
+            fileConfiguration.addDefault("uniqueLootList", uniqueLootList);
+        if (!dropsEliteMobsLoot)
+            fileConfiguration.addDefault("dropsEliteMobsLoot", dropsEliteMobsLoot);
+        if (!dropsVanillaLoot)
+            fileConfiguration.addDefault("dropsVanillaLoot", dropsVanillaLoot);
+        if (!trails.isEmpty())
+            fileConfiguration.addDefault("trails", trails);
+        if (!onDamageMessages.isEmpty())
+            fileConfiguration.addDefault("onDamageMessages", onDamageMessages);
+        if (!onDamagedMessages.isEmpty())
+            fileConfiguration.addDefault("onDamagedMessages", onDamagedMessages);
+        if (spawnChance > 0)
+            fileConfiguration.addDefault("spawnChance", spawnChance);
+        if (regionalBoss)
+            fileConfiguration.addDefault("isRegionalBoss", regionalBoss);
+        if (spawnCooldown > 0)
+            fileConfiguration.addDefault("spawnCooldown", spawnCooldown);
+        if (leashRadius > 0)
+            fileConfiguration.addDefault("leashRadius", leashRadius);
+        if (!onDeathCommands.isEmpty())
+            fileConfiguration.addDefault("onDeathCommands", onDeathCommands);
+        if (announcementPriority > 0)
+            fileConfiguration.addDefault("announcementPriority", announcementPriority);
+        if (disguise != null)
+            fileConfiguration.addDefault("disguise", disguise);
+        if (customDisguiseData != null)
+            fileConfiguration.addDefault("customDisguiseData", customDisguiseData);
+        if (followDistance > 0)
+            fileConfiguration.addDefault("followDistance", followDistance);
+        if (!phases.isEmpty())
+            fileConfiguration.addDefault("phases", phases);
+        if (mountedEntity != null)
+            fileConfiguration.addDefault("mountedEntity", mountedEntity);
+        if (!cullReinforcements)
+            fileConfiguration.addDefault("cullReinforcements", cullReinforcements);
+        if (frozen)
+            fileConfiguration.addDefault("frozen", frozen);
     }
 
     /**
      * Pulls from the config so it can be used in other spots
      */
     public CustomBossConfigFields(FileConfiguration configuration, File file) {
-
+        //initialize core defaults
         this.fileName = file.getName();
-
         this.file = file;
-
         this.fileConfiguration = configuration;
 
-        this.entityType = configuration.getString("entityType");
+        if (!configHas("entityType")) {
+            this.entityType = "ZOMBIE";
+            new WarningMessage("Your custom boss " + fileName + " does not have an entity type! Make sure you set one!");
+        } else
+            this.entityType = parseConfigString("entityType");
 
-        if (configuration.get("isEnabled") == null)
-            this.isEnabled = true;
-        else
-            this.isEnabled = configuration.getBoolean("isEnabled");
+        if (configHas("isEnabled"))
+            this.enabled = configuration.getBoolean("isEnabled");
 
-        if (configuration.getString("name") == null)
+        if (!configHas("name"))
             this.name = "Undefined name";
         else
-            this.name = configuration.getString("name");
+            this.name = parseConfigString("name");
 
-        if (configuration.getString("level") == null)
-            this.level = "-1";
+        if (!configHas("level"))
+            this.level = "dynamic";
         else
-            this.level = configuration.getString("level");
+            this.level = parseConfigString("level");
 
-        if (configuration.get("timeout") == null)
-            this.timeout = 0;
-        else
-            this.timeout = configuration.getInt("timeout");
+        if (configHas("isPersistent"))
+            this.persistent = parseConfigBoolean("isPersistent");
 
-        if (configuration.get("isPersistent") == null)
-            this.isPersistent = false;
-        else
-            this.isPersistent = configuration.getBoolean("isPersistent");
+        if (configHas("healthMultiplier"))
+            this.healthMultiplier = parseConfigDouble("healthMultiplier");
 
-        if (configuration.get("healthMultiplier") == null)
-            this.healthMultiplier = 1;
-        else
-            this.healthMultiplier = configuration.getDouble("healthMultiplier");
+        if (configHas("damageMultiplier"))
+            this.damageMultiplier = parseConfigDouble("damageMultiplier");
 
-        if (configuration.get("healthMultiplier") == null)
-            this.damageMultiplier = 1;
-        else
-            this.damageMultiplier = configuration.getDouble("damageMultiplier");
+        if (configHas("isBaby"))
+            this.baby = parseConfigBoolean("isBaby");
+
+        if (configHas("dropsEliteMobsLoot"))
+            this.dropsEliteMobsLoot = parseConfigBoolean("dropsEliteMobsLoot");
+
+        if (configHas("dropsVanillaLoot"))
+            this.dropsVanillaLoot = parseConfigBoolean("dropsVanillaLoot");
+
+        if (configHas("spawnChance")) {
+            this.spawnChance = parseConfigDouble("spawnChance");
+            if (this.spawnChance > 0)
+                if (enabled)
+                    naturallySpawnedElites.add(this);
+        }
+
+        if (configHas("frozen"))
+            this.frozen = parseConfigBoolean("frozen");
+
+        this.onDeathCommands = (List<String>) parseConfigArray("onDeathCommands");
+        this.onSpawnCommands = (List<String>) parseConfigArray("onSpawnCommands");
+        this.onCombatEnterCommands = (List<String>) parseConfigArray("onCombatEnterCommands");
+        this.onCombatLeaveCommands = (List<String>) parseConfigArray("onCombatLeaveCommands");
+        this.deathMessages = parseConfigArray("deathMessages");
+        this.uniqueLootList = parseConfigArray("uniqueLootList");
+        this.powers = parseConfigArray("powers");
+        this.onDamageMessages = parseConfigArray("onDamageMessages");
+        this.onDamagedMessages = parseConfigArray("onDamagedMessages");
+        this.trails = parseConfigArray("trails");
+        this.phases = parseConfigArray("phases");
+
+        this.locationMessage = parseConfigString("locationMessage");
+        this.mountedEntity = parseConfigString("mountedEntity");
+        this.spawnMessage = parseConfigString("spawnMessage");
+        this.deathMessage = parseConfigString("deathMessage");
+        this.escapeMessage = parseConfigString("escapeMessage");
+        this.disguise = parseConfigString("disguise");
+        this.customDisguiseData = parseConfigString("customDisguiseData");
+
+        this.announcementPriority = parseConfigInteger("announcementPriority");
+        this.followDistance = parseConfigInteger("followDistance");
+        this.spawnCooldown = parseConfigInteger("spawnCooldown");
+        this.timeout = parseConfigInteger("timeout");
+
+        this.leashRadius = parseConfigDouble("leashRadius");
+
         this.helmet = parseItem(configuration.getString("helmet"));
         this.chestplate = parseItem(configuration.getString("chestplate"));
         this.leggings = parseItem(configuration.getString("leggings"));
@@ -263,81 +735,15 @@ public class CustomBossConfigFields {
         this.mainHand = parseItem(configuration.getString("mainHand"));
         this.offHand = parseItem(configuration.getString("offHand"));
 
-        if (!configuration.contains("isBaby"))
-            this.isBaby = false;
-        else
-            this.isBaby = configuration.getBoolean("isBaby");
-
-        this.powers = configuration.getStringList("powers");
-        this.spawnMessage = configuration.getString("spawnMessage");
-        this.deathMessage = configuration.getString("deathMessage");
-        this.deathMessages = configuration.getStringList("deathMessages");
-        this.escapeMessage = configuration.getString("escapeMessage");
-        this.locationMessage = configuration.getString("locationMessage");
-        this.uniqueLootList = configuration.getStringList("uniqueLootList");
-        if (configuration.get("dropsEliteMobsLoot") != null)
-            this.dropsEliteMobsLoot = configuration.getBoolean("dropsEliteMobsLoot");
-        else this.dropsEliteMobsLoot = true;
-        if (configuration.get("dropsVanillaLoot") != null)
-            this.dropsVanillaLoot = configuration.getBoolean("dropsVanillaLoot");
-        else this.dropsVanillaLoot = true;
-        this.trails = configuration.getStringList("trails");
-        if (!configuration.contains("onDamageMessages"))
-            this.onDamageMessages = new ArrayList<>();
-        else
-            this.onDamageMessages = configuration.getStringList("onDamageMessages");
-        if (!configuration.contains("onDamagedMessages"))
-            this.onDamagedMessages = new ArrayList<>();
-        else
-            this.onDamagedMessages = configuration.getStringList("onDamagedMessages");
-        if (configuration.get("spawnChance") != null) {
-            this.spawnChance = configuration.getDouble("spawnChance");
-            if (this.spawnChance > 0)
-                if (isEnabled)
-                    naturallySpawnedElites.add(this);
-        } else
-            this.spawnChance = 0;
-
-        if (!configuration.contains("isRegionalBoss"))
-            this.isRegionalBoss = false;
-        else
-            this.isRegionalBoss = configuration.getBoolean("isRegionalBoss");
-
-        this.followRange = configuration.getInt("followDistance");
-
-        this.leashRadius = configuration.getDouble("leashRadius");
-
-        this.onDeathCommands = (List<String>) configuration.getList("onDeathCommands");
-
-        this.onSpawnCommands = (List<String>) configuration.getList("onSpawnCommands");
-
-        this.onCombatEnterCommands = (List<String>) configuration.getList("onCombatEnterCommands");
-
-        this.onCombatLeaveCommands = (List<String>) configuration.getList("onCombatLeaveCommands");
-
-        this.mountedEntity = configuration.getString("mountedEntity");
-
         customBossConfigFields.put(fileName, this);
 
-        if (configuration.get("announcementPriority") != null)
-            this.announcementPriority = configuration.getInt("announcementPriority");
-        else
-            this.announcementPriority = 1;
-
-        this.disguise = configuration.getString("disguise");
-        this.customDisguiseData = configuration.getString("customDisguiseData");
-
-        this.frozen = configuration.getBoolean("frozen");
-
-        if (!configuration.contains("spawnCooldown")) this.spawnCooldown = 0;
-        else this.spawnCooldown = configuration.getInt("spawnCooldown");
-
-        if (this.isRegionalBoss) {
-            regionalElites.put(fileName, this);
-            AbstractRegionalEntity.initialize(this);
+        if (configHas("isRegionalBoss")) {
+            this.regionalBoss = parseConfigBoolean("isRegionalBoss");
+            if (this.regionalBoss) {
+                regionalElites.put(fileName, this);
+                AbstractRegionalEntity.initialize(this);
+            }
         }
-
-        this.phases = configuration.getStringList("phases");
 
         for (String rawDamageModifier : configuration.getStringList("damageModifiers")) {
             String[] parsedStrings = rawDamageModifier.split(",");
@@ -367,6 +773,34 @@ public class CustomBossConfigFields {
 
     }
 
+    private String parseConfigString(String configKey) {
+        return fileConfiguration.getString(configKey);
+    }
+
+    private List parseConfigArray(String configKey) {
+        if (!configHas(configKey)) return new ArrayList();
+        return fileConfiguration.getList(configKey);
+    }
+
+    //Note: this is currently limited to defaulting to 0 if something doesn't exist, which works only for most things
+    private int parseConfigInteger(String configKey) {
+        if (!configHas(configKey)) return 0;
+        return fileConfiguration.getInt(configKey);
+    }
+
+    private double parseConfigDouble(String configKey) {
+        if (!configHas(configKey)) return 0;
+        return fileConfiguration.getDouble(configKey);
+    }
+
+    private boolean parseConfigBoolean(String configKey) {
+        return fileConfiguration.getBoolean(configKey);
+    }
+
+    private boolean configHas(String configKey) {
+        return fileConfiguration.contains(configKey);
+    }
+
     private ItemStack parseItem(String materialString) {
         if (materialString == null)
             return ItemStackGenerator.generateItemStack(Material.AIR);
@@ -391,241 +825,6 @@ public class CustomBossConfigFields {
             new WarningMessage("If you're trying to use a player UUID, something went wrong while trying to assign the UUID.");
             return ItemStackGenerator.generateItemStack(Material.AIR);
         }
-    }
-
-    public String getFileName() {
-        return this.fileName;
-    }
-
-    public String getEntityType() {
-        return this.entityType;
-    }
-
-    public boolean isEnabled() {
-        return this.isEnabled;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public int getLevel() {
-        if (level.equalsIgnoreCase("dynamic")) {
-            return DynamicBossLevelConstructor.findDynamicBossLevel();
-        } else {
-            try {
-                return Integer.valueOf(level);
-            } catch (Exception ex) {
-                new WarningMessage("Regional Elite Mob level for " + fileName + " is neither numeric nor dynamic. Fix the configuration for it.");
-                return 1;
-            }
-        }
-    }
-
-    public int getTimeout() {
-        return this.timeout;
-    }
-
-    public Boolean getIsPersistent() {
-        return this.isPersistent;
-    }
-
-    //Used to override the persistent behavior of mounted entites, in the future also of regional bosses
-    public void setIsPersistent(boolean isPersistent) {
-        this.isPersistent = isPersistent;
-    }
-
-    public double getHealthMultiplier() {
-        return this.healthMultiplier;
-    }
-
-    public double getDamageMultiplier() {
-        return this.damageMultiplier;
-    }
-
-    public ItemStack getHelmet() {
-        return this.helmet;
-    }
-
-    public ItemStack getChestplate() {
-        return this.chestplate;
-    }
-
-    public ItemStack getLeggings() {
-        return this.leggings;
-    }
-
-    public ItemStack getBoots() {
-        return this.boots;
-    }
-
-    public ItemStack getMainHand() {
-        return this.mainHand;
-    }
-
-    public ItemStack getOffHand() {
-        return this.offHand;
-    }
-
-    public boolean isBaby() {
-        return this.isBaby;
-    }
-
-    public List<String> getPowers() {
-        return this.powers;
-    }
-
-    public String getSpawnMessage() {
-        return this.spawnMessage;
-    }
-
-    public String getDeathMessage() {
-        return this.deathMessage;
-    }
-
-    public List<String> getDeathMessages() {
-        return this.deathMessages;
-    }
-
-    public String getEscapeMessage() {
-        return this.escapeMessage;
-    }
-
-    public String getLocationMessage() {
-        return this.locationMessage;
-    }
-
-    public List<String> getUniqueLootList() {
-        return this.uniqueLootList;
-    }
-
-    public boolean getDropsEliteMobsLoot() {
-        return dropsEliteMobsLoot;
-    }
-
-    public boolean getDropsVanillaLoot() {
-        return dropsVanillaLoot;
-    }
-
-    public List<String> getTrails() {
-        return this.trails;
-    }
-
-    public List<String> getOnDamageMessages() {
-        return onDamageMessages;
-    }
-
-    public List<String> getOnDamagedMessages() {
-        return onDamagedMessages;
-    }
-
-    public double getSpawnChance() {
-        return spawnChance;
-    }
-
-    public boolean isRegionalBoss() {
-        return isRegionalBoss;
-    }
-
-    public void setLeashRadius(double leashRadius) {
-        this.leashRadius = leashRadius;
-        this.fileConfiguration.set("leashRadius", leashRadius);
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-    }
-
-    public int getSpawnCooldown() {
-        return spawnCooldown;
-    }
-
-    public double getLeashRadius() {
-        return leashRadius;
-    }
-
-    public Integer getFollowRange() {
-        return this.followRange;
-    }
-
-    public List<String> getOnDeathCommands() {
-        return onDeathCommands;
-    }
-
-    public List<String> getOnSpawnCommands() {
-        return onSpawnCommands;
-    }
-
-    public List<String> getOnCombatEnterCommands() {
-        return onCombatEnterCommands;
-    }
-
-    public List<String> getOnCombatLeaveCommands() {
-        return onCombatLeaveCommands;
-    }
-
-    public Map<String, Object> getAdditionalConfigOptions() {
-        return additionalConfigOptions;
-    }
-
-    public String getMountedEntity() {
-        return this.mountedEntity;
-    }
-
-    /**
-     * Announcement priority:
-     * 0 - no messages
-     * 1 - spawn/kill/escape messages
-     * 2 - spawn/kill/escape messages + player tracking
-     * 3 - spawn/kill/escape messages + player tracking + DiscordSRV discord notifications
-     * <p>
-     * Default is 1 since the spawn messages have to be added to config files intentionally and it's weird to have to
-     * enabled them elsewhere on purpose
-     *
-     * @return
-     */
-    public int getAnnouncementPriority() {
-        if (this.announcementPriority == null)
-            return 1;
-        return this.announcementPriority;
-    }
-
-    /**
-     * Integration with LibsDisguises
-     * Only used if that plugin is loaded.
-     *
-     * @return The string with which to form the DisguiseType
-     */
-    public String getDisguise() {
-        return this.disguise;
-    }
-
-    public String getCustomDisguiseData() {
-        return customDisguiseData;
-    }
-
-    public Boolean getFrozen() {
-        return this.frozen;
-    }
-
-    public List<String> getPhases() {
-        return this.phases;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public double getDamageModifier(Material material) {
-        return damageModifiers.get(material) == null ? 1 : damageModifiers.get(material);
-    }
-
-    public FileConfiguration getFileConfiguration() {
-        return fileConfiguration;
-    }
-
-    public boolean filesOutOfSync = false;
-
-    public boolean getCullReinforcements() {
-        if (fileConfiguration.get("cullReinforcements") == null) return false;
-        return fileConfiguration.getBoolean("cullReinforcements");
     }
 
 }

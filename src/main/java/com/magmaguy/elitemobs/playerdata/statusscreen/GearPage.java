@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.VersionChecker;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -183,7 +182,7 @@ public class GearPage {
             case TURTLE_HELMET:
                 return ChatColor.GREEN;
             default:
-                if (!VersionChecker.currentVersionIsUnder(16, 0)) {
+                if (!VersionChecker.serverVersionOlderThan(16, 0)) {
                     if (material.equals(Material.NETHERITE_HELMET) ||
                             material.equals(Material.NETHERITE_CHESTPLATE) ||
                             material.equals(Material.NETHERITE_LEGGINGS) ||

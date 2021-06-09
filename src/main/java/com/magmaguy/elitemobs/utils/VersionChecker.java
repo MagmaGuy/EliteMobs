@@ -4,44 +4,22 @@ import org.bukkit.Bukkit;
 
 public class VersionChecker {
 
-    public static boolean currentVersionIsUnder(int version, int subVersion) {
+    /**
+     * Compares a Minecraft version with the current version on the server. Returns true if the version on the server is older.
+     *
+     * @param majorVersion Target major version to compare (i.e. 1.>>>17<<<.0)
+     * @param minorVersion Target minor version to compare (i.e. 1.17.>>>0<<<)
+     * @return Whether the version is under the value to be compared
+     */
+    public static boolean serverVersionOlderThan(int majorVersion, int minorVersion) {
 
-        if (Bukkit.getBukkitVersion().split("[.]").length < 4) {
+        int actualMajorVersion = Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]);
+        int actualMinorVersion = Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[2].split("-")[0]);
 
-            try {
-                return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 2)) < version;
-            } catch (Exception ex) {
-                return Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1].substring(0, 1)) < version;
-            }
+        if (actualMajorVersion < majorVersion)
+            return true;
 
-        }
-
-        if (Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) < version) return true;
-
-        if (Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]) == version) {
-            try {
-
-                byte actualSubversion = Byte.parseByte(Bukkit.getBukkitVersion().split("[.]")[2].substring(0, 1));
-                return actualSubversion < subVersion;
-
-            } catch (Exception e) {
-
-                try {
-
-                    byte actualSubversion = Byte.parseByte(Bukkit.getBukkitVersion().split("[.]")[2].substring(0, 0));
-                    return actualSubversion < subVersion;
-
-                } catch (Exception ex) {
-
-                    Bukkit.getLogger().warning("[EliteMobs] Couldn't read version properly, report this to the developer!");
-                    return false;
-
-                }
-            }
-
-        }
-
-        return false;
+        return actualMajorVersion == majorVersion && actualMinorVersion < minorVersion;
 
     }
 

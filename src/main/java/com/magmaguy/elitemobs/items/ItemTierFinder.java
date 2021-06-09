@@ -83,7 +83,7 @@ public class ItemTierFinder {
                 if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
                     return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             default:
-                if (!VersionChecker.currentVersionIsUnder(16, 0)) {
+                if (!VersionChecker.serverVersionOlderThan(16, 0)) {
                     if (material.equals(Material.NETHERITE_HELMET) ||
                             material.equals(Material.NETHERITE_CHESTPLATE) ||
                             material.equals(Material.NETHERITE_LEGGINGS) ||
@@ -142,7 +142,7 @@ public class ItemTierFinder {
                 if (material.equals(Material.GOLDEN_HOE) || material.equals(Material.WOODEN_HOE))
                     return GOLD_WOOD_LEATHER_TIER + mainEnchantment;
             default:
-                if (!VersionChecker.currentVersionIsUnder(16, 0))
+                if (!VersionChecker.serverVersionOlderThan(16, 0))
                     if (material.equals(Material.NETHERITE_SWORD) ||
                             material.equals(Material.NETHERITE_AXE) ||
                             material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
@@ -214,7 +214,7 @@ public class ItemTierFinder {
             case LEATHER_BOOTS:
                 return Enchantment.PROTECTION_ENVIRONMENTAL;
             default:
-                if (!VersionChecker.currentVersionIsUnder(16, 0)) {
+                if (!VersionChecker.serverVersionOlderThan(16, 0)) {
                     if (material.equals(Material.NETHERITE_SWORD) ||
                             material.equals(Material.NETHERITE_AXE) ||
                             material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)

@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.EnderDragonPhaseSimplifier;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -39,7 +40,7 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
 
                 if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
                     EnderDragon.Phase phase = ((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase();
-                    if (!isValidPhase(phase)) return;
+                    if (!EnderDragonPhaseSimplifier.isLanded(phase)) return;
                 }
 
                 doPower(eliteMobEntity);
@@ -60,7 +61,7 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
                 if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
                     ((EnderDragon) eliteMobEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
 
-                if (doExit(eliteMobEntity) || !isValidPhase(((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase())) {
+                if (doExit(eliteMobEntity) || !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase())) {
                     cancel();
                     return;
                 }
@@ -90,7 +91,7 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
     }
 
     private ArrayList<PieBlock> pieBlocks = new ArrayList<>();
-    private int radius = 30;
+    private final int radius = 30;
 
     //todo: move this to its own class, make sure it only generates once ever and then just randomizes rotations
     private void setAffectedBlocks() {
@@ -120,7 +121,7 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
 
 
     //this is structured like this because the relative block generator is moving out of this class
-    private ArrayList<PieBlock> realBlocks = new ArrayList<>();
+    private final ArrayList<PieBlock> realBlocks = new ArrayList<>();
 
     private void generateRealCircle(EliteMobEntity eliteMobEntity) {
         for (PieBlock pieBlock : pieBlocks) {
@@ -198,19 +199,6 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
 
         Explosion.generateFakeExplosion(blockList, eliteMobEntity.getLivingEntity());
 
-    }
-
-
-    private boolean isValidPhase(EnderDragon.Phase phase) {
-        switch (phase) {
-            case SEARCH_FOR_BREATH_ATTACK_TARGET:
-            case HOVER:
-            case ROAR_BEFORE_ATTACK:
-            case BREATH_ATTACK:
-                return true;
-            default:
-                return false;
-        }
     }
 
     @Override

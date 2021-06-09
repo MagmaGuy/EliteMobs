@@ -7,7 +7,7 @@ import org.bukkit.entity.EntityType;
 public class EliteBee extends EliteMobProperties {
 
     public EliteBee() {
-        if (VersionChecker.currentVersionIsUnder(15, 0)) {
+        if (VersionChecker.serverVersionOlderThan(15, 0)) {
             return;
         }
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.BEE).getName();

@@ -63,7 +63,7 @@ public class CustomBossCommandHandler {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed set the leash radius! Was the boss a valid regional boss?"));
             return;
         }
-        customBossConfigFields.setLeashRadius(leashRadius);
+        customBossConfigFields.runtimeSetLeashRadius(leashRadius);
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
             if (customBossConfigFields.getFileName().equals(regionalBossEntity.getCustomBossConfigFields().getFileName()))
                 regionalBossEntity.setLeashRadius(leashRadius);

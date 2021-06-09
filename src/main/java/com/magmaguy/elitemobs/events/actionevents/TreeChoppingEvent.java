@@ -24,7 +24,7 @@ public class TreeChoppingEvent implements Listener {
 
         if (event.isCancelled()) return;
         if (!EliteMobs.validWorldList.contains(event.getBlock().getWorld())) return;
-        if (EliteMobs.worldguardIsEnabled &&
+        if (EliteMobs.worldGuardIsEnabled &&
                 !WorldGuardFlagChecker.checkFlag(event.getPlayer().getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
             return;
         if (!event.getPlayer().hasPermission("elitemobs.events.fae")) return;

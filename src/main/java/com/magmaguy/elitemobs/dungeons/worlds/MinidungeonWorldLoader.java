@@ -30,7 +30,7 @@ public class MinidungeonWorldLoader {
                 world.setKeepSpawnInMemory(false);
             new InfoMessage("Minidungeons world " + minidungeon.dungeonPackagerConfigFields.getWorldName() + " was loaded successfully!");
             minidungeon.isInstalled = true;
-            if (EliteMobs.worldguardIsEnabled && minidungeon.dungeonPackagerConfigFields.getProtect())
+            if (EliteMobs.worldGuardIsEnabled && minidungeon.dungeonPackagerConfigFields.getProtect())
                 WorldGuardCompatibility.protectWorldMinidugeonArea(world.getSpawnLocation(), minidungeon);
             return world;
         } catch (Exception exception) {

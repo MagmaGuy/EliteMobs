@@ -26,7 +26,6 @@ import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -105,7 +104,7 @@ public class EliteMobEntity {
      * the Elite Mob conversion
      */
     public static boolean validSpawnLocation(Location location) {
-        if (!EliteMobs.worldguardIsEnabled)
+        if (!EliteMobs.worldGuardIsEnabled)
             return true;
         if (!Bukkit.getPluginManager().getPlugin("WorldGuard").isEnabled()) return true;
         return WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getEliteMobsSpawnFlag());
@@ -261,7 +260,7 @@ public class EliteMobEntity {
         livingEntity.getEquipment().setLeggingsDropChance(0);
         livingEntity.getEquipment().setBootsDropChance(0);
 
-        if (!VersionChecker.currentVersionIsUnder(15, 0))
+        if (!VersionChecker.serverVersionOlderThan(15, 0))
             if (livingEntity instanceof Bee)
                 ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
 

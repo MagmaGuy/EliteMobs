@@ -39,8 +39,8 @@ public class DebugScreen {
                 page += "Has AI: " + !regionalBossEntity.customBossEntity.advancedGetEntity().hasAI() + "\n";
             } else
                 page += "Is Alive (MC): false\n";
-            page += "Is Persistent: " + regionalBossEntity.getCustomBossConfigFields().getIsPersistent() + "\n";
-            if (regionalBossEntity.getCustomBossConfigFields().getIsPersistent())
+            page += "Is Persistent: " + regionalBossEntity.getCustomBossConfigFields().isPersistent() + "\n";
+            if (regionalBossEntity.getCustomBossConfigFields().isPersistent())
                 page += "Is Respawning: " + regionalBossEntity.isRespawning() + "\n";
             pages.add(page);
         }

@@ -28,7 +28,7 @@ public class OasisAdventure extends DungeonPackagerConfigFields {
                 new Vector(0, 0, 0),
                 0D,
                 0D,
-                0,
+                2,
                 "Difficulty: &6Medium\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&6A big adventure for beginners!",

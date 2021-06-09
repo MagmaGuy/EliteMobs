@@ -41,7 +41,7 @@ public class ZombieBloat extends MajorPower implements Listener {
         new BukkitRunnable() {
 
             int timer = 0;
-            LivingEntity eventZombie = (LivingEntity) event.getEntity();
+            final LivingEntity eventZombie = (LivingEntity) event.getEntity();
 
             @Override
             public void run() {

@@ -9,13 +9,13 @@ import java.util.Map;
 
 public class PotionEffectsConfigFields {
 
-    private String fileName;
-    private boolean isEnabled;
-    private String name;
+    private final String fileName;
+    private final boolean isEnabled;
+    private final String name;
     private PotionEffectType potionEffectType;
-    private int onHitDuration;
-    private double value;
-    private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
+    private final int onHitDuration;
+    private final double value;
+    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
     private FileConfiguration configuration;
 
     public PotionEffectsConfigFields(String fileName,

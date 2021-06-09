@@ -116,7 +116,7 @@ public class MinorPowerPowerStance implements Listener {
         Item item = eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
                 new ItemStack(material));
         item.setPickupDelay(Integer.MAX_VALUE);
-        if (!VersionChecker.currentVersionIsUnder(1, 11))
+        if (!VersionChecker.serverVersionOlderThan(1, 11))
             item.setGravity(false);
         item.setInvulnerable(true);
         EntityTracker.registerItemVisualEffects(item);

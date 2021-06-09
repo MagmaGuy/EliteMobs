@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteExplosionEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.TemporaryBlockTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.utils.EntityFinder;
@@ -58,7 +59,7 @@ public class Explosion {
         detonatedBlocks.clear();
     }
 
-    private int delayBeforeRegen = 2;
+    private final int delayBeforeRegen = 2;
 
     public void regenerate() {
 
@@ -122,7 +123,7 @@ public class Explosion {
     }
 
     public static class ExplosionEvent implements Listener {
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void entityExplodeEvent(EntityExplodeEvent event) {
             EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteMobEntity != null) {
@@ -152,6 +153,8 @@ public class Explosion {
             if (block.getType().isAir() ||
                     block.getType().equals(Material.FIRE) ||
                     block.isLiquid())
+                continue;
+            if (TemporaryBlockTracker.temporaryBlocks.contains(block))
                 continue;
             nearbyBlockScan(blockStates, block.getState());
         }

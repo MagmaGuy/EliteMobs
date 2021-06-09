@@ -9,35 +9,10 @@ public class NecronomiconZombieConfig extends CustomBossConfigFields {
                 EntityType.ZOMBIE.toString(),
                 true,
                 "$reinforcementLevel &7Summoned Zombie",
-                "dynamic",
-                0,
-                false,
-                0.3,
-                0.1,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "dynamic");
+        setHealthMultiplier(0.3);
+        setDamageMultiplier(0.1);
+        setDropsVanillaLoot(false);
+        setDropsEliteMobsLoot(false);
     }
 }

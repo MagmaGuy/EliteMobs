@@ -8,11 +8,11 @@ import java.util.Map;
 
 public class PowersConfigFields {
 
-    private String fileName;
-    private boolean isEnabled;
-    private String name;
-    private String effect;
-    private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
+    private final String fileName;
+    private final boolean isEnabled;
+    private final String name;
+    private final String effect;
+    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
     private FileConfiguration configuration;
 
     private int powerCooldown = 0;

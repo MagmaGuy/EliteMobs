@@ -38,7 +38,6 @@ public class FlamePyre extends BossPower implements Listener {
     /**
      * Warning phase
      *
-     * @param eliteMobEntity
      */
     private void doFlamePyrePhase1(EliteMobEntity eliteMobEntity) {
         eliteMobEntity.getLivingEntity().setAI(false);
@@ -70,7 +69,6 @@ public class FlamePyre extends BossPower implements Listener {
     /**
      * First damage phase
      *
-     * @param eliteMobEntity
      */
     private void doFlamePyrePhase2(EliteMobEntity eliteMobEntity) {
         new BukkitRunnable() {
@@ -135,7 +133,6 @@ public class FlamePyre extends BossPower implements Listener {
     /**
      * Final/full damage phase
      *
-     * @param eliteMobEntity
      */
     private void doFlamePyrePhase4(EliteMobEntity eliteMobEntity) {
         new BukkitRunnable() {
