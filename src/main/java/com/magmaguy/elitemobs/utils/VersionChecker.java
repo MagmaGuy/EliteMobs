@@ -13,13 +13,21 @@ public class VersionChecker {
      */
     public static boolean serverVersionOlderThan(int majorVersion, int minorVersion) {
 
-        int actualMajorVersion = Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[1]);
-        int actualMinorVersion = Integer.parseInt(Bukkit.getBukkitVersion().split("[.]")[2].split("-")[0]);
+        String[] splitVersion = Bukkit.getBukkitVersion().split("[.]");
+
+        int actualMajorVersion = Integer.parseInt(splitVersion[1].split("-")[0]);
+
+        int actualMinorVersion = 0;
+        if (splitVersion.length > 2)
+            actualMinorVersion = Integer.parseInt(splitVersion[2].split("-")[0]);
 
         if (actualMajorVersion < majorVersion)
             return true;
 
-        return actualMajorVersion == majorVersion && actualMinorVersion < minorVersion;
+        if (splitVersion.length > 2)
+            return actualMajorVersion == majorVersion && actualMinorVersion < minorVersion;
+
+        return false;
 
     }
 
