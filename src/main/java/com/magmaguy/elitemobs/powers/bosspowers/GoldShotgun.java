@@ -56,9 +56,10 @@ public class GoldShotgun extends BossPower implements Listener {
                 if (counter < 20 * 3) return;
 
                 cancel();
-                List<Item> nuggetList = generateVisualItems(eliteMobEntity, player);
-                ProjectileDamage.doGoldNuggetDamage(nuggetList, eliteMobEntity);
                 eliteMobEntity.getLivingEntity().setAI(true);
+                List<Item> nuggetList = generateVisualItems(eliteMobEntity, player);
+                if (nuggetList == null) return;
+                ProjectileDamage.doGoldNuggetDamage(nuggetList, eliteMobEntity);
 
             }
 
@@ -69,6 +70,7 @@ public class GoldShotgun extends BossPower implements Listener {
     private void doSmokeEffect(EliteMobEntity eliteMobEntity, Player player) {
         for (int i = 0; i < 200; i++) {
             Vector shotVector = getShotVector(eliteMobEntity, player);
+            if (shotVector == null) return;
             eliteMobEntity.getLivingEntity().getWorld().spawnParticle(
                     Particle.SMOKE_NORMAL,
                     eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 0.5, 0)),
@@ -82,6 +84,7 @@ public class GoldShotgun extends BossPower implements Listener {
 
     private List<Item> generateVisualItems(EliteMobEntity eliteMobEntity, Player player) {
         List<Item> nuggetList = new ArrayList<>();
+        if (getShotVector(eliteMobEntity, player) == null) return null;
         for (int i = 0; i < 200; i++) {
             Item visualProjectile = eliteMobEntity.getLivingEntity().getWorld().dropItem(
                     eliteMobEntity.getLivingEntity().getLocation(),
@@ -98,6 +101,7 @@ public class GoldShotgun extends BossPower implements Listener {
     }
 
     private Vector getShotVector(EliteMobEntity eliteMobEntity, Player player) {
+        if (!player.getLocation().getWorld().equals(eliteMobEntity.getLivingEntity().getLocation())) return null;
         return player.getLocation().clone()
                 .add(new Location(player.getWorld(), 0.0, 1.0, 0.0))
                 .add(new Location(player.getWorld(),

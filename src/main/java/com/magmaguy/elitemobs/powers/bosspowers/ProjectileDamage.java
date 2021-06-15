@@ -40,10 +40,14 @@ public class ProjectileDamage {
                         if (entity != eliteMobEntity.getLivingEntity())
                             if (entity instanceof LivingEntity) {
                                 BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
-                                iterator.remove();
-                                goldNugget.remove();
                                 removed = true;
                             }
+
+                    if (removed){
+                        iterator.remove();
+                        goldNugget.remove();
+                    }
+
                     if (!removed && goldNugget.isOnGround()) {
                         iterator.remove();
                         goldNugget.remove();

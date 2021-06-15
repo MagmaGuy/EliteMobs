@@ -11,14 +11,16 @@ public class ElitePowerParser {
 
     public static HashSet<ElitePower> parsePowers(List<String> powers) {
         HashSet<ElitePower> elitePowers = new HashSet<>();
-        boolean hasCustomSummons = false;
+        CustomSummonPower customSummonPower = null;
         for (String powerName : powers) {
-            if (!hasCustomSummons && powerName.split(":")[0].equalsIgnoreCase("summon")) {
-                elitePowers.add(new CustomSummonPower(powers));
-                hasCustomSummons = true;
-            } else if (hasCustomSummons && powerName.split(":")[0].equalsIgnoreCase("summon")) {
-                continue;
-            } else if (ElitePower.getElitePower(powerName) != null)
+            if (powerName.split(":")[0].equalsIgnoreCase("summon")
+                    || powerName.split(":")[0].equalsIgnoreCase("summonable"))
+                if (customSummonPower == null) {
+                    customSummonPower = new CustomSummonPower(powerName);
+                    elitePowers.add(customSummonPower);
+                } else
+                    customSummonPower.addEntry(powerName);
+            else if (ElitePower.getElitePower(powerName) != null)
                 elitePowers.add(ElitePower.getElitePower(powerName));
             else
                 new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");

@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonDiscoFireballs;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonShockwave;
+import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonTornado;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments.*;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
@@ -37,7 +38,6 @@ public class ElitePower {
             new GoldShotgun(),
             new HyperLoot(),
             new SpiritWalk(),
-            new SummonRaug(),
             new SummonTheReturned(),
             new MeteorShower(),
             new BulletHell(),
@@ -65,6 +65,7 @@ public class ElitePower {
             new EnderDragonShockwave(),
             new EnderDragonDiscoFireballs(),
             new EnderDragonFireballBombardment(),
+            new EnderDragonTornado(),
 
             //Defensive powers
             new Invisibility(),

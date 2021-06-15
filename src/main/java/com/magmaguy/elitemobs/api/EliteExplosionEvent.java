@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
+import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonTornado;
 import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
@@ -22,7 +23,7 @@ public class EliteExplosionEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final EliteMobEntity eliteMobEntity;
-    private final Location explosionSourceLocation;
+    private Location explosionSourceLocation;
     private boolean isCancelled = false;
     private final ArrayList<BlockState> blockStates;
     private final ElitePower elitePower;
@@ -72,8 +73,13 @@ public class EliteExplosionEvent extends Event implements Cancellable {
         return handlers;
     }
 
+    public void setExplosionSourceLocation(Location explosionSourceLocation) {
+        this.explosionSourceLocation = explosionSourceLocation;
+    }
+
     public enum VisualExplosionEffectType {
         NORMAL,
+        HIGH_POWER,
         ASCEND
     }
 
@@ -84,7 +90,9 @@ public class EliteExplosionEvent extends Event implements Cancellable {
             visualExplosionEffectType = VisualExplosionEffectType.NORMAL;
         else if (elitePower.getFileName().equals(new EnderDragonEmpoweredLightning().getFileName()))
             visualExplosionEffectType = VisualExplosionEffectType.ASCEND;
-        else
+        else if (elitePower instanceof EnderDragonTornado) {
+            visualExplosionEffectType = VisualExplosionEffectType.HIGH_POWER;
+        }else
             visualExplosionEffectType = VisualExplosionEffectType.NORMAL;
 
         for (BlockState blockState : blockStates) {
@@ -98,6 +106,9 @@ public class EliteExplosionEvent extends Event implements Cancellable {
                             .toVector().normalize().setY(1).normalize().multiply(ThreadLocalRandom.current().nextDouble()));
                     fallingBlock.setGravity(false);
                     fallingBlock.setGlowing(true);
+                    break;
+                case HIGH_POWER:
+                    fallingBlock.setVelocity(fallingBlock.getLocation().clone().subtract(explosionSourceLocation).toVector().normalize().setY(2).multiply(0.9));
                     break;
                 case NORMAL:
                 default:
