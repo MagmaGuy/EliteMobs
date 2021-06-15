@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -116,6 +117,7 @@ public class Flamethrower extends BossPower implements Listener {
             for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
                 if (entity instanceof LivingEntity) {
                     if (eliteMobEntity.getLivingEntity().equals(entity)) continue;
+                    if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
                     BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
                 }
 

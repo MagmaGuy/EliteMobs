@@ -137,15 +137,19 @@ public class Explosion {
         }
     }
 
+    public static void generateFakeExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSourceLocation) {
+        generateExplosion(blockList, entity, elitePower, explosionSourceLocation);
+    }
+
     public static void generateFakeExplosion(List<Block> blockList, Entity entity) {
-        generateExplosion(blockList, entity);
+        generateExplosion(blockList, entity, null, null);
     }
 
     private static void generateExplosion(EntityExplodeEvent event) {
-        generateExplosion(event.blockList(), event.getEntity());
+        generateExplosion(event.blockList(), event.getEntity(), null, null);
     }
 
-    private static void generateExplosion(List<Block> blockList, Entity entity) {
+    private static void generateExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSource) {
 
         ArrayList<BlockState> blockStates = new ArrayList<>();
 
@@ -166,8 +170,6 @@ public class Explosion {
 
         EliteExplosionEvent eliteExplosionEvent = null;
 
-        ElitePower elitePower;
-
         //for projectiles
         if (entity instanceof Projectile) {
             eliteExplosionEvent = new EliteExplosionEvent(
@@ -180,11 +182,14 @@ public class Explosion {
         } else {
             eliteExplosionEvent = new EliteExplosionEvent(
                     eliteMobEntity,
-                    elitePower = null,
+                    elitePower,
                     entity.getLocation(),
                     blockStates);
             if (eliteExplosionEvent.isCancelled()) return;
         }
+
+        if (explosionSource != null)
+            eliteExplosionEvent.setExplosionSourceLocation(explosionSource);
 
         eliteExplosionEvent.visualExplosionEffect(elitePower);
 

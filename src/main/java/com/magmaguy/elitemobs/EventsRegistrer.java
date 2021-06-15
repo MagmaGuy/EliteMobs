@@ -99,7 +99,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PigHandler(), plugin);
         pluginManager.registerEvents(new SheepHandler(), plugin);
         pluginManager.registerEvents(new FindSuperMobs(), plugin);
-        pluginManager.registerEvents(new ItemEnchantmentPrevention(), plugin);
+        if (ItemSettingsConfig.preventEliteItemEnchantment)
+            pluginManager.registerEvents(new ItemEnchantmentPrevention(), plugin);
 
         //Mob damage
         pluginManager.registerEvents(new PlayerDamagedByEliteMobHandler(), plugin);
@@ -145,7 +146,6 @@ public class EventsRegistrer {
         //Minor mob powers
         pluginManager.registerEvents(new InvulnerabilityArrow(), plugin);
         pluginManager.registerEvents(new InvulnerabilityFallDamage(), plugin);
-        pluginManager.registerEvents(new InvulnerabilityFire(), plugin);
         pluginManager.registerEvents(new InvulnerabilityKnockback(), plugin);
         pluginManager.registerEvents(new BonusLoot(), plugin);
         pluginManager.registerEvents(new Taunt(), plugin);
@@ -192,7 +192,6 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FlamePyre(), plugin);
         pluginManager.registerEvents(new SummonTheReturned(), plugin);
         pluginManager.registerEvents(new HyperLoot(), plugin);
-        pluginManager.registerEvents(new SummonRaug(), plugin);
         pluginManager.registerEvents(new SummonTheReturned(), plugin);
         pluginManager.registerEvents(new SummonEmbers(), plugin);
         pluginManager.registerEvents(new MeteorShower(), plugin);

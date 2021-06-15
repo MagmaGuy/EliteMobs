@@ -14,7 +14,7 @@ public class BalrogConfig extends CustomBossConfigFields {
                 true,
                 "$eventBossLevel &4Balrog",
                 "dynamic");
-        setPowers(Collections.singletonList("summon_raug.yml"));
+        setPowers(Collections.singletonList("summonable:summonType=ON_HIT:chance=0.5:filename=raug.yml"));
         setUniqueLootList(Collections.singletonList("dwarven_greed.yml:1"));
         setTrails(Arrays.asList(Particle.SMOKE_LARGE.toString(),
                 Particle.SMOKE_LARGE.toString(),
