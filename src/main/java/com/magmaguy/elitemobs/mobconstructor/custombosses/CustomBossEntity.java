@@ -607,9 +607,11 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             if (event.getEliteMobEntity().customBossEntity == null) return;
             if (event.getEliteMobEntity().customBossEntity.customBossConfigFields.getCullReinforcements()) {
                 for (CustomBossEntity customBossEntity : event.getEliteMobEntity().eliteReinforcementEntities)
-                    customBossEntity.remove(true);
+                    if (customBossEntity != null)
+                        customBossEntity.remove(true);
                 for (Entity entity : event.getEliteMobEntity().nonEliteReinforcementEntities)
-                    entity.remove();
+                    if (entity != null)
+                        entity.remove();
             }
         }
     }

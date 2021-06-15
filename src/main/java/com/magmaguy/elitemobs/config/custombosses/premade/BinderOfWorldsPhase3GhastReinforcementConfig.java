@@ -13,5 +13,6 @@ public class BinderOfWorldsPhase3GhastReinforcementConfig extends CustomBossConf
         setDropsVanillaLoot(false);
         setDropsEliteMobsLoot(false);
         setTimeout(2);
+        setFollowDistance(200);
     }
 }

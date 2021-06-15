@@ -32,7 +32,6 @@ public class PowersConfig {
             new GoldShotgunConfig(),
             new HyperLootConfig(),
             new SpiritWalkConfig(),
-            new SummonRaugConfig(),
             new SummonTheReturnedConfig(),
             new InvisibilityConfig(),
             new InvulnerabilityArrowConfig(),
@@ -86,7 +85,8 @@ public class PowersConfig {
             new EnderDragonEmpoweredLightningConfig(),
             new EnderDragonShockwaveConfig(),
             new EnderDragonDiscoFireballsConfig(),
-            new EnderDragonAimedFireballConfig()
+            new EnderDragonAimedFireballConfig(),
+            new EnderDragonTornadoConfig()
     ));
 
     public static void initializeConfigs() {

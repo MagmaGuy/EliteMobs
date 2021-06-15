@@ -9,9 +9,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 
 public class ItemEnchantmentPrevention implements Listener {
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onResultGeneration(PrepareAnvilEvent event) {
-        if (!(ItemTagger.isEliteItem(event.getInventory().getItem(0)) && ItemTagger.isEliteItem(event.getInventory().getItem(1))))
+        if (!ItemTagger.isEliteItem(event.getInventory().getItem(0)) &&
+                !ItemTagger.isEliteItem(event.getInventory().getItem(1)))
             return;
         event.setResult(ItemStackGenerator.generateItemStack(Material.AIR));
         event.getInventory().setRepairCost(300);
