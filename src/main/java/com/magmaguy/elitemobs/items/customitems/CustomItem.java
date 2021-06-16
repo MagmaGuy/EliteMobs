@@ -410,8 +410,8 @@ public class CustomItem {
                         getLore(),
                         null,
                         player,
-                        showItemWorth);
-        parseCustomModelID(itemStack);
+                        showItemWorth,
+                        customLootConfigFields.getCustomModelID());
         return itemStack;
     }
 
@@ -427,7 +427,6 @@ public class CustomItem {
             case SCALABLE:
                 itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player);
         }
-        parseCustomModelID(itemStack);
         return itemStack;
     }
 
@@ -481,13 +480,6 @@ public class CustomItem {
 
     public ItemType getItemType() {
         return itemType;
-    }
-
-    public void parseCustomModelID(ItemStack itemStack) {
-        if (customLootConfigFields.getCustomModelID() == null) return;
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(customLootConfigFields.getCustomModelID());
-        itemStack.setItemMeta(itemMeta);
     }
 
 }
