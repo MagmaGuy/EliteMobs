@@ -29,7 +29,8 @@ public class ItemConstructor {
                                           List<String> lore,
                                           EliteMobEntity eliteMobEntity,
                                           Player player,
-                                          boolean showItemWorth) {
+                                          boolean showItemWorth,
+                                          int customModelID) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;
@@ -62,6 +63,12 @@ public class ItemConstructor {
         new ElitePotionEffectContainer(itemMeta, potionEffects);
 
         itemStack.setItemMeta(itemMeta);
+
+        //Apply custom model id
+        if (customModelID > 0) {
+            itemMeta.setCustomModelData(customModelID);
+            itemStack.setItemMeta(itemMeta);
+        }
 
         return commonFeatures(itemStack, eliteMobEntity, player, enchantments, customEnchantments, showItemWorth);
     }

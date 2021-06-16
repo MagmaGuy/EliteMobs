@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class BinderOfWorldsLair extends DungeonPackagerConfigFields {
     public BinderOfWorldsLair(){
-        super("bind_of_worlds_lair",
+        super("binder_of_worlds_lair",
                 false,
                 "Binder Of Worlds",
                 DungeonLocationType.WORLD,

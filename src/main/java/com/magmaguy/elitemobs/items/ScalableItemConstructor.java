@@ -33,7 +33,8 @@ public class ScalableItemConstructor {
                 customItem.getLore(),
                 null,
                 player,
-                false
+                false,
+                customItem.getCustomLootConfigFields().getCustomModelID()
         );
     }
 
@@ -144,7 +145,8 @@ public class ScalableItemConstructor {
                 customItem.getLore(),
                 null,
                 player,
-                false
+                false,
+                customItem.getCustomLootConfigFields().getCustomModelID()
         );
 
     }

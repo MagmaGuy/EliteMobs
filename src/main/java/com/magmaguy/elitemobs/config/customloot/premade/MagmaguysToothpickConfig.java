@@ -17,5 +17,6 @@ public class MagmaguysToothpickConfig extends CustomLootConfigFields {
                 "dynamic",
                 "scalable",
                 "custom");
+        setCustomModelID(1);
     }
 }

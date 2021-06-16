@@ -27,7 +27,12 @@ public class CustomLootConfigFields {
     private final String dropWeight;
     private final String scalability;
     private final String itemType;
-    private Integer customModelID;
+
+    public void setCustomModelID(Integer customModelID) {
+        this.customModelID = customModelID;
+    }
+
+    private Integer customModelID = 0;
 
 
     public CustomLootConfigFields(String fileName,
@@ -65,6 +70,8 @@ public class CustomLootConfigFields {
         fileConfiguration.addDefault("dropWeight", dropWeight);
         fileConfiguration.addDefault("scalability", scalability);
         fileConfiguration.addDefault("itemType", itemType);
+        if (customModelID > 0)
+            fileConfiguration.addDefault("customModelID", customModelID);
     }
 
     public CustomLootConfigFields(String fileName, FileConfiguration configuration) {
