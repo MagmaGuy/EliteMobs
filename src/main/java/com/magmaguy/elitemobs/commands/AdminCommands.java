@@ -542,7 +542,7 @@ public class AdminCommands {
                 }));
 
         // /em unbind
-        manager.command(builder.literal("unbind")
+        manager.command(builder.literal("forceunbind")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Unbinds a held soulbound item.")

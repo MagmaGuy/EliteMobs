@@ -25,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -200,6 +201,7 @@ public class ItemLootShower implements Listener {
 
         ItemStack currencyItemStack = SoulbindEnchantment.addEnchantment(ItemStackGenerator.generateItemStack(material, "",
                 Arrays.asList("EliteMobsCurrencyItem", value + "", ThreadLocalRandom.current().nextDouble() + "")), player);
+        setCoinModel(currencyItemStack, 1);
         Item currencyItem = location.getWorld().dropItem(location.clone().add(new Vector(0, 1, 0)), currencyItemStack);
         EntityTracker.registerItemVisualEffects(currencyItem);
 
@@ -229,6 +231,8 @@ public class ItemLootShower implements Listener {
         currencyItem.setCustomName(ChatColorConverter.convert("&7" + 1 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
 
+        //currencyItem.setItemStack(setCoinModel(currencyItem.getItemStack(), EconomySettingsConfig.lootShowerData1));
+
     }
 
     private void dropFive(Location location) {
@@ -243,6 +247,8 @@ public class ItemLootShower implements Listener {
 
         currencyItem.setCustomName(ChatColorConverter.convert("&f" + 5 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
+
+        //currencyItem.setItemStack(setCoinModel(currencyItem.getItemStack(), EconomySettingsConfig.lootShowerData5));
     }
 
     private void dropTen(Location location) {
@@ -257,6 +263,8 @@ public class ItemLootShower implements Listener {
 
         currencyItem.setCustomName(ChatColorConverter.convert("&a" + 10 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
+
+        //currencyItem.setItemStack(setCoinModel(currencyItem.getItemStack(), EconomySettingsConfig.lootShowerData10));
     }
 
     private void dropTwenty(Location location) {
@@ -271,6 +279,8 @@ public class ItemLootShower implements Listener {
 
         currencyItem.setCustomName(ChatColorConverter.convert("&2" + 20 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
+
+        //currencyItem.setItemStack(setCoinModel(currencyItem.getItemStack(), EconomySettingsConfig.lootShowerData20));
     }
 
     private void dropFifty(Location location) {
@@ -285,6 +295,8 @@ public class ItemLootShower implements Listener {
 
         currencyItem.setCustomName(ChatColorConverter.convert("&2" + 50 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
+
+        //currencyItem.setItemStack(setCoinModel(currencyItem.getItemStack(), EconomySettingsConfig.lootShowerData50));
     }
 
     private void dropOneHundred(Location location) {
@@ -298,6 +310,8 @@ public class ItemLootShower implements Listener {
 
         currencyItem.setCustomName(ChatColorConverter.convert("&2" + 100 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
+
+        //currencyItem.setItemStack(setCoinModel(currencyItem.getItemStack(), EconomySettingsConfig.lootShowerData100));
     }
 
     private void dropFiveHundred(Location location) {
@@ -311,6 +325,8 @@ public class ItemLootShower implements Listener {
 
         currencyItem.setCustomName(ChatColorConverter.convert("&2" + 500 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
+
+        //currencyItem.setItemStack(setCoinModel(currencyItem.getItemStack(), EconomySettingsConfig.lootShowerData500));
     }
 
     private void dropOneThousand(Location location) {
@@ -324,6 +340,15 @@ public class ItemLootShower implements Listener {
 
         currencyItem.setCustomName(ChatColorConverter.convert("&2" + 1000 + " " + EconomySettingsConfig.currencyName));
         currencyItem.setCustomNameVisible(true);
+
+        //currencyItem.setItemStack(setCoinModel(currencyItem.getItemStack(), EconomySettingsConfig.lootShowerData1000));
+    }
+
+    private ItemStack setCoinModel(ItemStack itemStack, int data) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setCustomModelData(data);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
     }
 
 

@@ -76,7 +76,7 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
 
             return livingEntity;
         } catch (Exception ex) {
-            new WarningMessage("Failed to spawn a Custom Boss' living entity! Is the region protected against spawns? Custom boss: " + customBossConfigFields.getFileName() + " entry: " + location.toString());
+            new WarningMessage("Failed to spawn a Custom Boss' living entity! Is the region protected against spawns / is your boss configuration valid? Custom boss: " + customBossConfigFields.getFileName() + " entry: " + location.toString());
             ex.printStackTrace();
             return null;
         }
