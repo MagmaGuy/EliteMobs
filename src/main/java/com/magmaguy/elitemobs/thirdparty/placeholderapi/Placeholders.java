@@ -134,6 +134,10 @@ public class Placeholders extends PlaceholderExpansion {
                 return highestGuildUser;
             case "player_shortened_guild_rank":
                 return AdventurersGuildConfig.getShortenedRankName(GuildRank.getGuildPrestigeRank(player, false), GuildRank.getActiveGuildRank(player, false));
+            case "player_kills":
+                return "" + PlayerData.getKills(player.getUniqueId());
+            case "player_deaths":
+                return "" + PlayerData.getDeaths(player.getUniqueId());
         }
 
         // We return null if an invalid placeholder (f.e. %someplugin_placeholder3%)
