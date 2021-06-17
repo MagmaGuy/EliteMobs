@@ -1,5 +1,5 @@
 name: EliteMobs
-version: 7.3.1-SNAPSHOT-7
+version: 7.3.1
 author: MagmaGuy
 main: com.magmaguy.elitemobs.EliteMobs
 api-version: 1.14
@@ -56,14 +56,20 @@ permissions:
   elitemobs.adventurersguild.teleport:
     description: Allows players to teleport to the adventurer's guild hub using /ag
     default: true
+  elitemobs.adventurersguild.command:
+    description: Allows players to rank menu using the /em adventurersguild command
+    default: true
   elitemobs.rank.command:
     description: Allows players to open the rank menu through /em rank
     default: true
   elitemobs.rank.npc:
     description: Allows players to access the /em rank menu through NPCs
     default: true
-  elitemobs.quest:
-    description: Allows players to take on quests
+  elitemobs.quest.command:
+    description: Allows players to take on quests via command
+    default: true
+  elitemobs.quest.npc:
+    description: Allows players to take on quests via EliteMobs NPC
     default: true
   elitemobs.dungeontp:
     description: Allows players to teleport to an elitemobs-set location
@@ -77,62 +83,36 @@ permissions:
   elitemobs.shareitem:
     description: Shares a held Elite Item on chat.
     default: true
-  elitemobs.scrap:
-    description: Allows players to scrap items
-    children:
-      elitemobs.scrap.npc: true
-      elitemobs.scrap.command: true
   elitemobs.scrap.npc:
     description: Allows players to scrap items at an npc
     default: true
   elitemobs.scrap.command:
     description: Allows players to scrap items using a command
     default: true
-  elitemobs.smelt:
-    description: Allows players to smelt items
-    children:
-      elitemobs.smelt.command: true
-      elitemobs.smelt.npc: true
   elitemobs.smelt.command:
     description: Allows players to smelt items using a command
     default: true
   elitemobs.smelt.npc:
     description: Allows players to smelt items using an npc
     default: true
-  elitemobs.repair:
-    children:
-      elitemobs.repair.command: true
-      elitemobs.repair.npc: true
   elitemobs.repair.command:
     description: Allows players to use the repair command to open the menu for repairing elite items
     default: true
   elitemobs.repair.npc:
     description: Allows players to interact with the NPC for repairing items
     default: true
-  elitemobs.refiner:
-    children:
-      elitemobs.refiner.command: true
-      elitemobs.refiner.npc: true
   elitemobs.refiner.command:
     description: Allows players to use the refiner command to open the menu for upgrading Elite Scrap
     default: true
   elitemobs.refiner.npc:
     description: Allows players to interact with the NPC for upgrading Elite Scrap
     default: true
-  elitemobs.enhancer:
-    children:
-      elitemobs.enhancer.command: true
-      elitemobs.enhancer.npc: true
   elitemobs.enhancer.command:
     description: Allows players to use the enhancer command to open the menu for upgrading Elite Items
     default: true
   elitemobs.enhancer.npc:
     description: Allows players to interact with the NPC for upgrading Elite Items
     default: true
-  elitemobs.unbind:
-    children:
-      elitemobs.unbind.command: true
-      elitemobs.unbind.npc: true
   elitemobs.unbind.command:
     description: Allows players to use the unbind command to open the menu for unbinding Elite Items
     default: true

@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 public class BinderOfWorldsPhase3EndermanReinforcementConfig extends CustomBossConfigFields {
     public BinderOfWorldsPhase3EndermanReinforcementConfig(){
         super("binder_of_worlds_phase_3_enderman_reinforcement",
-                EntityType.GHAST.toString(),
+                EntityType.ENDERMAN.toString(),
                 true,
                 "$reinforcementLevel &5Reality Slayer",
                 "250");

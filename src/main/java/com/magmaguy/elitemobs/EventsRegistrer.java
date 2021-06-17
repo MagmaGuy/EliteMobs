@@ -257,6 +257,7 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
         if (!VersionChecker.serverVersionOlderThan(15, 0))
             pluginManager.registerEvents(new PreventEliteBeeHiveEnter(), plugin);
+        pluginManager.registerEvents(new EnderDragonUnstuck(), plugin);
 
         //Antiexploits
         pluginManager.registerEvents(new PreventMountExploit(), plugin);
