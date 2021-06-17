@@ -15,7 +15,10 @@ public class AdventurersGuildCommand {
 
     public static void adventurersGuildCommand(Player player) {
         if (adventurersGuildTeleport(player)) return;
-        GuildRankMenuHandler.initializeGuildRankMenu(player);
+        if (player.hasPermission("elitemobs.adventurersguild.command"))
+            GuildRankMenuHandler.initializeGuildRankMenu(player);
+        else
+            player.sendMessage("Missing permission: elitemobs.adventurersguild.command / elitemobs.adventurersguild.teleport");
     }
 
     public static boolean adventurersGuildTeleport(Player player) {

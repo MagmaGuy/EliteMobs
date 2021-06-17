@@ -87,12 +87,13 @@ public class NPCInteractions implements Listener {
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case QUEST_GIVER:
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        QuestsMenu.initializeQuestsMenu(event.getPlayer());
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                if (event.getPlayer().hasPermission("elitemobs.quest.npc"))
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            QuestsMenu.initializeQuestsMenu(event.getPlayer());
+                        }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case BAR:
                 break;
