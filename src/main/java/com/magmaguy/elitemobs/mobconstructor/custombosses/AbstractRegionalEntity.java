@@ -18,7 +18,7 @@ public class AbstractRegionalEntity {
     /**
      * Initializes all the regional bosses, one Custom Boss File at a time.
      *
-     * @param customBossConfigFields CustomBossConfigFields for the regional boss to be intialized.
+     * @param customBossConfigFields CustomBossConfigFields for the regional boss to be initialized.
      */
     public static void initialize(CustomBossConfigFields customBossConfigFields) {
         List<String> locations = customBossConfigFields.getFileConfiguration().getStringList("spawnLocations");
@@ -28,6 +28,15 @@ public class AbstractRegionalEntity {
         }
         for (String string : locations)
             new AbstractRegionalEntity(string, customBossConfigFields);
+    }
+
+    /**
+     * Initializes reinforcement regional entities
+     *
+     * @param customBossConfigFields CustomBossConfigFields for the regional boss to be initialized.
+     */
+    public static void initialize(Location spawnLocation, CustomBossConfigFields customBossConfigFields) {
+            new AbstractRegionalEntity(spawnLocation, customBossConfigFields);
     }
 
     public static HashMap<CustomBossConfigFields, ArrayList<AbstractRegionalEntity>> abstractRegionalEntityHashMap = new HashMap<>();
@@ -132,6 +141,7 @@ public class AbstractRegionalEntity {
     public CustomBossConfigFields customBossConfigFields;
     public boolean isSyncedWithDungeonPackage = false;
     public RegionalBossEntity regionalBossEntity;
+    public CustomBossEntity summoningEntity;
 
     /**
      * Creates a regional boss based on the configuration settings that the custom boss has, using a location in the
@@ -177,6 +187,30 @@ public class AbstractRegionalEntity {
         regionalBossEntity = new RegionalBossEntity(this);
         addAbstractRegionalEntity(this);
     }
+
+    /**
+     * Creates a temporary regional boss based on a location. Used by the custom summon power.
+     *
+     * @param location
+     * @param customBossConfigFields
+     */
+    public AbstractRegionalEntity(Location location, CustomBossConfigFields customBossConfigFields, int summoningBossLevel, boolean inheritLevel, CustomBossEntity summoningEntity) {
+        this.customBossConfigFields = customBossConfigFields;
+        this.file = customBossConfigFields.getFile();
+        this.fileConfiguration = customBossConfigFields.getFileConfiguration();
+        this.respawnCoolDownInMinutes = 0;
+        this.spawnLocation = location;
+        this.worldName = location.getWorld().getName();
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+        this.worldIsLoaded = true;
+        this.unixRespawnTime = 0;
+        if (inheritLevel)
+            customBossConfigFields.setLevel(summoningBossLevel+"");
+        regionalBossEntity = new RegionalBossEntity(this, summoningEntity);
+    }
+
 
     //This is used to make sure that console doesn't get spammed a billion times with the same world isn't present notification
     public static ArrayList<String> worldNotifications = new ArrayList<>();

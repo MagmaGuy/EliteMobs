@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -36,6 +37,15 @@ public class CustomBossBossBar {
                 ", " + (int) customBossEntity.getLocation().getY() +
                 ", " + (int) customBossEntity.getLocation().getZ();
         bossBar = Bukkit.createBossBar(customBossEntity.bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+
+        if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1 || customBossEntity.getHealth() / customBossEntity.getMaxHealth() < 0){
+            new WarningMessage("The following boss had more health than it should: " + customBossEntity.getName());
+            new WarningMessage("This is a problem usually caused by running more than one plugin that modifies mob health!" +
+                    " EliteMobs can't fix this issue because it is being caused by another plugin." +
+                    " If you want EliteMobs to work correctly, find a way to fix this issue with whatever other plugin is causing it.");
+            return;
+        }
+
         bossBar.setProgress(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
         bossBar.addPlayer(player);
 
@@ -45,7 +55,8 @@ public class CustomBossBossBar {
         bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isOnline() ||
+                if (customBossEntity.getLivingEntity() == null && customBossEntity.simplePersistentEntity == null
+                        || !player.isOnline() ||
                         !player.getWorld().equals(customBossEntity.getLocation().getWorld()) ||
                         !customBossEntity.trackingPlayer.contains(player) &&
                                 player.getLocation().distance(customBossEntity.getLocation()) > 20 ||

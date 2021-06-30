@@ -53,6 +53,7 @@ public class MobPropertiesConfig {
             new EliteGhastConfig(),
             new EliteWolfConfig(),
             new EliteEnderDragon(),
+            new EliteShulkerConfig(),
             new SuperChickenConfig(),
             new SuperCowConfig(),
             new SuperMushroomCowConfig(),

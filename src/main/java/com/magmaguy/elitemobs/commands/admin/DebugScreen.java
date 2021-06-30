@@ -37,6 +37,11 @@ public class DebugScreen {
                         regionalBossEntity.customBossEntity.advancedGetEntity().getLocation().getBlockY() + ", " +
                         regionalBossEntity.customBossEntity.advancedGetEntity().getLocation().getBlockZ() + "\n";
                 page += "Has AI: " + !regionalBossEntity.customBossEntity.advancedGetEntity().hasAI() + "\n";
+                if (regionalBossEntity.customBossEntity != null && regionalBossEntity.customBossEntity.getLivingEntity() != null)
+                    if (player.getWorld().equals(regionalBossEntity.customBossEntity.getLocation().getWorld()))
+                        page += "Spawn distance: X=" + (int)(player.getLocation().getX() - regionalBossEntity.spawnLocation.getX())
+                                + " | Y=" + (int)(player.getLocation().getY() - regionalBossEntity.spawnLocation.getY()) +
+                                " | Z=" + (int)(player.getLocation().getZ() - regionalBossEntity.spawnLocation.getZ() )+ "\n";
             } else
                 page += "Is Alive (MC): false\n";
             page += "Is Persistent: " + regionalBossEntity.getCustomBossConfigFields().isPersistent() + "\n";

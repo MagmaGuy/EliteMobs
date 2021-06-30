@@ -441,6 +441,16 @@ public class CustomBossConfigFields {
 
     private boolean frozen = false;
 
+    public boolean isReinforcement() {
+        return reinforcement;
+    }
+
+    public void setReinforcement(boolean reinforcement) {
+        this.reinforcement = reinforcement;
+    }
+
+    private boolean reinforcement = false;
+
     public List<String> getPhases() {
         return this.phases;
     }
@@ -643,6 +653,8 @@ public class CustomBossConfigFields {
             fileConfiguration.addDefault("cullReinforcements", cullReinforcements);
         if (frozen)
             fileConfiguration.addDefault("frozen", frozen);
+        if (reinforcement)
+            fileConfiguration.addDefault("reinforcement", reinforcement);
     }
 
     /**
@@ -701,6 +713,9 @@ public class CustomBossConfigFields {
         if (configHas("frozen"))
             this.frozen = parseConfigBoolean("frozen");
 
+        if (configHas("reinforcement"))
+            this.reinforcement = parseConfigBoolean("reinforcement");
+
         this.onDeathCommands = (List<String>) parseConfigArray("onDeathCommands");
         this.onSpawnCommands = (List<String>) parseConfigArray("onSpawnCommands");
         this.onCombatEnterCommands = (List<String>) parseConfigArray("onCombatEnterCommands");
@@ -741,7 +756,8 @@ public class CustomBossConfigFields {
             this.regionalBoss = parseConfigBoolean("isRegionalBoss");
             if (this.regionalBoss) {
                 regionalElites.put(fileName, this);
-                AbstractRegionalEntity.initialize(this);
+                if (!reinforcement)
+                    AbstractRegionalEntity.initialize(this);
             }
         }
 

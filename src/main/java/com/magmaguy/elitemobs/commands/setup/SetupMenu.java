@@ -2,11 +2,11 @@ package com.magmaguy.elitemobs.commands.setup;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
+import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
-import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -147,7 +147,11 @@ public class SetupMenu {
     }
 
     private void addBossCount(List<String> lore, Minidungeon minidungeon) {
-        lore.add("&fRegional boss count: " + minidungeon.relativeDungeonLocations.bossCount);
+        try {
+            lore.add("&fRegional boss count: " + minidungeon.relativeDungeonLocations.bossCount);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to determine regional boss count! Are the relative dungeon locations correct?");
+        }
     }
 
     private void addInstallationString(List<String> lore, Minidungeon minidungeon) {
