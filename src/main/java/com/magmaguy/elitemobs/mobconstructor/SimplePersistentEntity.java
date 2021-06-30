@@ -90,9 +90,9 @@ public class SimplePersistentEntity {
 
     //Something is causing a weird double chunk load issue... not sure what but it's also probably causing a CME
     private static void loadChunk(int chunkLocation) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
+        //new BukkitRunnable() {
+        //    @Override
+        //    public void run() {
                 try {
                     for (SimplePersistentEntity simplePersistentEntity : persistentEntities.get(chunkLocation)) {
                         if (simplePersistentEntity.customBossEntity != null)
@@ -105,8 +105,8 @@ public class SimplePersistentEntity {
                 }
                 persistentEntities.removeAll(chunkLocation);
                 chunkLocations.remove(chunkLocation);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 1);
+        //      }
+    //}.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
 
     private static void unloadWorld(World world){

@@ -407,7 +407,7 @@ public class AdventurersGuildConfig {
             case 18:
                 return "ⅩⅤⅠⅠⅠ";
             case 19:
-                return "ⅩⅠⅤ";
+                return "ⅩⅠⅩ";
             case 20:
                 return "ⅩⅩ";
             case 0:

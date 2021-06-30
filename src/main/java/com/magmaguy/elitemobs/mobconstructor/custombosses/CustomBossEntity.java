@@ -517,6 +517,8 @@ public class CustomBossEntity extends EliteMobEntity implements Listener, Simple
             if (simplePersistentEntity != null)
                 simplePersistentEntity.remove();
         }
+        if (regionalBossEntity != null && customBossConfigFields.isReinforcement())
+            regionalBossEntity.removeAsReinforcement();
     }
 
     /**

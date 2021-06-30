@@ -101,6 +101,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FindSuperMobs(), plugin);
         if (ItemSettingsConfig.preventEliteItemEnchantment)
             pluginManager.registerEvents(new ItemEnchantmentPrevention(), plugin);
+        if (ItemSettingsConfig.preventEliteItemDiamondToNetheriteUpgrade)
+            pluginManager.registerEvents(new PreventUpgradeDiamondToNetherite(), plugin);
 
         //Mob damage
         pluginManager.registerEvents(new PlayerDamagedByEliteMobHandler(), plugin);

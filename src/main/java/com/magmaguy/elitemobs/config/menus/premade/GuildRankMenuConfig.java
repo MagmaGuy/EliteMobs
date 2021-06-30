@@ -133,7 +133,7 @@ public class GuildRankMenuConfig extends MenusConfigFields {
         difficultyModifierMessage = ConfigurationEngine.setString(fileConfiguration, "difficultyModifierMessages", "&fElite Mob difficulty modifier: &c$modifier%");
 
         lootTierMessage = ConfigurationEngine.setString(fileConfiguration, "lootTierMessages", "&2Elites can drop up to tier $tier loot!");
-        currencyBonusMessage = ConfigurationEngine.setString(fileConfiguration, "currencyBonusMessages", "&a$amount% coins from drops and quests!");
+        currencyBonusMessage = ConfigurationEngine.setString(fileConfiguration, "currencyBonusMessages", "&a$amountx coins from drops and quests!");
         healthBonusMessage = ConfigurationEngine.setString(fileConfiguration, "healthBonusMessages", "&cAdds $amount ❤ of max health");
         critBonusMessage = ConfigurationEngine.setString(fileConfiguration, "critBonusMessages", "&eAdds $amount% chance to crit");
         dodgeBonusMessage = ConfigurationEngine.setString(fileConfiguration, "dodgeBonusMessages", "&8Adds $amount% chance to dodge");

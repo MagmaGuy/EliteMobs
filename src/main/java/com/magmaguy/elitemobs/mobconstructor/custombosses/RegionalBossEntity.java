@@ -54,6 +54,28 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
             }.runTaskLater(MetadataHandler.PLUGIN, ticksBeforeUnixTime);
     }
 
+    private  CustomBossEntity summoningEntity;
+    public RegionalBossEntity(AbstractRegionalEntity abstractRegionalEntity, CustomBossEntity summoningEntity) {
+        this.abstractRegionalEntity = abstractRegionalEntity;
+        this.customBossConfigFields = abstractRegionalEntity.customBossConfigFields;
+        this.leashRadius = customBossConfigFields.getLeashRadius();
+        this.ticksBeforeUnixTime = (int) abstractRegionalEntity.getTicksBeforeRespawn();
+        this.spawnLocation = abstractRegionalEntity.getSpawnLocation();
+        this.spawnCooldownInMinutes = customBossConfigFields.getSpawnCooldown();
+
+        regionalBossEntityList.add(this);
+
+        if (abstractRegionalEntity.isWorldIsLoaded())
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    spawnRegionalBoss();
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, ticksBeforeUnixTime);
+
+        this.summoningEntity = summoningEntity;
+    }
+
     public void spawnRegionalBoss() {
         this.customBossEntity = CustomBossEntity.constructCustomBoss(
                 customBossConfigFields,
@@ -80,6 +102,8 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
         checkLeash();
         customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
         customBossEntity.setIsRegionalBoss(true);
+        if (summoningEntity != null)
+            summoningEntity.eliteReinforcementEntities.add(customBossEntity);
 
     }
 
@@ -147,6 +171,15 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
     public void removeTemporarily() {
         if (leashTask != null)
             leashTask.cancel();
+    }
+
+    /**
+     * Gets rid of repeating tasks that would cause issues if the custom boss ceases to be valid during runtime
+     */
+    public void removeAsReinforcement() {
+        if (leashTask != null)
+            leashTask.cancel();
+        regionalBossEntityList.remove(this);
     }
 
     /**
