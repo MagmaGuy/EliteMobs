@@ -4,9 +4,11 @@ import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
@@ -319,12 +321,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 summonReinforcement(spawningEntity, customBossReinforcement);
             } else {
 
-                Location spawnLocation;
-
-                if (spawningEntity.regionalBossEntity != null)
-                    spawnLocation = spawningEntity.regionalBossEntity.spawnLocation.clone().add(customBossReinforcement.spawnLocationOffset);
-                else
-                    spawnLocation = spawningEntity.getLivingEntity().getLocation().clone().add(customBossReinforcement.spawnLocationOffset);
+                Location spawnLocation = getFinalSpawnLocation(spawningEntity, customBossReinforcement.spawnLocationOffset);
 
                 Entity entity = spawnLocation.getWorld().spawnEntity(spawnLocation, customBossReinforcement.entityType);
                 entity.getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, "eliteCrystal"), PersistentDataType.STRING, "eliteCrystal");
@@ -359,9 +356,9 @@ public class CustomSummonPower extends ElitePower implements Listener {
         for (int i = 0; i < customBossReinforcement.amount; i++) {
             Location spawnLocation = eliteMobEntity.getLivingEntity().getLocation();
             if (customBossReinforcement.spawnLocationOffset != null)
-                spawnLocation.clone().add(customBossReinforcement.spawnLocationOffset);
+                spawnLocation = getFinalSpawnLocation(eliteMobEntity, customBossReinforcement.spawnLocationOffset);
             if (customBossReinforcement.spawnNearby)
-                for (int loc = 0; loc < 30; loc++){
+                for (int loc = 0; loc < 30; loc++) {
                     Location randomLocation = spawnLocation.clone().add(new Vector(
                             ThreadLocalRandom.current().nextInt(-15, 15),
                             0,
@@ -373,13 +370,31 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 }
 
             CustomBossEntity customBossEntity;
-            if (customBossReinforcement.inheritLevel)
+            if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName).isRegionalBoss()) {
+                new AbstractRegionalEntity(spawnLocation,
+                        CustomBossConfigFields.customBossConfigFields.get(customBossReinforcement.bossFileName),
+                        eliteMobEntity.getLevel(),
+                        customBossReinforcement.inheritLevel,
+                        eliteMobEntity.customBossEntity);
+                customBossReinforcement.isSummoned = true;
+            } else if (customBossReinforcement.inheritLevel) {
                 customBossEntity = CustomBossEntity.constructCustomBoss(customBossReinforcement.bossFileName, spawnLocation, eliteMobEntity.getLevel());
-            else
+                customBossReinforcement.isSummoned = true;
+                eliteMobEntity.eliteReinforcementEntities.add(customBossEntity);
+            } else {
                 customBossEntity = CustomBossEntity.constructCustomBoss(customBossReinforcement.bossFileName, spawnLocation);
-            customBossReinforcement.isSummoned = true;
-            eliteMobEntity.eliteReinforcementEntities.add(customBossEntity);
+                customBossReinforcement.isSummoned = true;
+                eliteMobEntity.eliteReinforcementEntities.add(customBossEntity);
+            }
         }
+    }
+
+    private Location getFinalSpawnLocation(EliteMobEntity summoningEntity, Vector spawnLocationOffset) {
+        if (summoningEntity.regionalBossEntity != null)
+            return summoningEntity.regionalBossEntity.spawnLocation.clone().add(spawnLocationOffset);
+        if (summoningEntity == null)
+            return null;
+        return summoningEntity.getLivingEntity().getLocation().add(spawnLocationOffset);
     }
 
 
