@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.config.commands.CommandsConfig;
 import com.magmaguy.elitemobs.config.configurationimporter.ConfigurationImporter;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
@@ -26,6 +27,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.EventLauncher;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
@@ -137,6 +139,7 @@ public class EliteMobs extends JavaPlugin {
         //launch events
         EventLauncher eventLauncher = new EventLauncher();
         eventLauncher.eventRepeatingTask();
+        ActionEvent.initializeBlueprintEvents();
 
         //launch internal clock for attack cooldown
         EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.launchInternalClock();
@@ -311,6 +314,7 @@ public class EliteMobs extends JavaPlugin {
         DiscordSRVConfig.initializeConfig();
         ReadMeForTranslationsConfig.initialize();
         ItemUpgradeSystemConfig.initializeConfig();
+        CustomEventsConfig.initializeConfigs();
     }
 
     public static void worldScanner() {
