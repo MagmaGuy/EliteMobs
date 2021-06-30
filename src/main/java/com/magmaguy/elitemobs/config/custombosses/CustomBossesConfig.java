@@ -33,6 +33,8 @@ public class CustomBossesConfig {
             new NecronomiconSkeletonConfig(),
             new TheReturnedConfig(),
             new BalrogConfig(),
+            new KrakenConfig(),
+            new KillerRabbitOfCaerbannogConfig(),
             new RaugConfig(),
             new ZombieFriendConfig(),
             new ZombieMomConfig(),
