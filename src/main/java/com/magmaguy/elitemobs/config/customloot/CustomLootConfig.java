@@ -33,6 +33,7 @@ public class CustomLootConfig {
             new ShulkerCharmConfig(),
             new SlowpokeCharmConfig(),
             new TheFellerConfig(),
+            new RodOfTheDepthsConfig(),
             new VampiricCharmConfig(),
             new ZombieKingsAxeConfig(),
             new MeteorShowerScrollConfig(),

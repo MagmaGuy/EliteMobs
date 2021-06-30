@@ -260,6 +260,9 @@ public class EliteMobEntity {
         livingEntity.getEquipment().setLeggingsDropChance(0);
         livingEntity.getEquipment().setBootsDropChance(0);
 
+        if (livingEntity.getType().equals(EntityType.RABBIT))
+            ((Rabbit) livingEntity).setRabbitType(Rabbit.Type.THE_KILLER_BUNNY);
+
         if (!VersionChecker.serverVersionOlderThan(15, 0))
             if (livingEntity instanceof Bee)
                 ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);

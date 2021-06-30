@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
 import com.magmaguy.elitemobs.events.actionevents.MiningEvent;
@@ -293,6 +294,7 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new TreeChoppingEvent(), plugin);
         }
 
+        pluginManager.registerEvents(new ActionEvent.ActionEventEvents(), plugin);
 
         //Set up health and damage displays
         if (MobCombatSettingsConfig.displayHealthOnHit)
