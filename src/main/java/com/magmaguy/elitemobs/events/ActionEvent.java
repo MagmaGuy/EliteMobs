@@ -23,7 +23,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ActionEvent extends CustomEvent {
 
     public static ArrayList<ActionEvent> blueprintEvents = new ArrayList<>();
-    //todo: implement wrapper to assign events
     public static ArrayList<ActionEvent> actionEvents = new ArrayList<>();
 
     /**
@@ -34,12 +33,13 @@ public class ActionEvent extends CustomEvent {
      */
     public static void initializeBlueprintEvents() {
         for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values())
-            switch (customEventsConfigFields.getEventType()) {
-                case BREAK_BLOCK:
-                case FISH:
-                case TILL_SOIL:
-                    blueprintEvents.add(new ActionEvent(customEventsConfigFields));
-            }
+            if (customEventsConfigFields.isEnabled())
+                switch (customEventsConfigFields.getEventType()) {
+                    case BREAK_BLOCK:
+                    case FISH:
+                    case TILL_SOIL:
+                        blueprintEvents.add(new ActionEvent(customEventsConfigFields));
+                }
     }
 
     public boolean checkBlockBreakStartConditions(Material material) {
@@ -62,11 +62,13 @@ public class ActionEvent extends CustomEvent {
         actionEvent.setEventStartLocation(location);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);
         if (customEventStartEvent.isCancelled()) return;
+        if (!actionEvent.startConditions.conditionsAreValid(location)) return;
         actionEvents.add(actionEvent);
         actionEvent.start();
     }
 
     public double chance;
+    public List<Material> breakableMaterials;
 
     public ActionEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
@@ -74,8 +76,6 @@ public class ActionEvent extends CustomEvent {
         this.breakableMaterials = customEventsConfigFields.getBreakableMaterials();
         setPrimaryCustomBossFilenames(primaryCustomBossFilenames);
     }
-
-    public List<Material> breakableMaterials;
 
     @Override
     public void startModifiers() {
@@ -96,7 +96,7 @@ public class ActionEvent extends CustomEvent {
 
     @Override
     public void endModifiers() {
-
+        actionEvents.remove(this);
     }
 
     public static class ActionEventEvents implements Listener {

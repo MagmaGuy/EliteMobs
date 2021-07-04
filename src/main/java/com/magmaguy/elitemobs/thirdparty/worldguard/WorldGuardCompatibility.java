@@ -31,6 +31,7 @@ public class WorldGuardCompatibility {
     private static StateFlag ELITEMOBS_EVENTS = new StateFlag("elitemobs-events", true);
     private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL = new IntegerFlag("elitemobs-minimum-level");
     private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL = new IntegerFlag("elitemobs-maximum-level");
+    private static StateFlag ELITEMOBS_EXPLOSION_REGEN = new StateFlag("elitemob-explosion-regen", true);
 
     public static boolean initialize() {
 
@@ -99,6 +100,14 @@ public class WorldGuardCompatibility {
             ELITEMOBS_MAXIMUM_LEVEL = (IntegerFlag) registry.get("elitemobs-maximum-level");
         }
 
+        try {
+            registry.register(ELITEMOBS_EXPLOSION_REGEN);
+            Bukkit.getLogger().info("[EliteMobs] - elitemobs-explosion-regen");
+        } catch (FlagConflictException | IllegalStateException e) {
+            Bukkit.getLogger().warning("[EliteMobs] Warning: flag elitemob-explosion-regen already exists! This is normal if you've just now reloaded EliteMobs.");
+            ELITEMOBS_EXPLOSION_REGEN = (StateFlag) registry.get("elitemobs-explosion-regen");
+        }
+
         return true;
 
     }
@@ -129,6 +138,10 @@ public class WorldGuardCompatibility {
 
     public static final IntegerFlag getEliteMobsMaximumLevel() {
         return ELITEMOBS_MAXIMUM_LEVEL;
+    }
+
+    public static final StateFlag getEliteMobsExplosionRegen() {
+        return ELITEMOBS_EXPLOSION_REGEN;
     }
 
     private static final StateFlag.State allow = StateFlag.State.ALLOW;

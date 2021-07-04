@@ -86,7 +86,8 @@ public class PowersConfig {
             new EnderDragonShockwaveConfig(),
             new EnderDragonDiscoFireballsConfig(),
             new EnderDragonAimedFireballConfig(),
-            new EnderDragonTornadoConfig()
+            new EnderDragonTornadoConfig(),
+            new FireworksBarrageConfig()
     ));
 
     public static void initializeConfigs() {
