@@ -1,12 +1,15 @@
 package com.magmaguy.elitemobs.explosionregen;
 
+import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteExplosionEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.entitytracker.TemporaryBlockTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -150,6 +153,11 @@ public class Explosion {
     }
 
     private static void generateExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSource) {
+        if (!DefaultConfig.doExplosionRegen) return;
+        if (EliteMobs.worldGuardIsEnabled)
+            if (explosionSource != null)
+                if (!WorldGuardFlagChecker.doExplosionRegenFlag(explosionSource))
+                    return;
 
         ArrayList<BlockState> blockStates = new ArrayList<>();
 

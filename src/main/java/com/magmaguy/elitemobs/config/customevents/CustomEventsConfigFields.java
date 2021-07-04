@@ -1,8 +1,13 @@
 package com.magmaguy.elitemobs.config.customevents;
 
 import com.magmaguy.elitemobs.events.CustomEvent;
+import com.magmaguy.elitemobs.events.MoonPhaseDetector;
+import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldType;
+import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -35,11 +40,66 @@ public class CustomEventsConfigFields {
 
     List<String> bossFilenames;
 
-    public CustomEventsConfigFields(String filename, boolean isEnabled, CustomEvent.EventType eventType, List<String> bossFilenames) {
+    /**
+     * For Action Events
+     *
+     * @param filename
+     * @param isEnabled
+     * @param eventType
+     * @param bossFilenames
+     */
+    public CustomEventsConfigFields(String filename,
+                                    boolean isEnabled,
+                                    CustomEvent.EventType eventType,
+                                    List<String> bossFilenames) {
         this.filename = filename + ".yml";
         this.enabled = isEnabled;
         this.eventType = eventType;
         this.bossFilenames = bossFilenames;
+    }
+
+    public double getLocalCooldown() {
+        return localCooldown;
+    }
+
+    private double localCooldown = 0;
+
+    public double getGlobalCooldown() {
+        return globalCooldown;
+    }
+
+    private double globalCooldown = 0;
+
+    public double getWeight() {
+        return weight;
+    }
+
+    private double weight = 0;
+
+    /**
+     * For Timed Events
+     *
+     * @param filename
+     * @param isEnabled
+     * @param eventType
+     * @param bossFilenames
+     */
+    public CustomEventsConfigFields(String filename,
+                                    boolean isEnabled,
+                                    CustomEvent.EventType eventType,
+                                    List<String> bossFilenames,
+                                    double localCooldown,
+                                    double globalCooldown,
+                                    double weight,
+                                    TimedEvent.SpawnType spawnType) {
+        this.filename = filename + ".yml";
+        this.enabled = isEnabled;
+        this.eventType = eventType;
+        this.bossFilenames = bossFilenames;
+        this.localCooldown = localCooldown;
+        this.globalCooldown = globalCooldown;
+        this.weight = weight;
+        this.spawnType = spawnType;
     }
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -57,6 +117,36 @@ public class CustomEventsConfigFields {
             breakableMaterials.forEach(material -> convertedList.add(material.toString()));
             fileConfiguration.addDefault("breakableMaterials", convertedList);
         }
+        if (localCooldown != 0)
+            fileConfiguration.addDefault("localCooldown", localCooldown);
+        if (globalCooldown != 0)
+            fileConfiguration.addDefault("globalCooldown", globalCooldown);
+        if (weight != 0)
+            fileConfiguration.addDefault("weight", weight);
+        if (eventDuration != 0)
+            fileConfiguration.addDefault("eventDuration", eventDuration);
+        if (!endEventWithBossDeath)
+            fileConfiguration.addDefault("endEventWithBossDeath", endEventWithBossDeath);
+        if (spawnType != TimedEvent.SpawnType.INSTANT_SPAWN)
+            fileConfiguration.addDefault("spawnType", spawnType.toString());
+        if (lowestYLevel != 0)
+            fileConfiguration.addDefault("lowestYLevel", lowestYLevel);
+        if (highestYLevel != 320)
+            fileConfiguration.addDefault("highestYLevel", highestYLevel);
+        if (!validWorlds.isEmpty())
+            fileConfiguration.addDefault("validWorlds", validWorlds);
+        if (!validWorldTypes.isEmpty())
+            fileConfiguration.addDefault("validWorldTypes", validWorldTypes);
+        if (!validBiomes.isEmpty())
+            fileConfiguration.addDefault("validBiomes", validBiomes);
+        if (earliestTime != 0)
+            fileConfiguration.addDefault("earliestTime", earliestTime);
+        if (latestTime != 0)
+            fileConfiguration.addDefault("latestTime", latestTime);
+        if (moonPhase != null)
+            fileConfiguration.addDefault("moonPhase", moonPhase.toString());
+        if (minimumPlayerCount != 0)
+            fileConfiguration.addDefault("minimumPlayerCount", minimumPlayerCount);
     }
 
     public String getStartMessage() {
@@ -129,13 +219,138 @@ public class CustomEventsConfigFields {
 
     private List<Material> breakableMaterials;
 
+    public double getEventDuration() {
+        return eventDuration;
+    }
+
+    public void setEventDuration(double eventDuration) {
+        this.eventDuration = eventDuration;
+    }
+
+    private double eventDuration = 0;
+
+    public boolean isEndEventWithBossDeath() {
+        return endEventWithBossDeath;
+    }
+
+    public void setEndEventWithBossDeath(boolean endEventWithBossDeath) {
+        this.endEventWithBossDeath = endEventWithBossDeath;
+    }
+
+    private boolean endEventWithBossDeath = true;
+
+    public TimedEvent.SpawnType getSpawnType() {
+        return spawnType;
+    }
+
+    public void setSpawnType(TimedEvent.SpawnType spawnType) {
+        this.spawnType = spawnType;
+    }
+
+    TimedEvent.SpawnType spawnType = TimedEvent.SpawnType.INSTANT_SPAWN;
+
+    public int getLowestYLevel() {
+        return lowestYLevel;
+    }
+
+    public void setLowestYLevel(int lowestYLevel) {
+        this.lowestYLevel = lowestYLevel;
+    }
+
+    int lowestYLevel = 0;
+
+    public int getHighestYLevel() {
+        return highestYLevel;
+    }
+
+    public void setHighestYLevel(int highestYLevel) {
+        this.highestYLevel = highestYLevel;
+    }
+
+    int highestYLevel = 320;
+
+    public List<String> getValidWorlds() {
+        return validWorlds;
+    }
+
+    public void setValidWorlds(List<String> validWorlds) {
+        this.validWorlds = validWorlds;
+    }
+
+    List<String> validWorlds = new ArrayList<>();
+
+    public List<World.Environment> getValidWorldTypes() {
+        return validWorldTypes;
+    }
+
+    public void setValidWorldTypes(List<World.Environment> validWorldTypes) {
+        this.validWorldTypes = validWorldTypes;
+    }
+
+    List<World.Environment> validWorldTypes = new ArrayList<>();
+
+    public List<Biome> getValidBiomes() {
+        return validBiomes;
+    }
+
+    public void setValidBiomes(List<Biome> validBiomes) {
+        this.validBiomes = validBiomes;
+    }
+
+    List<Biome> validBiomes = new ArrayList<>();
+
+    public long getEarliestTime() {
+        return earliestTime;
+    }
+
+    public void setEarliestTime(long earliestTime) {
+        this.earliestTime = earliestTime;
+    }
+
+    private long earliestTime = 0;
+
+    public long getLatestTime() {
+        return latestTime;
+    }
+
+    public void setLatestTime(long latestTime) {
+        this.latestTime = latestTime;
+    }
+
+    private long latestTime = 24000;
+
+    public MoonPhaseDetector.MoonPhase getMoonPhase() {
+        return moonPhase;
+    }
+
+    public void setMoonPhase(MoonPhaseDetector.MoonPhase moonPhase) {
+        this.moonPhase = moonPhase;
+    }
+
+    private MoonPhaseDetector.MoonPhase moonPhase = null;
+
+    public int getMinimumPlayerCount() {
+        return minimumPlayerCount;
+    }
+
+    public void setMinimumPlayerCount(int minimumPlayerCount) {
+        this.minimumPlayerCount = minimumPlayerCount;
+    }
+
+    private int minimumPlayerCount = 0;
+
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+
     private FileConfiguration fileConfiguration;
 
     public CustomEventsConfigFields(FileConfiguration fileConfiguration, File file) {
         this.filename = file.getName();
         this.fileConfiguration = fileConfiguration;
-        if (configHas("isEnabled"))
-            this.enabled = fileConfiguration.getBoolean("isEnabled");
+        this.enabled = processBoolean("isEnabled", enabled);
         if (configHas("eventType")) {
             try {
                 this.eventType = CustomEvent.EventType.valueOf(fileConfiguration.getString("eventType"));
@@ -150,32 +365,43 @@ public class CustomEventsConfigFields {
             new WarningMessage("Custom event file " + filename + " is missing a valid eventType entry! Fix it for the event to be registered!");
             return;
         }
-        if (configHas("bossFilenames")) {
-            try {
-                this.bossFilenames = fileConfiguration.getStringList("bossFilenames");
-            } catch (Exception ex) {
-                new WarningMessage("Custom event file " + filename + " has an invalid custom bosses list! Fix it for the event to work!");
-                return;
-            }
-        } else {
+        this.bossFilenames = processStringList("bossFilenames", bossFilenames);
+        if (this.bossFilenames == null) {
             new WarningMessage("Custom event file " + filename + " is missing a valid bossFilenames entry! Fix it for the event to be registered!");
             return;
         }
 
-        this.startMessage = processString("startMessage");
-        this.endMessage = processString("endMessage");
-        this.eventStartCommands = processStringList("eventStartCommands");
-        this.eventEndCommands = processStringList("eventEndCommands");
-        this.announcementPriority = processInt("announcementPriority");
-        this.chance = processDouble("chance");
+        this.startMessage = processString("startMessage", startMessage);
+        this.endMessage = processString("endMessage", endMessage);
+        this.eventStartCommands = processStringList("eventStartCommands", eventStartCommands);
+        this.eventEndCommands = processStringList("eventEndCommands", eventEndCommands);
+        this.announcementPriority = processInt("announcementPriority", announcementPriority);
+        this.chance = processDouble("chance", chance);
         this.breakableMaterials = processBreakables("breakableMaterials");
+        this.localCooldown = processDouble("localCooldown", localCooldown);
+        this.globalCooldown = processDouble("globalCooldown", globalCooldown);
+        this.weight = processDouble("weight", weight);
+        this.eventDuration = processDouble("eventDuration", eventDuration);
+        this.endEventWithBossDeath = processBoolean("endEventWithBossDeath", endEventWithBossDeath);
+        this.spawnType = processSpawnType("spawnType", spawnType);
+        this.lowestYLevel = processInt("lowestYLevel", lowestYLevel);
+        this.highestYLevel = processInt("highestYLevel", highestYLevel);
+        this.validWorlds = processStringList("validWorlds", validWorlds);
+        this.validWorldTypes = processValidWorldTypes("validWorldTypes");
+        this.validBiomes = processValidBiomes("validBiomes");
+        this.earliestTime = processLong("earliestTime", earliestTime);
+        this.latestTime = processLong("latestTime", latestTime);
+        this.moonPhase = processMoonPhase("moonPhase", moonPhase);
+        this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount);
     }
 
     private boolean configHas(String configKey) {
         return fileConfiguration.contains(configKey);
     }
 
-    private String processString(String path) {
+    private String processString(String path, String pluginDefault) {
+        if (!configHas(path))
+            return pluginDefault;
         try {
             return fileConfiguration.getString(path);
         } catch (Exception ex) {
@@ -184,7 +410,9 @@ public class CustomEventsConfigFields {
         return null;
     }
 
-    private List<String> processStringList(String path) {
+    private List<String> processStringList(String path, List<String> pluginDefault) {
+        if (!configHas(path))
+            return pluginDefault;
         try {
             return fileConfiguration.getStringList(path);
         } catch (Exception ex) {
@@ -193,7 +421,9 @@ public class CustomEventsConfigFields {
         return null;
     }
 
-    private int processInt(String path) {
+    private int processInt(String path, int pluginDefault) {
+        if (!configHas(path))
+            return pluginDefault;
         try {
             return fileConfiguration.getInt(path);
         } catch (Exception ex) {
@@ -202,7 +432,21 @@ public class CustomEventsConfigFields {
         return 0;
     }
 
-    private double processDouble(String path) {
+    private long processLong(String path, long pluginDefault) {
+        if (!configHas(path))
+            return pluginDefault;
+        try {
+            return fileConfiguration.getInt(path);
+        } catch (Exception ex) {
+            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
+        }
+        return 0;
+    }
+
+
+    private double processDouble(String path, double pluginDefault) {
+        if (!configHas(path))
+            return pluginDefault;
         try {
             return fileConfiguration.getDouble(path);
         } catch (Exception ex) {
@@ -211,8 +455,19 @@ public class CustomEventsConfigFields {
         return 0;
     }
 
+    private boolean processBoolean(String path, boolean pluginDefault) {
+        if (!configHas(path))
+            return pluginDefault;
+        try {
+            return fileConfiguration.getBoolean(path);
+        } catch (Exception ex) {
+            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
+        }
+        return true;
+    }
+
     private List<Material> processBreakables(String path) {
-        List<String> unprocessedBreakables = processStringList(path);
+        List<String> unprocessedBreakables = processStringList(path, null);
         if (unprocessedBreakables == null && eventType.equals(CustomEvent.EventType.BREAK_BLOCK)) {
             new WarningMessage("Custom event file " + filename + " has an incorrect or missing entry for " + path + " which is required for BREAK_BLOCK event types!");
         }
@@ -225,6 +480,58 @@ public class CustomEventsConfigFields {
             new WarningMessage("Custom event file " + filename + " has an invalid material entry in " + path + " !");
             return null;
         }
+    }
+
+    private TimedEvent.SpawnType processSpawnType(String path, TimedEvent.SpawnType pluginDefault) {
+        if (!configHas(path))
+            return pluginDefault;
+        try {
+            return TimedEvent.SpawnType.valueOf(fileConfiguration.getString(path));
+        } catch (Exception ex) {
+            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
+        }
+        return pluginDefault;
+    }
+
+    private List<World.Environment> processValidWorldTypes(String path) {
+        List<String> validWorldTypes = processStringList(path, null);
+        if (validWorldTypes == null)
+            return this.validWorldTypes;
+        try {
+            List<World.Environment> processedWorldTypes = new ArrayList<>();
+            for (String string : validWorldTypes)
+                processedWorldTypes.add(World.Environment.valueOf(string));
+            return processedWorldTypes;
+        } catch (Exception ex) {
+            new WarningMessage("Custom event file " + filename + " has an invalid world type entry in " + path + " !");
+            return null;
+        }
+    }
+
+    private List<Biome> processValidBiomes(String path) {
+        List<String> validBiomes = processStringList(path, null);
+        if (validBiomes == null)
+            return this.validBiomes;
+        try {
+            List<Biome> processedBiomes = new ArrayList<>();
+            for (String string : validBiomes)
+                processedBiomes.add(Biome.valueOf(string));
+            return processedBiomes;
+        } catch (Exception ex) {
+            new WarningMessage("Custom event file " + filename + " has an invalid biome entry in " + path + " !");
+            return null;
+        }
+    }
+
+    private MoonPhaseDetector.MoonPhase processMoonPhase(String path, MoonPhaseDetector.MoonPhase pluginDefault) {
+        if (!configHas(path))
+            return pluginDefault;
+        try {
+            return MoonPhaseDetector.MoonPhase.valueOf(fileConfiguration.getString(path));
+        } catch (Exception ex) {
+            new WarningMessage("Custom event file " + filename + " has an incorrect moon phase entry for " + path);
+        }
+        return pluginDefault;
     }
 
 }

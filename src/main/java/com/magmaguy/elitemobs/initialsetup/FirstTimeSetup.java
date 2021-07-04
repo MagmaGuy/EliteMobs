@@ -34,7 +34,7 @@ public class FirstTimeSetup implements Listener {
                 setupDone.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs setup done"));
                 setupMessage.addExtra(setupDone);
                 event.getPlayer().spigot().sendMessage(setupMessage);
-                event.getPlayer().sendMessage(ChatColorConverter.convert("&8&oThis message will only be sent admins!"));
+                event.getPlayer().sendMessage(ChatColorConverter.convert("&8&oThis message will only be sent to admins!"));
 
                 event.getPlayer().sendMessage("----------------------------------------------------");
             }

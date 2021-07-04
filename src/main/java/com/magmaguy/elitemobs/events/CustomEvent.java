@@ -24,10 +24,15 @@ public abstract class CustomEvent {
     }
 
     public enum EventType {
+        //Action Events
         BREAK_BLOCK,
         FISH,
-        TILL_SOIL
+        TILL_SOIL,
+        TIMED
     }
+
+    //Start Conditions
+    public StartConditions startConditions;
 
     //Common fields
     public EventType eventType;
@@ -43,6 +48,8 @@ public abstract class CustomEvent {
      * Instantiates a Custom Event, does not necessarily start one but starts scanning for whether one should happen
      */
     public CustomEvent(CustomEventsConfigFields customEventsConfigFields) {
+        this.startConditions = new StartConditions(customEventsConfigFields);
+
         this.customEventsConfigFields = customEventsConfigFields;
         this.eventType = customEventsConfigFields.getEventType();
         this.startMessage = customEventsConfigFields.getStartMessage();
@@ -62,7 +69,6 @@ public abstract class CustomEvent {
     }
 
     public List<String> primaryCustomBossFilenames;
-
 
     public Location getEventStartLocation() {
         return eventStartLocation;

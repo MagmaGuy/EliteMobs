@@ -2,10 +2,7 @@ package com.magmaguy.elitemobs.config.customevents;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
-import com.magmaguy.elitemobs.config.customevents.premade.BalrogEvent;
-import com.magmaguy.elitemobs.config.customevents.premade.FaeEvent;
-import com.magmaguy.elitemobs.config.customevents.premade.KillerRabbitOfCaerbannogEvent;
-import com.magmaguy.elitemobs.config.customevents.premade.KrakenEvent;
+import com.magmaguy.elitemobs.config.customevents.premade.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -28,11 +25,12 @@ public class CustomEventsConfig {
         return customEvents.get(fileName);
     }
 
-    private static final ArrayList<CustomEventsConfigFields> CustomEventsConfigFieldsList = new ArrayList<>(Arrays.asList(
+    private static final ArrayList<CustomEventsConfigFields> CustomEventsConfigFieldsList = new ArrayList(Arrays.asList(
             new BalrogEvent(),
             new FaeEvent(),
             new KrakenEvent(),
-            new KillerRabbitOfCaerbannogEvent()
+            new KillerRabbitOfCaerbannogEvent(),
+            new TreasureGoblinEventConfig()
     ));
 
     /**
