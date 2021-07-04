@@ -19,10 +19,6 @@ public class EventsConfig {
 
     private static final ArrayList<EventsFieldConfig> eventsFieldConfigs = new ArrayList<>(Arrays.asList(
             new DeadMoonEventConfig(),
-            new SmallTreasureGoblinEventConfig(),
-            new BalrogEventConfig(),
-            new KrakenEventConfig(),
-            new FaeEventConfig(),
             new MeteorEventConfig()
     ));
 
@@ -39,16 +35,12 @@ public class EventsConfig {
      * @return
      */
     private static FileConfiguration initializeConfiguration(EventsFieldConfig eventsFieldConfig) {
-
         File file = ConfigurationEngine.fileCreator("events", eventsFieldConfig.getFileName());
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         eventsFieldConfig.generateConfigDefaults(fileConfiguration);
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
-
         eventFields.put(file.getName(), new EventsFieldConfig(fileConfiguration, file));
-
         return fileConfiguration;
-
     }
 
 

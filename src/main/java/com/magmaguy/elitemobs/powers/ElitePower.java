@@ -66,6 +66,7 @@ public class ElitePower {
             new EnderDragonDiscoFireballs(),
             new EnderDragonFireballBombardment(),
             new EnderDragonTornado(),
+            new FireworksBarrage(),
 
             //Defensive powers
             new Invisibility(),

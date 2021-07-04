@@ -41,4 +41,12 @@ public class WorldGuardFlagChecker {
         return WorldGuardFlagChecker.getIntegerFlagValue(location, WorldGuardCompatibility.getEliteMobsMaximumLevel());
     }
 
+    public static boolean doExplosionRegenFlag(Location location){
+        com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionQuery query = container.createQuery();
+        ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
+        return set.testState(null, WorldGuardCompatibility.getEliteMobsExplosionRegen());
+    }
+
 }

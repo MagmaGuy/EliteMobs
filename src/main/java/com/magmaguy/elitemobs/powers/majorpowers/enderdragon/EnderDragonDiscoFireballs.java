@@ -58,7 +58,9 @@ public class EnderDragonDiscoFireballs extends MajorCombatEnterScanningPower {
                 if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
                     ((EnderDragon) eliteMobEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
 
-                if (doExit(eliteMobEntity) || !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase())) {
+                if (doExit(eliteMobEntity) ||
+                        eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON) &&
+                                !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase())) {
                     cancel();
                     return;
                 }

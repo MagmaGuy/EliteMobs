@@ -24,6 +24,7 @@ public class DefaultConfig {
     public static boolean otherCommandsLeadToEMStatusMenu;
     public static boolean setupDone;
     public static Location defaultSpawnLocation;
+    public static boolean doExplosionRegen;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -62,6 +63,8 @@ public class DefaultConfig {
         } catch (Exception ex) {
             new WarningMessage("There is an issue with your defaultSpawnLocation in the config.yml configuration file! Fix it!");
         }
+
+        doExplosionRegen = ConfigurationEngine.setBoolean(fileConfiguration, "doExplosionRegen", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

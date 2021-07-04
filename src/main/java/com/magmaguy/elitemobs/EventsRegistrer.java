@@ -16,14 +16,9 @@ import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.commands.setup.SetupMenu;
 import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
-import com.magmaguy.elitemobs.config.events.EventsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.EliteEvent;
-import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
-import com.magmaguy.elitemobs.events.actionevents.MiningEvent;
-import com.magmaguy.elitemobs.events.actionevents.TreeChoppingEvent;
-import com.magmaguy.elitemobs.events.mobs.Kraken;
 import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
 import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
 import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
@@ -51,7 +46,6 @@ import com.magmaguy.elitemobs.powers.AggroPrevention;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFallDamage;
-import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFire;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityKnockback;
 import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
@@ -114,7 +108,8 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new PlayerDeathMessageByEliteMob(), plugin);
 
         //explosion regenerator
-        pluginManager.registerEvents(new Explosion.ExplosionEvent(), plugin);
+        if (DefaultConfig.doExplosionRegen)
+            pluginManager.registerEvents(new Explosion.ExplosionEvent(), plugin);
 
         //Mob loot
         pluginManager.registerEvents(new DefaultDropsHandler(), plugin);
@@ -200,6 +195,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new MeteorShower(), plugin);
         pluginManager.registerEvents(new BulletHell(), plugin);
         pluginManager.registerEvents(new DeathSlice(), plugin);
+        pluginManager.registerEvents(new FireworksBarrage.FireworksBarrageEvents(), plugin);
         pluginManager.registerEvents(new CustomSummonPower.CustomSummonPowerEvent(), plugin);
         pluginManager.registerEvents(new EnderDragonEmpoweredLightning.EnderDragonEmpoweredLightningEvents(), plugin);
         pluginManager.registerEvents(new MajorCombatEnterScanningPower.MajorCombatEnterScanningPowerEvents(), plugin);
@@ -282,17 +278,6 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new DeadMoonEvent(), plugin);
         pluginManager.registerEvents(new SmallTreasureGoblinEvent(), plugin);
         pluginManager.registerEvents(new MeteorEvent(), plugin);
-
-        if (EventsConfig.getEventFields("kraken.yml").isEnabled()) {
-            pluginManager.registerEvents(new Kraken(), plugin);
-            pluginManager.registerEvents(new KrakenEvent(), plugin);
-        }
-        if (EventsConfig.getEventFields("balrog.yml").isEnabled()) {
-            pluginManager.registerEvents(new MiningEvent(), plugin);
-        }
-        if (EventsConfig.getEventFields("fae.yml").isEnabled()) {
-            pluginManager.registerEvents(new TreeChoppingEvent(), plugin);
-        }
 
         pluginManager.registerEvents(new ActionEvent.ActionEventEvents(), plugin);
 
