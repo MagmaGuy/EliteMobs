@@ -62,7 +62,7 @@ public class ActionEvent extends CustomEvent {
         actionEvent.setEventStartLocation(location);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);
         if (customEventStartEvent.isCancelled()) return;
-        if (!actionEvent.startConditions.conditionsAreValid(location)) return;
+        if (!actionEvent.startConditions.areValid()) return;
         actionEvents.add(actionEvent);
         actionEvent.start();
     }

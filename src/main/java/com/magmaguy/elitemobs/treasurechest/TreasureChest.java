@@ -112,6 +112,7 @@ public class TreasureChest {
             location.getChunk().load();
         } catch (Exception ex) {
             new InfoMessage("Location " + customTreasureChestConfigFields.getLocationString() + " is not loaded, so a treasure chest will not be placed!");
+            new WarningMessage(ex.getMessage());
             return;
         }
 

@@ -91,6 +91,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
 
     public static boolean isValidSoulbindUser(ItemMeta itemMeta, Player player) {
         if (!isEnabled) return true;
+        if (player.hasPermission("elitemobs.soulbind.bypass")) return true;
         if (itemMeta == null)
             return true;
         if (!itemMeta.getPersistentDataContainer().has(SOULBIND_KEY, PersistentDataType.STRING))

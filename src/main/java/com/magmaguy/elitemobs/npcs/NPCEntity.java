@@ -12,7 +12,6 @@ import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
@@ -90,8 +89,6 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         }
 
         this.villager.setRemoveWhenFarAway(false);
-
-        if (!villager.isValid()) return;
 
         setName(npCsConfigFields.getName());
         initializeRole(npCsConfigFields.getRole());
@@ -182,7 +179,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         EntityTracker.registerNPCEntity(this);
     }
 
-    public void worldLoad(World world){
+    public void worldLoad(World world) {
         if (!(spawnLocation != null && spawnLocation.getWorld().getName().equalsIgnoreCase(world.getName()))) return;
         if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
         spawnLocation.getChunk().load();
@@ -505,7 +502,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
             public void run() {
                 removeNPCEntity();
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, (long) (timeout*20*60));
+        }.runTaskLater(MetadataHandler.PLUGIN, (long) (timeout * 20 * 60));
     }
 
 

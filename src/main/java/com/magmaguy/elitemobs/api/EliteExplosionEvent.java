@@ -131,8 +131,6 @@ public class EliteExplosionEvent extends Event implements Cancellable {
     public static ArrayList<FallingBlock> fallingBlocks = new ArrayList<>();
 
     public static class EliteExplosionEvents implements Listener {
-
-
         @EventHandler(ignoreCancelled = true)
         public void onBlockDrop(EntityChangeBlockEvent event) {
 
