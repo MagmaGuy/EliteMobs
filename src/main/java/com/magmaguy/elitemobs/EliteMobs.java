@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
+import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
@@ -225,8 +226,15 @@ public class EliteMobs extends JavaPlugin {
             }
         }
 
+        CustomTreasureChestsConfig.initializeConfigs();
+        TreasureChest.initializeTreasureChest();
+
         //Initialize npcs
+        NPCsConfig.initializeConfigs();
         new NPCInitializer();
+
+        //Initialize custom spawn methods, this runs late because it compares loaded worlds against worlds listed in the config
+        new CustomSpawnConfig();
 
         //Commands
         new CommandHandler();
@@ -303,13 +311,12 @@ public class EliteMobs extends JavaPlugin {
         AntiExploitConfig.initializeConfig();
         AdventurersGuildConfig.initializeConfig();
         ValidWorldsConfig.initializeConfig();
-        NPCsConfig.initializeConfigs();
+
         MenusConfig.initializeConfigs();
         PowersConfig.initializeConfigs();
         MobPropertiesConfig.initializeConfigs();
         CustomEnchantment.initializeCustomEnchantments();
-        CustomTreasureChestsConfig.initializeConfigs();
-        TreasureChest.initializeTreasureChest();
+
         MobCombatSettingsConfig.initializeConfig();
         CommandsConfig.initializeConfigs();
         EventsConfig.initializeConfigs();

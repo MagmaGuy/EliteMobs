@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.utils.DebugMessage;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -22,10 +22,10 @@ public class EliteMobRemoveEvent extends Event {
      * @param removalReason  Reason for removal
      */
     public EliteMobRemoveEvent(EliteMobEntity eliteMobEntity, RemovalReason removalReason) {
-        new DebugMessage("Unregistering elite mob!");
         this.entity = eliteMobEntity.getLivingEntity();
         this.eliteMobEntity = eliteMobEntity;
         this.removalReason = removalReason;
+        new DeveloperMessage("Unregistering elite mob for " + removalReason.toString());
         EntityTracker.unregister(eliteMobEntity.uuid, removalReason);
     }
 

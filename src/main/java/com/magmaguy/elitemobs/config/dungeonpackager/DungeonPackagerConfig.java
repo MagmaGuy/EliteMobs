@@ -1,16 +1,14 @@
 package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.dungeonpackager.premade.*;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -74,12 +72,14 @@ public class DungeonPackagerConfig {
         dungeonPackagerConfigFields.generateConfigDefaults(fileConfiguration);
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
         DungeonPackagerConfigFields dungeonPackagerConfigFields1 = new DungeonPackagerConfigFields(fileConfiguration, file);
-        dungeonPackages.put(file.getName(), dungeonPackagerConfigFields1);
-        try {
-            new Minidungeon(dungeonPackagerConfigFields1);
-        } catch (Exception ex) {
-            new WarningMessage("Error while parsing a minidungeon!");
-            ex.printStackTrace();
+        if (dungeonPackagerConfigFields1.getFileConfiguration() != null) {
+            dungeonPackages.put(file.getName(), dungeonPackagerConfigFields1);
+            try {
+                new Minidungeon(dungeonPackagerConfigFields1);
+            } catch (Exception ex) {
+                new WarningMessage("Error while parsing minidungeon " + file.getName() + " !");
+                ex.printStackTrace();
+            }
         }
         return fileConfiguration;
 

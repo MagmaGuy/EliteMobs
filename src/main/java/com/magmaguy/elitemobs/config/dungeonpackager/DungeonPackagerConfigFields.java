@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.Vector;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DungeonPackagerConfigFields {
@@ -29,31 +30,31 @@ public class DungeonPackagerConfigFields {
         ADVENTURE
     }
 
-    private final String fileName;
+    private String fileName;
     private boolean isEnabled;
-    private final String name;
+    private String name;
     private FileConfiguration fileConfiguration;
     private DungeonLocationType dungeonLocationType;
-    private final List<String> customInfo;
-    private final List<String> relativeBossLocations;
-    private final List<String> relativeTreasureChestLocations;
-    private final String downloadLink;
+    private List<String> customInfo = new ArrayList<>();
+    private List<String> relativeBossLocations = new ArrayList<>();
+    private List<String> relativeTreasureChestLocations = new ArrayList<>();
+    private String downloadLink = "";
     private DungeonSizeCategory dungeonSizeCategory;
     private String worldName;
-    private final String schematicName;
+    private String schematicName = "";
     private World.Environment environment;
-    private final Boolean protect;
+    private Boolean protect = null;
     private File file;
     private Location anchorPoint;
     private double rotation;
     private Vector corner1, corner2;
     private Vector teleportPoint;
-    private final Double teleportPointPitch;
-    private final Double teleportPointYaw;
-    private final int dungeonVersion;
-    private final String playerInfo;
-    private final String regionEnterMessage;
-    private final String regionLeaveMessage;
+    private Double teleportPointPitch = 0d;
+    private Double teleportPointYaw = 0d;
+    private int dungeonVersion = 0;
+    private String playerInfo = "";
+    private String regionEnterMessage = "";
+    private String regionLeaveMessage = "";
 
     public DungeonPackagerConfigFields(String fileName,
                                        boolean isEnabled,
@@ -103,33 +104,37 @@ public class DungeonPackagerConfigFields {
     }
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("name", name);
-        fileConfiguration.addDefault("dungeonLocationType", dungeonLocationType.toString());
-        fileConfiguration.addDefault("customInfo", customInfo);
-        fileConfiguration.addDefault("relativeBossLocations", relativeBossLocations);
-        fileConfiguration.addDefault("relativeTreasureLocations", relativeTreasureChestLocations);
-        fileConfiguration.addDefault("downloadLink", downloadLink);
-        fileConfiguration.addDefault("dungeonSizeCategory", dungeonSizeCategory.toString());
-        fileConfiguration.addDefault("worldName", worldName);
-        fileConfiguration.addDefault("schematicName", schematicName);
-        if (environment != null)
-            fileConfiguration.addDefault("environment", environment.toString());
-        if (protect != null)
-            fileConfiguration.addDefault("protect", protect);
-        fileConfiguration.addDefault("rotation", 0);
-        if (corner1 != null)
-            fileConfiguration.addDefault("corner1", corner1.getBlockX() + "," + corner1.getBlockY() + "," + corner1.getBlockZ());
-        if (corner2 != null)
-            fileConfiguration.addDefault("corner2", corner2.getBlockX() + "," + corner2.getBlockY() + "," + corner2.getBlockZ());
-        if (teleportPoint != null)
-            fileConfiguration.addDefault("teleportPoint", teleportPoint.getBlockX() + "," + teleportPoint.getBlockY() + "," + teleportPoint.getBlockZ());
-        fileConfiguration.addDefault("teleportPointPitch", teleportPointPitch);
-        fileConfiguration.addDefault("teleportPointYaw", teleportPointYaw);
-        fileConfiguration.addDefault("dungeonVersion", dungeonVersion);
-        fileConfiguration.addDefault("playerInfo", playerInfo);
-        fileConfiguration.addDefault("regionEnterMessage", regionEnterMessage);
-        fileConfiguration.addDefault("regionLeaveMessage", regionLeaveMessage);
+        try {
+            fileConfiguration.addDefault("isEnabled", isEnabled);
+            fileConfiguration.addDefault("name", name);
+            fileConfiguration.addDefault("dungeonLocationType", dungeonLocationType.toString());
+            fileConfiguration.addDefault("customInfo", customInfo);
+            fileConfiguration.addDefault("relativeBossLocations", relativeBossLocations);
+            fileConfiguration.addDefault("relativeTreasureLocations", relativeTreasureChestLocations);
+            fileConfiguration.addDefault("downloadLink", downloadLink);
+            fileConfiguration.addDefault("dungeonSizeCategory", dungeonSizeCategory.toString());
+            fileConfiguration.addDefault("worldName", worldName);
+            fileConfiguration.addDefault("schematicName", schematicName);
+            if (environment != null)
+                fileConfiguration.addDefault("environment", environment.toString());
+            if (protect != null)
+                fileConfiguration.addDefault("protect", protect);
+            fileConfiguration.addDefault("rotation", 0);
+            if (corner1 != null)
+                fileConfiguration.addDefault("corner1", corner1.getBlockX() + "," + corner1.getBlockY() + "," + corner1.getBlockZ());
+            if (corner2 != null)
+                fileConfiguration.addDefault("corner2", corner2.getBlockX() + "," + corner2.getBlockY() + "," + corner2.getBlockZ());
+            if (teleportPoint != null)
+                fileConfiguration.addDefault("teleportPoint", teleportPoint.getBlockX() + "," + teleportPoint.getBlockY() + "," + teleportPoint.getBlockZ());
+            fileConfiguration.addDefault("teleportPointPitch", teleportPointPitch);
+            fileConfiguration.addDefault("teleportPointYaw", teleportPointYaw);
+            fileConfiguration.addDefault("dungeonVersion", dungeonVersion);
+            fileConfiguration.addDefault("playerInfo", playerInfo);
+            fileConfiguration.addDefault("regionEnterMessage", regionEnterMessage);
+            fileConfiguration.addDefault("regionLeaveMessage", regionLeaveMessage);
+        } catch (Exception ex) {
+            new WarningMessage("A field in a dungeon packager was not valid!");
+        }
     }
 
     public DungeonPackagerConfigFields(FileConfiguration fileConfiguration, File file) {
@@ -142,6 +147,8 @@ public class DungeonPackagerConfigFields {
             this.dungeonLocationType = DungeonLocationType.valueOf(fileConfiguration.getString("dungeonLocationType"));
         } catch (Exception exception) {
             new WarningMessage("File " + fileName + " does not have a valid dungeonLocationType!");
+            this.fileConfiguration = null;
+            return;
         }
         this.customInfo = fileConfiguration.getStringList("customInfo");
         this.relativeBossLocations = fileConfiguration.getStringList("relativeBossLocations");
@@ -151,6 +158,8 @@ public class DungeonPackagerConfigFields {
             this.dungeonSizeCategory = DungeonSizeCategory.valueOf(fileConfiguration.getString("dungeonSizeCategory"));
         } catch (Exception exception) {
             new WarningMessage("File " + fileName + " does not have a valid dungeonSizeCategory!");
+            this.fileConfiguration = null;
+            return;
         }
         this.worldName = fileConfiguration.getString("worldName");
         this.schematicName = fileConfiguration.getString("schematicName");
@@ -190,6 +199,10 @@ public class DungeonPackagerConfigFields {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public FileConfiguration getFileConfiguration(){
+        return this.fileConfiguration;
     }
 
     public boolean isEnabled() {

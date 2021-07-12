@@ -24,14 +24,14 @@ import java.util.UUID;
 
 public class WorldGuardCompatibility {
 
-    private static StateFlag ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
-    private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG = new StateFlag("elitemob-only-spawning", false);
-    private static StateFlag ELITEMOBS_ANTIEXPLOIT = new StateFlag("elitemobs-antiexploit", true);
-    private static StateFlag ELITEMOBS_DUNGEON = new StateFlag("elitemobs-dungeon", false);
-    private static StateFlag ELITEMOBS_EVENTS = new StateFlag("elitemobs-events", true);
-    private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL = new IntegerFlag("elitemobs-minimum-level");
-    private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL = new IntegerFlag("elitemobs-maximum-level");
-    private static StateFlag ELITEMOBS_EXPLOSION_REGEN = new StateFlag("elitemob-explosion-regen", true);
+    private static StateFlag ELITEMOBS_SPAWN_FLAG;
+    private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG;
+    private static StateFlag ELITEMOBS_ANTIEXPLOIT;
+    private static StateFlag ELITEMOBS_DUNGEON;
+    private static StateFlag ELITEMOBS_EVENTS;
+    private static IntegerFlag ELITEMOBS_MINIMUM_LEVEL;
+    private static IntegerFlag ELITEMOBS_MAXIMUM_LEVEL;
+    private static StateFlag ELITEMOBS_EXPLOSION_REGEN;
 
     public static boolean initialize() {
 
@@ -49,8 +49,10 @@ public class WorldGuardCompatibility {
             new WarningMessage("Something went wrong while loading WorldGuard. Are you using the right WorldGuard version?");
             return false;
         }
+
         Bukkit.getLogger().info("[EliteMobs] Enabling flags:");
         try {
+            ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
             registry.register(ELITEMOBS_SPAWN_FLAG);
             Bukkit.getLogger().info("[EliteMobs] - elitemob-spawning");
         } catch (FlagConflictException | IllegalStateException e) {
@@ -58,6 +60,7 @@ public class WorldGuardCompatibility {
             ELITEMOBS_SPAWN_FLAG = (StateFlag) registry.get("elitemob-spawning");
         }
         try {
+            ELITEMOBS_ONLY_SPAWN_FLAG = new StateFlag("elitemob-only-spawning", false);
             registry.register(ELITEMOBS_ONLY_SPAWN_FLAG);
             Bukkit.getLogger().info("[EliteMobs] - elitemob-only-spawning");
         } catch (FlagConflictException | IllegalStateException e) {
@@ -65,6 +68,7 @@ public class WorldGuardCompatibility {
             ELITEMOBS_ONLY_SPAWN_FLAG = (StateFlag) registry.get("elitemob-only-spawning");
         }
         try {
+            ELITEMOBS_ANTIEXPLOIT = new StateFlag("elitemobs-antiexploit", true);
             registry.register(ELITEMOBS_ANTIEXPLOIT);
             Bukkit.getLogger().info("[EliteMobs] - elitemobs-antiexploit");
         } catch (FlagConflictException | IllegalStateException e) {
@@ -72,6 +76,7 @@ public class WorldGuardCompatibility {
             ELITEMOBS_ANTIEXPLOIT = (StateFlag) registry.get("elitemobs-antiexploit");
         }
         try {
+            ELITEMOBS_DUNGEON = new StateFlag("elitemobs-dungeon", false);
             registry.register(ELITEMOBS_DUNGEON);
             Bukkit.getLogger().info("[EliteMobs] - elitemobs-dungeon");
         } catch (FlagConflictException | IllegalStateException e) {
@@ -79,6 +84,7 @@ public class WorldGuardCompatibility {
             ELITEMOBS_DUNGEON = (StateFlag) registry.get("elitemobs-dungeon");
         }
         try {
+            ELITEMOBS_EVENTS = new StateFlag("elitemobs-events", true);
             registry.register(ELITEMOBS_EVENTS);
             Bukkit.getLogger().info("[EliteMobs] - elitemobs-events");
         } catch (FlagConflictException | IllegalStateException e) {
@@ -86,6 +92,7 @@ public class WorldGuardCompatibility {
             ELITEMOBS_EVENTS = (StateFlag) registry.get("elitemobs-events");
         }
         try {
+            ELITEMOBS_MINIMUM_LEVEL = new IntegerFlag("elitemobs-minimum-level");
             registry.register(ELITEMOBS_MINIMUM_LEVEL);
             Bukkit.getLogger().info("[EliteMobs] - elitemobs-minimum-level");
         } catch (FlagConflictException | IllegalStateException e) {
@@ -93,6 +100,7 @@ public class WorldGuardCompatibility {
             ELITEMOBS_MINIMUM_LEVEL = (IntegerFlag) registry.get("elitemobs-minimum-level");
         }
         try {
+            ELITEMOBS_MAXIMUM_LEVEL = new IntegerFlag("elitemobs-maximum-level");
             registry.register(ELITEMOBS_MAXIMUM_LEVEL);
             Bukkit.getLogger().info("[EliteMobs] - elitemobs-maximum-level");
         } catch (FlagConflictException | IllegalStateException e) {
@@ -101,6 +109,7 @@ public class WorldGuardCompatibility {
         }
 
         try {
+            ELITEMOBS_EXPLOSION_REGEN = new StateFlag("elitemobs-explosion-regen", true);
             registry.register(ELITEMOBS_EXPLOSION_REGEN);
             Bukkit.getLogger().info("[EliteMobs] - elitemobs-explosion-regen");
         } catch (FlagConflictException | IllegalStateException e) {
