@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.entitytracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;
@@ -28,9 +27,6 @@ public class EliteEntityTracker extends TrackedEntity implements AbstractTracked
     @Override
     public void specificRemoveHandling(RemovalReason removalReason) {
         eliteMobEntity.remove(removalReason);
-
-        //new DeveloperMessage("Reason: " + removalReason);
-        //new DeveloperMessage("Name: " + eliteMobEntity.getName());
 
         if (removalReason.equals(RemovalReason.CHUNK_UNLOAD)) {
             if (eliteMobEntity.customBossEntity != null)

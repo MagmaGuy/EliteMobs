@@ -30,6 +30,8 @@ public class ConfigurationLocation {
             String locationOnlyString = locationString.split(":")[0];
 
             world = Bukkit.getWorld(getSubString(locationOnlyString, 0, ","));
+            if (world == null)
+                new WarningMessage("World string for " + locationOnlyString + " is null. This location won't be able to load correctly.");
             x = Double.parseDouble(getSubString(locationOnlyString, 1, ","));
             y = Double.parseDouble(getSubString(locationOnlyString, 2, ","));
             z = Double.parseDouble(getSubString(locationOnlyString, 3, ","));

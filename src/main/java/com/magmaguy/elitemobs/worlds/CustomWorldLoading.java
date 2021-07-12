@@ -15,8 +15,7 @@ public class CustomWorldLoading {
         File[] listOfFiles = folder.listFiles();
 
         for (File listOfFile : listOfFiles) {
-            if (listOfFile.isDirectory() &&
-                    listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName)) {
+            if (listOfFile.isDirectory() && listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName)) {
                 new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " found! Loading it in...");
                 try {
                     WorldCreator worldCreator = new WorldCreator(AdventurersGuildConfig.guildWorldName);

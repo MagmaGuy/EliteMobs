@@ -149,7 +149,7 @@ public class Explosion {
     }
 
     private static void generateExplosion(EntityExplodeEvent event) {
-        generateExplosion(event.blockList(), event.getEntity(), null, null);
+        generateExplosion(event.blockList(), event.getEntity(), null, event.getEntity().getLocation());
     }
 
     private static void generateExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSource) {

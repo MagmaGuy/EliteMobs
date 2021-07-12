@@ -50,13 +50,13 @@ public class CustomEventsConfig {
             for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfigFieldsList) {
                 if (file.getName().equalsIgnoreCase(customEventsConfigFields.getFilename())) {
                     CustomEventsConfigFieldsList.remove(customEventsConfigFields);
-                    initializeConfiguration(customEventsConfigFields);
+                    initialize(customEventsConfigFields);
                     isPremade = true;
                     break;
                 }
             }
             if (!isPremade)
-                initializeConfiguration(file);
+                initialize(file);
         }
 
         if (!CustomEventsConfigFieldsList.isEmpty())
@@ -71,7 +71,7 @@ public class CustomEventsConfig {
      */
     private static void generateFreshConfigurations() {
         for (CustomEventsConfigFields CustomEventsConfigFields : CustomEventsConfigFieldsList)
-            initializeConfiguration(CustomEventsConfigFields);
+            initialize(CustomEventsConfigFields);
     }
 
     /**
@@ -80,7 +80,7 @@ public class CustomEventsConfig {
      * @param CustomEventsConfigFields
      * @return
      */
-    private static FileConfiguration initializeConfiguration(CustomEventsConfigFields CustomEventsConfigFields) {
+    private static void initialize(CustomEventsConfigFields CustomEventsConfigFields) {
 
         File file = ConfigurationEngine.fileCreator("customevents", CustomEventsConfigFields.getFilename());
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
@@ -89,8 +89,6 @@ public class CustomEventsConfig {
 
         customEvents.put(file.getName(), new CustomEventsConfigFields(fileConfiguration, file));
 
-        return fileConfiguration;
-
     }
 
     /**
@@ -98,9 +96,8 @@ public class CustomEventsConfig {
      *
      * @return
      */
-    private static FileConfiguration initializeConfiguration(File file) {
+    private static void initialize(File file) {
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
         customEvents.put(file.getName(), new CustomEventsConfigFields(fileConfiguration, file));
-        return fileConfiguration;
     }
 }

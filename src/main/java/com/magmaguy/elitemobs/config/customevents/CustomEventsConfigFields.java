@@ -129,22 +129,7 @@ public class CustomEventsConfigFields {
             fileConfiguration.addDefault("endEventWithBossDeath", endEventWithBossDeath);
         if (spawnType != TimedEvent.SpawnType.INSTANT_SPAWN)
             fileConfiguration.addDefault("spawnType", spawnType.toString());
-        if (lowestYLevel != 0)
-            fileConfiguration.addDefault("lowestYLevel", lowestYLevel);
-        if (highestYLevel != 320)
-            fileConfiguration.addDefault("highestYLevel", highestYLevel);
-        if (!validWorlds.isEmpty())
-            fileConfiguration.addDefault("validWorlds", validWorlds);
-        if (!validWorldTypes.isEmpty())
-            fileConfiguration.addDefault("validWorldTypes", validWorldTypes);
-        if (!validBiomes.isEmpty())
-            fileConfiguration.addDefault("validBiomes", validBiomes);
-        if (earliestTime != 0)
-            fileConfiguration.addDefault("earliestTime", earliestTime);
-        if (latestTime != 0)
-            fileConfiguration.addDefault("latestTime", latestTime);
-        if (moonPhase != null)
-            fileConfiguration.addDefault("moonPhase", moonPhase.toString());
+
         if (minimumPlayerCount != 0)
             fileConfiguration.addDefault("minimumPlayerCount", minimumPlayerCount);
     }
@@ -249,85 +234,6 @@ public class CustomEventsConfigFields {
 
     TimedEvent.SpawnType spawnType = TimedEvent.SpawnType.INSTANT_SPAWN;
 
-    public int getLowestYLevel() {
-        return lowestYLevel;
-    }
-
-    public void setLowestYLevel(int lowestYLevel) {
-        this.lowestYLevel = lowestYLevel;
-    }
-
-    int lowestYLevel = 0;
-
-    public int getHighestYLevel() {
-        return highestYLevel;
-    }
-
-    public void setHighestYLevel(int highestYLevel) {
-        this.highestYLevel = highestYLevel;
-    }
-
-    int highestYLevel = 320;
-
-    public List<String> getValidWorlds() {
-        return validWorlds;
-    }
-
-    public void setValidWorlds(List<String> validWorlds) {
-        this.validWorlds = validWorlds;
-    }
-
-    List<String> validWorlds = new ArrayList<>();
-
-    public List<World.Environment> getValidWorldTypes() {
-        return validWorldTypes;
-    }
-
-    public void setValidWorldTypes(List<World.Environment> validWorldTypes) {
-        this.validWorldTypes = validWorldTypes;
-    }
-
-    List<World.Environment> validWorldTypes = new ArrayList<>();
-
-    public List<Biome> getValidBiomes() {
-        return validBiomes;
-    }
-
-    public void setValidBiomes(List<Biome> validBiomes) {
-        this.validBiomes = validBiomes;
-    }
-
-    List<Biome> validBiomes = new ArrayList<>();
-
-    public long getEarliestTime() {
-        return earliestTime;
-    }
-
-    public void setEarliestTime(long earliestTime) {
-        this.earliestTime = earliestTime;
-    }
-
-    private long earliestTime = 0;
-
-    public long getLatestTime() {
-        return latestTime;
-    }
-
-    public void setLatestTime(long latestTime) {
-        this.latestTime = latestTime;
-    }
-
-    private long latestTime = 24000;
-
-    public MoonPhaseDetector.MoonPhase getMoonPhase() {
-        return moonPhase;
-    }
-
-    public void setMoonPhase(MoonPhaseDetector.MoonPhase moonPhase) {
-        this.moonPhase = moonPhase;
-    }
-
-    private MoonPhaseDetector.MoonPhase moonPhase = null;
 
     public int getMinimumPlayerCount() {
         return minimumPlayerCount;
@@ -384,14 +290,9 @@ public class CustomEventsConfigFields {
         this.eventDuration = processDouble("eventDuration", eventDuration);
         this.endEventWithBossDeath = processBoolean("endEventWithBossDeath", endEventWithBossDeath);
         this.spawnType = processSpawnType("spawnType", spawnType);
-        this.lowestYLevel = processInt("lowestYLevel", lowestYLevel);
-        this.highestYLevel = processInt("highestYLevel", highestYLevel);
-        this.validWorlds = processStringList("validWorlds", validWorlds);
-        this.validWorldTypes = processValidWorldTypes("validWorldTypes");
-        this.validBiomes = processValidBiomes("validBiomes");
-        this.earliestTime = processLong("earliestTime", earliestTime);
-        this.latestTime = processLong("latestTime", latestTime);
-        this.moonPhase = processMoonPhase("moonPhase", moonPhase);
+
+
+
         this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount);
     }
 
@@ -489,47 +390,6 @@ public class CustomEventsConfigFields {
             return TimedEvent.SpawnType.valueOf(fileConfiguration.getString(path));
         } catch (Exception ex) {
             new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
-        }
-        return pluginDefault;
-    }
-
-    private List<World.Environment> processValidWorldTypes(String path) {
-        List<String> validWorldTypes = processStringList(path, null);
-        if (validWorldTypes == null)
-            return this.validWorldTypes;
-        try {
-            List<World.Environment> processedWorldTypes = new ArrayList<>();
-            for (String string : validWorldTypes)
-                processedWorldTypes.add(World.Environment.valueOf(string));
-            return processedWorldTypes;
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an invalid world type entry in " + path + " !");
-            return null;
-        }
-    }
-
-    private List<Biome> processValidBiomes(String path) {
-        List<String> validBiomes = processStringList(path, null);
-        if (validBiomes == null)
-            return this.validBiomes;
-        try {
-            List<Biome> processedBiomes = new ArrayList<>();
-            for (String string : validBiomes)
-                processedBiomes.add(Biome.valueOf(string));
-            return processedBiomes;
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an invalid biome entry in " + path + " !");
-            return null;
-        }
-    }
-
-    private MoonPhaseDetector.MoonPhase processMoonPhase(String path, MoonPhaseDetector.MoonPhase pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
-        try {
-            return MoonPhaseDetector.MoonPhase.valueOf(fileConfiguration.getString(path));
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect moon phase entry for " + path);
         }
         return pluginDefault;
     }

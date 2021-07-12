@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.adventurersguild;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.attribute.Attribute;
@@ -17,6 +18,7 @@ public class GuildRank {
 
     public static void setGuildPrestigeRank(Player player, int prestigeRank) {
         PlayerData.setGuildPrestigeLevel(player.getUniqueId(), prestigeRank);
+        ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);
     }
 
     public static int getGuildPrestigeRank(Player player) {

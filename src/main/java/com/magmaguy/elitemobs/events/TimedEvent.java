@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.CustomEventStartEvent;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -48,13 +49,27 @@ public class TimedEvent extends CustomEvent implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60, 20 * 60);
     }
 
+    /**
+     * Just because the event is instantiated, does not necessarily mean it started. If the spawn isn't instant, then
+     * it needs to be queued for a later date. If the spawn is instant but no valid location can be found, it should retry
+     * on a delay.
+     */
     private void instantiateEvent() {
         TimedEvent timedEvent = new TimedEvent(customEventsConfigFields);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(timedEvent);
         if (customEventStartEvent.isCancelled()) return;
 
-        //Start cooldown for the blueprints, not the instantiated event because that one will be deleted at the end of its runtime
-        this.nextLocalEventTrigger = System.currentTimeMillis() + localCooldown * 60000;
+        switch (customEventsConfigFields.getSpawnType()) {
+            case ENHANCED_SPAWN:
+                break;
+            case INSTANT_SPAWN:
+                break;
+            default:
+                new WarningMessage("Failed to instantiate timed event " + customEventStartEvent.getEventName() + " because it did not have a valid Spawn Type!");
+                break;
+        }
+
+        //global cooldown
         nextEventTrigger = System.currentTimeMillis() + globalCooldown * 60000;
 
         timedEvents.add(timedEvent);
@@ -79,7 +94,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     }
 
     public enum SpawnType {
-        NATURAL_SPAWN,
+        ENHANCED_SPAWN,
         INSTANT_SPAWN
     }
 
@@ -87,12 +102,18 @@ public class TimedEvent extends CustomEvent implements Listener {
      * Queues an event to start when the start conditions are met
      */
     public void queueEvent() {
-
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                //if (startConditions.areValid())
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
     @Override
     public void startModifiers() {
-
+        //Start cooldown for the blueprints, not the instantiated event because that one will be deleted at the end of its runtime
+        this.nextLocalEventTrigger = System.currentTimeMillis() + localCooldown * 60000;
     }
 
     @Override
@@ -105,9 +126,9 @@ public class TimedEvent extends CustomEvent implements Listener {
         timedEvents.remove(this);
     }
 
-    public static class TimeEventEvents implements Listener{
-        @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-        public void onEliteSpawn(){
+    public static class TimeEventEvents implements Listener {
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+        public void onEliteSpawn() {
 
         }
     }
