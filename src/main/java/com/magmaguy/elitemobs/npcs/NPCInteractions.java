@@ -96,6 +96,7 @@ public class NPCInteractions implements Listener {
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case BAR:
+                event.getPlayer().sendMessage("[EliteMobs] This feature is coming soon!");
                 break;
             case ARENA:
                 break;

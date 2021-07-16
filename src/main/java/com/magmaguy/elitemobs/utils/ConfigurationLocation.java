@@ -31,7 +31,7 @@ public class ConfigurationLocation {
 
             world = Bukkit.getWorld(getSubString(locationOnlyString, 0, ","));
             if (world == null)
-                new WarningMessage("World string for " + locationOnlyString + " is null. This location won't be able to load correctly.");
+                new WarningMessage("Does world " + locationOnlyString + " exist? Did you install the Adventurer's Guild?.");
             x = Double.parseDouble(getSubString(locationOnlyString, 1, ","));
             y = Double.parseDouble(getSubString(locationOnlyString, 2, ","));
             z = Double.parseDouble(getSubString(locationOnlyString, 3, ","));

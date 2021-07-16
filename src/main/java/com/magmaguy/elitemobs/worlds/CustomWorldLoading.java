@@ -20,7 +20,8 @@ public class CustomWorldLoading {
                 try {
                     WorldCreator worldCreator = new WorldCreator(AdventurersGuildConfig.guildWorldName);
                     Bukkit.createWorld(worldCreator).setKeepSpawnInMemory(false);
-                    new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " has been successfully loaded! It can be accessed through the '/ag' command, unless you changed that config option!");
+                    new InfoMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName +
+                            " has been successfully loaded! It can be accessed through the '/ag' command, unless you changed that config option!");
                 } catch (Exception ex) {
                     new WarningMessage("Failed to generate Adventurer's Guild World!");
                     ex.printStackTrace();
