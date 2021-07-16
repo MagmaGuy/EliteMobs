@@ -6,31 +6,82 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.entitytracker.NPCEntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Consumer;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity implements SimplePersistentEntityInterface {
+
+    public static class NPCEntityEvents implements Listener {
+        public static HashMap<Chunk, List<NPCEntity>> npcEntityHashMap = new HashMap<>();
+
+        public static void queueNPCEntity(Chunk chunk, NPCEntity npcEntity) {
+            if (!npcEntityHashMap.containsKey(chunk))
+                npcEntityHashMap.put(chunk, new ArrayList<>(Collections.singletonList(npcEntity)));
+            else {
+                List<NPCEntity> npcEntities = npcEntityHashMap.get(chunk);
+                npcEntities.add(npcEntity);
+                npcEntityHashMap.put(chunk, npcEntities);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void onChunkLoad(ChunkLoadEvent event) {
+            List<NPCEntity> npcEntities = npcEntityHashMap.get(event.getChunk());
+            if (npcEntities == null) return;
+            new DeveloperMessage("Chunk load wasn't null!");
+            for (NPCEntity npcEntity : npcEntities) {
+                WorldGuardSpawnEventBypasser.forceSpawn();
+                try {
+                    new DeveloperMessage("Running npc load!");
+                    //this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+                    npcEntity.completeSetup();
+                } catch (Exception ex) {
+                    new WarningMessage("NPC " + npcEntity.npCsConfigFields.getFileName() + " tried to spawn in an invalid location. " +
+                            "This may be due to region protection preventing it from spawning correctly. If not, delete the location" +
+                            " in its configuration file and try setting it up again.");
+                    ex.printStackTrace();
+                    return;
+                }
+            }
+
+        }
+    }
+
+    public static Consumer<? extends Villager> consumer = new Consumer<Villager>() {
+
+        @Override
+        public void accept(Villager entity) {
+            // do something
+            entity.setRemoveWhenFarAway(false);
+            entity.setPersistent(false);
+            entity.setAI(false);
+            new DeveloperMessage("Spawning entity: " + entity.getType());
+        }
+
+    };
 
     private Villager villager = null;
     public UUID uuid;
@@ -66,44 +117,41 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         if (npCsConfigFields.getLocation().equalsIgnoreCase("null"))
             return;
 
-        ArrayList<NPCEntity> npcEntitiesToCull = new ArrayList<>();
-
-        for (NPCEntity npcEntity : NPCEntityTracker.npcEntities.values())
-            if (npcEntity.getSpawnLocation().equals(spawnLocation))
-                npcEntitiesToCull.add(npcEntity);
-
-        for (NPCEntity npcEntity : npcEntitiesToCull)
-            npcEntity.removeNPCEntity();
-
-        if (this.villager != null) return;
-
-        WorldGuardSpawnEventBypasser.forceSpawn();
-        try {
-            this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
-            this.uuid = villager.getUniqueId();
-        } catch (Exception ex) {
-            new WarningMessage("NPC " + npCsConfigFields.getFileName() + " tried to spawn in an invalid location. " +
-                    "This may be due to region protection preventing it from spawning correctly. If not, delete the location" +
-                    " in its configuration file and try setting it up again.");
-            return;
+        if (spawnLocation == null) {
+            new DeveloperMessage("Something went wrong - npc entity location was null! Check with the dev!");
         }
 
-        this.villager.setRemoveWhenFarAway(false);
+        //happens when the world associated to the mob isn't loaded
+        if (spawnLocation.getWorld() == null)
+            return;
 
+        spawnLocation.getChunk().addPluginChunkTicket(MetadataHandler.PLUGIN);
+
+        if (spawnLocation.getChunk().isLoaded()) {
+            new DeveloperMessage("Chunk was already loaded!");
+            completeSetup();
+        } else
+
+            NPCEntityEvents.queueNPCEntity(spawnLocation.getChunk(), this);
+
+    }
+
+    public void completeSetup() {
+        this.villager = this.spawnLocation.getWorld().spawn(this.spawnLocation, Villager.class, (Consumer<Villager>) consumer);
+        this.uuid = this.villager.getUniqueId();
+        EntityTracker.registerNPCEntity(this);
         setName(npCsConfigFields.getName());
         initializeRole(npCsConfigFields.getRole());
         setProfession(npCsConfigFields.getProfession());
         setGreetings(npCsConfigFields.getGreetings());
         setDialog(npCsConfigFields.getDialog());
         setFarewell(npCsConfigFields.getFarewell());
-        setCanMove(npCsConfigFields.isCanMove());
+
         setCanTalk(npCsConfigFields.isCanTalk());
         setActivationRadius(npCsConfigFields.getActivationRadius());
         setDisappearsAtNight(npCsConfigFields.isCanSleep());
         setNpcInteractionType(npCsConfigFields.getInteractionType());
         setTimeout();
-
-        EntityTracker.registerNPCEntity(this);
     }
 
     /**
@@ -138,6 +186,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         }
 
         this.villager.setRemoveWhenFarAway(false);
+        this.villager.setPersistent(false);
 
         if (!villager.isValid()) return;
 
@@ -147,7 +196,8 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         setGreetings(npCsConfigFields.getGreetings());
         setDialog(npCsConfigFields.getDialog());
         setFarewell(npCsConfigFields.getFarewell());
-        setCanMove(npCsConfigFields.isCanMove());
+        //setCanMove(npCsConfigFields.isCanMove());
+        this.villager.setAI(false);
         setCanTalk(npCsConfigFields.isCanTalk());
         setActivationRadius(npCsConfigFields.getActivationRadius());
         setDisappearsAtNight(npCsConfigFields.isCanSleep());
@@ -162,8 +212,14 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     @Override
     public void chunkUnload() {
         villager.remove();
-        if (timeout < 1)
+        if (timeout < 1) {
             simplePersistentEntity = new SimplePersistentEntity(this);
+            if (villager != null) {
+                new DeveloperMessage("Removing NPC for chunk unload!");
+                villager.remove();
+            }
+            new DeveloperMessage("Generating new NPC simple persistent entity!");
+        }
     }
 
     @Override
@@ -171,18 +227,21 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         if (villager != null && villager.isValid()) return;
         WorldGuardSpawnEventBypasser.forceSpawn();
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
+        EntityTracker.registerNPCEntity(this);
         this.uuid = villager.getUniqueId();
         setName(npCsConfigFields.getName());
         setProfession(npCsConfigFields.getProfession());
         initializeRole(role);
-        setCanMove(canMove);
-        EntityTracker.registerNPCEntity(this);
+        this.villager.setAI(false);
+        //setCanMove(canMove);
+        new DeveloperMessage("Chunk load npc creation");
     }
 
     public void worldLoad(World world) {
-        if (!(spawnLocation != null && spawnLocation.getWorld().getName().equalsIgnoreCase(world.getName()))) return;
-        if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
+        if (spawnLocation == null && !setSpawnLocation(npCsConfigFields.getLocation())) return;
+        if (!spawnLocation.getWorld().getName().equalsIgnoreCase(world.getName())) return;
         spawnLocation.getChunk().load();
+        new DeveloperMessage("World load npc creation");
     }
 
     /**
@@ -235,6 +294,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         this.roleDisplay.setVisible(false);
         this.roleDisplay.setGravity(false);
         this.roleDisplay.setPersistent(false);
+        new DeveloperMessage("initialized role message");
     }
 
     /**
@@ -349,22 +409,24 @@ public class NPCEntity implements SimplePersistentEntityInterface {
      * Returns whether or not the NPCEntity can move.
      *
      * @return whether the NPCEntity can move
-     */
+
     public boolean getCanMove() {
-        return this.canMove;
+    return this.canMove;
     }
+     */
 
     /**
      * Sets the NPCEntity's ability to move
      *
      * @param canMove Sets if the NPCEntity can move
-     */
+
     public void setCanMove(boolean canMove) {
-        this.canMove = canMove;
-        this.villager.setAI(canMove);
-        if (!canMove)
-            villager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
+    this.canMove = canMove;
+    this.villager.setAI(canMove);
+    if (!canMove)
+    villager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
     }
+     */
 
     /**
      * Returns whether the NPCEntity can use NPCChatBubble

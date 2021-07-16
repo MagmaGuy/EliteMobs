@@ -25,7 +25,6 @@ public class EliteMobRemoveEvent extends Event {
         this.entity = eliteMobEntity.getLivingEntity();
         this.eliteMobEntity = eliteMobEntity;
         this.removalReason = removalReason;
-        new DeveloperMessage("Unregistering elite mob for " + removalReason.toString());
         EntityTracker.unregister(eliteMobEntity.uuid, removalReason);
     }
 
