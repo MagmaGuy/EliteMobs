@@ -26,6 +26,7 @@ repositories {
     //Vault
     maven { url = 'https://jitpack.io' }
     //DiscordSRV
+    maven { url = 'https://m2.dv8tion.net/releases/'}
     maven { url = 'https://nexus.scarsz.me/content/groups/public/' }
     //LibsDisguises
     maven { url = 'https://repo.md-5.net/content/groups/public/' }
@@ -41,7 +42,7 @@ dependencies {
     //Spigot API
     compileOnly "org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT"
     //BStats API
-    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '1.8'
+    implementation group: 'org.bstats', name: 'bstats-bukkit', version: '2.2.1'
     //WorldGuard API
     compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-bukkit', version: '7.0.0'
     //CloudCommands
@@ -55,15 +56,15 @@ dependencies {
     //Vault
     compileOnly group: 'com.github.MilkBowl', name: 'VaultAPI', version: '1.7'
     //DiscordSRV
-    compileOnly 'net.dv8tion:JDA:4.2.0_227'
-    compileOnly group: 'com.discordsrv', name: 'discordsrv', version: '1.21.3'
+    compileOnly 'net.dv8tion:JDA:4.2.1_262'
+    implementation group: 'com.discordsrv', name: 'discordsrv', version: '1.23.0'
     //SQLite
     compileOnly group: 'org.xerial', name: 'sqlite-jdbc', version: '3.32.3'
     //LibsDisguises
-    compileOnly group: 'LibsDisguises', name: 'LibsDisguises', version: '10.0.18'
+    compileOnly group: 'com.comphenix.protocol', name: 'ProtocolLib', version: '4.7.0';
+    compileOnly group: 'LibsDisguises', name: 'LibsDisguises', version: '10.0.26'
     //PlaceholderAPI
     compileOnly group: 'me.clip', name: 'placeholderapi', version: '2.10.9'
-
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
 
     //apache commons
