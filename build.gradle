@@ -115,3 +115,5 @@ wrapper {
     gradleVersion = "7.0"
     distributionType = Wrapper.DistributionType.BIN
 }
+
+tasks.build.dependsOn tasks.shadowJar
