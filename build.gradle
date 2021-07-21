@@ -110,3 +110,8 @@ ext {
 processResources {
     filter org.apache.tools.ant.filters.ReplaceTokens, tokens: resourceTokens
 }
+
+wrapper {
+    gradleVersion = "7.0"
+    distributionType = Wrapper.DistributionType.BIN
+}
