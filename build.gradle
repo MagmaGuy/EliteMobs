@@ -1,8 +1,8 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'idea'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 //Fixes issues related to special characters being used
