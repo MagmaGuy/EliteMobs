@@ -2,14 +2,14 @@ package com.magmaguy.elitemobs.powers.majorpowers.zombie;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
-import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
+import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -36,7 +36,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
     private int chantIndex = 0;
 
-    private static final HashSet<EliteMobEntity> chantingMobs = new HashSet<>();
+    private static final HashSet<EliteEntity> chantingMobs = new HashSet<>();
     //todo: Shouldn't this be static?
 
     public ZombieNecronomicon() {
@@ -54,9 +54,9 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
         spawnReinforcements(event.getEliteMobEntity(), event.getPlayer(), zombieNecronomicon);
     }
 
-    private void necronomiconVisualEffect(EliteMobEntity eliteMobEntity, ZombieNecronomicon zombieNecronomicon) {
+    private void necronomiconVisualEffect(EliteEntity eliteEntity, ZombieNecronomicon zombieNecronomicon) {
 
-        LivingEntity livingEntity = eliteMobEntity.getLivingEntity();
+        LivingEntity livingEntity = eliteEntity.getLivingEntity();
         livingEntity.setAI(false);
         zombieNecronomicon.setIsFiring(true);
         nameScroller(livingEntity, zombieNecronomicon);
@@ -171,9 +171,9 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
     }
 
-    private void spawnReinforcements(EliteMobEntity eliteMobEntity, LivingEntity targetted, ZombieNecronomicon zombieNecronomicon) {
+    private void spawnReinforcements(EliteEntity eliteEntity, LivingEntity targetted, ZombieNecronomicon zombieNecronomicon) {
 
-        LivingEntity targetter = eliteMobEntity.getLivingEntity();
+        LivingEntity targetter = eliteEntity.getLivingEntity();
 
         new BukkitRunnable() {
 
@@ -205,27 +205,29 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                     targetter.setAI(false);
 
                     if (!zombieNecronomicon.getIsFiring())
-                        necronomiconVisualEffect(eliteMobEntity, zombieNecronomicon);
+                        necronomiconVisualEffect(eliteEntity, zombieNecronomicon);
 
                     if (randomizedNumber < 5) {
 
-                        CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss("necronomicon_zombie.yml", targetter.getLocation(), eliteMobEntity.getLevel());
+                        CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_zombie.yml");
+                        customBossEntity.spawn(targetter.getLocation(), eliteEntity.getLevel(), false);
 
                         customBossEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
 
-                        eliteMobEntity.eliteReinforcementEntities.add(customBossEntity);
+                        eliteEntity.addReinforcement(customBossEntity);
 
                         entityList.add(customBossEntity.getLivingEntity());
 
                     } else {
 
-                        CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss("necronomicon_skeleton.yml", targetter.getLocation(), eliteMobEntity.getLevel());
+                        CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("necronomicon_skeleton.yml");
+                        customBossEntity.spawn(targetter.getLocation(), eliteEntity.getLevel(), false);
 
                         customBossEntity.getLivingEntity().setVelocity(new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) / 30, 0.5,
                                 (ThreadLocalRandom.current().nextDouble() - 0.5) / 30));
 
-                        eliteMobEntity.eliteReinforcementEntities.add(customBossEntity);
+                        eliteEntity.addReinforcement(customBossEntity);
 
                         entityList.add(customBossEntity.getLivingEntity());
 

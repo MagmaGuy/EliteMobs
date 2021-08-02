@@ -1,16 +1,16 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-public class KillerRabbitOfCaerbannogConfig extends CustomBossConfigFields {
+public class KillerRabbitOfCaerbannogConfig extends CustomBossesConfigFields {
     public KillerRabbitOfCaerbannogConfig() {
         super("killer_rabbit_of_caerbannog",
-                EntityType.RABBIT.toString(),
+                EntityType.RABBIT,
                 true,
                 "$eventBossLevel &cKiller Rabbit of Caerbannog",
                 "dynamic");

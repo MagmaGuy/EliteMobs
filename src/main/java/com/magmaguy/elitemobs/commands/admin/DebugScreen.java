@@ -24,28 +24,27 @@ public class DebugScreen {
         List<String> pages = new ArrayList<String>();
 
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet()) {
-            if (!regionalBossEntity.getCustomBossConfigFields().getFileName().contains(argument) &&
-                    !regionalBossEntity.getCustomBossConfigFields().getName().toLowerCase().contains(argument.toLowerCase()))
+            if (!regionalBossEntity.getCustomBossesConfigFields().getFilename().contains(argument) &&
+                    !regionalBossEntity.getCustomBossesConfigFields().getName().toLowerCase().contains(argument.toLowerCase()))
                 continue;
-            String page = regionalBossEntity.getCustomBossConfigFields().getFileName() + "\n";
-            page += "Name: " + ChatColorConverter.convert(regionalBossEntity.getCustomBossConfigFields().getName()) + ChatColor.BLACK + "\n";
-            page += "Level: " + regionalBossEntity.getCustomBossConfigFields().getLevel() + "\n";
-            if (regionalBossEntity.customBossEntity != null && regionalBossEntity.customBossEntity.advancedGetEntity() != null) {
-                page += "Is Alive (MC): " + !regionalBossEntity.customBossEntity.advancedGetEntity().isDead() + "\n";
+            String page = regionalBossEntity.getCustomBossesConfigFields().getFilename() + "\n";
+            page += "Name: " + ChatColorConverter.convert(regionalBossEntity.getCustomBossesConfigFields().getName()) + ChatColor.BLACK + "\n";
+            page += "Level: " + regionalBossEntity.getCustomBossesConfigFields().getLevel() + "\n";
+            if (regionalBossEntity.getLivingEntity() != null) {
+                page += "Is Alive (MC): " + !regionalBossEntity.getLivingEntity().isDead() + "\n";
                 page += "XYZ: " +
-                        regionalBossEntity.customBossEntity.advancedGetEntity().getLocation().getBlockX() + ", " +
-                        regionalBossEntity.customBossEntity.advancedGetEntity().getLocation().getBlockY() + ", " +
-                        regionalBossEntity.customBossEntity.advancedGetEntity().getLocation().getBlockZ() + "\n";
-                page += "Has AI: " + !regionalBossEntity.customBossEntity.advancedGetEntity().hasAI() + "\n";
-                if (regionalBossEntity.customBossEntity != null && regionalBossEntity.customBossEntity.getLivingEntity() != null)
-                    if (player.getWorld().equals(regionalBossEntity.customBossEntity.getLocation().getWorld()))
-                        page += "Spawn distance: X=" + (int)(player.getLocation().getX() - regionalBossEntity.spawnLocation.getX())
-                                + " | Y=" + (int)(player.getLocation().getY() - regionalBossEntity.spawnLocation.getY()) +
-                                " | Z=" + (int)(player.getLocation().getZ() - regionalBossEntity.spawnLocation.getZ() )+ "\n";
+                        regionalBossEntity.getLocation().getBlockX() + ", " +
+                        regionalBossEntity.getLocation().getBlockY() + ", " +
+                        regionalBossEntity.getLocation().getBlockZ() + "\n";
+                page += "Has AI: " + !regionalBossEntity.getLivingEntity().hasAI() + "\n";
+                    if (player.getWorld().equals(regionalBossEntity.getLocation().getWorld()))
+                        page += "Spawn distance: X=" + (int)(player.getLocation().getX() - regionalBossEntity.getSpawnLocation().getX())
+                                + " | Y=" + (int)(player.getLocation().getY() - regionalBossEntity.getSpawnLocation().getY()) +
+                                " | Z=" + (int)(player.getLocation().getZ() - regionalBossEntity.getSpawnLocation().getZ() )+ "\n";
             } else
                 page += "Is Alive (MC): false\n";
-            page += "Is Persistent: " + regionalBossEntity.getCustomBossConfigFields().isPersistent() + "\n";
-            if (regionalBossEntity.getCustomBossConfigFields().isPersistent())
+            page += "Is Persistent: " + regionalBossEntity.getCustomBossesConfigFields().isPersistent() + "\n";
+            if (regionalBossEntity.getCustomBossesConfigFields().isPersistent())
                 page += "Is Respawning: " + regionalBossEntity.isRespawning() + "\n";
             pages.add(page);
         }

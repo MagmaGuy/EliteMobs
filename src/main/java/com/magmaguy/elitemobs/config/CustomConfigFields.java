@@ -1,25 +1,24 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CustomConfigFields implements CustomConfigFieldsInterface {
-
-    public CustomConfig getCustomConfig() {
-        return customConfig;
-    }
-
-    public void setCustomConfig(CustomConfig customConfig) {
-        this.customConfig = customConfig;
-    }
-
-    protected CustomConfig customConfig;
 
     public String getFilename() {
         return filename;
@@ -44,7 +43,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
      * @param isEnabled
      */
     public CustomConfigFields(String filename, boolean isEnabled) {
-        this.filename = filename;
+        this.filename = filename.contains(".yml") ? filename : filename + ".yml";
         this.isEnabled = isEnabled;
     }
 
@@ -68,22 +67,6 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
 
     protected File file;
 
-    /**
-     * Used by admin-created files
-     *
-     * @param customConfig
-     * @param fileConfiguration
-     * @param file
-     */
-    public CustomConfigFields(CustomConfig customConfig, FileConfiguration fileConfiguration, File file) {
-        this.customConfig = customConfig;
-        this.fileConfiguration = fileConfiguration;
-        this.filename = file.getName();
-        this.file = file;
-        customConfig.addCustomConfigFields(getFilename(), this);
-        processCustomSpawnConfigFields();
-    }
-
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration, File file) {
 
@@ -104,7 +87,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
     }
 
     @Override
-    public void processCustomSpawnConfigFields() {
+    public void processConfigFields() {
 
     }
 
@@ -116,7 +99,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         if (!configHas(path))
             return pluginDefault;
         try {
-            return fileConfiguration.getString(path);
+            return ChatColorConverter.convert(fileConfiguration.getString(path));
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
@@ -127,7 +110,10 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         if (!configHas(path))
             return pluginDefault;
         try {
-            return fileConfiguration.getStringList(path);
+            List<String> list = new ArrayList<>(); ;
+            for (String string : fileConfiguration.getStringList(path))
+                list.add(ChatColorConverter.convert(string));
+            return list;
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
@@ -231,6 +217,43 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
         return pluginDefault;
+    }
+
+    public ItemStack processItemStack(String path, ItemStack pluginDefault) {
+        if (!configHas(path)) {
+            return pluginDefault;
+        }
+        try {
+            String materialString = processString(path, null);
+            if (materialString == null)
+                return null;
+            if (materialString.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")) {
+                ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
+                SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
+                skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString(materialString)));
+                playerHead.setItemMeta(skullMeta);
+                return playerHead;
+            }
+            if (materialString.contains(":")) {
+                if (materialString.split(":")[1].contains("leather_") || materialString.split(":")[1].contains("LEATHER_") ) {
+                    ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.getMaterial(materialString.split(":")[0]));
+                    LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
+                    leatherArmorMeta.setColor(Color.fromRGB(Integer.parseInt(materialString.split(":")[1])));
+                    itemStack.setItemMeta(leatherArmorMeta);
+                    return itemStack;
+                } else {
+                    ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.getMaterial(materialString.split(":")[0]));
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    itemMeta.setCustomModelData(Integer.parseInt(materialString.split(":")[1]));
+                    itemStack.setItemMeta(itemMeta);
+                    return itemStack;
+                }
+            } else
+                return ItemStackGenerator.generateItemStack(Material.getMaterial(materialString));
+        } catch (Exception ex) {
+            new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+        }
+        return null;
     }
 
 }

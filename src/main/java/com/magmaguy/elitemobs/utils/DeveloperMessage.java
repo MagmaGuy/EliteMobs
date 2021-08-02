@@ -4,6 +4,6 @@ import org.bukkit.Bukkit;
 
 public class DeveloperMessage {
     public DeveloperMessage(String message) {
-        //Bukkit.getLogger().warning("[EliteMobs] Developer message: " + message);
+        Bukkit.getLogger().warning("[EliteMobs] Developer message: " + message);
     }
 }

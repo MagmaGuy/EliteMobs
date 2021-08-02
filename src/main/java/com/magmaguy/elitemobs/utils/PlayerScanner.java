@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 public class PlayerScanner {
-    private static final int range = Bukkit.getServer().getViewDistance() * 16;
+    private static final int range = Math.max(Bukkit.getServer().getViewDistance() * 16, 5 * 16);
 
     public static ArrayList<Player> getNearbyPlayers(Location location) {
         ArrayList<Player> nearbyPlayers = new ArrayList<>();

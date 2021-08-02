@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.entitytracker.TrackedEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

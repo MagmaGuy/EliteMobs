@@ -9,9 +9,9 @@ import java.util.Arrays;
 public class FaeEvent extends CustomEventsConfigFields {
     public FaeEvent() {
         super("fae",
-                true,
-                CustomEvent.EventType.BREAK_BLOCK,
-                Arrays.asList("fire_fae.yml", "ice_fae.yml", "lightning_fae.yml"));
+                true);
+        setEventType(CustomEvent.EventType.BREAK_BLOCK);
+        setBossFilenames(Arrays.asList("fire_fae.yml", "ice_fae.yml", "lightning_fae.yml"));
         setChance(0.0001);
         setBreakableMaterials(Arrays.asList(Material.BIRCH_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG,
                 Material.OAK_LOG, Material.SPRUCE_LOG, Material.JUNGLE_LOG));

@@ -1,11 +1,6 @@
 package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.items.EliteItemLore;
-import com.magmaguy.elitemobs.items.ItemTagger;
-import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 

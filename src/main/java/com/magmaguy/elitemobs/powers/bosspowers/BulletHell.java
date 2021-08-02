@@ -4,9 +4,9 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -40,29 +40,29 @@ public class BulletHell extends BossPower implements Listener {
 
     }
 
-    public void doBulletHell(EliteMobEntity eliteMobEntity) {
-        eliteMobEntity.getLivingEntity().setAI(false);
-        if (eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)).getBlock().getType().equals(Material.AIR))
-            eliteMobEntity.getLivingEntity().teleport(eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
+    public void doBulletHell(EliteEntity eliteEntity) {
+        eliteEntity.getLivingEntity().setAI(false);
+        if (eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)).getBlock().getType().equals(Material.AIR))
+            eliteEntity.getLivingEntity().teleport(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
         new BukkitRunnable() {
             int counter = 0;
-            final Location initialLocation = eliteMobEntity.getLivingEntity().getLocation().clone();
+            final Location initialLocation = eliteEntity.getLivingEntity().getLocation().clone();
 
             @Override
             public void run() {
 
-                if (!eliteMobEntity.getLivingEntity().isValid() || eliteMobEntity.getLivingEntity().isDead()) {
+                if (!eliteEntity.getLivingEntity().isValid() || eliteEntity.getLivingEntity().isDead()) {
                     cancel();
                     return;
                 }
 
-                eliteMobEntity.getLivingEntity().getWorld().spawnParticle(Particle.DRIP_WATER, eliteMobEntity.getLivingEntity().getLocation(), 10, 1, 1, 1);
+                eliteEntity.getLivingEntity().getWorld().spawnParticle(Particle.DRIP_WATER, eliteEntity.getLivingEntity().getLocation(), 10, 1, 1, 1);
 
-                for (Entity nearbyEntity : eliteMobEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
+                for (Entity nearbyEntity : eliteEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
                     if (nearbyEntity instanceof Player)
                         if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
                                 ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)) {
-                            Arrow arrow = (Arrow) EliteProjectile.create(EntityType.ARROW, eliteMobEntity.getLivingEntity(), (Player) nearbyEntity, false);
+                            Arrow arrow = (Arrow) EliteProjectile.create(EntityType.ARROW, eliteEntity.getLivingEntity(), (Player) nearbyEntity, false);
                             arrow.setVelocity(arrow.getVelocity().multiply(0.1));
                             trackingArrowLoop((Player) nearbyEntity, arrow);
                         }
@@ -70,8 +70,8 @@ public class BulletHell extends BossPower implements Listener {
                 counter++;
                 if (counter > 20) {
                     cancel();
-                    eliteMobEntity.getLivingEntity().setAI(true);
-                    eliteMobEntity.getLivingEntity().teleport(initialLocation);
+                    eliteEntity.getLivingEntity().setAI(true);
+                    eliteEntity.getLivingEntity().teleport(initialLocation);
                 }
 
             }

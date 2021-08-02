@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.config.dungeonpackager;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -238,8 +238,8 @@ public class DungeonPackagerConfigFields {
         return relativeBossLocations;
     }
 
-    public boolean setRelativeBossLocations(CustomBossConfigFields customBossConfigFields, Location relativeLocation) {
-        String configurationLocation = customBossConfigFields.getFileName() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
+    public boolean setRelativeBossLocations(CustomBossesConfigFields customBossesConfigFields, Location relativeLocation) {
+        String configurationLocation = customBossesConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
         relativeBossLocations.add(configurationLocation);
         return ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
     }

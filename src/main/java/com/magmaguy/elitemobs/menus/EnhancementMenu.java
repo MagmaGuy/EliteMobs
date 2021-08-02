@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.menus.premade.EnhancementMenuConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
@@ -15,12 +15,12 @@ public class EliteMobDeathEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
-    private final EliteMobEntity eliteMobEntity;
+    private final EliteEntity eliteEntity;
     private final EntityDeathEvent entityDeathEvent;
 
-    public EliteMobDeathEvent(EliteMobEntity eliteMobEntity, EntityDeathEvent entityDeathEvent) {
-        this.entity = eliteMobEntity.getLivingEntity();
-        this.eliteMobEntity = eliteMobEntity;
+    public EliteMobDeathEvent(EliteEntity eliteEntity, EntityDeathEvent entityDeathEvent) {
+        this.entity = eliteEntity.getUnsyncedLivingEntity();
+        this.eliteEntity = eliteEntity;
         this.entityDeathEvent = entityDeathEvent;
     }
 
@@ -28,8 +28,8 @@ public class EliteMobDeathEvent extends Event {
         return this.entity;
     }
 
-    public EliteMobEntity getEliteMobEntity() {
-        return this.eliteMobEntity;
+    public EliteEntity getEliteMobEntity() {
+        return this.eliteEntity;
     }
 
     public EntityDeathEvent getEntityDeathEvent() {
@@ -48,10 +48,12 @@ public class EliteMobDeathEvent extends Event {
     public static class EliteMobDeathEventFilter implements Listener {
         @EventHandler
         public void onMobDeath(EntityDeathEvent event) {
-            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteMobEntity == null) return;
-            new EventCaller(new EliteMobDeathEvent(eliteMobEntity, event));
-            new EventCaller(new EliteMobRemoveEvent(eliteMobEntity, RemovalReason.DEATH));
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+            if (eliteEntity == null) return;
+            new EventCaller(new EliteMobDeathEvent(eliteEntity, event));
+            new EventCaller(new EliteMobRemoveEvent(eliteEntity, RemovalReason.DEATH));
+            if (eliteEntity.getUnsyncedLivingEntity() == null) return;
+            EntityTracker.unregister(eliteEntity.getUnsyncedLivingEntity().getUniqueId(), RemovalReason.DEATH);
         }
     }
 

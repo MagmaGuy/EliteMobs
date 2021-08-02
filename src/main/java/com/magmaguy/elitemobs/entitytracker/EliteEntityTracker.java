@@ -2,60 +2,41 @@ package com.magmaguy.elitemobs.entitytracker;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import org.bukkit.metadata.FixedMetadataValue;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import org.bukkit.metadata.LazyMetadataValue;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 public class EliteEntityTracker extends TrackedEntity implements AbstractTrackedEntity {
 
-    public static HashMap<UUID, EliteMobEntity> eliteMobEntities = new HashMap<>();
+    public static HashMap<UUID, EliteEntity> eliteMobEntities = new HashMap<>();
 
-    public EliteMobEntity eliteMobEntity;
+    public EliteEntity eliteEntity;
 
-    public EliteEntityTracker(EliteMobEntity eliteMobEntity, boolean isPersistent) {
-        super(eliteMobEntity.uuid, eliteMobEntity.getLivingEntity(), !isPersistent, true, eliteMobEntities);
-        this.eliteMobEntity = eliteMobEntity;
-        eliteMobEntities.put(eliteMobEntity.uuid, eliteMobEntity);
-        if (eliteMobEntity.getLivingEntity() != null)
-            eliteMobEntity.getLivingEntity().setMetadata(
+    public EliteEntityTracker(EliteEntity eliteEntity, boolean isPersistent) {
+        super(eliteEntity.getLivingEntity().getUniqueId(), eliteEntity.getLivingEntity(), !isPersistent, true, eliteMobEntities);
+        this.eliteEntity = eliteEntity;
+        eliteMobEntities.put(eliteEntity.getLivingEntity().getUniqueId(), eliteEntity);
+        if (eliteEntity.getLivingEntity() != null)
+            eliteEntity.getLivingEntity().setMetadata(
                     MetadataHandler.ELITE_MOB_METADATA,
-                    new FixedMetadataValue(MetadataHandler.PLUGIN, eliteMobEntity.getLevel()));
+                    new LazyMetadataValue(MetadataHandler.PLUGIN, LazyMetadataValue.CacheStrategy.NEVER_CACHE, eliteEntity::getLevel));
     }
 
     @Override
     public void specificRemoveHandling(RemovalReason removalReason) {
-        eliteMobEntity.remove(removalReason);
-
-        if (removalReason.equals(RemovalReason.CHUNK_UNLOAD)) {
-            if (eliteMobEntity.customBossEntity != null)
-                eliteMobEntity.customBossEntity.chunkUnload();
-            if (eliteMobEntity.regionalBossEntity != null)
-                eliteMobEntity.regionalBossEntity.chunkUnload();
+        switch (removalReason){
+            case CHUNK_UNLOAD:
+                eliteEntity.chunkUnload();
+                break;
+            case WORLD_UNLOAD:
+                eliteEntity.worldUnload();
+                break;
+            default:
+                eliteEntity.remove(removalReason);
         }
-
-        if (removalReason.equals(RemovalReason.SHUTDOWN))
-            if (eliteMobEntity.customBossEntity != null)
-                eliteMobEntity.customBossEntity.remove(true);
-
-        if (removalReason.equals(RemovalReason.DEATH) || removalReason.equals(RemovalReason.BOSS_TIMEOUT)) {
-            if (eliteMobEntity.regionalBossEntity != null)
-                eliteMobEntity.regionalBossEntity.respawnRegionalBoss();
-            if (eliteMobEntity.phaseBossEntity != null)
-                eliteMobEntity.phaseBossEntity.deathHandler();
-        }
-
-        if (removalReason.equals(RemovalReason.REMOVE_COMMAND)) {
-            if (eliteMobEntity.customBossEntity != null)
-                eliteMobEntity.customBossEntity.remove(true);
-            if (eliteMobEntity.regionalBossEntity != null)
-                eliteMobEntity.regionalBossEntity.removePermanently();
-        }
-
-        if (removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END))
-            eliteMobEntity.customBossEntity.remove(true);
-
     }
 
 }

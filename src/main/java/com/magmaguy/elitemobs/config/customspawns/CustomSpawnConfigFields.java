@@ -14,7 +14,7 @@ import java.util.List;
 public class CustomSpawnConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
     public CustomSpawnConfigFields(String filename, boolean isEnabled) {
-        super(filename + ".yml", isEnabled);
+        super( filename, isEnabled);
     }
 
     public int getLowestYLevel() {
@@ -157,7 +157,7 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
     }
 
     @Override
-    public void processCustomSpawnConfigFields() {
+    public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled);
         this.lowestYLevel = processInt("lowestYLevel", lowestYLevel);
         this.highestYLevel = processInt("highestYLevel", highestYLevel);

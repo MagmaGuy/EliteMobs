@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -33,33 +33,33 @@ public class MeteorShower extends BossPower implements Listener {
 
     }
 
-    public static void doMeteorShower(EliteMobEntity eliteMobEntity) {
-        eliteMobEntity.getLivingEntity().setAI(false);
+    public static void doMeteorShower(EliteEntity eliteEntity) {
+        eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             int counter = 0;
-            final Location initialLocation = eliteMobEntity.getLivingEntity().getLocation().clone();
+            final Location initialLocation = eliteEntity.getLivingEntity().getLocation().clone();
             @Override
             public void run() {
 
-                if (!eliteMobEntity.getLivingEntity().isValid()) {
+                if (!eliteEntity.getLivingEntity().isValid()) {
                     cancel();
                     return;
                 }
 
                 if (counter > 10 * 20) {
                     cancel();
-                    eliteMobEntity.getLivingEntity().setAI(true);
-                    eliteMobEntity.getLivingEntity().teleport(initialLocation);
+                    eliteEntity.getLivingEntity().setAI(true);
+                    eliteEntity.getLivingEntity().teleport(initialLocation);
                     return;
                 }
 
                 counter++;
 
-                doCloudEffect(eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
+                doCloudEffect(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
 
                 if (counter > 2 * 20) {
 
-                    doFireballs(eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)), eliteMobEntity);
+                    doFireballs(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)), eliteEntity);
 
                 }
 
@@ -77,7 +77,7 @@ public class MeteorShower extends BossPower implements Listener {
         }
     }
 
-    private static void doFireballs(Location location, EliteMobEntity eliteMobEntity) {
+    private static void doFireballs(Location location, EliteEntity eliteEntity) {
         for (int i = 0; i < 1; i++) {
             int randX = ThreadLocalRandom.current().nextInt(30) - 15;
             int randY = ThreadLocalRandom.current().nextInt(2);
@@ -85,7 +85,7 @@ public class MeteorShower extends BossPower implements Listener {
             Location newLocation = location.clone().add(new Vector(randX, randY, randZ));
             newLocation = newLocation.setDirection(new Vector(ThreadLocalRandom.current().nextDouble() - 0.5, -0.5, ThreadLocalRandom.current().nextDouble() - 0.5));
             Fireball fireball = (Fireball) location.getWorld().spawnEntity(newLocation, EntityType.FIREBALL);
-            fireball.setShooter(eliteMobEntity.getLivingEntity());
+            fireball.setShooter(eliteEntity.getLivingEntity());
             fireball.setDirection(fireball.getDirection().multiply(0.5));
         }
     }

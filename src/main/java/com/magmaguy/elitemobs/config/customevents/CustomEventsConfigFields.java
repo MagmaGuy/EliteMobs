@@ -1,65 +1,44 @@
 package com.magmaguy.elitemobs.config.customevents;
 
+import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.events.CustomEvent;
-import com.magmaguy.elitemobs.events.MoonPhaseDetector;
-import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldType;
-import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomEventsConfigFields {
-
-    public String getFilename() {
-        return filename;
-    }
-
-    private String filename;
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    private boolean enabled = true;
+public class CustomEventsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
     public CustomEvent.EventType getEventType() {
         return eventType;
     }
 
-    CustomEvent.EventType eventType;
+    public void setEventType(CustomEvent.EventType eventType) {
+        this.eventType = eventType;
+    }
+
+    private CustomEvent.EventType eventType = CustomEvent.EventType.DEFAULT;
 
     public List<String> getBossFilenames() {
         return bossFilenames;
     }
 
-    List<String> bossFilenames;
-
-    /**
-     * For Action Events
-     *
-     * @param filename
-     * @param isEnabled
-     * @param eventType
-     * @param bossFilenames
-     */
-    public CustomEventsConfigFields(String filename,
-                                    boolean isEnabled,
-                                    CustomEvent.EventType eventType,
-                                    List<String> bossFilenames) {
-        this.filename = filename + ".yml";
-        this.enabled = isEnabled;
-        this.eventType = eventType;
+    public void setBossFilenames(List<String> bossFilenames) {
         this.bossFilenames = bossFilenames;
     }
 
+    private List<String> bossFilenames = new ArrayList<>();
+
     public double getLocalCooldown() {
         return localCooldown;
+    }
+
+    public void setLocalCooldown(double localCooldown) {
+        this.localCooldown = localCooldown;
     }
 
     private double localCooldown = 0;
@@ -68,42 +47,34 @@ public class CustomEventsConfigFields {
         return globalCooldown;
     }
 
+    public void setGlobalCooldown(double globalCooldown) {
+        this.globalCooldown = globalCooldown;
+    }
+
     private double globalCooldown = 0;
 
     public double getWeight() {
         return weight;
     }
 
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
     private double weight = 0;
 
     /**
-     * For Timed Events
+     * For Action Events
      *
      * @param filename
      * @param isEnabled
-     * @param eventType
-     * @param bossFilenames
      */
-    public CustomEventsConfigFields(String filename,
-                                    boolean isEnabled,
-                                    CustomEvent.EventType eventType,
-                                    List<String> bossFilenames,
-                                    double localCooldown,
-                                    double globalCooldown,
-                                    double weight,
-                                    TimedEvent.SpawnType spawnType) {
-        this.filename = filename + ".yml";
-        this.enabled = isEnabled;
-        this.eventType = eventType;
-        this.bossFilenames = bossFilenames;
-        this.localCooldown = localCooldown;
-        this.globalCooldown = globalCooldown;
-        this.weight = weight;
-        this.spawnType = spawnType;
+    public CustomEventsConfigFields(String filename, boolean isEnabled) {
+        super(filename, isEnabled);
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        fileConfiguration.addDefault("isEnabled", enabled);
+    @Override
+    public void generateConfigDefaults(FileConfiguration fileConfiguration, File file) {
         fileConfiguration.addDefault("eventType", eventType.toString());
         fileConfiguration.addDefault("bossFilenames", bossFilenames);
         if (startMessage != null) fileConfiguration.addDefault("startMessage", startMessage);
@@ -117,21 +88,13 @@ public class CustomEventsConfigFields {
             breakableMaterials.forEach(material -> convertedList.add(material.toString()));
             fileConfiguration.addDefault("breakableMaterials", convertedList);
         }
-        if (localCooldown != 0)
-            fileConfiguration.addDefault("localCooldown", localCooldown);
-        if (globalCooldown != 0)
-            fileConfiguration.addDefault("globalCooldown", globalCooldown);
-        if (weight != 0)
-            fileConfiguration.addDefault("weight", weight);
-        if (eventDuration != 0)
-            fileConfiguration.addDefault("eventDuration", eventDuration);
-        if (!endEventWithBossDeath)
-            fileConfiguration.addDefault("endEventWithBossDeath", endEventWithBossDeath);
-        if (spawnType != TimedEvent.SpawnType.INSTANT_SPAWN)
-            fileConfiguration.addDefault("spawnType", spawnType.toString());
-
-        if (minimumPlayerCount != 0)
-            fileConfiguration.addDefault("minimumPlayerCount", minimumPlayerCount);
+        if (localCooldown != 0) fileConfiguration.addDefault("localCooldown", localCooldown);
+        if (globalCooldown != 0) fileConfiguration.addDefault("globalCooldown", globalCooldown);
+        if (weight != 0) fileConfiguration.addDefault("weight", weight);
+        if (eventDuration != 0) fileConfiguration.addDefault("eventDuration", eventDuration);
+        if (!endEventWithBossDeath) fileConfiguration.addDefault("endEventWithBossDeath", endEventWithBossDeath);
+        if (!customSpawn.isEmpty()) fileConfiguration.addDefault("spawnType", customSpawn.toString());
+        if (minimumPlayerCount != 0) fileConfiguration.addDefault("minimumPlayerCount", minimumPlayerCount);
     }
 
     public String getStartMessage() {
@@ -224,16 +187,16 @@ public class CustomEventsConfigFields {
 
     private boolean endEventWithBossDeath = true;
 
-    public TimedEvent.SpawnType getSpawnType() {
-        return spawnType;
+
+    public String getCustomSpawn() {
+        return customSpawn;
     }
 
-    public void setSpawnType(TimedEvent.SpawnType spawnType) {
-        this.spawnType = spawnType;
+    public void setCustomSpawn(String customSpawn) {
+        this.customSpawn = customSpawn;
     }
 
-    TimedEvent.SpawnType spawnType = TimedEvent.SpawnType.INSTANT_SPAWN;
-
+    private String customSpawn = "";
 
     public int getMinimumPlayerCount() {
         return minimumPlayerCount;
@@ -245,153 +208,29 @@ public class CustomEventsConfigFields {
 
     private int minimumPlayerCount = 0;
 
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-
-    private FileConfiguration fileConfiguration;
-
-    public CustomEventsConfigFields(FileConfiguration fileConfiguration, File file) {
-        this.filename = file.getName();
-        this.fileConfiguration = fileConfiguration;
-        this.enabled = processBoolean("isEnabled", enabled);
-        if (configHas("eventType")) {
-            try {
-                this.eventType = CustomEvent.EventType.valueOf(fileConfiguration.getString("eventType"));
-            } catch (Exception ex) {
-                new WarningMessage("Tried to parse an eventType for custom event file " + filename + " which was not valid! Valid types:");
-                for (CustomEvent.EventType eventTypes : CustomEvent.EventType.values())
-                    new WarningMessage(eventTypes.toString());
-                new WarningMessage("This event will not be registered.");
-                return;
-            }
-        } else {
-            new WarningMessage("Custom event file " + filename + " is missing a valid eventType entry! Fix it for the event to be registered!");
+    @Override
+    public void processConfigFields() {
+        this.eventType = processEnum("eventType", eventType);
+        if (eventType == CustomEvent.EventType.DEFAULT) {
+            new WarningMessage("Failed to determine a valid event type for " + filename + " ! This event will not be registered.");
             return;
         }
         this.bossFilenames = processStringList("bossFilenames", bossFilenames);
-        if (this.bossFilenames == null) {
-            new WarningMessage("Custom event file " + filename + " is missing a valid bossFilenames entry! Fix it for the event to be registered!");
-            return;
-        }
-
+        if (bossFilenames == null) return;
         this.startMessage = processString("startMessage", startMessage);
         this.endMessage = processString("endMessage", endMessage);
         this.eventStartCommands = processStringList("eventStartCommands", eventStartCommands);
         this.eventEndCommands = processStringList("eventEndCommands", eventEndCommands);
         this.announcementPriority = processInt("announcementPriority", announcementPriority);
         this.chance = processDouble("chance", chance);
-        this.breakableMaterials = processBreakables("breakableMaterials");
+        this.breakableMaterials = processEnumList("breakableMaterials", breakableMaterials, Material.class);
         this.localCooldown = processDouble("localCooldown", localCooldown);
         this.globalCooldown = processDouble("globalCooldown", globalCooldown);
         this.weight = processDouble("weight", weight);
         this.eventDuration = processDouble("eventDuration", eventDuration);
         this.endEventWithBossDeath = processBoolean("endEventWithBossDeath", endEventWithBossDeath);
-        this.spawnType = processSpawnType("spawnType", spawnType);
-
-
-
+        this.customSpawn = processString("spawnType", customSpawn);
         this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount);
-    }
-
-    private boolean configHas(String configKey) {
-        return fileConfiguration.contains(configKey);
-    }
-
-    private String processString(String path, String pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
-        try {
-            return fileConfiguration.getString(path);
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
-        }
-        return null;
-    }
-
-    private List<String> processStringList(String path, List<String> pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
-        try {
-            return fileConfiguration.getStringList(path);
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
-        }
-        return null;
-    }
-
-    private int processInt(String path, int pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
-        try {
-            return fileConfiguration.getInt(path);
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
-        }
-        return 0;
-    }
-
-    private long processLong(String path, long pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
-        try {
-            return fileConfiguration.getInt(path);
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
-        }
-        return 0;
-    }
-
-
-    private double processDouble(String path, double pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
-        try {
-            return fileConfiguration.getDouble(path);
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
-        }
-        return 0;
-    }
-
-    private boolean processBoolean(String path, boolean pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
-        try {
-            return fileConfiguration.getBoolean(path);
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
-        }
-        return true;
-    }
-
-    private List<Material> processBreakables(String path) {
-        List<String> unprocessedBreakables = processStringList(path, null);
-        if (unprocessedBreakables == null && eventType.equals(CustomEvent.EventType.BREAK_BLOCK)) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect or missing entry for " + path + " which is required for BREAK_BLOCK event types!");
-        }
-        try {
-            List<Material> processedBreakables = new ArrayList<>();
-            for (String string : unprocessedBreakables)
-                processedBreakables.add(Material.valueOf(string));
-            return processedBreakables;
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an invalid material entry in " + path + " !");
-            return null;
-        }
-    }
-
-    private TimedEvent.SpawnType processSpawnType(String path, TimedEvent.SpawnType pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
-        try {
-            return TimedEvent.SpawnType.valueOf(fileConfiguration.getString(path));
-        } catch (Exception ex) {
-            new WarningMessage("Custom event file " + filename + " has an incorrect entry for " + path);
-        }
-        return pluginDefault;
     }
 
 }

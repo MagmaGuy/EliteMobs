@@ -1,10 +1,10 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
-import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
 import com.magmaguy.elitemobs.utils.StringColorAnimator;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
@@ -47,10 +47,10 @@ public class QuestObjective implements Serializable {
         return currentKills;
     }
 
-    public boolean processQuestProgression(EliteMobEntity eliteMobEntity, Player player) {
-        if (!eliteMobEntity.getHasSpecialLoot()) return false;
-        if (!eliteMobEntity.getLivingEntity().getType().equals(getEntityType())) return false;
-        if (eliteMobEntity.getLevel() < getMinimumEliteMobLevel()) return false;
+    public boolean processQuestProgression(EliteEntity eliteEntity, Player player) {
+        if (!eliteEntity.getHasSpecialLoot()) return false;
+        if (!eliteEntity.getLivingEntity().getType().equals(getEntityType())) return false;
+        if (eliteEntity.getLevel() < getMinimumEliteMobLevel()) return false;
         addKill(player);
         return true;
     }

@@ -205,7 +205,8 @@ public class TreasureChest {
                 new WarningMessage("Entry: " + string);
                 new WarningMessage("Correct format: filename.yml:weight");
             }
-        CustomBossEntity.constructCustomBoss(WeightedProbability.pickWeighedProbability(weighedValues), location, randomizeTier());
+        CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(WeightedProbability.pickWeighedProbability(weighedValues));
+        customBossEntity.spawn(location, randomizeTier(), false);
     }
 
     private void doTreasure(Player player) {

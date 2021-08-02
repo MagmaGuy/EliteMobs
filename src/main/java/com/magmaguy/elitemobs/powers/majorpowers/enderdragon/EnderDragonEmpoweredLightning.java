@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -47,7 +47,7 @@ public class EnderDragonEmpoweredLightning extends MajorPower {
     private boolean isActive = false;
     private BukkitTask bukkitTask = null;
 
-    private void activate(EliteMobEntity eliteMobEntity) {
+    private void activate(EliteEntity eliteEntity) {
         if (isActive)
             return;
 
@@ -56,8 +56,8 @@ public class EnderDragonEmpoweredLightning extends MajorPower {
         bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (isInCooldown(eliteMobEntity)) return;
-                fireLightning(eliteMobEntity);
+                if (isInCooldown(eliteEntity)) return;
+                fireLightning(eliteEntity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
 
@@ -68,16 +68,16 @@ public class EnderDragonEmpoweredLightning extends MajorPower {
         bukkitTask.cancel();
     }
 
-    public void fireLightning(EliteMobEntity eliteMobEntity) {
+    public void fireLightning(EliteEntity eliteEntity) {
 
-        doCooldown(eliteMobEntity);
+        doCooldown(eliteEntity);
 
-        for (Entity entity : eliteMobEntity.getLivingEntity().getLocation().getWorld().getNearbyEntities(eliteMobEntity.getLivingEntity().getLocation(), 150, 150, 150))
+        for (Entity entity : eliteEntity.getLivingEntity().getLocation().getWorld().getNearbyEntities(eliteEntity.getLivingEntity().getLocation(), 150, 150, 150))
             if (entity.getType().equals(EntityType.PLAYER))
                 lightningTask(entity.getLocation().clone());
 
         for (int i = 0; i < 50; i++) {
-            Location randomLocation = locationRandomizer(eliteMobEntity.getLivingEntity().getLocation(), 0);
+            Location randomLocation = locationRandomizer(eliteEntity.getLivingEntity().getLocation(), 0);
             if (randomLocation == null) continue;
 
             new BukkitRunnable() {

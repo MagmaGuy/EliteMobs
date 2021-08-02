@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,11 +29,11 @@ public class Flamethrower extends BossPower implements Listener {
     /**
      * Warning phase
      *
-     * @param eliteMobEntity
+     * @param eliteEntity
      */
-    private void doFlamethrowerPhase1(EliteMobEntity eliteMobEntity, Location fixedPlayerLocation) {
+    private void doFlamethrowerPhase1(EliteEntity eliteEntity, Location fixedPlayerLocation) {
 
-        eliteMobEntity.getLivingEntity().setAI(false);
+        eliteEntity.getLivingEntity().setAI(false);
 
         new BukkitRunnable() {
             int counter = 0;
@@ -41,11 +41,11 @@ public class Flamethrower extends BossPower implements Listener {
             @Override
             public void run() {
 
-                doParticleEffect(eliteMobEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
+                doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
                 counter++;
 
                 if (counter < 20 * 2) return;
-                doFlamethrowerPhase2(eliteMobEntity, fixedPlayerLocation);
+                doFlamethrowerPhase2(eliteEntity, fixedPlayerLocation);
                 cancel();
 
             }
@@ -67,12 +67,12 @@ public class Flamethrower extends BossPower implements Listener {
 
     }
 
-    private void doParticleEffect(EliteMobEntity eliteMobEntity, Location fixedPlayerLocation, Particle particle) {
-        Vector directionVector = fixedPlayerLocation.clone().subtract(eliteMobEntity.getLivingEntity().getLocation()).toVector().normalize();
+    private void doParticleEffect(EliteEntity eliteEntity, Location fixedPlayerLocation, Particle particle) {
+        Vector directionVector = fixedPlayerLocation.clone().subtract(eliteEntity.getLivingEntity().getLocation()).toVector().normalize();
         for (int i = 0; i < 5; i++) {
-            eliteMobEntity.getLivingEntity().getWorld().spawnParticle(
+            eliteEntity.getLivingEntity().getWorld().spawnParticle(
                     particle,
-                    eliteMobEntity.getLivingEntity().getEyeLocation().clone().add(directionVector.getX(), -0.5, directionVector.getZ()),
+                    eliteEntity.getLivingEntity().getEyeLocation().clone().add(directionVector.getX(), -0.5, directionVector.getZ()),
                     0,
                     (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getX(),
                     (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.1 + directionVector.getY(),
@@ -84,41 +84,41 @@ public class Flamethrower extends BossPower implements Listener {
     /**
      * Damage phase
      *
-     * @param eliteMobEntity
+     * @param eliteEntity
      */
-    private void doFlamethrowerPhase2(EliteMobEntity eliteMobEntity, Location fixedPlayerLocation) {
-        List<Location> damagePoints = generateDamagePoints(eliteMobEntity, fixedPlayerLocation);
+    private void doFlamethrowerPhase2(EliteEntity eliteEntity, Location fixedPlayerLocation) {
+        List<Location> damagePoints = generateDamagePoints(eliteEntity, fixedPlayerLocation);
         new BukkitRunnable() {
             int timer = 0;
 
             @Override
             public void run() {
-                doParticleEffect(eliteMobEntity, fixedPlayerLocation, Particle.FLAME);
-                doDamage(damagePoints, eliteMobEntity);
+                doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.FLAME);
+                doDamage(damagePoints, eliteEntity);
                 timer++;
                 if (timer < 20 * 3) return;
-                doFlamethrowerPhase3(eliteMobEntity, fixedPlayerLocation);
+                doFlamethrowerPhase3(eliteEntity, fixedPlayerLocation);
                 cancel();
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-    private static List<Location> generateDamagePoints(EliteMobEntity eliteMobEntity, Location fixedPlayerLocation) {
+    private static List<Location> generateDamagePoints(EliteEntity eliteEntity, Location fixedPlayerLocation) {
         List<Location> locations = new ArrayList<>();
-        Location eliteMobLocation = eliteMobEntity.getLivingEntity().getLocation().clone();
+        Location eliteMobLocation = eliteEntity.getLivingEntity().getLocation().clone();
         Vector toPlayerVector = fixedPlayerLocation.clone().subtract(eliteMobLocation).toVector().normalize().multiply(0.5);
         for (int i = 0; i < 40; i++)
             locations.add(eliteMobLocation.add(toPlayerVector).clone());
         return locations;
     }
 
-    private static void doDamage(List<Location> locations, EliteMobEntity eliteMobEntity) {
+    private static void doDamage(List<Location> locations, EliteEntity eliteEntity) {
         for (Location location : locations)
             for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
                 if (entity instanceof LivingEntity) {
-                    if (eliteMobEntity.getLivingEntity().equals(entity)) continue;
+                    if (eliteEntity.getLivingEntity().equals(entity)) continue;
                     if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
-                    BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
+                    BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
                 }
 
     }
@@ -126,19 +126,19 @@ public class Flamethrower extends BossPower implements Listener {
     /**
      * Cooldown phase
      *
-     * @param eliteMobEntity
+     * @param eliteEntity
      */
-    private void doFlamethrowerPhase3(EliteMobEntity eliteMobEntity, Location fixedPlayerLocation) {
+    private void doFlamethrowerPhase3(EliteEntity eliteEntity, Location fixedPlayerLocation) {
         new BukkitRunnable() {
             int timer = 0;
 
             @Override
             public void run() {
                 timer++;
-                doParticleEffect(eliteMobEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
+                doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
                 if (timer < 20) return;
                 cancel();
-                eliteMobEntity.getLivingEntity().setAI(true);
+                eliteEntity.getLivingEntity().setAI(true);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }

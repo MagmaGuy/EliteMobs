@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.commands.admin;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
 import org.bukkit.command.CommandSender;
@@ -18,10 +18,10 @@ public class KillHandler {
 
     public static void killAggressiveMobs(CommandSender commandSender) {
         int counter = 0;
-        Iterator<EliteMobEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().values().iterator();
+        Iterator<EliteEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().values().iterator();
         while (eliteMobEntityIterator.hasNext()) {
-            EliteMobEntity eliteMobEntity = eliteMobEntityIterator.next();
-            EntityTracker.unregister(eliteMobEntity.uuid, RemovalReason.KILL_COMMAND);
+            EliteEntity eliteEntity = eliteMobEntityIterator.next();
+            EntityTracker.unregister(eliteEntity.getLivingEntity().getUniqueId(), RemovalReason.KILL_COMMAND);
             eliteMobEntityIterator.remove();
             counter++;
         }
@@ -44,11 +44,11 @@ public class KillHandler {
     public static void killEntityType(CommandSender commandSender, EntityType entityType) {
         if (EliteMobProperties.getValidMobTypes().contains(entityType)) {
             int counter = 0;
-            Iterator<EliteMobEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().values().iterator();
+            Iterator<EliteEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().values().iterator();
             while (eliteMobEntityIterator.hasNext()) {
-                EliteMobEntity eliteMobEntity = eliteMobEntityIterator.next();
-                if (!eliteMobEntity.getLivingEntity().getType().equals(entityType)) continue;
-                EntityTracker.unregister(eliteMobEntity.uuid, RemovalReason.KILL_COMMAND);
+                EliteEntity eliteEntity = eliteMobEntityIterator.next();
+                if (!eliteEntity.getLivingEntity().getType().equals(entityType)) continue;
+                EntityTracker.unregister(eliteEntity.getLivingEntity().getUniqueId(), RemovalReason.KILL_COMMAND);
                 eliteMobEntityIterator.remove();
                 counter++;
             }

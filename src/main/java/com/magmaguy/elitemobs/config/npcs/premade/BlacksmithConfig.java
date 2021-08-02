@@ -1,17 +1,18 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 
 public class BlacksmithConfig extends NPCsConfigFields {
     public BlacksmithConfig() {
-        super(
-                "blacksmith.yml",
+        super("blacksmith",
                 true,
                 "Greg",
                 "<Blacksmith>",
-                "TOOLSMITH",
+                Villager.Profession.TOOLSMITH,
                 "em_adventurers_guild,285.5,93,261.5,179,0",
                 Arrays.asList(
                         "Welcome to our shop!",
@@ -36,11 +37,8 @@ public class BlacksmithConfig extends NPCsConfigFields {
                         "Come back soon!",
                         "Come back any time!",
                         "Recommend this shop to your\\nfriends!"),
-                false,
                 true,
                 3,
-                false,
-                "PROCEDURALLY_GENERATED_SHOP"
-        );
+                NPCInteractions.NPCInteractionType.PROCEDURALLY_GENERATED_SHOP);
     }
 }

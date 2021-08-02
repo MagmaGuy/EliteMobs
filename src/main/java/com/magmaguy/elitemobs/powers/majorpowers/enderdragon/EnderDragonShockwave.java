@@ -4,7 +4,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.EnderDragonPhaseSimplifier;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,28 +30,28 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
     }
 
     @Override
-    protected void finishActivation(EliteMobEntity eliteMobEntity) {
+    protected void finishActivation(EliteEntity eliteEntity) {
         super.bukkitTask = new BukkitRunnable() {
 
             @Override
             public void run() {
-                if (doExit(eliteMobEntity) || isInCooldown(eliteMobEntity)) {
+                if (doExit(eliteEntity) || isInCooldown(eliteEntity)) {
                     return;
                 }
 
-                if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
-                    EnderDragon.Phase phase = ((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase();
+                if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
+                    EnderDragon.Phase phase = ((EnderDragon) eliteEntity.getLivingEntity()).getPhase();
                     if (!EnderDragonPhaseSimplifier.isLanded(phase)) return;
                 }
 
-                doPower(eliteMobEntity);
+                doPower(eliteEntity);
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 10);
     }
 
-    private void doPower(EliteMobEntity eliteMobEntity) {
-        doCooldown(eliteMobEntity);
+    private void doPower(EliteEntity eliteEntity) {
+        doCooldown(eliteEntity);
 
         new BukkitRunnable() {
             int counter = 0;
@@ -58,27 +59,27 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
             @Override
             public void run() {
 
-                if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
-                    ((EnderDragon) eliteMobEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
+                if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
+                    ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
 
-                if (doExit(eliteMobEntity) || !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase())) {
+                if (doExit(eliteEntity) || !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteEntity.getLivingEntity()).getPhase())) {
                     cancel();
                     return;
                 }
 
                 if (counter == 0) {
                     setAffectedBlocks();
-                    generateRealCircle(eliteMobEntity);
+                    generateRealCircle(eliteEntity);
                     warningPhaseCounter = 0;
                     damagePhaseCounter = 0;
                 }
 
                 if (counter < 20 * 3) {
-                    doWarningPhase(eliteMobEntity);
+                    doWarningPhase(eliteEntity);
                 }
 
                 if (counter > 20 * 3) {
-                    doDamagePhase(eliteMobEntity);
+                    doDamagePhase(eliteEntity);
                 }
 
                 if (counter >= 20 * (3 + 6)) {
@@ -123,9 +124,9 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
     //this is structured like this because the relative block generator is moving out of this class
     private final ArrayList<PieBlock> realBlocks = new ArrayList<>();
 
-    private void generateRealCircle(EliteMobEntity eliteMobEntity) {
+    private void generateRealCircle(EliteEntity eliteEntity) {
         for (PieBlock pieBlock : pieBlocks) {
-            Location rawPieBlock = eliteMobEntity.customBossEntity.getLocation().clone().add(pieBlock.vector);
+            Location rawPieBlock = eliteEntity.getLivingEntity().getLocation().clone().add(pieBlock.vector);
             for (int y = 0; y > -10; y--) {
                 Location tempLocation = rawPieBlock.clone();
                 tempLocation.setY(rawPieBlock.getY() + y);
@@ -142,14 +143,14 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
 
     private int warningPhaseCounter = 0;
 
-    private void doWarningPhase(EliteMobEntity eliteMobEntity) {
+    private void doWarningPhase(EliteEntity eliteEntity) {
 
         Iterator<PieBlock> pieBlockIterator = ((ArrayList<PieBlock>) realBlocks.clone()).iterator();
 
         while (pieBlockIterator.hasNext()) {
             PieBlock pieBlock = pieBlockIterator.next();
             if (pieBlock.distance < warningPhaseCounter) {
-                Location rawPieBlock = eliteMobEntity.customBossEntity.getLocation().clone().add(pieBlock.vector);
+                Location rawPieBlock = eliteEntity.getLivingEntity().getLocation().clone().add(pieBlock.vector);
 
                 pieBlockIterator.remove();
 
@@ -166,14 +167,14 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
 
     private int damagePhaseCounter = 0;
 
-    private void doDamagePhase(EliteMobEntity eliteMobEntity) {
+    private void doDamagePhase(EliteEntity eliteEntity) {
         List<Block> blockList = new ArrayList<>();
         Iterator<PieBlock> pieBlockIterator = realBlocks.iterator();
         while (pieBlockIterator.hasNext()) {
             PieBlock pieBlock = pieBlockIterator.next();
 
             if (pieBlock.distance < damagePhaseCounter) {
-                Location rawPieBlock = eliteMobEntity.customBossEntity.getLocation().clone().add(pieBlock.vector);
+                Location rawPieBlock = eliteEntity.getLivingEntity().getLocation().clone().add(pieBlock.vector);
 
                 if (rawPieBlock.getBlock().isPassable()) continue;
 
@@ -181,9 +182,9 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
                         new BoundingBox(rawPieBlock.getX(), rawPieBlock.getY(), rawPieBlock.getZ(),
                                 rawPieBlock.getX() + 1, rawPieBlock.getY() + 3, rawPieBlock.getZ() + 1))) {
                     if (entity.getType().equals(EntityType.FALLING_BLOCK)) continue;
-                    entity.setVelocity(entity.getLocation().clone().subtract(eliteMobEntity.getLivingEntity().getLocation()).toVector().setY(1).normalize().multiply(3));
+                    entity.setVelocity(entity.getLocation().clone().subtract(eliteEntity.getLivingEntity().getLocation()).toVector().setY(1).normalize().multiply(3));
                     if (entity.getType().equals(EntityType.PLAYER))
-                        BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 20);
+                        BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 20);
                 }
 
                 if (rawPieBlock.getBlock().getType().getBlastResistance() >= 7)
@@ -197,12 +198,12 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
 
         damagePhaseCounter++;
 
-        Explosion.generateFakeExplosion(blockList, eliteMobEntity.getLivingEntity());
+        Explosion.generateFakeExplosion(blockList, eliteEntity.getLivingEntity());
 
     }
 
     @Override
-    protected void finishDeactivation(EliteMobEntity eliteMobEntity) {
+    protected void finishDeactivation(EliteEntity eliteEntity) {
 
     }
 

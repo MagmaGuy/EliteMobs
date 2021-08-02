@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -22,28 +22,28 @@ public class MajorPowerPowerStance implements Listener {
 
     public static int trackAmount = 2;
     public static int individualEffectsPerTrack = 2;
-    private EliteMobEntity eliteMobEntity;
+    private EliteEntity eliteEntity;
 
-    public MajorPowerPowerStance(EliteMobEntity eliteMobEntity) {
+    public MajorPowerPowerStance(EliteEntity eliteEntity) {
 
         if (!MobCombatSettingsConfig.enableVisualEffectsForNaturalMobs)
             return;
-        if (MobCombatSettingsConfig.disableVisualEffectsForSpawnerMobs && !eliteMobEntity.isNaturalEntity())
+        if (MobCombatSettingsConfig.disableVisualEffectsForSpawnerMobs && !eliteEntity.isNaturalEntity())
             return;
 
-        this.eliteMobEntity = eliteMobEntity;
+        this.eliteEntity = eliteEntity;
 
-        if (eliteMobEntity.hasMajorVisualEffect()) return;
-        eliteMobEntity.setHasMajorVisualEffect(true);
+        if (eliteEntity.hasMajorVisualEffect()) return;
+        eliteEntity.setHasMajorVisualEffect(true);
 
-        if (eliteMobEntity.getMajorPowerCount() < 1)
+        if (eliteEntity.getMajorPowerCount() < 1)
             return;
 
         /*
         Obfuscate powers to prevent TPS loss
          */
         if (MobCombatSettingsConfig.obfuscateMobPowers)
-            if (eliteMobEntity.getHasVisualEffectObfuscated()) {
+            if (eliteEntity.getHasVisualEffectObfuscated()) {
                 Object[][] multiDimensionalTrailTracker = new Object[trackAmount][individualEffectsPerTrack];
 
                 for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
@@ -57,13 +57,13 @@ public class MajorPowerPowerStance implements Listener {
                 }
 
                 VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                        MajorPowerStanceMath.cachedVectors, eliteMobEntity.hasMajorVisualEffect(),
-                        MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
+                        MajorPowerStanceMath.cachedVectors, eliteEntity.hasMajorVisualEffect(),
+                        MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
                 return;
             }
 
-        Object[][] multiDimensionalTrailTracker = new Object[trackAmount][eliteMobEntity.getMajorPowerCount() * individualEffectsPerTrack];
+        Object[][] multiDimensionalTrailTracker = new Object[trackAmount][eliteEntity.getMajorPowerCount() * individualEffectsPerTrack];
 
         for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
             ArrayList<Object> localObjects = new ArrayList<>();
@@ -75,8 +75,8 @@ public class MajorPowerPowerStance implements Listener {
         }
 
         VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                MajorPowerStanceMath.cachedVectors, eliteMobEntity.hasMajorVisualEffect(),
-                MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
+                MajorPowerStanceMath.cachedVectors, eliteEntity.hasMajorVisualEffect(),
+                MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
     }
 
@@ -88,10 +88,10 @@ public class MajorPowerPowerStance implements Listener {
 
         ArrayList<Object> effects = new ArrayList<>();
 
-        for (ElitePower elitePower : eliteMobEntity.getPowers())
+        for (ElitePower elitePower : eliteEntity.getPowers())
             if (elitePower instanceof MajorPower)
-                if (eliteMobEntity.getPower(elitePower).getTrail() != null)
-                    effects.add(effectParser(eliteMobEntity.getPower(elitePower).getTrail()));
+                if (eliteEntity.getPower(elitePower).getTrail() != null)
+                    effects.add(effectParser(eliteEntity.getPower(elitePower).getTrail()));
 
         return effects;
 
@@ -113,7 +113,7 @@ public class MajorPowerPowerStance implements Listener {
 
     private Object addEffect(Material material) {
 
-        Item item = eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
+        Item item = eliteEntity.getLivingEntity().getWorld().dropItem(eliteEntity.getLivingEntity().getLocation(),
                 new ItemStack(material));
         item.setPickupDelay(Integer.MAX_VALUE);
         if (!VersionChecker.serverVersionOlderThan(1, 11))

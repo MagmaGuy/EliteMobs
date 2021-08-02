@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -39,18 +39,18 @@ public class FlamePyre extends BossPower implements Listener {
      * Warning phase
      *
      */
-    private void doFlamePyrePhase1(EliteMobEntity eliteMobEntity) {
-        eliteMobEntity.getLivingEntity().setAI(false);
+    private void doFlamePyrePhase1(EliteEntity eliteEntity) {
+        eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             int counter = 0;
 
             @Override
             public void run() {
                 counter++;
-                spawnPhase1Particle(eliteMobEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
+                spawnPhase1Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
                 if (counter < 20 * 2) return;
                 cancel();
-                doFlamePyrePhase2(eliteMobEntity);
+                doFlamePyrePhase2(eliteEntity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
@@ -70,19 +70,19 @@ public class FlamePyre extends BossPower implements Listener {
      * First damage phase
      *
      */
-    private void doFlamePyrePhase2(EliteMobEntity eliteMobEntity) {
+    private void doFlamePyrePhase2(EliteEntity eliteEntity) {
         new BukkitRunnable() {
             int counter = 0;
 
             @Override
             public void run() {
                 counter++;
-                spawnPhase1Particle(eliteMobEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
-                doDamage(eliteMobEntity, 0.5, 50, 0.5);
-                spawnPhase2Particle(eliteMobEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
+                spawnPhase1Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
+                doDamage(eliteEntity, 0.5, 50, 0.5);
+                spawnPhase2Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
                 if (counter < 20 * 2) return;
                 cancel();
-                doFlamePyrePhase3(eliteMobEntity);
+                doFlamePyrePhase3(eliteEntity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
@@ -98,30 +98,30 @@ public class FlamePyre extends BossPower implements Listener {
         }
     }
 
-    private void doDamage(EliteMobEntity eliteMobEntity, double range1, double range2, double range3) {
-        for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(range1, range2, range3))
+    private void doDamage(EliteEntity eliteEntity, double range1, double range2, double range3) {
+        for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(range1, range2, range3))
             if (entity instanceof LivingEntity)
-                BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
+                BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
     }
 
     /**
      * Second damage phase / last warning phase
      *
-     * @param eliteMobEntity
+     * @param eliteEntity
      */
-    private void doFlamePyrePhase3(EliteMobEntity eliteMobEntity) {
+    private void doFlamePyrePhase3(EliteEntity eliteEntity) {
         new BukkitRunnable() {
             int counter = 0;
 
             @Override
             public void run() {
                 counter++;
-                spawnPhase2Particle(eliteMobEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
-                doDamage(eliteMobEntity, 3, 50, 3);
-                spawnPhase3Particle(eliteMobEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
+                spawnPhase2Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
+                doDamage(eliteEntity, 3, 50, 3);
+                spawnPhase3Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
                 if (counter < 20 * 2) return;
                 cancel();
-                doFlamePyrePhase4(eliteMobEntity);
+                doFlamePyrePhase4(eliteEntity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
@@ -134,18 +134,18 @@ public class FlamePyre extends BossPower implements Listener {
      * Final/full damage phase
      *
      */
-    private void doFlamePyrePhase4(EliteMobEntity eliteMobEntity) {
+    private void doFlamePyrePhase4(EliteEntity eliteEntity) {
         new BukkitRunnable() {
             int counter = 0;
 
             @Override
             public void run() {
                 counter++;
-                spawnPhase3Particle(eliteMobEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
-                doDamage(eliteMobEntity, 5, 50, 5);
+                spawnPhase3Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
+                doDamage(eliteEntity, 5, 50, 5);
                 if (counter < 20 * 2) return;
                 cancel();
-                eliteMobEntity.getLivingEntity().setAI(true);
+                eliteEntity.getLivingEntity().setAI(true);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }

@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.entitytracker.TemporaryBlockTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
@@ -128,8 +128,8 @@ public class Explosion {
     public static class ExplosionEvent implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void entityExplodeEvent(EntityExplodeEvent event) {
-            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteMobEntity != null) {
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+            if (eliteEntity != null) {
                 generateExplosion(event);
                 return;
             }
@@ -172,16 +172,16 @@ public class Explosion {
         }
 
         Entity shooter = EntityFinder.filterRangedDamagers(entity);
-        EliteMobEntity eliteMobEntity = null;
+        EliteEntity eliteEntity = null;
         if (shooter != null)
-            eliteMobEntity = EntityTracker.getEliteMobEntity(shooter);
+            eliteEntity = EntityTracker.getEliteMobEntity(shooter);
 
         EliteExplosionEvent eliteExplosionEvent = null;
 
         //for projectiles
         if (entity instanceof Projectile) {
             eliteExplosionEvent = new EliteExplosionEvent(
-                    eliteMobEntity,
+                    eliteEntity,
                     elitePower = ElitePower.getElitePower(EliteProjectile.readExplosivePower((Projectile) entity)),
                     entity.getLocation(),
                     blockStates);
@@ -189,7 +189,7 @@ public class Explosion {
 
         } else {
             eliteExplosionEvent = new EliteExplosionEvent(
-                    eliteMobEntity,
+                    eliteEntity,
                     elitePower,
                     entity.getLocation(),
                     blockStates);

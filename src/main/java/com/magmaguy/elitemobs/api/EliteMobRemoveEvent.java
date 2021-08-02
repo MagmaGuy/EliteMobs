@@ -2,8 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -12,28 +11,28 @@ public class EliteMobRemoveEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
-    private final EliteMobEntity eliteMobEntity;
+    private final EliteEntity eliteEntity;
     private final RemovalReason removalReason;
 
     /**
      * This is always the last event to be called when an Elite Mob dies, and is used to clean up references to it in memory.
      *
-     * @param eliteMobEntity Elite Mob removed
+     * @param eliteEntity Elite Mob removed
      * @param removalReason  Reason for removal
      */
-    public EliteMobRemoveEvent(EliteMobEntity eliteMobEntity, RemovalReason removalReason) {
-        this.entity = eliteMobEntity.getLivingEntity();
-        this.eliteMobEntity = eliteMobEntity;
+    public EliteMobRemoveEvent(EliteEntity eliteEntity, RemovalReason removalReason) {
+        this.entity = eliteEntity.getUnsyncedLivingEntity();
+        this.eliteEntity = eliteEntity;
         this.removalReason = removalReason;
-        EntityTracker.unregister(eliteMobEntity.uuid, removalReason);
+        EntityTracker.unregister(eliteEntity.getUnsyncedLivingEntity().getUniqueId(), removalReason);
     }
 
     public Entity getEntity() {
         return this.entity;
     }
 
-    public EliteMobEntity getEliteMobEntity() {
-        return this.eliteMobEntity;
+    public EliteEntity getEliteMobEntity() {
+        return this.eliteEntity;
     }
 
     public RemovalReason getRemovalReason() {

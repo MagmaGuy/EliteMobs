@@ -1,16 +1,15 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
 import java.util.Collections;
 
-public class SummonableWolfConfig extends CustomBossConfigFields {
+public class SummonableWolfConfig extends CustomBossesConfigFields {
     public SummonableWolfConfig() {
         super("summonable_wolf",
-                EntityType.WOLF.toString(),
+                EntityType.WOLF,
                 true,
                 "$normalLevel Wolfy",
                 "dynamic");

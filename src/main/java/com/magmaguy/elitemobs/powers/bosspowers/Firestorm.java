@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -35,9 +35,9 @@ public class Firestorm extends BossPower implements Listener {
 
     }
 
-    private static void doFirestorm(EliteMobEntity eliteMobEntity) {
-        if (eliteMobEntity == null || !eliteMobEntity.getLivingEntity().isValid()) return;
-        eliteMobEntity.getLivingEntity().setAI(false);
+    private static void doFirestorm(EliteEntity eliteEntity) {
+        if (eliteEntity == null || !eliteEntity.getLivingEntity().isValid()) return;
+        eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             int counter = 0;
 
@@ -45,20 +45,20 @@ public class Firestorm extends BossPower implements Listener {
             public void run() {
                 counter++;
 
-                if (counter > 20 * 10 | !eliteMobEntity.getLivingEntity().isValid()) {
-                    if (eliteMobEntity.getLivingEntity().isValid())
-                        eliteMobEntity.getLivingEntity().setAI(true);
+                if (counter > 20 * 10 | !eliteEntity.getLivingEntity().isValid()) {
+                    if (eliteEntity.getLivingEntity().isValid())
+                        eliteEntity.getLivingEntity().setAI(true);
                     cancel();
                     return;
                 }
 
                 if (counter % 5 == 0) {
-                    Location randomLocation = eliteMobEntity.getLivingEntity().getLocation().add(new Vector(
+                    Location randomLocation = eliteEntity.getLivingEntity().getLocation().add(new Vector(
                             ThreadLocalRandom.current().nextInt(-20, 20),
                             0,
                             ThreadLocalRandom.current().nextInt(-20, 20)
                     ));
-                    doFlamePyrePhase1(randomLocation, eliteMobEntity);
+                    doFlamePyrePhase1(randomLocation, eliteEntity);
                 }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
@@ -67,7 +67,7 @@ public class Firestorm extends BossPower implements Listener {
     /**
      * Warning phase
      */
-    private static void doFlamePyrePhase1(Location location, EliteMobEntity eliteMobEntity) {
+    private static void doFlamePyrePhase1(Location location, EliteEntity eliteEntity) {
         new BukkitRunnable() {
             int counter = 0;
 
@@ -77,7 +77,7 @@ public class Firestorm extends BossPower implements Listener {
                 spawnPhase1Particle(location, Particle.SMOKE_NORMAL);
                 if (counter < 20 * 2) return;
                 cancel();
-                doFlamePyrePhase2(location, eliteMobEntity);
+                doFlamePyrePhase2(location, eliteEntity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
@@ -96,7 +96,7 @@ public class Firestorm extends BossPower implements Listener {
     /**
      * First damage phase
      */
-    private static void doFlamePyrePhase2(Location location, EliteMobEntity eliteMobEntity) {
+    private static void doFlamePyrePhase2(Location location, EliteEntity eliteEntity) {
         new BukkitRunnable() {
             int counter = 0;
 
@@ -104,11 +104,11 @@ public class Firestorm extends BossPower implements Listener {
             public void run() {
                 counter++;
                 spawnPhase1Particle(location, Particle.FLAME);
-                doDamage(location, eliteMobEntity, 0.5, 50, 0.5);
+                doDamage(location, eliteEntity, 0.5, 50, 0.5);
                 spawnPhase2Particle(location, Particle.SMOKE_NORMAL);
                 if (counter < 20 * 2) return;
                 cancel();
-                doFlamePyrePhase3(location, eliteMobEntity);
+                doFlamePyrePhase3(location, eliteEntity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
@@ -124,16 +124,16 @@ public class Firestorm extends BossPower implements Listener {
         }
     }
 
-    private static void doDamage(Location location, EliteMobEntity eliteMobEntity, double range1, double range2, double range3) {
+    private static void doDamage(Location location, EliteEntity eliteEntity, double range1, double range2, double range3) {
         for (Entity entity : location.getWorld().getNearbyEntities(location, range1, range2, range3))
             if (entity instanceof LivingEntity)
-                BossCustomAttackDamage.dealCustomDamage(eliteMobEntity.getLivingEntity(), (LivingEntity) entity, 1);
+                BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
     }
 
     /**
      * Second damage phase / last warning phase
      */
-    private static void doFlamePyrePhase3(Location location, EliteMobEntity eliteMobEntity) {
+    private static void doFlamePyrePhase3(Location location, EliteEntity eliteEntity) {
         new BukkitRunnable() {
             int counter = 0;
 
@@ -141,11 +141,11 @@ public class Firestorm extends BossPower implements Listener {
             public void run() {
                 counter++;
                 spawnPhase2Particle(location, Particle.FLAME);
-                doDamage(location, eliteMobEntity, 3, 50, 3);
+                doDamage(location, eliteEntity, 3, 50, 3);
                 spawnPhase3Particle(location, Particle.SMOKE_NORMAL);
                 if (counter < 20 * 2) return;
                 cancel();
-                doFlamePyrePhase4(location, eliteMobEntity);
+                doFlamePyrePhase4(location, eliteEntity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
@@ -157,9 +157,9 @@ public class Firestorm extends BossPower implements Listener {
     /**
      * Final/full damage phase
      *
-     * @param eliteMobEntity
+     * @param eliteEntity
      */
-    private static void doFlamePyrePhase4(Location location, EliteMobEntity eliteMobEntity) {
+    private static void doFlamePyrePhase4(Location location, EliteEntity eliteEntity) {
         new BukkitRunnable() {
             int counter = 0;
 
@@ -167,7 +167,7 @@ public class Firestorm extends BossPower implements Listener {
             public void run() {
                 counter++;
                 spawnPhase3Particle(location, Particle.FLAME);
-                doDamage(location, eliteMobEntity, 5, 50, 5);
+                doDamage(location, eliteEntity, 5, 50, 5);
                 if (counter < 20 * 2) return;
                 cancel();
             }

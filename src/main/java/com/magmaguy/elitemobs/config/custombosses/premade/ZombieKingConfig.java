@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
@@ -9,10 +9,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class ZombieKingConfig extends CustomBossConfigFields {
+public class ZombieKingConfig extends CustomBossesConfigFields {
     public ZombieKingConfig() {
         super("zombie_king",
-                EntityType.ZOMBIE.toString(),
+                EntityType.ZOMBIE,
                 true,
                 "$eventBossLevel &4Zombie King",
                 "dynamic");

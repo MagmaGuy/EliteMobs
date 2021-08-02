@@ -1,15 +1,15 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
 
-public class BlayyzeConfig extends CustomBossConfigFields {
+public class BlayyzeConfig extends CustomBossesConfigFields {
     public BlayyzeConfig() {
         super("blayyze",
-                EntityType.BLAZE.toString(),
+                EntityType.BLAZE,
                 true,
                 "$eventBossLevel &6Blayyze",
                 "dynamic");

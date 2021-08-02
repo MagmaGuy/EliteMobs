@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -30,8 +30,8 @@ public class AttackLightning extends MinorPower implements Listener {
         fireLightning(event.getEliteMobEntity());
     }
 
-    public void fireLightning(EliteMobEntity eliteMobEntity) {
-        for (Entity entity : eliteMobEntity.getLivingEntity().getLocation().getWorld().getNearbyEntities(eliteMobEntity.getLivingEntity().getLocation(), 20, 20, 20))
+    public void fireLightning(EliteEntity eliteEntity) {
+        for (Entity entity : eliteEntity.getLivingEntity().getLocation().getWorld().getNearbyEntities(eliteEntity.getLivingEntity().getLocation(), 20, 20, 20))
             if (entity.getType().equals(EntityType.PLAYER))
                 lightningTask(entity.getLocation().clone());
     }

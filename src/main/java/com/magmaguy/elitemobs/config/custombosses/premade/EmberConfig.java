@@ -1,15 +1,15 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
 
-public class EmberConfig extends CustomBossConfigFields {
+public class EmberConfig extends CustomBossesConfigFields {
     public EmberConfig() {
         super("ember",
-                EntityType.BLAZE.toString(),
+                EntityType.BLAZE,
                 true,
                 "$reinforcementLevel &cEmber",
                 "dynamic");

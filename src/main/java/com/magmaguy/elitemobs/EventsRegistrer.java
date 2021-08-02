@@ -18,10 +18,6 @@ import com.magmaguy.elitemobs.config.*;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
-import com.magmaguy.elitemobs.events.EliteEvent;
-import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
-import com.magmaguy.elitemobs.events.timedevents.MeteorEvent;
-import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.gamemodes.nightmaremodeworld.DaylightWatchdog;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.ZoneWarner;
@@ -207,7 +203,6 @@ public class EventsRegistrer {
         //Custom bosses
         pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
         pluginManager.registerEvents(new CustomBossDeath(), plugin);
-        pluginManager.registerEvents(new CustomBossBossBar.CustomBossBossBarEvent(), plugin);
         pluginManager.registerEvents(new SimplePersistentEntity.PersistentEntityEvent(), plugin);
         pluginManager.registerEvents(new CustomBossTaunts(), plugin);
         pluginManager.registerEvents(new PhaseBossEntity.PhaseBossEntityListener(), plugin);
@@ -273,13 +268,6 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new HoneyBlockJumpExploit(), plugin);
         pluginManager.registerEvents(new EliteMobDamagedByPlayerAntiExploitListener(), plugin);
 
-
-        //Initialize events
-        pluginManager.registerEvents(new EliteEvent.AbstractEliteEventEvents(), plugin);
-        pluginManager.registerEvents(new DeadMoonEvent(), plugin);
-        pluginManager.registerEvents(new SmallTreasureGoblinEvent(), plugin);
-        pluginManager.registerEvents(new MeteorEvent(), plugin);
-
         pluginManager.registerEvents(new ActionEvent.ActionEventEvents(), plugin);
 
         //Set up health and damage displays
@@ -322,7 +310,6 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new WorldGuardSpawnEventBypasser(), plugin);
         pluginManager.registerEvents(new WorldGuardEliteMobOnlySpawnFlag(), plugin);
         pluginManager.registerEvents(new WorldGuardDungeonFlag(), plugin);
-        pluginManager.registerEvents(new NPCEntity.NPCEntityEvents(), plugin);
 
         pluginManager.registerEvents(new EntityTransformPreventer(), plugin);
         pluginManager.registerEvents(new EliteBlazeWaterDamagePrevention(), plugin);

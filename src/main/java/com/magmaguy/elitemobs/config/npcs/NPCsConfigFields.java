@@ -1,52 +1,30 @@
 package com.magmaguy.elitemobs.config.npcs;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Villager;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class NPCsConfigFields {
-
-    private final String fileName;
-    private boolean isEnabled;
-    private final String name;
-    private final String role;
-    private final String profession;
-    private String location;
-    private final List<String> greetings;
-    private final List<String> dialog;
-    private final List<String> farewell;
-    private final boolean canMove;
-    private final boolean canTalk;
-    private final double activationRadius;
-    private final boolean canSleep;
-    private final String interactionType;
-    private FileConfiguration fileConfiguration = null;
-    private File file;
-    private double timeout;
-    public String noPreviousLocationMessage;
-    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
+public class NPCsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
                             String name,
                             String role,
-                            String profession,
+                            Villager.Profession profession,
                             String location,
                             List<String> greetings,
                             List<String> dialog,
                             List<String> farewell,
-                            boolean canMove,
                             boolean canTalk,
                             double activationRadius,
-                            boolean canSleep,
-                            String interactionType) {
-        this.fileName = fileName;
-        this.isEnabled = isEnabled;
+                            NPCInteractions.NPCInteractionType interactionType) {
+        super(fileName, isEnabled);
         this.name = name;
         this.role = role;
         this.profession = profession;
@@ -54,13 +32,132 @@ public class NPCsConfigFields {
         this.greetings = greetings;
         this.dialog = dialog;
         this.farewell = farewell;
-        this.canMove = canMove;
         this.canTalk = canTalk;
         this.activationRadius = activationRadius;
-        this.canSleep = canSleep;
         this.interactionType = interactionType;
-
     }
+
+    public NPCsConfigFields(String filename,
+                            boolean isEnabled){
+        super(filename, isEnabled);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private String name;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    private String role;
+
+    public Villager.Profession getProfession() {
+        return profession;
+    }
+
+    public void setProfession(Villager.Profession profession) {
+        this.profession = profession;
+    }
+
+    private Villager.Profession profession = Villager.Profession.NITWIT;
+
+    public String getLocation() {
+        return location;
+    }
+
+    private String location;
+
+    public List<String> getGreetings() {
+        return greetings;
+    }
+
+    public void setGreetings(List<String> greetings) {
+        this.greetings = greetings;
+    }
+
+    private List<String> greetings;
+
+    public List<String> getDialog() {
+        return dialog;
+    }
+
+    public void setDialog(List<String> dialog) {
+        this.dialog = dialog;
+    }
+
+    private List<String> dialog;
+
+    public List<String> getFarewell() {
+        return farewell;
+    }
+
+    public void setFarewell(List<String> farewell) {
+        this.farewell = farewell;
+    }
+
+    private List<String> farewell;
+
+    public boolean isCanTalk() {
+        return canTalk;
+    }
+
+    public void setCanTalk(boolean canTalk) {
+        this.canTalk = canTalk;
+    }
+
+    private boolean canTalk;
+
+    public double getActivationRadius() {
+        return activationRadius;
+    }
+
+    public void setActivationRadius(double activationRadius) {
+        this.activationRadius = activationRadius;
+    }
+
+    private double activationRadius;
+
+    public NPCInteractions.NPCInteractionType getInteractionType() {
+        return interactionType;
+    }
+
+    public void setInteractionType(NPCInteractions.NPCInteractionType interactionType) {
+        this.interactionType = interactionType;
+    }
+
+    private NPCInteractions.NPCInteractionType interactionType;
+
+
+    public double getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(double timeout) {
+        this.timeout = timeout;
+    }
+
+    private double timeout;
+
+    public String getNoPreviousLocationMessage() {
+        return noPreviousLocationMessage;
+    }
+
+    public void setNoPreviousLocationMessage(String noPreviousLocationMessage) {
+        this.noPreviousLocationMessage = noPreviousLocationMessage;
+    }
+
+    public String noPreviousLocationMessage;
 
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
         fileConfiguration.addDefault("isEnabled", isEnabled);
@@ -71,99 +168,26 @@ public class NPCsConfigFields {
         fileConfiguration.addDefault("greetings", greetings);
         fileConfiguration.addDefault("dialog", dialog);
         fileConfiguration.addDefault("farewell", farewell);
-        fileConfiguration.addDefault("canMove", canMove);
         fileConfiguration.addDefault("canTalk", canTalk);
         fileConfiguration.addDefault("activationRadius", activationRadius);
-        fileConfiguration.addDefault("canSleep", canSleep);
         fileConfiguration.addDefault("interactionType", interactionType);
-        if (!additionalConfigOptions.isEmpty())
-            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
-    public NPCsConfigFields(FileConfiguration fileConfiguration, File file) {
-        this.fileConfiguration = fileConfiguration;
-        this.file = file;
-        this.fileName = file.getName();
-        this.isEnabled = fileConfiguration.getBoolean("isEnabled");
-        this.name = fileConfiguration.getString("name");
-        this.role = fileConfiguration.getString("role");
-        this.profession = fileConfiguration.getString("profession");
-        this.location = fileConfiguration.getString("spawnLocation");
-        this.greetings = fileConfiguration.getStringList("greetings");
-        this.dialog = fileConfiguration.getStringList("dialog");
-        this.farewell = fileConfiguration.getStringList("farewell");
-        this.canMove = fileConfiguration.getBoolean("canMove");
-        this.canTalk = fileConfiguration.getBoolean("canTalk");
-        this.activationRadius = fileConfiguration.getDouble("activationRadius");
-        this.canSleep = fileConfiguration.getBoolean("canSleep");
-        this.interactionType = fileConfiguration.getString("interactionType");
-        if (fileConfiguration.getString("timeout") != null)
-            this.timeout = fileConfiguration.getDouble("timeout");
-        else
-            this.timeout = 0;
-        if (fileConfiguration.getString("noPreviousLocationMessage") != null)
-            this.noPreviousLocationMessage = fileConfiguration.getString("noPreviousLocationMessage");
+    public void processConfigFields() {
+        this.name = processString("name", name);
+        this.role = processString("role", role);
+        this.profession = processEnum("profession", profession);
+        this.location = processString("spawnLocation", location);
+        this.greetings = processStringList("greetings", greetings);
+        this.dialog = processStringList("dialog", dialog);
+        this.farewell = processStringList("farewell", farewell);
+        this.canTalk = processBoolean("canTalk", canTalk);
+        this.activationRadius = processDouble("activationRadius", activationRadius);
+        this.interactionType = processEnum("interactionType", interactionType);
+        this.timeout = processDouble("timeout", timeout);
+        this.noPreviousLocationMessage = processString("noPreviousLocationMessage", noPreviousLocationMessage);
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public String getProfession() {
-        return profession;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public List<String> getGreetings() {
-        return greetings;
-    }
-
-    public List<String> getDialog() {
-        return dialog;
-    }
-
-    public List<String> getFarewell() {
-        return farewell;
-    }
-
-    public boolean isCanMove() {
-        return canMove;
-    }
-
-    public boolean isCanTalk() {
-        return canTalk;
-    }
-
-    public double getActivationRadius() {
-        return activationRadius;
-    }
-
-    public boolean isCanSleep() {
-        return canSleep;
-    }
-
-    public String getInteractionType() {
-        return interactionType;
-    }
-
-    public File getFile() {
-        return file;
-    }
 
     public void setEnabled(boolean enabled) {
         this.isEnabled = enabled;
@@ -184,14 +208,6 @@ public class NPCsConfigFields {
         } catch (Exception ex) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }
-    }
-
-    public Map<String, Object> getAdditionalConfigOptions() {
-        return additionalConfigOptions;
-    }
-
-    public double getTimeout() {
-        return this.timeout;
     }
 
 }

@@ -2,11 +2,11 @@ package com.magmaguy.elitemobs.combatsystem;
 
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
-import com.magmaguy.elitemobs.items.MobTierCalculator;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.ProjectileTagger;
 import org.bukkit.Material;
@@ -99,13 +99,13 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
     }
 
-    private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EliteMobEntity eliteMobEntity, EntityDamageByEntityEvent event) {
+    private double eliteToPlayerDamageFormula(double eliteTier, double playerTier, Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
 
-        double baseDamage = EliteMobProperties.getPluginData(eliteMobEntity.getLivingEntity().getType()).baseDamage;
+        double baseDamage = EliteMobProperties.getPluginData(eliteEntity.getLivingEntity().getType()).baseDamage;
         double bonusDamage = eliteTier;
         double damageReduction = playerTier;
         double secondaryDamageReduction = secondaryEnchantmentDamageReduction(player, event);
-        double customBossDamageMultiplier = eliteMobEntity.getDamageMultiplier();
+        double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
 
         double finalDamage = (baseDamage + bonusDamage - damageReduction - secondaryDamageReduction) *
                 MobCombatSettingsConfig.damageToPlayerMultiplier * customBossDamageMultiplier;

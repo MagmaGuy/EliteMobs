@@ -1,16 +1,18 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 
 public class EnhancerConfig extends NPCsConfigFields {
     public EnhancerConfig(){
-        super("enhancer_config.yml",
+        super("enhancer_config",
                 true,
                 "Tim",
                 "<Enhancer>",
-                "WEAPONSMITH",
+                Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,282.5,77,242.5,0,0",
                 Arrays.asList(
                         "Want to uprade yer items?",
@@ -28,10 +30,8 @@ public class EnhancerConfig extends NPCsConfigFields {
                         "Don't embarrass yourself out there!",
                         "Come back when you have more orbs!",
                         "Go get more orbs!"),
-                false,
                 true,
                 3,
-                false,
-                "ENHANCER");
+                NPCInteractions.NPCInteractionType.ENHANCER);
     }
 }

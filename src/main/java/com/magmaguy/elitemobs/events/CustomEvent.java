@@ -3,8 +3,10 @@ package com.magmaguy.elitemobs.events;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.announcements.AnnouncementPriority;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
@@ -25,6 +27,7 @@ public abstract class CustomEvent {
 
     public enum EventType {
         //Action Events
+        DEFAULT,
         BREAK_BLOCK,
         FISH,
         TILL_SOIL,
@@ -36,10 +39,15 @@ public abstract class CustomEvent {
 
     //Common fields
     public EventType eventType;
-    public ArrayList<EliteMobEntity> eventEliteMobs = new ArrayList<>();
+    public ArrayList<EliteEntity> eventEliteMobs = new ArrayList<>();
     public ArrayList<CustomBossEntity> primaryEliteMobs = new ArrayList<>();
     public BukkitTask eventWatchdog;
     public int announcementPriority;
+
+    public CustomEventsConfigFields getCustomEventsConfigFields() {
+        return customEventsConfigFields;
+    }
+
     public CustomEventsConfigFields customEventsConfigFields;
     public String startMessage, endMessage;
     public List<String> startEventCommands, endEventCommands;
@@ -89,15 +97,7 @@ public abstract class CustomEvent {
      */
     public void start() {
         startModifiers();
-        boolean elitesNotNull = true;
-        for (String filename : primaryCustomBossFilenames) {
-            CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss(filename, getEventStartLocation());
-            if (customBossEntity == null)
-                elitesNotNull = false;
-            primaryEliteMobs.add(customBossEntity);
-            eventEliteMobs.add(customBossEntity);
-        }
-        if (!elitesNotNull) {
+        if (primaryEliteMobs.isEmpty()) {
             new WarningMessage("Event (event name) has failed to start because the bosses failed to spawn correctly!" +
                     "This could be due to an issue with the configuration of the bosses in the event, with the configuration" +
                     " of the event or due to a protection in the target location!");
@@ -131,7 +131,7 @@ public abstract class CustomEvent {
     public void end() {
         eventEliteMobs.stream().forEach(eliteMobEntity -> {
             if (eliteMobEntity != null)
-                eliteMobEntity.remove(true);
+                EntityTracker.unregister(eliteMobEntity.getUnsyncedLivingEntity(), RemovalReason.BOSS_TIMEOUT);
         });
         if (this.endMessage != null)
             AnnouncementPriority.announce(this.endMessage, eventStartLocation.getWorld(), this.announcementPriority);
