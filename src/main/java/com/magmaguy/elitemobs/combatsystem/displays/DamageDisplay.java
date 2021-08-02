@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.DialogArmorStand;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -20,10 +21,7 @@ public class DamageDisplay implements Listener {
     public void onHit(EliteMobDamagedByPlayerEvent event) {
         if (!MobCombatSettingsConfig.displayDamageOnHit) return;
 
-        double randomCoordX = (ThreadLocalRandom.current().nextDouble() * 2) - 1;
-        double randomCoordZ = (ThreadLocalRandom.current().nextDouble() * 2) - 1;
-
-        Vector offset = new Vector(randomCoordX, 1.5, randomCoordZ);
+        Vector offset = new Vector(ThreadLocalRandom.current().nextDouble(-2, 2), 0, ThreadLocalRandom.current().nextDouble(-2, 2));
 
         if (event.isCriticalStrike()) {
             DialogArmorStand.createDialogArmorStand(

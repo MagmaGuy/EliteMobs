@@ -1,15 +1,15 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
 
-public class RaugConfig extends CustomBossConfigFields {
+public class RaugConfig extends CustomBossesConfigFields {
     public RaugConfig() {
         super("raug",
-                EntityType.SILVERFISH.toString(),
+                EntityType.SILVERFISH,
                 true,
                 "$reinforcementLevel &4Raug",
                 "dynamic");

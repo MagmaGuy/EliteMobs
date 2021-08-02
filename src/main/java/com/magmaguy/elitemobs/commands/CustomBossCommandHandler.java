@@ -1,10 +1,9 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -27,15 +26,17 @@ public class CustomBossCommandHandler {
     }
 
     public static void addSpawnLocation(String customBossConfigFieldsString, Player player) {
-        CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.regionalElites.get(customBossConfigFieldsString);
-        if (customBossConfigFields == null)
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.regionalElites.get(customBossConfigFieldsString);
+        if (customBossesConfigFields == null)
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add spawn location! Custom Boss " + customBossConfigFieldsString + " is not valid regional boss!"));
         else {
             Location safeSpawnLocation = autoSeekSafeSpawnLocation(player.getLocation());
             if (safeSpawnLocation == null)
                 player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
-            else
-                new AbstractRegionalEntity(safeSpawnLocation, customBossConfigFields);
+            else{
+                RegionalBossEntity regionalBossEntity = new RegionalBossEntity(customBossesConfigFields, safeSpawnLocation);
+                regionalBossEntity.saveNewLocation();
+            }
         }
     }
 
@@ -45,27 +46,27 @@ public class CustomBossCommandHandler {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add relative location! Minidungeon is not valid!"));
             return;
         }
-        CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.regionalElites.get(customBossConfigFieldsString);
-        if (customBossConfigFields == null)
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.regionalElites.get(customBossConfigFieldsString);
+        if (customBossesConfigFields == null)
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed to add relative location! Custom boss is not valid!"));
         else {
             Location safeSpawnLocation = autoSeekSafeSpawnLocation(player.getLocation());
             if (safeSpawnLocation == null)
                 player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
             else
-                minidungeon.initializeRelativeLocationAddition(customBossConfigFields, safeSpawnLocation);
+                minidungeon.initializeRelativeLocationAddition(customBossesConfigFields, safeSpawnLocation);
         }
     }
 
     public static void setLeashRadius(String customBossConfigFieldsString, CommandSender commandSender, int leashRadius) {
-        CustomBossConfigFields customBossConfigFields = CustomBossConfigFields.regionalElites.get(customBossConfigFieldsString);
-        if (customBossConfigFields == null) {
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.regionalElites.get(customBossConfigFieldsString);
+        if (customBossesConfigFields == null) {
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Failed set the leash radius! Was the boss a valid regional boss?"));
             return;
         }
-        customBossConfigFields.runtimeSetLeashRadius(leashRadius);
+        customBossesConfigFields.runtimeSetLeashRadius(leashRadius);
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-            if (customBossConfigFields.getFileName().equals(regionalBossEntity.getCustomBossConfigFields().getFileName()))
+            if (customBossesConfigFields.getFilename().equals(regionalBossEntity.getCustomBossesConfigFields().getFilename()))
                 regionalBossEntity.setLeashRadius(leashRadius);
     }
 

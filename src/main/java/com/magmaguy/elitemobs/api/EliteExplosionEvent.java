@@ -2,11 +2,10 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonTornado;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
@@ -22,24 +21,24 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EliteExplosionEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    private final EliteMobEntity eliteMobEntity;
+    private final EliteEntity eliteEntity;
     private Location explosionSourceLocation;
     private boolean isCancelled = false;
     private final ArrayList<BlockState> blockStates;
     private final ElitePower elitePower;
 
-    public EliteExplosionEvent(EliteMobEntity eliteMobEntity,
+    public EliteExplosionEvent(EliteEntity eliteEntity,
                                ElitePower elitePower,
                                Location explosionSourceLocation,
                                ArrayList<BlockState> blockStates) {
-        this.eliteMobEntity = eliteMobEntity;
+        this.eliteEntity = eliteEntity;
         this.explosionSourceLocation = explosionSourceLocation;
         this.elitePower = elitePower;
         this.blockStates = blockStates;
     }
 
-    public EliteMobEntity getEliteMobEntity() {
-        return eliteMobEntity;
+    public EliteEntity getEliteMobEntity() {
+        return eliteEntity;
     }
 
     public Location getExplosionSourceLocation() {
@@ -92,7 +91,7 @@ public class EliteExplosionEvent extends Event implements Cancellable {
             visualExplosionEffectType = VisualExplosionEffectType.ASCEND;
         else if (elitePower instanceof EnderDragonTornado) {
             visualExplosionEffectType = VisualExplosionEffectType.HIGH_POWER;
-        }else
+        } else
             visualExplosionEffectType = VisualExplosionEffectType.NORMAL;
 
         for (BlockState blockState : blockStates) {

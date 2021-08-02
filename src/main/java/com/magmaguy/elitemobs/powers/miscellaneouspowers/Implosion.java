@@ -2,10 +2,10 @@ package com.magmaguy.elitemobs.powers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -35,10 +35,10 @@ public class Implosion extends MinorPower implements Listener {
                 if (counter > 20 * 3) {
                     for (Entity entity : event.getEntity().getWorld().getNearbyEntities(event.getEntity().getLocation(), 10, 10, 10))
                         if (entity instanceof LivingEntity) {
-                            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(entity);
-                            if (eliteMobEntity != null && eliteMobEntity instanceof CustomBossEntity) {
-                                CustomBossEntity customBossEntity = (CustomBossEntity) eliteMobEntity;
-                                if (customBossEntity.customBossConfigFields.getFrozen())
+                            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
+                            if (eliteEntity != null && eliteEntity instanceof CustomBossEntity) {
+                                CustomBossEntity customBossEntity = (CustomBossEntity) eliteEntity;
+                                if (customBossEntity.getCustomBossesConfigFields().getFrozen())
                                     continue;
                             }
                             entity.setVelocity(event.getEntity().getLocation().clone().subtract(entity.getLocation()).toVector().multiply(0.5));

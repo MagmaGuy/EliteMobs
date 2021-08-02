@@ -3,11 +3,11 @@ package com.magmaguy.elitemobs.powers.majorpowers.skeleton;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.powers.offensivepowers.AttackArrow;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powers.offensivepowers.AttackArrow;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
@@ -34,21 +34,21 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
         repeatingTrackingArrowTask(event.getEliteMobEntity(), skeletonTrackingArrow);
     }
 
-    private void repeatingTrackingArrowTask(EliteMobEntity eliteMobEntity, SkeletonTrackingArrow skeletonTrackingArrow) {
+    private void repeatingTrackingArrowTask(EliteEntity eliteEntity, SkeletonTrackingArrow skeletonTrackingArrow) {
         new BukkitRunnable() {
 
             @Override
             public void run() {
-                if (!eliteMobEntity.getLivingEntity().isValid() || eliteMobEntity.getLivingEntity().isDead()) {
+                if (!eliteEntity.isValid()) {
                     skeletonTrackingArrow.setIsFiring(false);
                     cancel();
                     return;
                 }
-                for (Entity nearbyEntity : eliteMobEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
+                for (Entity nearbyEntity : eliteEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
                     if (nearbyEntity instanceof Player)
                         if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
                                 ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)) {
-                            Arrow arrow = AttackArrow.shootArrow(eliteMobEntity.getLivingEntity(), (Player) nearbyEntity);
+                            Arrow arrow = AttackArrow.shootArrow(eliteEntity.getLivingEntity(), (Player) nearbyEntity);
                             arrow.setVelocity(arrow.getVelocity().multiply(0.1));
                             arrow.setGravity(false);
                             trackingArrowLoop((Player) nearbyEntity, arrow);
@@ -64,7 +64,7 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
 
             @Override
             public void run() {
-                if (player.isValid() && !player.isDead() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())
+                if (player.isValid() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())
                         && player.getLocation().distanceSquared(arrow.getLocation()) < 900 && !arrow.isOnGround()) {
                     if (counter % 10 == 0)
                         arrow.setVelocity(arrow.getVelocity().add(arrowAdjustmentVector(arrow, player)));

@@ -1,16 +1,18 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 
 public class RepairmanConfig extends NPCsConfigFields {
     public RepairmanConfig() {
-        super("repairman_config.yml",
+        super("repairman_config",
                 true,
                 "Reggie",
                 "<Repairman>",
-                "WEAPONSMITH",
+                Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,278.5,81,263.5,-90,0",
                 Arrays.asList(
                         "Get your items repaired!",
@@ -28,11 +30,8 @@ public class RepairmanConfig extends NPCsConfigFields {
                         "Don't forget to do maintenance!",
                         "I'll be here if you need me!",
                         "Call me beep me if you wanna reach me,\\nif you wanna page me that's ok"),
-                false,
                 true,
                 3,
-                false,
-                "REPAIRMAN"
-        );
+                NPCInteractions.NPCInteractionType.REPAIRMAN);
     }
 }

@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.versionnotifier;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -61,7 +60,7 @@ public class VersionChecker {
                 if (!snapshot)
                     Bukkit.getLogger().info("[EliteMobs] You are running the latest version!");
                 else
-                    new InfoMessage("You are running a snapshot version! You can check for updated in the #releases channel on the EliteMobs Discord!");
+                    new InfoMessage("You are running a snapshot version! You can check for updates in the #releases channel on the EliteMobs Discord!");
 
                 pluginIsUpToDate = true;
             }

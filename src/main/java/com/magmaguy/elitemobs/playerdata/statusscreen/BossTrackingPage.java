@@ -1,7 +1,8 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -30,13 +31,19 @@ public class BossTrackingPage {
 
         ArrayList<TextComponent> textComponents = new ArrayList<>();
         int counter = 0;
-        for (CustomBossEntity customBossEntity : CustomBossEntity.trackableCustomBosses) {
-            TextComponent message = new TextComponent(customBossEntity.bossBarMessage(player, customBossEntity.customBossConfigFields.getLocationMessage()) + "\n");
-            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PlayerStatusMenuConfig.onBossTrackHover).create()));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + customBossEntity.uuid));
-            textComponents.add(message);
 
-            counter++;
+        for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
+            try {
+                TextComponent message = new TextComponent(customBossEntity.getCustomBossBossBar().bossBarMessage(player, customBossEntity.getCustomBossesConfigFields().getLocationMessage()) + "\n");
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PlayerStatusMenuConfig.onBossTrackHover).create()));
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs trackcustomboss " + customBossEntity.getEliteUUID()));
+                textComponents.add(message);
+
+                counter++;
+            } catch (Exception ex) {
+                new WarningMessage("Failed to correctly get elements for boss tracking page!");
+                ex.printStackTrace();
+            }
         }
 
         if (counter == 0) {

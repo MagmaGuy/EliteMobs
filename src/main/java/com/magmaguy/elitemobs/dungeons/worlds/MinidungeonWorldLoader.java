@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.dungeons.worlds;
 
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -11,7 +11,6 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
 import java.io.File;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -50,7 +49,7 @@ public class MinidungeonWorldLoader {
         World world = loadWorld(minidungeon);
         if (world == null) return null;
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-            if (regionalBossEntity.getSpawnWorldName().equals(world.getName()))
+            if (regionalBossEntity.getWorldName().equals(world.getName()))
                 regionalBossEntity.worldLoad();
         return world;
     }

@@ -20,7 +20,7 @@ public class AttackPush extends MinorPower implements Listener {
         if (event.isCancelled()) return;
         AttackPush attackPush = (AttackPush) event.getEliteMobEntity().getPower(this);
         if (!event.getPlayer().isValid()) return;
-        if (!event.getEliteMobEntity().getLivingEntity().isValid()) return;
+        if (!event.getEliteMobEntity().isValid()) return;
         if (!event.getPlayer().getWorld().equals(event.getEliteMobEntity().getLivingEntity().getWorld())) return;
         if (attackPush == null) return;
         if (attackPush.getGlobalCooldownActive()) return;

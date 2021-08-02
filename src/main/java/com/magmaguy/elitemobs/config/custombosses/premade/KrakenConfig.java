@@ -1,16 +1,16 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-public class KrakenConfig extends CustomBossConfigFields {
+public class KrakenConfig extends CustomBossesConfigFields {
     public KrakenConfig(){
         super("kraken",
-                EntityType.ELDER_GUARDIAN.toString(),
+                EntityType.ELDER_GUARDIAN,
                 true,
                 "$eventBossLevel &3Kraken",
                 "dynamic");

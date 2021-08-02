@@ -10,22 +10,20 @@ import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.admin.*;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
-import com.magmaguy.elitemobs.config.events.EventsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.menus.GetLootMenu;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -34,9 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 public class AdminCommands {
 
@@ -157,8 +153,8 @@ public class AdminCommands {
                         commandContext.get("eliteLevel"),
                         commandContext.get("powers"))));
 
-        ArrayList<String> customBosses = new ArrayList<>(CustomBossConfigFields.customBossConfigFields.keySet());
-        ArrayList<String> regionalBosses = new ArrayList<>(CustomBossConfigFields.regionalElites.keySet());
+        ArrayList<String> customBosses = new ArrayList<>(CustomBossesConfigFields.customBossConfigFields.keySet());
+        ArrayList<String> regionalBosses = new ArrayList<>(CustomBossesConfigFields.regionalElites.keySet());
 
         // /em spawncustom <fileName>
         manager.command(builder.literal("spawncustom", "spawncustomboss")
@@ -262,7 +258,7 @@ public class AdminCommands {
                         (Player) commandContext.getSender(), commandContext.get("bossFileName"), commandContext.get("minidungeonFileName"))));
 
         // /em setLeashRadius <fileName> <radius>
-        manager.command(builder.literal("addSpawnLocation", "asp")
+        manager.command(builder.literal("setLeashRadius")
                 .argument(StringArgument.<CommandSender>newBuilder("fileName").withSuggestionsProvider(((objectCommandContext, s) -> regionalBosses)),
                         ArgumentDescription.of("Custom Boss configuration file name"))
                 .argument(DoubleArgument.newBuilder("radius"), ArgumentDescription.of("Radius of the Regional Boss leash"))
@@ -293,7 +289,8 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> DebugScreen.open((Player) commandContext.getSender(), commandContext.get("argument"))));
 
-        ArrayList<String> events = new ArrayList<>(EventsConfig.eventFields.keySet());
+        ArrayList<String> events = new ArrayList<>();
+        TimedEvent.blueprintEvents.stream().forEach(event -> events.add(event.getCustomEventsConfigFields().getFilename()));
 
         // /em event <eventName>
         manager.command(builder.literal("event")
@@ -304,7 +301,7 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> EventCommand.trigger(commandContext.getSender(), commandContext.get("events"))));
 
-        ArrayList<String> npcs = new ArrayList<>(NPCsConfig.NPCsList.keySet());
+        ArrayList<String> npcs = new ArrayList<>(NPCsConfig.npcEntities.keySet());
 
         // /em spawnnpc <npcFileName>
         manager.command(builder.literal("spawnnpc")

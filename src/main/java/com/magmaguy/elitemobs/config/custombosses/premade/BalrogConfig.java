@@ -1,16 +1,16 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-public class BalrogConfig extends CustomBossConfigFields {
+public class BalrogConfig extends CustomBossesConfigFields {
     public BalrogConfig() {
         super("balrog",
-                EntityType.SILVERFISH.toString(),
+                EntityType.SILVERFISH,
                 true,
                 "$eventBossLevel &4Balrog",
                 "dynamic");

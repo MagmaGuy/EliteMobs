@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -27,7 +27,7 @@ public class ItemConstructor {
                                           HashMap<String, Integer> customEnchantments,
                                           List<String> potionEffects,
                                           List<String> lore,
-                                          EliteMobEntity eliteMobEntity,
+                                          EliteEntity eliteEntity,
                                           Player player,
                                           boolean showItemWorth,
                                           int customModelID) {
@@ -70,13 +70,13 @@ public class ItemConstructor {
             itemStack.setItemMeta(itemMeta);
         }
 
-        return commonFeatures(itemStack, eliteMobEntity, player, enchantments, customEnchantments, showItemWorth);
+        return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth);
     }
 
     /*
     For procedurally generated items
      */
-    public static ItemStack constructItem(double itemTier, EliteMobEntity killedMob, Player player, boolean showItemWorth) {
+    public static ItemStack constructItem(double itemTier, EliteEntity killedMob, Player player, boolean showItemWorth) {
 
         ItemStack itemStack;
         ItemMeta itemMeta;
@@ -120,7 +120,7 @@ public class ItemConstructor {
     }
 
     private static ItemStack commonFeatures(ItemStack itemStack,
-                                            EliteMobEntity eliteMobEntity,
+                                            EliteEntity eliteEntity,
                                             Player player,
                                             HashMap<Enchantment, Integer> enchantments,
                                             HashMap<String, Integer> customEnchantments,
@@ -139,7 +139,7 @@ public class ItemConstructor {
         /*
         Register item source for lore redraw
          */
-        ItemTagger.registerItemSource(eliteMobEntity, itemMeta);
+        ItemTagger.registerItemSource(eliteEntity, itemMeta);
 
         //Tag the item
         ItemTagger.registerEnchantments(itemMeta, enchantments);

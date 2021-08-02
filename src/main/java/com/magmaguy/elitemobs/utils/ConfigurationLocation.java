@@ -28,21 +28,22 @@ public class ConfigurationLocation {
 
         try {
             String locationOnlyString = locationString.split(":")[0];
+            String[] slicedString = locationOnlyString.split(",");
 
-            world = Bukkit.getWorld(getSubString(locationOnlyString, 0, ","));
+            world = Bukkit.getWorld(slicedString[0]);
             if (world == null)
-                new WarningMessage("Does world " + locationOnlyString + " exist? Did you install the Adventurer's Guild?.");
-            x = Double.parseDouble(getSubString(locationOnlyString, 1, ","));
-            y = Double.parseDouble(getSubString(locationOnlyString, 2, ","));
-            z = Double.parseDouble(getSubString(locationOnlyString, 3, ","));
-            yaw = Float.parseFloat(getSubString(locationOnlyString, 4, ","));
-            pitch = Float.parseFloat(getSubString(locationOnlyString, 5, ","));
+                new InfoMessage("Failed to spawn entity in world " + slicedString[0] + " because this world is not yet installed!");
+            x = Double.parseDouble(slicedString[1]);
+            y = Double.parseDouble(slicedString[2]);
+            z = Double.parseDouble(slicedString[3]);
+            yaw = Float.parseFloat(slicedString[4]);
+            pitch = Float.parseFloat(slicedString[5]);
         } catch (Exception ex) {
             if (locationString == null || locationString.equals("null"))
                 return null;
             new WarningMessage("Attempted to deserialize an invalid location!");
             new WarningMessage("Expected location format: worldname,x,y,z,pitch,yaw");
-            new WarningMessage("Real location format: " + locationString);
+            new WarningMessage("Actual location format: " + locationString);
             return null;
         }
         return new Location(world, x, y, z, yaw, pitch);

@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Projectile;
@@ -21,18 +21,18 @@ public class EnderDragonArrowBombardment extends Bombardment {
     }
 
     @Override
-    public void taskBehavior(EliteMobEntity eliteMobEntity) {
-        for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(200, 100, 200))
+    public void taskBehavior(EliteEntity eliteEntity) {
+        for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(200, 100, 200))
 
             if (entity.getType().equals(EntityType.PLAYER)) {
                 Vector shotVector = entity.getLocation().clone().add(new Vector(0, 1, 0))
-                        .subtract(eliteMobEntity.getLivingEntity().getLocation().clone())
+                        .subtract(eliteEntity.getLivingEntity().getLocation().clone())
                         .add(new Vector(ThreadLocalRandom.current().nextDouble() - 0.5,
                                 ThreadLocalRandom.current().nextDouble() - 0.5,
                                 ThreadLocalRandom.current().nextDouble() - 0.5))
                         .toVector().normalize().multiply(2);
 
-                Projectile arrow = EliteProjectile.create(EntityType.ARROW, eliteMobEntity.getLivingEntity(), shotVector, false);
+                Projectile arrow = EliteProjectile.create(EntityType.ARROW, eliteEntity.getLivingEntity(), shotVector, false);
 
                 //anti-lag measure, culls arrows after 4 seconds
                 new BukkitRunnable() {

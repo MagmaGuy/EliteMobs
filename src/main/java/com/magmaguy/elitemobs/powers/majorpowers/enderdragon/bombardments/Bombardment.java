@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.utils.EnderDragonPhaseSimplifier;
 import org.bukkit.entity.EnderDragon;
@@ -31,7 +31,7 @@ public abstract class Bombardment extends MajorPower implements Listener {
     private boolean firing = false;
     private BukkitTask task = null;
 
-    public void activate(EliteMobEntity eliteMobEntity) {
+    public void activate(EliteEntity eliteEntity) {
 
         if (isActive) return;
         isActive = true;
@@ -44,16 +44,16 @@ public abstract class Bombardment extends MajorPower implements Listener {
 
                 counter++;
 
-                if (stopCondition(eliteMobEntity))
+                if (stopCondition(eliteEntity))
                     return;
 
-                if (firing || isInCooldown(eliteMobEntity))
+                if (firing || isInCooldown(eliteEntity))
                     return;
 
                 if (ThreadLocalRandom.current().nextDouble() > 0.1) return;
 
-                if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
-                    EnderDragon.Phase phase = ((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase();
+                if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
+                    EnderDragon.Phase phase = ((EnderDragon) eliteEntity.getLivingEntity()).getPhase();
                     if (phase.equals(EnderDragon.Phase.DYING) ||
                             phase.equals(EnderDragon.Phase.HOVER) ||
                             phase.equals(EnderDragon.Phase.ROAR_BEFORE_ATTACK) ||
@@ -63,10 +63,10 @@ public abstract class Bombardment extends MajorPower implements Listener {
                     }
                 }
 
-                for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(10, 100, 10)) {
+                for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(10, 100, 10)) {
                     if (entity.getType().equals(EntityType.PLAYER)) {
                         firing = true;
-                        fire(eliteMobEntity);
+                        fire(eliteEntity);
                         return;
                     }
                 }
@@ -81,18 +81,18 @@ public abstract class Bombardment extends MajorPower implements Listener {
         task.cancel();
     }
 
-    private boolean stopCondition(EliteMobEntity eliteMobEntity) {
-        if (eliteMobEntity == null ||
-                eliteMobEntity.getLivingEntity() == null ||
-                !eliteMobEntity.getLivingEntity().isValid() ||
-                !eliteMobEntity.isInCombat()) {
+    private boolean stopCondition(EliteEntity eliteEntity) {
+        if (eliteEntity == null ||
+                eliteEntity.getLivingEntity() == null ||
+                !eliteEntity.isValid() ||
+                !eliteEntity.isInCombat()) {
             deactivate();
             return true;
         }
 
-        if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
+        if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
             return !EnderDragonPhaseSimplifier.isFlying(
-                    ((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase(),
+                    ((EnderDragon) eliteEntity.getLivingEntity()).getPhase(),
                     false);
 
         return false;
@@ -100,9 +100,9 @@ public abstract class Bombardment extends MajorPower implements Listener {
 
     public int firingTimer = 0;
 
-    private void fire(EliteMobEntity eliteMobEntity) {
+    private void fire(EliteEntity eliteEntity) {
 
-        doCooldown(eliteMobEntity);
+        doCooldown(eliteEntity);
 
         isActive = true;
 
@@ -113,19 +113,19 @@ public abstract class Bombardment extends MajorPower implements Listener {
             @Override
             public void run() {
                 firingTimer++;
-                if (stopCondition(eliteMobEntity) || firingTimer > 20 * 5) {
+                if (stopCondition(eliteEntity) || firingTimer > 20 * 5) {
                     cancel();
                     firing = false;
                     return;
                 }
 
-                taskBehavior(eliteMobEntity);
+                taskBehavior(eliteEntity);
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-    public abstract void taskBehavior(EliteMobEntity eliteMobEntity);
+    public abstract void taskBehavior(EliteEntity eliteEntity);
 
     public static class BombardmentEvents implements Listener {
         @EventHandler

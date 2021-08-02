@@ -16,7 +16,7 @@
 package com.magmaguy.elitemobs.powers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
@@ -26,7 +26,7 @@ public class PowerCooldown {
     /*
     This class just removes metadata after a variable delay, allows
      */
-    public static void startCooldownTimer(EliteMobEntity eliteMob, HashSet<EliteMobEntity> cooldownList, int duration) {
+    public static void startCooldownTimer(EliteEntity eliteMob, HashSet<EliteEntity> cooldownList, int duration) {
 
         cooldownList.add(eliteMob);
 
@@ -46,7 +46,7 @@ public class PowerCooldown {
     /*
     This method checks if the cooldown is active
      */
-    public static boolean isInCooldown(EliteMobEntity eliteMob, HashSet<EliteMobEntity> cooldownList) {
+    public static boolean isInCooldown(EliteEntity eliteMob, HashSet<EliteEntity> cooldownList) {
         return cooldownList.contains(eliteMob);
     }
 

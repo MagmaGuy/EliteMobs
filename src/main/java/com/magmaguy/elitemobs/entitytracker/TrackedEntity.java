@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,7 +45,7 @@ public class TrackedEntity {
 
     public TrackedEntity(UUID uuid, Entity entity, boolean removeWhenFarAway, boolean removeOnShutdown, HashMap trackedHashMap) {
         if (entity == null) {
-            new DeveloperMessage("Failed to register entity: was null");
+            new WarningMessage("Failed to register entity: was null");
             return;
         }
         this.uuid = uuid;

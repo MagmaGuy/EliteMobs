@@ -3,9 +3,9 @@ package com.magmaguy.elitemobs.powers.majorpowers.zombie;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,15 +31,17 @@ public class ZombieFriends extends MajorPower implements Listener {
         if (ThreadLocalRandom.current().nextDouble() > 0.01) return;
         zombieFriendConfig.setIsFiring(true);
 
-        CustomBossEntity reinforcement1 = CustomBossEntity.constructCustomBoss("zombie_friends_friend.yml", event.getEntity().getLocation(), event.getEliteMobEntity().getLevel());
-        CustomBossEntity reinforcement2 = CustomBossEntity.constructCustomBoss("zombie_friends_friend.yml", event.getEntity().getLocation(), event.getEliteMobEntity().getLevel());
+        CustomBossEntity reinforcement1 = CustomBossEntity.createCustomBossEntity("zombie_friends_friend.yml");
+        reinforcement1.spawn(event.getEntity().getLocation(), event.getEliteMobEntity().getLevel(), false);
+        CustomBossEntity reinforcement2 = CustomBossEntity.createCustomBossEntity("zombie_friends_friend.yml");
+        reinforcement2.spawn(event.getEntity().getLocation(), event.getEliteMobEntity().getLevel(), false);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!event.getEliteMobEntity().getLivingEntity().isValid() || !reinforcement1.getLivingEntity().isValid() && !reinforcement2.getLivingEntity().isValid()) {
+                if (!event.getEliteMobEntity().isValid() || !reinforcement1.isValid() && !reinforcement2.isValid()) {
 
-                    if (reinforcement1 != null && reinforcement1.getLivingEntity().isValid()) {
+                    if (reinforcement1 != null && reinforcement1.isValid()) {
 
                         nameClearer(reinforcement1);
 
@@ -49,7 +51,7 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                     }
 
-                    if (reinforcement2 != null && reinforcement2.getLivingEntity().isValid()) {
+                    if (reinforcement2 != null && reinforcement2.isValid()) {
 
 
                         nameClearer(reinforcement2);
@@ -75,7 +77,7 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcement1.getLivingEntity().isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcement1.isValid()) {
 
                         nameClearer(reinforcement1);
 
@@ -85,7 +87,7 @@ public class ZombieFriends extends MajorPower implements Listener {
 
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcement2.getLivingEntity().isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcement2.isValid()) {
 
                         nameClearer(reinforcement2);
 
@@ -101,13 +103,13 @@ public class ZombieFriends extends MajorPower implements Listener {
 
     }
 
-    private void nameClearer(EliteMobEntity eliteMobEntity) {
+    private void nameClearer(EliteEntity eliteEntity) {
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (eliteMobEntity.getLivingEntity().isValid())
-                    eliteMobEntity.setName(eliteMobEntity.getName());
+                if (eliteEntity.isValid())
+                    eliteEntity.setName(eliteEntity.getName(), true);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
 

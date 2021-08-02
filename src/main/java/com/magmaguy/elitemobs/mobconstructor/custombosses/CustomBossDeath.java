@@ -2,7 +2,9 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.Round;
@@ -13,13 +15,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomBossDeath implements Listener {
 
     @EventHandler
     public void onEliteMobDeath(EliteMobDeathEvent event) {
-        if (event.getEliteMobEntity().customBossEntity == null) return;
-        CustomBossEntity customBossEntity = event.getEliteMobEntity().customBossEntity;
+        if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
+        CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
 
         doLoot(customBossEntity);
         doDeathMessage(customBossEntity);
@@ -28,26 +31,30 @@ public class CustomBossDeath implements Listener {
         CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
 
         //todo this should be moved to the death event
-        if (customBossEntity.customBossConfigFields.getOnDeathCommands() != null &&
-                !customBossEntity.customBossConfigFields.getOnDeathCommands().isEmpty())
-            OnDeathCommands.parseConsoleCommand(customBossEntity.customBossConfigFields.getOnDeathCommands(), event);
+        if (customBossEntity.customBossesConfigFields.getOnDeathCommands() != null &&
+                !customBossEntity.customBossesConfigFields.getOnDeathCommands().isEmpty())
+            OnDeathCommands.parseConsoleCommand(customBossEntity.customBossesConfigFields.getOnDeathCommands(), event);
 
         //todo this should be set by the elite entity not the custom boss
-        if (!customBossEntity.customBossConfigFields.getDropsVanillaLoot()) {
+        if (!customBossEntity.customBossesConfigFields.getDropsVanillaLoot()) {
             event.getEntityDeathEvent().setDroppedExp(0);
             for (ItemStack itemStack : event.getEntityDeathEvent().getDrops())
                 itemStack.setAmount(0);
         }
-
-        //untracker for various custom boss tasks
-        customBossEntity.doDeath();
 
     }
 
     private static void doLoot(CustomBossEntity customBossEntity) {
         for (Player player : customBossEntity.getDamagers().keySet())
             if (!customBossEntity.getTriggeredAntiExploit())
-                customBossEntity.dropLoot(player);
+                dropLoot(player, customBossEntity);
+    }
+
+    public static void dropLoot(Player player, CustomBossEntity customBossEntity) {
+        if (customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
+        for (CustomItem customItem : customBossEntity.customBossesConfigFields.getUniqueLootList().keySet())
+            if (ThreadLocalRandom.current().nextDouble() < customBossEntity.customBossesConfigFields.getUniqueLootList().get(customItem))
+                CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), customItem.getFileName(), customBossEntity.getLivingEntity().getLocation());
     }
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {
@@ -62,9 +69,9 @@ public class CustomBossDeath implements Listener {
 
         playersList = ChatColorConverter.convert(playersList);
 
-        if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 0 && customBossEntity.hasDamagers())
-            if (customBossEntity.customBossConfigFields.getDeathMessages() != null &&
-                    customBossEntity.customBossConfigFields.getDeathMessages().size() > 0) {
+        if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 0 && customBossEntity.hasDamagers())
+            if (customBossEntity.customBossesConfigFields.getDeathMessages() != null &&
+                    customBossEntity.customBossesConfigFields.getDeathMessages().size() > 0) {
                 Player topDamager = null, secondDamager = null, thirdDamager = null;
 
                 HashMap<Player, Double> sortedMap = sortByComparator(customBossEntity.getDamagers(), false);
@@ -87,7 +94,7 @@ public class CustomBossDeath implements Listener {
                     }
                 }
 
-                for (String string : customBossEntity.customBossConfigFields.getDeathMessages()) {
+                for (String string : customBossEntity.customBossesConfigFields.getDeathMessages()) {
                     if (string.contains("$damager1name"))
                         if (topDamager != null)
                             string = string.replace("$damager1name", topDamager.getDisplayName());
@@ -125,7 +132,7 @@ public class CustomBossDeath implements Listener {
                         string = string.replace("$players", playersList);
                     Bukkit.broadcastMessage(ChatColorConverter.convert(string));
                     if (string.length() > 0)
-                        if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 2)
+                        if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 2)
                             new DiscordSRVAnnouncement(ChatColorConverter.convert(string));
                 }
 
@@ -138,13 +145,13 @@ public class CustomBossDeath implements Listener {
                                                 Round.twoDecimalPlaces(customBossEntity.getDamagers().get(player)) + "")));
 
             } else {
-                if (customBossEntity.customBossConfigFields.getDeathMessage() != null) {
-                    if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 0)
+                if (customBossEntity.customBossesConfigFields.getDeathMessage() != null) {
+                    if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 0)
                         Bukkit.broadcastMessage(ChatColorConverter.convert(
-                                customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
-                    if (customBossEntity.customBossConfigFields.getAnnouncementPriority() > 2)
+                                customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList)));
+                    if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() > 2)
                         new DiscordSRVAnnouncement(ChatColorConverter.convert(
-                                customBossEntity.customBossConfigFields.getDeathMessage().replace("$players", playersList)));
+                                customBossEntity.customBossesConfigFields.getDeathMessage().replace("$players", playersList)));
                 }
             }
     }

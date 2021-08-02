@@ -1,16 +1,18 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 
 public class CombatInstructorConfig extends NPCsConfigFields {
     public CombatInstructorConfig() {
-        super("combat_instructor.yml",
+        super("combat_instructor",
                 true,
                 "Charles",
                 "<Combat Instructor>",
-                "NITWIT",
+                Villager.Profession.NITWIT,
                 "em_adventurers_guild,277.41,90.0,286.23,-214.85,-1.95",
                 Arrays.asList(
                         "Want to learn about combat?",
@@ -54,11 +56,8 @@ public class CombatInstructorConfig extends NPCsConfigFields {
                         "Elite Mobs with floating\\neggs summon reinforcements\\nwhen hit",
                         "Elite Mobs with floating\\nfireworks summon Team Rocket\\nwhen hit"),
                 null,
-                false,
                 true,
                 3,
-                true,
-                "CHAT"
-        );
+                NPCInteractions.NPCInteractionType.CHAT);
     }
 }

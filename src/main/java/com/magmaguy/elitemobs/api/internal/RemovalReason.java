@@ -20,5 +20,6 @@ public enum RemovalReason {
     NPC_TIMEOUT,
     OTHER,
     REMOVE_COMMAND,
-    KILL_COMMAND
+    KILL_COMMAND,
+    REINFORCEMENT_CULL
 }

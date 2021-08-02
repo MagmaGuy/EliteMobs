@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -32,7 +33,7 @@ public class ActionEvent extends CustomEvent {
      * @return Instantiated ActionEvent
      */
     public static void initializeBlueprintEvents() {
-        for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values())
+        for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values()) {
             if (customEventsConfigFields.isEnabled())
                 switch (customEventsConfigFields.getEventType()) {
                     case BREAK_BLOCK:
@@ -40,6 +41,7 @@ public class ActionEvent extends CustomEvent {
                     case TILL_SOIL:
                         blueprintEvents.add(new ActionEvent(customEventsConfigFields));
                 }
+        }
     }
 
     public boolean checkBlockBreakStartConditions(Material material) {
@@ -63,7 +65,20 @@ public class ActionEvent extends CustomEvent {
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);
         if (customEventStartEvent.isCancelled()) return;
         if (!actionEvent.startConditions.areValid()) return;
+
+        for (String filename : primaryCustomBossFilenames) {
+            CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(filename);
+            if (customBossEntity == null){
+                new WarningMessage("Failed to generate custom boss " + filename + " ! This has cancelled action event " + customEventsConfigFields.getFilename() + " !");
+                return;
+            }
+            customBossEntity.spawn(getEventStartLocation(), false);
+            primaryEliteMobs.add(customBossEntity);
+            eventEliteMobs.add(customBossEntity);
+        }
+
         actionEvents.add(actionEvent);
+
         actionEvent.start();
     }
 

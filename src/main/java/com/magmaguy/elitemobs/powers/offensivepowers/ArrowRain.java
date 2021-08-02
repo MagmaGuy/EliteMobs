@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powers.bosspowers.MeteorShower;
 import org.bukkit.Location;
@@ -35,34 +35,34 @@ public class ArrowRain extends MinorPower implements Listener {
 
     }
 
-    public static void doArrowRain(EliteMobEntity eliteMobEntity) {
-        eliteMobEntity.getLivingEntity().setAI(false);
+    public static void doArrowRain(EliteEntity eliteEntity) {
+        eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             int counter = 0;
-            final Location initialLocation = eliteMobEntity.getLivingEntity().getLocation().clone();
+            final Location initialLocation = eliteEntity.getLivingEntity().getLocation().clone();
 
             @Override
             public void run() {
 
-                if (!eliteMobEntity.getLivingEntity().isValid()) {
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }
 
                 if (counter > 10 * 20) {
                     cancel();
-                    eliteMobEntity.getLivingEntity().setAI(true);
-                    eliteMobEntity.getLivingEntity().teleport(initialLocation);
+                    eliteEntity.getLivingEntity().setAI(true);
+                    eliteEntity.getLivingEntity().teleport(initialLocation);
                     return;
                 }
 
                 counter++;
 
-                MeteorShower.doCloudEffect(eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
+                MeteorShower.doCloudEffect(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
 
                 if (counter > 20) {
 
-                    doArrows(eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)), eliteMobEntity);
+                    doArrows(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)), eliteEntity);
 
                 }
 
@@ -71,7 +71,7 @@ public class ArrowRain extends MinorPower implements Listener {
     }
 
 
-    private static void doArrows(Location location, EliteMobEntity eliteMobEntity) {
+    private static void doArrows(Location location, EliteEntity eliteEntity) {
         for (int i = 0; i < 1; i++) {
             int randX = ThreadLocalRandom.current().nextInt(30) - 15;
             int randY = ThreadLocalRandom.current().nextInt(2);
@@ -79,7 +79,7 @@ public class ArrowRain extends MinorPower implements Listener {
             Location newLocation = location.clone().add(new Vector(randX, randY, randZ));
             newLocation = newLocation.setDirection(new Vector(ThreadLocalRandom.current().nextDouble() - 0.5, -0.5, ThreadLocalRandom.current().nextDouble() - 0.5));
             Arrow arrow = (Arrow) location.getWorld().spawnEntity(newLocation, EntityType.ARROW);
-            arrow.setShooter(eliteMobEntity.getLivingEntity());
+            arrow.setShooter(eliteEntity.getLivingEntity());
         }
     }
 

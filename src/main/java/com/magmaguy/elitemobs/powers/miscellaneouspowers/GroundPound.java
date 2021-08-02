@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.miscellaneouspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import org.bukkit.Location;
@@ -39,14 +39,14 @@ public class GroundPound extends MinorPower implements Listener {
     }
 
 
-    public void doGroundPound(EliteMobEntity eliteMobEntity) {
+    public void doGroundPound(EliteEntity eliteEntity) {
 
         //step 1: make boss go up
         new BukkitRunnable() {
             @Override
             public void run() {
-                eliteMobEntity.getLivingEntity().setVelocity(new Vector(0, 1.5, 0));
-                cloudParticle(eliteMobEntity.getLivingEntity().getLocation());
+                eliteEntity.getLivingEntity().setVelocity(new Vector(0, 1.5, 0));
+                cloudParticle(eliteEntity.getLivingEntity().getLocation());
 
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);
@@ -58,32 +58,32 @@ public class GroundPound extends MinorPower implements Listener {
             @Override
             public void run() {
                 counter++;
-                if (!NonSolidBlockTypes.isPassthrough(eliteMobEntity.getLivingEntity().getLocation().clone().subtract(new Vector(0, 0.2, 0)).getBlock().getType())) {
+                if (!NonSolidBlockTypes.isPassthrough(eliteEntity.getLivingEntity().getLocation().clone().subtract(new Vector(0, 0.2, 0)).getBlock().getType())) {
 
-                    eliteMobEntity.getLivingEntity().setVelocity(new Vector(0, -2, 0));
-                    cloudParticle(eliteMobEntity.getLivingEntity().getLocation());
+                    eliteEntity.getLivingEntity().setVelocity(new Vector(0, -2, 0));
+                    cloudParticle(eliteEntity.getLivingEntity().getLocation());
 
                     new BukkitRunnable() {
                         int counter = 0;
 
                         @Override
                         public void run() {
-                            if (counter > 20 * 5 || !eliteMobEntity.getLivingEntity().isValid()) {
+                            if (counter > 20 * 5 || !eliteEntity.isValid()) {
                                 cancel();
                                 return;
                             }
 
                             counter++;
 
-                            if (!eliteMobEntity.getLivingEntity().isOnGround())
+                            if (!eliteEntity.getLivingEntity().isOnGround())
                                 return;
 
                             cancel();
 
-                            landCloudParticle(eliteMobEntity.getLivingEntity().getLocation());
+                            landCloudParticle(eliteEntity.getLivingEntity().getLocation());
 
-                            for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(10, 10, 10)) {
-                                entity.setVelocity(entity.getLocation().clone().subtract(eliteMobEntity.getLivingEntity().getLocation()).toVector().normalize().multiply(2).setY(1.5));
+                            for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(10, 10, 10)) {
+                                entity.setVelocity(entity.getLocation().clone().subtract(eliteEntity.getLivingEntity().getLocation()).toVector().normalize().multiply(2).setY(1.5));
                                 if (entity instanceof LivingEntity) {
                                     ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 2));
                                 }

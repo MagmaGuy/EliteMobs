@@ -2,10 +2,9 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
@@ -16,7 +15,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 
@@ -24,58 +22,55 @@ public class EliteMobEnterCombatEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private final Player targetEntity;
-    private final EliteMobEntity eliteMobEntity;
+    private final EliteEntity eliteEntity;
 
-    public EliteMobEnterCombatEvent(EliteMobEntity eliteMobEntity, Player targetEntity) {
+    public EliteMobEnterCombatEvent(EliteEntity eliteEntity, Player targetEntity) {
         this.targetEntity = targetEntity;
-        this.eliteMobEntity = eliteMobEntity;
-        eliteMobEntity.setIsInCombat(true);
+        this.eliteEntity = eliteEntity;
+        eliteEntity.setIsInCombat(true);
         if (!DefaultConfig.alwaysShowNametags)
-            eliteMobEntity.setNameVisible(true);
-        if (eliteMobEntity instanceof CustomBossEntity)
-            CommandRunner.runCommandFromList(((CustomBossEntity) eliteMobEntity).customBossConfigFields.getOnCombatEnterCommands(), new ArrayList<>());
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!eliteMobEntity.getLivingEntity().isValid()) {
-                    cancel();
-                    Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity,
-                            EliteMobExitCombatEvent.EliteMobExitCombatReason.ELITE_NOT_VALID));
-                }
-                if (!eliteMobEntity.isInCombatGracePeriod())
-                    if (((Mob) eliteMobEntity.getLivingEntity()).getTarget() == null) {
-                        for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(
-                                eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
-                                eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
-                                eliteMobEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue())) {
-                            if (entity instanceof Player) {
-                                if (((Player) entity).getGameMode().equals(GameMode.SPECTATOR))
-                                    continue;
-                                return;
-                            }
-                        }
-                        cancel();
-                        Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteMobEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.NO_NEARBY_PLAYERS));
-                    }
-
+            eliteEntity.setNameVisible(true);
+        if (eliteEntity instanceof CustomBossEntity)
+            CommandRunner.runCommandFromList(((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getOnCombatEnterCommands(), new ArrayList<>());
+        Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, (task) -> {
+            if (!eliteEntity.isValid()) {
+                task.cancel();
+                Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteEntity,
+                        EliteMobExitCombatEvent.EliteMobExitCombatReason.ELITE_NOT_VALID));
+                return;
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
+            if (!eliteEntity.isInCombatGracePeriod())
+                if (((Mob) eliteEntity.getLivingEntity()).getTarget() == null) {
+                    for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(
+                            eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
+                            eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue(),
+                            eliteEntity.getLivingEntity().getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue())) {
+                        if (entity instanceof Player) {
+                            if (((Player) entity).getGameMode().equals(GameMode.SPECTATOR))
+                                continue;
+                            return;
+                        }
+                    }
+                    task.cancel();
+                    Bukkit.getServer().getPluginManager().callEvent(new EliteMobExitCombatEvent(eliteEntity, EliteMobExitCombatEvent.EliteMobExitCombatReason.NO_NEARBY_PLAYERS));
+                }
+        }, 20L, 20L);
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public Player getTargetEntity() {
         return this.targetEntity;
     }
 
-    public EliteMobEntity getEliteMobEntity() {
-        return this.eliteMobEntity;
+    public EliteEntity getEliteMobEntity() {
+        return this.eliteEntity;
     }
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

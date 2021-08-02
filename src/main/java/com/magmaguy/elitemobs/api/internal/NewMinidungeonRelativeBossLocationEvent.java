@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.api.internal;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
@@ -15,13 +15,13 @@ public class NewMinidungeonRelativeBossLocationEvent extends Event implements Ca
     private final Minidungeon minidungeon;
     private final Location relativeLocation;
     private final Location realLocation;
-    private final CustomBossConfigFields customBossConfigFields;
+    private final CustomBossesConfigFields customBossesConfigFields;
 
-    public NewMinidungeonRelativeBossLocationEvent(Minidungeon minidungeon, Location relativeLocation, Location realLocation, CustomBossConfigFields customBossConfigFields) {
+    public NewMinidungeonRelativeBossLocationEvent(Minidungeon minidungeon, Location relativeLocation, Location realLocation, CustomBossesConfigFields customBossesConfigFields) {
         this.minidungeon = minidungeon;
         this.relativeLocation = relativeLocation;
         this.realLocation = realLocation;
-        this.customBossConfigFields = customBossConfigFields;
+        this.customBossesConfigFields = customBossesConfigFields;
         if (relativeLocation == null) setCancelled(true);
     }
 
@@ -37,8 +37,8 @@ public class NewMinidungeonRelativeBossLocationEvent extends Event implements Ca
         return realLocation;
     }
 
-    public CustomBossConfigFields getCustomBossConfigFields() {
-        return customBossConfigFields;
+    public CustomBossesConfigFields getCustomBossConfigFields() {
+        return customBossesConfigFields;
     }
 
     @Override

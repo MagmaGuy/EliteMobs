@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments;
 
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -15,14 +15,14 @@ public class EnderDragonEnderFireballBombardment extends Bombardment {
     }
 
     @Override
-    public void taskBehavior(EliteMobEntity eliteMobEntity) {
+    public void taskBehavior(EliteEntity eliteEntity) {
         if (ThreadLocalRandom.current().nextDouble() > 0.1) return;
-        for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(200, 100, 200))
+        for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(200, 100, 200))
             if (entity.getType().equals(EntityType.PLAYER))
-                ((DragonFireball) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(
-                        eliteMobEntity.getLivingEntity().getLocation(),
+                ((DragonFireball) eliteEntity.getLivingEntity().getWorld().spawnEntity(
+                        eliteEntity.getLivingEntity().getLocation(),
                         EntityType.DRAGON_FIREBALL)).setDirection(
-                        entity.getLocation().clone().subtract(eliteMobEntity.getLivingEntity().getLocation()).toVector().normalize());
+                        entity.getLocation().clone().subtract(eliteEntity.getLivingEntity().getLocation()).toVector().normalize());
     }
 
 }

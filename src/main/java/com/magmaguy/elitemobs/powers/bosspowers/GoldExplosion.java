@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
@@ -39,9 +39,9 @@ public class GoldExplosion extends BossPower implements Listener {
 
     }
 
-    private void doGoldExplosion(EliteMobEntity eliteMobEntity) {
+    private void doGoldExplosion(EliteEntity eliteEntity) {
 
-        eliteMobEntity.getLivingEntity().setAI(false);
+        eliteEntity.getLivingEntity().setAI(false);
 
         new BukkitRunnable() {
             int counter = 0;
@@ -50,19 +50,19 @@ public class GoldExplosion extends BossPower implements Listener {
             public void run() {
                 counter++;
                 if (MobCombatSettingsConfig.enableWarningVisualEffects)
-                    eliteMobEntity.getLivingEntity().getWorld().spawnParticle(Particle.SMOKE_NORMAL, eliteMobEntity.getLivingEntity().getLocation(), counter, 1, 1, 1, 0);
+                    eliteEntity.getLivingEntity().getWorld().spawnParticle(Particle.SMOKE_NORMAL, eliteEntity.getLivingEntity().getLocation(), counter, 1, 1, 1, 0);
 
                 if (counter < 20 * 1.5) return;
                 cancel();
-                eliteMobEntity.getLivingEntity().setAI(true);
-                List<Item> goldNuggets = generateVisualItems(eliteMobEntity);
-                ProjectileDamage.doGoldNuggetDamage(goldNuggets, eliteMobEntity);
+                eliteEntity.getLivingEntity().setAI(true);
+                List<Item> goldNuggets = generateVisualItems(eliteEntity);
+                ProjectileDamage.doGoldNuggetDamage(goldNuggets, eliteEntity);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
     }
 
-    private List<Item> generateVisualItems(EliteMobEntity eliteMobEntity) {
+    private List<Item> generateVisualItems(EliteEntity eliteEntity) {
         List<Item> visualItemsList = new ArrayList<>();
         for (int i = 0; i < 200; i++) {
             Vector velocityVector = new Vector(
@@ -70,8 +70,8 @@ public class GoldExplosion extends BossPower implements Listener {
                     ThreadLocalRandom.current().nextDouble() / 1.5,
                     ThreadLocalRandom.current().nextDouble() - 0.5);
 
-            Item visualProjectile = eliteMobEntity.getLivingEntity().getWorld().dropItem(
-                    eliteMobEntity.getLivingEntity().getLocation().clone()
+            Item visualProjectile = eliteEntity.getLivingEntity().getWorld().dropItem(
+                    eliteEntity.getLivingEntity().getLocation().clone()
                             .add(new Vector(velocityVector.getX(),
                                     0.5,
                                     velocityVector.getZ())),

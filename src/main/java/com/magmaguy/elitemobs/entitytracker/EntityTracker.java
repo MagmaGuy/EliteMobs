@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.NPCEntitySpawnEvent;
 import com.magmaguy.elitemobs.api.SuperMobSpawnEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
@@ -28,15 +28,15 @@ import java.util.UUID;
 public class EntityTracker implements Listener {
 
     //Elite Mobs
-    public static HashMap<UUID, EliteMobEntity> getEliteMobs() {
+    public static HashMap<UUID, EliteEntity> getEliteMobs() {
         return EliteEntityTracker.eliteMobEntities;
     }
 
-    public static boolean registerEliteMob(EliteMobEntity eliteMobEntity) {
-        EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteMobEntity);
+    public static boolean registerEliteMob(EliteEntity eliteEntity) {
+        EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteEntity);
         new EventCaller(eliteMobSpawnEvent);
         if (eliteMobSpawnEvent.isCancelled()) return false;
-        new EliteEntityTracker(eliteMobEntity, eliteMobEntity.getPersistent());
+        new EliteEntityTracker(eliteEntity, eliteEntity.getPersistent());
         return true;
     }
 
@@ -44,11 +44,11 @@ public class EntityTracker implements Listener {
         return EliteEntityTracker.eliteMobEntities.containsKey(entity.getUniqueId());
     }
 
-    public static EliteMobEntity getEliteMobEntity(Entity entity) {
+    public static EliteEntity getEliteMobEntity(Entity entity) {
         return entity == null ? null : getEliteMobEntity(entity.getUniqueId());
     }
 
-    public static EliteMobEntity getEliteMobEntity(UUID uuid) {
+    public static EliteEntity getEliteMobEntity(UUID uuid) {
         return EliteEntityTracker.eliteMobEntities.get(uuid);
     }
 
@@ -189,7 +189,7 @@ public class EntityTracker implements Listener {
             block.setType(Material.AIR);
         TemporaryBlockTracker.temporaryBlocks.clear();
         SimplePersistentEntity.persistentEntities.clear();
-        CustomBossEntity.trackableCustomBosses.clear();
+        CustomBossEntity.getTrackableCustomBosses().clear();
         CrashFix.knownSessionChunks.clear();
     }
 

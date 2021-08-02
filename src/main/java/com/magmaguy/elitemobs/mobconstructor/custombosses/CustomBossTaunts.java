@@ -9,19 +9,19 @@ import org.bukkit.event.Listener;
 public class CustomBossTaunts implements Listener {
     @EventHandler
     public void onDamagedMessages(EliteMobDamagedEvent eliteMobDamagedEvent) {
-        if (eliteMobDamagedEvent.getEliteMobEntity().customBossEntity == null) return;
-        if (eliteMobDamagedEvent.getEliteMobEntity().customBossEntity.customBossConfigFields.getOnDamagedMessages().isEmpty())
+        if (!(eliteMobDamagedEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
+        if (((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages().isEmpty())
             return;
         Taunt.nametagProcessor(eliteMobDamagedEvent.getEliteMobEntity().getLivingEntity(),
-                eliteMobDamagedEvent.getEliteMobEntity().customBossEntity.customBossConfigFields.getOnDamagedMessages());
+                ((CustomBossEntity) eliteMobDamagedEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamagedMessages());
     }
 
     @EventHandler
     public void onDamageMessages(PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent) {
-        if (playerDamagedByEliteMobEvent.getEliteMobEntity().customBossEntity == null) return;
-        if (playerDamagedByEliteMobEvent.getEliteMobEntity().customBossEntity.customBossConfigFields.getOnDamageMessages().isEmpty())
+        if (!(playerDamagedByEliteMobEvent.getEliteMobEntity() instanceof CustomBossEntity)) return;
+        if (((CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamageMessages().isEmpty())
             return;
-        Taunt.nametagProcessor(playerDamagedByEliteMobEvent.getEliteMobEntity().customBossEntity.getLivingEntity(),
-                playerDamagedByEliteMobEvent.getEliteMobEntity().customBossEntity.customBossConfigFields.getOnDamageMessages());
+        Taunt.nametagProcessor(playerDamagedByEliteMobEvent.getEliteMobEntity().getLivingEntity(),
+                ((CustomBossEntity) playerDamagedByEliteMobEvent.getEliteMobEntity()).getCustomBossesConfigFields().getOnDamageMessages());
     }
 }

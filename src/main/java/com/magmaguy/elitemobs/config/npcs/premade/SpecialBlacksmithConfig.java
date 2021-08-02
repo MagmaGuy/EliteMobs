@@ -1,16 +1,18 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 
 public class SpecialBlacksmithConfig extends NPCsConfigFields {
     public SpecialBlacksmithConfig() {
-        super("special_blacksmith.yml",
+        super("special_blacksmith",
                 true,
                 "Grog",
                 "<Special Blacksmith>",
-                "WEAPONSMITH",
+                Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,282.5,93,258.5,-90,0",
                 Arrays.asList(
                         "Need something?",
@@ -30,11 +32,8 @@ public class SpecialBlacksmithConfig extends NPCsConfigFields {
                         "Don't get yourself killed,\\nwe want you to bring us\\nmore gear.",
                         "Next time buy something \\nmore expensive.",
                         "Don't forget, no refunds."),
-                false,
                 true,
                 3,
-                true,
-                "CUSTOM_SHOP"
-        );
+                NPCInteractions.NPCInteractionType.CUSTOM_SHOP);
     }
 }

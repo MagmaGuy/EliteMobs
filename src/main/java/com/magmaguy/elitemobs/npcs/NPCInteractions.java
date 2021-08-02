@@ -48,11 +48,10 @@ public class NPCInteractions implements Listener {
             event.getPlayer().sendMessage("[EliteMobs] You can't rename NPCs using name tags!");
             return;
         }
-        if (npcEntity.getIsSleeping()) return;
 
         event.setCancelled(true);
 
-        switch (npcEntity.getInteractionType()) {
+        switch (npcEntity.getNpCsConfigFields().getInteractionType()) {
             case GUILD_GREETER:
                 if (event.getPlayer().hasPermission("elitemobs.rank.npc")) {
                     new BukkitRunnable() {
@@ -200,7 +199,7 @@ public class NPCInteractions implements Listener {
         if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
 
         for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
-            if (event.getView().getTitle().equals(npcEntity.getName())) {
+            if (event.getView().getTitle().equals(npcEntity.getNpCsConfigFields().getName())) {
                 event.setCancelled(true);
                 return;
             }

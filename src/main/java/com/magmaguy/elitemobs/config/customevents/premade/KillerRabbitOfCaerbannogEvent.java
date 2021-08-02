@@ -9,9 +9,9 @@ import java.util.Arrays;
 public class KillerRabbitOfCaerbannogEvent extends CustomEventsConfigFields {
     public KillerRabbitOfCaerbannogEvent() {
         super("killer_rabbit_of_caerbannog",
-                true,
-                CustomEvent.EventType.TILL_SOIL,
-                Arrays.asList("killer_rabbit_of_caerbannog.yml"));
+                true);
+        setEventType(CustomEvent.EventType.TILL_SOIL);
+        setBossFilenames(Arrays.asList("killer_rabbit_of_caerbannog.yml"));
         setChance(0.0001);
         setBreakableMaterials(Arrays.asList(Material.COAL, Material.IRON_ORE, Material.GOLD_ORE, Material.LAPIS_ORE,
                 Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.REDSTONE_ORE));

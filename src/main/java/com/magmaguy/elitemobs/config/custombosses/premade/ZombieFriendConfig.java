@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
-public class ZombieFriendConfig extends CustomBossConfigFields {
+public class ZombieFriendConfig extends CustomBossesConfigFields {
     public ZombieFriendConfig() {
         super("zombie_friends_friend",
-                EntityType.ZOMBIE.toString(),
+                EntityType.ZOMBIE,
                 true,
                 "$reinforcementLevel &7Zombie Friend",
                 "dynamic");

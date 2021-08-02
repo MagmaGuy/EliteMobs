@@ -1,16 +1,18 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 
 public class UnbinderConfig extends NPCsConfigFields {
     public UnbinderConfig() {
-        super("unbinder.yml",
+        super("unbinder",
                 true,
                 "Ulfric",
                 "<Unbinder>",
-                "WEAPONSMITH",
+                Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,296.5,81,253.5,90,0",
                 Arrays.asList(
                         "Greetings.",
@@ -25,10 +27,8 @@ public class UnbinderConfig extends NPCsConfigFields {
                 Arrays.asList(
                         "Remember: Use unbind\\nscrolls wisely.",
                         "Safe travels, friend."),
-                false,
                 true,
                 3,
-                false,
-                "UNBINDER");
+                NPCInteractions.NPCInteractionType.UNBINDER);
     }
 }

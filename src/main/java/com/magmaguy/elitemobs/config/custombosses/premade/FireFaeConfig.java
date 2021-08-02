@@ -1,16 +1,15 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
 import java.util.Collections;
 
-public class FireFaeConfig extends CustomBossConfigFields {
+public class FireFaeConfig extends CustomBossesConfigFields {
     public FireFaeConfig() {
         super("fire_fae",
-                EntityType.VEX.toString(),
+                EntityType.VEX,
                 true,
                 "$eventBossLevel &cFire Fae",
                 "dynamic");

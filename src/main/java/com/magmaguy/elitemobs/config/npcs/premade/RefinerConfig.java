@@ -1,16 +1,18 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 
 public class RefinerConfig extends NPCsConfigFields {
     public RefinerConfig(){
-        super("refiner_config.yml",
+        super("refiner_config",
                 true,
                 "Ralph",
                 "<Refiner>",
-                "WEAPONSMITH",
+                Villager.Profession.WEAPONSMITH,
                 "em_adventurers_guild,292.5,81,269.5,90,0",
                 Arrays.asList(
                         "Want to uprade your scrap?",
@@ -28,10 +30,8 @@ public class RefinerConfig extends NPCsConfigFields {
                         "Come back when you have\\nmore to low level scrap",
                         "Don't forget to make that\\nscrap useful!",
                         "Go get into a scrap!"),
-                false,
                 true,
                 3,
-                false,
-                "REFINER");
+                NPCInteractions.NPCInteractionType.REFINER);
     }
 }

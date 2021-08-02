@@ -9,7 +9,7 @@ import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.ChatMessageType;
@@ -32,34 +32,27 @@ import static com.magmaguy.elitemobs.utils.WeightedProbability.pickWeighedProbab
  */
 public class LootTables implements Listener {
 
-    @EventHandler
-    public void onDeath(EliteMobDeathEvent event) {
+    private static boolean proceduralItemsOn;
+    private static boolean customItemsOn;
+    private static boolean weighedItemsExist;
+    private static boolean fixedItemsExist;
+    private static boolean limitedItemsExist;
+    private static boolean scalableItemsExist;
 
-        if (!event.getEliteMobEntity().getHasSpecialLoot()) return;
-        if (event.getEliteMobEntity().getLevel() < 1) return;
-        if (event.getEliteMobEntity().getDamagers().isEmpty()) return;
-
-        if (!event.getEliteMobEntity().hasVanillaLoot())
-            event.getEntityDeathEvent().getDrops().clear();
-
-        generatePlayerLoot(event.getEliteMobEntity());
-
-    }
-
-    public static void generatePlayerLoot(EliteMobEntity eliteMobEntity) {
-        if (eliteMobEntity.getTriggeredAntiExploit())
+    public static void generatePlayerLoot(EliteEntity eliteEntity) {
+        if (eliteEntity.getTriggeredAntiExploit())
             return;
-        for (Player player : eliteMobEntity.getDamagers().keySet()) {
+        for (Player player : eliteEntity.getDamagers().keySet()) {
 
-            if (eliteMobEntity.getDamagers().get(player) / eliteMobEntity.getMaxHealth() < 0.1)
+            if (eliteEntity.getDamagers().get(player) / eliteEntity.getMaxHealth() < 0.1)
                 continue;
 
-            new ItemLootShower(eliteMobEntity.getTier(), eliteMobEntity.getLivingEntity().getLocation(), player);
+            new ItemLootShower(eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
 
             Item item = null;
 
             if (AdventurersGuildConfig.guildLootLimiter) {
-                double itemTier = setItemTier((int) eliteMobEntity.getTier());
+                double itemTier = setItemTier(eliteEntity.getLevel());
                 if (itemTier > GuildRank.getActiveGuildRank(player) * 10) {
                     itemTier = GuildRank.getActiveGuildRank(player) * 10;
                     new BukkitRunnable() {
@@ -69,9 +62,9 @@ public class LootTables implements Listener {
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10);
                 }
-                item = generateLoot((int) Math.floor(itemTier), eliteMobEntity, player);
+                item = generateLoot((int) Math.floor(itemTier), eliteEntity, player);
             } else
-                item = generateLoot(eliteMobEntity, player);
+                item = generateLoot(eliteEntity, player);
 
             if (item != null &&
                     item.getItemStack() != null &&
@@ -89,13 +82,6 @@ public class LootTables implements Listener {
         }
     }
 
-    private static boolean proceduralItemsOn;
-    private static boolean customItemsOn;
-    private static boolean weighedItemsExist;
-    private static boolean fixedItemsExist;
-    private static boolean limitedItemsExist;
-    private static boolean scalableItemsExist;
-
     public static void initialize() {
         proceduralItemsOn = ProceduralItemGenerationSettingsConfig.doProceduralItemDrops;
         customItemsOn = ItemSettingsConfig.doEliteMobsLoot && !CustomItem.getCustomItemStackList().isEmpty();
@@ -105,20 +91,20 @@ public class LootTables implements Listener {
         scalableItemsExist = CustomItem.getScalableItems() != null && !CustomItem.getScalableItems().isEmpty();
     }
 
-    private static Item generateLoot(EliteMobEntity eliteMobEntity, Player player) {
+    private static Item generateLoot(EliteEntity eliteEntity, Player player) {
 
-        int mobTier = (int) MobTierCalculator.findMobTier(eliteMobEntity);
+        int mobTier = (int) MobTierCalculator.findMobTier(eliteEntity);
 
         /*
         Add some wiggle room to avoid making obtaining loot too linear
          */
         int itemTier = (int) setItemTier(mobTier);
 
-        return generateLoot(itemTier, eliteMobEntity, player);
+        return generateLoot(itemTier, eliteEntity, player);
 
     }
 
-    public static Item generateLoot(int itemTier, EliteMobEntity eliteMobEntity, Player player) {
+    public static Item generateLoot(int itemTier, EliteEntity eliteEntity, Player player) {
 
          /*
         Handle the odds of an item dropping
@@ -154,15 +140,15 @@ public class LootTables implements Listener {
 
         switch (selectedLootSystem) {
             case "procedural":
-                return dropProcedurallyGeneratedItem(itemTier, eliteMobEntity, player);
+                return dropProcedurallyGeneratedItem(itemTier, eliteEntity, player);
             case "weighed":
-                return dropWeighedFixedItem(eliteMobEntity.getLivingEntity().getLocation(), player);
+                return dropWeighedFixedItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
             case "fixed":
-                return dropFixedItem(eliteMobEntity.getLivingEntity().getLocation(), itemTier, player);
+                return dropFixedItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), itemTier, player);
             case "limited":
-                return dropLimitedItem(eliteMobEntity.getLivingEntity().getLocation(), itemTier, player);
+                return dropLimitedItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), itemTier, player);
             case "scalable":
-                return dropScalableItem(eliteMobEntity.getLivingEntity().getLocation(), itemTier, player);
+                return dropScalableItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), itemTier, player);
         }
 
         return null;
@@ -249,7 +235,6 @@ public class LootTables implements Listener {
 
     }
 
-
     public static Item dropWeighedFixedItem(Location location, Player player) {
 
         double totalWeight = 0;
@@ -279,9 +264,9 @@ public class LootTables implements Listener {
 
     }
 
-    private static Item dropProcedurallyGeneratedItem(int tierLevel, EliteMobEntity eliteMobEntity, Player player) {
-        ItemStack randomLoot = ItemConstructor.constructItem(tierLevel, eliteMobEntity, player, false);
-        return eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(), randomLoot);
+    private static Item dropProcedurallyGeneratedItem(int tierLevel, EliteEntity eliteEntity, Player player) {
+        ItemStack randomLoot = ItemConstructor.constructItem(tierLevel, eliteEntity, player, false);
+        return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), randomLoot);
     }
 
     private static Item dropProcedurallyGeneratedItem(int tierLevel, Location location, Player player) {
@@ -299,6 +284,20 @@ public class LootTables implements Listener {
 
     private static Item dropFixedItem(Location location, int itemTier, Player player) {
         return location.getWorld().dropItem(location, CustomItem.getFixedItems().get(itemTier).get(ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size())).generateDefaultsItemStack(player, false));
+    }
+
+    @EventHandler
+    public void onDeath(EliteMobDeathEvent event) {
+
+        if (!event.getEliteMobEntity().getHasSpecialLoot()) return;
+        if (event.getEliteMobEntity().getLevel() < 1) return;
+        if (event.getEliteMobEntity().getDamagers().isEmpty()) return;
+
+        if (!event.getEliteMobEntity().hasVanillaLoot())
+            event.getEntityDeathEvent().getDrops().clear();
+
+        generatePlayerLoot(event.getEliteMobEntity());
+
     }
 
 }

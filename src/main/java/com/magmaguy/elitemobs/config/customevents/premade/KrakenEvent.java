@@ -8,9 +8,9 @@ import java.util.Arrays;
 public class KrakenEvent extends CustomEventsConfigFields {
     public KrakenEvent() {
         super("kraken",
-                true,
-                CustomEvent.EventType.FISH,
-                Arrays.asList("kraken.yml"));
-        setChance(0.0001);
+                true);
+        setEventType(CustomEvent.EventType.FISH);
+        setBossFilenames(Arrays.asList("kraken.yml"));
+        setChance(0.005);
     }
 }

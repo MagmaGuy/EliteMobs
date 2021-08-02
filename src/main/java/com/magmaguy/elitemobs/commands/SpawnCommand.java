@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
@@ -27,7 +29,11 @@ public class SpawnCommand {
     public static void spawnEliteEntityTypeCommand(Player player, EntityType entityType, Integer level, String[] powers) {
         LivingEntity livingEntity = (LivingEntity) player.getLocation().getWorld().spawnEntity(getLocation(player), entityType);
         HashSet<ElitePower> mobPowers = getPowers(powers, player);
-        new EliteMobEntity(livingEntity, level, mobPowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        EliteEntity eliteEntity = new EliteEntity();
+        eliteEntity.setLevel(level);
+        eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        if (!mobPowers.isEmpty()) eliteEntity.applyPowers(mobPowers);
+        else eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
     }
 
     public static void spawnEliteEntityTypeCommand(CommandSender commandSender,
@@ -61,7 +67,11 @@ public class SpawnCommand {
         HashSet<ElitePower> mobPowers = new HashSet<>();
         if (powers.isPresent())
             mobPowers = getPowers(powers.get(), commandSender);
-        new EliteMobEntity(livingEntity, level, mobPowers, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        EliteEntity eliteEntity = new EliteEntity();
+        eliteEntity.setLevel(level);
+        eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        if (!mobPowers.isEmpty()) eliteEntity.applyPowers(mobPowers);
+        else eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
     }
 
     public static void spawnCustomBossCommand(CommandSender commandSender,
@@ -70,7 +80,13 @@ public class SpawnCommand {
                                               Vector coords) {
         try {
             Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
-            CustomBossEntity.constructCustomBoss(fileName, location);
+            CustomBossesConfigFields customBossesConfigFields  = CustomBossesConfig.getCustomBoss(fileName);
+            if (customBossesConfigFields == null){
+                commandSender.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+            }
+            CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
+            customBossEntity.setSpawnLocation(location);
+            customBossEntity.spawn(false);
         } catch (Exception e) {
             commandSender.sendMessage("[EliteMobs] World argument was not valid!");
         }
@@ -84,7 +100,14 @@ public class SpawnCommand {
                                               int level) {
         try {
             Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
-            CustomBossEntity.constructCustomBoss(fileName, location, level);
+            CustomBossesConfigFields customBossesConfigFields  = CustomBossesConfig.getCustomBoss(fileName);
+            if (customBossesConfigFields == null){
+                commandSender.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+            }
+            CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
+            customBossEntity.setSpawnLocation(location);
+            customBossEntity.setLevel(level);
+            customBossEntity.spawn(false);
         } catch (Exception e) {
             commandSender.sendMessage("[EliteMobs] World argument was not valid!");
         }
@@ -92,11 +115,24 @@ public class SpawnCommand {
     }
 
     public static void spawnCustomBossCommand(Player player, String fileName, int level) {
-        CustomBossEntity.constructCustomBoss(fileName, getLocation(player), level);
+        CustomBossesConfigFields customBossesConfigFields  = CustomBossesConfig.getCustomBoss(fileName);
+        if (customBossesConfigFields == null){
+            player.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+        }
+        CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
+        customBossEntity.setSpawnLocation(getLocation(player));
+        customBossEntity.setLevel(level);
+        customBossEntity.spawn(false);
     }
 
     public static void spawnCustomBossCommand(Player player, String fileName) {
-        CustomBossEntity.constructCustomBoss(fileName, getLocation(player));
+        CustomBossesConfigFields customBossesConfigFields  = CustomBossesConfig.getCustomBoss(fileName);
+        if (customBossesConfigFields == null){
+            player.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+        }
+        CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
+        customBossEntity.setSpawnLocation(getLocation(player));
+        customBossEntity.spawn(false);
     }
 
     public static void spawnSuperMobCommand(Player player, EntityType entityType) {

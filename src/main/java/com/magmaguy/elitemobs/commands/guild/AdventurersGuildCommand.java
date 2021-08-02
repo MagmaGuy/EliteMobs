@@ -24,7 +24,6 @@ public class AdventurersGuildCommand {
     public static boolean adventurersGuildTeleport(Player player) {
         if (!player.hasPermission("elitemobs.adventurersguild.teleport")) return false;
         if (!AdventurersGuildConfig.agTeleport) return false;
-        if (!AdventurersGuildConfig.alwaysUseNpcs) return false;
         if (AdventurersGuildConfig.guildWorldLocation == null)
             defineTeleportLocation();
         if (AdventurersGuildConfig.guildWorldLocation == null) return false;

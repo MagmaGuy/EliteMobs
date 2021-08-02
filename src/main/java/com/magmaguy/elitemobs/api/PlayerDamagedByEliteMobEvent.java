@@ -2,9 +2,8 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,15 +17,15 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
-    private final EliteMobEntity eliteMobEntity;
+    private final EliteEntity eliteEntity;
     private final Player player;
     private boolean isCancelled = false;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
     private final Projectile projectile;
 
-    public PlayerDamagedByEliteMobEvent(EliteMobEntity eliteMobEntity, Player player, EntityDamageByEntityEvent event, Projectile projectile) {
+    public PlayerDamagedByEliteMobEvent(EliteEntity eliteEntity, Player player, EntityDamageByEntityEvent event, Projectile projectile) {
         this.entity = event.getEntity();
-        this.eliteMobEntity = eliteMobEntity;
+        this.eliteEntity = eliteEntity;
         this.player = player;
         this.entityDamageByEntityEvent = event;
         this.projectile = projectile;
@@ -36,8 +35,8 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
         return this.entity;
     }
 
-    public EliteMobEntity getEliteMobEntity() {
-        return this.eliteMobEntity;
+    public EliteEntity getEliteMobEntity() {
+        return this.eliteEntity;
     }
 
     public Player getPlayer() {
@@ -85,13 +84,13 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
             Projectile projectile = null;
 
-            EliteMobEntity eliteMobEntity = null;
+            EliteEntity eliteEntity = null;
             if (event.getDamager() instanceof LivingEntity)
-                eliteMobEntity = EntityTracker.getEliteMobEntity(event.getDamager());
+                eliteEntity = EntityTracker.getEliteMobEntity(event.getDamager());
             else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity) {
-                eliteMobEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getDamager()).getShooter());
+                eliteEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getDamager()).getShooter());
                 projectile = (Projectile) event.getDamager();
-            }if (eliteMobEntity == null) return;
+            }if (eliteEntity == null) return;
 
             //dodge chance
             if (ThreadLocalRandom.current().nextDouble() < GuildRank.dodgeBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100) {
@@ -100,7 +99,7 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
                 return;
             }
 
-            PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteMobEntity, player, event, projectile);
+            PlayerDamagedByEliteMobEvent playerDamagedByEliteMobEvent = new PlayerDamagedByEliteMobEvent(eliteEntity, player, event, projectile);
             if (!playerDamagedByEliteMobEvent.isCancelled)
                 new EventCaller(playerDamagedByEliteMobEvent);
         }
