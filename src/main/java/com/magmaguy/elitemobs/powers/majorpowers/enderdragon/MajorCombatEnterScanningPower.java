@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.majorpowers.enderdragon;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import org.bukkit.event.EventHandler;
@@ -48,27 +48,27 @@ public abstract class MajorCombatEnterScanningPower extends MajorPower implement
         }
     }
 
-    protected void activate(EliteMobEntity eliteMobEntity) {
+    protected void activate(EliteEntity eliteEntity) {
         if (isActive) return;
         isActive = true;
-        finishActivation(eliteMobEntity);
+        finishActivation(eliteEntity);
     }
 
-    protected abstract void finishActivation(EliteMobEntity eliteMobEntity);
+    protected abstract void finishActivation(EliteEntity eliteEntity);
 
-    public void deactivate(EliteMobEntity eliteMobEntity) {
+    public void deactivate(EliteEntity eliteEntity) {
         if (bukkitTask != null)
             bukkitTask.cancel();
         isActive = false;
-        finishDeactivation(eliteMobEntity);
+        finishDeactivation(eliteEntity);
     }
 
-    protected abstract void finishDeactivation(EliteMobEntity eliteMobEntity);
+    protected abstract void finishDeactivation(EliteEntity eliteEntity);
 
-    protected boolean doExit(EliteMobEntity eliteMobEntity) {
-        if (eliteMobEntity == null ||
-                !eliteMobEntity.getLivingEntity().isValid()) {
-            deactivate(eliteMobEntity);
+    protected boolean doExit(EliteEntity eliteEntity) {
+        if (eliteEntity == null ||
+                !eliteEntity.isValid()) {
+            deactivate(eliteEntity);
             return true;
         }
 

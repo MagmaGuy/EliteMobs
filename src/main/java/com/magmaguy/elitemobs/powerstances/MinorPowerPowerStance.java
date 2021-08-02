@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.powerstances;
 
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -22,28 +22,28 @@ public class MinorPowerPowerStance implements Listener {
 
     public static int trackAmount = 2;
     public static int individualEffectsPerTrack = 2;
-    private EliteMobEntity eliteMobEntity;
+    private EliteEntity eliteEntity;
 
     //Secondary effect item processing
-    public MinorPowerPowerStance(EliteMobEntity eliteMobEntity) {
+    public MinorPowerPowerStance(EliteEntity eliteEntity) {
 
         if (!MobCombatSettingsConfig.enableVisualEffectsForNaturalMobs)
             return;
-        if (MobCombatSettingsConfig.disableVisualEffectsForSpawnerMobs && !eliteMobEntity.isNaturalEntity())
+        if (MobCombatSettingsConfig.disableVisualEffectsForSpawnerMobs && !eliteEntity.isNaturalEntity())
             return;
 
-        this.eliteMobEntity = eliteMobEntity;
-        if (eliteMobEntity.hasMinorVisualEffect()) return;
-        eliteMobEntity.setHasMinorVisualEffect(true);
+        this.eliteEntity = eliteEntity;
+        if (eliteEntity.hasMinorVisualEffect()) return;
+        eliteEntity.setHasMinorVisualEffect(true);
 
-        if (eliteMobEntity.getMinorPowerCount() < 1)
+        if (eliteEntity.getMinorPowerCount() < 1)
             return;
 
         /*
         Obfuscate powers to prevent TPS loss
          */
         if (MobCombatSettingsConfig.obfuscateMobPowers)
-            if (eliteMobEntity.getHasVisualEffectObfuscated()) {
+            if (eliteEntity.getHasVisualEffectObfuscated()) {
                 Object[][] multiDimensionalTrailTracker = new Object[trackAmount][individualEffectsPerTrack];
 
                 for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
@@ -57,13 +57,13 @@ public class MinorPowerPowerStance implements Listener {
                 }
 
                 VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                        MinorPowerStanceMath.cachedVectors, eliteMobEntity.hasMinorVisualEffect(),
-                        MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
+                        MinorPowerStanceMath.cachedVectors, eliteEntity.hasMinorVisualEffect(),
+                        MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
                 return;
             }
 
-        Object[][] multiDimensionalTrailTracker = new Object[trackAmount][eliteMobEntity.getMinorPowerCount() * individualEffectsPerTrack];
+        Object[][] multiDimensionalTrailTracker = new Object[trackAmount][eliteEntity.getMinorPowerCount() * individualEffectsPerTrack];
 
         for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
             ArrayList<Object> localObjects = new ArrayList<>();
@@ -75,8 +75,8 @@ public class MinorPowerPowerStance implements Listener {
         }
 
         VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                MinorPowerStanceMath.cachedVectors, eliteMobEntity.hasMinorVisualEffect(),
-                MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteMobEntity);
+                MinorPowerStanceMath.cachedVectors, eliteEntity.hasMinorVisualEffect(),
+                MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
     }
 
@@ -88,10 +88,10 @@ public class MinorPowerPowerStance implements Listener {
 
         ArrayList<Object> effects = new ArrayList<>();
 
-        for (ElitePower elitePower : eliteMobEntity.getPowers())
+        for (ElitePower elitePower : eliteEntity.getPowers())
             if (elitePower instanceof MinorPower)
-                if (eliteMobEntity.getPower(elitePower).getTrail() != null)
-                    effects.add(effectParser(eliteMobEntity.getPower(elitePower).getTrail()));
+                if (eliteEntity.getPower(elitePower).getTrail() != null)
+                    effects.add(effectParser(eliteEntity.getPower(elitePower).getTrail()));
 
         return effects;
 
@@ -113,7 +113,7 @@ public class MinorPowerPowerStance implements Listener {
 
     private Object addEffect(Material material) {
 
-        Item item = eliteMobEntity.getLivingEntity().getWorld().dropItem(eliteMobEntity.getLivingEntity().getLocation(),
+        Item item = eliteEntity.getLivingEntity().getWorld().dropItem(eliteEntity.getLivingEntity().getLocation(),
                 new ItemStack(material));
         item.setPickupDelay(Integer.MAX_VALUE);
         if (!VersionChecker.serverVersionOlderThan(1, 11))

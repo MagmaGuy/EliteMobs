@@ -1,9 +1,7 @@
 package com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments;
 
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments.Bombardment;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ThrownPotion;
@@ -23,7 +21,7 @@ public class EnderDragonPotionBombardment extends Bombardment {
     }
 
     @Override
-    public void taskBehavior(EliteMobEntity eliteMobEntity) {
+    public void taskBehavior(EliteEntity eliteEntity) {
         for (int i = 0; i < 5; i++) {
 
             ItemStack itemStack = new ItemStack(Material.SPLASH_POTION);
@@ -35,8 +33,8 @@ public class EnderDragonPotionBombardment extends Bombardment {
             itemStack.setItemMeta(potionMeta);
 
 
-            ThrownPotion thrownPotion = (ThrownPotion) eliteMobEntity.getLivingEntity().getWorld().spawnEntity(
-                    eliteMobEntity.getLivingEntity().getLocation().clone().subtract(
+            ThrownPotion thrownPotion = (ThrownPotion) eliteEntity.getLivingEntity().getWorld().spawnEntity(
+                    eliteEntity.getLivingEntity().getLocation().clone().subtract(
                             new Vector(ThreadLocalRandom.current().nextInt(-1, 1),
                                     1,
                                     ThreadLocalRandom.current().nextInt(-1, 1)))

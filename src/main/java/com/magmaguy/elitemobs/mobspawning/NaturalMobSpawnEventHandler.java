@@ -4,14 +4,12 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.gamemodes.zoneworld.Grid;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
@@ -20,7 +18,9 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser
 import com.magmaguy.elitemobs.utils.PlayerScanner;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Location;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -47,6 +47,10 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (MobPropertiesConfig.getMobProperties().get(event.getEntityType()) == null ||
                 !MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled())
             return;
+
+        if (EliteMobs.worldGuardIsEnabled)
+            if (!WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getEliteMobsSpawnFlag()))
+                return;
 
         //This fires for custom bosses, so don't override those spawns
         if (WorldGuardSpawnEventBypasser.isForcedSpawn()) return;
@@ -87,10 +91,9 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + livingEntity.getWorld().getName())) {
             int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()));
-            EliteMobEntity eliteMobEntity = new EliteMobEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
+            EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
             if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
-                eliteMobEntity.setHasSpecialLoot(false);
-            naturalCustomBossSpawn(livingEntity, eliteMobLevel);
+                eliteEntity.setHasSpecialLoot(false);
             return;
         }
 
@@ -111,29 +114,10 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (eliteMobLevel > MobCombatSettingsConfig.naturalElitemobLevelCap)
             eliteMobLevel = MobCombatSettingsConfig.naturalElitemobLevelCap;
 
-        EliteMobEntity eliteMobEntity = new EliteMobEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
+        EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
 
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
-            eliteMobEntity.setHasSpecialLoot(false);
-
-        naturalCustomBossSpawn(livingEntity, eliteMobLevel);
-
-    }
-
-    private static void naturalCustomBossSpawn(Entity entity, int eliteMobLevel) {
-        /*
-        Check to see if they'll become a naturally spawned Custom Boss
-         */
-        if (EliteMobs.worldGuardIsEnabled)
-            if (!WorldGuardFlagChecker.checkFlag(entity.getLocation(), WorldGuardCompatibility.getEliteMobsEventsFlag()))
-                return;
-
-        for (CustomBossConfigFields customBossConfigFields : CustomBossConfigFields.getNaturallySpawnedElites())
-            if (entity.getType().toString().equalsIgnoreCase(customBossConfigFields.getEntityType()))
-                if (ThreadLocalRandom.current().nextDouble() < customBossConfigFields.getSpawnChance()) {
-                    CustomBossEntity.constructCustomBoss(customBossConfigFields.getFileName(), entity.getLocation(), eliteMobLevel);
-                    return;
-                }
+            eliteEntity.setHasSpecialLoot(false);
 
     }
 
@@ -172,7 +156,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         //add wiggle room
         int wiggle = ThreadLocalRandom.current().nextInt(5) - 2;
-        eliteMobLevel = wiggle + eliteMobLevel < 0 ? 0 : eliteMobLevel + wiggle;
+        eliteMobLevel = Math.max(wiggle + eliteMobLevel, 1);
 
         return eliteMobLevel;
 

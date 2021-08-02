@@ -1,17 +1,18 @@
 package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.entity.Villager;
 
 import java.util.Arrays;
 
 public class GuildAttendantConfig extends NPCsConfigFields {
     public GuildAttendantConfig() {
-        super(
-                "guild_attendant.yml",
+        super("guild_attendant",
                 true,
                 "Gillian",
                 "<Guild Attendant>",
-                "LIBRARIAN",
+                Villager.Profession.LIBRARIAN,
                 "em_adventurers_guild,283.5,91,229.5,179,0",
                 Arrays.asList(
                         "Welcome to the\\nAdventurer's Guild!",
@@ -28,11 +29,8 @@ public class GuildAttendantConfig extends NPCsConfigFields {
                         "See you soon!",
                         "Thanks for stopping by!",
                         "Happy hunting!"),
-                false,
                 true,
                 3,
-                false,
-                "GUILD_GREETER"
-        );
+                NPCInteractions.NPCInteractionType.GUILD_GREETER);
     }
 }

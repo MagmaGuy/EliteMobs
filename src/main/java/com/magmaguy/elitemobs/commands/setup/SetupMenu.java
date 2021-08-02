@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
-import com.magmaguy.elitemobs.npcs.NPCInitializer;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -205,7 +204,6 @@ public class SetupMenu {
                             CustomWorldLoading.startupWorldInitialization();
                             AdventurersGuildCommand.defineTeleportLocation();
                             AdventurersGuildConfig.toggleGuildInstall();
-                            new NPCInitializer();
                             if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
                                 WorldGuardCompatibility.protectWorldMinidugeonArea(AdventurersGuildCommand.defineTeleportLocation());
                                 player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2The Adventurer's Guild Hub has been protected against griefing and mob spawning (among others)!"));

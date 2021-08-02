@@ -1,12 +1,9 @@
 package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.config.menus.premade.RefinerMenuConfig;
-import com.magmaguy.elitemobs.config.menus.premade.RefinerMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
-import com.magmaguy.elitemobs.config.menus.premade.RefinerMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 

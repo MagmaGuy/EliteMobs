@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import com.magmaguy.elitemobs.powers.ProjectileTagger;
 import org.bukkit.Location;
@@ -44,10 +44,10 @@ public class FrostCone extends BossPower implements Listener {
         startFrostCone(event.getEliteMobEntity(), event.getPlayer().getLocation().clone());
     }
 
-    public static void startFrostCone(EliteMobEntity eliteMobEntity, Location damager) {
-        if (eliteMobEntity == null || eliteMobEntity.getLivingEntity() == null || !eliteMobEntity.getLivingEntity().isValid())
+    public static void startFrostCone(EliteEntity eliteEntity, Location damager) {
+        if (eliteEntity == null || eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid())
             return;
-        eliteMobEntity.getLivingEntity().setAI(false);
+        eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             int counter = 0;
 
@@ -56,33 +56,33 @@ public class FrostCone extends BossPower implements Listener {
                 counter++;
 
                 //ending phase
-                if (counter > 20 * 6 || !isPowerStillValid(eliteMobEntity, damager)) {
+                if (counter > 20 * 6 || !isPowerStillValid(eliteEntity, damager)) {
                     cancel();
-                    if (!eliteMobEntity.getLivingEntity().isDead())
-                        eliteMobEntity.getLivingEntity().setAI(true);
+                    if (!eliteEntity.getLivingEntity().isDead())
+                        eliteEntity.getLivingEntity().setAI(true);
                     return;
                 }
                 
                 //warning phase
                 if (counter < 20 * 3) {
-                    doSmokeEffect(eliteMobEntity, damager);
+                    doSmokeEffect(eliteEntity, damager);
                     return;
                 }
 
                 //firing phase
                 for (int i = 0; i < 10; i++)
-                    createSnowball(eliteMobEntity, damager);
+                    createSnowball(eliteEntity, damager);
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-    private static void doSmokeEffect(EliteMobEntity eliteMobEntity, Location location) {
+    private static void doSmokeEffect(EliteEntity eliteEntity, Location location) {
         for (int i = 0; i < 100; i++) {
-            Vector shotVector = getShotVector(eliteMobEntity, location);
-            eliteMobEntity.getLivingEntity().getWorld().spawnParticle(
+            Vector shotVector = getShotVector(eliteEntity, location);
+            eliteEntity.getLivingEntity().getWorld().spawnParticle(
                     Particle.SMOKE_NORMAL,
-                    eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 1, 0)),
+                    eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 1, 0)),
                     0,
                     shotVector.getX(),
                     shotVector.getY(),
@@ -91,14 +91,14 @@ public class FrostCone extends BossPower implements Listener {
         }
     }
 
-    private static boolean isPowerStillValid(EliteMobEntity eliteMobEntity, Location playerLocation){
-        if (!eliteMobEntity.getLivingEntity().isValid())
+    private static boolean isPowerStillValid(EliteEntity eliteEntity, Location playerLocation){
+        if (!eliteEntity.getLivingEntity().isValid())
             return false;
-        return eliteMobEntity.getLivingEntity().getWorld().equals(playerLocation.getWorld());
+        return eliteEntity.getLivingEntity().getWorld().equals(playerLocation.getWorld());
     }
 
-    private static Vector getShotVector(EliteMobEntity eliteMobEntity, Location location) {
-        return location.clone().subtract(eliteMobEntity.getLivingEntity().getLocation().clone()).toVector()
+    private static Vector getShotVector(EliteEntity eliteEntity, Location location) {
+        return location.clone().subtract(eliteEntity.getLivingEntity().getLocation().clone()).toVector()
                 .normalize()
                 .add(new Vector(
                         ThreadLocalRandom.current().nextDouble() * 1 - 0.5,
@@ -107,8 +107,8 @@ public class FrostCone extends BossPower implements Listener {
                 .normalize();
     }
 
-    private static Snowball createSnowball(EliteMobEntity eliteMobEntity, Location location) {
-        Projectile snowball = EliteProjectile.create(EntityType.SNOWBALL, eliteMobEntity.getLivingEntity(), getShotVector(eliteMobEntity, location), false);
+    private static Snowball createSnowball(EliteEntity eliteEntity, Location location) {
+        Projectile snowball = EliteProjectile.create(EntityType.SNOWBALL, eliteEntity.getLivingEntity(), getShotVector(eliteEntity, location), false);
         ProjectileTagger.tagProjectileWithCustomDamage(snowball, 2);
         snowball.getPersistentDataContainer().set(frostConeSnowballKey, PersistentDataType.STRING, "true");
         return (Snowball) snowball;

@@ -3,14 +3,14 @@ package com.magmaguy.elitemobs.dungeons;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.NewMinidungeonRelativeBossLocationEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.dungeons.worlds.MinidungeonWorldLoader;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.AbstractRegionalEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
-import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -142,7 +142,7 @@ public class Minidungeon {
      */
     private void checkIfBossesInstalled() {
         for (RelativeDungeonLocations.RelativeDungeonLocation relativeDungeonLocation : relativeDungeonLocations.relativeDungeonLocations) {
-            if (relativeDungeonLocation.customBossConfigFields == null) {
+            if (relativeDungeonLocation.customBossesConfigFields == null) {
                 this.bossesDownloaded = false;
                 return;
             }
@@ -170,28 +170,28 @@ public class Minidungeon {
                     realDungeonLocations.add(
                             new RealDungeonLocation(
                                     dungeonPackagerConfigFields.getAnchorPoint().clone().add(relativeDungeonLocation.location),
-                                    relativeDungeonLocation.customBossConfigFields));
+                                    relativeDungeonLocation.customBossesConfigFields));
                 else {
                     realDungeonLocations.add(
                             new RealDungeonLocation(GenericRotationMatrixMath.rotateLocationYAxis(
                                     dungeonPackagerConfigFields.getRotation(),
                                     dungeonPackagerConfigFields.getAnchorPoint(),
                                     relativeDungeonLocation.location),
-                                    relativeDungeonLocation.customBossConfigFields));
+                                    relativeDungeonLocation.customBossesConfigFields));
                 }
             }
         }
 
         public class RealDungeonLocation {
             public Location location;
-            public CustomBossConfigFields customBossConfigFields;
-            public AbstractRegionalEntity abstractRegionalEntity;
+            public CustomBossesConfigFields customBossesConfigFields;
+            public RegionalBossEntity regionalBossEntity;
 
-            public RealDungeonLocation(Location location, CustomBossConfigFields customBossConfigFields) {
+            public RealDungeonLocation(Location location, CustomBossesConfigFields customBossesConfigFields) {
                 this.location = location;
-                this.customBossConfigFields = customBossConfigFields;
+                this.customBossesConfigFields = customBossesConfigFields;
                 if (isInstalled)
-                    this.abstractRegionalEntity = AbstractRegionalEntity.get(customBossConfigFields, location);
+                    this.regionalBossEntity = RegionalBossEntity.getRegionalBoss(customBossesConfigFields, location);
             }
         }
 
@@ -200,14 +200,14 @@ public class Minidungeon {
          */
         public void commitLocations() {
             for (RealDungeonLocation realDungeonLocation : realDungeonLocations) {
-                realDungeonLocation.abstractRegionalEntity = new AbstractRegionalEntity(realDungeonLocation.location, realDungeonLocation.customBossConfigFields);
+                realDungeonLocation.regionalBossEntity = new RegionalBossEntity(realDungeonLocation.customBossesConfigFields, realDungeonLocation.location);
             }
         }
 
         public void uncommitLocations() {
             for (RealDungeonLocation realDungeonLocation : realDungeonLocations)
                 try {
-                    realDungeonLocation.abstractRegionalEntity.regionalBossEntity.removePermanently();
+                    realDungeonLocation.regionalBossEntity.remove(RemovalReason.REMOVE_COMMAND);
                 } catch (Exception exception) {
                     new WarningMessage("Failed to remove a spawn location while unloading a boss!");
                 }
@@ -230,12 +230,12 @@ public class Minidungeon {
         }
 
         public class RelativeDungeonLocation {
-            CustomBossConfigFields customBossConfigFields;
+            CustomBossesConfigFields customBossesConfigFields;
             Vector location;
 
             public RelativeDungeonLocation(String rawLocationString) {
                 try {
-                    customBossConfigFields = CustomBossesConfig.getCustomBoss(rawLocationString.split(":")[0]);
+                    customBossesConfigFields = CustomBossesConfig.getCustomBoss(rawLocationString.split(":")[0]);
                     this.location = new Vector(
                             //no world location for relative positioning
                             //x
@@ -264,21 +264,21 @@ public class Minidungeon {
         }
     }
 
-    public boolean initializeRelativeLocationAddition(CustomBossConfigFields customBossConfigFields, Location location) {
-        Location relativeLocation = addRelativeLocation(customBossConfigFields, location);
+    public boolean initializeRelativeLocationAddition(CustomBossesConfigFields customBossesConfigFields, Location location) {
+        Location relativeLocation = addRelativeLocation(customBossesConfigFields, location);
         Bukkit.getPluginManager().callEvent(new NewMinidungeonRelativeBossLocationEvent(
                 this,
                 relativeLocation,
                 dungeonPackagerConfigFields.getAnchorPoint().clone().add(relativeLocation),
-                customBossConfigFields));
+                customBossesConfigFields));
         return relativeLocation != null;
     }
 
-    private Location addRelativeLocation(CustomBossConfigFields customBossConfigFields, Location location) {
+    private Location addRelativeLocation(CustomBossesConfigFields customBossesConfigFields, Location location) {
         if (dungeonPackagerConfigFields.getAnchorPoint() == null)
             return null;
         Location relativeLocation = location.clone().subtract(dungeonPackagerConfigFields.getAnchorPoint());
-        if (dungeonPackagerConfigFields.setRelativeBossLocations(customBossConfigFields, relativeLocation))
+        if (dungeonPackagerConfigFields.setRelativeBossLocations(customBossesConfigFields, relativeLocation))
             return relativeLocation;
         else
             return null;
@@ -334,7 +334,7 @@ public class Minidungeon {
                     return;
                 }
             for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-                if (regionalBossEntity.getSpawnWorldName().equals(world.getName()))
+                if (regionalBossEntity.getSpawnLocation().getWorld() == world)
                     regionalBossEntity.worldUnload();
             MinidungeonWorldLoader.unloadWorld(this);
             player.sendMessage("Minidugeon " + dungeonPackagerConfigFields.getWorldName() +
@@ -429,9 +429,9 @@ public class Minidungeon {
         if (!isInstalled) return;
         for (String regionalBossLocations : dungeonPackagerConfigFields.getRelativeBossLocations()) {
             String bossFileName = regionalBossLocations.split(":")[0];
-            CustomBossConfigFields customBossConfigFields = CustomBossesConfig.getCustomBoss(bossFileName);
-            quantificationFilter(customBossConfigFields);
-            if (customBossConfigFields != null && customBossConfigFields.isRegionalBoss())
+            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossFileName);
+            quantificationFilter(customBossesConfigFields);
+            if (customBossesConfigFields != null && customBossesConfigFields.isRegionalBoss())
                 regionalBossCount++;
         }
     }
@@ -439,15 +439,15 @@ public class Minidungeon {
     public void quantifyWorldBosses() {
         if (!isInstalled) return;
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-            if (regionalBossEntity.getSpawnWorldName().equals(world.getName())) {
+            if (regionalBossEntity.getLocation().getWorld() == world) {
                 regionalBossCount++;
-                quantificationFilter(regionalBossEntity.getCustomBossConfigFields());
+                quantificationFilter(regionalBossEntity.getCustomBossesConfigFields());
             }
     }
 
-    private void quantificationFilter(CustomBossConfigFields customBossConfigFields) {
+    private void quantificationFilter(CustomBossesConfigFields customBossesConfigFields) {
         try {
-            int level = customBossConfigFields.getLevel();
+            int level = customBossesConfigFields.getLevel();
             lowestTier = lowestTier == null ? level : lowestTier < level ? lowestTier : level;
             highestTier = highestTier == null ? level : highestTier > level ? highestTier : level;
         } catch (Exception ex) {

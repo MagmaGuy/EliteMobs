@@ -9,9 +9,9 @@ import java.util.Arrays;
 public class BalrogEvent extends CustomEventsConfigFields {
     public BalrogEvent() {
         super("balrog",
-                true,
-                CustomEvent.EventType.BREAK_BLOCK,
-                Arrays.asList("balrog.yml"));
+                true);
+        setEventType(CustomEvent.EventType.BREAK_BLOCK);
+        setBossFilenames(Arrays.asList("balrog.yml"));
         setChance(0.0001);
         setBreakableMaterials(Arrays.asList(Material.COAL_ORE, Material.IRON_ORE, Material.GOLD_ORE, Material.LAPIS_ORE,
                 Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.REDSTONE_ORE));

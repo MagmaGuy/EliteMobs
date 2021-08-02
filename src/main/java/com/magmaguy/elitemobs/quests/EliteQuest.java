@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.quests;
 
-import com.magmaguy.elitemobs.items.MobTierCalculator;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.config.menus.premade.QuestMenuConfig;
+import com.magmaguy.elitemobs.items.MobTierCalculator;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.utils.DeepCopy;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -81,8 +81,8 @@ public class EliteQuest implements Serializable {
         return questObjective;
     }
 
-    public boolean processQuestProgression(EliteMobEntity eliteMobEntity, Player player) {
-        return getQuestObjective().processQuestProgression(eliteMobEntity, player);
+    public boolean processQuestProgression(EliteEntity eliteEntity, Player player) {
+        return getQuestObjective().processQuestProgression(eliteEntity, player);
     }
 
     public String getQuestStatus() {

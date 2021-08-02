@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
-public class NecronomiconZombieConfig extends CustomBossConfigFields {
+public class NecronomiconZombieConfig extends CustomBossesConfigFields {
     public NecronomiconZombieConfig() {
         super("necronomicon_zombie",
-                EntityType.ZOMBIE.toString(),
+                EntityType.ZOMBIE,
                 true,
                 "$reinforcementLevel &7Summoned Zombie",
                 "dynamic");

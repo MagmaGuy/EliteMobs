@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.thirdparty.libsdisguises;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.*;
@@ -16,7 +16,7 @@ public class DisguiseEntity {
      *
      * @param disguiseName Raw name following config format
      */
-    public static void disguise(String disguiseName, Entity entity, CustomBossConfigFields customBossConfigFields) {
+    public static void disguise(String disguiseName, Entity entity, CustomBossesConfigFields customBossesConfigFields) {
 
         if (disguiseName.contains("player:")) {
             playerDisguise(disguiseName.replace("player:", ""), entity);
@@ -25,7 +25,7 @@ public class DisguiseEntity {
 
         if (disguiseName.contains("custom")) {
             try {
-                customDisguise(disguiseName.replace("custom:", ""), entity, customBossConfigFields);
+                customDisguise(disguiseName.replace("custom:", ""), entity, customBossesConfigFields);
             } catch (Exception ex) {
                 new WarningMessage("Failed to assign custom disguise " + disguiseName + "! Did you configure the disguise correctly?");
             }
@@ -73,12 +73,12 @@ public class DisguiseEntity {
         miscDisguise.startDisguise();
     }
 
-    private static void customDisguise(String customDisguise, Entity entity, CustomBossConfigFields customBossConfigFields) {
+    private static void customDisguise(String customDisguise, Entity entity, CustomBossesConfigFields customBossesConfigFields) {
         Disguise disguise = DisguiseAPI.getCustomDisguise(customDisguise);
         try {
             if (disguise == null)
-                if (customBossConfigFields.getCustomDisguiseData() != null) {
-                    DisguiseAPI.addCustomDisguise(customDisguise, customBossConfigFields.getCustomDisguiseData());
+                if (customBossesConfigFields.getCustomDisguiseData() != null) {
+                    DisguiseAPI.addCustomDisguise(customDisguise, customBossesConfigFields.getCustomDisguiseData());
                     disguise = DisguiseAPI.getCustomDisguise(customDisguise);
                 }
             if (disguise == null)
@@ -88,7 +88,7 @@ public class DisguiseEntity {
             disguise.setDynamicName(true);
             disguise.startDisguise();
         } catch (Exception ex) {
-            new WarningMessage("Failed to set custom disguise for boss " + customBossConfigFields.getFileName() + " !");
+            new WarningMessage("Failed to set custom disguise for boss " + customBossesConfigFields.getFilename() + " !");
             new WarningMessage("Does the disguise exist?");
             ex.printStackTrace();
         }

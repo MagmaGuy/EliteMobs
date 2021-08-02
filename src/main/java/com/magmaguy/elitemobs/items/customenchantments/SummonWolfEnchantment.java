@@ -41,9 +41,9 @@ public class SummonWolfEnchantment extends CustomEnchantment {
     }
 
     private static Wolf summonGenericWolf(Player player) {
-        CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss("summonable_wolf.yml",
-                player.getLocation(),
-                ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
+        CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("summonable_wolf.yml");
+        customBossEntity.setSpawnLocation(player.getLocation());
+        customBossEntity.setLevel(ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
         if (customBossEntity.getLivingEntity().getType() != EntityType.WOLF) {
             new WarningMessage("snoopy.yml boss file was not set to a wolf entity type! It must be a wolf for the summon mechanic to work correctly!");
             return null;
@@ -52,9 +52,9 @@ public class SummonWolfEnchantment extends CustomEnchantment {
     }
 
     private static Wolf summonSnoopy(Player player) {
-        CustomBossEntity customBossEntity = CustomBossEntity.constructCustomBoss("snoopy.yml",
-                player.getLocation(),
-                ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
+        CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity("summonable_wolf.yml");
+        customBossEntity.setSpawnLocation(player.getLocation());
+        customBossEntity.setLevel(ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true));
         if (customBossEntity.getLivingEntity().getType() != EntityType.WOLF) {
             new WarningMessage("snoopy.yml boss file was not set to a wolf entity type! It must be a wolf for the summon mechanic to work correctly!");
             return null;

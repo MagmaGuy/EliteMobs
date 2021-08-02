@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
-public class ZombieDadConfig extends CustomBossConfigFields {
+public class ZombieDadConfig extends CustomBossesConfigFields {
     public ZombieDadConfig() {
         super("zombie_parents_dad",
-                EntityType.SKELETON.toString(),
+                EntityType.SKELETON,
                 true,
                 "$reinforcementLevel &7Zombie Dad",
                 "dynamic");

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.*;
 import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
@@ -20,7 +20,7 @@ import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -113,7 +113,7 @@ public class ElitePower {
                 try {
                     return elitePower.getClass().newInstance();
                 } catch (Exception ex) {
-                    new DeveloperMessage("Failed to instance power");
+                    new WarningMessage("Failed to instance power");
                 }
             }
         return null;
@@ -212,13 +212,13 @@ public class ElitePower {
         return this.cooldown;
     }
 
-    public boolean isInCooldown(EliteMobEntity eliteMobEntity) {
-        return this.powerCooldownActive || eliteMobEntity.isCooldown();
+    public boolean isInCooldown(EliteEntity eliteEntity) {
+        return this.powerCooldownActive || eliteEntity.isCooldown();
     }
 
-    public void doCooldown(EliteMobEntity eliteMobEntity) {
+    public void doCooldown(EliteEntity eliteEntity) {
         this.powerCooldownActive = true;
-        eliteMobEntity.doGlobalPowerCooldown(globalCooldownTime * 20);
+        eliteEntity.doGlobalPowerCooldown(globalCooldownTime * 20);
 
         new BukkitRunnable() {
             @Override
@@ -233,9 +233,9 @@ public class ElitePower {
         this.cooldown = cooldown;
     }
 
-    protected void doGlobalCooldown(int ticks, EliteMobEntity eliteMobEntity) {
+    protected void doGlobalCooldown(int ticks, EliteEntity eliteEntity) {
         setGlobalCooldownTime(true);
-        eliteMobEntity.doCooldown();
+        eliteEntity.doCooldown();
         new BukkitRunnable() {
             @Override
             public void run() {

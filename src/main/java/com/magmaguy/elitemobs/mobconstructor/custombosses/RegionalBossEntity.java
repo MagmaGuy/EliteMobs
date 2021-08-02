@@ -1,208 +1,204 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.NewMinidungeonRelativeBossLocationEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
-public class RegionalBossEntity implements SimplePersistentEntityInterface {
+public class RegionalBossEntity extends CustomBossEntity implements SimplePersistentEntityInterface {
 
-    private static final HashSet<RegionalBossEntity> regionalBossEntityList = new HashSet();
+    private static final HashSet<RegionalBossEntity> regionalBosses = new HashSet();
+    private static ArrayListMultimap<CustomBossesConfigFields, RegionalBossEntity> regionalBossesFromConfigFields = ArrayListMultimap.create();
+    private final double leashRadius;
+    //Format: worldName,x,y,z,pitch,yaw:unixTimeForRespawn
+    private String rawString;
+    private String rawLocationString;
+    private long ticksBeforeRespawn = 0;
+    private long unixRespawnTime;
+    private int respawnCoolDownInMinutes = 0;
+    private boolean isRespawning = false;
+    private BukkitTask leashTask;
 
-    public static HashSet<RegionalBossEntity> getRegionalBossEntitySet() {
-        return regionalBossEntityList;
+    public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
+        super(customBossesConfigFields);
+        this.rawString = rawString;
+        this.rawLocationString = rawString.split(":")[0];
+        this.respawnCoolDownInMinutes = customBossesConfigFields.getSpawnCooldown();
+        this.leashRadius = customBossesConfigFields.getLeashRadius();
+
+        regionalBossesFromConfigFields.put(customBossesConfigFields, this);
+
+        unixRespawnTime = 0;
+        if (rawString.contains(":"))
+            unixRespawnTime = Long.parseLong(rawString.split(":")[1]);
+        ticksBeforeRespawn = 0;
+        if (unixRespawnTime > 0)
+            ticksBeforeRespawn = (unixRespawnTime - System.currentTimeMillis()) / 1000 * 20 < 0 ?
+                    0 : (unixRespawnTime - System.currentTimeMillis()) / 1000 * 20;
+        super.worldName = rawLocationString.split(",")[0];
+        super.spawnLocation = ConfigurationLocation.deserialize(rawLocationString);
     }
 
-    private final AbstractRegionalEntity abstractRegionalEntity;
-    private final CustomBossConfigFields customBossConfigFields;
-    private double leashRadius;
-    private final int ticksBeforeUnixTime;
-    private final int spawnCooldownInMinutes;
-    public Location spawnLocation;
-    private boolean isRespawning;
-    public CustomBossEntity customBossEntity;
-
-    public RegionalBossEntity(AbstractRegionalEntity abstractRegionalEntity) {
-        this.abstractRegionalEntity = abstractRegionalEntity;
-        this.customBossConfigFields = abstractRegionalEntity.customBossConfigFields;
-        this.leashRadius = customBossConfigFields.getLeashRadius();
-        this.ticksBeforeUnixTime = (int) abstractRegionalEntity.getTicksBeforeRespawn();
-        this.spawnLocation = abstractRegionalEntity.getSpawnLocation();
-        this.spawnCooldownInMinutes = customBossConfigFields.getSpawnCooldown();
-
-        regionalBossEntityList.add(this);
-
-        if (abstractRegionalEntity.isWorldIsLoaded())
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    spawnRegionalBoss();
-                }
-            }.runTaskLater(MetadataHandler.PLUGIN, ticksBeforeUnixTime);
+    public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location) {
+        super(customBossesConfigFields);
+        super.spawnLocation = location;
+        this.leashRadius = customBossesConfigFields.getLeashRadius();
     }
 
-    private  CustomBossEntity summoningEntity;
-    public RegionalBossEntity(AbstractRegionalEntity abstractRegionalEntity, CustomBossEntity summoningEntity) {
-        this.abstractRegionalEntity = abstractRegionalEntity;
-        this.customBossConfigFields = abstractRegionalEntity.customBossConfigFields;
-        this.leashRadius = customBossConfigFields.getLeashRadius();
-        this.ticksBeforeUnixTime = (int) abstractRegionalEntity.getTicksBeforeRespawn();
-        this.spawnLocation = abstractRegionalEntity.getSpawnLocation();
-        this.spawnCooldownInMinutes = customBossConfigFields.getSpawnCooldown();
-
-        regionalBossEntityList.add(this);
-
-        if (abstractRegionalEntity.isWorldIsLoaded())
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    spawnRegionalBoss();
-                }
-            }.runTaskLater(MetadataHandler.PLUGIN, ticksBeforeUnixTime);
-
-        this.summoningEntity = summoningEntity;
-    }
-
-    public void spawnRegionalBoss() {
-        this.customBossEntity = CustomBossEntity.constructCustomBoss(
-                customBossConfigFields,
-                spawnLocation,
-                customBossConfigFields.getLevel(),
-                this,
-                false);
-
-        //todo: test this in intentionally protected areas
-        if (this.customBossEntity == null || customBossEntity.getLivingEntity() == null) {
-            new WarningMessage("Regional boss " + customBossConfigFields.getFile().getName() +
-                    " failed to spawn in location " + spawnLocation.toString() + " ! Does the region prevent mobs" +
-                    " from spawning?");
-            return;
-        }
-
-        //Warn admins about bad spawn location
-        if (!spawnLocation.getBlock().isPassable())
-            new WarningMessage("Warning: Location " + abstractRegionalEntity.getRawString() + " for boss " +
-                    customBossConfigFields.getFileName() + " seems to be inside of a solid block!");
-
-        this.customBossEntity.regionalBossEntity = this;
-
-        checkLeash();
-        customBossEntity.getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
-        customBossEntity.setIsRegionalBoss(true);
-        if (summoningEntity != null)
-            summoningEntity.eliteReinforcementEntities.add(customBossEntity);
-
-    }
-
-    private final RegionalBossEntity regionalBossEntity = this;
-
-    public void respawnRegionalBoss() {
-        if (isRespawning) return;
-        isRespawning = true;
-
+    public static void regionalDataSaver() {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!regionalBossEntityList.contains(regionalBossEntity)) {
-                    cancel();
-                    return;
-                }
-                spawnRegionalBoss();
-                checkLeash();
-                isRespawning = false;
+                save();
             }
+        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
+    }
 
-        }.runTaskLater(MetadataHandler.PLUGIN, spawnCooldownInMinutes * 20 * 60);
-        //commit to the configs
-        abstractRegionalEntity.updateTicksBeforeRespawn();
+    public static void save() {
+        for (CustomBossesConfigFields customBossesConfigFields : regionalBossesFromConfigFields.keySet()) {
+            if (!customBossesConfigFields.isFilesOutOfSync()) continue;
+            customBossesConfigFields.setFilesOutOfSync(false);
+            List<String> spawnLocations = new ArrayList<>();
+            for (RegionalBossEntity regionalBossEntity : regionalBossesFromConfigFields.get(customBossesConfigFields))
+                spawnLocations.add(regionalBossEntity.rawString);
+            customBossesConfigFields.getFileConfiguration().set("spawnLocations", spawnLocations);
+            try {
+                customBossesConfigFields.getFileConfiguration().save(customBossesConfigFields.getFile());
+            } catch (Exception ex) {
+                new WarningMessage("Failed to save respawn timer for " + customBossesConfigFields.getFileConfiguration().getName() + " !");
+            }
+        }
+    }
+
+    public static RegionalBossEntity getRegionalBoss(CustomBossesConfigFields customBossesConfigFields, Location spawnLocation) {
+        for (RegionalBossEntity regionalBossEntity : regionalBossesFromConfigFields.get(customBossesConfigFields))
+            if (regionalBossEntity.getSpawnLocation() == spawnLocation)
+                return regionalBossEntity;
+        return null;
+    }
+
+    public static HashSet<RegionalBossEntity> getRegionalBossEntitySet() {
+        return regionalBosses;
+    }
+
+    @Nullable
+    public static RegionalBossEntity createRegionalBossEntity(String filename, Location spawnLocation) {
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(filename);
+        if (customBossesConfigFields == null)
+            return null;
+        return new RegionalBossEntity(customBossesConfigFields, spawnLocation);
     }
 
     public boolean isRespawning() {
         return isRespawning;
     }
 
-    public void setLeashRadius(double leashRadius) {
-        this.leashRadius = leashRadius;
+    public void saveNewLocation() {
+        customBossesConfigFields.setFilesOutOfSync(true);
     }
 
-    private BukkitTask leashTask;
+    public void initialize() {
+        if (spawnLocation == null) {
+            new WarningMessage("Spawn location for regional boss" + getCustomBossesConfigFields().getFilename() + " was null!");
+            if (rawLocationString != null)
+                new WarningMessage("Problematic entry: " + rawLocationString);
+            return;
+        }
+        if (spawnLocation.getWorld() == null) return;
+        queueSpawn(false);
+    }
 
-    private void checkLeash() {
+    public void queueSpawn(boolean silent) {
+        RegionalBossEntity regionalBossEntity = this;
+        this.isRespawning = true;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
+            ticksBeforeRespawn = 0;
+            //Reminder: this might not spawn a living entity as it gets queued for when the chunk loads
+            regionalBossEntity.spawn(silent);
+        }, ticksBeforeRespawn);
+    }
 
+    public void respawn() {
+        this.isRespawning = true;
+        if (super.phaseBossEntity != null)
+            super.phaseBossEntity.deathReset();
+        unixRespawnTime = (respawnCoolDownInMinutes * 60L * 1000L) + System.currentTimeMillis();
+        ticksBeforeRespawn = respawnCoolDownInMinutes * 60L * 20L;
+        rawString = rawLocationString + unixRespawnTime;
+        customBossesConfigFields.setFilesOutOfSync(true);
+        queueSpawn(false);
+    }
+
+    public void checkLeash() {
         if (leashRadius < 1)
             return;
-
-        leashTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                try {
-                    if (customBossEntity == null ||
-                            customBossEntity.getLivingEntity() == null ||
-                            !customBossEntity.getLivingEntity().isValid()) {
-                        cancel();
-                        return;
-                    }
-                    if (customBossEntity.getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius, 2))
-                        SpiritWalk.spiritWalkRegionalBossAnimation(customBossEntity, customBossEntity.getLivingEntity().getLocation(), spawnLocation);
-                } catch (Exception ex) {
-                    new WarningMessage("Async leash task errored!");
+        RegionalBossEntity regionalBossEntity = this;
+        leashTask = Bukkit.getScheduler().runTaskTimerAsynchronously(MetadataHandler.PLUGIN, () -> {
+            try {
+                if (getLivingEntity() == null ||
+                        !getLivingEntity().isValid()) {
+                    leashTask.cancel();
+                    return;
                 }
+                if (getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius, 2))
+                    SpiritWalk.spiritWalkRegionalBossAnimation(regionalBossEntity, getLivingEntity().getLocation(), spawnLocation);
+
+            } catch (Exception ex) {
+                new WarningMessage("Async leash task errored!");
             }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 3, 20 * 3);
-
+        }, 20 * 3, 20 * 3);
     }
 
-    /**
-     * Gets rid of repeating tasks that would cause issues if the custom boss ceases to be valid during runtime
-     */
-    public void removeTemporarily() {
+    public void setLeashRadius(int leashRadius) {
+        getCustomBossesConfigFields().setLeashRadius(leashRadius);
+        getCustomBossesConfigFields().setFilesOutOfSync(true);
+    }
+
+    @Override
+    public void spawn(boolean silent) {
+        super.spawn(silent);
+        this.isRespawning = false;
+        checkLeash();
+    }
+
+    @Override
+    public void remove(RemovalReason removalReason) {
         if (leashTask != null)
             leashTask.cancel();
-    }
 
-    /**
-     * Gets rid of repeating tasks that would cause issues if the custom boss ceases to be valid during runtime
-     */
-    public void removeAsReinforcement() {
-        if (leashTask != null)
-            leashTask.cancel();
-        regionalBossEntityList.remove(this);
-    }
-
-    /**
-     * Permanently deletes this instance of the regional boss from the config files
-     */
-    public void removePermanently() {
-        if (customBossEntity != null)
-            customBossEntity.remove(true);
-        regionalBossEntityList.remove(this);
-        abstractRegionalEntity.remove();
-    }
-
-    /**
-     * Returns the name of the world the boss is meant to spawn in. Used for checking if the boss should spawn when a world loads.
-     *
-     * @return The name of the world the boss is meant to spawn in.
-     */
-    public String getSpawnWorldName() {
-        return abstractRegionalEntity.getWorldName();
-    }
-
-    public CustomBossConfigFields getCustomBossConfigFields() {
-        return customBossConfigFields;
+        super.remove(removalReason);
+        if (customBossesConfigFields.isReinforcement()) {
+            regionalBosses.remove(this);
+        }
+        switch (removalReason) {
+            case REMOVE_COMMAND:
+                regionalBosses.remove(this);
+                //todo: permanent removal logic goes here
+                regionalBossesFromConfigFields.remove(customBossesConfigFields, this);
+                break;
+            case DEATH:
+            case BOSS_TIMEOUT: {
+                new WarningMessage("respawn was scheduled due to " + removalReason);
+                respawn();
+            }
+        }
     }
 
     /**
@@ -210,6 +206,7 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
      */
     @Override
     public void chunkLoad() {
+        super.chunkLoad();
         checkLeash();
     }
 
@@ -218,35 +215,33 @@ public class RegionalBossEntity implements SimplePersistentEntityInterface {
      */
     @Override
     public void chunkUnload() {
-        removeTemporarily();
+        super.chunkUnload();
+        //leash is already handled in softRemove()
     }
 
     /**
      * Runs on world load. Starts a new instance of the boss in-game that was previously cached in an unloaded world.
      * This is the primary means of regional boss loading for world-based minidungeons in the dungeon packager.
      */
+    @Override
     public void worldLoad() {
-        abstractRegionalEntity.setSpawnLocation();
-        spawnRegionalBoss();
+        super.worldLoad();
     }
 
     /**
      * Runs on world unload. Removes this instance of the boss in-game.
      * This is the primary means of removing regional bosses when a world-based minidungeons is uninstalled via the dungeon packager
      */
+    @Override
     public void worldUnload() {
-        spawnLocation = null;
-        abstractRegionalEntity.setWorldIsLoaded(false);
-        abstractRegionalEntity.setSpawnLocation(null);
-        removeTemporarily();
-        EntityTracker.unregister(customBossEntity.uuid, RemovalReason.WORLD_UNLOAD);
-        customBossEntity.remove(true);
+        super.worldUnload();
     }
 
     public static class RegionalBossEntityEvents implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void onNewMinidungeonRelativeBossLocationEvent(NewMinidungeonRelativeBossLocationEvent event) {
-            new AbstractRegionalEntity(event.getRealLocation(), event.getCustomBossConfigFields());
+            new RegionalBossEntity(event.getCustomBossConfigFields(), ConfigurationLocation.serialize(event.getRealLocation()));
+            event.getCustomBossConfigFields().setFilesOutOfSync(true);
         }
     }
 

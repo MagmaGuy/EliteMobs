@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.powerstances;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
@@ -15,28 +15,28 @@ public class VisualItemProcessor {
     private final boolean hasValidEffect;
 
     public VisualItemProcessor(Object[][] multiDimensionalTrailTracker, Vector[][] cachedVectorPositions,
-                               boolean visualEffectBoolean, int pointsPerRotation, EliteMobEntity eliteMobEntity) {
+                               boolean visualEffectBoolean, int pointsPerRotation, EliteEntity eliteEntity) {
 
         this.hasValidEffect = visualEffectBoolean;
         if (multiDimensionalTrailTracker.length < 1)
             return;
 
-        rotateExistingEffects(multiDimensionalTrailTracker, cachedVectorPositions, pointsPerRotation, eliteMobEntity);
+        rotateExistingEffects(multiDimensionalTrailTracker, cachedVectorPositions, pointsPerRotation, eliteEntity);
 
     }
 
     private void rotateExistingEffects(Object[][] multiDimensionalTrailTracker, Vector[][] cachedVectorPositions,
-                                       int pointsPerRotation, EliteMobEntity eliteMobEntity) {
+                                       int pointsPerRotation, EliteEntity eliteEntity) {
 
         new BukkitRunnable() {
 
             int counter = 0;
-            final boolean isObfuscated = eliteMobEntity.getHasVisualEffectObfuscated();
+            final boolean isObfuscated = eliteEntity.getHasVisualEffectObfuscated();
 
             @Override
             public void run() {
 
-                if (!eliteMobEntity.getLivingEntity().isValid() || !hasValidEffect) {
+                if (!eliteEntity.getLivingEntity().isValid() || !hasValidEffect) {
                     VisualItemRemover.removeItems(multiDimensionalTrailTracker);
                     cancel();
                     return;
@@ -55,10 +55,10 @@ public class VisualItemProcessor {
                         Vector vector = cachedVectorPositions[i][adjustedEffectPositionInRotation];
 
                         if (multiDimensionalTrailTracker[i][j] instanceof Item)
-                            rotateItem(multiDimensionalTrailTracker[i][j], vector, eliteMobEntity);
+                            rotateItem(multiDimensionalTrailTracker[i][j], vector, eliteEntity);
 
                         if (multiDimensionalTrailTracker[i][j] instanceof Particle)
-                            rotateParticle(multiDimensionalTrailTracker[i][j], vector, eliteMobEntity);
+                            rotateParticle(multiDimensionalTrailTracker[i][j], vector, eliteEntity);
 
                         sectionCounter++;
                         if (sectionCounter >= pointsPerRotation)
@@ -76,20 +76,20 @@ public class VisualItemProcessor {
                 /*
                 Check if the effect has ceased being obfuscated
                  */
-                if (isObfuscated != eliteMobEntity.getHasVisualEffectObfuscated()){
+                if (isObfuscated != eliteEntity.getHasVisualEffectObfuscated()){
                     VisualItemRemover.removeItems(multiDimensionalTrailTracker);
                     cancel();
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            eliteMobEntity.setHasVisualEffectObfuscated(false);
+                            eliteEntity.setHasVisualEffectObfuscated(false);
                             if (Arrays.deepEquals(cachedVectorPositions, MinorPowerStanceMath.cachedVectors)) {
-                                eliteMobEntity.setHasMinorVisualEffect(false);
-                                new MinorPowerPowerStance(eliteMobEntity);
+                                eliteEntity.setHasMinorVisualEffect(false);
+                                new MinorPowerPowerStance(eliteEntity);
                             }
                             if (Arrays.deepEquals(cachedVectorPositions, MajorPowerStanceMath.cachedVectors)) {
-                                eliteMobEntity.setHasMajorVisualEffect(false);
-                                new MajorPowerPowerStance(eliteMobEntity);
+                                eliteEntity.setHasMajorVisualEffect(false);
+                                new MajorPowerPowerStance(eliteEntity);
                             }
                         }
                     }.runTask(MetadataHandler.PLUGIN);
@@ -113,7 +113,7 @@ public class VisualItemProcessor {
         return location;
     }
 
-    private void rotateItem(Object itemObject, Vector vector, EliteMobEntity eliteMobEntity) {
+    private void rotateItem(Object itemObject, Vector vector, EliteEntity eliteEntity) {
 
         Item item = (Item) itemObject;
 
@@ -121,7 +121,7 @@ public class VisualItemProcessor {
 //            return;
 
         Location currentLocation = item.getLocation().clone();
-        Location newLocation = eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 1, 0)).add(vector);
+        Location newLocation = eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 1, 0)).add(vector);
 
 //        if (currentLocation.distanceSquared(newLocation) > Math.pow(3, 2)) {
 //            item.teleport(newLocation);
@@ -140,10 +140,10 @@ public class VisualItemProcessor {
 
     }
 
-    private void rotateParticle(Object particleObject, Vector vector, EliteMobEntity eliteMobEntity) {
+    private void rotateParticle(Object particleObject, Vector vector, EliteEntity eliteEntity) {
         Particle particle = (Particle) particleObject;
-        eliteMobEntity.getLivingEntity().getWorld().spawnParticle(
-                particle, eliteMobEntity.getLivingEntity().getLocation().add(0, 1, 0).add(vector),
+        eliteEntity.getLivingEntity().getWorld().spawnParticle(
+                particle, eliteEntity.getLivingEntity().getLocation().add(0, 1, 0).add(vector),
                 1, 0, 0, 0, 0.01);
     }
 

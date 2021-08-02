@@ -225,9 +225,9 @@ public class UserCommands {
                 .senderType(Player.class)
                 .handler(commandContext -> {
                     try {
-                        for (CustomBossEntity customBossEntity : CustomBossEntity.trackableCustomBosses)
-                            if (customBossEntity.uuid.equals(UUID.fromString(commandContext.get("uuid")))) {
-                                customBossEntity.startBossBarTask((Player) commandContext.getSender(), true);
+                        for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses())
+                            if (customBossEntity.getEliteUUID().equals(UUID.fromString(commandContext.get("uuid")))) {
+                                customBossEntity.getCustomBossBossBar().addTrackingPlayer((Player) commandContext.getSender());
                                 return;
                             }
                         commandContext.getSender().sendMessage("[EliteMobs] Sorry, this boss is already gone!");

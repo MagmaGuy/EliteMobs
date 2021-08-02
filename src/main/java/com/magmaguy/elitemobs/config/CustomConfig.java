@@ -1,14 +1,14 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfigFields;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class CustomConfig {
 
-    public HashMap<String, CustomConfigFields> getCustomConfigFieldsHashMap() {
+    public HashMap<String, ? extends CustomConfigFields> getCustomConfigFieldsHashMap() {
         return customConfigFieldsHashMap;
     }
 
@@ -29,7 +29,7 @@ public class CustomConfig {
      * @param filename           Name of the file , using the format filename.yml
      * @param customConfigFields Custom Config Fields, should be from an extended subclass
      */
-    public void addCustomConfigFields(String filename, CustomConfigFields customConfigFields) {
+    public <V extends CustomConfigFields> void addCustomConfigFields(String filename, CustomConfigFields customConfigFields) {
         customConfigFieldsHashMap.put(filename, customConfigFields);
     }
 
@@ -37,44 +37,54 @@ public class CustomConfig {
     private final HashMap<String, CustomConfigFields> customConfigFieldsHashMap = new HashMap<>();
 
     //This is only used for loading configurations in to check if the machine has all of the default files
-    private ArrayList<CustomConfigFields> customConfigFieldsArrayList = new ArrayList<>();
+    private ArrayList customConfigFieldsArrayList = new ArrayList<>();
 
-    private String path;
+    private String folderName;
+
+    private Class<? extends CustomConfigFields> customConfigFields;
 
     /**
-     * Initializes all configurations and stores them in a static list for later access
+     * Initializes all configurations and stores them in a list for later access
      */
-    public CustomConfig(String path, String packageName) {
-        this.path = path;
+    public CustomConfig(String folderName, String packageName, String customConfigFieldsClassName) {
+        this.folderName = folderName;
+
+        try {
+            customConfigFields = (Class<? extends CustomConfigFields>) Class.forName(packageName.replace("premade", customConfigFieldsClassName));
+        } catch (Exception ex) {
+            new WarningMessage("Messed up the class name for " + customConfigFieldsClassName);
+            ex.printStackTrace();
+            return;
+        }
 
         //Set defaults through reflections by getting everything that extends specific CustomConfigFields within specific package scopes
-        Reflections reflections = new Reflections(packageName, new SubTypesScanner(false));
+        Reflections reflections = new Reflections(packageName);
 
-        Set<Class> classSet = new HashSet<>(reflections.getSubTypesOf(CustomSpawnConfigFields.class));
+        Set<Class> classSet = new HashSet<>(reflections.getSubTypesOf(customConfigFields));
         classSet.forEach(aClass -> {
             try {
-                customConfigFieldsArrayList.add((CustomConfigFields) aClass.newInstance());
+                customConfigFieldsArrayList.add(aClass.newInstance());
             } catch (Exception ex) {
-                new WarningMessage("Failed to generate plugin default classes for " + path + " ! This is very bad, warn the developer!");
+                new WarningMessage("Failed to generate plugin default classes for " + folderName + " ! This is very bad, warn the developer!");
                 ex.printStackTrace();
             }
         });
 
         //Check if the directory doesn't exist
         try {
-            if (!Files.isDirectory(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getPath() + path))) {
+            if (!Files.isDirectory(Paths.get(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + folderName))) {
                 generateFreshConfigurations();
                 return;
             }
         } catch (Exception ex) {
-            new WarningMessage("Failed to generate plugin default files for " + path + " ! This is very bad, warn the developer!");
+            new WarningMessage("Failed to generate plugin default files for " + folderName + " ! This is very bad, warn the developer!");
             ex.printStackTrace();
             return;
         }
 
         //Runs if the directory exists
         //Check if all the defaults exist
-        for (File file : (new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + path)).listFiles()) {
+        for (File file : (new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + folderName)).listFiles()) {
             try {
                 boolean isPremade = false;
                 for (Object object : customConfigFieldsArrayList) {
@@ -89,7 +99,7 @@ public class CustomConfig {
                 if (!isPremade)
                     initialize(file);
             } catch (Exception ex) {
-                new WarningMessage("Failed to read plugin files for " + path + " ! This is very bad, warn the developer!");
+                new WarningMessage("Failed to read plugin files for " + folderName + " ! This is very bad, warn the developer!");
                 ex.printStackTrace();
                 return;
             }
@@ -100,7 +110,7 @@ public class CustomConfig {
             if (!customConfigFieldsArrayList.isEmpty())
                 generateFreshConfigurations();
         } catch (Exception ex) {
-            new WarningMessage("Failed to finish generating default plugin files for " + path + " ! This is very bad, warn the developer!");
+            new WarningMessage("Failed to finish generating default plugin files for " + folderName + " ! This is very bad, warn the developer!");
             ex.printStackTrace();
             return;
         }
@@ -111,35 +121,35 @@ public class CustomConfig {
      * Called when the appropriate configurations directory does not exist
      */
     private void generateFreshConfigurations() {
-        for (CustomConfigFields customConfigFields : customConfigFieldsArrayList)
-            initialize(customConfigFields);
+        for (Object customConfigFields : customConfigFieldsArrayList)
+            initialize((CustomConfigFields) customConfigFields);
     }
 
     /**
-     * Initializes a single instance of a premade configuration using the default values.
+     * Initializes a single instance of a premade configuration using the default values. Writes defaults.
      */
     private void initialize(CustomConfigFields customConfigFields) {
         //Create configuration file from defaults if it does not exist
-        File file = ConfigurationEngine.fileCreator(path, customConfigFields.getFilename());
+        File file = ConfigurationEngine.fileCreator(folderName, customConfigFields.getFilename());
+
+        new DeveloperMessage("Initializing default file " + file.getName());
         //Get config file
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
         //Generate config defaults
         customConfigFields.generateConfigDefaults(fileConfiguration, file);
 
-        //todo: remove the commented line below
-        //customConfigFields.generateConfigDefaults(fileConfiguration, file);
-
         //Save all configuration values as they exist
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
         //Associate config
-        customConfigFields.setCustomConfig(this);
         customConfigFields.setFile(file);
         customConfigFields.setFileConfiguration(fileConfiguration);
-        addCustomConfigFields(customConfigFields.getFilename(), customConfigFields);
 
         //Parse actual fields and load into RAM to be used
-        customConfigFields.processCustomSpawnConfigFields();
+        customConfigFields.processConfigFields();
+
+        //Store for use by the plugin
+        addCustomConfigFields(file.getName(), customConfigFields);
     }
 
     /**
@@ -148,9 +158,23 @@ public class CustomConfig {
     private void initialize(File file) {
         //Load file configuration from file
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
+        new DeveloperMessage("Initializing custom file : " + file.getName());
 
-        //Parse actual fields and load into RAM to be used
-        new CustomConfigFields(this, fileConfiguration, file);
+        try {
+            //Instantiate the correct CustomConfigFields instance
+            Constructor<?> constructor = customConfigFields.getConstructor(String.class, boolean.class);
+            CustomConfigFields instancedCustomConfigFields = (CustomConfigFields) constructor.newInstance(file.getName(), true);
+            instancedCustomConfigFields.setFileConfiguration(fileConfiguration);
+            instancedCustomConfigFields.setFile(file);
+            //Parse actual fields and load into RAM to be used
+            instancedCustomConfigFields.processConfigFields();
+            //Store for use by the plugin
+            addCustomConfigFields(file.getName(), instancedCustomConfigFields);
+        } catch (Exception ex) {
+            new WarningMessage("Bad constructor");
+            ex.printStackTrace();
+        }
+
     }
 
 }

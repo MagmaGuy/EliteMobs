@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.majorpowers.enderdragon;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.EnderDragonPhaseSimplifier;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -26,21 +26,21 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
     }
 
     @Override
-    protected void finishActivation(EliteMobEntity eliteMobEntity) {
+    protected void finishActivation(EliteEntity eliteEntity) {
         super.bukkitTask = new BukkitRunnable() {
 
             @Override
             public void run() {
-                if (doExit(eliteMobEntity) || isInCooldown(eliteMobEntity)) {
+                if (doExit(eliteEntity) || isInCooldown(eliteEntity)) {
                     return;
                 }
 
-                if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
-                    EnderDragon.Phase phase = ((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase();
+                if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
+                    EnderDragon.Phase phase = ((EnderDragon) eliteEntity.getLivingEntity()).getPhase();
                     if (!EnderDragonPhaseSimplifier.isLanded(phase)) return;
                 }
 
-                doPower(eliteMobEntity);
+                doPower(eliteEntity);
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 10);
@@ -49,24 +49,24 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
     private Location tornadoEye = null;
     private Vector tornadoSpeed = null;
 
-    private void doPower(EliteMobEntity eliteMobEntity) {
-        doCooldown(eliteMobEntity);
+    private void doPower(EliteEntity eliteEntity) {
+        doCooldown(eliteEntity);
 
-        tornadoEye = eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(6, -6, 0))
+        tornadoEye = eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(6, -6, 0))
                 .toVector().rotateAroundY(ThreadLocalRandom.current().nextDouble(0, 2 * Math.PI))
-                .toLocation(eliteMobEntity.getLivingEntity().getWorld());
+                .toLocation(eliteEntity.getLivingEntity().getWorld());
 
-        tornadoSpeed = tornadoEye.clone().subtract(eliteMobEntity.getLivingEntity().getLocation()).toVector().setY(0).normalize().multiply(0.2);
+        tornadoSpeed = tornadoEye.clone().subtract(eliteEntity.getLivingEntity().getLocation()).toVector().setY(0).normalize().multiply(0.2);
         new BukkitRunnable() {
             int counter = 0;
 
             @Override
             public void run() {
 
-                if (eliteMobEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
-                    ((EnderDragon) eliteMobEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
+                if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
+                    ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
 
-                if (doExit(eliteMobEntity) || !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteMobEntity.getLivingEntity()).getPhase())) {
+                if (doExit(eliteEntity) || !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteEntity.getLivingEntity()).getPhase())) {
                     cancel();
                     return;
                 }
@@ -75,7 +75,7 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
 
                 if (counter % 2 == 0) {
                     doTornadoParticles();
-                    doTerrainDestruction(eliteMobEntity);
+                    doTerrainDestruction(eliteEntity);
                     doEntityDisplacement();
                 }
 
@@ -101,7 +101,7 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
             }
     }
 
-    private void doTerrainDestruction(EliteMobEntity eliteMobEntity) {
+    private void doTerrainDestruction(EliteEntity eliteEntity) {
         List<Block> blockList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             Location location = tornadoEye.clone().add(new Vector(
@@ -113,7 +113,7 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
             if (block.getLocation().getY() != -1)
                 blockList.add(block);
         }
-        Explosion.generateFakeExplosion(blockList, eliteMobEntity.getLivingEntity(), this, tornadoEye.clone());
+        Explosion.generateFakeExplosion(blockList, eliteEntity.getLivingEntity(), this, tornadoEye.clone());
     }
 
     private void doEntityDisplacement() {
@@ -127,7 +127,7 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
     }
 
     @Override
-    protected void finishDeactivation(EliteMobEntity eliteMobEntity) {
+    protected void finishDeactivation(EliteEntity eliteEntity) {
 
     }
 

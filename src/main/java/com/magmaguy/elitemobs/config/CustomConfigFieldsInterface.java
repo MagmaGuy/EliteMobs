@@ -6,5 +6,5 @@ import java.io.File;
 
 public interface CustomConfigFieldsInterface {
      void generateConfigDefaults(FileConfiguration fileConfiguration, File file);
-     void processCustomSpawnConfigFields();
+     void processConfigFields();
 }

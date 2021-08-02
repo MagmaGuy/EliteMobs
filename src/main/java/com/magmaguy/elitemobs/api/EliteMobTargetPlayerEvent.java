@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -16,13 +16,13 @@ public class EliteMobTargetPlayerEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
-    private final EliteMobEntity eliteMobEntity;
+    private final EliteEntity eliteEntity;
     private final Player player;
     private final EntityTargetLivingEntityEvent entityTargetLivingEntityEvent;
 
-    public EliteMobTargetPlayerEvent(EliteMobEntity eliteMobEntity, Player player, EntityTargetLivingEntityEvent event) {
+    public EliteMobTargetPlayerEvent(EliteEntity eliteEntity, Player player, EntityTargetLivingEntityEvent event) {
         this.entity = event.getEntity();
-        this.eliteMobEntity = eliteMobEntity;
+        this.eliteEntity = eliteEntity;
         this.player = player;
         this.entityTargetLivingEntityEvent = event;
     }
@@ -31,8 +31,8 @@ public class EliteMobTargetPlayerEvent extends Event {
         return this.entity;
     }
 
-    public EliteMobEntity getEliteMobEntity() {
-        return this.eliteMobEntity;
+    public EliteEntity getEliteMobEntity() {
+        return this.eliteEntity;
     }
 
     public Player getPlayer() {
@@ -57,11 +57,11 @@ public class EliteMobTargetPlayerEvent extends Event {
         public void onMobTarget(EntityTargetLivingEntityEvent event) {
             if (!(event.getTarget() instanceof Player)) return;
             Player player = (Player) event.getTarget();
-            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteMobEntity == null) return;
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+            if (eliteEntity == null) return;
 
             if (player.getGameMode().equals(GameMode.ADVENTURE) || player.getGameMode().equals(GameMode.SURVIVAL))
-                Bukkit.getServer().getPluginManager().callEvent(new EliteMobTargetPlayerEvent(eliteMobEntity, player, event));
+                Bukkit.getServer().getPluginManager().callEvent(new EliteMobTargetPlayerEvent(eliteEntity, player, event));
         }
     }
 

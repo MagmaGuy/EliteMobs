@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -8,10 +8,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class TreasureGoblinConfig extends CustomBossConfigFields {
+public class TreasureGoblinConfig extends CustomBossesConfigFields {
     public TreasureGoblinConfig() {
         super("treasure_goblin",
-                EntityType.ZOMBIE.toString(),
+                EntityType.ZOMBIE,
                 true,
                 "$eventBossLevel &eTreasure Goblin",
                 "dynamic");
@@ -37,5 +37,6 @@ public class TreasureGoblinConfig extends CustomBossConfigFields {
         setLocationMessage("&cTreasure Goblin: $distance blocks away!");
         setTrails(Collections.singletonList(Material.GOLD_NUGGET.toString()));
         setAnnouncementPriority(2);
+        setPersistent(true);
     }
 }

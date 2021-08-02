@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -15,13 +15,13 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
-    private final EliteMobEntity eliteMobEntity;
+    private final EliteEntity eliteEntity;
     private boolean isCancelled = false;
     private final EntityDamageEvent entityDamageEvent;
 
-    public EliteMobDamagedEvent(EliteMobEntity eliteMobEntity, EntityDamageEvent event) {
-        this.entity = eliteMobEntity.getLivingEntity();
-        this.eliteMobEntity = eliteMobEntity;
+    public EliteMobDamagedEvent(EliteEntity eliteEntity, EntityDamageEvent event) {
+        this.entity = eliteEntity.getLivingEntity();
+        this.eliteEntity = eliteEntity;
         this.entityDamageEvent = event;
     }
 
@@ -29,8 +29,8 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
         return entity;
     }
 
-    public EliteMobEntity getEliteMobEntity() {
-        return eliteMobEntity;
+    public EliteEntity getEliteMobEntity() {
+        return eliteEntity;
     }
 
     public EntityDamageEvent getEntityDamageEvent() {
@@ -64,20 +64,20 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
         public void onEntityDamageByEntityEvent(EntityDamageEvent event) {
 
             if (event.isCancelled()) return;
-            EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteMobEntity == null) return;
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+            if (eliteEntity == null) return;
 
-            EliteMobDamagedEvent eliteMobDamagedEvent = new EliteMobDamagedEvent(eliteMobEntity, event);
+            EliteMobDamagedEvent eliteMobDamagedEvent = new EliteMobDamagedEvent(eliteEntity, event);
             new EventCaller(eliteMobDamagedEvent);
             if (eliteMobDamagedEvent.isCancelled) {
                 eliteMobDamagedEvent.setCancelled(true);
                 return;
             }
 
-            if (EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteMobEntity.getLivingEntity().getLocation(),
+            if (EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteEntity.getLivingEntity().getLocation(),
                     WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
                 return;
-            Bukkit.getServer().getPluginManager().callEvent(new GenericAntiExploitEvent(eliteMobEntity, event));
+            Bukkit.getServer().getPluginManager().callEvent(new GenericAntiExploitEvent(eliteEntity, event));
 
         }
 

@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import org.bukkit.Location;
@@ -37,11 +37,11 @@ public class ArrowFireworks extends MinorPower implements Listener {
 
     }
 
-    private static void doArrowFireworks(EliteMobEntity eliteMobEntity) {
+    private static void doArrowFireworks(EliteEntity eliteEntity) {
 
-        Location centeredLocation = eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 3, 0));
+        Location centeredLocation = eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 3, 0));
 
-        for (int x = 0; x < eliteMobEntity.getDamagers().size(); x++) {
+        for (int x = 0; x < eliteEntity.getDamagers().size(); x++) {
 
             Location newLocation = centeredLocation.clone();
 
@@ -58,7 +58,7 @@ public class ArrowFireworks extends MinorPower implements Listener {
             if (!validBlockFound) return;
 
             SpectralArrow rocketArrow = (SpectralArrow) newLocation.getWorld().spawnEntity(newLocation, EntityType.SPECTRAL_ARROW);
-            rocketArrow.setShooter(eliteMobEntity.getLivingEntity());
+            rocketArrow.setShooter(eliteEntity.getLivingEntity());
             rocketArrow.setVelocity(new Vector(0, 0.5, 0));
             rocketArrow.setGravity(false);
             rocketArrow.setGlowing(true);
@@ -68,7 +68,7 @@ public class ArrowFireworks extends MinorPower implements Listener {
 
                 @Override
                 public void run() {
-                    if (!rocketArrow.isValid() || eliteMobEntity.getLivingEntity().isDead()) {
+                    if (!rocketArrow.isValid() || eliteEntity.getLivingEntity().isDead()) {
                         cancel();
                         return;
                     }
@@ -81,7 +81,7 @@ public class ArrowFireworks extends MinorPower implements Listener {
                             Arrow fireworkArrow = (Arrow) rocketArrow.getWorld().spawnEntity(rocketArrow.getLocation(), EntityType.ARROW);
                             Vector randomizedDirection = new Vector((ThreadLocalRandom.current().nextDouble() - 0.5) * 2, (ThreadLocalRandom.current().nextDouble() - 0.5) * 2, (ThreadLocalRandom.current().nextDouble() - 0.5) * 2);
                             fireworkArrow.setVelocity(randomizedDirection);
-                            fireworkArrow.setShooter(eliteMobEntity.getLivingEntity());
+                            fireworkArrow.setShooter(eliteEntity.getLivingEntity());
                             fireworkArrow.setGlowing(true);
                         }
 

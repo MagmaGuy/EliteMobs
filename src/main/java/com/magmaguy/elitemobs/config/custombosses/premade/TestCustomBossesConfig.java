@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
@@ -9,10 +9,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class TestCustomBossConfig extends CustomBossConfigFields {
-    public TestCustomBossConfig() {
+public class TestCustomBossesConfig extends CustomBossesConfigFields {
+    public TestCustomBossesConfig() {
         super("test_boss",
-                EntityType.ZOMBIE.toString(),
+                EntityType.ZOMBIE,
                 true,
                 "$eventBossLevel &eTest boss",
                 "dynamic");

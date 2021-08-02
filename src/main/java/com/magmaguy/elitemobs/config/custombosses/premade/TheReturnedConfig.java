@@ -1,12 +1,12 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.entity.EntityType;
 
-public class TheReturnedConfig extends CustomBossConfigFields {
+public class TheReturnedConfig extends CustomBossesConfigFields {
     public TheReturnedConfig() {
         super("the_returned",
-                EntityType.HUSK.toString(),
+                EntityType.HUSK,
                 true,
                 "$reinforcementLevel &6The Returned",
                 "dynamic");

@@ -12,5 +12,7 @@ public class TreasureGoblinSpawn extends CustomSpawnConfigFields {
                 true);
         setSurfaceSpawn(true);
         setValidWorldTypes(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
+        setCanSpawnInLight(true);
+        setBypassWorldGuard(false);
     }
 }

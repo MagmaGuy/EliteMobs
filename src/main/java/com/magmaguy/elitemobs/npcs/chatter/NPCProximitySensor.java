@@ -29,11 +29,11 @@ public class NPCProximitySensor implements Listener {
 
                 for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
                     if (npcEntity.getVillager().isValid())
-                        for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getActivationRadius(),
-                                npcEntity.getActivationRadius(), npcEntity.getActivationRadius()))
+                        for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNpCsConfigFields().getActivationRadius(),
+                                npcEntity.getNpCsConfigFields().getActivationRadius(), npcEntity.getNpCsConfigFields().getActivationRadius()))
                             if (entity.getType().equals(EntityType.PLAYER)) {
                                 if (nearbyPlayers.contains(entity)) {
-                                    if (!npcEntity.getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
+                                    if (!npcEntity.getNpCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
                                         npcEntity.sayDialog((Player) entity);
                                     seenPlayerList.remove(entity);
                                     break;

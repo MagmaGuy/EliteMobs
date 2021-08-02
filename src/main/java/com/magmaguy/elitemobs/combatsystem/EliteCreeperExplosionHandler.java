@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.combatsystem;
 
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -29,7 +29,7 @@ public class EliteCreeperExplosionHandler implements Listener {
         for (PotionEffect potionEffect : ((Creeper) event.getEntity()).getActivePotionEffects())
             ((Creeper) event.getEntity()).removePotionEffect(potionEffect.getType());
 
-        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
 
         for (Entity entity : event.getEntity().getNearbyEntities(event.getRadius(), event.getRadius(), event.getRadius()))
             if (entity.getType().equals(EntityType.PLAYER)) {
@@ -46,11 +46,11 @@ public class EliteCreeperExplosionHandler implements Listener {
                             damageReduction += PlayerDamagedByEliteMobHandler.getDamageIncreasePercentage(enchantment, itemStack);
                 }
                 damageReduction += elitePlayerInventory.baseDamageReduction();
-                double finalDamage = eliteMobEntity.getTier() - damageReduction;
+                double finalDamage = eliteEntity.getLevel() - damageReduction;
                 finalDamage = finalDamage < 0 ? 0 : finalDamage;
-                player.damage(finalDamage, eliteMobEntity.getLivingEntity());
+                player.damage(finalDamage, eliteEntity.getLivingEntity());
             } else if (entity instanceof LivingEntity)
-                ((LivingEntity) entity).damage(eliteMobEntity.getTier());
+                ((LivingEntity) entity).damage(eliteEntity.getLevel());
 
     }
 

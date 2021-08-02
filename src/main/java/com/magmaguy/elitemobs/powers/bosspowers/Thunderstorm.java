@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -34,23 +34,23 @@ public class Thunderstorm extends BossPower implements Listener {
 
     }
 
-    public static void doThunderstorm(EliteMobEntity eliteMobEntity) {
-        if (eliteMobEntity == null || !eliteMobEntity.getLivingEntity().isValid()) return;
-        eliteMobEntity.getLivingEntity().setAI(false);
+    public static void doThunderstorm(EliteEntity eliteEntity) {
+        if (eliteEntity == null || !eliteEntity.getLivingEntity().isValid()) return;
+        eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             int counter = 0;
 
             @Override
             public void run() {
                 counter++;
-                if (counter > 20 * 5 || eliteMobEntity == null || !eliteMobEntity.getLivingEntity().isValid()) {
+                if (counter > 20 * 5 || eliteEntity == null || !eliteEntity.getLivingEntity().isValid()) {
                     cancel();
-                    eliteMobEntity.getLivingEntity().setAI(true);
+                    eliteEntity.getLivingEntity().setAI(true);
                     return;
                 }
 
                 if (counter % 2 == 0) {
-                    Location randomLocation = eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(
+                    Location randomLocation = eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(
                             ThreadLocalRandom.current().nextInt(-20, 20),
                             0,
                             ThreadLocalRandom.current().nextInt(-20, 20)));
@@ -59,7 +59,7 @@ public class Thunderstorm extends BossPower implements Listener {
 
 
                 if (counter % 20 == 0) {
-                    for (Entity entity : eliteMobEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
+                    for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
                         if (entity.getType().equals(EntityType.PLAYER))
                             lightningTask(entity.getLocation());
                 }

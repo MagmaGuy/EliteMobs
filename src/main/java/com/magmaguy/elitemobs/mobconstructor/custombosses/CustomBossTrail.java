@@ -32,8 +32,8 @@ public class CustomBossTrail {
 
     private void startBossTrails() {
         //todo: this is not good
-        if (customBossEntity.customBossConfigFields.getTrails() == null) return;
-        for (String string : customBossEntity.customBossConfigFields.getTrails()) {
+        if (customBossEntity.customBossesConfigFields.getTrails() == null) return;
+        for (String string : customBossEntity.customBossesConfigFields.getTrails()) {
             try {
                 Particle particle = Particle.valueOf(string);
                 doParticleTrail(particle);

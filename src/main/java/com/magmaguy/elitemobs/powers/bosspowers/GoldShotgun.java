@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Location;
@@ -40,9 +40,9 @@ public class GoldShotgun extends BossPower implements Listener {
 
     }
 
-    private void doGoldShotgun(EliteMobEntity eliteMobEntity, Player player) {
+    private void doGoldShotgun(EliteEntity eliteEntity, Player player) {
 
-        eliteMobEntity.getLivingEntity().setAI(false);
+        eliteEntity.getLivingEntity().setAI(false);
 
         new BukkitRunnable() {
             int counter = 0;
@@ -50,16 +50,16 @@ public class GoldShotgun extends BossPower implements Listener {
             @Override
             public void run() {
 
-                doSmokeEffect(eliteMobEntity, player);
+                doSmokeEffect(eliteEntity, player);
                 counter++;
 
                 if (counter < 20 * 3) return;
 
                 cancel();
-                eliteMobEntity.getLivingEntity().setAI(true);
-                List<Item> nuggetList = generateVisualItems(eliteMobEntity, player);
+                eliteEntity.getLivingEntity().setAI(true);
+                List<Item> nuggetList = generateVisualItems(eliteEntity, player);
                 if (nuggetList == null) return;
-                ProjectileDamage.doGoldNuggetDamage(nuggetList, eliteMobEntity);
+                ProjectileDamage.doGoldNuggetDamage(nuggetList, eliteEntity);
 
             }
 
@@ -67,13 +67,13 @@ public class GoldShotgun extends BossPower implements Listener {
 
     }
 
-    private void doSmokeEffect(EliteMobEntity eliteMobEntity, Player player) {
+    private void doSmokeEffect(EliteEntity eliteEntity, Player player) {
         for (int i = 0; i < 200; i++) {
-            Vector shotVector = getShotVector(eliteMobEntity, player);
+            Vector shotVector = getShotVector(eliteEntity, player);
             if (shotVector == null) return;
-            eliteMobEntity.getLivingEntity().getWorld().spawnParticle(
+            eliteEntity.getLivingEntity().getWorld().spawnParticle(
                     Particle.SMOKE_NORMAL,
-                    eliteMobEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 0.5, 0)),
+                    eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 0.5, 0)),
                     0,
                     shotVector.getX(),
                     shotVector.getY(),
@@ -82,33 +82,33 @@ public class GoldShotgun extends BossPower implements Listener {
         }
     }
 
-    private List<Item> generateVisualItems(EliteMobEntity eliteMobEntity, Player player) {
+    private List<Item> generateVisualItems(EliteEntity eliteEntity, Player player) {
         List<Item> nuggetList = new ArrayList<>();
-        if (getShotVector(eliteMobEntity, player) == null) return null;
+        if (getShotVector(eliteEntity, player) == null) return null;
         for (int i = 0; i < 200; i++) {
-            Item visualProjectile = eliteMobEntity.getLivingEntity().getWorld().dropItem(
-                    eliteMobEntity.getLivingEntity().getLocation(),
+            Item visualProjectile = eliteEntity.getLivingEntity().getWorld().dropItem(
+                    eliteEntity.getLivingEntity().getLocation(),
                     ItemStackGenerator.generateItemStack(
                             Material.GOLD_NUGGET,
                             "visual projectile",
                             Arrays.asList(ThreadLocalRandom.current().nextDouble() + "")));
             ProjectileDamage.configureVisualProjectile(visualProjectile);
-            visualProjectile.setVelocity(getShotVector(eliteMobEntity, player).multiply(0.9));
+            visualProjectile.setVelocity(getShotVector(eliteEntity, player).multiply(0.9));
             visualProjectile.setGravity(false);
             nuggetList.add(visualProjectile);
         }
         return nuggetList;
     }
 
-    private Vector getShotVector(EliteMobEntity eliteMobEntity, Player player) {
-        if (!player.getLocation().getWorld().equals(eliteMobEntity.getLivingEntity().getLocation())) return null;
+    private Vector getShotVector(EliteEntity eliteEntity, Player player) {
+        if (!player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getLocation())) return null;
         return player.getLocation().clone()
                 .add(new Location(player.getWorld(), 0.0, 1.0, 0.0))
                 .add(new Location(player.getWorld(),
                         ThreadLocalRandom.current().nextDouble() * 2 - 1,
                         ThreadLocalRandom.current().nextDouble() * 2 - 1,
                         ThreadLocalRandom.current().nextDouble() * 2 - 1))
-                .subtract(eliteMobEntity.getLivingEntity().getLocation()).toVector().normalize();
+                .subtract(eliteEntity.getLivingEntity().getLocation()).toVector().normalize();
     }
 
 }

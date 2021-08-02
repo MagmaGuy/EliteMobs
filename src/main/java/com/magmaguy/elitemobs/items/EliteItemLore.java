@@ -10,7 +10,7 @@ import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
@@ -37,7 +37,7 @@ public class EliteItemLore {
     boolean showItemWorth;
     String itemWorth = null;
     String itemSource = null;
-    EliteMobEntity eliteMobEntity;
+    EliteEntity eliteEntity;
     Player soulboundPlayer = null;
     List<String> customLore = new ArrayList<>();
     int prestigeLevel = 0;

@@ -3,9 +3,9 @@ package com.magmaguy.elitemobs.powers.majorpowers.zombie;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.MajorPower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,17 +31,19 @@ public class ZombieParents extends MajorPower implements Listener {
         if (ThreadLocalRandom.current().nextDouble() > 0.01) return;
         zombieParents.setIsFiring(false);
 
-        CustomBossEntity reinforcementMom = CustomBossEntity.constructCustomBoss("zombie_parents_mom.yml", event.getEntity().getLocation(), event.getEliteMobEntity().getLevel());
-        CustomBossEntity reinforcementDad = CustomBossEntity.constructCustomBoss("zombie_parents_dad.yml", event.getEntity().getLocation(), event.getEliteMobEntity().getLevel());
+        CustomBossEntity reinforcementMom = CustomBossEntity.createCustomBossEntity("zombie_parents_mom.yml");
+        reinforcementMom.spawn(event.getEntity().getLocation(), event.getEliteMobEntity().getLevel(), false);
+        CustomBossEntity reinforcementDad = CustomBossEntity.createCustomBossEntity("zombie_parents_dad.yml");
+        reinforcementDad.spawn(event.getEntity().getLocation(), event.getEliteMobEntity().getLevel(), false);
 
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                if (!event.getEliteMobEntity().getLivingEntity().isValid()) {
+                if (!event.getEliteMobEntity().isValid()) {
 
-                    if (reinforcementDad != null && reinforcementDad.getLivingEntity().isValid()) {
+                    if (reinforcementDad != null && reinforcementDad.isValid()) {
 
                         nameClearer(reinforcementDad);
 
@@ -51,7 +53,7 @@ public class ZombieParents extends MajorPower implements Listener {
 
                     }
 
-                    if (reinforcementMom != null && reinforcementMom.getLivingEntity().isValid()) {
+                    if (reinforcementMom != null && reinforcementMom.isValid()) {
 
                         nameClearer(reinforcementMom);
 
@@ -75,7 +77,7 @@ public class ZombieParents extends MajorPower implements Listener {
 
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcementDad != null && reinforcementDad.getLivingEntity().isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcementDad != null && reinforcementDad.isValid()) {
 
                         nameClearer(reinforcementDad);
 
@@ -85,7 +87,7 @@ public class ZombieParents extends MajorPower implements Listener {
 
                     }
 
-                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcementMom != null && reinforcementMom.getLivingEntity().isValid()) {
+                    if (ThreadLocalRandom.current().nextDouble() < 0.5 && reinforcementMom != null && reinforcementMom.isValid()) {
 
                         nameClearer(reinforcementMom);
 
@@ -103,13 +105,13 @@ public class ZombieParents extends MajorPower implements Listener {
 
     }
 
-    private void nameClearer(EliteMobEntity eliteMobEntity) {
+    private void nameClearer(EliteEntity eliteEntity) {
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (eliteMobEntity.getLivingEntity().isValid())
-                    eliteMobEntity.setName(eliteMobEntity.getName());
+                if (eliteEntity.isValid())
+                    eliteEntity.setName(eliteEntity.getName(), true);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
 

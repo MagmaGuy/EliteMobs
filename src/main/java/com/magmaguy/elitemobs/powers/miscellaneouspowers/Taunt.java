@@ -6,9 +6,9 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -19,8 +19,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static com.magmaguy.elitemobs.ChatColorConverter.convert;
 
 /**
  * Created by MagmaGuy on 06/05/2017.
@@ -59,12 +57,12 @@ public class Taunt extends MinorPower implements Listener {
 
         if (!(event.getEntity() instanceof LivingEntity) ||
                 ((LivingEntity) event.getEntity()).getHealth() - event.getEntityDamageEvent().getFinalDamage() <= 0 ||
-                !event.getEntity().isValid())
+                !event.getEliteMobEntity().isValid())
             return;
 
-        EliteMobEntity eliteMobEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-        if (eliteMobEntity == null) return;
-        if (eliteMobEntity.hasPower(this)) {
+        EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        if (eliteEntity == null) return;
+        if (eliteEntity.hasPower(this)) {
             Entity entity = event.getEntity();
 
             if (event.getEntityDamageEvent().getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))

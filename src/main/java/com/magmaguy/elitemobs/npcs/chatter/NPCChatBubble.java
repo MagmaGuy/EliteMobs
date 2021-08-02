@@ -17,7 +17,7 @@ public class NPCChatBubble {
 
     public NPCChatBubble(String message, NPCEntity npcEntity, Player player) {
 
-        if (!npcEntity.getCanTalk() )return;
+        if (!npcEntity.getNpCsConfigFields().isCanTalk()) return;
 
         if (message == null) return;
         if (npcEntity.getVillager().hasPotionEffect(PotionEffectType.INVISIBILITY)) return;
@@ -30,7 +30,7 @@ public class NPCChatBubble {
 
             Location newLocation = npcEntity.getVillager().getEyeLocation().clone()
                     .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
-                    .add(new Vector(0, -50 - (0.2 * lineCounter), 0));
+                    .add(new Vector(0, -0.8-(0.2 * lineCounter), 0));
 
             ArmorStand visualArmorStand = VisualArmorStand.VisualArmorStand(newLocation, substring);
 
@@ -44,13 +44,7 @@ public class NPCChatBubble {
                         cancel();
                         return;
                     }
-
-                    if (counter == 1)
-                        visualArmorStand.teleport(visualArmorStand.getLocation().add(new Vector(0, 49.2, 0)));
-
-                    if (counter > 1)
-                        visualArmorStand.teleport(visualArmorStand.getLocation().clone().add(new Vector(0, 0.005, 0)));
-
+                    visualArmorStand.teleport(visualArmorStand.getLocation().clone().add(new Vector(0, 0.005, 0)));
                     counter++;
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);

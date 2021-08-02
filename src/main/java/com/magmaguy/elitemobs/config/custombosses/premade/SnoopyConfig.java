@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
-import com.magmaguy.elitemobs.config.custombosses.CustomBossConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
@@ -11,10 +11,10 @@ import java.util.Collections;
  * January 2006 - January 2021
  * Gone but not forgotten.
  */
-public class SnoopyConfig extends CustomBossConfigFields {
+public class SnoopyConfig extends CustomBossesConfigFields {
     public SnoopyConfig() {
         super("snoopy",
-                EntityType.WOLF.toString(),
+                EntityType.WOLF,
                 true,
                 "&6{&4☠&6} &fSnoopy",
                 "dynamic");
