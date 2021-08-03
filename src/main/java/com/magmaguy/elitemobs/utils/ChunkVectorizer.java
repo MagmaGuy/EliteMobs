@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.utils;
 
 import org.bukkit.Chunk;
-import org.bukkit.World;
 
 import java.util.Objects;
 import java.util.UUID;

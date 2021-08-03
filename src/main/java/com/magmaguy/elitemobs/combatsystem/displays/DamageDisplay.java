@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.DialogArmorStand;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;

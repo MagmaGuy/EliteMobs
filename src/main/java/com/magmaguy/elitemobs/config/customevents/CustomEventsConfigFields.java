@@ -5,63 +5,28 @@ import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CustomEventsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
-    public CustomEvent.EventType getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(CustomEvent.EventType eventType) {
-        this.eventType = eventType;
-    }
-
     private CustomEvent.EventType eventType = CustomEvent.EventType.DEFAULT;
-
-    public List<String> getBossFilenames() {
-        return bossFilenames;
-    }
-
-    public void setBossFilenames(List<String> bossFilenames) {
-        this.bossFilenames = bossFilenames;
-    }
-
     private List<String> bossFilenames = new ArrayList<>();
-
-    public double getLocalCooldown() {
-        return localCooldown;
-    }
-
-    public void setLocalCooldown(double localCooldown) {
-        this.localCooldown = localCooldown;
-    }
-
     private double localCooldown = 0;
-
-    public double getGlobalCooldown() {
-        return globalCooldown;
-    }
-
-    public void setGlobalCooldown(double globalCooldown) {
-        this.globalCooldown = globalCooldown;
-    }
-
     private double globalCooldown = 0;
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
     private double weight = 0;
+    private String startMessage;
+    private String endMessage;
+    private List<String> eventStartCommands;
+    private List<String> eventEndCommands;
+    private int announcementPriority = 0;
+    private double chance = 0;
+    private List<Material> breakableMaterials;
+    private double eventDuration = 0;
+    private boolean endEventWithBossDeath = true;
+    private String customSpawn = "";
+    private int minimumPlayerCount = 0;
 
     /**
      * For Action Events
@@ -73,10 +38,48 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         super(filename, isEnabled);
     }
 
+    public CustomEvent.EventType getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(CustomEvent.EventType eventType) {
+        this.eventType = eventType;
+    }
+
+    public List<String> getBossFilenames() {
+        return bossFilenames;
+    }
+
+    public void setBossFilenames(List<String> bossFilenames) {
+        this.bossFilenames = bossFilenames;
+    }
+
+    public double getLocalCooldown() {
+        return localCooldown;
+    }
+
+    public void setLocalCooldown(double localCooldown) {
+        this.localCooldown = localCooldown;
+    }
+
+    public double getGlobalCooldown() {
+        return globalCooldown;
+    }
+
+    public void setGlobalCooldown(double globalCooldown) {
+        this.globalCooldown = globalCooldown;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration, File file) {
-        fileConfiguration.addDefault("eventType", eventType.toString());
-        fileConfiguration.addDefault("bossFilenames", bossFilenames);
+    public void generateConfigDefaults() {
         if (startMessage != null) fileConfiguration.addDefault("startMessage", startMessage);
         if (endMessage != null) fileConfiguration.addDefault("endMessage", endMessage);
         if (eventStartCommands != null) fileConfiguration.addDefault("eventStartCommands", eventStartCommands);
@@ -105,8 +108,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.startMessage = startMessage;
     }
 
-    private String startMessage;
-
     public String getEndMessage() {
         return endMessage;
     }
@@ -114,8 +115,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     public void setEndMessage(String endMessage) {
         this.endMessage = endMessage;
     }
-
-    private String endMessage;
 
     public List<String> getEventStartCommands() {
         return eventStartCommands;
@@ -125,8 +124,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.eventStartCommands = eventStartCommands;
     }
 
-    private List<String> eventStartCommands;
-
     public List<String> getEventEndCommands() {
         return eventEndCommands;
     }
@@ -134,8 +131,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     public void setEventEndCommands(List<String> eventEndCommands) {
         this.eventEndCommands = eventEndCommands;
     }
-
-    private List<String> eventEndCommands;
 
     public int getAnnouncementPriority() {
         return announcementPriority;
@@ -145,8 +140,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.announcementPriority = announcementPriority;
     }
 
-    private int announcementPriority = 0;
-
     public double getChance() {
         return chance;
     }
@@ -154,8 +147,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     public void setChance(double chance) {
         this.chance = chance;
     }
-
-    private double chance = 0;
 
     public List<Material> getBreakableMaterials() {
         return breakableMaterials;
@@ -165,8 +156,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.breakableMaterials = breakableMaterials;
     }
 
-    private List<Material> breakableMaterials;
-
     public double getEventDuration() {
         return eventDuration;
     }
@@ -174,8 +163,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     public void setEventDuration(double eventDuration) {
         this.eventDuration = eventDuration;
     }
-
-    private double eventDuration = 0;
 
     public boolean isEndEventWithBossDeath() {
         return endEventWithBossDeath;
@@ -185,9 +172,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.endEventWithBossDeath = endEventWithBossDeath;
     }
 
-    private boolean endEventWithBossDeath = true;
-
-
     public String getCustomSpawn() {
         return customSpawn;
     }
@@ -196,8 +180,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.customSpawn = customSpawn;
     }
 
-    private String customSpawn = "";
-
     public int getMinimumPlayerCount() {
         return minimumPlayerCount;
     }
@@ -205,8 +187,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     public void setMinimumPlayerCount(int minimumPlayerCount) {
         this.minimumPlayerCount = minimumPlayerCount;
     }
-
-    private int minimumPlayerCount = 0;
 
     @Override
     public void processConfigFields() {

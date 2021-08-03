@@ -5,16 +5,27 @@ import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CustomSpawnConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
+    int lowestYLevel = 0;
+    int highestYLevel = 320;
+    List<World> validWorlds = new ArrayList<>();
+    List<World.Environment> validWorldTypes = new ArrayList<>();
+    List<Biome> validBiomes = new ArrayList<>();
+    private long earliestTime = 0;
+    private long latestTime = 24000;
+    private MoonPhaseDetector.MoonPhase moonPhase = null;
+    private boolean bypassWorldGuard = false;
+    private boolean canSpawnInLight = false;
+    private boolean isSurfaceSpawn = false;
+    private boolean isUndergroundSpawn = false;
+
     public CustomSpawnConfigFields(String filename, boolean isEnabled) {
-        super( filename, isEnabled);
+        super(filename, isEnabled);
     }
 
     public int getLowestYLevel() {
@@ -25,8 +36,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         this.lowestYLevel = lowestYLevel;
     }
 
-    int lowestYLevel = 0;
-
     public int getHighestYLevel() {
         return highestYLevel;
     }
@@ -34,8 +43,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
     public void setHighestYLevel(int highestYLevel) {
         this.highestYLevel = highestYLevel;
     }
-
-    int highestYLevel = 320;
 
     public List<World> getValidWorlds() {
         return validWorlds;
@@ -45,8 +52,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         this.validWorlds = validWorlds;
     }
 
-    List<World> validWorlds = new ArrayList<>();
-
     public List<World.Environment> getValidWorldTypes() {
         return validWorldTypes;
     }
@@ -54,8 +59,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
     public void setValidWorldTypes(List<World.Environment> validWorldTypes) {
         this.validWorldTypes = validWorldTypes;
     }
-
-    List<World.Environment> validWorldTypes = new ArrayList<>();
 
     public List<Biome> getValidBiomes() {
         return validBiomes;
@@ -65,8 +68,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         this.validBiomes = validBiomes;
     }
 
-    List<Biome> validBiomes = new ArrayList<>();
-
     public long getEarliestTime() {
         return earliestTime;
     }
@@ -74,8 +75,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
     public void setEarliestTime(long earliestTime) {
         this.earliestTime = earliestTime;
     }
-
-    private long earliestTime = 0;
 
     public long getLatestTime() {
         return latestTime;
@@ -85,8 +84,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         this.latestTime = latestTime;
     }
 
-    private long latestTime = 24000;
-
     public MoonPhaseDetector.MoonPhase getMoonPhase() {
         return moonPhase;
     }
@@ -94,8 +91,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
     public void setMoonPhase(MoonPhaseDetector.MoonPhase moonPhase) {
         this.moonPhase = moonPhase;
     }
-
-    private MoonPhaseDetector.MoonPhase moonPhase = null;
 
     public boolean isBypassWorldGuard() {
         return bypassWorldGuard;
@@ -105,8 +100,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         this.bypassWorldGuard = bypassWorldGuard;
     }
 
-    private boolean bypassWorldGuard = false;
-
     public boolean canSpawnInLight() {
         return canSpawnInLight;
     }
@@ -114,8 +107,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
     public void setCanSpawnInLight(boolean canSpawnInLight) {
         this.canSpawnInLight = canSpawnInLight;
     }
-
-    private boolean canSpawnInLight = false;
 
     public boolean isSurfaceSpawn() {
         return isSurfaceSpawn;
@@ -125,8 +116,6 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         isSurfaceSpawn = surfaceSpawn;
     }
 
-    private boolean isSurfaceSpawn = false;
-
     public boolean isUndergroundSpawn() {
         return isUndergroundSpawn;
     }
@@ -135,12 +124,8 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         isUndergroundSpawn = undergroundSpawn;
     }
 
-    private boolean isUndergroundSpawn = false;
-
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration, File file) {
-        super.fileConfiguration = fileConfiguration;
-        super.file = file;
+    public void generateConfigDefaults() {
         fileConfiguration.addDefault("isEnabled", isEnabled);
         if (lowestYLevel != 0) addDefault("lowestYLevel", lowestYLevel);
         if (highestYLevel != 320) addDefault("highestYLevel", highestYLevel);

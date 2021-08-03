@@ -7,7 +7,6 @@ import org.bukkit.metadata.LazyMetadataValue;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 public class EliteEntityTracker extends TrackedEntity implements AbstractTrackedEntity {
 

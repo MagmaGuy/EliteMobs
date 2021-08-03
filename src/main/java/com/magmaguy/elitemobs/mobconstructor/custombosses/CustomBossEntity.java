@@ -17,7 +17,6 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -158,6 +157,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (livingEntity != null) {
             startBossTrails();
             mountEntity();
+            //Prevent custom bosses from getting removed when far away, this is important for mounts and reinforcements in large arenas
+            getLivingEntity().setRemoveWhenFarAway(false);
             if (this instanceof RegionalBossEntity) {
                 if (!spawnLocation.getBlock().isPassable())
                     new WarningMessage("Warning: Location " + customBossesConfigFields.getFilename() + " for boss " +

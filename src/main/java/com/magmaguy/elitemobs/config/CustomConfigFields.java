@@ -68,7 +68,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
     protected File file;
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration, File file) {
+    public void generateConfigDefaults() {
 
     }
 
