@@ -498,7 +498,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void generateConfigDefaults() {
         //initialize core defaults
         fileConfiguration.addDefault("isEnabled", enabled);
-        fileConfiguration.addDefault("entityType", entityType);
+        fileConfiguration.addDefault("entityType", entityType.toString());
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("level", level);
         //All defaults below this point are optional

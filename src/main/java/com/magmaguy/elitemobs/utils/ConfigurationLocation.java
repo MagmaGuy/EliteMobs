@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.HashSet;
+
 public class ConfigurationLocation {
 
     /*
@@ -16,6 +18,8 @@ public class ConfigurationLocation {
     public static String serialize(Location location) {
         return serialize(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
     }
+
+    public static HashSet<String> notLoadedWorldNames = new HashSet<>();
 
     public static Location deserialize(String locationString) {
 
@@ -31,8 +35,12 @@ public class ConfigurationLocation {
             String[] slicedString = locationOnlyString.split(",");
 
             world = Bukkit.getWorld(slicedString[0]);
-            if (world == null)
-                new InfoMessage("Failed to spawn entity in world " + slicedString[0] + " because this world is not yet installed!");
+            if (world == null && !notLoadedWorldNames.contains(slicedString[0])){
+                if (!notLoadedWorldNames.isEmpty())
+                    new WarningMessage("Some NPCs/bosses don't their world installed! If you need help setting things up, you can go to " + DiscordLinks.mainLink + " !");
+                new InfoMessage("World " + slicedString[0] + " is not yet loaded! Entities that should spawn there have been queued.");
+                notLoadedWorldNames.add(slicedString[0]);
+            }
             x = Double.parseDouble(slicedString[1]);
             y = Double.parseDouble(slicedString[2]);
             z = Double.parseDouble(slicedString[3]);

@@ -163,14 +163,14 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         fileConfiguration.addDefault("isEnabled", isEnabled);
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("role", role);
-        fileConfiguration.addDefault("profession", profession);
+        fileConfiguration.addDefault("profession", profession.toString());
         fileConfiguration.addDefault("spawnLocation", location);
         fileConfiguration.addDefault("greetings", greetings);
         fileConfiguration.addDefault("dialog", dialog);
         fileConfiguration.addDefault("farewell", farewell);
         fileConfiguration.addDefault("canTalk", canTalk);
         fileConfiguration.addDefault("activationRadius", activationRadius);
-        fileConfiguration.addDefault("interactionType", interactionType);
+        fileConfiguration.addDefault("interactionType", interactionType.toString());
     }
 
     @Override

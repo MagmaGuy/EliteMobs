@@ -131,11 +131,11 @@ public class CustomConfig {
         //Generate config defaults
         customConfigFields.generateConfigDefaults();
 
-        //Save all configuration values as they exist
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-
         //Parse actual fields and load into RAM to be used
         customConfigFields.processConfigFields();
+
+        //Save all configuration values as they exist
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
         //Store for use by the plugin
         addCustomConfigFields(file.getName(), customConfigFields);

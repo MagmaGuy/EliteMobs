@@ -20,21 +20,10 @@ import java.util.UUID;
 
 public class CustomConfigFields implements CustomConfigFieldsInterface {
 
-    public String getFilename() {
-        return filename;
-    }
-
     protected String filename;
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
     protected boolean isEnabled;
+    protected FileConfiguration fileConfiguration;
+    protected File file;
 
     /**
      * Used by plugin-generated files (defaults)
@@ -47,6 +36,18 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         this.isEnabled = isEnabled;
     }
 
+    public String getFilename() {
+        return filename;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
     public FileConfiguration getFileConfiguration() {
         return fileConfiguration;
     }
@@ -55,8 +56,6 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         this.fileConfiguration = fileConfiguration;
     }
 
-    protected FileConfiguration fileConfiguration;
-
     public File getFile() {
         return file;
     }
@@ -64,8 +63,6 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
     public void setFile(File file) {
         this.file = file;
     }
-
-    protected File file;
 
     @Override
     public void generateConfigDefaults() {
@@ -110,7 +107,8 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         if (!configHas(path))
             return pluginDefault;
         try {
-            List<String> list = new ArrayList<>(); ;
+            List<String> list = new ArrayList<>();
+            ;
             for (String string : fileConfiguration.getStringList(path))
                 list.add(ChatColorConverter.convert(string));
             return list;
@@ -235,7 +233,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
                 return playerHead;
             }
             if (materialString.contains(":")) {
-                if (materialString.split(":")[1].contains("leather_") || materialString.split(":")[1].contains("LEATHER_") ) {
+                if (materialString.split(":")[1].contains("leather_") || materialString.split(":")[1].contains("LEATHER_")) {
                     ItemStack itemStack = ItemStackGenerator.generateItemStack(Material.getMaterial(materialString.split(":")[0]));
                     LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
                     leatherArmorMeta.setColor(Color.fromRGB(Integer.parseInt(materialString.split(":")[1])));

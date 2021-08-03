@@ -57,6 +57,10 @@ public class GroundPound extends MinorPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 counter++;
                 if (!NonSolidBlockTypes.isPassthrough(eliteEntity.getLivingEntity().getLocation().clone().subtract(new Vector(0, 0.2, 0)).getBlock().getType())) {
 

@@ -1,9 +1,12 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -13,7 +16,9 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class SimplePersistentEntity {
 
@@ -21,6 +26,8 @@ public class SimplePersistentEntity {
     //Values are stored for the chunk load events
     public static ArrayListMultimap<Integer, SimplePersistentEntity> persistentEntities = ArrayListMultimap.create();
     public static ArrayListMultimap<String, SimplePersistentEntity> persistentEntitiesForQueuedWorlds = ArrayListMultimap.create();
+
+
     public int chunk;
     public Location location;
     public CustomBossEntity customBossEntity;
@@ -43,7 +50,9 @@ public class SimplePersistentEntity {
                     location.getBlockZ() >> 4,
                     location.getWorld().getUID());
             addPersistentEntity(this);
-        } else addPersistentEntityForWorld(this);
+        } else {
+            addPersistentEntityForWorld(this);
+        }
     }
 
     public SimplePersistentEntity(NPCEntity npcEntity) {
@@ -96,7 +105,13 @@ public class SimplePersistentEntity {
     }
 
     private static void unloadWorld(World world) {
-        persistentEntities.values().removeIf(simplePersistentEntity -> simplePersistentEntity.location.getWorld().equals(world));
+        List<SimplePersistentEntity> worldEntities = new ArrayList<>(persistentEntities.values());
+        worldEntities.forEach((simplePersistentEntity -> {
+            if (simplePersistentEntity.location == null) return;
+            if (simplePersistentEntity.location.getWorld() == null) return;
+            if (!simplePersistentEntity.location.getWorld().equals(world)) return;
+            simplePersistentEntity.customBossEntity.remove(RemovalReason.WORLD_UNLOAD);
+        }));
     }
 
     public void remove() {
@@ -109,14 +124,17 @@ public class SimplePersistentEntity {
         @EventHandler(ignoreCancelled = true)
         public void worldLoadEvent(WorldLoadEvent event) {
             if (persistentEntitiesForQueuedWorlds.get(event.getWorld().getName()) == null) return;
-            for (SimplePersistentEntity simplePersistentEntity : persistentEntitiesForQueuedWorlds.get(event.getWorld().getName())) {
-                if (simplePersistentEntity.customBossEntity != null)
-                    simplePersistentEntity.customBossEntity.worldLoad();
-                else if (simplePersistentEntity.npcEntity != null) {
-                    simplePersistentEntity.npcEntity.setSpawnLocation();
-                    simplePersistentEntity.npcEntity.queueSpawn();
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> {
+                for (SimplePersistentEntity simplePersistentEntity : persistentEntitiesForQueuedWorlds.get(event.getWorld().getName())) {
+                    if (simplePersistentEntity.customBossEntity != null)
+                        simplePersistentEntity.customBossEntity.worldLoad();
+                    else if (simplePersistentEntity.npcEntity != null) {
+                        simplePersistentEntity.npcEntity.setSpawnLocation();
+                        simplePersistentEntity.npcEntity.queueSpawn();
+                    }
                 }
-            }
+                persistentEntitiesForQueuedWorlds.removeAll(event.getWorld().getName());
+            }, 20);
         }
 
         //Store world names and serialized locations

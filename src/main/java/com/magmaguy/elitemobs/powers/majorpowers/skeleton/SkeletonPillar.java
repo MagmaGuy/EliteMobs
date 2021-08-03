@@ -17,6 +17,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class SkeletonPillar extends MajorPower implements Listener {
 
+    private Location soundLocation;
+
     public SkeletonPillar() {
         super(PowersConfig.getPower("skeleton_pillar.yml"));
     }
@@ -50,7 +52,8 @@ public class SkeletonPillar extends MajorPower implements Listener {
 
                 if (timer > 20 * 7 || !event.getEliteMobEntity().isValid()) {
 
-                    event.getEliteMobEntity().getLivingEntity().setAI(true);
+                    if (event.getEliteMobEntity() != null)
+                        event.getEliteMobEntity().getLivingEntity().setAI(true);
                     cancel();
 
                 } else if (timer > 20 * 1 && timer < 20 * 7) {
@@ -102,8 +105,6 @@ public class SkeletonPillar extends MajorPower implements Listener {
                 0, 0, offset, timer).toLocation(location.getWorld());
         return newLocation;
     }
-
-    private Location soundLocation;
 
     private void playPillarSong(Location location) {
         soundLocation = location;
