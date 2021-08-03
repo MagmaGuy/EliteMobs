@@ -48,6 +48,11 @@ public class SpiritWalk extends BossPower implements Listener {
             @Override
             public void run() {
 
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
+
                 if (eliteEntity.getLivingEntity().getLocation().clone().distance(finalLocation) < 2 || counter > 20 * 10) {
 
                     eliteEntity.getLivingEntity().teleport(finalLocation);
@@ -92,6 +97,11 @@ public class SpiritWalk extends BossPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
+
                 if (eliteEntity.getLivingEntity().isInsideVehicle())
                     eliteEntity.getLivingEntity().leaveVehicle();
 
