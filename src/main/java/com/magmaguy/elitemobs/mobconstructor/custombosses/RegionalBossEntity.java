@@ -103,6 +103,10 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(filename);
         if (customBossesConfigFields == null)
             return null;
+        return createRegionalBossEntity(customBossesConfigFields, spawnLocation);
+    }
+
+    public static RegionalBossEntity createRegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location spawnLocation) {
         return new RegionalBossEntity(customBossesConfigFields, spawnLocation);
     }
 
@@ -115,13 +119,13 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     }
 
     public void initialize() {
-        if (spawnLocation == null) {
-            new WarningMessage("Spawn location for regional boss" + getCustomBossesConfigFields().getFilename() + " was null!");
-            if (rawLocationString != null)
-                new WarningMessage("Problematic entry: " + rawLocationString);
-            return;
-        }
-        if (spawnLocation.getWorld() == null) return;
+        //if (spawnLocation == null) {
+        //    new WarningMessage("Spawn location for regional boss" + getCustomBossesConfigFields().getFilename() + " was null!");
+        //    if (rawLocationString != null)
+        //        new WarningMessage("Problematic entry: " + rawLocationString);
+        //    return;
+        //}
+        //if (spawnLocation.getWorld() == null) return;
         queueSpawn(false);
     }
 
@@ -190,8 +194,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         switch (removalReason) {
             case REMOVE_COMMAND:
                 regionalBosses.remove(this);
-                //todo: permanent removal logic goes here
                 regionalBossesFromConfigFields.remove(customBossesConfigFields, this);
+                getCustomBossesConfigFields().setFilesOutOfSync(true);
                 break;
             case DEATH:
             case BOSS_TIMEOUT: {

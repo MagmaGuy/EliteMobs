@@ -205,10 +205,9 @@ public class EliteMobs extends JavaPlugin {
             }
         }
 
-        //new NPCInitializer();
-
         //Load all regional bosses
         new CustomBossesConfig();
+
         //Find the stats of bosses in minidungeons
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
             if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))

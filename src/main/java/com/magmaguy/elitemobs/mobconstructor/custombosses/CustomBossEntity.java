@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -291,7 +292,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         boolean bossInstanceEnd = removalReason.equals(RemovalReason.KILL_COMMAND) ||
                 removalReason.equals(RemovalReason.DEATH) ||
                 removalReason.equals(RemovalReason.BOSS_TIMEOUT) ||
-                removalReason.equals(RemovalReason.OTHER);
+                removalReason.equals(RemovalReason.OTHER) ||
+                removalReason.equals(RemovalReason.WORLD_UNLOAD);
 
         if (!isPersistent) bossInstanceEnd = true;
 

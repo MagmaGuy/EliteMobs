@@ -200,7 +200,9 @@ public class Minidungeon {
          */
         public void commitLocations() {
             for (RealDungeonLocation realDungeonLocation : realDungeonLocations) {
-                realDungeonLocation.regionalBossEntity = new RegionalBossEntity(realDungeonLocation.customBossesConfigFields, realDungeonLocation.location);
+                realDungeonLocation.regionalBossEntity = RegionalBossEntity.createRegionalBossEntity(realDungeonLocation.customBossesConfigFields, realDungeonLocation.location);
+                realDungeonLocation.regionalBossEntity.initialize();
+                realDungeonLocation.regionalBossEntity.getCustomBossesConfigFields().setFilesOutOfSync(true);
             }
         }
 
