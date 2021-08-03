@@ -19,7 +19,7 @@ public class CustomSpawnConfig extends CustomConfig {
     public static CustomSpawnConfig customSpawnConfig;
 
     public CustomSpawnConfig() {
-        super("customspawns", "com.magmaguy.elitemobs.config.customspawns.premade", "CustomSpawnConfigFields");
+        super("customspawns", "com.magmaguy.elitemobs.config.customspawns.premade", CustomSpawnConfigFields.class);
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
             customSpawns.put(key, (CustomSpawnConfigFields) super.getCustomConfigFieldsHashMap().get(key));
         customSpawnConfig = this;

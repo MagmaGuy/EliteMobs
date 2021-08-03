@@ -14,7 +14,7 @@ public class NPCsConfig extends CustomConfig {
     }
 
     public NPCsConfig(){
-        super("npcs", "com.magmaguy.elitemobs.config.npcs.premade", "NPCsConfigFields");
+        super("npcs", "com.magmaguy.elitemobs.config.npcs.premade", NPCsConfigFields.class);
         npcEntities = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet()){
             npcEntities.put(key, (NPCsConfigFields) super.getCustomConfigFieldsHashMap().get(key));

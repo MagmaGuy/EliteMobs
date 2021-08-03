@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;

@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Villager;
 
 import java.util.List;
@@ -159,7 +158,8 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
 
     public String noPreviousLocationMessage;
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    @Override
+    public void generateConfigDefaults() {
         fileConfiguration.addDefault("isEnabled", isEnabled);
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("role", role);
@@ -173,6 +173,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         fileConfiguration.addDefault("interactionType", interactionType);
     }
 
+    @Override
     public void processConfigFields() {
         this.name = processString("name", name);
         this.role = processString("role", role);
