@@ -52,7 +52,7 @@ public class SkeletonPillar extends MajorPower implements Listener {
 
                 if (timer > 20 * 7 || !event.getEliteMobEntity().isValid()) {
 
-                    if (event.getEliteMobEntity() != null)
+                    if (event.getEliteMobEntity().getLivingEntity() != null)
                         event.getEliteMobEntity().getLivingEntity().setAI(true);
                     cancel();
 

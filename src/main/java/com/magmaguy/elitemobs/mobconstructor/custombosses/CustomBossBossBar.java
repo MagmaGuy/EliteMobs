@@ -96,6 +96,7 @@ public class CustomBossBossBar {
                 ", " + customBossEntity.getLocation().getBlockY() +
                 ", " + customBossEntity.getLocation().getBlockZ();
         bossBar.setTitle(bossBarMessage(player, locationString));
+        if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1) return;
         bossBar.setProgress(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
     }
 
