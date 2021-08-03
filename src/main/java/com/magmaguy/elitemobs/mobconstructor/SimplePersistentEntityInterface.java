@@ -1,7 +1,5 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
-import org.bukkit.World;
-
 public interface SimplePersistentEntityInterface {
 
     /**

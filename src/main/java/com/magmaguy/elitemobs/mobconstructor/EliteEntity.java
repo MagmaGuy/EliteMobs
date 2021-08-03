@@ -80,6 +80,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     //currently used to store ender crystals for the dragon boss fight
     protected List<Entity> nonEliteReinforcementEntities = new ArrayList<>();
     protected boolean bypassesProtections = false;
+    private double health;
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern
@@ -239,29 +240,42 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.maxHealth = (level * CombatSystem.TARGET_HITS_TO_KILL + this.defaultMaxHealth) * healthMultiplier;
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         livingEntity.setHealth(maxHealth);
+        this.health = maxHealth;
     }
 
     public void resetMaxHealth() {
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         livingEntity.setHealth(maxHealth);
+        this.health = maxHealth;
     }
 
+    /**
+     * Health is cached by EliteMobs for when health needs to be displayed when the {@link LivingEntity} isn't valid, but
+     * return the field from the {@link LivingEntity} when available
+     *
+     * @return Boss health
+     */
     public double getHealth() {
-        return livingEntity.getHealth();
+        if (livingEntity != null)
+            return livingEntity.getHealth();
+        else
+            return this.health;
     }
 
     public void setHealth(double health) {
+        this.health = health;
         livingEntity.setHealth(health);
     }
 
     public double damage(double damage) {
-        double health = Math.max(0, livingEntity.getHealth() - damage);
+        health = Math.max(0, livingEntity.getHealth() - damage);
         livingEntity.setHealth(health);
         return damage;
     }
 
     public void fullHeal() {
         setHealth(this.maxHealth);
+        this.health = maxHealth;
         damagers.clear();
     }
 
@@ -431,6 +445,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         //7 is the base damage of a diamond sword
         livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
         livingEntity.setHealth(maxHealth);
+        this.health = maxHealth;
     }
 
     public String getName() {

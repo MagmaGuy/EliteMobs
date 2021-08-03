@@ -28,19 +28,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomSpawn {
 
-    public CustomSpawnConfigFields getCustomSpawnConfigFields() {
-        return customSpawnConfigFields;
-    }
-
-    private CustomSpawnConfigFields customSpawnConfigFields;
-
-    public ArrayList<CustomBossEntity> getCustomBossEntities() {
-        return customBossEntities;
-    }
-
-    private ArrayList<CustomBossEntity> customBossEntities = new ArrayList<>();
-
+    public boolean isEvent = false;
     TimedEvent timedEvent;
+    private CustomSpawnConfigFields customSpawnConfigFields;
+    private ArrayList<CustomBossEntity> customBossEntities = new ArrayList<>();
+    private int allTries = 0;
+    private Location spawnLocation;
 
     /**
      * Used by the TimedEvent system to find valid locations
@@ -56,6 +49,14 @@ public class CustomSpawn {
             }
             customBossEntities.add(new CustomBossEntity(customBossesConfigFields));
         });
+    }
+
+    public CustomSpawnConfigFields getCustomSpawnConfigFields() {
+        return customSpawnConfigFields;
+    }
+
+    public ArrayList<CustomBossEntity> getCustomBossEntities() {
+        return customBossEntities;
     }
 
     public void queueSpawn() {
@@ -89,7 +90,7 @@ public class CustomSpawn {
                 for (CustomBossEntity customBossEntity : customBossEntities)
                     customBossEntity.spawn(spawnLocation, false);
 
-                if (timedEvent != null){
+                if (timedEvent != null) {
                     timedEvent.queueEvent();
                     cancel();
                 }
@@ -97,8 +98,6 @@ public class CustomSpawn {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
-
-    private int allTries = 0;
 
     private void generateCustomSpawn() {
         int maxTries = 100;
@@ -136,16 +135,6 @@ public class CustomSpawn {
         return this;
     }
 
-    private Location spawnLocation;
-
-    public boolean isBypassesWorldGuard() {
-        return bypassesWorldGuard;
-    }
-
-    public void setBypassesWorldGuard(boolean bypassesWorldGuard) {
-        this.bypassesWorldGuard = bypassesWorldGuard;
-    }
-
     public boolean isEvent() {
         return isEvent;
     }
@@ -153,11 +142,6 @@ public class CustomSpawn {
     public void setEvent(boolean event) {
         isEvent = event;
     }
-
-    public boolean isEvent = false;
-
-    //Not all regional bosses should be treated as dungeon bosses, some can be reinforcements, more subtypes coming soon
-    private boolean bypassesWorldGuard = false;
 
     public Location generateRandomSpawnLocation() {
 
@@ -247,13 +231,12 @@ public class CustomSpawn {
             return null;
 
         //Check WorldGuard flags
-        if (EliteMobs.worldGuardIsEnabled)
-            if (!bypassesWorldGuard){
-                if (!WorldGuardFlagChecker.doEventFlag(location))
-                    return null;
-                if (!WorldGuardFlagChecker.doEliteMobsSpawnFlag(location))
-                    return null;
-            }
+        if (EliteMobs.worldGuardIsEnabled) {
+            if (!WorldGuardFlagChecker.doEventFlag(location))
+                return null;
+            if (!WorldGuardFlagChecker.doEliteMobsSpawnFlag(location))
+                return null;
+        }
 
         //Light level check - following 1.18 rules
         if (!customSpawnConfigFields.canSpawnInLight())

@@ -8,9 +8,7 @@ import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,14 +19,55 @@ import java.util.List;
 
 public class CustomBossesConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
-    public static HashMap<String, CustomBossesConfigFields> customBossConfigFields = new HashMap<>();
     private static final HashSet<CustomBossesConfigFields> naturallySpawnedElites = new HashSet<>();
-
-    public static HashSet<CustomBossesConfigFields> getNaturallySpawnedElites() {
-        return naturallySpawnedElites;
-    }
-
+    public static HashMap<String, CustomBossesConfigFields> customBossConfigFields = new HashMap<>();
     public static HashMap<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
+    private final HashMap<Material, Double> damageModifiers = new HashMap();
+    private int timeout = 0;
+    private boolean isPersistent = false;
+    private double healthMultiplier = 1;
+    private double damageMultiplier = 1;
+    private ItemStack helmet = null;
+    private ItemStack chestplate = null;
+    private ItemStack leggings = null;
+    private ItemStack boots = null;
+    private ItemStack mainHand = null;
+    private ItemStack offHand = null;
+    private boolean baby = false;
+    private List<String> powers = new ArrayList<>();
+    private String spawnMessage = null;
+    private String deathMessage = null;
+    private List<String> deathMessages = new ArrayList<>();
+    private String escapeMessage = null;
+    private String locationMessage = null;
+    private List<String> uniqueLootList = new ArrayList<>();
+    private HashMap<CustomItem, Double> parsedUniqueLootList = new HashMap<>();
+    private boolean dropsEliteMobsLoot = true;
+    private boolean dropsVanillaLoot = true;
+    private List<String> trails = new ArrayList<>();
+    private List<String> onDamageMessages = new ArrayList<>();
+    private List<String> onDamagedMessages = new ArrayList<>();
+    private double leashRadius = 0;
+    private Integer followDistance = 0;
+    private boolean regionalBoss = false;
+    private int spawnCooldown = 0;
+    private List<String> onDeathCommands = new ArrayList<>();
+    private List<String> onSpawnCommands = new ArrayList<>();
+    private List<String> onCombatEnterCommands = new ArrayList<>();
+    private List<String> onCombatLeaveCommands = new ArrayList<>();
+    private String mountedEntity = null;
+    private int announcementPriority = 0;
+    private String disguise = null;
+    private String customDisguiseData = null;
+    private boolean frozen = false;
+    private boolean reinforcement = false;
+    private List<String> phases = new ArrayList<>();
+    private EntityType entityType = EntityType.ZOMBIE;
+    private boolean enabled = true;
+    private String name = "Default Name";
+    private String level = null;
+    private boolean cullReinforcements = true;
+    private boolean filesOutOfSync = false;
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -55,6 +94,10 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         super(fileName, isEnabled);
     }
 
+    public static HashSet<CustomBossesConfigFields> getNaturallySpawnedElites() {
+        return naturallySpawnedElites;
+    }
+
     public int getTimeout() {
         return this.timeout;
     }
@@ -62,8 +105,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
-
-    private int timeout = 0;
 
     public boolean isPersistent() {
         return isPersistent;
@@ -73,8 +114,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.isPersistent = persistent;
     }
 
-    private boolean isPersistent = false;
-
     public double getHealthMultiplier() {
         return this.healthMultiplier;
     }
@@ -82,8 +121,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setHealthMultiplier(double healthMultiplier) {
         this.healthMultiplier = healthMultiplier;
     }
-
-    private double healthMultiplier = 1;
 
     public double getDamageMultiplier() {
         return this.damageMultiplier;
@@ -93,8 +130,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.damageMultiplier = damageMultiplier;
     }
 
-    private double damageMultiplier = 1;
-
     public ItemStack getHelmet() {
         return this.helmet;
     }
@@ -102,8 +137,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setHelmet(ItemStack helmet) {
         this.helmet = helmet;
     }
-
-    private ItemStack helmet = null;
 
     public ItemStack getChestplate() {
         return this.chestplate;
@@ -113,8 +146,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.chestplate = chestplate;
     }
 
-    private ItemStack chestplate = null;
-
     public ItemStack getLeggings() {
         return this.leggings;
     }
@@ -122,8 +153,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setLeggings(ItemStack leggings) {
         this.leggings = leggings;
     }
-
-    private ItemStack leggings = null;
 
     public ItemStack getBoots() {
         return this.boots;
@@ -133,8 +162,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.boots = boots;
     }
 
-    private ItemStack boots = null;
-
     public ItemStack getMainHand() {
         return this.mainHand;
     }
@@ -142,8 +169,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setMainHand(ItemStack mainHand) {
         this.mainHand = mainHand;
     }
-
-    private ItemStack mainHand = null;
 
     public ItemStack getOffHand() {
         return this.offHand;
@@ -153,8 +178,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.offHand = offHand;
     }
 
-    private ItemStack offHand = null;
-
     public boolean getBaby() {
         return this.baby;
     }
@@ -162,8 +185,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setBaby(boolean baby) {
         this.baby = baby;
     }
-
-    private boolean baby = false;
 
     public List<String> getPowers() {
         return this.powers;
@@ -173,8 +194,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.powers = powers;
     }
 
-    private List<String> powers = new ArrayList<>();
-
     public String getSpawnMessage() {
         return this.spawnMessage;
     }
@@ -182,8 +201,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setSpawnMessage(String spawnMessage) {
         this.spawnMessage = spawnMessage;
     }
-
-    private String spawnMessage = null;
 
     public String getDeathMessage() {
         return this.deathMessage;
@@ -193,8 +210,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.deathMessage = deathMessage;
     }
 
-    private String deathMessage = null;
-
     public List<String> getDeathMessages() {
         return this.deathMessages;
     }
@@ -202,8 +217,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setDeathMessages(List<String> deathMessages) {
         this.deathMessages = deathMessages;
     }
-
-    private List<String> deathMessages = new ArrayList<>();
 
     public String getEscapeMessage() {
         return this.escapeMessage;
@@ -213,8 +226,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.escapeMessage = escapeMessage;
     }
 
-    private String escapeMessage = null;
-
     public String getLocationMessage() {
         return this.locationMessage;
     }
@@ -222,8 +233,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setLocationMessage(String locationMessage) {
         this.locationMessage = locationMessage;
     }
-
-    private String locationMessage = null;
 
     public HashMap<CustomItem, Double> getUniqueLootList() {
         return this.parsedUniqueLootList;
@@ -233,10 +242,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.uniqueLootList = uniqueLootList;
     }
 
-    private List<String> uniqueLootList = new ArrayList<>();
-
-    private HashMap<CustomItem, Double> parsedUniqueLootList = new HashMap<>();
-
     public boolean getDropsEliteMobsLoot() {
         return dropsEliteMobsLoot;
     }
@@ -244,8 +249,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setDropsEliteMobsLoot(boolean dropsEliteMobsLoot) {
         this.dropsEliteMobsLoot = dropsEliteMobsLoot;
     }
-
-    private boolean dropsEliteMobsLoot = true;
 
     public boolean getDropsVanillaLoot() {
         return dropsVanillaLoot;
@@ -255,8 +258,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.dropsVanillaLoot = dropsVanillaLoot;
     }
 
-    private boolean dropsVanillaLoot = true;
-
     public List<String> getTrails() {
         return this.trails;
     }
@@ -264,8 +265,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setTrails(List<String> trails) {
         this.trails = trails;
     }
-
-    private List<String> trails = new ArrayList<>();
 
     public List<String> getOnDamageMessages() {
         return onDamageMessages;
@@ -275,8 +274,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.onDamageMessages = onDamageMessages;
     }
 
-    private List<String> onDamageMessages = new ArrayList<>();
-
     public List<String> getOnDamagedMessages() {
         return onDamagedMessages;
     }
@@ -285,10 +282,12 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.onDamagedMessages = onDamagedMessages;
     }
 
-    private List<String> onDamagedMessages = new ArrayList<>();
-
     public double getLeashRadius() {
         return leashRadius;
+    }
+
+    public void setLeashRadius(double leashRadius) {
+        this.leashRadius = leashRadius;
     }
 
     public void runtimeSetLeashRadius(double leashRadius) {
@@ -296,12 +295,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.fileConfiguration.set("leashRadius", leashRadius);
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
-
-    public void setLeashRadius(double leashRadius) {
-        this.leashRadius = leashRadius;
-    }
-
-    private double leashRadius = 0;
 
     public Integer getFollowDistance() {
         return this.followDistance;
@@ -311,8 +304,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.followDistance = followDistance;
     }
 
-    private Integer followDistance = 0;
-
     public boolean isRegionalBoss() {
         return regionalBoss;
     }
@@ -320,8 +311,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setRegionalBoss(boolean regionalBoss) {
         this.regionalBoss = regionalBoss;
     }
-
-    private boolean regionalBoss = false;
 
     public int getSpawnCooldown() {
         return spawnCooldown;
@@ -331,8 +320,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.spawnCooldown = spawnCooldown;
     }
 
-    private int spawnCooldown = 0;
-
     public List<String> getOnDeathCommands() {
         return onDeathCommands;
     }
@@ -340,8 +327,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setOnDeathCommands(List<String> onDeathCommands) {
         this.onDeathCommands = onDeathCommands;
     }
-
-    private List<String> onDeathCommands = new ArrayList<>();
 
     public List<String> getOnSpawnCommands() {
         return onSpawnCommands;
@@ -351,8 +336,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.onSpawnCommands = onSpawnCommands;
     }
 
-    private List<String> onSpawnCommands = new ArrayList<>();
-
     public List<String> getOnCombatEnterCommands() {
         return onCombatEnterCommands;
     }
@@ -360,8 +343,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setOnCombatEnterCommands(List<String> onCombatEnterCommands) {
         this.onCombatEnterCommands = onCombatEnterCommands;
     }
-
-    private List<String> onCombatEnterCommands = new ArrayList<>();
 
     public List<String> getOnCombatLeaveCommands() {
         return onCombatLeaveCommands;
@@ -371,8 +352,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.onCombatLeaveCommands = onCombatLeaveCommands;
     }
 
-    private List<String> onCombatLeaveCommands = new ArrayList<>();
-
     public String getMountedEntity() {
         return this.mountedEntity;
     }
@@ -380,8 +359,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setMountedEntity(String mountedEntity) {
         this.mountedEntity = mountedEntity;
     }
-
-    private String mountedEntity = null;
 
     /**
      * Announcement priority:
@@ -403,8 +380,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.announcementPriority = announcementPriority;
     }
 
-    private int announcementPriority = 0;
-
     /**
      * Integration with LibsDisguises
      * Only used if that plugin is loaded.
@@ -419,8 +394,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.disguise = disguise;
     }
 
-    private String disguise = null;
-
     public String getCustomDisguiseData() {
         return customDisguiseData;
     }
@@ -428,8 +401,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setCustomDisguiseData(String customDisguiseData) {
         this.customDisguiseData = customDisguiseData;
     }
-
-    private String customDisguiseData = null;
 
     public Boolean getFrozen() {
         return this.frozen;
@@ -439,8 +410,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.frozen = frozen;
     }
 
-    private boolean frozen = false;
-
     public boolean isReinforcement() {
         return reinforcement;
     }
@@ -448,8 +417,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setReinforcement(boolean reinforcement) {
         this.reinforcement = reinforcement;
     }
-
-    private boolean reinforcement = false;
 
     public List<String> getPhases() {
         return this.phases;
@@ -459,8 +426,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.phases = phases;
     }
 
-    private List<String> phases = new ArrayList<>();
-
     public double getDamageModifier(Material material) {
         return damageModifiers.get(material) == null ? 1 : damageModifiers.get(material);
     }
@@ -468,8 +433,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public HashMap<Material, Double> getDamageModifiers() {
         return damageModifiers;
     }
-
-    private final HashMap<Material, Double> damageModifiers = new HashMap();
 
     public EntityType getEntityType() {
         return this.entityType;
@@ -479,8 +442,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.entityType = entityType;
     }
 
-    private EntityType entityType = EntityType.ZOMBIE;
-
     public boolean isEnabled() {
         return this.enabled;
     }
@@ -489,8 +450,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.enabled = enabled;
     }
 
-    private boolean enabled = true;
-
     public String getName() {
         return ChatColorConverter.convert(this.name);
     }
@@ -498,8 +457,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setName(String name) {
         this.name = name;
     }
-
-    private String name = "Default Name";
 
     public int getLevel() {
         if (level.equalsIgnoreCase("dynamic")) {
@@ -518,8 +475,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.level = level;
     }
 
-    private String level = null;
-
     public boolean getCullReinforcements() {
         return cullReinforcements;
     }
@@ -527,8 +482,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setCullReinforcements(boolean cullReinforcements) {
         this.cullReinforcements = cullReinforcements;
     }
-
-    private boolean cullReinforcements = true;
 
     public boolean isFilesOutOfSync() {
         return filesOutOfSync;
@@ -538,12 +491,11 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.filesOutOfSync = filesOutOfSync;
     }
 
-    private boolean filesOutOfSync = false;
-
     /**
      * Generates config defaults to be used by CustomBossesConfig
      */
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    @Override
+    public void generateConfigDefaults() {
         //initialize core defaults
         fileConfiguration.addDefault("isEnabled", enabled);
         fileConfiguration.addDefault("entityType", entityType);
@@ -589,6 +541,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         if (reinforcement) fileConfiguration.addDefault("reinforcement", reinforcement);
     }
 
+    @Override
     public void processConfigFields() {
         customBossConfigFields.put(getFilename(), this);
         this.entityType = processEnum("entityType", entityType);

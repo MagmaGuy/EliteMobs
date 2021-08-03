@@ -17,7 +17,7 @@ public class CustomEventsConfig extends CustomConfig {
     private static HashMap<String, CustomEventsConfigFields> customEvents;
 
     public CustomEventsConfig() {
-        super("customevents", "com.magmaguy.elitemobs.config.customevents.premade", "CustomEventsConfigFields");
+        super("customevents", "com.magmaguy.elitemobs.config.customevents.premade", CustomEventsConfigFields.class);
         customEvents = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
             customEvents.put(key, (CustomEventsConfigFields) super.getCustomConfigFieldsHashMap().get(key));

@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -19,43 +18,19 @@ import java.util.Set;
 
 public class CustomConfig {
 
-    public HashMap<String, ? extends CustomConfigFields> getCustomConfigFieldsHashMap() {
-        return customConfigFieldsHashMap;
-    }
-
-    /**
-     * Adds entry to custom config fields. This is done directly by the custom config fields as they are iterated through.
-     *
-     * @param filename           Name of the file , using the format filename.yml
-     * @param customConfigFields Custom Config Fields, should be from an extended subclass
-     */
-    public <V extends CustomConfigFields> void addCustomConfigFields(String filename, CustomConfigFields customConfigFields) {
-        customConfigFieldsHashMap.put(filename, customConfigFields);
-    }
-
     //This stores configurations long term, ? is the specific extended custom config field
     private final HashMap<String, CustomConfigFields> customConfigFieldsHashMap = new HashMap<>();
-
     //This is only used for loading configurations in to check if the machine has all of the default files
-    private ArrayList customConfigFieldsArrayList = new ArrayList<>();
-
-    private String folderName;
-
-    private Class<? extends CustomConfigFields> customConfigFields;
+    private final ArrayList customConfigFieldsArrayList = new ArrayList<>();
+    private final String folderName;
+    private final Class<? extends CustomConfigFields> customConfigFields;
 
     /**
      * Initializes all configurations and stores them in a list for later access
      */
-    public CustomConfig(String folderName, String packageName, String customConfigFieldsClassName) {
+    public CustomConfig(String folderName, String packageName, Class<? extends CustomConfigFields> customConfigFields) {
         this.folderName = folderName;
-
-        try {
-            customConfigFields = (Class<? extends CustomConfigFields>) Class.forName(packageName.replace("premade", customConfigFieldsClassName));
-        } catch (Exception ex) {
-            new WarningMessage("Messed up the class name for " + customConfigFieldsClassName);
-            ex.printStackTrace();
-            return;
-        }
+        this.customConfigFields = customConfigFields;
 
         //Set defaults through reflections by getting everything that extends specific CustomConfigFields within specific package scopes
         Reflections reflections = new Reflections(packageName);
@@ -117,6 +92,20 @@ public class CustomConfig {
 
     }
 
+    public HashMap<String, ? extends CustomConfigFields> getCustomConfigFieldsHashMap() {
+        return customConfigFieldsHashMap;
+    }
+
+    /**
+     * Adds entry to custom config fields. This is done directly by the custom config fields as they are iterated through.
+     *
+     * @param filename           Name of the file , using the format filename.yml
+     * @param customConfigFields Custom Config Fields, should be from an extended subclass
+     */
+    public <V extends CustomConfigFields> void addCustomConfigFields(String filename, CustomConfigFields customConfigFields) {
+        customConfigFieldsHashMap.put(filename, customConfigFields);
+    }
+
     /**
      * Called when the appropriate configurations directory does not exist
      */
@@ -131,19 +120,19 @@ public class CustomConfig {
     private void initialize(CustomConfigFields customConfigFields) {
         //Create configuration file from defaults if it does not exist
         File file = ConfigurationEngine.fileCreator(folderName, customConfigFields.getFilename());
-
-        new DeveloperMessage("Initializing default file " + file.getName());
         //Get config file
         FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-        //Generate config defaults
-        customConfigFields.generateConfigDefaults(fileConfiguration, file);
-
-        //Save all configuration values as they exist
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
         //Associate config
         customConfigFields.setFile(file);
         customConfigFields.setFileConfiguration(fileConfiguration);
+
+
+        //Generate config defaults
+        customConfigFields.generateConfigDefaults();
+
+        //Save all configuration values as they exist
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
         //Parse actual fields and load into RAM to be used
         customConfigFields.processConfigFields();
@@ -158,7 +147,6 @@ public class CustomConfig {
     private void initialize(File file) {
         //Load file configuration from file
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        new DeveloperMessage("Initializing custom file : " + file.getName());
 
         try {
             //Instantiate the correct CustomConfigFields instance

@@ -17,7 +17,7 @@ public class CustomBossesConfig extends CustomConfig {
     private static HashMap<String, CustomBossesConfigFields> customBosses = new HashMap<>();
 
     public CustomBossesConfig() {
-        super("custombosses", "com.magmaguy.elitemobs.config.custombosses.premade", "CustomBossesConfigFields");
+        super("custombosses", "com.magmaguy.elitemobs.config.custombosses.premade", CustomBossesConfigFields.class);
         customBosses = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
             customBosses.put(key, (CustomBossesConfigFields) super.getCustomConfigFieldsHashMap().get(key));

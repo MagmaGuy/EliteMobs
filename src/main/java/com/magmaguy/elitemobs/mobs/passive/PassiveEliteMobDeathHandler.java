@@ -31,6 +31,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.magmaguy.elitemobs.EliteMobs.validWorldList;
@@ -88,7 +89,7 @@ public class PassiveEliteMobDeathHandler implements Listener {
 
         private static void checkLostSuperMob(LivingEntity livingEntity) {
 
-            if (livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() !=
+            if (Objects.requireNonNull(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue() !=
                     SuperMobProperties.getSuperMobMaxHealth(livingEntity))
                 return;
 

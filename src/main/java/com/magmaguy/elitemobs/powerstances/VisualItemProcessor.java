@@ -36,7 +36,7 @@ public class VisualItemProcessor {
             @Override
             public void run() {
 
-                if (!eliteEntity.getLivingEntity().isValid() || !hasValidEffect) {
+                if (!eliteEntity.isValid() || !hasValidEffect) {
                     VisualItemRemover.removeItems(multiDimensionalTrailTracker);
                     cancel();
                     return;

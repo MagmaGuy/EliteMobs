@@ -12,7 +12,6 @@ import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -78,7 +77,6 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         if (villager != null && villager.isValid()) return;
         WorldGuardSpawnEventBypasser.forceSpawn();
         villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class, (villager) -> {
-            new DeveloperMessage("Initializing npc: " + npCsConfigFields.getName());
             villager.setAI(false);
             villager.setPersistent(false);
             villager.setRemoveWhenFarAway(false);
