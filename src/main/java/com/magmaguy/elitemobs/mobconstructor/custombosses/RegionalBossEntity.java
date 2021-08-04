@@ -56,10 +56,18 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         super.spawnLocation = ConfigurationLocation.deserialize(rawLocationString);
     }
 
-    public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location) {
+    private RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent) {
         super(customBossesConfigFields);
         super.spawnLocation = location;
         this.leashRadius = customBossesConfigFields.getLeashRadius();
+        if (permanent) {
+            this.rawString = ConfigurationLocation.serialize(location);
+            this.rawLocationString = rawString.split(":")[0];
+            this.unixRespawnTime = 0;
+            this.respawnCoolDownInMinutes = customBossesConfigFields.getSpawnCooldown();
+            regionalBossesFromConfigFields.put(customBossesConfigFields, this);
+            saveNewLocation();
+        }
     }
 
     public static void regionalDataSaver() {
@@ -99,15 +107,17 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     }
 
     @Nullable
-    public static RegionalBossEntity createRegionalBossEntity(String filename, Location spawnLocation) {
+    public static RegionalBossEntity createTemporaryRegionalBossEntity(String filename, Location spawnLocation) {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(filename);
         if (customBossesConfigFields == null)
             return null;
-        return createRegionalBossEntity(customBossesConfigFields, spawnLocation);
+        return new RegionalBossEntity(customBossesConfigFields, spawnLocation, false);
     }
 
-    public static RegionalBossEntity createRegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location spawnLocation) {
-        return new RegionalBossEntity(customBossesConfigFields, spawnLocation);
+    public static RegionalBossEntity createPermanentRegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location spawnLocation) {
+        RegionalBossEntity regionalBossEntity = new RegionalBossEntity(customBossesConfigFields, spawnLocation, true);
+        regionalBossEntity.initialize();
+        return regionalBossEntity;
     }
 
     public boolean isRespawning() {
@@ -115,7 +125,11 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     }
 
     public void saveNewLocation() {
+        if (spawnLocation == null || getLocation() == null) {
+            new WarningMessage("Failed to save regional boss because it failed to spawn correctly!");
+        }
         customBossesConfigFields.setFilesOutOfSync(true);
+        rawString = ConfigurationLocation.serialize(spawnLocation);
     }
 
     public void initialize() {
@@ -145,7 +159,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             super.phaseBossEntity.deathReset();
         unixRespawnTime = (respawnCoolDownInMinutes * 60L * 1000L) + System.currentTimeMillis();
         ticksBeforeRespawn = respawnCoolDownInMinutes * 60L * 20L;
-        rawString = rawLocationString + unixRespawnTime;
+        rawString = rawLocationString + ":" + unixRespawnTime;
         customBossesConfigFields.setFilesOutOfSync(true);
         queueSpawn(false);
     }

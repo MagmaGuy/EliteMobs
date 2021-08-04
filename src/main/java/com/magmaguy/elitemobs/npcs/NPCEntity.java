@@ -67,7 +67,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     }
 
     public void queueSpawn() {
-        if (spawnLocation != null && spawnLocation.getWorld() != null && ChunkLocationChecker.locationIsLoaded(spawnLocation)) {
+        if (spawnLocation != null && ChunkLocationChecker.locationIsLoaded(spawnLocation)) {
             spawn();
             return;
         }
@@ -89,6 +89,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         initializeRole();
         uuid = villager.getUniqueId();
         setTimeout();
+        simplePersistentEntity = null;
     }
 
     public Villager getVillager() {
@@ -121,12 +122,12 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
     @Override
     public void chunkUnload() {
-        villager.remove();
-        if (getNpCsConfigFields().getTimeout() < 1) {
-            simplePersistentEntity = new SimplePersistentEntity(this);
-            if (villager != null)
-                villager.remove();
-        }
+        if (villager != null)
+            villager.remove();
+        if (getNpCsConfigFields().getTimeout() > 0) return;
+        simplePersistentEntity = new SimplePersistentEntity(this);
+        if (villager != null)
+            villager.remove();
     }
 
     @Override
@@ -182,9 +183,12 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     }
 
     public void remove(RemovalReason removalReason) {
-        roleDisplay.remove();
-        if (villager != null)
+        if (roleDisplay != null)
+            roleDisplay.remove();
+        if (villager != null) {
             NPCEntityTracker.npcEntities.remove(villager.getUniqueId());
+            this.villager = null;
+        }
         boolean permanentRemoval = false;
 
         if (removalReason.equals(RemovalReason.REMOVE_COMMAND))

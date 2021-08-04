@@ -376,11 +376,8 @@ public class Minidungeon {
          * This runs when an admin tries to install a dungeon
          */
         public void commitLocations() {
-            for (RealDungeonLocation realDungeonLocation : realDungeonLocations) {
-                realDungeonLocation.regionalBossEntity = RegionalBossEntity.createRegionalBossEntity(realDungeonLocation.customBossesConfigFields, realDungeonLocation.location);
-                realDungeonLocation.regionalBossEntity.initialize();
-                realDungeonLocation.regionalBossEntity.getCustomBossesConfigFields().setFilesOutOfSync(true);
-            }
+            for (RealDungeonLocation realDungeonLocation : realDungeonLocations)
+                realDungeonLocation.regionalBossEntity = RegionalBossEntity.createPermanentRegionalBossEntity(realDungeonLocation.customBossesConfigFields, realDungeonLocation.location);
         }
 
         public void uncommitLocations() {
