@@ -20,7 +20,16 @@ public class NPCEntityTracker extends TrackedEntity implements AbstractTrackedEn
 
     @Override
     public void specificRemoveHandling(RemovalReason removalReason) {
-        npcEntity.remove(removalReason);
+        switch (removalReason) {
+            case CHUNK_UNLOAD:
+                npcEntity.chunkUnload();
+                break;
+            case WORLD_UNLOAD:
+                npcEntity.worldUnload();
+                break;
+            default:
+                npcEntity.remove(removalReason);
+        }
     }
 
 }

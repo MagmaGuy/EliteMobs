@@ -173,6 +173,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
 
     @Override
     public void processConfigFields() {
+        this.isEnabled = processBoolean("isEnabled", isEnabled);
         this.name = processString("name", name);
         this.role = processString("role", role);
         this.profession = processEnum("profession", profession);

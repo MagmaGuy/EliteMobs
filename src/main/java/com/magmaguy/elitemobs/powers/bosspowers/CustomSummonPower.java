@@ -328,7 +328,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 }
 
             if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName).isRegionalBoss()) {
-                RegionalBossEntity regionalBossEntity = RegionalBossEntity.createRegionalBossEntity(customBossReinforcement.bossFileName, spawnLocation);
+                RegionalBossEntity regionalBossEntity = RegionalBossEntity.createTemporaryRegionalBossEntity(customBossReinforcement.bossFileName, spawnLocation);
                 if (regionalBossEntity == null) {
                     new WarningMessage("Failed to spawn reinforcement for " + eliteEntity.getName() + " because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
                     return;

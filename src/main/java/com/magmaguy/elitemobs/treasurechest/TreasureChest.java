@@ -87,7 +87,7 @@ public class TreasureChest {
 
         this.chestTier = customTreasureChestConfigFields.getChestTier();
         this.location = customTreasureChestConfigFields.getLocation();
-        if (location == null)
+        if (location == null || location.getWorld() == null)
             return;
 
         try {

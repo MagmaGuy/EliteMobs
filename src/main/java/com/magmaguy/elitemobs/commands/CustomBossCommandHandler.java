@@ -34,8 +34,7 @@ public class CustomBossCommandHandler {
             if (safeSpawnLocation == null)
                 player.sendMessage("[EliteMobs] No safe spawn location found! Make sure the area is passable!");
             else {
-                RegionalBossEntity regionalBossEntity = new RegionalBossEntity(customBossesConfigFields, safeSpawnLocation);
-                regionalBossEntity.saveNewLocation();
+                RegionalBossEntity regionalBossEntity = RegionalBossEntity.createPermanentRegionalBossEntity(customBossesConfigFields, safeSpawnLocation);
             }
         }
     }

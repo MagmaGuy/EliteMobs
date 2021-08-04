@@ -15,9 +15,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 public class SimplePersistentEntity {
 
@@ -104,15 +102,15 @@ public class SimplePersistentEntity {
     }
 
     private static void unloadWorld(World world) {
-        List<SimplePersistentEntity> worldEntities = new ArrayList<>(persistentEntities.values());
-        worldEntities.forEach((simplePersistentEntity -> {
-            if (simplePersistentEntity.location == null) return;
-            if (simplePersistentEntity.location.getWorld() == null) return;
-            if (!simplePersistentEntity.location.getWorld().equals(world)) return;
+        persistentEntities.values().removeIf((simplePersistentEntity -> {
+            if (simplePersistentEntity.location == null) return false;
+            if (simplePersistentEntity.location.getWorld() == null) return false;
+            if (!simplePersistentEntity.location.getWorld().equals(world)) return false;
             if (simplePersistentEntity.customBossEntity != null)
                 simplePersistentEntity.customBossEntity.worldUnload();
             else if (simplePersistentEntity.npcEntity != null)
                 simplePersistentEntity.npcEntity.worldUnload();
+            return true;
         }));
     }
 
@@ -127,12 +125,11 @@ public class SimplePersistentEntity {
         public void worldLoadEvent(WorldLoadEvent event) {
             if (persistentEntitiesForQueuedWorlds.get(event.getWorld().getName()) == null) return;
             Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> {
-                for (SimplePersistentEntity simplePersistentEntity : persistentEntitiesForQueuedWorlds.get(event.getWorld().getName())) {
+                for (SimplePersistentEntity simplePersistentEntity : persistentEntitiesForQueuedWorlds.get(event.getWorld().getName()))
                     if (simplePersistentEntity.customBossEntity != null)
                         simplePersistentEntity.customBossEntity.worldLoad();
                     else if (simplePersistentEntity.npcEntity != null)
                         simplePersistentEntity.npcEntity.worldLoad();
-                }
                 persistentEntitiesForQueuedWorlds.removeAll(event.getWorld().getName());
             }, 20);
         }
