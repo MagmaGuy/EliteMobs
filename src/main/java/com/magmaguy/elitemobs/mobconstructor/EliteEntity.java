@@ -181,6 +181,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void setLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
+        if (livingEntity == null) return;
         this.livingEntity = livingEntity;
         this.unsyncedLivingEntity = livingEntity;
         this.entityType = livingEntity.getType();
