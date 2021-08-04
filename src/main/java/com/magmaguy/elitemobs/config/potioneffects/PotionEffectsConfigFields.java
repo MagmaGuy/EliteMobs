@@ -12,10 +12,10 @@ public class PotionEffectsConfigFields {
     private final String fileName;
     private final boolean isEnabled;
     private final String name;
-    private PotionEffectType potionEffectType;
     private final int onHitDuration;
     private final double value;
     private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
+    private PotionEffectType potionEffectType;
     private FileConfiguration configuration;
 
     public PotionEffectsConfigFields(String fileName,
@@ -30,15 +30,6 @@ public class PotionEffectsConfigFields {
         this.value = value;
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("name", name);
-        fileConfiguration.addDefault("onHitDuration", onHitDuration);
-        fileConfiguration.addDefault("value", value);
-        if (!additionalConfigOptions.isEmpty())
-            fileConfiguration.addDefaults(additionalConfigOptions);
-    }
-
     public PotionEffectsConfigFields(FileConfiguration fileConfiguration, File file) {
         this.fileName = file.getName();
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
@@ -47,6 +38,15 @@ public class PotionEffectsConfigFields {
         this.value = fileConfiguration.getDouble("value");
         this.potionEffectType = PotionEffectType.getByName(this.fileName.toUpperCase());
         this.configuration = fileConfiguration;
+    }
+
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+        fileConfiguration.addDefault("isEnabled", isEnabled);
+        fileConfiguration.addDefault("name", name);
+        fileConfiguration.addDefault("onHitDuration", onHitDuration);
+        fileConfiguration.addDefault("value", value);
+        if (!additionalConfigOptions.isEmpty())
+            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     public String getFileName() {

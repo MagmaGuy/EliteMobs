@@ -267,6 +267,10 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         livingEntity.setHealth(health);
     }
 
+    public void syncPluginHealth(double health) {
+        this.health = health;
+    }
+
     public double damage(double damage) {
         health = Math.max(0, livingEntity.getHealth() - damage);
         livingEntity.setHealth(health);
@@ -650,8 +654,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
      */
     public boolean isValid() {
         if (livingEntity == null) return false;
-        if (!livingEntity.isValid()) return false;
-        return true;
+        return livingEntity.isValid();
     }
 
     public void remove(RemovalReason removalReason) {
@@ -661,10 +664,8 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         if (removalReason.equals(RemovalReason.CHUNK_UNLOAD))
             if (isPersistent)
                 return;
-        if (livingEntity != null) {
-            livingEntity.removeMetadata(MetadataHandler.ELITE_MOB_METADATA, MetadataHandler.PLUGIN);
+        if (livingEntity != null)
             livingEntity.remove();
-        }
         this.livingEntity = null;
     }
 

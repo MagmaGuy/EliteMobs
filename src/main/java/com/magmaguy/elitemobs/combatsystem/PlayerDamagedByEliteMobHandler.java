@@ -29,6 +29,12 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
     public static boolean bypass = false;
 
+    public static double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
+        double maxEnchantmentLevel = EnchantmentsConfig.getEnchantment(enchantment).getMaxLevel();
+        double currentEnchantmentLevel = weapon.getEnchantmentLevel(enchantment);
+        return currentEnchantmentLevel / maxEnchantmentLevel <= 1 ? currentEnchantmentLevel / maxEnchantmentLevel : 1;
+    }
+
     /**
      * EliteMobs -> player damage handler.
      *
@@ -72,7 +78,7 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
         }
 
         //if the projectile deals custom damage
-        if (event.getProjectile() != null && ProjectileTagger.projectileHasCustomDamage(event.getProjectile())){
+        if (event.getProjectile() != null && ProjectileTagger.projectileHasCustomDamage(event.getProjectile())) {
             double damage = ProjectileTagger.getProjectileCustomDamage(event.getProjectile());
             if (damage < 0) return;
             //Set the final damage value
@@ -134,12 +140,6 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
 
         return totalReductionLevel;
 
-    }
-
-    public static double getDamageIncreasePercentage(Enchantment enchantment, ItemStack weapon) {
-        double maxEnchantmentLevel = EnchantmentsConfig.getEnchantment(enchantment).getMaxLevel();
-        double currentEnchantmentLevel = weapon.getEnchantmentLevel(enchantment);
-        return currentEnchantmentLevel / maxEnchantmentLevel <= 1 ? currentEnchantmentLevel / maxEnchantmentLevel : 1;
     }
 
 }

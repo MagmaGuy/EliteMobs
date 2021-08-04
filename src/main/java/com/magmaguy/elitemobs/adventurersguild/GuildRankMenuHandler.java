@@ -23,48 +23,10 @@ import java.util.List;
 
 public class GuildRankMenuHandler implements Listener {
 
-    @EventHandler
-    public void onRankSelectorClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) return;
-        if (!inventories.contains(event.getInventory())) return;
-        event.setCancelled(true);
-        Player player = (Player) event.getWhoClicked();
-
-        if (event.getSlot() == prestigetRankSlot) {
-            selectPrestigeUnlock(player);
-            return;
-        }
-        Integer selectedRank = null;
-
-        for (int i = 0; i < rankSlots.size(); i++) {
-            if (rankSlots.get(i) == event.getSlot()) {
-                selectedRank = i;
-                break;
-            }
-        }
-
-        //Clicked nothing
-        if (selectedRank == null) return;
-
-        if (GuildRank.getMaxGuildRank(player) >= selectedRank) {
-            selectUnlockedRank(player, selectedRank);
-            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
-            return;
-        }
-
-        if (GuildRank.getMaxGuildRank(player) + 1 == selectedRank) {
-            selectRankToUnlock(player, selectedRank);
-            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
-            return;
-        }
-
-        if (GuildRank.getMaxGuildRank(player) < selectedRank) {
-            selectPrestigeUnlock(player);
-            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
-            return;
-        }
-
-    }
+    private static final HashSet<Inventory> inventories = new HashSet<>();
+    private static final ArrayList<Integer> rankSlots = new ArrayList<>(Arrays.asList(
+            4, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42));
+    private static final int prestigetRankSlot = 49;
 
     private static void selectUnlockedRank(Player player, int guildRank) {
         GuildRank.setActiveGuildRank(player, guildRank);
@@ -119,19 +81,6 @@ public class GuildRankMenuHandler implements Listener {
                                 .replace("$prestigeRank", GuildRank.getActiveGuildRank(player) + "")
                                 .replace("$activeRank", GuildRank.getGuildPrestigeRank(player) + ""));
     }
-
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        if (!inventories.contains(event.getInventory())) return;
-        inventories.remove(event.getInventory());
-    }
-
-    private static final HashSet<Inventory> inventories = new HashSet<>();
-
-    private static final ArrayList<Integer> rankSlots = new ArrayList<>(Arrays.asList(
-            4, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42));
-
-    private static final int prestigetRankSlot = 49;
 
     /**
      * Using the following slots for the menu:
@@ -321,15 +270,6 @@ public class GuildRankMenuHandler implements Listener {
         return GuildRankMenuConfig.dodgeBonusMessage.replace("$amount", GuildRank.dodgeBonusValue(prestigeLevel, guildRank) + "");
     }
 
-    private enum guildRankStatus {
-        UNLOCKED,
-        SELECTED,
-        NEXT_UNLOCK,
-        LOCKED,
-        PRESTIGE_LOCKED,
-        PRESTIGE_NEXT_UNLOCK,
-    }
-
     private static int tierPriceCalculator(int tier, int prestigeLevel) {
         /*Logic:
         tier * 10 = max mob tier
@@ -338,6 +278,64 @@ public class GuildRankMenuHandler implements Listener {
          */
         double eliteMobsToKillBeforeGuildRankup = AdventurersGuildConfig.baseKillsForRankUp + AdventurersGuildConfig.additionalKillsForRankUpPerTier * (tier - 1);
         return (int) ((tier - 1) * 10 / 2 * eliteMobsToKillBeforeGuildRankup * (GuildRank.currencyBonusMultiplier(prestigeLevel)));
+    }
+
+    @EventHandler
+    public void onRankSelectorClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
+        if (!inventories.contains(event.getInventory())) return;
+        event.setCancelled(true);
+        Player player = (Player) event.getWhoClicked();
+
+        if (event.getSlot() == prestigetRankSlot) {
+            selectPrestigeUnlock(player);
+            return;
+        }
+        Integer selectedRank = null;
+
+        for (int i = 0; i < rankSlots.size(); i++) {
+            if (rankSlots.get(i) == event.getSlot()) {
+                selectedRank = i;
+                break;
+            }
+        }
+
+        //Clicked nothing
+        if (selectedRank == null) return;
+
+        if (GuildRank.getMaxGuildRank(player) >= selectedRank) {
+            selectUnlockedRank(player, selectedRank);
+            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
+            return;
+        }
+
+        if (GuildRank.getMaxGuildRank(player) + 1 == selectedRank) {
+            selectRankToUnlock(player, selectedRank);
+            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
+            return;
+        }
+
+        if (GuildRank.getMaxGuildRank(player) < selectedRank) {
+            selectPrestigeUnlock(player);
+            GuildRankMenuHandler.populateInventory(event.getInventory(), player);
+            return;
+        }
+
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!inventories.contains(event.getInventory())) return;
+        inventories.remove(event.getInventory());
+    }
+
+    private enum guildRankStatus {
+        UNLOCKED,
+        SELECTED,
+        NEXT_UNLOCK,
+        LOCKED,
+        PRESTIGE_LOCKED,
+        PRESTIGE_NEXT_UNLOCK,
     }
 
 }

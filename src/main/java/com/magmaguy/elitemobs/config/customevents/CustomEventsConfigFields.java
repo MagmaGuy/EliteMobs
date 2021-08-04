@@ -96,7 +96,7 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         if (weight != 0) fileConfiguration.addDefault("weight", weight);
         if (eventDuration != 0) fileConfiguration.addDefault("eventDuration", eventDuration);
         if (!endEventWithBossDeath) fileConfiguration.addDefault("endEventWithBossDeath", endEventWithBossDeath);
-        if (!customSpawn.isEmpty()) fileConfiguration.addDefault("spawnType", customSpawn.toString());
+        if (!customSpawn.isEmpty()) fileConfiguration.addDefault("spawnType", customSpawn);
         if (minimumPlayerCount != 0) fileConfiguration.addDefault("minimumPlayerCount", minimumPlayerCount);
     }
 

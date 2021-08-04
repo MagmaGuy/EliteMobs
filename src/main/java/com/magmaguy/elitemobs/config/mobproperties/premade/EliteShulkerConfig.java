@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Arrays;
 
 public class EliteShulkerConfig extends MobPropertiesConfigFields {
-    public EliteShulkerConfig(){
+    public EliteShulkerConfig() {
         super("elite_shulker",
                 EntityType.SHULKER,
                 true,

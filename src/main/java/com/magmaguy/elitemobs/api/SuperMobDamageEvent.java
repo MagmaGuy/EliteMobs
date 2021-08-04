@@ -9,18 +9,17 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class SuperMobDamageEvent extends Event implements Cancellable {
     //todo: make canceleable
 
-    public static void callEvent(LivingEntity livingEntity, EntityDamageEvent entityDamageEvent) {
-        new EventCaller(new SuperMobDamageEvent(livingEntity, entityDamageEvent));
-    }
-
     private static final HandlerList handlers = new HandlerList();
     private final LivingEntity livingEntity;
     private final EntityDamageEvent entityDamageEvent;
     private boolean cancelled = false;
-
     public SuperMobDamageEvent(LivingEntity livingEntity, EntityDamageEvent entityDamageEvent) {
         this.livingEntity = livingEntity;
         this.entityDamageEvent = entityDamageEvent;
+    }
+
+    public static void callEvent(LivingEntity livingEntity, EntityDamageEvent entityDamageEvent) {
+        new EventCaller(new SuperMobDamageEvent(livingEntity, entityDamageEvent));
     }
 
     public static HandlerList getHandlerList() {

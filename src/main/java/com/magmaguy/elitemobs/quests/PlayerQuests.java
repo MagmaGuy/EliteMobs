@@ -10,6 +10,13 @@ import java.util.UUID;
 
 public class PlayerQuests implements Serializable {
 
+    public Player player;
+    public ArrayList<EliteQuest> quests = new ArrayList<>();
+
+    public PlayerQuests(Player player) {
+        this.player = player;
+    }
+
     public static PlayerQuests getData(Player player) {
         return PlayerData.getQuestStatus(player.getUniqueId());
     }
@@ -43,13 +50,6 @@ public class PlayerQuests implements Serializable {
 
     public static void updateDatabase(Player player, PlayerQuests playerQuests) {
         PlayerData.setQuestStatus(player.getUniqueId(), playerQuests);
-    }
-
-    public Player player;
-    public ArrayList<EliteQuest> quests = new ArrayList<>();
-
-    public PlayerQuests(Player player) {
-        this.player = player;
     }
 
     public boolean hasQuest(UUID uuid) {

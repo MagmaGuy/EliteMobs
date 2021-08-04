@@ -12,6 +12,9 @@ import java.util.UUID;
 public class VaultCompatibility {
 
     public static boolean VAULT_ENABLED = false;
+    private static Economy econ = null;
+    private static Permission perms = null;
+    private static Chat chat = null;
 
     public static void vaultSetup() {
         if (Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) {
@@ -29,10 +32,6 @@ public class VaultCompatibility {
         }
     }
 
-    private static Economy econ = null;
-    private static Permission perms = null;
-    private static Chat chat = null;
-
     public static void setupEconomy() {
         if (Bukkit.getServer().getPluginManager().getPlugin("Vault") == null) {
             return;
@@ -42,18 +41,6 @@ public class VaultCompatibility {
             return;
         }
         econ = rsp.getProvider();
-    }
-
-    public boolean setupChat() {
-        RegisteredServiceProvider<Chat> rsp = Bukkit.getServer().getServicesManager().getRegistration(Chat.class);
-        chat = rsp.getProvider();
-        return chat != null;
-    }
-
-    public boolean setupPermissions() {
-        RegisteredServiceProvider<Permission> rsp = Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
-        perms = rsp.getProvider();
-        return perms != null;
     }
 
     public static void addVaultCurrency(UUID user, double amount) {
@@ -91,6 +78,18 @@ public class VaultCompatibility {
 
     public static Chat getChat() {
         return chat;
+    }
+
+    public boolean setupChat() {
+        RegisteredServiceProvider<Chat> rsp = Bukkit.getServer().getServicesManager().getRegistration(Chat.class);
+        chat = rsp.getProvider();
+        return chat != null;
+    }
+
+    public boolean setupPermissions() {
+        RegisteredServiceProvider<Permission> rsp = Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
+        perms = rsp.getProvider();
+        return perms != null;
     }
 
 }

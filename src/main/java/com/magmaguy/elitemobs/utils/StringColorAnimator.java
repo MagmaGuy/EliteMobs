@@ -14,11 +14,11 @@ public class StringColorAnimator {
 
         String finalSubtitle = subtitle;
         new BukkitRunnable() {
+            final int titleSize = title.length();
+            final int subtitleSize = finalSubtitle.length();
             int counter = 0;
             int titleIndex = 0;
             int subtitleIndex = 0;
-            final int titleSize = title.length();
-            final int subtitleSize = finalSubtitle.length();
 
             @Override
             public void run() {

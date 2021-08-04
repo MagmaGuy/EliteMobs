@@ -23,18 +23,6 @@ public class Firestorm extends BossPower implements Listener {
         super(PowersConfig.getPower("firestorm.yml"));
     }
 
-    @EventHandler
-    public void onDamage(EliteMobDamagedByPlayerEvent event) {
-        Firestorm firestorm = (Firestorm) event.getEliteMobEntity().getPower(this);
-        if (firestorm == null) return;
-        if (!eventIsValid(event, firestorm)) return;
-        if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
-
-        firestorm.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
-        doFirestorm(event.getEliteMobEntity());
-
-    }
-
     private static void doFirestorm(EliteEntity eliteEntity) {
         if (eliteEntity == null || !eliteEntity.getLivingEntity().isValid()) return;
         eliteEntity.getLivingEntity().setAI(false);
@@ -172,6 +160,18 @@ public class Firestorm extends BossPower implements Listener {
                 cancel();
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+    }
+
+    @EventHandler
+    public void onDamage(EliteMobDamagedByPlayerEvent event) {
+        Firestorm firestorm = (Firestorm) event.getEliteMobEntity().getPower(this);
+        if (firestorm == null) return;
+        if (!eventIsValid(event, firestorm)) return;
+        if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
+
+        firestorm.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
+        doFirestorm(event.getEliteMobEntity());
+
     }
 
 }

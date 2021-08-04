@@ -11,7 +11,7 @@ public class DialogArmorStand {
 
     public static ArmorStand createDialogArmorStand(Entity sourceEntity, String dialog, Vector offset) {
 
-        offset.add(getDisplacementVector(sourceEntity).subtract(new Vector(0,1,0)));
+        offset.add(getDisplacementVector(sourceEntity).subtract(new Vector(0, 1, 0)));
         Vector finalOffset = offset;
         ArmorStand armorStand = VisualArmorStand.VisualArmorStand(sourceEntity.getLocation().clone().add(finalOffset), dialog);
 

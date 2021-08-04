@@ -24,6 +24,8 @@ import java.util.UUID;
 
 public class WorldGuardCompatibility {
 
+    private static final StateFlag.State allow = StateFlag.State.ALLOW;
+    private static final StateFlag.State deny = StateFlag.State.DENY;
     private static StateFlag ELITEMOBS_SPAWN_FLAG;
     private static StateFlag ELITEMOBS_ONLY_SPAWN_FLAG;
     private static StateFlag ELITEMOBS_ANTIEXPLOIT;
@@ -152,9 +154,6 @@ public class WorldGuardCompatibility {
     public static final StateFlag getEliteMobsExplosionRegen() {
         return ELITEMOBS_EXPLOSION_REGEN;
     }
-
-    private static final StateFlag.State allow = StateFlag.State.ALLOW;
-    private static final StateFlag.State deny = StateFlag.State.DENY;
 
     public static void protectWorldMinidugeonArea(Location location, Minidungeon minidungeon) {
         try {

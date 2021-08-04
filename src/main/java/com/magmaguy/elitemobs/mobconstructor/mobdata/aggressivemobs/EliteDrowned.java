@@ -11,7 +11,7 @@ public class EliteDrowned extends EliteMobProperties {
         this.defaultMaxHealth = 20;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.DROWNED).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.DROWNED).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 
 }

@@ -19,6 +19,21 @@ public class TimedEvent extends CustomEvent implements Listener {
 
     public static ArrayList<TimedEvent> blueprintEvents = new ArrayList<>();
     public static ArrayList<TimedEvent> timedEvents = new ArrayList<>();
+    //stores the time of the last global trigger
+    public static double nextEventTrigger = 0;
+    public double localCooldown;
+    public double nextLocalEventTrigger = 0;
+    public double globalCooldown;
+    public double weight;
+    public String filename;
+    public CustomSpawn customSpawn;
+    public TimedEvent(CustomEventsConfigFields customEventsConfigFields) {
+        super(customEventsConfigFields);
+        this.localCooldown = customEventsConfigFields.getLocalCooldown();
+        this.globalCooldown = customEventsConfigFields.getGlobalCooldown();
+        this.weight = customEventsConfigFields.getWeight();
+        this.filename = customEventsConfigFields.getFilename();
+    }
 
     public static void initializeBlueprintEvents() {
         for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values())
@@ -86,24 +101,6 @@ public class TimedEvent extends CustomEvent implements Listener {
 
         timedEvents.add(timedEvent);
         timedEvent.queueEvent();
-    }
-
-    //stores the time of the last global trigger
-    public static double nextEventTrigger = 0;
-
-    public double localCooldown;
-    public double nextLocalEventTrigger = 0;
-    public double globalCooldown;
-    public double weight;
-    public String filename;
-    public CustomSpawn customSpawn;
-
-    public TimedEvent(CustomEventsConfigFields customEventsConfigFields) {
-        super(customEventsConfigFields);
-        this.localCooldown = customEventsConfigFields.getLocalCooldown();
-        this.globalCooldown = customEventsConfigFields.getGlobalCooldown();
-        this.weight = customEventsConfigFields.getWeight();
-        this.filename = customEventsConfigFields.getFilename();
     }
 
     /**

@@ -7,10 +7,6 @@ import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class PlayerStatusMenuConfig extends MenusConfigFields {
-    public PlayerStatusMenuConfig() {
-        super("player_status_screen");
-    }
-
     public static boolean doIndexPage, doStatsPage, doGearPage, doTeleportsPage, doCommandsPage, doQuestTrackingPage, doBossTrackingPage;
     public static String[] indexTextLines = new String[13], indexHoverLines = new String[13], indexCommandLines = new String[13];
     public static String[] statsTextLines = new String[13], statsHoverLines = new String[13], statsCommandLines = new String[13];
@@ -20,6 +16,51 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     public static String[] bossTrackerTextLines = new String[13], bossTrackerHoverLines = new String[13], bossTrackerCommandLines = new String[13];
     public static String[] questTrackerTextLines = new String[13], questTrackerHoverLines = new String[13], questTrackerCommandLines = new String[13];
     public static String onBossTrackHover, onQuestTrackHover, onTeleportHover;
+    public PlayerStatusMenuConfig() {
+        super("player_status_screen");
+    }
+
+    private static void indexLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
+        indexTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexTexts" + line, text);
+        indexHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexHovers" + line, hover);
+        indexCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexCommands" + line, command);
+    }
+
+    private static void statsLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
+        statsTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "statsText" + line, text);
+        statsHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "statsHover" + line, hover);
+        statsCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "statsCommand" + line, command);
+    }
+
+    private static void gearLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
+        gearTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearText" + line, text);
+        gearHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearHover" + line, hover);
+        gearCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearCommand" + line, command);
+    }
+
+    private static void teleportLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
+        teleportTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportText" + line, text);
+        teleportHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportHover" + line, hover);
+        teleportCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportCommand" + line, command);
+    }
+
+    private static void commandsLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
+        commandsTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "commandsText" + line, text);
+        commandsHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "commandsHover" + line, hover);
+        commandsCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "commandsCommand" + line, command);
+    }
+
+    private static void questTrackerLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
+        questTrackerTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "questTrackerText" + line, text);
+        questTrackerHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "questTrackerHover" + line, hover);
+        questTrackerCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "questTrackerCommand" + line, command);
+    }
+
+    private static void bossTrackerLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
+        bossTrackerTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "bossTrackerText" + line, text);
+        bossTrackerHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "bossTrackerHover" + line, hover);
+        bossTrackerCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "bossTrackerCommand" + line, command);
+    }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {
@@ -140,48 +181,6 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
 
         onBossTrackHover = ConfigurationEngine.setString(fileConfiguration, "onBossTrackHover", "Click to track/untrack!");
 
-    }
-
-    private static void indexLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
-        indexTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexTexts" + line, text);
-        indexHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexHovers" + line, hover);
-        indexCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "indexCommands" + line, command);
-    }
-
-    private static void statsLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
-        statsTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "statsText" + line, text);
-        statsHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "statsHover" + line, hover);
-        statsCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "statsCommand" + line, command);
-    }
-
-    private static void gearLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
-        gearTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearText" + line, text);
-        gearHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearHover" + line, hover);
-        gearCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "gearCommand" + line, command);
-    }
-
-    private static void teleportLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
-        teleportTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportText" + line, text);
-        teleportHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportHover" + line, hover);
-        teleportCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "teleportCommand" + line, command);
-    }
-
-    private static void commandsLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
-        commandsTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "commandsText" + line, text);
-        commandsHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "commandsHover" + line, hover);
-        commandsCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "commandsCommand" + line, command);
-    }
-
-    private static void questTrackerLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
-        questTrackerTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "questTrackerText" + line, text);
-        questTrackerHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "questTrackerHover" + line, hover);
-        questTrackerCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "questTrackerCommand" + line, command);
-    }
-
-    private static void bossTrackerLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
-        bossTrackerTextLines[line] = ConfigurationEngine.setString(fileConfiguration, "bossTrackerText" + line, text);
-        bossTrackerHoverLines[line] = ConfigurationEngine.setString(fileConfiguration, "bossTrackerHover" + line, hover);
-        bossTrackerCommandLines[line] = ConfigurationEngine.setString(fileConfiguration, "bossTrackerCommand" + line, command);
     }
 
 }

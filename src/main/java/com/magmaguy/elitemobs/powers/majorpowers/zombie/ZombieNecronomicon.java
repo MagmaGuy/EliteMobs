@@ -34,9 +34,8 @@ import static com.magmaguy.elitemobs.ChatColorConverter.convert;
  */
 public class ZombieNecronomicon extends MajorPower implements Listener {
 
-    private int chantIndex = 0;
-
     private static final HashSet<EliteEntity> chantingMobs = new HashSet<>();
+    private int chantIndex = 0;
     //todo: Shouldn't this be static?
 
     public ZombieNecronomicon() {
@@ -65,8 +64,8 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
             return;
 
         new BukkitRunnable() {
-            int counter = 0;
             final HashMap<Integer, List<Item>> fourTrack = new HashMap();
+            int counter = 0;
 
             @Override
             public void run() {

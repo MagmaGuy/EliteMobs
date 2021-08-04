@@ -23,29 +23,36 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EnderDragonEmpoweredLightning extends MajorPower {
 
+    private boolean isActive = false;
+    private BukkitTask bukkitTask = null;
+
     public EnderDragonEmpoweredLightning() {
         super(PowersConfig.getPower("ender_dragon_empowered_lightning.yml"));
     }
 
-    public static class EnderDragonEmpoweredLightningEvents implements Listener {
-        @EventHandler
-        public void onCombatEnter(EliteMobEnterCombatEvent event) {
-            EnderDragonEmpoweredLightning empoweredLightning = (EnderDragonEmpoweredLightning) event.getEliteMobEntity().getPower("ender_dragon_empowered_lightning.yml");
-            if (empoweredLightning == null) return;
-            empoweredLightning.activate(event.getEliteMobEntity());
-        }
+    public static void lightningTask(Location location) {
+        new BukkitRunnable() {
+            int counter = 0;
 
-        @EventHandler
-        public void onCombatLeave(EliteMobExitCombatEvent event) {
-            EnderDragonEmpoweredLightning empoweredLightning = (EnderDragonEmpoweredLightning) event.getEliteMobEntity().getPower("ender_dragon_empowered_lightning.yml");
-            if (empoweredLightning == null) return;
-            empoweredLightning.deactivate();
-        }
+            @Override
+            public void run() {
+                counter++;
+                if (counter > 20 * 3) {
+                    location.getWorld().strikeLightning(location);
+                    Fireball fireball = (Fireball) location.getWorld().spawnEntity(location, EntityType.FIREBALL);
+                    EntityTracker.registerProjectileEntity(fireball);
+                    fireball.setDirection(new Vector(0, -3, 0));
+                    fireball.setVelocity(new Vector(0, -3, 0));
+                    fireball.setYield(15F);
+                    EliteProjectile.signExplosiveWithPower(fireball, "ender_dragon_empowered_lightning.yml");
+                    cancel();
+                    return;
+                }
+                location.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, location, 10, 0.5, 1.5, 0.5, 0.3);
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
     }
-
-    private boolean isActive = false;
-    private BukkitTask bukkitTask = null;
 
     private void activate(EliteEntity eliteEntity) {
         if (isActive)
@@ -104,27 +111,20 @@ public class EnderDragonEmpoweredLightning extends MajorPower {
         return randomLocation;
     }
 
-    public static void lightningTask(Location location) {
-        new BukkitRunnable() {
-            int counter = 0;
+    public static class EnderDragonEmpoweredLightningEvents implements Listener {
+        @EventHandler
+        public void onCombatEnter(EliteMobEnterCombatEvent event) {
+            EnderDragonEmpoweredLightning empoweredLightning = (EnderDragonEmpoweredLightning) event.getEliteMobEntity().getPower("ender_dragon_empowered_lightning.yml");
+            if (empoweredLightning == null) return;
+            empoweredLightning.activate(event.getEliteMobEntity());
+        }
 
-            @Override
-            public void run() {
-                counter++;
-                if (counter > 20 * 3) {
-                    location.getWorld().strikeLightning(location);
-                    Fireball fireball = (Fireball) location.getWorld().spawnEntity(location, EntityType.FIREBALL);
-                    EntityTracker.registerProjectileEntity(fireball);
-                    fireball.setDirection(new Vector(0, -3, 0));
-                    fireball.setVelocity(new Vector(0, -3, 0));
-                    fireball.setYield(15F);
-                    EliteProjectile.signExplosiveWithPower(fireball, "ender_dragon_empowered_lightning.yml");
-                    cancel();
-                    return;
-                }
-                location.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, location, 10, 0.5, 1.5, 0.5, 0.3);
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        @EventHandler
+        public void onCombatLeave(EliteMobExitCombatEvent event) {
+            EnderDragonEmpoweredLightning empoweredLightning = (EnderDragonEmpoweredLightning) event.getEliteMobEntity().getPower("ender_dragon_empowered_lightning.yml");
+            if (empoweredLightning == null) return;
+            empoweredLightning.deactivate();
+        }
 
     }
 

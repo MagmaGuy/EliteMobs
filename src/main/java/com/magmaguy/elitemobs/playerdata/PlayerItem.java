@@ -19,29 +19,17 @@ import java.util.ArrayList;
 
 public class PlayerItem {
 
-    public enum EquipmentSlot {
-        HELMET,
-        CHESTPLATE,
-        LEGGINGS,
-        BOOTS,
-        MAINHAND,
-        OFFHAND
-    }
-
     public EquipmentSlot equipmentSlot;
     public Player player;
     public ItemStack itemStack = null;
     public int itemTier = 0;
     public ArrayList<ElitePotionEffect> continuousPotionEffects = new ArrayList<>();
     public ArrayList<ElitePotionEffect> onHitPotionEffects = new ArrayList<>();
-
     public int damageArthropodsLevel = 0;
     public int damageUndeadLevel = 0;
     public int thornsLevel = 0;
     private double critChance = 0;
     private double hunterChance = 0;
-
-
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
      * of checks done by EliteMobs during combat and for passive potion effect applications. It should (largely) only update
@@ -160,6 +148,15 @@ public class PlayerItem {
         if (update)
             fullUpdate(itemStack);
         return this.hunterChance;
+    }
+
+    public enum EquipmentSlot {
+        HELMET,
+        CHESTPLATE,
+        LEGGINGS,
+        BOOTS,
+        MAINHAND,
+        OFFHAND
     }
 
 }

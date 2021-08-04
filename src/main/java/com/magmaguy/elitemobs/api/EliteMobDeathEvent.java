@@ -24,6 +24,10 @@ public class EliteMobDeathEvent extends Event {
         this.entityDeathEvent = entityDeathEvent;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public Entity getEntity() {
         return this.entity;
     }
@@ -38,10 +42,6 @@ public class EliteMobDeathEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

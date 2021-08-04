@@ -13,9 +13,9 @@ public class EnchantmentsConfigFields {
     private final boolean isEnabled;
     private final String name;
     private final int maxLevel;
-    private Enchantment enchantment;
     private final double value;
     private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
+    private Enchantment enchantment;
     private FileConfiguration fileConfiguration;
 
     public EnchantmentsConfigFields(String fileName,
@@ -28,15 +28,6 @@ public class EnchantmentsConfigFields {
         this.name = name;
         this.maxLevel = maxLevel;
         this.value = value;
-    }
-
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("name", name);
-        fileConfiguration.addDefault("maxLevel", maxLevel);
-        fileConfiguration.addDefault("value", value);
-        if (!additionalConfigOptions.isEmpty())
-            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     public EnchantmentsConfigFields(FileConfiguration fileConfiguration, File file) {
@@ -52,6 +43,15 @@ public class EnchantmentsConfigFields {
             this.enchantment = null;
         }
         this.value = fileConfiguration.getDouble("value");
+    }
+
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+        fileConfiguration.addDefault("isEnabled", isEnabled);
+        fileConfiguration.addDefault("name", name);
+        fileConfiguration.addDefault("maxLevel", maxLevel);
+        fileConfiguration.addDefault("value", value);
+        if (!additionalConfigOptions.isEmpty())
+            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     public String getFileName() {

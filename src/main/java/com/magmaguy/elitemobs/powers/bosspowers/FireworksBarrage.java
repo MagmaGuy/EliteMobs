@@ -34,8 +34,8 @@ public class FireworksBarrage extends BossPower {
                 eliteEntity.getLivingEntity().teleport(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
         FireworksBarrage fireworksBarrage = this;
         new BukkitRunnable() {
-            int counter = 0;
             final Location initialLocation = eliteEntity.getLivingEntity().getLocation().clone();
+            int counter = 0;
 
             @Override
             public void run() {
@@ -83,6 +83,19 @@ public class FireworksBarrage extends BossPower {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 10);
     }
 
+    public static class FireworksBarrageEvents implements Listener {
+        @EventHandler
+        public void onDamage(EliteMobDamagedByPlayerEvent event) {
+            FireworksBarrage fireworksBarrage = (FireworksBarrage) event.getEliteMobEntity().getPower(new FireworksBarrage());
+            if (fireworksBarrage == null) return;
+            if (!eventIsValid(event, fireworksBarrage)) return;
+            if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
+
+            fireworksBarrage.doCooldown(event.getEliteMobEntity());
+            fireworksBarrage.doFireworksBarrage(event.getEliteMobEntity());
+        }
+    }
+
     private class FireworkTask {
         public FireworkTask(Firework firework, Location targetLocation, EliteEntity eliteEntity, FireworksBarrage fireworksBarrage) {
             new BukkitRunnable() {
@@ -107,19 +120,6 @@ public class FireworksBarrage extends BossPower {
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
-        }
-    }
-
-    public static class FireworksBarrageEvents implements Listener {
-        @EventHandler
-        public void onDamage(EliteMobDamagedByPlayerEvent event) {
-            FireworksBarrage fireworksBarrage = (FireworksBarrage) event.getEliteMobEntity().getPower(new FireworksBarrage());
-            if (fireworksBarrage == null) return;
-            if (!eventIsValid(event, fireworksBarrage)) return;
-            if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
-
-            fireworksBarrage.doCooldown(event.getEliteMobEntity());
-            fireworksBarrage.doFireworksBarrage(event.getEliteMobEntity());
         }
     }
 

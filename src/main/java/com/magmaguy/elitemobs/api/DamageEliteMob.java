@@ -30,12 +30,6 @@ public class DamageEliteMob {
         return damageFormula(player, eliteEntity, DamageAmount.HIGH);
     }
 
-    public enum DamageAmount {
-        LOW,
-        MEDIUM,
-        HIGH
-    }
-
     private static double damageFormula(EliteEntity eliteEntity, DamageAmount damageAmount) {
         return eliteEntity.damage(tierCalc(eliteEntity, damageAmount));
     }
@@ -58,6 +52,12 @@ public class DamageEliteMob {
             case HIGH:
                 return eliteEntity.getLevel() + 3;
         }
+    }
+
+    public enum DamageAmount {
+        LOW,
+        MEDIUM,
+        HIGH
     }
 
 }

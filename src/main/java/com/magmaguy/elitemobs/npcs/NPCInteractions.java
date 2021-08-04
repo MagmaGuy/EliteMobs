@@ -19,25 +19,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class NPCInteractions implements Listener {
 
-    public enum NPCInteractionType {
-        GUILD_GREETER,
-        CHAT,
-        CUSTOM_SHOP,
-        PROCEDURALLY_GENERATED_SHOP,
-        BAR,
-        ARENA,
-        QUEST_GIVER,
-        NONE,
-        SELL,
-        TELEPORT_BACK,
-        SCRAPPER,
-        SMELTER,
-        REPAIRMAN,
-        ENHANCER,
-        REFINER,
-        UNBINDER
-    }
-
     @EventHandler
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
 
@@ -204,6 +185,25 @@ public class NPCInteractions implements Listener {
                 return;
             }
 
+    }
+
+    public enum NPCInteractionType {
+        GUILD_GREETER,
+        CHAT,
+        CUSTOM_SHOP,
+        PROCEDURALLY_GENERATED_SHOP,
+        BAR,
+        ARENA,
+        QUEST_GIVER,
+        NONE,
+        SELL,
+        TELEPORT_BACK,
+        SCRAPPER,
+        SMELTER,
+        REPAIRMAN,
+        ENHANCER,
+        REFINER,
+        UNBINDER
     }
 
 

@@ -10,11 +10,11 @@ public class MenusConfigFields {
         this.fileName = fileName + ".yml";
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-    }
-
     public MenusConfigFields(FileConfiguration configuration) {
 
+    }
+
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
     }
 
     public String getFileName() {

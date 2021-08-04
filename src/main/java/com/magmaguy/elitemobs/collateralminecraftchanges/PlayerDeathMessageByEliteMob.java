@@ -29,17 +29,6 @@ public class PlayerDeathMessageByEliteMob implements Listener {
         deadPlayerList.remove(player);
     }
 
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-
-        if (isDeadPlayer(event.getEntity())) {
-            event.setDeathMessage(deadPlayerList.get(event.getEntity()));
-            PlayerStatsTracker.registerPlayerDeath(event.getEntity());
-            removeDeadPlayer(event.getEntity());
-        }
-
-    }
-
     public static String initializeDeathMessage(Player player, LivingEntity livingEntity) {
 
         String deathMessage = "";
@@ -70,6 +59,17 @@ public class PlayerDeathMessageByEliteMob implements Listener {
         deathMessage = ChatColorConverter.convert("&7" + deathMessage);
 
         return deathMessage;
+
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+
+        if (isDeadPlayer(event.getEntity())) {
+            event.setDeathMessage(deadPlayerList.get(event.getEntity()));
+            PlayerStatsTracker.registerPlayerDeath(event.getEntity());
+            removeDeadPlayer(event.getEntity());
+        }
 
     }
 

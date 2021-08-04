@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Arrays;
 
 public class EliteKillerBunnyConfig extends MobPropertiesConfigFields {
-    public EliteKillerBunnyConfig(){
+    public EliteKillerBunnyConfig() {
         super("elite_killer_bunny",
                 EntityType.RABBIT,
                 true,

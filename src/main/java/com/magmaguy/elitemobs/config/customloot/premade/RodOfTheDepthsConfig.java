@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class RodOfTheDepthsConfig extends CustomLootConfigFields {
-    public RodOfTheDepthsConfig(){
+    public RodOfTheDepthsConfig() {
         super("rod_of_the_depths",
                 true,
                 Material.FISHING_ROD.toString(),

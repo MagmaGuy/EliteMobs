@@ -12,15 +12,14 @@ import java.util.List;
 
 
 public class CustomShopMenuConfig extends MenusConfigFields {
-    public CustomShopMenuConfig() {
-        super("custom_shop_menu");
-    }
-
     public static String shopName;
     public static ItemStack rerollItem;
     public static int rerollSlot;
     public static List<Integer> storeSlots;
     public static String messageFullInventory;
+    public CustomShopMenuConfig() {
+        super("custom_shop_menu");
+    }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {

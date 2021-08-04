@@ -19,6 +19,44 @@ import java.util.HashSet;
 
 public class QuestsMenu implements Listener {
 
+    private static final HashSet<Inventory> inventories = new HashSet<>();
+    private static final ArrayList<Integer> rankSlots = new ArrayList<>(Arrays.asList(10, 12, 14, 16));
+    private static final HashMap<Integer, ArrayList<EliteQuest>> rotatingQuests = new HashMap();
+
+    public static Inventory initializeQuestsMenu(Player player) {
+        Inventory questsMenu = Bukkit.createInventory(player, 18, QuestMenuConfig.menuName);
+        questsMenu = populateInventory(questsMenu, player);
+        inventories.add(questsMenu);
+        player.openInventory(questsMenu);
+        return questsMenu;
+    }
+
+    private static Inventory populateInventory(Inventory inventory, Player player) {
+        for (int i = 0; i < rankSlots.size(); i++)
+            inventory.setItem(rankSlots.get(i), rotatingQuests.get(GuildRank.getActiveGuildRank(player)).get(i).generateQuestItemStack(player));
+        return inventory;
+    }
+
+    //refreshes quests every hour
+    public static void questRefresher() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                populateQuests();
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 60 * 60 * 20);
+    }
+
+    private static void populateQuests() {
+        for (int i = 0; i < 21; i++) {
+            ArrayList<EliteQuest> questList = new ArrayList();
+            for (int j = 0; j < 4; j++) {
+                questList.add(new EliteQuest(i));
+            }
+            rotatingQuests.put(i, questList);
+        }
+    }
+
     @EventHandler
     public void onRankSelectorClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
@@ -53,46 +91,6 @@ public class QuestsMenu implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         if (!inventories.contains(event.getInventory())) return;
         inventories.remove(event.getInventory());
-    }
-
-    private static final HashSet<Inventory> inventories = new HashSet<>();
-
-    private static final ArrayList<Integer> rankSlots = new ArrayList<>(Arrays.asList(10, 12, 14, 16));
-
-    public static Inventory initializeQuestsMenu(Player player) {
-        Inventory questsMenu = Bukkit.createInventory(player, 18, QuestMenuConfig.menuName);
-        questsMenu = populateInventory(questsMenu, player);
-        inventories.add(questsMenu);
-        player.openInventory(questsMenu);
-        return questsMenu;
-    }
-
-    private static Inventory populateInventory(Inventory inventory, Player player) {
-        for (int i = 0; i < rankSlots.size(); i++)
-            inventory.setItem(rankSlots.get(i), rotatingQuests.get(GuildRank.getActiveGuildRank(player)).get(i).generateQuestItemStack(player));
-        return inventory;
-    }
-
-    private static final HashMap<Integer, ArrayList<EliteQuest>> rotatingQuests = new HashMap();
-
-    //refreshes quests every hour
-    public static void questRefresher() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                populateQuests();
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 60 * 60 * 20);
-    }
-
-    private static void populateQuests() {
-        for (int i = 0; i < 21; i++) {
-            ArrayList<EliteQuest> questList = new ArrayList();
-            for (int j = 0; j < 4; j++) {
-                questList.add(new EliteQuest(i));
-            }
-            rotatingQuests.put(i, questList);
-        }
     }
 
 }

@@ -28,7 +28,9 @@ import java.util.UUID;
 
 public class SoulbindEnchantment extends CustomEnchantment {
 
+    public static final NamespacedKey PRESTIGE_KEY = new NamespacedKey(MetadataHandler.PLUGIN, "prestige");
     public static String key = "soulbind";
+    public static final NamespacedKey SOULBIND_KEY = new NamespacedKey(MetadataHandler.PLUGIN, key);
     public static boolean isEnabled;
 
     public SoulbindEnchantment() {
@@ -65,8 +67,8 @@ public class SoulbindEnchantment extends CustomEnchantment {
                         EnchantmentsConfig.getEnchantment("soulbind.yml")
                                 .getFileConfiguration().getString("hologramString").replace("$player", player.getDisplayName())));
                 new BukkitRunnable() {
-                    int counter = 0;
                     final Location lastLocation = item.getLocation().clone();
+                    int counter = 0;
 
                     @Override
                     public void run() {
@@ -85,9 +87,6 @@ public class SoulbindEnchantment extends CustomEnchantment {
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 3);
     }
-
-    public static final NamespacedKey SOULBIND_KEY = new NamespacedKey(MetadataHandler.PLUGIN, key);
-    public static final NamespacedKey PRESTIGE_KEY = new NamespacedKey(MetadataHandler.PLUGIN, "prestige");
 
     public static boolean isValidSoulbindUser(ItemMeta itemMeta, Player player) {
         if (!isEnabled) return true;
@@ -118,7 +117,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
         //return Bukkit.getPlayer(UUID.fromString(itemMeta.getPersistentDataContainer().get(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING)));
     }
 
-    public static boolean itemHasSoulbindEnchantment(ItemMeta itemMeta){
+    public static boolean itemHasSoulbindEnchantment(ItemMeta itemMeta) {
         return itemMeta.getPersistentDataContainer().has(SOULBIND_KEY, PersistentDataType.STRING);
     }
 

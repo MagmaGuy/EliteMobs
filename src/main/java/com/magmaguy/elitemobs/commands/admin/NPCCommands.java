@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands.admin;
 
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -30,7 +31,7 @@ public class NPCCommands {
         try {
             for (NPCEntity npcEntity : EntityTracker.getNPCEntities().values())
                 if (npcEntity.npCsConfigFields.equals(npCsConfigFields))
-                    npcEntity.removeNPCEntity();
+                    npcEntity.remove(RemovalReason.REMOVE_COMMAND);
         } catch (Exception ex) {
         }
 

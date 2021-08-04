@@ -14,6 +14,6 @@ public class EliteHoglin extends EliteMobProperties {
         this.defaultMaxHealth = 40;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.HOGLIN).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.HOGLIN).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 }

@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class RemoveCommand {
+    public static HashSet<UUID> removingPlayers = new HashSet<>();
+
     public static void remove(Player player) {
         if (removingPlayers.contains(player.getUniqueId())) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &aYou are no longer removing elites!"));
@@ -24,8 +26,6 @@ public class RemoveCommand {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cYou are now removing elites when you punch them! Run &a/em remove &cagain to stop removing elites!"));
         }
     }
-
-    public static HashSet<UUID> removingPlayers = new HashSet<>();
 
     public static class RemoveCommandEvents implements Listener {
         @EventHandler(priority = EventPriority.LOWEST)

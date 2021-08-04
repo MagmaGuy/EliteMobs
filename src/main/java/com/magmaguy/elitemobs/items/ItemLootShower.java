@@ -36,78 +36,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemLootShower implements Listener {
 
-    private final Player player;
+    private static final HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
     public static HashMap<UUID, Coin> coinValues = new HashMap<>();
-
-    private class Coin {
-        UUID player;
-        UUID item;
-        double value;
-        boolean pickupable;
-
-        public Coin(double value, Player player, Item item) {
-            this.player = player.getUniqueId();
-            this.value = value;
-            this.item = item.getUniqueId();
-            coinValues.put(item.getUniqueId(), this);
-            pickupable = false;
-            item.setGravity(false);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (coinValues.containsKey(item.getUniqueId())) {
-                        if (Bukkit.getEntity(item.getUniqueId()) != null)
-                            Bukkit.getEntity(item.getUniqueId()).remove();
-                        coinValues.remove(item.getUniqueId());
-                    }
-                }
-            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * 5);
-
-            new BukkitRunnable() {
-                int counter = 0;
-
-                @Override
-                public void run() {
-
-                    if (!item.isValid() ||
-                            !player.isValid() ||
-                            !player.getWorld().equals(item.getWorld()) ||
-                            counter > 20 * 4 ||
-                            item.getLocation().distanceSquared(player.getLocation()) > 900) {
-                        cancel();
-                        pickupable = true;
-                        item.setGravity(true);
-                        return;
-                    }
-
-                    item.setVelocity(player.getLocation().clone().subtract(item.getLocation()).toVector().normalize().multiply(0.2));
-
-                    if (player.getLocation().distanceSquared(item.getLocation()) <= 1) {
-                        item.remove();
-                        EconomyHandler.addCurrency(player.getUniqueId(), value);
-                        sendCurrencyNotification(player);
-
-                        //cache for counting how much coin they're getting over a short amount of time
-                        if (playerCurrencyPickup.containsKey(player))
-                            playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + value);
-                        else
-                            playerCurrencyPickup.put(player, value);
-
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                TextComponent.fromLegacyText(
-                                        ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
-                                                .replace("$currency_name", EconomySettingsConfig.currencyName)
-                                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
-                        coinValues.remove(item.getUniqueId());
-                        cancel();
-                        return;
-                    }
-
-                    counter++;
-                }
-            }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
-        }
-    }
+    private final Player player;
 
     public ItemLootShower(double eliteMobTier, Location location, Player player) {
 
@@ -195,6 +126,45 @@ public class ItemLootShower implements Listener {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 2, 2);
 
+    }
+
+    private static void sendCurrencyNotification(Player player) {
+        if (playerCurrencyPickup.containsKey(player)) return;
+
+        new BukkitRunnable() {
+            double oldAmount = 0;
+
+            @Override
+            public void run() {
+
+                if (!playerCurrencyPickup.containsKey(player)) {
+                    playerCurrencyPickup.put(player, 0.0);
+                    return;
+                }
+
+                if (oldAmount != playerCurrencyPickup.get(player)) {
+                    oldAmount = playerCurrencyPickup.get(player);
+                    return;
+                }
+
+                player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.chatCurrencyShowerMessage
+                        .replace("$currency_name", EconomySettingsConfig.currencyName)
+                        .replace("$amount", playerCurrencyPickup.get(player) + "")));
+
+                playerCurrencyPickup.remove(player);
+                sendAdventurersGuildNotification(player);
+
+                cancel();
+
+            }
+
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 40);
+
+    }
+
+    private static void sendAdventurersGuildNotification(Player player) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(ChatColorConverter.convert(EconomySettingsConfig.adventurersGuildNotificationMessage)));
     }
 
     private Item generateCurrencyItem(Material material, Location location, double value) {
@@ -351,9 +321,6 @@ public class ItemLootShower implements Listener {
         return itemStack;
     }
 
-
-    private static final HashMap<Player, Double> playerCurrencyPickup = new HashMap<>();
-
     /**
      * Currency pickup event
      */
@@ -396,44 +363,74 @@ public class ItemLootShower implements Listener {
         }
     }
 
+    private class Coin {
+        UUID player;
+        UUID item;
+        double value;
+        boolean pickupable;
 
-    private static void sendCurrencyNotification(Player player) {
-        if (playerCurrencyPickup.containsKey(player)) return;
-
-        new BukkitRunnable() {
-            double oldAmount = 0;
-
-            @Override
-            public void run() {
-
-                if (!playerCurrencyPickup.containsKey(player)) {
-                    playerCurrencyPickup.put(player, 0.0);
-                    return;
+        public Coin(double value, Player player, Item item) {
+            this.player = player.getUniqueId();
+            this.value = value;
+            this.item = item.getUniqueId();
+            coinValues.put(item.getUniqueId(), this);
+            pickupable = false;
+            item.setGravity(false);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (coinValues.containsKey(item.getUniqueId())) {
+                        if (Bukkit.getEntity(item.getUniqueId()) != null)
+                            Bukkit.getEntity(item.getUniqueId()).remove();
+                        coinValues.remove(item.getUniqueId());
+                    }
                 }
+            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * 5);
 
-                if (oldAmount != playerCurrencyPickup.get(player)) {
-                    oldAmount = playerCurrencyPickup.get(player);
-                    return;
+            new BukkitRunnable() {
+                int counter = 0;
+
+                @Override
+                public void run() {
+
+                    if (!item.isValid() ||
+                            !player.isValid() ||
+                            !player.getWorld().equals(item.getWorld()) ||
+                            counter > 20 * 4 ||
+                            item.getLocation().distanceSquared(player.getLocation()) > 900) {
+                        cancel();
+                        pickupable = true;
+                        item.setGravity(true);
+                        return;
+                    }
+
+                    item.setVelocity(player.getLocation().clone().subtract(item.getLocation()).toVector().normalize().multiply(0.2));
+
+                    if (player.getLocation().distanceSquared(item.getLocation()) <= 1) {
+                        item.remove();
+                        EconomyHandler.addCurrency(player.getUniqueId(), value);
+                        sendCurrencyNotification(player);
+
+                        //cache for counting how much coin they're getting over a short amount of time
+                        if (playerCurrencyPickup.containsKey(player))
+                            playerCurrencyPickup.put(player, playerCurrencyPickup.get(player) + value);
+                        else
+                            playerCurrencyPickup.put(player, value);
+
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                TextComponent.fromLegacyText(
+                                        ChatColorConverter.convert(EconomySettingsConfig.actionBarCurrencyShowerMessage
+                                                .replace("$currency_name", EconomySettingsConfig.currencyName)
+                                                .replace("$amount", Round.twoDecimalPlaces(playerCurrencyPickup.get(player)) + ""))));
+                        coinValues.remove(item.getUniqueId());
+                        cancel();
+                        return;
+                    }
+
+                    counter++;
                 }
-
-                player.sendMessage(ChatColorConverter.convert(EconomySettingsConfig.chatCurrencyShowerMessage
-                        .replace("$currency_name", EconomySettingsConfig.currencyName)
-                        .replace("$amount", playerCurrencyPickup.get(player) + "")));
-
-                playerCurrencyPickup.remove(player);
-                sendAdventurersGuildNotification(player);
-
-                cancel();
-
-            }
-
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 40);
-
-    }
-
-    private static void sendAdventurersGuildNotification(Player player) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(ChatColorConverter.convert(EconomySettingsConfig.adventurersGuildNotificationMessage)));
+            }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
+        }
     }
 
 }

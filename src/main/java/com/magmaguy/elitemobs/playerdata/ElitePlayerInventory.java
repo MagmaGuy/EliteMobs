@@ -15,16 +15,9 @@ import java.util.UUID;
 
 public class ElitePlayerInventory {
 
-    public static void initialize() {
-        for (Player player : Bukkit.getOnlinePlayers())
-            playerInventories.put(player.getUniqueId(), new ElitePlayerInventory(player));
-    }
-
     public static HashMap<UUID, ElitePlayerInventory> playerInventories = new HashMap<>();
-
     public final PlayerItem helmet, chestplate, leggings, boots, mainhand, offhand;
     private final Player player;
-
     /**
      * Object of the player's inventory for EliteMobs.
      * For performance reasons, values are cached and updated only when strictly necessary.
@@ -41,6 +34,11 @@ public class ElitePlayerInventory {
         this.mainhand = new PlayerItem(player.getInventory().getItemInMainHand(), PlayerItem.EquipmentSlot.MAINHAND, player);
         this.offhand = new PlayerItem(player.getInventory().getItemInOffHand(), PlayerItem.EquipmentSlot.OFFHAND, player);
         playerInventories.put(player.getUniqueId(), this);
+    }
+
+    public static void initialize() {
+        for (Player player : Bukkit.getOnlinePlayers())
+            playerInventories.put(player.getUniqueId(), new ElitePlayerInventory(player));
     }
 
     /**
@@ -130,18 +128,6 @@ public class ElitePlayerInventory {
                 boots.getHunterChance(player.getInventory().getBoots(), update);
     }
 
-    public static class ElitePlayerInventoryEvents implements Listener {
-        @EventHandler
-        public void onPlayerLogin(PlayerLoginEvent event) {
-            playerInventories.put(event.getPlayer().getUniqueId(), new ElitePlayerInventory(event.getPlayer()));
-        }
-
-        @EventHandler
-        public void onPlayerLogout(PlayerQuitEvent event) {
-            playerInventories.remove(event.getPlayer().getUniqueId());
-        }
-    }
-
     /**
      * Outputs the base damage of the player given the current gear. Does not take secondary enchantments into account,
      * such as Smite
@@ -171,5 +157,17 @@ public class ElitePlayerInventory {
      */
     public int getThornsLevel() {
         return helmet.thornsLevel + chestplate.thornsLevel + leggings.thornsLevel + boots.thornsLevel;
+    }
+
+    public static class ElitePlayerInventoryEvents implements Listener {
+        @EventHandler
+        public void onPlayerLogin(PlayerLoginEvent event) {
+            playerInventories.put(event.getPlayer().getUniqueId(), new ElitePlayerInventory(event.getPlayer()));
+        }
+
+        @EventHandler
+        public void onPlayerLogout(PlayerQuitEvent event) {
+            playerInventories.remove(event.getPlayer().getUniqueId());
+        }
     }
 }

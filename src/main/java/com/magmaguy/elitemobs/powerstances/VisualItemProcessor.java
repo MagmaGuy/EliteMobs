@@ -25,13 +25,24 @@ public class VisualItemProcessor {
 
     }
 
+    /*
+    Adjusts the position in each item track based on the amount of powers currently in that track
+     */
+    public static int adjustTrackPosition(double pointsPerRotation, int totalEffectQuantity,
+                                          int sectionCounter, int globalCounter) {
+        int location = (int) (pointsPerRotation / totalEffectQuantity * sectionCounter + globalCounter);
+        if (location >= 30)
+            location -= 30;
+        return location;
+    }
+
     private void rotateExistingEffects(Object[][] multiDimensionalTrailTracker, Vector[][] cachedVectorPositions,
                                        int pointsPerRotation, EliteEntity eliteEntity) {
 
         new BukkitRunnable() {
 
-            int counter = 0;
             final boolean isObfuscated = eliteEntity.getHasVisualEffectObfuscated();
+            int counter = 0;
 
             @Override
             public void run() {
@@ -76,7 +87,7 @@ public class VisualItemProcessor {
                 /*
                 Check if the effect has ceased being obfuscated
                  */
-                if (isObfuscated != eliteEntity.getHasVisualEffectObfuscated()){
+                if (isObfuscated != eliteEntity.getHasVisualEffectObfuscated()) {
                     VisualItemRemover.removeItems(multiDimensionalTrailTracker);
                     cancel();
                     new BukkitRunnable() {
@@ -102,17 +113,6 @@ public class VisualItemProcessor {
 
     }
 
-    /*
-    Adjusts the position in each item track based on the amount of powers currently in that track
-     */
-    public static int adjustTrackPosition(double pointsPerRotation, int totalEffectQuantity,
-                                          int sectionCounter, int globalCounter) {
-        int location = (int) (pointsPerRotation / totalEffectQuantity * sectionCounter + globalCounter);
-        if (location >= 30)
-            location -= 30;
-        return location;
-    }
-
     private void rotateItem(Object itemObject, Vector vector, EliteEntity eliteEntity) {
 
         Item item = (Item) itemObject;
@@ -135,7 +135,7 @@ public class VisualItemProcessor {
 //        if (Math.abs(movementVector.getX()) > 3 || Math.abs(movementVector.getY()) > 3 || Math.abs(movementVector.getZ()) > 3) {
 //            item.teleport(newLocation);
 //        } else {
-            item.setVelocity(movementVector);
+        item.setVelocity(movementVector);
 //        }
 
     }

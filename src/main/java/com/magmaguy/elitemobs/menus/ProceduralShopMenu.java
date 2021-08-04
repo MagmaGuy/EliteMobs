@@ -28,6 +28,7 @@ public class ProceduralShopMenu implements Listener {
 
     private static final String SHOP_KEY = ObfuscatedStringHandler.obfuscateString("/");
     private static final String SHOP_NAME = ProceduralShopMenuConfig.shopName + SHOP_KEY;
+    private static final List<Integer> validSlots = ProceduralShopMenuConfig.storeSlots;
 
     public static void shopInitializer(Player player) {
 
@@ -50,8 +51,6 @@ public class ProceduralShopMenu implements Listener {
         shopContents(shopInventory, player);
 
     }
-
-    private static final List<Integer> validSlots = ProceduralShopMenuConfig.storeSlots;
 
     private static void shopContents(Inventory shopInventory, Player player) {
 

@@ -21,37 +21,19 @@ import java.util.List;
 
 public abstract class CustomEvent {
 
-    public static boolean isLocationValid(Location location) {
-        return !(EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getEliteMobsEventsFlag()));
-    }
-
-    public enum EventType {
-        //Action Events
-        DEFAULT,
-        BREAK_BLOCK,
-        FISH,
-        TILL_SOIL,
-        TIMED
-    }
-
     //Start Conditions
     public StartConditions startConditions;
-
     //Common fields
     public EventType eventType;
     public ArrayList<EliteEntity> eventEliteMobs = new ArrayList<>();
     public ArrayList<CustomBossEntity> primaryEliteMobs = new ArrayList<>();
     public BukkitTask eventWatchdog;
     public int announcementPriority;
-
-    public CustomEventsConfigFields getCustomEventsConfigFields() {
-        return customEventsConfigFields;
-    }
-
     public CustomEventsConfigFields customEventsConfigFields;
     public String startMessage, endMessage;
     public List<String> startEventCommands, endEventCommands;
-
+    public List<String> primaryCustomBossFilenames;
+    public Location eventStartLocation;
     /**
      * Instantiates a Custom Event, does not necessarily start one but starts scanning for whether one should happen
      */
@@ -68,6 +50,14 @@ public abstract class CustomEvent {
         this.primaryCustomBossFilenames = customEventsConfigFields.getBossFilenames();
     }
 
+    public static boolean isLocationValid(Location location) {
+        return !(EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getEliteMobsEventsFlag()));
+    }
+
+    public CustomEventsConfigFields getCustomEventsConfigFields() {
+        return customEventsConfigFields;
+    }
+
     public List<String> getPrimaryCustomBossFilenames() {
         return primaryCustomBossFilenames;
     }
@@ -76,8 +66,6 @@ public abstract class CustomEvent {
         this.primaryCustomBossFilenames = primaryCustomBossFilenames;
     }
 
-    public List<String> primaryCustomBossFilenames;
-
     public Location getEventStartLocation() {
         return eventStartLocation;
     }
@@ -85,12 +73,6 @@ public abstract class CustomEvent {
     public void setEventStartLocation(Location eventStartLocation) {
         this.eventStartLocation = eventStartLocation;
     }
-
-    public Location eventStartLocation;
-
-    //START CHECKS - currently in each class
-
-    //ACTIVE
 
     /**
      * Starts a Custom Event watchdog, which will scan whether the event is still ongoing or if it has ended every second
@@ -115,15 +97,16 @@ public abstract class CustomEvent {
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
     }
 
+    //START CHECKS - currently in each class
+
+    //ACTIVE
+
     public abstract void startModifiers();
 
     /**
      * Checks whether the conditions for the event to end have been met
      */
     public abstract void eventWatchdog();
-
-
-    //END
 
     /**
      * Starts the end of the event, deletes all EliteMobEntities spawned by the event and queues further event completion requirements
@@ -140,11 +123,23 @@ public abstract class CustomEvent {
         endModifiers();
     }
 
+
+    //END
+
     /**
      * Gets called by the end() method, completes any extension-specific behavior for the end of the event, such as
      * implementing cooldowns or doing announcements.
      */
     public abstract void endModifiers();
+
+    public enum EventType {
+        //Action Events
+        DEFAULT,
+        BREAK_BLOCK,
+        FISH,
+        TILL_SOIL,
+        TIMED
+    }
 
     //End broadcasts / rewards
 }

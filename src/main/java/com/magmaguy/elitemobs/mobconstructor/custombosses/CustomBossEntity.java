@@ -17,7 +17,6 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -181,7 +180,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         CommandRunner.runCommandFromList(customBossesConfigFields.getOnSpawnCommands(), new ArrayList<>());
     }
 
-    private void setPluginName(){
+    private void setPluginName() {
         if (this.level == -1)
             super.setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", "?" + "")
                             .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + "?" + "&2]&f"))
@@ -190,14 +189,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                             .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + "?" + "&8〕&f")
                             .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + "?" + "&4」&f"))),
                     false);
-            else
-        super.setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", this.level + "")
-                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + this.level + "&2]&f"))
-                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + this.level + "&6〗&f"))
-                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + this.level + "&4』&f"))
-                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.level + "&8〕&f")
-                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + this.level + "&4」&f"))),
-                false);
+        else
+            super.setName(ChatColorConverter.convert(customBossesConfigFields.getName().replace("$level", this.level + "")
+                            .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + this.level + "&2]&f"))
+                            .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + this.level + "&6〗&f"))
+                            .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + this.level + "&4』&f"))
+                            .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + this.level + "&8〕&f")
+                            .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + this.level + "&4」&f"))),
+                    false);
     }
 
     private void announceSpawn() {

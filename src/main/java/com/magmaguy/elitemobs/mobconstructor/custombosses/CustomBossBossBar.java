@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.utils.Round;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -28,7 +29,7 @@ public class CustomBossBossBar {
     private final CustomBossEntity customBossEntity;
     private final Map<Player, BossBar> bossBars = new HashMap<>();
     private BukkitTask bossBarUpdater;
-    private HashSet<Player> trackingPlayers = new HashSet<>();
+    private final HashSet<Player> trackingPlayers = new HashSet<>();
 
     public CustomBossBossBar(CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
@@ -96,8 +97,9 @@ public class CustomBossBossBar {
                 ", " + customBossEntity.getLocation().getBlockY() +
                 ", " + customBossEntity.getLocation().getBlockZ();
         bossBar.setTitle(bossBarMessage(player, locationString));
-        if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1) return;
-        bossBar.setProgress(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
+        double progress = Round.twoDecimalPlaces(customBossEntity.getHealth() / customBossEntity.getMaxHealth());
+        if (progress > 1) return;
+        bossBar.setProgress(progress);
     }
 
     public void start() {

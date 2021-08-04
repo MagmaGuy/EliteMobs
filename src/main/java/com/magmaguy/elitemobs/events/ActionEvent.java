@@ -25,6 +25,15 @@ public class ActionEvent extends CustomEvent {
 
     public static ArrayList<ActionEvent> blueprintEvents = new ArrayList<>();
     public static ArrayList<ActionEvent> actionEvents = new ArrayList<>();
+    public double chance;
+    public List<Material> breakableMaterials;
+
+    public ActionEvent(CustomEventsConfigFields customEventsConfigFields) {
+        super(customEventsConfigFields);
+        this.chance = customEventsConfigFields.getChance();
+        this.breakableMaterials = customEventsConfigFields.getBreakableMaterials();
+        setPrimaryCustomBossFilenames(primaryCustomBossFilenames);
+    }
 
     /**
      * Initializes events directly from the configuration files, and keeps a copy to run checks over in order to instantiate
@@ -50,13 +59,11 @@ public class ActionEvent extends CustomEvent {
     }
 
     public boolean checkFishStartConditions() {
-        if (ThreadLocalRandom.current().nextDouble() >= chance) return false;
-        return true;
+        return !(ThreadLocalRandom.current().nextDouble() >= chance);
     }
 
     public boolean checkTillSoilStartConditions() {
-        if (ThreadLocalRandom.current().nextDouble() >= chance) return false;
-        return true;
+        return !(ThreadLocalRandom.current().nextDouble() >= chance);
     }
 
     private void instantiateEvent(Location location) {
@@ -68,7 +75,7 @@ public class ActionEvent extends CustomEvent {
 
         for (String filename : primaryCustomBossFilenames) {
             CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(filename);
-            if (customBossEntity == null){
+            if (customBossEntity == null) {
                 new WarningMessage("Failed to generate custom boss " + filename + " ! This has cancelled action event " + customEventsConfigFields.getFilename() + " !");
                 return;
             }
@@ -80,16 +87,6 @@ public class ActionEvent extends CustomEvent {
         actionEvents.add(actionEvent);
 
         actionEvent.start();
-    }
-
-    public double chance;
-    public List<Material> breakableMaterials;
-
-    public ActionEvent(CustomEventsConfigFields customEventsConfigFields) {
-        super(customEventsConfigFields);
-        this.chance = customEventsConfigFields.getChance();
-        this.breakableMaterials = customEventsConfigFields.getBreakableMaterials();
-        setPrimaryCustomBossFilenames(primaryCustomBossFilenames);
     }
 
     @Override

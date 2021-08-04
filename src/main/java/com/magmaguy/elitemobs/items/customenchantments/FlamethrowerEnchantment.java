@@ -26,13 +26,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FlamethrowerEnchantment extends CustomEnchantment {
 
+    private static final ArrayList<Player> playersUsingFlamethrower = new ArrayList<>();
     public static String key = "flamethrower";
 
     public FlamethrowerEnchantment() {
         super(key, false);
     }
-
-    private static final ArrayList<Player> playersUsingFlamethrower = new ArrayList<>();
 
     private static List<Location> generateDamagePoints(Player player, Location fixedPlayerLocation) {
         List<Location> locations = new ArrayList<>();

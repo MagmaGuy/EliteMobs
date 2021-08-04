@@ -14,16 +14,6 @@ import java.util.HashMap;
 public class MobPropertiesConfig {
 
     private static final HashMap<EntityType, MobPropertiesConfigFields> mobProperties = new HashMap<>();
-
-    public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {
-        return mobProperties;
-    }
-
-    public static void addMobProperties(EntityType entityType, MobPropertiesConfigFields mobPropertiesConfigFields) {
-        mobProperties.put(entityType, mobPropertiesConfigFields);
-    }
-
-
     private static final ArrayList<MobPropertiesConfigFields> mobPropertiesConfigFieldsList = new ArrayList<MobPropertiesConfigFields>(Arrays.asList(
             new EliteBlazeConfig(),
             new EliteCaveSpiderConfig(),
@@ -61,6 +51,14 @@ public class MobPropertiesConfig {
             new SuperSheepConfig(),
             new EliteKillerBunnyConfig()
     ));
+
+    public static HashMap<EntityType, MobPropertiesConfigFields> getMobProperties() {
+        return mobProperties;
+    }
+
+    public static void addMobProperties(EntityType entityType, MobPropertiesConfigFields mobPropertiesConfigFields) {
+        mobProperties.put(entityType, mobPropertiesConfigFields);
+    }
 
     public static void initializeConfigs() {
 

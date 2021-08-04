@@ -11,9 +11,8 @@ public class StartConditions {
         this.minimumPlayerCount = customEventsConfigFields.getMinimumPlayerCount();
     }
 
-    public boolean areValid(){
-        if (Bukkit.getServer().getOnlinePlayers().size() < minimumPlayerCount) return false;
-        return true;
+    public boolean areValid() {
+        return Bukkit.getServer().getOnlinePlayers().size() >= minimumPlayerCount;
     }
 
 }

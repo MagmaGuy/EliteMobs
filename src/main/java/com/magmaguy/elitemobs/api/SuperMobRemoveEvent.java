@@ -10,16 +10,15 @@ import java.util.UUID;
 
 public class SuperMobRemoveEvent extends Event {
 
-    public static void callEvent(UUID uuid, RemovalReason removalReason) {
-        new EventCaller(new SuperMobRemoveEvent(uuid, removalReason));
-    }
-
     private static final HandlerList handlers = new HandlerList();
     private final UUID uuid;
-
     public SuperMobRemoveEvent(UUID uuid, RemovalReason removalReason) {
         this.uuid = uuid;
         EntityTracker.unregister(uuid, removalReason);
+    }
+
+    public static void callEvent(UUID uuid, RemovalReason removalReason) {
+        new EventCaller(new SuperMobRemoveEvent(uuid, removalReason));
     }
 
     public static HandlerList getHandlerList() {

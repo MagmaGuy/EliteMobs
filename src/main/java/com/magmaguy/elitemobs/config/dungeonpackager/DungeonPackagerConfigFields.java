@@ -17,22 +17,9 @@ import java.util.List;
 
 public class DungeonPackagerConfigFields {
 
-    public enum DungeonLocationType {
-        WORLD,
-        SCHEMATIC
-    }
-
-    public enum DungeonSizeCategory {
-        LAIR,
-        MINIDUNGEON,
-        DUNGEON,
-        RAID,
-        ADVENTURE
-    }
-
-    private String fileName;
+    private final String fileName;
     private boolean isEnabled;
-    private String name;
+    private final String name;
     private FileConfiguration fileConfiguration;
     private DungeonLocationType dungeonLocationType;
     private List<String> customInfo = new ArrayList<>();
@@ -55,7 +42,6 @@ public class DungeonPackagerConfigFields {
     private String playerInfo = "";
     private String regionEnterMessage = "";
     private String regionLeaveMessage = "";
-
     public DungeonPackagerConfigFields(String fileName,
                                        boolean isEnabled,
                                        String name,
@@ -102,41 +88,6 @@ public class DungeonPackagerConfigFields {
         this.regionEnterMessage = regionEnterMessage;
         this.regionLeaveMessage = regionLeaveMessage;
     }
-
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        try {
-            fileConfiguration.addDefault("isEnabled", isEnabled);
-            fileConfiguration.addDefault("name", name);
-            fileConfiguration.addDefault("dungeonLocationType", dungeonLocationType.toString());
-            fileConfiguration.addDefault("customInfo", customInfo);
-            fileConfiguration.addDefault("relativeBossLocations", relativeBossLocations);
-            fileConfiguration.addDefault("relativeTreasureLocations", relativeTreasureChestLocations);
-            fileConfiguration.addDefault("downloadLink", downloadLink);
-            fileConfiguration.addDefault("dungeonSizeCategory", dungeonSizeCategory.toString());
-            fileConfiguration.addDefault("worldName", worldName);
-            fileConfiguration.addDefault("schematicName", schematicName);
-            if (environment != null)
-                fileConfiguration.addDefault("environment", environment.toString());
-            if (protect != null)
-                fileConfiguration.addDefault("protect", protect);
-            fileConfiguration.addDefault("rotation", 0);
-            if (corner1 != null)
-                fileConfiguration.addDefault("corner1", corner1.getBlockX() + "," + corner1.getBlockY() + "," + corner1.getBlockZ());
-            if (corner2 != null)
-                fileConfiguration.addDefault("corner2", corner2.getBlockX() + "," + corner2.getBlockY() + "," + corner2.getBlockZ());
-            if (teleportPoint != null)
-                fileConfiguration.addDefault("teleportPoint", teleportPoint.getBlockX() + "," + teleportPoint.getBlockY() + "," + teleportPoint.getBlockZ());
-            fileConfiguration.addDefault("teleportPointPitch", teleportPointPitch);
-            fileConfiguration.addDefault("teleportPointYaw", teleportPointYaw);
-            fileConfiguration.addDefault("dungeonVersion", dungeonVersion);
-            fileConfiguration.addDefault("playerInfo", playerInfo);
-            fileConfiguration.addDefault("regionEnterMessage", regionEnterMessage);
-            fileConfiguration.addDefault("regionLeaveMessage", regionLeaveMessage);
-        } catch (Exception ex) {
-            new WarningMessage("A field in a dungeon packager was not valid!");
-        }
-    }
-
     public DungeonPackagerConfigFields(FileConfiguration fileConfiguration, File file) {
         this.file = file;
         this.fileName = file.getName();
@@ -197,11 +148,45 @@ public class DungeonPackagerConfigFields {
         regionLeaveMessage = fileConfiguration.getString("regionLeaveMessage");
     }
 
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+        try {
+            fileConfiguration.addDefault("isEnabled", isEnabled);
+            fileConfiguration.addDefault("name", name);
+            fileConfiguration.addDefault("dungeonLocationType", dungeonLocationType.toString());
+            fileConfiguration.addDefault("customInfo", customInfo);
+            fileConfiguration.addDefault("relativeBossLocations", relativeBossLocations);
+            fileConfiguration.addDefault("relativeTreasureLocations", relativeTreasureChestLocations);
+            fileConfiguration.addDefault("downloadLink", downloadLink);
+            fileConfiguration.addDefault("dungeonSizeCategory", dungeonSizeCategory.toString());
+            fileConfiguration.addDefault("worldName", worldName);
+            fileConfiguration.addDefault("schematicName", schematicName);
+            if (environment != null)
+                fileConfiguration.addDefault("environment", environment.toString());
+            if (protect != null)
+                fileConfiguration.addDefault("protect", protect);
+            fileConfiguration.addDefault("rotation", 0);
+            if (corner1 != null)
+                fileConfiguration.addDefault("corner1", corner1.getBlockX() + "," + corner1.getBlockY() + "," + corner1.getBlockZ());
+            if (corner2 != null)
+                fileConfiguration.addDefault("corner2", corner2.getBlockX() + "," + corner2.getBlockY() + "," + corner2.getBlockZ());
+            if (teleportPoint != null)
+                fileConfiguration.addDefault("teleportPoint", teleportPoint.getBlockX() + "," + teleportPoint.getBlockY() + "," + teleportPoint.getBlockZ());
+            fileConfiguration.addDefault("teleportPointPitch", teleportPointPitch);
+            fileConfiguration.addDefault("teleportPointYaw", teleportPointYaw);
+            fileConfiguration.addDefault("dungeonVersion", dungeonVersion);
+            fileConfiguration.addDefault("playerInfo", playerInfo);
+            fileConfiguration.addDefault("regionEnterMessage", regionEnterMessage);
+            fileConfiguration.addDefault("regionLeaveMessage", regionLeaveMessage);
+        } catch (Exception ex) {
+            new WarningMessage("A field in a dungeon packager was not valid!");
+        }
+    }
+
     public String getFileName() {
         return fileName;
     }
 
-    public FileConfiguration getFileConfiguration(){
+    public FileConfiguration getFileConfiguration() {
         return this.fileConfiguration;
     }
 
@@ -351,5 +336,18 @@ public class DungeonPackagerConfigFields {
 
     public String getRegionLeaveMessage() {
         return ChatColorConverter.convert(regionLeaveMessage);
+    }
+
+    public enum DungeonLocationType {
+        WORLD,
+        SCHEMATIC
+    }
+
+    public enum DungeonSizeCategory {
+        LAIR,
+        MINIDUNGEON,
+        DUNGEON,
+        RAID,
+        ADVENTURE
     }
 }

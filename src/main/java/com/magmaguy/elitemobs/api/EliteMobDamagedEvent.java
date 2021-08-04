@@ -16,13 +16,17 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
     private final EliteEntity eliteEntity;
-    private boolean isCancelled = false;
     private final EntityDamageEvent entityDamageEvent;
+    private boolean isCancelled = false;
 
     public EliteMobDamagedEvent(EliteEntity eliteEntity, EntityDamageEvent event) {
         this.entity = eliteEntity.getLivingEntity();
         this.eliteEntity = eliteEntity;
         this.entityDamageEvent = event;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public Entity getEntity() {
@@ -52,11 +56,6 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
     public HandlerList getHandlers() {
         return handlers;
     }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
 
     public static class EliteMobDamageEventFilter implements Listener {
 

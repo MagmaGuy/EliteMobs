@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import org.bukkit.entity.EntityType;
 
 public class EliteEnderDragon extends EliteMobProperties {
-    public EliteEnderDragon(){
+    public EliteEnderDragon() {
         this.name = MobPropertiesConfig.getMobProperties().get(EntityType.ENDER_DRAGON).getName();
         this.entityType = EntityType.ENDER_DRAGON;
         this.defaultMaxHealth = 200;

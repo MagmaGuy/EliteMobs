@@ -5,11 +5,11 @@ import com.magmaguy.elitemobs.config.commands.CommandsConfigFields;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class CheckTierOthersConfig extends CommandsConfigFields {
+    public static String message1, message2, message3, noPermMessage;
+
     public CheckTierOthersConfig() {
         super("check_tier_others");
     }
-
-    public static String message1, message2, message3, noPermMessage;
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {

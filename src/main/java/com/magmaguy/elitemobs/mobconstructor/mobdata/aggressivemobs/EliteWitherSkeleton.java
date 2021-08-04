@@ -11,7 +11,7 @@ public class EliteWitherSkeleton extends EliteMobProperties {
         this.defaultMaxHealth = 20;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.WITHER_SKELETON).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.WITHER_SKELETON).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 
 }

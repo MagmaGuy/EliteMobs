@@ -18,21 +18,12 @@ import java.util.HashMap;
 
 public class PlayerPreTeleportEvent extends Event implements Cancellable {
 
-    public static void teleportPlayer(Player player, Location destination) {
-        if (CombatTagConfig.enableTeleportTimer)
-            new EventCaller(new PlayerPreTeleportEvent(player, destination));
-        else
-            PlayerTeleportEvent.teleportPlayer(player, destination);
-    }
-
     private static final HashMap<Player, PlayerPreTeleportEvent> playerPlayerPreTeleportEventHashMap = new HashMap<>();
-
     private static final HandlerList handlers = new HandlerList();
-    private boolean isCancelled = false;
     private final Location destination;
     private final Location originalLocation;
     private final Player player;
-
+    private boolean isCancelled = false;
     /**
      * Called when a player initiates a teleport to a location. The teleport will go through 3 seconds after the event is
      * launched, assuming it isn't cancelled by the player or via code.
@@ -91,12 +82,19 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
 
     }
 
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
+    public static void teleportPlayer(Player player, Location destination) {
+        if (CombatTagConfig.enableTeleportTimer)
+            new EventCaller(new PlayerPreTeleportEvent(player, destination));
+        else
+            PlayerTeleportEvent.teleportPlayer(player, destination);
     }
 
     public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    @Override
+    public HandlerList getHandlers() {
         return handlers;
     }
 

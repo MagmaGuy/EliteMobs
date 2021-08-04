@@ -11,7 +11,7 @@ public class EliteIronGolem extends EliteMobProperties {
         this.defaultMaxHealth = 100;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.IRON_GOLEM).getBaseDamage();
         isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.IRON_GOLEM).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 
 }

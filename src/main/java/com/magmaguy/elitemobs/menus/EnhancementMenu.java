@@ -25,13 +25,41 @@ import java.util.HashMap;
 import java.util.List;
 
 public class EnhancementMenu extends EliteMenu {
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
     private static final int eliteItemInputSlot = EnhancementMenuConfig.eliteItemInputSlot;
     private static final int scrapItemInputSlot = EnhancementMenuConfig.eliteUpgradeOrbInputSlot;
     private static final int outputSlot = EnhancementMenuConfig.outputSlot;
     private static final int eliteItemInformationInputSlot = EnhancementMenuConfig.eliteItemInputInformationSlot;
     private static final int eliteScrapInformationInputSlot = EnhancementMenuConfig.eliteUpgradeOrbInputInformationSlot;
     private static final int informationOutputSlot = EnhancementMenuConfig.outputInformationSlot;
+    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+
+    private static void calculateOutput(Inventory EnhancementInventory) {
+        if (EnhancementInventory.getItem(EnhancementMenuConfig.eliteUpgradeOrbInputSlot) == null || EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot) == null) {
+            EnhancementInventory.setItem(EnhancementMenuConfig.outputSlot, null);
+            return;
+        }
+        int enhancementScore = ItemTagger.getEnchantment(EnhancementInventory.getItem(EnhancementMenuConfig.eliteUpgradeOrbInputSlot).getItemMeta(), "EliteUpgradeItem");
+        int itemScore = ItemTierFinder.findBattleTier(EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot));
+
+        if (enhancementScore <= itemScore) {
+            EnhancementInventory.setItem(EnhancementMenuConfig.outputSlot, null);
+            return;
+        }
+
+        ItemStack outputItem = EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot).clone();
+        Enchantment mainCombatEnchantment = ItemTierFinder.getMainCombatEnchantment(outputItem.getType());
+        NamespacedKey enchantmentKey = mainCombatEnchantment.getKey();
+        ItemMeta itemMeta = outputItem.getItemMeta();
+        int enchantmentLevel = ItemTagger.getEnchantment(outputItem.getItemMeta(), enchantmentKey) + 1;
+        if (outputItem.getEnchantmentLevel(mainCombatEnchantment) < mainCombatEnchantment.getMaxLevel())
+            outputItem.addEnchantment(mainCombatEnchantment, enchantmentLevel);
+        ItemTagger.registerEnchantment(itemMeta, enchantmentKey, enchantmentLevel);
+        outputItem.setItemMeta(itemMeta);
+
+        new EliteItemLore(outputItem, false);
+
+        EnhancementInventory.setItem(outputSlot, outputItem);
+    }
 
     /**
      * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
@@ -168,34 +196,6 @@ public class EnhancementMenu extends EliteMenu {
             EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
         }
 
-    }
-
-    private static void calculateOutput(Inventory EnhancementInventory) {
-        if (EnhancementInventory.getItem(EnhancementMenuConfig.eliteUpgradeOrbInputSlot) == null || EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot) == null) {
-            EnhancementInventory.setItem(EnhancementMenuConfig.outputSlot, null);
-            return;
-        }
-        int enhancementScore = ItemTagger.getEnchantment(EnhancementInventory.getItem(EnhancementMenuConfig.eliteUpgradeOrbInputSlot).getItemMeta(), "EliteUpgradeItem");
-        int itemScore = ItemTierFinder.findBattleTier(EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot));
-
-        if (enhancementScore <= itemScore) {
-            EnhancementInventory.setItem(EnhancementMenuConfig.outputSlot, null);
-            return;
-        }
-
-        ItemStack outputItem = EnhancementInventory.getItem(EnhancementMenuConfig.eliteItemInputSlot).clone();
-        Enchantment mainCombatEnchantment = ItemTierFinder.getMainCombatEnchantment(outputItem.getType());
-        NamespacedKey enchantmentKey = mainCombatEnchantment.getKey();
-        ItemMeta itemMeta = outputItem.getItemMeta();
-        int enchantmentLevel = ItemTagger.getEnchantment(outputItem.getItemMeta(), enchantmentKey) + 1;
-        if (outputItem.getEnchantmentLevel(mainCombatEnchantment) < mainCombatEnchantment.getMaxLevel())
-            outputItem.addEnchantment(mainCombatEnchantment, enchantmentLevel);
-        ItemTagger.registerEnchantment(itemMeta, enchantmentKey, enchantmentLevel);
-        outputItem.setItemMeta(itemMeta);
-
-        new EliteItemLore(outputItem, false);
-
-        EnhancementInventory.setItem(outputSlot, outputItem);
     }
 
 }
