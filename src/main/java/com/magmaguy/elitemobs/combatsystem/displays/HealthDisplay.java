@@ -10,14 +10,6 @@ import org.bukkit.event.Listener;
 
 public class HealthDisplay implements Listener {
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onHit(EliteMobDamagedByPlayerEvent event) {
-        if (!MobCombatSettingsConfig.displayHealthOnHit) return;
-        int maxHealth = (int) event.getEliteMobEntity().getMaxHealth();
-        int currentHealth = (int) (event.getEliteMobEntity().getHealth() - event.getDamage());
-        DialogArmorStand.createDialogArmorStand(event.getEliteMobEntity().getLivingEntity(), setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
-    }
-
     /*
     Color progression: Dark green - Green - Red - Dark red
      */
@@ -32,6 +24,14 @@ public class HealthDisplay implements Listener {
         if (healthPercentage > 0)
             return ChatColor.DARK_RED;
         return ChatColor.DARK_RED;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onHit(EliteMobDamagedByPlayerEvent event) {
+        if (!MobCombatSettingsConfig.displayHealthOnHit) return;
+        int maxHealth = (int) event.getEliteMobEntity().getMaxHealth();
+        int currentHealth = (int) (event.getEliteMobEntity().getHealth() - event.getDamage());
+        DialogArmorStand.createDialogArmorStand(event.getEliteMobEntity().getLivingEntity(), setHealthColor(currentHealth, maxHealth) + "" + currentHealth + "/" + maxHealth);
     }
 
 }

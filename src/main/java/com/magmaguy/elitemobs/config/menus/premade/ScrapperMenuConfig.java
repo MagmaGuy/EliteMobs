@@ -13,10 +13,6 @@ import java.util.List;
 
 public class ScrapperMenuConfig extends MenusConfigFields {
 
-    public ScrapperMenuConfig() {
-        super("scrapper_menu");
-    }
-
     public static String shopName;
     public static ItemStack infoButton;
     public static int infoSlot;
@@ -25,6 +21,9 @@ public class ScrapperMenuConfig extends MenusConfigFields {
     public static int cancelSlot;
     public static ItemStack confirmButton;
     public static int confirmSlot;
+    public ScrapperMenuConfig() {
+        super("scrapper_menu");
+    }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {

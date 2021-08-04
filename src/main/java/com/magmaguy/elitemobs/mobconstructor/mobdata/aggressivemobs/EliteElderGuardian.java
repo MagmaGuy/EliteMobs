@@ -10,6 +10,6 @@ public class EliteElderGuardian extends EliteMobProperties {
         this.defaultMaxHealth = 80;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.ELDER_GUARDIAN).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.ELDER_GUARDIAN).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 }

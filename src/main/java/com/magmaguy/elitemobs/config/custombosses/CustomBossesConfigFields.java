@@ -41,7 +41,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private String escapeMessage = null;
     private String locationMessage = null;
     private List<String> uniqueLootList = new ArrayList<>();
-    private HashMap<CustomItem, Double> parsedUniqueLootList = new HashMap<>();
+    private final HashMap<CustomItem, Double> parsedUniqueLootList = new HashMap<>();
     private boolean dropsEliteMobsLoot = true;
     private boolean dropsVanillaLoot = true;
     private List<String> trails = new ArrayList<>();

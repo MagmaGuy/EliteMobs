@@ -6,14 +6,6 @@ import java.util.HashMap;
 
 public class CustomBossesConfig extends CustomConfig {
 
-    public static HashMap<String, ? extends CustomBossesConfigFields> getCustomBosses() {
-        return customBosses;
-    }
-
-    public static CustomBossesConfigFields getCustomBoss(String fileName) {
-        return customBosses.get(fileName);
-    }
-
     private static HashMap<String, CustomBossesConfigFields> customBosses = new HashMap<>();
 
     public CustomBossesConfig() {
@@ -21,6 +13,14 @@ public class CustomBossesConfig extends CustomConfig {
         customBosses = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
             customBosses.put(key, (CustomBossesConfigFields) super.getCustomConfigFieldsHashMap().get(key));
+    }
+
+    public static HashMap<String, ? extends CustomBossesConfigFields> getCustomBosses() {
+        return customBosses;
+    }
+
+    public static CustomBossesConfigFields getCustomBoss(String fileName) {
+        return customBosses.get(fileName);
     }
 
 }

@@ -36,6 +36,16 @@ public class PlayerPotionEffects implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20 * 1);
     }
 
+    public static void addOnHitCooldown(HashSet<Player> cooldownList, Player player, long delay) {
+        cooldownList.add(player);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                cooldownList.remove(player);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, delay);
+    }
+
     private void doContinuousPotionEffect(ElitePotionEffect elitePotionEffect, Player player) {
 
         //if the player has a higher amplifier potion effect, ignore. If it's the same, reapply to refresh the effect
@@ -62,7 +72,6 @@ public class PlayerPotionEffects implements Listener {
             player.removePotionEffect(elitePotionEffect.getPotionEffect().getType());
         player.addPotionEffect(elitePotionEffect.getPotionEffect());
     }
-
 
     @EventHandler
     public void onPlayerHitWithPotionEffect(EntityDamageByEntityEvent event) {
@@ -112,16 +121,6 @@ public class PlayerPotionEffects implements Listener {
                 break;
         }
 
-    }
-
-    public static void addOnHitCooldown(HashSet<Player> cooldownList, Player player, long delay) {
-        cooldownList.add(player);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                cooldownList.remove(player);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, delay);
     }
 
 }

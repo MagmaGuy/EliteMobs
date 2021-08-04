@@ -7,8 +7,8 @@ import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
-public class FireworksLair  extends DungeonPackagerConfigFields {
-    public FireworksLair(){
+public class FireworksLair extends DungeonPackagerConfigFields {
+    public FireworksLair() {
         super("fireworks_lair",
                 false,
                 "&aFireworks",

@@ -42,9 +42,9 @@ public class EliteMenu implements Listener {
         return event.getView().getTopInventory().equals(inventory);
     }
 
-    public static void cancel(Inventory eliteInventory, Inventory playerInventory, List<Integer> inputSlots){
+    public static void cancel(Inventory eliteInventory, Inventory playerInventory, List<Integer> inputSlots) {
         for (int slot : inputSlots)
-            if (eliteInventory.getItem(slot) != null){
+            if (eliteInventory.getItem(slot) != null) {
                 playerInventory.addItem(eliteInventory.getItem(slot));
                 eliteInventory.remove(eliteInventory.getItem(slot));
             }

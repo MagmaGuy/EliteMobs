@@ -102,34 +102,12 @@ public class ElitePower {
             new ArrowRain(),
             new GroundPound()
     ));
-
-    private static HashSet<ElitePower> getElitePowers() {
-        return elitePowers;
-    }
-
-    public static ElitePower getElitePower(String elitePowerName) {
-        for (ElitePower elitePower : getElitePowers())
-            if (elitePower.getFileName().equalsIgnoreCase(elitePowerName)) {
-                try {
-                    return elitePower.getClass().newInstance();
-                } catch (Exception ex) {
-                    new WarningMessage("Failed to instance power");
-                }
-            }
-        return null;
-    }
-
     private static final HashSet<MinorPower> defensivePowers = new HashSet<>(Arrays.asList(
             new Invisibility(),
             new InvulnerabilityArrow(),
             new InvulnerabilityFallDamage(),
             new InvulnerabilityFire(),
             new InvulnerabilityKnockback()));
-
-    public static HashSet<MinorPower> getDefensivePowers() {
-        return defensivePowers;
-    }
-
     private static final HashSet<MinorPower> miscellaneousPowers = new HashSet<>(Arrays.asList(
             new BonusLoot(),
             new Corpse(),
@@ -138,11 +116,6 @@ public class ElitePower {
             new MovementSpeed(),
             new Taunt(),
             new GroundPound()));
-
-    public static HashSet<MinorPower> getMiscellaneousPowers() {
-        return miscellaneousPowers;
-    }
-
     private static final HashSet<MinorPower> offensivePowers = new HashSet<>(Arrays.asList(
             new AttackArrow(),
             new AttackBlinding(),
@@ -160,29 +133,15 @@ public class ElitePower {
             new AttackWither(),
             new ArrowFireworks(),
             new ArrowRain()));
-
-    public static HashSet<MinorPower> getOffensivePowers() {
-        return offensivePowers;
-    }
-
-    private boolean cooldown = false;
-    private boolean powerCooldownActive = false;
     private final String fileName;
     private final String trail;
     private final String name;
     private final int powerCooldownTime;
     private final int globalCooldownTime;
-    private boolean isFiring = false;
     private final FileConfiguration configuration;
-
-    /**
-     * This is overwritten by certain classes to apply powers to a living entity upon activation
-     *
-     * @param livingEntity
-     */
-    public void applyPowers(LivingEntity livingEntity) {
-    }
-
+    private boolean cooldown = false;
+    private boolean powerCooldownActive = false;
+    private boolean isFiring = false;
     public ElitePower(PowersConfigFields powersConfigFields) {
         this.fileName = powersConfigFields.getFileName();
         this.name = powersConfigFields.getName();
@@ -190,6 +149,49 @@ public class ElitePower {
         this.configuration = powersConfigFields.getConfiguration();
         this.powerCooldownTime = powersConfigFields.getPowerCooldown();
         this.globalCooldownTime = powersConfigFields.getGlobalCooldown();
+    }
+
+    private static HashSet<ElitePower> getElitePowers() {
+        return elitePowers;
+    }
+
+    public static ElitePower getElitePower(String elitePowerName) {
+        for (ElitePower elitePower : getElitePowers())
+            if (elitePower.getFileName().equalsIgnoreCase(elitePowerName)) {
+                try {
+                    return elitePower.getClass().newInstance();
+                } catch (Exception ex) {
+                    new WarningMessage("Failed to instance power");
+                }
+            }
+        return null;
+    }
+
+    public static HashSet<MinorPower> getDefensivePowers() {
+        return defensivePowers;
+    }
+
+    public static HashSet<MinorPower> getMiscellaneousPowers() {
+        return miscellaneousPowers;
+    }
+
+    public static HashSet<MinorPower> getOffensivePowers() {
+        return offensivePowers;
+    }
+
+    protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
+        if (event.isCancelled()) return false;
+        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
+        if (elitePower.getGlobalCooldownActive()) return false;
+        return !event.getEliteMobEntity().isCooldown();
+    }
+
+    /**
+     * This is overwritten by certain classes to apply powers to a living entity upon activation
+     *
+     * @param livingEntity
+     */
+    public void applyPowers(LivingEntity livingEntity) {
     }
 
     public String getFileName() {
@@ -252,13 +254,6 @@ public class ElitePower {
                 setGlobalCooldownTime(false);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);
-    }
-
-    protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
-        if (event.isCancelled()) return false;
-        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
-        if (elitePower.getGlobalCooldownActive()) return false;
-        return !event.getEliteMobEntity().isCooldown();
     }
 
     public boolean getIsFiring() {

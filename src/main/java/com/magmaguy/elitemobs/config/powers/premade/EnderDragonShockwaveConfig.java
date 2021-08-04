@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config.powers.premade;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 
 public class EnderDragonShockwaveConfig extends PowersConfigFields {
-    public EnderDragonShockwaveConfig(){
+    public EnderDragonShockwaveConfig() {
         super("ender_dragon_shockwave",
                 true,
                 "Shockwave",

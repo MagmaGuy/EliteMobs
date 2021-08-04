@@ -15,6 +15,8 @@ import static org.bukkit.Material.*;
 
 public class MaterialGenerator {
 
+    private static final ArrayList<Material> validProceduralMaterials = new ArrayList();
+
     public static Material generateMaterial(Material material) {
 
         return material;
@@ -83,8 +85,6 @@ public class MaterialGenerator {
         return material;
 
     }
-
-    private static final ArrayList<Material> validProceduralMaterials = new ArrayList();
 
     public static void initializeValidProceduralMaterials() {
 

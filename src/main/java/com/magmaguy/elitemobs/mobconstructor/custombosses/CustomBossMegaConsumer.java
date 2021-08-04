@@ -27,8 +27,8 @@ public class CustomBossMegaConsumer {
     private final HashSet<ElitePower> powers;
     private final int level;
     private final boolean bypassesWorldGuardSpawn;
-    private Location spawnLocation;
     CustomBossEntity customBossEntity;
+    private final Location spawnLocation;
 
 
     /**

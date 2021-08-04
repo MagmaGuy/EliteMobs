@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.entitytracker.NPCEntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
@@ -130,12 +131,15 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
     @Override
     public void worldLoad() {
-
+        setSpawnLocation();
+        queueSpawn();
     }
 
     @Override
     public void worldUnload() {
-
+        spawnLocation = null;
+        simplePersistentEntity = new SimplePersistentEntity(this);
+        remove(RemovalReason.WORLD_UNLOAD);
     }
 
     //Can't be used after the NPCEntity is done initialising
@@ -172,23 +176,27 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         new BukkitRunnable() {
             @Override
             public void run() {
-                removeNPCEntity();
+                remove(RemovalReason.NPC_TIMEOUT);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, (long) (npCsConfigFields.getTimeout() * 20 * 60));
     }
 
-    /**
-     * Deletes the NPCEntity's data and entities associated to it.
-     */
-    public void removeNPCEntity() {
+    public void remove(RemovalReason removalReason) {
         roleDisplay.remove();
-        EntityTracker.unregister(villager, RemovalReason.NPC_TIMEOUT);
-    }
+        if (villager != null)
+            NPCEntityTracker.npcEntities.remove(villager.getUniqueId());
+        boolean permanentRemoval = false;
 
-    public void deleteNPCEntity() {
-        roleDisplay.remove();
-        EntityTracker.unregister(villager, RemovalReason.NPC_TIMEOUT);
-        npCsConfigFields.setEnabled(false);
+        if (removalReason.equals(RemovalReason.REMOVE_COMMAND))
+            npCsConfigFields.setEnabled(false);
+
+        if (removalReason.equals(RemovalReason.WORLD_UNLOAD) ||
+                removalReason.equals(RemovalReason.REMOVE_COMMAND))
+            permanentRemoval = true;
+
+        if (permanentRemoval) {
+            spawnLocation = null;
+        }
     }
 
     /**

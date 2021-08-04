@@ -36,6 +36,18 @@ public class PlayerStatusScreen implements Listener {
         generateBook(player, player);
     }
 
+    protected static void setHoverText(TextComponent textComponent, String text) {
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(text).create()));
+    }
+
+    public static String convertLightColorsToBlack(String string) {
+        string = ChatColorConverter.convert(string);
+        string = string.replace("§f", "§0").replace("§e", "§0");
+        if (!string.startsWith("§"))
+            string = "§0" + string;
+        return string;
+    }
+
     private ItemStack generateBook(Player requestingPlayer, Player targetPlayer) {
         TextComponent[] pages = new TextComponent[50];
         int pageCounter = 1;
@@ -102,18 +114,6 @@ public class PlayerStatusScreen implements Listener {
         }
 
         return BookMaker.generateBook(requestingPlayer, finalPages);
-    }
-
-    protected static void setHoverText(TextComponent textComponent, String text) {
-        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(text).create()));
-    }
-
-    public static String convertLightColorsToBlack(String string) {
-        string = ChatColorConverter.convert(string);
-        string = string.replace("§f", "§0").replace("§e", "§0");
-        if (!string.startsWith("§"))
-            string = "§0" + string;
-        return string;
     }
 
 

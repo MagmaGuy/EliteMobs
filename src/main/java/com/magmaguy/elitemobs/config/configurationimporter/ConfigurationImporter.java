@@ -17,9 +17,9 @@ public class ConfigurationImporter {
 
     public static void initializeConfigs() {
         Path configurationsPath = Paths.get(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath());
-        if (!Files.isDirectory(Paths.get(configurationsPath.normalize().toString() + "/imports"))) {
+        if (!Files.isDirectory(Paths.get(configurationsPath.normalize() + "/imports"))) {
             try {
-                Files.createDirectory(Paths.get(configurationsPath.normalize().toString() + "/imports"));
+                Files.createDirectory(Paths.get(configurationsPath.normalize() + "/imports"));
             } catch (Exception exception) {
                 new WarningMessage("Failed to create import directory! Tell the dev!");
                 exception.printStackTrace();
@@ -53,16 +53,16 @@ public class ConfigurationImporter {
                 for (File file : unzippedFile.listFiles()) {
                     switch (file.getName()) {
                         case "custombosses":
-                            moveFiles(file, Paths.get(configurationsPath.normalize().toString() + "/custombosses"));
+                            moveFiles(file, Paths.get(configurationsPath.normalize() + "/custombosses"));
                             break;
                         case "customitems":
-                            moveFiles(file, Paths.get(configurationsPath.normalize().toString() + "/customitems"));
+                            moveFiles(file, Paths.get(configurationsPath.normalize() + "/customitems"));
                             break;
                         case "customtreasurechests":
-                            moveFiles(file, Paths.get(configurationsPath.normalize().toString() + "/customtreasurechests"));
+                            moveFiles(file, Paths.get(configurationsPath.normalize() + "/customtreasurechests"));
                             break;
                         case "dungeonpackages":
-                            moveFiles(file, Paths.get(configurationsPath.normalize().toString() + "/dungeonpackages"));
+                            moveFiles(file, Paths.get(configurationsPath.normalize() + "/dungeonpackages"));
                             break;
                         case "worldcontainer":
                             moveWorlds(file);
@@ -130,7 +130,7 @@ public class ConfigurationImporter {
         for (File file : unzippedDirectory.listFiles())
             try {
                 new InfoMessage("Adding " + file.getCanonicalPath());
-                Files.move(file.toPath(), Paths.get(targetPath.normalize().toString() + "/" + file.getName()), StandardCopyOption.REPLACE_EXISTING);
+                Files.move(file.toPath(), Paths.get(targetPath.normalize() + "/" + file.getName()), StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception exception) {
                 new WarningMessage("Failed to move directories for " + file.getName() + "! Tell the dev!");
                 exception.printStackTrace();

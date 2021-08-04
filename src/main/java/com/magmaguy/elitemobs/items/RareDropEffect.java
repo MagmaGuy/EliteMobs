@@ -21,6 +21,7 @@ public class RareDropEffect implements Listener {
 
         new BukkitRunnable() {
             int counter = 0;
+
             @Override
             public void run() {
 

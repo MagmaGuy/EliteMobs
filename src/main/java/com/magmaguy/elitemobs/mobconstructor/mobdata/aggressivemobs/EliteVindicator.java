@@ -10,6 +10,6 @@ public class EliteVindicator extends EliteMobProperties {
         this.defaultMaxHealth = 24;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.VINDICATOR).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.VINDICATOR).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 }

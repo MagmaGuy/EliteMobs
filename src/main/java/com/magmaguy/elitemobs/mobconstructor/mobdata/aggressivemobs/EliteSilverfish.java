@@ -11,7 +11,7 @@ public class EliteSilverfish extends EliteMobProperties {
         this.defaultMaxHealth = 8;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.SILVERFISH).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.SILVERFISH).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 
 }

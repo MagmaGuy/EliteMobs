@@ -22,24 +22,11 @@ public class ArrowRain extends MinorPower implements Listener {
         super(PowersConfig.getPower("arrow_rain.yml"));
     }
 
-    @EventHandler
-    public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
-
-        ArrowRain arrowRain = (ArrowRain) event.getEliteMobEntity().getPower(this);
-        if (arrowRain == null) return;
-        if (!eventIsValid(event, arrowRain)) return;
-        if (ThreadLocalRandom.current().nextDouble() > 0.15) return;
-
-        arrowRain.doGlobalCooldown(20 * 15, event.getEliteMobEntity());
-        doArrowRain(event.getEliteMobEntity());
-
-    }
-
     public static void doArrowRain(EliteEntity eliteEntity) {
         eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
-            int counter = 0;
             final Location initialLocation = eliteEntity.getLivingEntity().getLocation().clone();
+            int counter = 0;
 
             @Override
             public void run() {
@@ -70,7 +57,6 @@ public class ArrowRain extends MinorPower implements Listener {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-
     private static void doArrows(Location location, EliteEntity eliteEntity) {
         for (int i = 0; i < 1; i++) {
             int randX = ThreadLocalRandom.current().nextInt(30) - 15;
@@ -81,6 +67,19 @@ public class ArrowRain extends MinorPower implements Listener {
             Arrow arrow = (Arrow) location.getWorld().spawnEntity(newLocation, EntityType.ARROW);
             arrow.setShooter(eliteEntity.getLivingEntity());
         }
+    }
+
+    @EventHandler
+    public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
+
+        ArrowRain arrowRain = (ArrowRain) event.getEliteMobEntity().getPower(this);
+        if (arrowRain == null) return;
+        if (!eventIsValid(event, arrowRain)) return;
+        if (ThreadLocalRandom.current().nextDouble() > 0.15) return;
+
+        arrowRain.doGlobalCooldown(20 * 15, event.getEliteMobEntity());
+        doArrowRain(event.getEliteMobEntity());
+
     }
 
 }

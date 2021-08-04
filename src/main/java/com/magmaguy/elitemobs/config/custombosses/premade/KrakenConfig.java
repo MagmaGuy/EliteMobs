@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class KrakenConfig extends CustomBossesConfigFields {
-    public KrakenConfig(){
+    public KrakenConfig() {
         super("kraken",
                 EntityType.ELDER_GUARDIAN,
                 true,

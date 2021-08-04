@@ -58,7 +58,7 @@ public class SummonTheReturned extends BossPower implements Listener {
         for (int i = 0; i < 10; i++) {
             Location spawnLocation = eliteEntity.getLivingEntity().getLocation();
 
-            CustomBossEntity.createCustomBossEntity("the_returned.yml").spawn(spawnLocation, eliteEntity.getLevel(),false);
+            CustomBossEntity.createCustomBossEntity("the_returned.yml").spawn(spawnLocation, eliteEntity.getLevel(), false);
 
             double x = ThreadLocalRandom.current().nextDouble() - 0.5;
             double z = ThreadLocalRandom.current().nextDouble() - 0.5;

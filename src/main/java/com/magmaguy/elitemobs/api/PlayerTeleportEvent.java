@@ -12,18 +12,12 @@ import java.util.HashMap;
 
 public class PlayerTeleportEvent extends Event implements Cancellable {
 
-    public static void teleportPlayer(Player player, Location destination) {
-        new EventCaller(new PlayerTeleportEvent(player, destination));
-    }
-
-    public static HashMap<Player, Location> previousLocations = new HashMap<>();
-
     private static final HandlerList handlers = new HandlerList();
-    private boolean isCancelled = false;
+    public static HashMap<Player, Location> previousLocations = new HashMap<>();
     private final Location destination;
     private final Location originalLocation;
     private final Player player;
-
+    private boolean isCancelled = false;
     /**
      * Event fired when players teleport due to EliteMobs. This is used for teleporting to the Adventurer's Guild and to
      * Dungeons.
@@ -37,12 +31,16 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
         this.originalLocation = player.getLocation().clone();
     }
 
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
+    public static void teleportPlayer(Player player, Location destination) {
+        new EventCaller(new PlayerTeleportEvent(player, destination));
     }
 
     public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+    @Override
+    public HandlerList getHandlers() {
         return handlers;
     }
 

@@ -18,6 +18,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class CombatTag implements Listener {
 
+    private static Player playerFinder(EntityDamageByEntityEvent event) {
+
+        if (event.getDamager() instanceof Player && EntityTracker.isEliteMob(event.getEntity()))
+            return (Player) event.getDamager();
+        if (event.getEntity() instanceof Player && (EntityTracker.isEliteMob(event.getEntity()) ||
+                event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
+                        EntityTracker.isEliteMob(((LivingEntity) ((Projectile) event.getDamager()).getShooter()))))
+            return (Player) event.getEntity();
+        if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player &&
+                EntityTracker.isEliteMob(event.getEntity()))
+            return (Player) ((Projectile) event.getDamager()).getShooter();
+
+        return null;
+
+    }
+
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
 
@@ -45,22 +61,6 @@ public class CombatTag implements Listener {
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
         }
-    }
-
-    private static Player playerFinder(EntityDamageByEntityEvent event) {
-
-        if (event.getDamager() instanceof Player && EntityTracker.isEliteMob(event.getEntity()))
-            return (Player) event.getDamager();
-        if (event.getEntity() instanceof Player && (EntityTracker.isEliteMob(event.getEntity()) ||
-                event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity &&
-                        EntityTracker.isEliteMob(((LivingEntity) ((Projectile) event.getDamager()).getShooter()))))
-            return (Player) event.getEntity();
-        if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player &&
-                EntityTracker.isEliteMob(event.getEntity()))
-            return (Player) ((Projectile) event.getDamager()).getShooter();
-
-        return null;
-
     }
 
 }

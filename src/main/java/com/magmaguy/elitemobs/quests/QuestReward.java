@@ -10,15 +10,8 @@ import java.io.Serializable;
 
 public class QuestReward implements Serializable {
 
-    enum RewardType {
-        MONETARY,
-        ITEM,
-        MIXED
-    }
-
     private RewardType rewardType;
     private double questReward;
-
     public QuestReward(int questTier, double questDifficulty) {
         setRewardType();
         setQuestReward(questTier, questDifficulty);
@@ -51,6 +44,12 @@ public class QuestReward implements Serializable {
                     .replace("$reward", this.questReward * GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)) + "")
                     .replace("$currencyName", EconomySettingsConfig.currencyName));
         }
+    }
+
+    enum RewardType {
+        MONETARY,
+        ITEM,
+        MIXED
     }
 
 }

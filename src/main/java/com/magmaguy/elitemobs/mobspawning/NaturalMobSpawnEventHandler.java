@@ -36,6 +36,47 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
  */
 public class NaturalMobSpawnEventHandler implements Listener {
 
+    /**
+     * This gets the level the natural Elite Mob should have. This level is determined by the power of the armor and weapons
+     * the players are wearing, as well as by how many players are in the area.
+     *
+     * @param spawnLocation Location to scan around for players
+     * @return
+     */
+    public static int getNaturalMobLevel(Location spawnLocation, ArrayList<Player> nearbyPlayers) {
+
+        int eliteMobLevel = 1;
+        int playerCount = 0;
+
+        for (Player player : nearbyPlayers) {
+            int individualPlayerThreat = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getNaturalMobSpawnLevel(true);
+            playerCount++;
+
+            if (individualPlayerThreat > eliteMobLevel)
+                eliteMobLevel = individualPlayerThreat;
+        }
+
+        /*
+        Party system modifier
+        Each player adds a +2 tier bonus
+         */
+        eliteMobLevel += playerCount * 2 * MobTierCalculator.PER_TIER_LEVEL_INCREASE;
+
+        if (MobCombatSettingsConfig.increaseDifficultyWithSpawnDistance) {
+            int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease(spawnLocation);
+            eliteMobLevel += levelIncrement;
+        }
+
+        if (playerCount == 0 || eliteMobLevel < 1) return 0;
+
+        //add wiggle room
+        int wiggle = ThreadLocalRandom.current().nextInt(5) - 2;
+        eliteMobLevel = Math.max(wiggle + eliteMobLevel, 1);
+
+        return eliteMobLevel;
+
+    }
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
 
@@ -118,47 +159,6 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
             eliteEntity.setHasSpecialLoot(false);
-
-    }
-
-    /**
-     * This gets the level the natural Elite Mob should have. This level is determined by the power of the armor and weapons
-     * the players are wearing, as well as by how many players are in the area.
-     *
-     * @param spawnLocation Location to scan around for players
-     * @return
-     */
-    public static int getNaturalMobLevel(Location spawnLocation, ArrayList<Player> nearbyPlayers) {
-
-        int eliteMobLevel = 1;
-        int playerCount = 0;
-
-        for (Player player : nearbyPlayers) {
-            int individualPlayerThreat = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getNaturalMobSpawnLevel(true);
-            playerCount++;
-
-            if (individualPlayerThreat > eliteMobLevel)
-                eliteMobLevel = individualPlayerThreat;
-        }
-
-        /*
-        Party system modifier
-        Each player adds a +2 tier bonus
-         */
-        eliteMobLevel += playerCount * 2 * MobTierCalculator.PER_TIER_LEVEL_INCREASE;
-
-        if (MobCombatSettingsConfig.increaseDifficultyWithSpawnDistance) {
-            int levelIncrement = SpawnRadiusDifficultyIncrementer.distanceFromSpawnLevelIncrease(spawnLocation);
-            eliteMobLevel += levelIncrement;
-        }
-
-        if (playerCount == 0 || eliteMobLevel < 1) return 0;
-
-        //add wiggle room
-        int wiggle = ThreadLocalRandom.current().nextInt(5) - 2;
-        eliteMobLevel = Math.max(wiggle + eliteMobLevel, 1);
-
-        return eliteMobLevel;
 
     }
 

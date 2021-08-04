@@ -7,7 +7,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Collections;
 
 public class ImperialBeeGuardConfig extends CustomBossesConfigFields {
-    public ImperialBeeGuardConfig(){
+    public ImperialBeeGuardConfig() {
         super("imperial_bee_guard",
                 EntityType.BEE,
                 true,

@@ -22,11 +22,48 @@ import java.util.List;
 
 public class SmeltMenu extends EliteMenu {
 
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
     private static final List<Integer> inputSlots = SmeltMenuConfig.inputSlots;
     private static final List<Integer> outputSlots = SmeltMenuConfig.outputSlots;
     private static final int informationInputSlot = SmeltMenuConfig.inputInformationSlot;
     private static final int informationOutputSlot = SmeltMenuConfig.outputInformationSlot;
+    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+
+    private static ArrayList<ItemStack>[] calculateOutput(ArrayList<ItemStack> inputItemStacks, Player player) {
+        // itemStack[0] = inputArray , itemStack[1] = outputArray
+        ArrayList<ItemStack>[] itemStacks = new ArrayList[2];
+        itemStacks[0] = new ArrayList<>();
+        itemStacks[1] = new ArrayList<>();
+        HashMap<Integer, Integer> inputScrapLevelAndAmountHashMap = new HashMap<>();
+
+        for (ItemStack itemStack : inputItemStacks)
+            if (itemStack != null) {
+                int scrapLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), "EliteScrap");
+                if (scrapLevel >= 0) {
+                    if (inputScrapLevelAndAmountHashMap.containsKey(scrapLevel))
+                        inputScrapLevelAndAmountHashMap.put(scrapLevel, inputScrapLevelAndAmountHashMap.get(scrapLevel) + itemStack.getAmount());
+                    else
+                        inputScrapLevelAndAmountHashMap.put(scrapLevel, itemStack.getAmount());
+                } else
+                    itemStacks[0].add(itemStack);
+            }
+
+        for (Integer scrapLevel : inputScrapLevelAndAmountHashMap.keySet()) {
+            int scrapAmount = inputScrapLevelAndAmountHashMap.get(scrapLevel);
+            int itemUpgradeOrbAmount = (int) Math.floor(scrapAmount / 25);
+            int scrapRemainderAmount = scrapAmount - itemUpgradeOrbAmount * 25;
+
+            ItemStack scrapRemainderItem = ItemConstructor.constructScrapItem(
+                    scrapLevel, player, false);
+            scrapRemainderItem.setAmount(scrapRemainderAmount);
+            itemStacks[0].add(scrapRemainderItem);
+
+            ItemStack upgradeItem = ItemConstructor.constructUpgradeItem(scrapLevel, player, false);
+            upgradeItem.setAmount(itemUpgradeOrbAmount);
+            itemStacks[1].add(upgradeItem);
+        }
+
+        return itemStacks;
+    }
 
     /**
      * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
@@ -175,43 +212,6 @@ public class SmeltMenu extends EliteMenu {
             EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), SmeltMenu.inputSlots);
         }
 
-    }
-
-    private static ArrayList<ItemStack>[] calculateOutput(ArrayList<ItemStack> inputItemStacks, Player player) {
-        // itemStack[0] = inputArray , itemStack[1] = outputArray
-        ArrayList<ItemStack>[] itemStacks = new ArrayList[2];
-        itemStacks[0] = new ArrayList<>();
-        itemStacks[1] = new ArrayList<>();
-        HashMap<Integer, Integer> inputScrapLevelAndAmountHashMap = new HashMap<>();
-
-        for (ItemStack itemStack : inputItemStacks)
-            if (itemStack != null) {
-                int scrapLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), "EliteScrap");
-                if (scrapLevel >= 0) {
-                    if (inputScrapLevelAndAmountHashMap.containsKey(scrapLevel))
-                        inputScrapLevelAndAmountHashMap.put(scrapLevel, inputScrapLevelAndAmountHashMap.get(scrapLevel) + itemStack.getAmount());
-                    else
-                        inputScrapLevelAndAmountHashMap.put(scrapLevel, itemStack.getAmount());
-                } else
-                    itemStacks[0].add(itemStack);
-            }
-
-        for (Integer scrapLevel : inputScrapLevelAndAmountHashMap.keySet()) {
-            int scrapAmount = inputScrapLevelAndAmountHashMap.get(scrapLevel);
-            int itemUpgradeOrbAmount = (int) Math.floor(scrapAmount / 25);
-            int scrapRemainderAmount = scrapAmount - itemUpgradeOrbAmount * 25;
-
-            ItemStack scrapRemainderItem = ItemConstructor.constructScrapItem(
-                    scrapLevel, player, false);
-            scrapRemainderItem.setAmount(scrapRemainderAmount);
-            itemStacks[0].add(scrapRemainderItem);
-
-            ItemStack upgradeItem = ItemConstructor.constructUpgradeItem(scrapLevel, player, false);
-            upgradeItem.setAmount(itemUpgradeOrbAmount);
-            itemStacks[1].add(upgradeItem);
-        }
-
-        return itemStacks;
     }
 
 }

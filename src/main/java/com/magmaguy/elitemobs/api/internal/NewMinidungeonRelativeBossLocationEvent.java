@@ -11,11 +11,11 @@ import org.bukkit.event.HandlerList;
 public class NewMinidungeonRelativeBossLocationEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    private boolean isCancelled = false;
     private final Minidungeon minidungeon;
     private final Location relativeLocation;
     private final Location realLocation;
     private final CustomBossesConfigFields customBossesConfigFields;
+    private boolean isCancelled = false;
 
     public NewMinidungeonRelativeBossLocationEvent(Minidungeon minidungeon, Location relativeLocation, Location realLocation, CustomBossesConfigFields customBossesConfigFields) {
         this.minidungeon = minidungeon;
@@ -23,6 +23,10 @@ public class NewMinidungeonRelativeBossLocationEvent extends Event implements Ca
         this.realLocation = realLocation;
         this.customBossesConfigFields = customBossesConfigFields;
         if (relativeLocation == null) setCancelled(true);
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public Minidungeon getMinidungeon() {
@@ -53,10 +57,6 @@ public class NewMinidungeonRelativeBossLocationEvent extends Event implements Ca
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

@@ -15,16 +15,10 @@ import java.util.ArrayList;
 public abstract class CustomEnchantment {
 
     private static final ArrayList<CustomEnchantment> customEnchantments = new ArrayList<>();
-
-    public static ArrayList<CustomEnchantment> getCustomEnchantments() {
-        return customEnchantments;
-    }
-
     public final String key;
     private final boolean dynamic;
     private final EnchantmentsConfigFields enchantmentsConfigFields;
     private final Enchantment originalEnchantment = null;
-
     public CustomEnchantment(String key, boolean dynamic) {
         this.key = key;
         this.dynamic = dynamic;
@@ -32,12 +26,8 @@ public abstract class CustomEnchantment {
         customEnchantments.add(this);
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public EnchantmentsConfigFields getEnchantmentsConfigFields() {
-        return enchantmentsConfigFields;
+    public static ArrayList<CustomEnchantment> getCustomEnchantments() {
+        return customEnchantments;
     }
 
     public static void initializeCustomEnchantments() {
@@ -72,6 +62,14 @@ public abstract class CustomEnchantment {
     public static int getCustomEnchantmentLevel(ItemStack itemStack, String key) {
         if (itemStack == null) return 0;
         return ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, key));
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public EnchantmentsConfigFields getEnchantmentsConfigFields() {
+        return enchantmentsConfigFields;
     }
 
 }

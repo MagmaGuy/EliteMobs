@@ -11,12 +11,6 @@ import java.util.List;
 
 public class OnDeathCommands implements Listener {
 
-    @EventHandler
-    public void onEliteMobDeath(EliteMobDeathEvent event) {
-        if (MobCombatSettingsConfig.commandsOnDeath.isEmpty()) return;
-        parseConsoleCommand(MobCombatSettingsConfig.commandsOnDeath, event);
-    }
-
     public static void parseConsoleCommand(List<String> configStrings, EliteMobDeathEvent event) {
         for (String string : configStrings) {
             if (string.contains("$level"))
@@ -42,6 +36,12 @@ public class OnDeathCommands implements Listener {
 
     private static void runConsoleCommand(String command) {
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+    }
+
+    @EventHandler
+    public void onEliteMobDeath(EliteMobDeathEvent event) {
+        if (MobCombatSettingsConfig.commandsOnDeath.isEmpty()) return;
+        parseConsoleCommand(MobCombatSettingsConfig.commandsOnDeath, event);
     }
 
 }

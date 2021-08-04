@@ -12,18 +12,6 @@ import java.util.HashMap;
 public class PotionEffectsConfig {
 
     private static final HashMap<String, PotionEffectsConfigFields> potionEffects = new HashMap();
-
-    public static void addPotionEffect(String fileName, PotionEffectsConfigFields powersConfigFields) {
-        potionEffects.put(fileName, powersConfigFields);
-    }
-
-    public static PotionEffectsConfigFields getPotionEffect(String fileName) {
-        fileName = fileName.toLowerCase();
-        if (!fileName.contains(".yml"))
-            fileName += ".yml";
-        return potionEffects.get(fileName);
-    }
-
     private static final ArrayList<PotionEffectsConfigFields> potionEffectsConfigFields = new ArrayList<>(Arrays.asList(
             new AbsorptionConfig(),
             new BlindnessConfig(),
@@ -56,6 +44,17 @@ public class PotionEffectsConfig {
             new WeaknessConfig(),
             new WitherConfig()
     ));
+
+    public static void addPotionEffect(String fileName, PotionEffectsConfigFields powersConfigFields) {
+        potionEffects.put(fileName, powersConfigFields);
+    }
+
+    public static PotionEffectsConfigFields getPotionEffect(String fileName) {
+        fileName = fileName.toLowerCase();
+        if (!fileName.contains(".yml"))
+            fileName += ".yml";
+        return potionEffects.get(fileName);
+    }
 
     public static void initializeConfigs() {
         for (PotionEffectsConfigFields powersConfigFields : potionEffectsConfigFields)

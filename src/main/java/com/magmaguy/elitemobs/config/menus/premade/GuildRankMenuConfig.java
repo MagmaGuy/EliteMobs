@@ -11,16 +11,15 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class GuildRankMenuConfig extends MenusConfigFields {
-    public GuildRankMenuConfig() {
-        super("guild_rank_selector_menu");
-    }
-
     public static String menuName;
     public static String lowTierWarning, normalTierWarning;
     public static ItemStack unlockedButton, lockedButton, currentButton, nextButton, prestigeLockedButton, prestigeNextUnlockButton;
     public static String notEnoughCurrencyMessage, unlockMessage, broadcastMessage, failedMessage;
     public static String spawnRateModifierMessage, lootModifierMessage, difficultyModifierMessage, lootTierMessage, currencyBonusMessage,
             healthBonusMessage, critBonusMessage, dodgeBonusMessage;
+    public GuildRankMenuConfig() {
+        super("guild_rank_selector_menu");
+    }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {

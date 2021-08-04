@@ -22,6 +22,15 @@ public class AttackFireball extends MinorPower implements Listener {
         super(PowersConfig.getPower("attack_fireball.yml"));
     }
 
+    public static Fireball shootFireball(Entity entity, Player player) {
+        Vector targetterToTargetted = player.getLocation().toVector().subtract(entity.getLocation().toVector()).normalize().multiply(0.01);
+        Fireball repeatingFireball = (Fireball) EliteProjectile.create(EntityType.FIREBALL, entity, player, targetterToTargetted, true);
+        repeatingFireball.setYield(3F);
+        repeatingFireball.setIsIncendiary(true);
+        repeatingFireball.setShooter((ProjectileSource) entity);
+        return repeatingFireball;
+    }
+
     @EventHandler
     public void targetEvent(EliteMobTargetPlayerEvent event) {
         if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
@@ -56,15 +65,6 @@ public class AttackFireball extends MinorPower implements Listener {
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 8);
 
-    }
-
-    public static Fireball shootFireball(Entity entity, Player player) {
-        Vector targetterToTargetted = player.getLocation().toVector().subtract(entity.getLocation().toVector()).normalize().multiply(0.01);
-        Fireball repeatingFireball = (Fireball) EliteProjectile.create(EntityType.FIREBALL, entity, player, targetterToTargetted, true);
-        repeatingFireball.setYield(3F);
-        repeatingFireball.setIsIncendiary(true);
-        repeatingFireball.setShooter((ProjectileSource) entity);
-        return repeatingFireball;
     }
 
 }

@@ -12,16 +12,15 @@ import org.bukkit.event.entity.EntityDeathEvent;
 
 public class SuperMobDeathEvent extends Event {
 
-    public static void callEvent(LivingEntity livingEntity) {
-        new EventCaller(new SuperMobDeathEvent(livingEntity));
-    }
-
     private static final HandlerList handlers = new HandlerList();
     private final LivingEntity livingEntity;
-
     public SuperMobDeathEvent(LivingEntity livingEntity) {
         this.livingEntity = livingEntity;
         new SuperMobRemoveEvent(livingEntity.getUniqueId(), RemovalReason.DEATH);
+    }
+
+    public static void callEvent(LivingEntity livingEntity) {
+        new EventCaller(new SuperMobDeathEvent(livingEntity));
     }
 
     public static HandlerList getHandlerList() {

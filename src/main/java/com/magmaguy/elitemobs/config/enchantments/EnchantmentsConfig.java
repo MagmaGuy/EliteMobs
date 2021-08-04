@@ -13,27 +13,6 @@ import java.util.HashMap;
 public class EnchantmentsConfig {
 
     private static final HashMap<String, EnchantmentsConfigFields> enchantments = new HashMap();
-
-    public static void addPowers(String fileName, EnchantmentsConfigFields enchantmentsConfigFields) {
-        enchantments.put(fileName, enchantmentsConfigFields);
-    }
-
-    public static HashMap<String, EnchantmentsConfigFields> getEnchantments() {
-        return enchantments;
-    }
-
-    public static EnchantmentsConfigFields getEnchantment(String fileName) {
-        return enchantments.get(fileName);
-    }
-
-    public static EnchantmentsConfigFields getEnchantment(Enchantment enchantment) {
-        for (EnchantmentsConfigFields enchantmentsConfigFields : enchantments.values())
-            if (enchantmentsConfigFields.getEnchantment() != null)
-                if (enchantmentsConfigFields.getEnchantment().equals(enchantment))
-                    return enchantmentsConfigFields;
-        return null;
-    }
-
     private static final ArrayList<EnchantmentsConfigFields> enchantmentsConfigFields = new ArrayList(Arrays.asList(
             new ArrowDamageConfig(),
             new ArrowFireConfig(),
@@ -85,6 +64,26 @@ public class EnchantmentsConfig {
             new SummonWolfConfig(),
             new UnbindConfig()
     ));
+
+    public static void addPowers(String fileName, EnchantmentsConfigFields enchantmentsConfigFields) {
+        enchantments.put(fileName, enchantmentsConfigFields);
+    }
+
+    public static HashMap<String, EnchantmentsConfigFields> getEnchantments() {
+        return enchantments;
+    }
+
+    public static EnchantmentsConfigFields getEnchantment(String fileName) {
+        return enchantments.get(fileName);
+    }
+
+    public static EnchantmentsConfigFields getEnchantment(Enchantment enchantment) {
+        for (EnchantmentsConfigFields enchantmentsConfigFields : enchantments.values())
+            if (enchantmentsConfigFields.getEnchantment() != null)
+                if (enchantmentsConfigFields.getEnchantment().equals(enchantment))
+                    return enchantmentsConfigFields;
+        return null;
+    }
 
     public static void initializeConfigs() {
         for (EnchantmentsConfigFields enchantmentsConfigFields : enchantmentsConfigFields)

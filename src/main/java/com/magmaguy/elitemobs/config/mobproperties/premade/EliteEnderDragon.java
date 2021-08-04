@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Arrays;
 
 public class EliteEnderDragon extends MobPropertiesConfigFields {
-    public EliteEnderDragon(){
+    public EliteEnderDragon() {
         super("elite_ender_dragon",
                 EntityType.ENDER_DRAGON,
                 true,

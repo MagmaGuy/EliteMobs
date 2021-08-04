@@ -27,6 +27,10 @@ public class EliteMobTargetPlayerEvent extends Event {
         this.entityTargetLivingEntityEvent = event;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public Entity getEntity() {
         return this.entity;
     }
@@ -45,10 +49,6 @@ public class EliteMobTargetPlayerEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

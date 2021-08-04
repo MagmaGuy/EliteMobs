@@ -15,15 +15,15 @@ import java.io.Serializable;
 public class QuestObjective implements Serializable {
 
     private final int questTier;
+    private final EntityType entityType;
+    private final QuestReward questReward;
     private int objectiveKills = 0;
     private int currentKills = 0;
     private int minimumEliteMobTier = 0;
     private int minimumEliteMobLevel = 0;
     private double questDifficulty = 0;
-    private final EntityType entityType;
     private boolean isComplete = false;
     private boolean isTurnedIn = false;
-    private final QuestReward questReward;
 
     public QuestObjective(int objectiveKills, int minimumEliteMobTier, EntityType entityType, int questTier) {
         this.questTier = questTier;

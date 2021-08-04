@@ -11,16 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ProceduralShopMenuConfig extends MenusConfigFields {
-    public ProceduralShopMenuConfig() {
-        super("procedural_shop_menu");
-    }
-
     public static String shopName;
     public static ItemStack rerollItem;
     public static int rerollSlot;
     public static List<Integer> storeSlots;
     public static int minTier, maxTier;
     public static String messageFullInventory;
+    public ProceduralShopMenuConfig() {
+        super("procedural_shop_menu");
+    }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {

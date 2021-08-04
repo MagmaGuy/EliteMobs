@@ -42,18 +42,6 @@ public class PowersConfigFields {
         this.globalCooldown = globalCooldown;
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("name", name);
-        fileConfiguration.addDefault("effect", effect);
-        if (this.powerCooldown > 0)
-            fileConfiguration.addDefault("powerCooldown", powerCooldown);
-        if (this.globalCooldown > 0)
-            fileConfiguration.addDefault("globalCooldown", globalCooldown);
-        if (!additionalConfigOptions.isEmpty())
-            fileConfiguration.addDefaults(additionalConfigOptions);
-    }
-
     public PowersConfigFields(FileConfiguration fileConfiguration, File file) {
         this.fileName = file.getName();
         this.isEnabled = fileConfiguration.getBoolean("isEnabled");
@@ -64,6 +52,18 @@ public class PowersConfigFields {
         if (fileConfiguration.get("globalCooldown") != null)
             this.globalCooldown = fileConfiguration.getInt("globalCooldown");
         this.configuration = fileConfiguration;
+    }
+
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+        fileConfiguration.addDefault("isEnabled", isEnabled);
+        fileConfiguration.addDefault("name", name);
+        fileConfiguration.addDefault("effect", effect);
+        if (this.powerCooldown > 0)
+            fileConfiguration.addDefault("powerCooldown", powerCooldown);
+        if (this.globalCooldown > 0)
+            fileConfiguration.addDefault("globalCooldown", globalCooldown);
+        if (!additionalConfigOptions.isEmpty())
+            fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
     public String getFileName() {

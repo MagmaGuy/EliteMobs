@@ -19,9 +19,9 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
     private final Entity entity;
     private final EliteEntity eliteEntity;
     private final Player player;
-    private boolean isCancelled = false;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
     private final Projectile projectile;
+    private boolean isCancelled = false;
 
     public PlayerDamagedByEliteMobEvent(EliteEntity eliteEntity, Player player, EntityDamageByEntityEvent event, Projectile projectile) {
         this.entity = event.getEntity();
@@ -29,6 +29,10 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
         this.player = player;
         this.entityDamageByEntityEvent = event;
         this.projectile = projectile;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public Entity getEntity() {
@@ -53,10 +57,6 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 
@@ -90,7 +90,8 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
             else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity) {
                 eliteEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getDamager()).getShooter());
                 projectile = (Projectile) event.getDamager();
-            }if (eliteEntity == null) return;
+            }
+            if (eliteEntity == null) return;
 
             //dodge chance
             if (ThreadLocalRandom.current().nextDouble() < GuildRank.dodgeBonusValue(GuildRank.getGuildPrestigeRank(player), GuildRank.getActiveGuildRank(player)) / 100) {

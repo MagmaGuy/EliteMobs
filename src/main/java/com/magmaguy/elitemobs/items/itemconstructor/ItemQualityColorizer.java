@@ -13,17 +13,7 @@ import java.util.List;
 
 public class ItemQualityColorizer {
 
-    public enum ItemQuality {
-        LIGHT_BLUE,
-        GOLD,
-        PURPLE,
-        BLUE,
-        GREEN,
-        WHITE,
-        GRAY
-    }
-
-//    /*
+    //    /*
 //    item quality: light blue (above max config enchant level) > gold > purple > blue > green > white > gray
 //     */
     public static ItemQuality getItemQuality(ItemStack itemStack) {
@@ -336,6 +326,16 @@ public class ItemQualityColorizer {
 
         return maxRank;
 
+    }
+
+    public enum ItemQuality {
+        LIGHT_BLUE,
+        GOLD,
+        PURPLE,
+        BLUE,
+        GREEN,
+        WHITE,
+        GRAY
     }
 
 }

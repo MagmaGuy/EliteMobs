@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
@@ -110,7 +109,10 @@ public class SimplePersistentEntity {
             if (simplePersistentEntity.location == null) return;
             if (simplePersistentEntity.location.getWorld() == null) return;
             if (!simplePersistentEntity.location.getWorld().equals(world)) return;
-            simplePersistentEntity.customBossEntity.remove(RemovalReason.WORLD_UNLOAD);
+            if (simplePersistentEntity.customBossEntity != null)
+                simplePersistentEntity.customBossEntity.worldUnload();
+            else if (simplePersistentEntity.npcEntity != null)
+                simplePersistentEntity.npcEntity.worldUnload();
         }));
     }
 
@@ -128,10 +130,8 @@ public class SimplePersistentEntity {
                 for (SimplePersistentEntity simplePersistentEntity : persistentEntitiesForQueuedWorlds.get(event.getWorld().getName())) {
                     if (simplePersistentEntity.customBossEntity != null)
                         simplePersistentEntity.customBossEntity.worldLoad();
-                    else if (simplePersistentEntity.npcEntity != null) {
-                        simplePersistentEntity.npcEntity.setSpawnLocation();
-                        simplePersistentEntity.npcEntity.queueSpawn();
-                    }
+                    else if (simplePersistentEntity.npcEntity != null)
+                        simplePersistentEntity.npcEntity.worldLoad();
                 }
                 persistentEntitiesForQueuedWorlds.removeAll(event.getWorld().getName());
             }, 20);

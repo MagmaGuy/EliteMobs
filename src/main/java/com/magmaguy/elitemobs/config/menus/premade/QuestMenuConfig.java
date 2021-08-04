@@ -11,16 +11,15 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class QuestMenuConfig extends MenusConfigFields {
-    public QuestMenuConfig() {
-        super("quest_menu");
-    }
-
     public static String menuName, questSelectorMenuTitle;
     public static ItemStack validTierButton, inactiveTierButton, invalidTierButton;
     public static String cancelMessagePart1, cancelMessagePart2, cancelMessagePart3;
     public static ItemStack killObjectiveButton;
     public static String questCancelMessage, questStartTitle, questStartSubtitle, questCompleteTitle, questCompleteSubtitle,
             objectiveString, rewardMessage, questCompleteBroadcastMessage, questStatusMessage, questStartBroadcastMessage;
+    public QuestMenuConfig() {
+        super("quest_menu");
+    }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {

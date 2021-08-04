@@ -21,11 +21,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EliteExplosionEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
+    public static ArrayList<FallingBlock> fallingBlocks = new ArrayList<>();
     private final EliteEntity eliteEntity;
-    private Location explosionSourceLocation;
-    private boolean isCancelled = false;
     private final ArrayList<BlockState> blockStates;
     private final ElitePower elitePower;
+    private Location explosionSourceLocation;
+    private boolean isCancelled = false;
 
     public EliteExplosionEvent(EliteEntity eliteEntity,
                                ElitePower elitePower,
@@ -37,12 +38,20 @@ public class EliteExplosionEvent extends Event implements Cancellable {
         this.blockStates = blockStates;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public EliteEntity getEliteMobEntity() {
         return eliteEntity;
     }
 
     public Location getExplosionSourceLocation() {
         return explosionSourceLocation;
+    }
+
+    public void setExplosionSourceLocation(Location explosionSourceLocation) {
+        this.explosionSourceLocation = explosionSourceLocation;
     }
 
     public ElitePower getElitePower() {
@@ -66,20 +75,6 @@ public class EliteExplosionEvent extends Event implements Cancellable {
     @Override
     public HandlerList getHandlers() {
         return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    public void setExplosionSourceLocation(Location explosionSourceLocation) {
-        this.explosionSourceLocation = explosionSourceLocation;
-    }
-
-    public enum VisualExplosionEffectType {
-        NORMAL,
-        HIGH_POWER,
-        ASCEND
     }
 
     public void visualExplosionEffect(ElitePower elitePower) {
@@ -127,7 +122,11 @@ public class EliteExplosionEvent extends Event implements Cancellable {
         }
     }
 
-    public static ArrayList<FallingBlock> fallingBlocks = new ArrayList<>();
+    public enum VisualExplosionEffectType {
+        NORMAL,
+        HIGH_POWER,
+        ASCEND
+    }
 
     public static class EliteExplosionEvents implements Listener {
         @EventHandler(ignoreCancelled = true)

@@ -48,7 +48,7 @@ public class SpiritWalk extends BossPower implements Listener {
             @Override
             public void run() {
 
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }
@@ -97,7 +97,7 @@ public class SpiritWalk extends BossPower implements Listener {
 
             @Override
             public void run() {
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }

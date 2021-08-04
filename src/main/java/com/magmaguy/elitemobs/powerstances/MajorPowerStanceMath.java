@@ -14,8 +14,8 @@ public class MajorPowerStanceMath {
     private final static double X = 0;
     private final static double Y = 1;
     private final static double Z = 0;
-    private static double a, b, c;
     public static Vector[][] cachedVectors = new Vector[MajorPowerPowerStance.trackAmount][NUMBER_OF_POINTS_PER_FULL_ROTATION];
+    private static double a, b, c;
 
     public static void initializeVectorCache() {
 

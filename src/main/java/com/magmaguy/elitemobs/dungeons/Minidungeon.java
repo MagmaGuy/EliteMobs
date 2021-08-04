@@ -158,114 +158,6 @@ public class Minidungeon {
         this.realDungeonLocations.uncommitLocations();
     }
 
-    /**
-     * This can only exist if the anchor point actually exists
-     */
-    public class RealDungeonLocations {
-        ArrayList<RealDungeonLocation> realDungeonLocations = new ArrayList<>();
-
-        public RealDungeonLocations() {
-            for (RelativeDungeonLocations.RelativeDungeonLocation relativeDungeonLocation : relativeDungeonLocations.relativeDungeonLocations) {
-                if (dungeonPackagerConfigFields.getRotation() == 0F)
-                    realDungeonLocations.add(
-                            new RealDungeonLocation(
-                                    dungeonPackagerConfigFields.getAnchorPoint().clone().add(relativeDungeonLocation.location),
-                                    relativeDungeonLocation.customBossesConfigFields));
-                else {
-                    realDungeonLocations.add(
-                            new RealDungeonLocation(GenericRotationMatrixMath.rotateLocationYAxis(
-                                    dungeonPackagerConfigFields.getRotation(),
-                                    dungeonPackagerConfigFields.getAnchorPoint(),
-                                    relativeDungeonLocation.location),
-                                    relativeDungeonLocation.customBossesConfigFields));
-                }
-            }
-        }
-
-        public class RealDungeonLocation {
-            public Location location;
-            public CustomBossesConfigFields customBossesConfigFields;
-            public RegionalBossEntity regionalBossEntity;
-
-            public RealDungeonLocation(Location location, CustomBossesConfigFields customBossesConfigFields) {
-                this.location = location;
-                this.customBossesConfigFields = customBossesConfigFields;
-                if (isInstalled)
-                    this.regionalBossEntity = RegionalBossEntity.getRegionalBoss(customBossesConfigFields, location);
-            }
-        }
-
-        /**
-         * This runs when an admin tries to install a dungeon
-         */
-        public void commitLocations() {
-            for (RealDungeonLocation realDungeonLocation : realDungeonLocations) {
-                realDungeonLocation.regionalBossEntity = RegionalBossEntity.createRegionalBossEntity(realDungeonLocation.customBossesConfigFields, realDungeonLocation.location);
-                realDungeonLocation.regionalBossEntity.initialize();
-                realDungeonLocation.regionalBossEntity.getCustomBossesConfigFields().setFilesOutOfSync(true);
-            }
-        }
-
-        public void uncommitLocations() {
-            for (RealDungeonLocation realDungeonLocation : realDungeonLocations)
-                try {
-                    realDungeonLocation.regionalBossEntity.remove(RemovalReason.REMOVE_COMMAND);
-                } catch (Exception exception) {
-                    new WarningMessage("Failed to remove a spawn location while unloading a boss!");
-                }
-        }
-    }
-
-    /**
-     * This stores the relative locations of the dungeon, meaning the locations relative to an anchor point. The locations
-     * do not take the rotation into account, that is done when converting for the real locations
-     */
-    public class RelativeDungeonLocations {
-        ArrayList<RelativeDungeonLocation> relativeDungeonLocations = new ArrayList<>();
-        public int bossCount = 0;
-
-        public RelativeDungeonLocations(List<String> rawStrings) {
-            for (String rawString : rawStrings) {
-                relativeDungeonLocations.add(new RelativeDungeonLocation(rawString));
-                bossCount++;
-            }
-        }
-
-        public class RelativeDungeonLocation {
-            CustomBossesConfigFields customBossesConfigFields;
-            Vector location;
-
-            public RelativeDungeonLocation(String rawLocationString) {
-                try {
-                    customBossesConfigFields = CustomBossesConfig.getCustomBoss(rawLocationString.split(":")[0]);
-                    this.location = new Vector(
-                            //no world location for relative positioning
-                            //x
-                            vectorGetter(rawLocationString, 0),
-                            //y
-                            vectorGetter(rawLocationString, 1),
-                            //z
-                            vectorGetter(rawLocationString, 2));
-                    //unfortunately pitch and yaw won't work here, not that it really matters
-                    //(float) vectorGetter(rawLocationString, 3),
-                    //(float) vectorGetter(rawLocationString, 4));
-                } catch (Exception ex) {
-                    new WarningMessage("Failed to generate dungeon from raw " + rawLocationString);
-                    ex.printStackTrace();
-                }
-            }
-
-            private double vectorGetter(String rawLocationString, int position) {
-                try {
-                    return Double.parseDouble(rawLocationString.split(":")[1].split(",")[position]);
-                } catch (Exception e) {
-                    new WarningMessage("Failed to parse relative location for " + rawLocationString);
-                    return 0;
-                }
-            }
-        }
-    }
-
     public boolean initializeRelativeLocationAddition(CustomBossesConfigFields customBossesConfigFields, Location location) {
         Location relativeLocation = addRelativeLocation(customBossesConfigFields, location);
         Bukkit.getPluginManager().callEvent(new NewMinidungeonRelativeBossLocationEvent(
@@ -453,6 +345,114 @@ public class Minidungeon {
             lowestTier = lowestTier == null ? level : lowestTier < level ? lowestTier : level;
             highestTier = highestTier == null ? level : highestTier > level ? highestTier : level;
         } catch (Exception ex) {
+        }
+    }
+
+    /**
+     * This can only exist if the anchor point actually exists
+     */
+    public class RealDungeonLocations {
+        ArrayList<RealDungeonLocation> realDungeonLocations = new ArrayList<>();
+
+        public RealDungeonLocations() {
+            for (RelativeDungeonLocations.RelativeDungeonLocation relativeDungeonLocation : relativeDungeonLocations.relativeDungeonLocations) {
+                if (dungeonPackagerConfigFields.getRotation() == 0F)
+                    realDungeonLocations.add(
+                            new RealDungeonLocation(
+                                    dungeonPackagerConfigFields.getAnchorPoint().clone().add(relativeDungeonLocation.location),
+                                    relativeDungeonLocation.customBossesConfigFields));
+                else {
+                    realDungeonLocations.add(
+                            new RealDungeonLocation(GenericRotationMatrixMath.rotateLocationYAxis(
+                                    dungeonPackagerConfigFields.getRotation(),
+                                    dungeonPackagerConfigFields.getAnchorPoint(),
+                                    relativeDungeonLocation.location),
+                                    relativeDungeonLocation.customBossesConfigFields));
+                }
+            }
+        }
+
+        /**
+         * This runs when an admin tries to install a dungeon
+         */
+        public void commitLocations() {
+            for (RealDungeonLocation realDungeonLocation : realDungeonLocations) {
+                realDungeonLocation.regionalBossEntity = RegionalBossEntity.createRegionalBossEntity(realDungeonLocation.customBossesConfigFields, realDungeonLocation.location);
+                realDungeonLocation.regionalBossEntity.initialize();
+                realDungeonLocation.regionalBossEntity.getCustomBossesConfigFields().setFilesOutOfSync(true);
+            }
+        }
+
+        public void uncommitLocations() {
+            for (RealDungeonLocation realDungeonLocation : realDungeonLocations)
+                try {
+                    realDungeonLocation.regionalBossEntity.remove(RemovalReason.REMOVE_COMMAND);
+                } catch (Exception exception) {
+                    new WarningMessage("Failed to remove a spawn location while unloading a boss!");
+                }
+        }
+
+        public class RealDungeonLocation {
+            public Location location;
+            public CustomBossesConfigFields customBossesConfigFields;
+            public RegionalBossEntity regionalBossEntity;
+
+            public RealDungeonLocation(Location location, CustomBossesConfigFields customBossesConfigFields) {
+                this.location = location;
+                this.customBossesConfigFields = customBossesConfigFields;
+                if (isInstalled)
+                    this.regionalBossEntity = RegionalBossEntity.getRegionalBoss(customBossesConfigFields, location);
+            }
+        }
+    }
+
+    /**
+     * This stores the relative locations of the dungeon, meaning the locations relative to an anchor point. The locations
+     * do not take the rotation into account, that is done when converting for the real locations
+     */
+    public class RelativeDungeonLocations {
+        public int bossCount = 0;
+        ArrayList<RelativeDungeonLocation> relativeDungeonLocations = new ArrayList<>();
+
+        public RelativeDungeonLocations(List<String> rawStrings) {
+            for (String rawString : rawStrings) {
+                relativeDungeonLocations.add(new RelativeDungeonLocation(rawString));
+                bossCount++;
+            }
+        }
+
+        public class RelativeDungeonLocation {
+            CustomBossesConfigFields customBossesConfigFields;
+            Vector location;
+
+            public RelativeDungeonLocation(String rawLocationString) {
+                try {
+                    customBossesConfigFields = CustomBossesConfig.getCustomBoss(rawLocationString.split(":")[0]);
+                    this.location = new Vector(
+                            //no world location for relative positioning
+                            //x
+                            vectorGetter(rawLocationString, 0),
+                            //y
+                            vectorGetter(rawLocationString, 1),
+                            //z
+                            vectorGetter(rawLocationString, 2));
+                    //unfortunately pitch and yaw won't work here, not that it really matters
+                    //(float) vectorGetter(rawLocationString, 3),
+                    //(float) vectorGetter(rawLocationString, 4));
+                } catch (Exception ex) {
+                    new WarningMessage("Failed to generate dungeon from raw " + rawLocationString);
+                    ex.printStackTrace();
+                }
+            }
+
+            private double vectorGetter(String rawLocationString, int position) {
+                try {
+                    return Double.parseDouble(rawLocationString.split(":")[1].split(",")[position]);
+                } catch (Exception e) {
+                    new WarningMessage("Failed to parse relative location for " + rawLocationString);
+                    return 0;
+                }
+            }
         }
     }
 

@@ -30,7 +30,7 @@ public class NPCChatBubble {
 
             Location newLocation = npcEntity.getVillager().getEyeLocation().clone()
                     .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
-                    .add(new Vector(0, -0.8-(0.2 * lineCounter), 0));
+                    .add(new Vector(0, -0.8 - (0.2 * lineCounter), 0));
 
             ArmorStand visualArmorStand = VisualArmorStand.VisualArmorStand(newLocation, substring);
 

@@ -7,9 +7,9 @@ import org.bukkit.Material;
 import java.util.Arrays;
 
 public class QueenBeeEvent extends CustomEventsConfigFields {
-    public QueenBeeEvent(){
+    public QueenBeeEvent() {
         super("queen_bee",
-                 true);
+                true);
         setEventType(CustomEvent.EventType.BREAK_BLOCK);
         setBossFilenames(Arrays.asList("queen_bee.yml"));
         setChance(0.001);

@@ -50,7 +50,7 @@ public class PhaseBossEntity {
         customBossEntity.setCustomBossesConfigFields(customBossesConfigFields);
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET))
             customBossEntity.spawn(customBossEntity.getSpawnLocation(), true);
-        else{
+        else {
             Location previousSpawnLocation = customBossEntity.getSpawnLocation().clone();
             customBossEntity.spawn(customBossEntity.getLocation(), true);
             customBossEntity.setSpawnLocation(previousSpawnLocation);
@@ -64,7 +64,7 @@ public class PhaseBossEntity {
         switchPhase(bossPhases.get(0), RemovalReason.PHASE_BOSS_RESET, 1);
     }
 
-    public void deathReset(){
+    public void deathReset() {
         currentPhase = bossPhases.get(0);
         customBossEntity.setCustomBossesConfigFields(customBossEntity.getCustomBossesConfigFields());
     }

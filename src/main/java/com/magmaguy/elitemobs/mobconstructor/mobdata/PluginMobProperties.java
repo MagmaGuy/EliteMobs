@@ -13,6 +13,11 @@ public abstract class PluginMobProperties {
     public double defaultMaxHealth;
     public double baseDamage;
 
+    public static void initializePluginMobValues() {
+        SuperMobProperties.initializeSuperMobValues();
+        EliteMobProperties.initializeEliteMobValues();
+    }
+
     public boolean isEnabled() {
         return isEnabled;
     }
@@ -25,18 +30,12 @@ public abstract class PluginMobProperties {
         return this.entityType;
     }
 
-
     public double getDefaultMaxHealth() {
         return defaultMaxHealth;
     }
 
     public double getSuperMobMaxHealth() {
         return defaultMaxHealth * DefaultConfig.superMobStackAmount;
-    }
-
-    public static void initializePluginMobValues() {
-        SuperMobProperties.initializeSuperMobValues();
-        EliteMobProperties.initializeEliteMobValues();
     }
 
 }

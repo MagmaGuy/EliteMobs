@@ -34,12 +34,7 @@ import java.util.*;
 public class Explosion {
 
     public static HashSet<Explosion> explosions = new HashSet();
-
-    public static void regenerateAllPendingBlocks() {
-        for (Explosion explosion : explosions)
-            explosion.resetAllBlocks();
-    }
-
+    private final int delayBeforeRegen = 2;
     public ArrayList<BlockState> detonatedBlocks = new ArrayList<>();
 
     public Explosion(ArrayList<BlockState> detonatedBlocks) {
@@ -56,88 +51,9 @@ public class Explosion {
         regenerate();
     }
 
-    public void resetAllBlocks() {
-        for (BlockState blockState : detonatedBlocks)
-            fullBlockRestore(blockState, true);
-        detonatedBlocks.clear();
-    }
-
-    private final int delayBeforeRegen = 2;
-
-    public void regenerate() {
-
-        Explosion explosion = this;
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (detonatedBlocks.isEmpty()) {
-                    explosions.remove(explosion);
-                    cancel();
-                    return;
-                }
-
-                BlockState firstBlock = null;
-                for (BlockState block : detonatedBlocks) {
-                    firstBlock = block;
-                    break;
-                }
-
-                fullBlockRestore(firstBlock, false);
-
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * delayBeforeRegen, 1);
-
-    }
-
-    private void fullBlockRestore(BlockState blockState, boolean isShutdown) {
-
-        for (Entity entity : blockState.getWorld().getNearbyEntities(new BoundingBox(blockState.getX(), blockState.getY(), blockState.getZ(),
-                blockState.getX() + 1, blockState.getY() + 1, blockState.getZ() + 1)))
-            entity.teleport(entity.getLocation().clone().add(new Vector(0, 1, 0)));
-
-        blockState.setBlockData(blockState.getBlockData());
-
-        if (blockState instanceof Container) {
-
-            Inventory container = null;
-
-            switch (blockState.getType()) {
-
-                case LECTERN:
-                    container = ((Lectern) blockState).getInventory();
-                    break;
-
-                case JUKEBOX:
-                    //((Jukebox) blockState).setRecord(this.items.get(0));
-                    blockState.update(true, false);
-                    break;
-
-                default:
-                    container = ((Container) blockState).getInventory();
-            }
-
-            if (container != null) container.setContents(((Container) blockState).getInventory().getContents());
-        }
-
-        blockState.update(true);
-        if (!isShutdown)
-            detonatedBlocks.remove(blockState);
-    }
-
-    public static class ExplosionEvent implements Listener {
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-        public void entityExplodeEvent(EntityExplodeEvent event) {
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteEntity != null) {
-                generateExplosion(event);
-                return;
-            }
-            Projectile eliteProjectile = EntityTracker.getProjectileEntity(event.getEntity().getUniqueId());
-            if (eliteProjectile != null) {
-                generateExplosion(event);
-            }
-        }
+    public static void regenerateAllPendingBlocks() {
+        for (Explosion explosion : explosions)
+            explosion.resetAllBlocks();
     }
 
     public static void generateFakeExplosion(List<Block> blockList, Entity entity, ElitePower elitePower, Location explosionSourceLocation) {
@@ -329,6 +245,88 @@ public class Explosion {
         blockStates.add(blockState.getBlock().getState());
         if (blockState instanceof Container)
             ((Container) blockState).getInventory().setContents(new ItemStack[0]);
+    }
+
+    public void resetAllBlocks() {
+        for (BlockState blockState : detonatedBlocks)
+            fullBlockRestore(blockState, true);
+        detonatedBlocks.clear();
+    }
+
+    public void regenerate() {
+
+        Explosion explosion = this;
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (detonatedBlocks.isEmpty()) {
+                    explosions.remove(explosion);
+                    cancel();
+                    return;
+                }
+
+                BlockState firstBlock = null;
+                for (BlockState block : detonatedBlocks) {
+                    firstBlock = block;
+                    break;
+                }
+
+                fullBlockRestore(firstBlock, false);
+
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * delayBeforeRegen, 1);
+
+    }
+
+    private void fullBlockRestore(BlockState blockState, boolean isShutdown) {
+
+        for (Entity entity : blockState.getWorld().getNearbyEntities(new BoundingBox(blockState.getX(), blockState.getY(), blockState.getZ(),
+                blockState.getX() + 1, blockState.getY() + 1, blockState.getZ() + 1)))
+            entity.teleport(entity.getLocation().clone().add(new Vector(0, 1, 0)));
+
+        blockState.setBlockData(blockState.getBlockData());
+
+        if (blockState instanceof Container) {
+
+            Inventory container = null;
+
+            switch (blockState.getType()) {
+
+                case LECTERN:
+                    container = ((Lectern) blockState).getInventory();
+                    break;
+
+                case JUKEBOX:
+                    //((Jukebox) blockState).setRecord(this.items.get(0));
+                    blockState.update(true, false);
+                    break;
+
+                default:
+                    container = ((Container) blockState).getInventory();
+            }
+
+            if (container != null) container.setContents(((Container) blockState).getInventory().getContents());
+        }
+
+        blockState.update(true);
+        if (!isShutdown)
+            detonatedBlocks.remove(blockState);
+    }
+
+    public static class ExplosionEvent implements Listener {
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+        public void entityExplodeEvent(EntityExplodeEvent event) {
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+            if (eliteEntity != null) {
+                generateExplosion(event);
+                return;
+            }
+            Projectile eliteProjectile = EntityTracker.getProjectileEntity(event.getEntity().getUniqueId());
+            if (eliteProjectile != null) {
+                generateExplosion(event);
+            }
+        }
     }
 
 }

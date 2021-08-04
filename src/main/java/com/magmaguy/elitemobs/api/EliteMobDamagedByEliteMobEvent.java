@@ -14,15 +14,19 @@ public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable
     private static final HandlerList handlers = new HandlerList();
     private final EliteEntity damager;
     private final EliteEntity damagee;
-    private boolean isCancelled = false;
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
     private final double damage;
+    private boolean isCancelled = false;
 
     public EliteMobDamagedByEliteMobEvent(EliteEntity damager, EliteEntity damagee, EntityDamageByEntityEvent event, double damage) {
         this.damager = damager;
         this.damagee = damagee;
         this.entityDamageByEntityEvent = event;
         this.damage = damage;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public EliteEntity getDamager() {
@@ -55,11 +59,6 @@ public class EliteMobDamagedByEliteMobEvent extends Event implements Cancellable
     public HandlerList getHandlers() {
         return handlers;
     }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
 
     public static class EliteMobDamagedByEliteMobFilter implements Listener {
 

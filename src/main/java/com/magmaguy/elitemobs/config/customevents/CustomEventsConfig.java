@@ -6,14 +6,6 @@ import java.util.HashMap;
 
 public class CustomEventsConfig extends CustomConfig {
 
-    public static HashMap<String, ? extends CustomEventsConfigFields> getCustomEvents() {
-        return customEvents;
-    }
-
-    public static CustomEventsConfigFields getCustomEvent(String fileName) {
-        return customEvents.get(fileName);
-    }
-
     private static HashMap<String, CustomEventsConfigFields> customEvents;
 
     public CustomEventsConfig() {
@@ -21,6 +13,14 @@ public class CustomEventsConfig extends CustomConfig {
         customEvents = new HashMap<>();
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
             customEvents.put(key, (CustomEventsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
+    }
+
+    public static HashMap<String, ? extends CustomEventsConfigFields> getCustomEvents() {
+        return customEvents;
+    }
+
+    public static CustomEventsConfigFields getCustomEvent(String fileName) {
+        return customEvents.get(fileName);
     }
 
 }

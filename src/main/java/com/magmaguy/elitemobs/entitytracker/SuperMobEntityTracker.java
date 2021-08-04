@@ -1,9 +1,7 @@
 package com.magmaguy.elitemobs.entitytracker;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -20,12 +18,10 @@ public class SuperMobEntityTracker extends TrackedEntity implements AbstractTrac
         this.uuid = uuid;
         this.livingEntity = livingEntity;
         superMobEntities.put(uuid, livingEntity);
-        livingEntity.setMetadata(MetadataHandler.SUPER_MOB_METADATA, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
     }
 
     @Override
     public void specificRemoveHandling(RemovalReason removalReason) {
-        livingEntity.removeMetadata(MetadataHandler.SUPER_MOB_METADATA, MetadataHandler.PLUGIN);
     }
 
 }

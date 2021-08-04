@@ -16,36 +16,11 @@ public abstract class MajorCombatEnterScanningPower extends MajorPower implement
 
     //todo: check if instancing elite powers will cause this value to keep growing or if it will stop it from registering new powers
     public static HashSet<MajorCombatEnterScanningPower> majorCombatEnterScanningPowers = new HashSet<>();
-
+    public BukkitTask bukkitTask = null;
+    private boolean isActive = false;
     public MajorCombatEnterScanningPower(PowersConfigFields powersConfigFields) {
         super(powersConfigFields);
         majorCombatEnterScanningPowers.add(this);
-    }
-
-    private boolean isActive = false;
-    public BukkitTask bukkitTask = null;
-
-    public static class MajorCombatEnterScanningPowerEvents implements Listener {
-        @EventHandler
-        public void onCombatEnter(EliteMobEnterCombatEvent event) {
-            for (MajorCombatEnterScanningPower majorCombatEnterScanningPower : majorCombatEnterScanningPowers) {
-                ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(majorCombatEnterScanningPower);
-                if (elitePowerInstance == null)
-                    continue;
-                ((MajorCombatEnterScanningPower) elitePowerInstance).activate(event.getEliteMobEntity());
-            }
-
-        }
-
-        @EventHandler
-        public void onCombatExit(EliteMobExitCombatEvent event) {
-            for (MajorCombatEnterScanningPower majorCombatEnterScanningPower : majorCombatEnterScanningPowers) {
-                ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(majorCombatEnterScanningPower);
-                if (elitePowerInstance == null)
-                    continue;
-                ((MajorCombatEnterScanningPower) elitePowerInstance).deactivate(event.getEliteMobEntity());
-            }
-        }
     }
 
     protected void activate(EliteEntity eliteEntity) {
@@ -73,6 +48,29 @@ public abstract class MajorCombatEnterScanningPower extends MajorPower implement
         }
 
         return false;
+    }
+
+    public static class MajorCombatEnterScanningPowerEvents implements Listener {
+        @EventHandler
+        public void onCombatEnter(EliteMobEnterCombatEvent event) {
+            for (MajorCombatEnterScanningPower majorCombatEnterScanningPower : majorCombatEnterScanningPowers) {
+                ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(majorCombatEnterScanningPower);
+                if (elitePowerInstance == null)
+                    continue;
+                ((MajorCombatEnterScanningPower) elitePowerInstance).activate(event.getEliteMobEntity());
+            }
+
+        }
+
+        @EventHandler
+        public void onCombatExit(EliteMobExitCombatEvent event) {
+            for (MajorCombatEnterScanningPower majorCombatEnterScanningPower : majorCombatEnterScanningPowers) {
+                ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(majorCombatEnterScanningPower);
+                if (elitePowerInstance == null)
+                    continue;
+                ((MajorCombatEnterScanningPower) elitePowerInstance).deactivate(event.getEliteMobEntity());
+            }
+        }
     }
 
 }

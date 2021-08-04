@@ -21,15 +21,15 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class Bombardment extends MajorPower implements Listener {
 
     public static ArrayList<String> bombardments = new ArrayList<>();
+    public int firingTimer = 0;
+    private boolean isActive = false;
+    private boolean firing = false;
+    private BukkitTask task = null;
 
     public Bombardment(PowersConfigFields powersConfigFields) {
         super(powersConfigFields);
         bombardments.add(powersConfigFields.getFileName());
     }
-
-    private boolean isActive = false;
-    private boolean firing = false;
-    private BukkitTask task = null;
 
     public void activate(EliteEntity eliteEntity) {
 
@@ -97,8 +97,6 @@ public abstract class Bombardment extends MajorPower implements Listener {
 
         return false;
     }
-
-    public int firingTimer = 0;
 
     private void fire(EliteEntity eliteEntity) {
 
