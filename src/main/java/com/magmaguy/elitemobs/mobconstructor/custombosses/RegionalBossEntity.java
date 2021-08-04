@@ -25,7 +25,7 @@ import java.util.List;
 public class RegionalBossEntity extends CustomBossEntity implements SimplePersistentEntityInterface {
 
     private static final HashSet<RegionalBossEntity> regionalBosses = new HashSet();
-    private static ArrayListMultimap<CustomBossesConfigFields, RegionalBossEntity> regionalBossesFromConfigFields = ArrayListMultimap.create();
+    private static final ArrayListMultimap<CustomBossesConfigFields, RegionalBossEntity> regionalBossesFromConfigFields = ArrayListMultimap.create();
     private final double leashRadius;
     //Format: worldName,x,y,z,pitch,yaw:unixTimeForRespawn
     private String rawString;
@@ -198,10 +198,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
                 getCustomBossesConfigFields().setFilesOutOfSync(true);
                 break;
             case DEATH:
-            case BOSS_TIMEOUT: {
-                new WarningMessage("respawn was scheduled due to " + removalReason);
+            case BOSS_TIMEOUT:
                 respawn();
-            }
         }
     }
 

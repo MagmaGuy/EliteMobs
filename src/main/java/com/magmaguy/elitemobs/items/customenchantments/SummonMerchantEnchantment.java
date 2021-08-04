@@ -19,9 +19,8 @@ import java.util.ArrayList;
 
 public class SummonMerchantEnchantment extends CustomEnchantment implements Listener {
 
-    public static String key = "summon_merchant";
-
     private static final String merchantMessage = EnchantmentsConfig.getEnchantment("summon_merchant.yml").getFileConfiguration().getString("message");
+    public static String key = "summon_merchant";
 
     public SummonMerchantEnchantment() {
         super(key, false);

@@ -17,14 +17,18 @@ public class EliteMobRemoveEvent extends Event {
     /**
      * This is always the last event to be called when an Elite Mob dies, and is used to clean up references to it in memory.
      *
-     * @param eliteEntity Elite Mob removed
-     * @param removalReason  Reason for removal
+     * @param eliteEntity   Elite Mob removed
+     * @param removalReason Reason for removal
      */
     public EliteMobRemoveEvent(EliteEntity eliteEntity, RemovalReason removalReason) {
         this.entity = eliteEntity.getUnsyncedLivingEntity();
         this.eliteEntity = eliteEntity;
         this.removalReason = removalReason;
         EntityTracker.unregister(eliteEntity.getUnsyncedLivingEntity().getUniqueId(), removalReason);
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public Entity getEntity() {
@@ -41,10 +45,6 @@ public class EliteMobRemoveEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

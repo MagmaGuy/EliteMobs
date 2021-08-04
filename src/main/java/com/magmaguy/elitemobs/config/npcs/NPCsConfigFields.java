@@ -11,6 +11,19 @@ import java.util.List;
 
 public class NPCsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
+    public String noPreviousLocationMessage;
+    private String name;
+    private String role;
+    private Villager.Profession profession = Villager.Profession.NITWIT;
+    private String location;
+    private List<String> greetings;
+    private List<String> dialog;
+    private List<String> farewell;
+    private boolean canTalk;
+    private double activationRadius;
+    private NPCInteractions.NPCInteractionType interactionType;
+    private double timeout;
+
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
                             String name,
@@ -37,7 +50,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     }
 
     public NPCsConfigFields(String filename,
-                            boolean isEnabled){
+                            boolean isEnabled) {
         super(filename, isEnabled);
     }
 
@@ -49,8 +62,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.name = name;
     }
 
-    private String name;
-
     public String getRole() {
         return role;
     }
@@ -58,8 +69,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     public void setRole(String role) {
         this.role = role;
     }
-
-    private String role;
 
     public Villager.Profession getProfession() {
         return profession;
@@ -69,13 +78,19 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.profession = profession;
     }
 
-    private Villager.Profession profession = Villager.Profession.NITWIT;
-
     public String getLocation() {
         return location;
     }
 
-    private String location;
+    public void setLocation(String location) {
+        this.location = location;
+        this.fileConfiguration.set("spawnLocation", location);
+        try {
+            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
+        }
+    }
 
     public List<String> getGreetings() {
         return greetings;
@@ -85,8 +100,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.greetings = greetings;
     }
 
-    private List<String> greetings;
-
     public List<String> getDialog() {
         return dialog;
     }
@@ -94,8 +107,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     public void setDialog(List<String> dialog) {
         this.dialog = dialog;
     }
-
-    private List<String> dialog;
 
     public List<String> getFarewell() {
         return farewell;
@@ -105,8 +116,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.farewell = farewell;
     }
 
-    private List<String> farewell;
-
     public boolean isCanTalk() {
         return canTalk;
     }
@@ -114,8 +123,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     public void setCanTalk(boolean canTalk) {
         this.canTalk = canTalk;
     }
-
-    private boolean canTalk;
 
     public double getActivationRadius() {
         return activationRadius;
@@ -125,8 +132,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.activationRadius = activationRadius;
     }
 
-    private double activationRadius;
-
     public NPCInteractions.NPCInteractionType getInteractionType() {
         return interactionType;
     }
@@ -134,9 +139,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     public void setInteractionType(NPCInteractions.NPCInteractionType interactionType) {
         this.interactionType = interactionType;
     }
-
-    private NPCInteractions.NPCInteractionType interactionType;
-
 
     public double getTimeout() {
         return timeout;
@@ -146,8 +148,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.timeout = timeout;
     }
 
-    private double timeout;
-
     public String getNoPreviousLocationMessage() {
         return noPreviousLocationMessage;
     }
@@ -155,8 +155,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     public void setNoPreviousLocationMessage(String noPreviousLocationMessage) {
         this.noPreviousLocationMessage = noPreviousLocationMessage;
     }
-
-    public String noPreviousLocationMessage;
 
     @Override
     public void generateConfigDefaults() {
@@ -189,7 +187,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.noPreviousLocationMessage = processString("noPreviousLocationMessage", noPreviousLocationMessage);
     }
 
-
     public void setEnabled(boolean enabled) {
         this.isEnabled = enabled;
         this.fileConfiguration.set("isEnabled", enabled);
@@ -199,16 +196,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update the enabled status for an NPC with no config file! Did you delete it during runtime?");
         }
 
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-        this.fileConfiguration.set("spawnLocation", location);
-        try {
-            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
-        }
     }
 
 }

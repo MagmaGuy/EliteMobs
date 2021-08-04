@@ -32,6 +32,41 @@ public class SellMenu extends EliteMenu implements Listener {
 
     public static HashMap<Player, Inventory> inventories = new HashMap<>();
 
+    private static double calculateShopValue(Inventory shopInventory, Player player) {
+        double itemWorth = 0;
+        for (Integer validSlot : validSlots) {
+            ItemStack itemStack = shopInventory.getItem(validSlot);
+            if (itemStack == null) continue;
+            itemWorth += (ItemWorthCalculator.determineResaleWorth(itemStack, player) * itemStack.getAmount());
+        }
+        return itemWorth;
+    }
+
+    private static ItemStack updateConfirmButton(double itemWorth) {
+        ItemStack clonedConfirmButton = SellMenuConfig.confirmButton.clone();
+
+        List<String> lore = new ArrayList<>();
+        for (String string : clonedConfirmButton.getItemMeta().getLore())
+            lore.add(string
+                    .replace("$currency_amount", itemWorth + "")
+                    .replace("$currency_name", EconomySettingsConfig.currencyName));
+
+        ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
+        clonedMeta.setLore(lore);
+        clonedConfirmButton.setItemMeta(clonedMeta);
+        return clonedConfirmButton;
+    }
+
+    private static void cancel(Inventory playerInventory, Inventory shopInventory) {
+        for (Integer validSlot : validSlots) {
+            ItemStack itemStack = shopInventory.getItem(validSlot);
+            if (itemStack != null) {
+                playerInventory.addItem(itemStack);
+                shopInventory.remove(itemStack);
+            }
+        }
+    }
+
     /**
      * Creates a menu for selling elitemobs items. Only special Elite Mob items can be sold here.
      *
@@ -169,41 +204,6 @@ public class SellMenu extends EliteMenu implements Listener {
 
             event.getInventory().setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
 
-        }
-    }
-
-    private static double calculateShopValue(Inventory shopInventory, Player player) {
-        double itemWorth = 0;
-        for (Integer validSlot : validSlots) {
-            ItemStack itemStack = shopInventory.getItem(validSlot);
-            if (itemStack == null) continue;
-            itemWorth += (ItemWorthCalculator.determineResaleWorth(itemStack, player) * itemStack.getAmount());
-        }
-        return itemWorth;
-    }
-
-    private static ItemStack updateConfirmButton(double itemWorth) {
-        ItemStack clonedConfirmButton = SellMenuConfig.confirmButton.clone();
-
-        List<String> lore = new ArrayList<>();
-        for (String string : clonedConfirmButton.getItemMeta().getLore())
-            lore.add(string
-                    .replace("$currency_amount", itemWorth + "")
-                    .replace("$currency_name", EconomySettingsConfig.currencyName));
-
-        ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
-        clonedMeta.setLore(lore);
-        clonedConfirmButton.setItemMeta(clonedMeta);
-        return clonedConfirmButton;
-    }
-
-    private static void cancel(Inventory playerInventory, Inventory shopInventory) {
-        for (Integer validSlot : validSlots) {
-            ItemStack itemStack = shopInventory.getItem(validSlot);
-            if (itemStack != null) {
-                playerInventory.addItem(itemStack);
-                shopInventory.remove(itemStack);
-            }
         }
     }
 

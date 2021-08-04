@@ -33,6 +33,10 @@ public class EliteMobExitCombatEvent extends Event {
             eliteEntity.setNameVisible(false);
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public EliteEntity getEliteMobEntity() {
         return this.eliteEntity;
     }
@@ -46,11 +50,7 @@ public class EliteMobExitCombatEvent extends Event {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    public enum EliteMobExitCombatReason{
+    public enum EliteMobExitCombatReason {
         NO_NEARBY_PLAYERS,
         SPIRIT_WALK,
         ELITE_NOT_VALID

@@ -13,7 +13,7 @@ public class EliteSkeleton extends EliteMobProperties {
         super.addMajorPower("skeleton_pillar.yml");
         super.addMajorPower("skeleton_tracking_arrow.yml");
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.SKELETON).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 
 }

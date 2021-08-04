@@ -12,19 +12,6 @@ import java.util.HashMap;
 public class PowersConfig {
 
     private static final HashMap<String, PowersConfigFields> powers = new HashMap();
-
-    public static void addPowers(String fileName, PowersConfigFields powersConfigFields) {
-        powers.put(fileName, powersConfigFields);
-    }
-
-    public static HashMap<String, PowersConfigFields> getPowers() {
-        return powers;
-    }
-
-    public static PowersConfigFields getPower(String fileName) {
-        return powers.get(fileName);
-    }
-
     private static final ArrayList<PowersConfigFields> powersConfigFieldsList = new ArrayList(Arrays.asList(
             new FlamePyreConfig(),
             new FlamethrowerConfig(),
@@ -89,6 +76,18 @@ public class PowersConfig {
             new EnderDragonTornadoConfig(),
             new FireworksBarrageConfig()
     ));
+
+    public static void addPowers(String fileName, PowersConfigFields powersConfigFields) {
+        powers.put(fileName, powersConfigFields);
+    }
+
+    public static HashMap<String, PowersConfigFields> getPowers() {
+        return powers;
+    }
+
+    public static PowersConfigFields getPower(String fileName) {
+        return powers.get(fileName);
+    }
 
     public static void initializeConfigs() {
         for (PowersConfigFields powersConfigFields : powersConfigFieldsList)

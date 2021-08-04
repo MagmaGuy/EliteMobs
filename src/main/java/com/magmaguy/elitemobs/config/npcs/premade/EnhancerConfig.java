@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import java.util.Arrays;
 
 public class EnhancerConfig extends NPCsConfigFields {
-    public EnhancerConfig(){
+    public EnhancerConfig() {
         super("enhancer_config",
                 true,
                 "Tim",

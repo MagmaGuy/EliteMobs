@@ -38,29 +38,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class TreasureChest {
 
     private static final HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
-
-    public static HashMap<Location, TreasureChest> getTreasureChestHashMap() {
-        return treasureChestHashMap;
-    }
-
-    public static TreasureChest getTreasureChest(Location location) {
-        return getTreasureChestHashMap().get(location);
-    }
-
-    public static void initializeTreasureChest() {
-        for (CustomTreasureChestConfigFields customTreasureChestConfigFields : CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().values())
-            new TreasureChest(customTreasureChestConfigFields);
-    }
-
-    private enum DropStyle {
-        SINGLE,
-        GROUP
-    }
-
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
     private final String fileName;
     private final String key;
     private final boolean isEnabled;
+    public boolean chunkIsLoaded = true;
+    public boolean effectIsOn = true;
     private Material chestMaterial;
     private BlockFace facing;
     private int chestTier;
@@ -74,7 +57,6 @@ public class TreasureChest {
     private long restockTime;
     private List<String> restockTimes;
     private List<String> effects;
-
     public TreasureChest(CustomTreasureChestConfigFields customTreasureChestConfigFields) {
 
         this.customTreasureChestConfigFields = customTreasureChestConfigFields;
@@ -134,6 +116,19 @@ public class TreasureChest {
 
         treasureChestHashMap.put(location, this);
 
+    }
+
+    public static HashMap<Location, TreasureChest> getTreasureChestHashMap() {
+        return treasureChestHashMap;
+    }
+
+    public static TreasureChest getTreasureChest(Location location) {
+        return getTreasureChestHashMap().get(location);
+    }
+
+    public static void initializeTreasureChest() {
+        for (CustomTreasureChestConfigFields customTreasureChestConfigFields : CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().values())
+            new TreasureChest(customTreasureChestConfigFields);
     }
 
     private void generateChest() {
@@ -272,7 +267,6 @@ public class TreasureChest {
             return Round.twoDecimalPlaces(seconds / 60 / 60 / 48) + "days";
     }
 
-
     public void startEffects() {
         //todo: this is not good
         for (String string : this.effects) {
@@ -288,9 +282,6 @@ public class TreasureChest {
             }
         }
     }
-
-    public boolean chunkIsLoaded = true;
-    public boolean effectIsOn = true;
 
     private void doParticleTrail(Particle particle) {
         effectIsOn = true;
@@ -341,6 +332,10 @@ public class TreasureChest {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
+    private enum DropStyle {
+        SINGLE,
+        GROUP
+    }
 
     public static class TreasureChestEvents implements Listener {
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

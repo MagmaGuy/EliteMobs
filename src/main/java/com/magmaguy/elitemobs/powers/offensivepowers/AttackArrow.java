@@ -21,6 +21,10 @@ public class AttackArrow extends MinorPower implements Listener {
         super(PowersConfig.getPower("attack_arrow.yml"));
     }
 
+    public static Arrow shootArrow(Entity entity, Player player) {
+        return (Arrow) EliteProjectile.create(EntityType.ARROW, entity, player, true);
+    }
+
     @EventHandler
     public void targetEvent(EliteMobTargetPlayerEvent event) {
         if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
@@ -55,10 +59,6 @@ public class AttackArrow extends MinorPower implements Listener {
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 8);
 
-    }
-
-    public static Arrow shootArrow(Entity entity, Player player) {
-        return (Arrow) EliteProjectile.create(EntityType.ARROW, entity, player, true);
     }
 
 }

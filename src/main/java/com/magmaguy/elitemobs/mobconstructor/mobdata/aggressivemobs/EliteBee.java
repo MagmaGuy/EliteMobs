@@ -15,6 +15,6 @@ public class EliteBee extends EliteMobProperties {
         this.defaultMaxHealth = 10;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.BEE).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.BEE).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 }

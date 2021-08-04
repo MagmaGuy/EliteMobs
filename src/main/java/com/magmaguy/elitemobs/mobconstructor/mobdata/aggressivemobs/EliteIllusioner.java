@@ -10,6 +10,6 @@ public class EliteIllusioner extends EliteMobProperties {
         this.defaultMaxHealth = 32;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.ILLUSIONER).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.ILLUSIONER).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 }

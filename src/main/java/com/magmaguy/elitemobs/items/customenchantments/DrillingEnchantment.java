@@ -28,6 +28,11 @@ public class DrillingEnchantment extends CustomEnchantment {
     }
 
     public static class DrillingEnchantmentEvents implements Listener {
+        private Material material = null;
+        private ItemStack itemStack = null;
+        private MiningDirection miningDirection = null;
+        private Player player;
+
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onDig(BlockBreakEvent event) {
             if (event.isCancelled()) return;
@@ -45,20 +50,6 @@ public class DrillingEnchantment extends CustomEnchantment {
                     event.getPlayer().getInventory().getItemInMainHand(),
                     event.getPlayer());
 
-        }
-
-        private Material material = null;
-        private ItemStack itemStack = null;
-        private MiningDirection miningDirection = null;
-        private Player player;
-
-        private enum MiningDirection {
-            UP,
-            DOWN,
-            NORTH,
-            SOUTH,
-            EAST,
-            WEST
         }
 
         private void drillBlocks(Block originalBlock, int enchantmentLevel, Location playerLocation, ItemStack playerItem, Player player) {
@@ -217,6 +208,15 @@ public class DrillingEnchantment extends CustomEnchantment {
                     break;
             }
 
+        }
+
+        private enum MiningDirection {
+            UP,
+            DOWN,
+            NORTH,
+            SOUTH,
+            EAST,
+            WEST
         }
     }
 

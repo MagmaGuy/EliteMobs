@@ -14,6 +14,6 @@ public class ElitePiglinBrute extends EliteMobProperties {
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.PIGLIN_BRUTE).getBaseDamage();
         this.defaultMaxHealth = 50;
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.PIGLIN_BRUTE).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 }

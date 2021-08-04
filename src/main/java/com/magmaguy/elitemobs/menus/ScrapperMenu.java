@@ -108,7 +108,7 @@ public class ScrapperMenu extends EliteMenu {
 
                 //Do transfer
                 for (int slot : ScrapperMenuConfig.storeSlots)
-                    if (shopInventory.getItem(slot) == null){
+                    if (shopInventory.getItem(slot) == null) {
                         shopInventory.setItem(slot, currentItem);
                         playerInventory.clear(event.getSlot());
                         break;
@@ -129,7 +129,7 @@ public class ScrapperMenu extends EliteMenu {
                         if (itemStack == null)
                             continue;
                         int tier = ItemTierFinder.findBattleTier(itemStack);
-                        for (int i = 0; i < itemStack.getAmount(); i++){
+                        for (int i = 0; i < itemStack.getAmount(); i++) {
                             if (ThreadLocalRandom.current().nextDouble() > 0.5) {
                                 player.sendMessage(ChatColorConverter.convert("Scrap failed!"));
                                 continue;

@@ -73,8 +73,50 @@ public class EliteMobs extends JavaPlugin {
     public static boolean worldGuardIsEnabled = false;
     public static List<World> zoneBasedSpawningWorlds = new ArrayList<>();
     public static List<World> nightmareWorlds = new ArrayList<>();
-    public Object placeholders = null;
     public static Metrics metrics;
+    public Object placeholders = null;
+
+    public static void initializeConfigs() {
+        DefaultConfig.initializeConfig();
+        ItemSettingsConfig.initializeConfig();
+        ProceduralItemGenerationSettingsConfig.initializeConfig();
+        PotionEffectsConfig.initializeConfigs();
+        ConfigValues.initializeConfigurations();
+        ConfigValues.initializeCachedConfigurations();
+        EconomySettingsConfig.initializeConfig();
+        EnchantmentsConfig.initializeConfigs();
+        AntiExploitConfig.initializeConfig();
+        CombatTagConfig.initializeConfig();
+        AntiExploitConfig.initializeConfig();
+        AdventurersGuildConfig.initializeConfig();
+        ValidWorldsConfig.initializeConfig();
+
+        MenusConfig.initializeConfigs();
+        PowersConfig.initializeConfigs();
+        MobPropertiesConfig.initializeConfigs();
+        CustomEnchantment.initializeCustomEnchantments();
+
+        MobCombatSettingsConfig.initializeConfig();
+        CommandsConfig.initializeConfigs();
+        DiscordSRVConfig.initializeConfig();
+        ReadMeForTranslationsConfig.initialize();
+        ItemUpgradeSystemConfig.initializeConfig();
+        new CustomEventsConfig();
+    }
+
+    public static void worldScanner() {
+        for (World world : Bukkit.getWorlds())
+            if (ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + world.getName())) {
+                validWorldList.add(world);
+                if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + world.getName()))
+                    zoneBasedSpawningWorlds.add(world);
+                if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + world.getName())) {
+                    nightmareWorlds.add(world);
+                    DaylightWatchdog.preventDaylight(world);
+                }
+            }
+
+    }
 
     @Override
     public void onEnable() {
@@ -286,48 +328,6 @@ public class EliteMobs extends JavaPlugin {
         PlayerData.closeConnection();
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");
         Bukkit.getLogger().info("[EliteMobs] All saved! Good night.");
-
-    }
-
-    public static void initializeConfigs() {
-        DefaultConfig.initializeConfig();
-        ItemSettingsConfig.initializeConfig();
-        ProceduralItemGenerationSettingsConfig.initializeConfig();
-        PotionEffectsConfig.initializeConfigs();
-        ConfigValues.initializeConfigurations();
-        ConfigValues.initializeCachedConfigurations();
-        EconomySettingsConfig.initializeConfig();
-        EnchantmentsConfig.initializeConfigs();
-        AntiExploitConfig.initializeConfig();
-        CombatTagConfig.initializeConfig();
-        AntiExploitConfig.initializeConfig();
-        AdventurersGuildConfig.initializeConfig();
-        ValidWorldsConfig.initializeConfig();
-
-        MenusConfig.initializeConfigs();
-        PowersConfig.initializeConfigs();
-        MobPropertiesConfig.initializeConfigs();
-        CustomEnchantment.initializeCustomEnchantments();
-
-        MobCombatSettingsConfig.initializeConfig();
-        CommandsConfig.initializeConfigs();
-        DiscordSRVConfig.initializeConfig();
-        ReadMeForTranslationsConfig.initialize();
-        ItemUpgradeSystemConfig.initializeConfig();
-        new CustomEventsConfig();
-    }
-
-    public static void worldScanner() {
-        for (World world : Bukkit.getWorlds())
-            if (ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + world.getName())) {
-                validWorldList.add(world);
-                if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + world.getName()))
-                    zoneBasedSpawningWorlds.add(world);
-                if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + world.getName())) {
-                    nightmareWorlds.add(world);
-                    DaylightWatchdog.preventDaylight(world);
-                }
-            }
 
     }
 

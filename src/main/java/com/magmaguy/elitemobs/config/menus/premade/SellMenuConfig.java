@@ -12,10 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SellMenuConfig extends MenusConfigFields {
-    public SellMenuConfig() {
-        super("sell_menu");
-    }
-
     public static String shopName;
     public static ItemStack infoButton;
     public static int infoSlot;
@@ -24,6 +20,9 @@ public class SellMenuConfig extends MenusConfigFields {
     public static int cancelSlot;
     public static ItemStack confirmButton;
     public static int confirmSlot;
+    public SellMenuConfig() {
+        super("sell_menu");
+    }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {

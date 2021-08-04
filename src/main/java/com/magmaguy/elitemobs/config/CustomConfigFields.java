@@ -108,7 +108,6 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return pluginDefault;
         try {
             List<String> list = new ArrayList<>();
-            ;
             for (String string : fileConfiguration.getStringList(path))
                 list.add(ChatColorConverter.convert(string));
             return list;

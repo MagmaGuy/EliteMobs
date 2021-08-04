@@ -18,6 +18,21 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EliteQuest implements Serializable {
 
+    private static final HashMap<Player, EliteQuest> questTracker = new HashMap();
+    /*
+    Actual class constructor
+     */
+    private final QuestObjective questObjective;
+    private final UUID uuid = UUID.randomUUID();
+
+    public EliteQuest(int questLevel) {
+        this.questObjective = new QuestObjective(
+                ThreadLocalRandom.current().nextInt(8) * questLevel + 8
+                , questLevel * 10,
+                generateRandomEntityType(),
+                questLevel);
+    }
+
     public static EliteQuest generateRandomQuest(int questLevel) {
         return new EliteQuest(questLevel);
     }
@@ -26,8 +41,6 @@ public class EliteQuest implements Serializable {
         Object[] array = EliteMobProperties.getValidMobTypes().toArray();
         return (EntityType) array[ThreadLocalRandom.current().nextInt(array.length)];
     }
-
-    private static final HashMap<Player, EliteQuest> questTracker = new HashMap();
 
     private static HashMap<Player, EliteQuest> getQuestTracker() {
         return questTracker;
@@ -57,20 +70,6 @@ public class EliteQuest implements Serializable {
     public static void cancelPlayerQuest(Player player) {
         player.sendMessage(QuestMenuConfig.questCancelMessage);
         removePlayersInQuests(player);
-    }
-
-    /*
-    Actual class constructor
-     */
-    private final QuestObjective questObjective;
-    private final UUID uuid = UUID.randomUUID();
-
-    public EliteQuest(int questLevel) {
-        this.questObjective = new QuestObjective(
-                ThreadLocalRandom.current().nextInt(8) * questLevel + 8
-                , questLevel * 10,
-                generateRandomEntityType(),
-                questLevel);
     }
 
     public UUID getUuid() {

@@ -7,21 +7,10 @@ import org.bukkit.potion.PotionEffectType;
 
 public class ElitePotionEffect {
 
-    public enum Target {
-        SELF,
-        TARGET
-    }
-
-    public enum ApplicationMethod {
-        ONHIT,
-        CONTINUOUS
-    }
-
     private PotionEffect potionEffect;
     private Target target;
     private ApplicationMethod applicationMethod;
     private double value;
-
     public ElitePotionEffect(String string) {
         try {
             String[] stringObject = string.split(",");
@@ -69,5 +58,15 @@ public class ElitePotionEffect {
 
     public double getValue() {
         return value;
+    }
+
+    public enum Target {
+        SELF,
+        TARGET
+    }
+
+    public enum ApplicationMethod {
+        ONHIT,
+        CONTINUOUS
     }
 }

@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class QueenBeeConfig extends CustomBossesConfigFields {
-    public QueenBeeConfig(){
+    public QueenBeeConfig() {
         super("queen_bee",
                 EntityType.BEE,
                 true,

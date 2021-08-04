@@ -26,6 +26,26 @@ public class Flamethrower extends BossPower implements Listener {
         super(PowersConfig.getPower("flamethrower.yml"));
     }
 
+    private static List<Location> generateDamagePoints(EliteEntity eliteEntity, Location fixedPlayerLocation) {
+        List<Location> locations = new ArrayList<>();
+        Location eliteMobLocation = eliteEntity.getLivingEntity().getLocation().clone();
+        Vector toPlayerVector = fixedPlayerLocation.clone().subtract(eliteMobLocation).toVector().normalize().multiply(0.5);
+        for (int i = 0; i < 40; i++)
+            locations.add(eliteMobLocation.add(toPlayerVector).clone());
+        return locations;
+    }
+
+    private static void doDamage(List<Location> locations, EliteEntity eliteEntity) {
+        for (Location location : locations)
+            for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
+                if (entity instanceof LivingEntity) {
+                    if (eliteEntity.getLivingEntity().equals(entity)) continue;
+                    if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
+                    BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
+                }
+
+    }
+
     /**
      * Warning phase
      *
@@ -101,26 +121,6 @@ public class Flamethrower extends BossPower implements Listener {
                 cancel();
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-    }
-
-    private static List<Location> generateDamagePoints(EliteEntity eliteEntity, Location fixedPlayerLocation) {
-        List<Location> locations = new ArrayList<>();
-        Location eliteMobLocation = eliteEntity.getLivingEntity().getLocation().clone();
-        Vector toPlayerVector = fixedPlayerLocation.clone().subtract(eliteMobLocation).toVector().normalize().multiply(0.5);
-        for (int i = 0; i < 40; i++)
-            locations.add(eliteMobLocation.add(toPlayerVector).clone());
-        return locations;
-    }
-
-    private static void doDamage(List<Location> locations, EliteEntity eliteEntity) {
-        for (Location location : locations)
-            for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
-                if (entity instanceof LivingEntity) {
-                    if (eliteEntity.getLivingEntity().equals(entity)) continue;
-                    if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
-                    BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
-                }
-
     }
 
     /**

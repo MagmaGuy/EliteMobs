@@ -25,6 +25,14 @@ public class GroundPound extends MinorPower implements Listener {
         super(PowersConfig.getPower("ground_pound.yml"));
     }
 
+    private static void cloudParticle(Location location) {
+        location.getWorld().spawnParticle(Particle.CLOUD, location, 10, 0.01, 0.01, 0.01, 0.7);
+    }
+
+    private static void landCloudParticle(Location location) {
+        location.getWorld().spawnParticle(Particle.CLOUD, location, 20, 0.1, 0.01, 0.1, 0.7);
+    }
+
     @EventHandler
     public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
         GroundPound groundPound = (GroundPound) event.getEliteMobEntity().getPower(this);
@@ -37,7 +45,6 @@ public class GroundPound extends MinorPower implements Listener {
         doGroundPound(event.getEliteMobEntity());
 
     }
-
 
     public void doGroundPound(EliteEntity eliteEntity) {
 
@@ -57,7 +64,7 @@ public class GroundPound extends MinorPower implements Listener {
 
             @Override
             public void run() {
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }
@@ -108,14 +115,6 @@ public class GroundPound extends MinorPower implements Listener {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 1);
 
-    }
-
-    private static void cloudParticle(Location location) {
-        location.getWorld().spawnParticle(Particle.CLOUD, location, 10, 0.01, 0.01, 0.01, 0.7);
-    }
-
-    private static void landCloudParticle(Location location) {
-        location.getWorld().spawnParticle(Particle.CLOUD, location, 20, 0.1, 0.01, 0.1, 0.7);
     }
 
 }

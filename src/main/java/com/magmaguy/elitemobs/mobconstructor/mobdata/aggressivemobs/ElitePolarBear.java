@@ -11,7 +11,7 @@ public class ElitePolarBear extends EliteMobProperties {
         this.defaultMaxHealth = 30;
         this.baseDamage = MobPropertiesConfig.getMobProperties().get(EntityType.POLAR_BEAR).getBaseDamage();
         this.isEnabled = MobPropertiesConfig.getMobProperties().get(EntityType.POLAR_BEAR).isEnabled();
-            eliteMobData.add(this);
+        eliteMobData.add(this);
     }
 
 }

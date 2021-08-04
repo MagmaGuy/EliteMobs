@@ -11,10 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 
 public class BuyOrSellMenuConfig extends MenusConfigFields {
-    public BuyOrSellMenuConfig() {
-        super("buy_or_sell_menu");
-    }
-
     public static String SHOP_NAME;
     public static ItemStack INFORMATION_ITEM;
     public static int INFORMATION_SLOT;
@@ -23,6 +19,9 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
     public static int BUY_SLOT;
     public static ItemStack SELL_ITEM;
     public static int SELL_SLOT;
+    public BuyOrSellMenuConfig() {
+        super("buy_or_sell_menu");
+    }
 
     @Override
     public void generateConfigDefaults(FileConfiguration fileConfiguration) {

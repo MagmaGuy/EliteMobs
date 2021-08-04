@@ -8,7 +8,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 
 public class BinderOfWorldsLair extends DungeonPackagerConfigFields {
-    public BinderOfWorldsLair(){
+    public BinderOfWorldsLair() {
         super("binder_of_worlds_lair",
                 false,
                 "Binder Of Worlds",

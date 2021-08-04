@@ -35,6 +35,7 @@ public class SetupMenu {
     ArrayList<Integer> validSlots = new ArrayList<>(Arrays.asList(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23,
             24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
     HashMap<Integer, Minidungeon> minidungeonHashMap = new HashMap<>();
+    boolean adventurersGuildIsDownloaded = false;
 
     public SetupMenu(Player player) {
         this.inventory = Bukkit.createInventory(player, 54, "Setup menu");
@@ -46,8 +47,6 @@ public class SetupMenu {
         setupMenus.put(inventory, this);
         player.openInventory(inventory);
     }
-
-    boolean adventurersGuildIsDownloaded = false;
 
     private void adventurersGuildWorldStatus() {
         String state = "Adventurer's Guild world is";

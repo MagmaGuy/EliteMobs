@@ -43,7 +43,7 @@ public class ProjectileDamage {
                                 removed = true;
                             }
 
-                    if (removed){
+                    if (removed) {
                         iterator.remove();
                         goldNugget.remove();
                     }

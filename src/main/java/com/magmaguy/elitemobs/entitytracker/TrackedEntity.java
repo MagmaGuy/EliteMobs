@@ -28,21 +28,6 @@ public class TrackedEntity {
     public HashMap trackedHashMap;
     private BukkitTask memoryWatchdog;
 
-    private void memoryWatchdog() {
-        memoryWatchdog = new BukkitRunnable() {
-            @Override
-            public void run() {
-                //sometimes this seems to not get cancelled properly, so first check if it's still even registered
-                if (!trackedEntities.containsKey(uuid)) {
-                    cancel();
-                    return;
-                }
-                if (entity == null || !entity.isValid())
-                    remove(RemovalReason.OTHER);
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
-    }
-
     public TrackedEntity(UUID uuid, Entity entity, boolean removeWhenFarAway, boolean removeOnShutdown, HashMap trackedHashMap) {
         if (entity == null) {
             new WarningMessage("Failed to register entity: was null");
@@ -57,6 +42,21 @@ public class TrackedEntity {
         trackedEntities.put(uuid, this);
         this.trackedHashMap = trackedHashMap;
         memoryWatchdog();
+    }
+
+    private void memoryWatchdog() {
+        memoryWatchdog = new BukkitRunnable() {
+            @Override
+            public void run() {
+                //sometimes this seems to not get cancelled properly, so first check if it's still even registered
+                if (!trackedEntities.containsKey(uuid)) {
+                    cancel();
+                    return;
+                }
+                if (entity == null || !entity.isValid())
+                    remove(RemovalReason.OTHER);
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
     }
 
     protected void remove(RemovalReason removalReason) {

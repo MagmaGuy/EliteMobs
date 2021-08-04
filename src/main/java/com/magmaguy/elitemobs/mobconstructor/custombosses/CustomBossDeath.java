@@ -18,31 +18,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomBossDeath implements Listener {
 
-    @EventHandler
-    public void onEliteMobDeath(EliteMobDeathEvent event) {
-        if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-        CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
-
-        doLoot(customBossEntity);
-        doDeathMessage(customBossEntity);
-
-        //untrack from trackable custom bosses
-        CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
-
-        //todo this should be moved to the death event
-        if (customBossEntity.customBossesConfigFields.getOnDeathCommands() != null &&
-                !customBossEntity.customBossesConfigFields.getOnDeathCommands().isEmpty())
-            OnDeathCommands.parseConsoleCommand(customBossEntity.customBossesConfigFields.getOnDeathCommands(), event);
-
-        //todo this should be set by the elite entity not the custom boss
-        if (!customBossEntity.customBossesConfigFields.getDropsVanillaLoot()) {
-            event.getEntityDeathEvent().setDroppedExp(0);
-            for (ItemStack itemStack : event.getEntityDeathEvent().getDrops())
-                itemStack.setAmount(0);
-        }
-
-    }
-
     private static void doLoot(CustomBossEntity customBossEntity) {
         for (Player player : customBossEntity.getDamagers().keySet())
             if (!customBossEntity.getTriggeredAntiExploit())
@@ -177,6 +152,31 @@ public class CustomBossDeath implements Listener {
             sortedMap.put(entry.getKey(), entry.getValue());
 
         return sortedMap;
+    }
+
+    @EventHandler
+    public void onEliteMobDeath(EliteMobDeathEvent event) {
+        if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
+        CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
+
+        doLoot(customBossEntity);
+        doDeathMessage(customBossEntity);
+
+        //untrack from trackable custom bosses
+        CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
+
+        //todo this should be moved to the death event
+        if (customBossEntity.customBossesConfigFields.getOnDeathCommands() != null &&
+                !customBossEntity.customBossesConfigFields.getOnDeathCommands().isEmpty())
+            OnDeathCommands.parseConsoleCommand(customBossEntity.customBossesConfigFields.getOnDeathCommands(), event);
+
+        //todo this should be set by the elite entity not the custom boss
+        if (!customBossEntity.customBossesConfigFields.getDropsVanillaLoot()) {
+            event.getEntityDeathEvent().setDroppedExp(0);
+            for (ItemStack itemStack : event.getEntityDeathEvent().getDrops())
+                itemStack.setAmount(0);
+        }
+
     }
 
 }

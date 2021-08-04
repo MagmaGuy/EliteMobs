@@ -10,10 +10,10 @@ public class MinorPowerStanceMath {
 
     public final static int NUMBER_OF_POINTS_PER_FULL_ROTATION = 30;
     private final static double X = 1;
-    private static double Y = 0;
     private final static double Z = 0;
-    private static double a, b, c;
     public static Vector[][] cachedVectors = new Vector[MinorPowerPowerStance.trackAmount][NUMBER_OF_POINTS_PER_FULL_ROTATION];
+    private static double Y = 0;
+    private static double a, b, c;
 
     public static void initializeVectorCache() {
 

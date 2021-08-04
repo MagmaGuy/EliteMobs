@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import java.util.Arrays;
 
 public class RefinerConfig extends NPCsConfigFields {
-    public RefinerConfig(){
+    public RefinerConfig() {
         super("refiner_config",
                 true,
                 "Ralph",

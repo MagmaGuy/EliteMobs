@@ -8,15 +8,6 @@ import java.util.List;
 public class CustomLootConfigFields {
 
     private static final List<CustomLootConfigFields> customLootConfigFields = new ArrayList<>();
-
-    public static List<CustomLootConfigFields> getCustomLootConfigFields() {
-        return customLootConfigFields;
-    }
-
-    public static void addCustomLootConfigField(CustomLootConfigFields customLootConfig) {
-        customLootConfigFields.add(customLootConfig);
-    }
-
     private final String fileName;
     private final boolean isEnabled;
     private final String material;
@@ -27,14 +18,7 @@ public class CustomLootConfigFields {
     private final String dropWeight;
     private final String scalability;
     private final String itemType;
-
-    public void setCustomModelID(Integer customModelID) {
-        this.customModelID = customModelID;
-    }
-
     private Integer customModelID = 0;
-
-
     public CustomLootConfigFields(String fileName,
                                   boolean isEnabled,
                                   String material,
@@ -57,6 +41,30 @@ public class CustomLootConfigFields {
         this.itemType = itemType;
     }
 
+    public CustomLootConfigFields(String fileName, FileConfiguration configuration) {
+        this.fileName = fileName;
+        if (configuration.get("isEnabled") != null)
+            this.isEnabled = configuration.getBoolean("isEnabled");
+        else this.isEnabled = false;
+        this.material = configuration.getString("material");
+        this.name = configuration.getString("name");
+        this.lore = configuration.getStringList("lore");
+        this.enchantments = configuration.getStringList("enchantments");
+        this.potionEffects = configuration.getStringList("potionEffects");
+        this.dropWeight = configuration.getString("dropWeight");
+        this.scalability = configuration.getString("scalability");
+        this.itemType = configuration.getString("itemType");
+        this.customModelID = configuration.getInt("customModelID");
+    }
+
+    public static List<CustomLootConfigFields> getCustomLootConfigFields() {
+        return customLootConfigFields;
+    }
+
+    public static void addCustomLootConfigField(CustomLootConfigFields customLootConfig) {
+        customLootConfigFields.add(customLootConfig);
+    }
+
     /**
      * Generates config defaults to be used by CustomBossesConfig
      */
@@ -72,22 +80,6 @@ public class CustomLootConfigFields {
         fileConfiguration.addDefault("itemType", itemType);
         if (customModelID > 0)
             fileConfiguration.addDefault("customModelID", customModelID);
-    }
-
-    public CustomLootConfigFields(String fileName, FileConfiguration configuration) {
-        this.fileName = fileName;
-        if (configuration.get("isEnabled") != null)
-            this.isEnabled = configuration.getBoolean("isEnabled");
-        else this.isEnabled = false;
-        this.material = configuration.getString("material");
-        this.name = configuration.getString("name");
-        this.lore = configuration.getStringList("lore");
-        this.enchantments = configuration.getStringList("enchantments");
-        this.potionEffects = configuration.getStringList("potionEffects");
-        this.dropWeight = configuration.getString("dropWeight");
-        this.scalability = configuration.getString("scalability");
-        this.itemType = configuration.getString("itemType");
-        this.customModelID = configuration.getInt("customModelID");
     }
 
     public String getFileName() {
@@ -132,5 +124,9 @@ public class CustomLootConfigFields {
 
     public Integer getCustomModelID() {
         return this.customModelID;
+    }
+
+    public void setCustomModelID(Integer customModelID) {
+        this.customModelID = customModelID;
     }
 }

@@ -24,6 +24,9 @@ public class ItemTagger {
     public static final NamespacedKey eliteMobsItemNamespacedKey = new NamespacedKey(MetadataHandler.PLUGIN, "EliteMobsItem");
     public static final NamespacedKey customLore = new NamespacedKey(MetadataHandler.PLUGIN, "CustomLore");
     public static String itemValue = "ItemValue";
+    public static NamespacedKey onHitPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "onHitPotionEffect");
+    public static NamespacedKey continuousPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "continuousPotionEffect");
+    public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
 
     public static void registerEliteItem(ItemMeta itemMeta) {
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
@@ -93,7 +96,6 @@ public class ItemTagger {
         itemMeta.getPersistentDataContainer().set(enchantmentKey, PersistentDataType.INTEGER, enchantmentLevel);
     }
 
-
     public static void registerCustomEnchantments(ItemMeta itemMeta, HashMap<String, Integer> customEnchantments) {
         for (String subString : customEnchantments.keySet())
             registerCustomEnchantment(itemMeta, subString, customEnchantments.get(subString));
@@ -129,7 +131,7 @@ public class ItemTagger {
         if (itemMeta == null)
             return 0;
         Integer level = itemMeta.getPersistentDataContainer().get(enchantmentKey, PersistentDataType.INTEGER);
-        if (level == null){
+        if (level == null) {
             Enchantment enchantment = Enchantment.getByKey(enchantmentKey);
             if (enchantment != null)
                 return itemMeta.getEnchantLevel(enchantment);
@@ -156,14 +158,9 @@ public class ItemTagger {
         return itemMeta.getPersistentDataContainer().has(enchantmentKey, PersistentDataType.INTEGER);
     }
 
-    public static NamespacedKey onHitPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "onHitPotionEffect");
-    public static NamespacedKey continuousPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "continuousPotionEffect");
-
     public static ArrayList<ElitePotionEffect> getPotionEffects(ItemMeta itemMeta, NamespacedKey namespacedKey) {
         return ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, namespacedKey);
     }
-
-    public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
 
     public static void registerItemSource(EliteEntity eliteEntity, ItemMeta itemMeta) {
         if (eliteEntity == null) {

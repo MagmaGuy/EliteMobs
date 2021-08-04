@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream;
 public class UnzipFile {
     public static File run(String zippedFileName) throws IOException {
         String mainDirectory = MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + "/imports/";
-        String fileZip =  mainDirectory + zippedFileName;
+        String fileZip = mainDirectory + zippedFileName;
         File finalDirectory = new File(mainDirectory + zippedFileName.replace(".zip", ""));
         byte[] buffer = new byte[1024];
         ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(fileZip));

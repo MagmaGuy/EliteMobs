@@ -21,8 +21,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class CustomBossTrail {
 
     private final CustomBossEntity customBossEntity;
-    private LivingEntity livingEntity;
     private final ArrayList<BukkitTask> bukkitTasks = new ArrayList<>();
+    private LivingEntity livingEntity;
 
     public CustomBossTrail(CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;

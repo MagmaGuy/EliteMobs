@@ -23,13 +23,22 @@ import java.util.HashMap;
 import java.util.List;
 
 public class UnbindMenu extends EliteMenu {
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
     private static final int eliteItemInputSlot = UnbinderMenuConfig.eliteItemInputSlot;
     private static final int scrapItemInputSlot = UnbinderMenuConfig.eliteUnbindInputSlot;
     private static final int outputSlot = UnbinderMenuConfig.outputSlot;
     private static final int eliteItemInformationInputSlot = UnbinderMenuConfig.eliteItemInputInformationSlot;
     private static final int eliteScrapInformationInputSlot = UnbinderMenuConfig.eliteScrapInputInformationSlot;
     private static final int informationOutputSlot = UnbinderMenuConfig.outputInformationSlot;
+    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+
+    private static void calculateOutput(Inventory UnbinderInventory) {
+        if (UnbinderInventory.getItem(UnbinderMenuConfig.eliteUnbindInputSlot) == null || UnbinderInventory.getItem(UnbinderMenuConfig.eliteItemInputSlot) == null) {
+            UnbinderInventory.setItem(UnbinderMenuConfig.outputSlot, null);
+            return;
+        }
+        ItemStack outputItem = UnbinderInventory.getItem(UnbinderMenuConfig.eliteItemInputSlot).clone();
+        UnbinderInventory.setItem(outputSlot, UnbindEnchantment.unbindItem(outputItem));
+    }
 
     /**
      * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
@@ -162,15 +171,6 @@ public class UnbindMenu extends EliteMenu {
             EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
         }
 
-    }
-
-    private static void calculateOutput(Inventory UnbinderInventory) {
-        if (UnbinderInventory.getItem(UnbinderMenuConfig.eliteUnbindInputSlot) == null || UnbinderInventory.getItem(UnbinderMenuConfig.eliteItemInputSlot) == null) {
-            UnbinderInventory.setItem(UnbinderMenuConfig.outputSlot, null);
-            return;
-        }
-        ItemStack outputItem = UnbinderInventory.getItem(UnbinderMenuConfig.eliteItemInputSlot).clone();
-        UnbinderInventory.setItem(outputSlot, UnbindEnchantment.unbindItem(outputItem));
     }
 
 }

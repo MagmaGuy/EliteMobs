@@ -21,18 +21,6 @@ public class LightningBolts extends BossPower implements Listener {
         super(PowersConfig.getPower("lightning_bolts.yml"));
     }
 
-    @EventHandler
-    public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
-        LightningBolts lightningBolts = (LightningBolts) event.getEliteMobEntity().getPower(this);
-        if (lightningBolts == null) return;
-        if (lightningBolts.getGlobalCooldownActive()) return;
-
-        lightningBolts.doGlobalCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getConfiguration().getInt("delayBetweenStrikes"));
-
-        lightningBolts.setIsFiring(true);
-        setLightiningPaths(event.getEliteMobEntity());
-    }
-
     private static void setLightiningPaths(EliteEntity eliteEntity) {
         if (eliteEntity.getLivingEntity() == null) return;
         eliteEntity.getLivingEntity().setAI(false);
@@ -74,6 +62,18 @@ public class LightningBolts extends BossPower implements Listener {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, counter * 5L, 1);
 
+    }
+
+    @EventHandler
+    public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
+        LightningBolts lightningBolts = (LightningBolts) event.getEliteMobEntity().getPower(this);
+        if (lightningBolts == null) return;
+        if (lightningBolts.getGlobalCooldownActive()) return;
+
+        lightningBolts.doGlobalCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getConfiguration().getInt("delayBetweenStrikes"));
+
+        lightningBolts.setIsFiring(true);
+        setLightiningPaths(event.getEliteMobEntity());
     }
 
 }

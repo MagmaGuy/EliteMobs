@@ -17,6 +17,8 @@ import java.util.HashSet;
 
 public class EliteCreeperExplosionHandler implements Listener {
 
+    private static final HashSet<Player> explosionPlayers = new HashSet<>();
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEliteCreeperDetonation(ExplosionPrimeEvent event) {
 
@@ -53,8 +55,6 @@ public class EliteCreeperExplosionHandler implements Listener {
                 ((LivingEntity) entity).damage(eliteEntity.getLevel());
 
     }
-
-    private static final HashSet<Player> explosionPlayers = new HashSet<>();
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void playerDamagedByExplosionEvent(EntityDamageEvent event) {

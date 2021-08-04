@@ -30,8 +30,8 @@ public class CustomSpawn {
 
     public boolean isEvent = false;
     TimedEvent timedEvent;
-    private CustomSpawnConfigFields customSpawnConfigFields;
-    private ArrayList<CustomBossEntity> customBossEntities = new ArrayList<>();
+    private final CustomSpawnConfigFields customSpawnConfigFields;
+    private final ArrayList<CustomBossEntity> customBossEntities = new ArrayList<>();
     private int allTries = 0;
     private Location spawnLocation;
 

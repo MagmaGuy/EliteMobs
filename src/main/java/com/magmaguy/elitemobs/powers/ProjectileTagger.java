@@ -9,15 +9,15 @@ public class ProjectileTagger {
 
     public static final NamespacedKey customDamageKey = new NamespacedKey(MetadataHandler.PLUGIN, "custom_damage");
 
-    public static void tagProjectileWithCustomDamage(Projectile projectile, double customDamage){
+    public static void tagProjectileWithCustomDamage(Projectile projectile, double customDamage) {
         projectile.getPersistentDataContainer().set(customDamageKey, PersistentDataType.DOUBLE, customDamage);
     }
 
-    public static boolean projectileHasCustomDamage(Projectile projectile){
+    public static boolean projectileHasCustomDamage(Projectile projectile) {
         return projectile.getPersistentDataContainer().has(customDamageKey, PersistentDataType.DOUBLE);
     }
 
-    public static double getProjectileCustomDamage(Projectile projectile){
+    public static double getProjectileCustomDamage(Projectile projectile) {
         if (!projectileHasCustomDamage(projectile))
             return -1;
         return projectile.getPersistentDataContainer().get(customDamageKey, PersistentDataType.DOUBLE);

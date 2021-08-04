@@ -19,6 +19,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EnderDragonDiscoFireballs extends MajorCombatEnterScanningPower {
 
+    int randomTiltSeed;
+    private ArrayList<Vector> relativeLocationOffsets;
+    private ArrayList<Location> realLocations = new ArrayList<>();
+    private int warningCounter = 0;
+    private ArrayList<Fireball> fireballs = new ArrayList<>();
+
     public EnderDragonDiscoFireballs() {
         super(PowersConfig.getPower("ender_dragon_disco_fireballs.yml"));
     }
@@ -89,25 +95,17 @@ public class EnderDragonDiscoFireballs extends MajorCombatEnterScanningPower {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-    private ArrayList<Vector> relativeLocationOffsets;
-
     private void generateLocations() {
         relativeLocationOffsets = new ArrayList<>();
         for (int i = 0; i < 12; i++)
             relativeLocationOffsets.add(new Vector(7, 0, 0).rotateAroundY(2D * Math.PI / 12D * i));
     }
 
-    private ArrayList<Location> realLocations = new ArrayList<>();
-
     private void commitLocations(EliteEntity eliteEntity) {
         realLocations = new ArrayList<>();
         for (Vector vector : relativeLocationOffsets)
             realLocations.add(eliteEntity.getLivingEntity().getLocation().clone().add(vector));
     }
-
-    private int warningCounter = 0;
-
-    private ArrayList<Fireball> fireballs = new ArrayList<>();
 
     private void doWarningPhase(EliteEntity eliteEntity) {
         //spawn fireballs and start rotation
@@ -146,8 +144,6 @@ public class EnderDragonDiscoFireballs extends MajorCombatEnterScanningPower {
         for (Fireball fireball : fireballs)
             fireball.setDirection(generateDownwardsVector(eliteEntity, fireball).multiply(0.1));
     }
-
-    int randomTiltSeed;
 
     private Vector generateDownwardsVector(EliteEntity eliteEntity, Fireball fireball) {
         double yValue = Math.cos(warningCounter) / 2 - 0.5;

@@ -80,8 +80,8 @@ public class SpawnCommand {
                                               Vector coords) {
         try {
             Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
-            CustomBossesConfigFields customBossesConfigFields  = CustomBossesConfig.getCustomBoss(fileName);
-            if (customBossesConfigFields == null){
+            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
+            if (customBossesConfigFields == null) {
                 commandSender.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
             }
             CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
@@ -100,8 +100,8 @@ public class SpawnCommand {
                                               int level) {
         try {
             Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
-            CustomBossesConfigFields customBossesConfigFields  = CustomBossesConfig.getCustomBoss(fileName);
-            if (customBossesConfigFields == null){
+            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
+            if (customBossesConfigFields == null) {
                 commandSender.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
             }
             CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
@@ -115,8 +115,8 @@ public class SpawnCommand {
     }
 
     public static void spawnCustomBossCommand(Player player, String fileName, int level) {
-        CustomBossesConfigFields customBossesConfigFields  = CustomBossesConfig.getCustomBoss(fileName);
-        if (customBossesConfigFields == null){
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
+        if (customBossesConfigFields == null) {
             player.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
@@ -126,8 +126,8 @@ public class SpawnCommand {
     }
 
     public static void spawnCustomBossCommand(Player player, String fileName) {
-        CustomBossesConfigFields customBossesConfigFields  = CustomBossesConfig.getCustomBoss(fileName);
-        if (customBossesConfigFields == null){
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
+        if (customBossesConfigFields == null) {
             player.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);

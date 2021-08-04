@@ -22,13 +22,29 @@ import java.util.HashMap;
 import java.util.List;
 
 public class RepairMenu extends EliteMenu {
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
     private static final int eliteItemInputSlot = RepairMenuConfig.eliteItemInputSlot;
     private static final int scrapItemInputSlot = RepairMenuConfig.eliteScrapInputSlot;
     private static final int outputSlot = RepairMenuConfig.outputSlot;
     private static final int eliteItemInformationInputSlot = RepairMenuConfig.eliteItemInputInformationSlot;
     private static final int eliteScrapInformationInputSlot = RepairMenuConfig.eliteScrapInputInformationSlot;
     private static final int informationOutputSlot = RepairMenuConfig.outputInformationSlot;
+    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+
+    private static void calculateOutput(Inventory repairInventory) {
+        if (repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot) == null || repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot) == null) {
+            repairInventory.setItem(RepairMenuConfig.outputSlot, null);
+            return;
+        }
+        int repairScore = ItemTagger.getEnchantment(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot).getItemMeta(), "EliteScrap");
+        ItemStack outputItem = repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot).clone();
+        ItemMeta itemMeta = outputItem.getItemMeta();
+        Damageable damageable = (Damageable) itemMeta;
+        int damage = Math.max(damageable.getDamage() - repairScore, 0);
+        damageable.setDamage(damage);
+        itemMeta = (ItemMeta) damageable;
+        outputItem.setItemMeta(itemMeta);
+        repairInventory.setItem(outputSlot, outputItem);
+    }
 
     /**
      * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
@@ -164,22 +180,6 @@ public class RepairMenu extends EliteMenu {
             EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), Arrays.asList(eliteItemInputSlot, scrapItemInputSlot));
         }
 
-    }
-
-    private static void calculateOutput(Inventory repairInventory) {
-        if (repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot) == null || repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot) == null) {
-            repairInventory.setItem(RepairMenuConfig.outputSlot, null);
-            return;
-        }
-        int repairScore = ItemTagger.getEnchantment(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot).getItemMeta(), "EliteScrap");
-        ItemStack outputItem = repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot).clone();
-        ItemMeta itemMeta = outputItem.getItemMeta();
-        Damageable damageable = (Damageable) itemMeta;
-        int damage = Math.max(damageable.getDamage() - repairScore, 0);
-        damageable.setDamage(damage);
-        itemMeta = (ItemMeta) damageable;
-        outputItem.setItemMeta(itemMeta);
-        repairInventory.setItem(outputSlot, outputItem);
     }
 
 }

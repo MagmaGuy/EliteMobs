@@ -21,6 +21,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EnderDragonTornado extends MajorCombatEnterScanningPower {
 
+    private Location tornadoEye = null;
+    private Vector tornadoSpeed = null;
+
     public EnderDragonTornado() {
         super(PowersConfig.getPower("ender_dragon_tornado.yml"));
     }
@@ -45,9 +48,6 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 10);
     }
-
-    private Location tornadoEye = null;
-    private Vector tornadoSpeed = null;
 
     private void doPower(EliteEntity eliteEntity) {
         doCooldown(eliteEntity);

@@ -28,6 +28,36 @@ public class BulletHell extends BossPower implements Listener {
         super(PowersConfig.getPower("bullet_hell.yml"));
     }
 
+    private static void trackingArrowLoop(Player player, Arrow arrow) {
+        new BukkitRunnable() {
+            int counter = 0;
+
+            @Override
+            public void run() {
+                if (player.isValid() && !player.isDead() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())
+                        && player.getLocation().distanceSquared(arrow.getLocation()) < 900 && !arrow.isOnGround()) {
+                    if (counter % 10 == 0)
+                        arrow.setVelocity(arrow.getVelocity().add(arrowAdjustmentVector(arrow, player)));
+                    arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.01, 0.01, 0.01, 0.01);
+                } else {
+                    arrow.setGravity(true);
+                    EntityTracker.unregister(arrow, RemovalReason.EFFECT_TIMEOUT);
+                    cancel();
+                }
+                if (counter > 20 * 10) {
+                    EntityTracker.unregister(arrow, RemovalReason.EFFECT_TIMEOUT);
+                    arrow.setGravity(true);
+                    cancel();
+                }
+                counter++;
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+    }
+
+    private static Vector arrowAdjustmentVector(Arrow arrow, Player player) {
+        return player.getEyeLocation().clone().subtract(new Vector(0, 0.5, 0)).subtract(arrow.getLocation()).toVector().normalize().multiply(0.1);
+    }
+
     @EventHandler
     public void onDamage(EliteMobDamagedByPlayerEvent event) {
         BulletHell bulletHell = (BulletHell) event.getEliteMobEntity().getPower(this);
@@ -45,8 +75,8 @@ public class BulletHell extends BossPower implements Listener {
         if (eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)).getBlock().getType().equals(Material.AIR))
             eliteEntity.getLivingEntity().teleport(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
         new BukkitRunnable() {
-            int counter = 0;
             final Location initialLocation = eliteEntity.getLivingEntity().getLocation().clone();
+            int counter = 0;
 
             @Override
             public void run() {
@@ -76,37 +106,6 @@ public class BulletHell extends BossPower implements Listener {
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 10);
-    }
-
-
-    private static void trackingArrowLoop(Player player, Arrow arrow) {
-        new BukkitRunnable() {
-            int counter = 0;
-
-            @Override
-            public void run() {
-                if (player.isValid() && !player.isDead() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())
-                        && player.getLocation().distanceSquared(arrow.getLocation()) < 900 && !arrow.isOnGround()) {
-                    if (counter % 10 == 0)
-                        arrow.setVelocity(arrow.getVelocity().add(arrowAdjustmentVector(arrow, player)));
-                    arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.01, 0.01, 0.01, 0.01);
-                } else {
-                    arrow.setGravity(true);
-                    EntityTracker.unregister(arrow, RemovalReason.EFFECT_TIMEOUT);
-                    cancel();
-                }
-                if (counter > 20 * 10) {
-                    EntityTracker.unregister(arrow, RemovalReason.EFFECT_TIMEOUT);
-                    arrow.setGravity(true);
-                    cancel();
-                }
-                counter++;
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-    }
-
-    private static Vector arrowAdjustmentVector(Arrow arrow, Player player) {
-        return player.getEyeLocation().clone().subtract(new Vector(0, 0.5, 0)).subtract(arrow.getLocation()).toVector().normalize().multiply(0.1);
     }
 
 }

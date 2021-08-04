@@ -10,11 +10,11 @@ public class CommandsConfigFields {
         this.fileName = fileName + ".yml";
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-    }
-
     public CommandsConfigFields(FileConfiguration configuration) {
 
+    }
+
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
     }
 
     public String getFileName() {

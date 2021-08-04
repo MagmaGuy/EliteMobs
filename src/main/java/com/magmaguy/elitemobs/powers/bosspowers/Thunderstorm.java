@@ -22,18 +22,6 @@ public class Thunderstorm extends BossPower implements Listener {
         super(PowersConfig.getPower("thunderstorm.yml"));
     }
 
-    @EventHandler
-    public void onDamage(EliteMobDamagedByPlayerEvent event) {
-        Thunderstorm thunderstorm = (Thunderstorm) event.getEliteMobEntity().getPower(this);
-        if (thunderstorm == null) return;
-        if (!eventIsValid(event, thunderstorm)) return;
-        if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
-
-        thunderstorm.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
-        doThunderstorm(event.getEliteMobEntity());
-
-    }
-
     public static void doThunderstorm(EliteEntity eliteEntity) {
         if (eliteEntity == null || !eliteEntity.getLivingEntity().isValid()) return;
         eliteEntity.getLivingEntity().setAI(false);
@@ -83,6 +71,18 @@ public class Thunderstorm extends BossPower implements Listener {
                 location.getWorld().spawnParticle(Particle.CRIT, location, 10, 0.5, 1.5, 0.5, 0.3);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+
+    }
+
+    @EventHandler
+    public void onDamage(EliteMobDamagedByPlayerEvent event) {
+        Thunderstorm thunderstorm = (Thunderstorm) event.getEliteMobEntity().getPower(this);
+        if (thunderstorm == null) return;
+        if (!eventIsValid(event, thunderstorm)) return;
+        if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
+
+        thunderstorm.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
+        doThunderstorm(event.getEliteMobEntity());
 
     }
 

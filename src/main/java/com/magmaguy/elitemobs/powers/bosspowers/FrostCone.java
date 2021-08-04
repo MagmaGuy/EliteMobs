@@ -28,20 +28,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FrostCone extends BossPower implements Listener {
 
+    private static final NamespacedKey frostConeSnowballKey = new NamespacedKey(MetadataHandler.PLUGIN, "frost_cone_snowball");
+    private static final HashMap<Player, Integer> frostconePlayer = new HashMap<>();
+
     public FrostCone() {
         super(PowersConfig.getPower("frost_cone.yml"));
-    }
-
-    @EventHandler
-    public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
-        FrostCone frostCone = (FrostCone) event.getEliteMobEntity().getPower(this);
-        if (frostCone == null) return;
-        if (frostCone.getGlobalCooldownActive()) return;
-
-        frostCone.doGlobalCooldown(20 * 10, event.getEliteMobEntity());
-
-        frostCone.setIsFiring(true);
-        startFrostCone(event.getEliteMobEntity(), event.getPlayer().getLocation().clone());
     }
 
     public static void startFrostCone(EliteEntity eliteEntity, Location damager) {
@@ -62,7 +53,7 @@ public class FrostCone extends BossPower implements Listener {
                         eliteEntity.getLivingEntity().setAI(true);
                     return;
                 }
-                
+
                 //warning phase
                 if (counter < 20 * 3) {
                     doSmokeEffect(eliteEntity, damager);
@@ -91,7 +82,7 @@ public class FrostCone extends BossPower implements Listener {
         }
     }
 
-    private static boolean isPowerStillValid(EliteEntity eliteEntity, Location playerLocation){
+    private static boolean isPowerStillValid(EliteEntity eliteEntity, Location playerLocation) {
         if (!eliteEntity.getLivingEntity().isValid())
             return false;
         return eliteEntity.getLivingEntity().getWorld().equals(playerLocation.getWorld());
@@ -114,8 +105,17 @@ public class FrostCone extends BossPower implements Listener {
         return (Snowball) snowball;
     }
 
-    private static final NamespacedKey frostConeSnowballKey = new NamespacedKey(MetadataHandler.PLUGIN, "frost_cone_snowball");
-    private static final HashMap<Player, Integer> frostconePlayer = new HashMap<>();
+    @EventHandler
+    public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
+        FrostCone frostCone = (FrostCone) event.getEliteMobEntity().getPower(this);
+        if (frostCone == null) return;
+        if (frostCone.getGlobalCooldownActive()) return;
+
+        frostCone.doGlobalCooldown(20 * 10, event.getEliteMobEntity());
+
+        frostCone.setIsFiring(true);
+        startFrostCone(event.getEliteMobEntity(), event.getPlayer().getLocation().clone());
+    }
 
     @EventHandler(ignoreCancelled = true)
     public void playerHitByFrostConeSnowball(PlayerDamagedByEliteMobEvent event) {
@@ -129,13 +129,14 @@ public class FrostCone extends BossPower implements Listener {
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 7, frostconePlayer.get(event.getPlayer())));
         new BukkitRunnable() {
             final int amount = frostconePlayer.get(event.getPlayer());
+
             @Override
             public void run() {
                 if (!frostconePlayer.containsKey(event.getPlayer())) return;
                 if (amount != frostconePlayer.get(event.getPlayer())) return;
                 frostconePlayer.remove(event.getPlayer());
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 *5);
+        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 5);
     }
 
 }

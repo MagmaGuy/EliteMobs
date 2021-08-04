@@ -19,6 +19,10 @@ public class CustomEventStartEvent extends Event implements Cancellable {
         this.customEvent = customEvent;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public CustomEvent getCustomEvent() {
         return customEvent;
     }
@@ -29,10 +33,6 @@ public class CustomEventStartEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

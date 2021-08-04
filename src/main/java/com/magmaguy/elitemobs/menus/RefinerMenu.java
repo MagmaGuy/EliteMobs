@@ -26,6 +26,56 @@ public class RefinerMenu extends EliteMenu {
 
     public static HashMap<Player, Inventory> inventories = new HashMap<>();
 
+    private static ArrayList<ItemStack>[] calculateOutput(Inventory inventory, Player player) {
+        ArrayList<ItemStack> inputItemStacks = new ArrayList<>();
+        for (int slot : inputSlots)
+            inputItemStacks.add(inventory.getItem(slot));
+        // itemStack[0] = inputArray , itemStack[1] = outputArray
+        ArrayList<ItemStack>[] itemStacks = new ArrayList[2];
+        itemStacks[0] = new ArrayList<>();
+        itemStacks[1] = new ArrayList<>();
+        HashMap<Integer, Integer> inputScrapLevelAndAmountHashMap = new HashMap<>();
+
+        for (ItemStack itemStack : inputItemStacks)
+            if (itemStack != null) {
+                int scrapLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), "EliteScrap");
+                if (scrapLevel >= 0) {
+                    if (inputScrapLevelAndAmountHashMap.containsKey(scrapLevel))
+                        inputScrapLevelAndAmountHashMap.put(scrapLevel, inputScrapLevelAndAmountHashMap.get(scrapLevel) + itemStack.getAmount());
+                    else
+                        inputScrapLevelAndAmountHashMap.put(scrapLevel, itemStack.getAmount());
+                } else
+                    itemStacks[0].add(itemStack);
+            }
+
+        for (Integer scrapLevel : inputScrapLevelAndAmountHashMap.keySet()) {
+            int scrapAmount = inputScrapLevelAndAmountHashMap.get(scrapLevel);
+            int newScrapAmount = (int) Math.floor(scrapAmount / 10);
+            int scrapRemainderAmount = scrapAmount - newScrapAmount * 10;
+
+            ItemStack scrapRemainderItem = ItemConstructor.constructScrapItem(
+                    scrapLevel, player, false);
+            scrapRemainderItem.setAmount(scrapRemainderAmount);
+            itemStacks[0].add(scrapRemainderItem);
+
+            ItemStack upgradedScrapItem = ItemConstructor.constructScrapItem(
+                    scrapLevel + 1, player, false);
+            upgradedScrapItem.setAmount(newScrapAmount);
+            itemStacks[1].add(upgradedScrapItem);
+        }
+
+        return itemStacks;
+    }
+
+    private static void refreshOutputVisuals(Inventory inventory, List<Integer> outputSlots, Player player) {
+        ArrayList<ItemStack>[] output = calculateOutput(inventory, player);
+        for (int i = 0; i < outputSlots.size(); i++)
+            if (output[1].size() > i)
+                inventory.setItem(outputSlots.get(i), output[1].get(i));
+            else
+                inventory.setItem(outputSlots.get(i), null);
+    }
+
     /**
      * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
      *
@@ -85,7 +135,6 @@ public class RefinerMenu extends EliteMenu {
         createEliteMenu(player, refinerInventory, inventories);
     }
 
-
     public static class RefinerMenuEvents implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
@@ -113,7 +162,7 @@ public class RefinerMenu extends EliteMenu {
 
                 //Do transfer
                 for (int slot : RefinerMenu.inputSlots)
-                    if (shopInventory.getItem(slot) == null){
+                    if (shopInventory.getItem(slot) == null) {
                         shopInventory.setItem(slot, currentItem);
                         playerInventory.clear(event.getSlot());
                         break;
@@ -167,56 +216,6 @@ public class RefinerMenu extends EliteMenu {
             EliteMenu.cancel(event.getView().getTopInventory(), event.getView().getBottomInventory(), inputSlots);
         }
 
-    }
-
-    private static ArrayList<ItemStack>[] calculateOutput(Inventory inventory, Player player) {
-        ArrayList<ItemStack> inputItemStacks = new ArrayList<>();
-        for (int slot : inputSlots)
-            inputItemStacks.add(inventory.getItem(slot));
-        // itemStack[0] = inputArray , itemStack[1] = outputArray
-        ArrayList<ItemStack>[] itemStacks = new ArrayList[2];
-        itemStacks[0] = new ArrayList<>();
-        itemStacks[1] = new ArrayList<>();
-        HashMap<Integer, Integer> inputScrapLevelAndAmountHashMap = new HashMap<>();
-
-        for (ItemStack itemStack : inputItemStacks)
-            if (itemStack != null) {
-                int scrapLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), "EliteScrap");
-                if (scrapLevel >= 0) {
-                    if (inputScrapLevelAndAmountHashMap.containsKey(scrapLevel))
-                        inputScrapLevelAndAmountHashMap.put(scrapLevel, inputScrapLevelAndAmountHashMap.get(scrapLevel) + itemStack.getAmount());
-                    else
-                        inputScrapLevelAndAmountHashMap.put(scrapLevel, itemStack.getAmount());
-                } else
-                    itemStacks[0].add(itemStack);
-            }
-
-        for (Integer scrapLevel : inputScrapLevelAndAmountHashMap.keySet()) {
-            int scrapAmount = inputScrapLevelAndAmountHashMap.get(scrapLevel);
-            int newScrapAmount = (int) Math.floor(scrapAmount / 10);
-            int scrapRemainderAmount = scrapAmount - newScrapAmount * 10;
-
-            ItemStack scrapRemainderItem = ItemConstructor.constructScrapItem(
-                    scrapLevel, player, false);
-            scrapRemainderItem.setAmount(scrapRemainderAmount);
-            itemStacks[0].add(scrapRemainderItem);
-
-            ItemStack upgradedScrapItem = ItemConstructor.constructScrapItem(
-                    scrapLevel + 1, player, false);
-            upgradedScrapItem.setAmount(newScrapAmount);
-            itemStacks[1].add(upgradedScrapItem);
-        }
-
-        return itemStacks;
-    }
-
-    private static void refreshOutputVisuals(Inventory inventory, List<Integer> outputSlots, Player player) {
-        ArrayList<ItemStack>[] output = calculateOutput(inventory, player);
-        for (int i = 0; i < outputSlots.size(); i++)
-            if (output[1].size() > i)
-                inventory.setItem(outputSlots.get(i), output[1].get(i));
-            else
-                inventory.setItem(outputSlots.get(i), null);
     }
 
 }

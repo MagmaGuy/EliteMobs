@@ -30,14 +30,6 @@ public class MobPropertiesConfigFields {
         this.baseDamage = baseDamage;
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("entityType", entityType.toString());
-        fileConfiguration.addDefault("name", name);
-        fileConfiguration.addDefault("deathMessages", deathMessages);
-        fileConfiguration.addDefault("baseDamage", baseDamage);
-    }
-
     public MobPropertiesConfigFields(FileConfiguration configuration, File file) {
         this.fileName = file.getName();
         this.entityType = EntityType.valueOf(configuration.getString("entityType"));
@@ -45,6 +37,14 @@ public class MobPropertiesConfigFields {
         this.name = configuration.getString("name");
         this.deathMessages = configuration.getStringList("deathMessages");
         this.baseDamage = configuration.getDouble("baseDamage");
+    }
+
+    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+        fileConfiguration.addDefault("isEnabled", isEnabled);
+        fileConfiguration.addDefault("entityType", entityType.toString());
+        fileConfiguration.addDefault("name", name);
+        fileConfiguration.addDefault("deathMessages", deathMessages);
+        fileConfiguration.addDefault("baseDamage", baseDamage);
     }
 
     public String getFileName() {

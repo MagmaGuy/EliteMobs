@@ -24,45 +24,6 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     private final HashSet<MinorPower> validOffensivePowers = (HashSet<MinorPower>) ElitePower.getOffensivePowers().clone();
     private final HashSet<MinorPower> validMiscellaneousPowers = (HashSet<MinorPower>) ElitePower.getMiscellaneousPowers().clone();
 
-    public void addMajorPower(String powerName) {
-        if (PowersConfig.getPower(powerName).isEnabled())
-            validMajorPowers.add((MajorPower) ElitePower.getElitePower(powerName));
-    }
-
-    public void removeOffensivePower(MinorPower minorPower) {
-        for (Iterator<MinorPower> iterator = validOffensivePowers.iterator(); iterator.hasNext(); ) {
-            MinorPower minorPower1 = iterator.next();
-            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName())) {
-                iterator.remove();
-                return;
-            }
-        }
-    }
-
-    public void removeDefensivePower(MinorPower minorPower) {
-        for (Iterator<MinorPower> iterator = validDefensivePowers.iterator(); iterator.hasNext(); ) {
-            MinorPower minorPower1 = iterator.next();
-            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName()))
-                iterator.remove();
-        }
-    }
-
-    public HashSet<MajorPower> getValidMajorPowers() {
-        return validMajorPowers;
-    }
-
-    public HashSet<MinorPower> getValidDefensivePowers() {
-        return validDefensivePowers;
-    }
-
-    public HashSet<MinorPower> getValidOffensivePowers() {
-        return validOffensivePowers;
-    }
-
-    public HashSet<MinorPower> getValidMiscellaneousPowers() {
-        return validMiscellaneousPowers;
-    }
-
     public static void initializeEliteMobValues() {
         new EliteBlaze();
         new EliteCaveSpider();
@@ -132,6 +93,45 @@ public abstract class EliteMobProperties extends PluginMobProperties {
         for (EliteMobProperties eliteMobProperties : eliteMobData)
             livingEntities.add(eliteMobProperties.getEntityType());
         return livingEntities;
+    }
+
+    public void addMajorPower(String powerName) {
+        if (PowersConfig.getPower(powerName).isEnabled())
+            validMajorPowers.add((MajorPower) ElitePower.getElitePower(powerName));
+    }
+
+    public void removeOffensivePower(MinorPower minorPower) {
+        for (Iterator<MinorPower> iterator = validOffensivePowers.iterator(); iterator.hasNext(); ) {
+            MinorPower minorPower1 = iterator.next();
+            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName())) {
+                iterator.remove();
+                return;
+            }
+        }
+    }
+
+    public void removeDefensivePower(MinorPower minorPower) {
+        for (Iterator<MinorPower> iterator = validDefensivePowers.iterator(); iterator.hasNext(); ) {
+            MinorPower minorPower1 = iterator.next();
+            if (minorPower1.getFileName().equalsIgnoreCase(minorPower.getFileName()))
+                iterator.remove();
+        }
+    }
+
+    public HashSet<MajorPower> getValidMajorPowers() {
+        return validMajorPowers;
+    }
+
+    public HashSet<MinorPower> getValidDefensivePowers() {
+        return validDefensivePowers;
+    }
+
+    public HashSet<MinorPower> getValidOffensivePowers() {
+        return validOffensivePowers;
+    }
+
+    public HashSet<MinorPower> getValidMiscellaneousPowers() {
+        return validMiscellaneousPowers;
     }
 
 }

@@ -35,6 +35,24 @@ public class Taunt extends MinorPower implements Listener {
         super(PowersConfig.getPower("taunt.yml"));
     }
 
+    //Also used by the custom bosses
+    public static void nametagProcessor(Entity entity, List<String> list) {
+        int randomizedKey = ThreadLocalRandom.current().nextInt(list.size());
+        String tempName = list.get(randomizedKey);
+        entity.setCustomName(ChatColorConverter.convert(tempName));
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                if (!entity.isValid())
+                    return;
+                entity.setCustomName(EntityTracker.getEliteMobEntity(entity).getName());
+            }
+
+
+        }.runTaskLater(MetadataHandler.PLUGIN, 4 * 20);
+    }
+
     /**
      * Runs when the Elite Mob targets a player
      *
@@ -93,24 +111,6 @@ public class Taunt extends MinorPower implements Listener {
     public void onDeath(EliteMobDeathEvent event) {
         if (!event.getEliteMobEntity().hasPower(this)) return;
         nametagProcessor(event.getEntity(), DEATH_LIST);
-    }
-
-    //Also used by the custom bosses
-    public static void nametagProcessor(Entity entity, List<String> list) {
-        int randomizedKey = ThreadLocalRandom.current().nextInt(list.size());
-        String tempName = list.get(randomizedKey);
-        entity.setCustomName(ChatColorConverter.convert(tempName));
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                if (!entity.isValid())
-                    return;
-                entity.setCustomName(EntityTracker.getEliteMobEntity(entity).getName());
-            }
-
-
-        }.runTaskLater(MetadataHandler.PLUGIN, 4 * 20);
     }
 
 }

@@ -25,6 +25,8 @@ public class TrackingFireball extends MajorPower {
 
     public static class TrackingFireballEvents implements Listener {
 
+        public static HashMap<UUID, TrackingFireballTasks.TrackingFireballTask> trackingFireballs = new HashMap<>();
+
         @EventHandler(ignoreCancelled = true)
         public void targetEvent(EliteMobTargetPlayerEvent event) {
             if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
@@ -42,9 +44,6 @@ public class TrackingFireball extends MajorPower {
             if (trackingFireballTask == null) return;
             trackingFireballTask.isAfterPlayer = !trackingFireballTask.isAfterPlayer;
         }
-
-
-        public static HashMap<UUID, TrackingFireballTasks.TrackingFireballTask> trackingFireballs = new HashMap<>();
 
         private class TrackingFireballTasks {
 

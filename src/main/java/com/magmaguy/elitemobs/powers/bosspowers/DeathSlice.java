@@ -25,18 +25,6 @@ public class DeathSlice extends BossPower implements Listener {
         super(PowersConfig.getPower("death_slice.yml"));
     }
 
-    @EventHandler
-    public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
-        DeathSlice deathSlice = (DeathSlice) event.getEliteMobEntity().getPower(this);
-        if (deathSlice == null) return;
-        if (deathSlice.getGlobalCooldownActive()) return;
-
-        if (ThreadLocalRandom.current().nextDouble() > 0.10) return;
-        deathSlice.doGlobalCooldown(20 * 20);
-
-        doDeathSlice(event.getEliteMobEntity());
-    }
-
     private static void doDeathSlice(EliteEntity eliteEntity) {
         ArrayList<Location> locations = raytracedLocationList(eliteEntity.getLivingEntity().getLocation());
         eliteEntity.getLivingEntity().setAI(false);
@@ -90,6 +78,18 @@ public class DeathSlice extends BossPower implements Listener {
         for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
             if (entity instanceof LivingEntity)
                 BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
+    }
+
+    @EventHandler
+    public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
+        DeathSlice deathSlice = (DeathSlice) event.getEliteMobEntity().getPower(this);
+        if (deathSlice == null) return;
+        if (deathSlice.getGlobalCooldownActive()) return;
+
+        if (ThreadLocalRandom.current().nextDouble() > 0.10) return;
+        deathSlice.doGlobalCooldown(20 * 20);
+
+        doDeathSlice(event.getEliteMobEntity());
     }
 
 }

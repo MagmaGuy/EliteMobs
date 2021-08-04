@@ -24,6 +24,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
 
+    private final int radius = 30;
+    //this is structured like this because the relative block generator is moving out of this class
+    private final ArrayList<PieBlock> realBlocks = new ArrayList<>();
+    private ArrayList<PieBlock> pieBlocks = new ArrayList<>();
+    private int warningPhaseCounter = 0;
+    private int damagePhaseCounter = 0;
+
     public EnderDragonShockwave() {
         super(PowersConfig.getPower("ender_dragon_shockwave.yml"));
     }
@@ -90,9 +97,6 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-    private ArrayList<PieBlock> pieBlocks = new ArrayList<>();
-    private final int radius = 30;
-
     //todo: move this to its own class, make sure it only generates once ever and then just randomizes rotations
     private void setAffectedBlocks() {
         pieBlocks = new ArrayList<>();
@@ -108,20 +112,6 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
             }
 
     }
-
-    private class PieBlock {
-        public Integer distance;
-        public Vector vector;
-
-        public PieBlock(Integer distance, Vector vector) {
-            this.distance = distance;
-            this.vector = vector;
-        }
-    }
-
-
-    //this is structured like this because the relative block generator is moving out of this class
-    private final ArrayList<PieBlock> realBlocks = new ArrayList<>();
 
     private void generateRealCircle(EliteEntity eliteEntity) {
         for (PieBlock pieBlock : pieBlocks) {
@@ -139,8 +129,6 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
         }
 
     }
-
-    private int warningPhaseCounter = 0;
 
     private void doWarningPhase(EliteEntity eliteEntity) {
 
@@ -163,8 +151,6 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
         warningPhaseCounter++;
 
     }
-
-    private int damagePhaseCounter = 0;
 
     private void doDamagePhase(EliteEntity eliteEntity) {
         List<Block> blockList = new ArrayList<>();
@@ -204,6 +190,16 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
     @Override
     protected void finishDeactivation(EliteEntity eliteEntity) {
 
+    }
+
+    private class PieBlock {
+        public Integer distance;
+        public Vector vector;
+
+        public PieBlock(Integer distance, Vector vector) {
+            this.distance = distance;
+            this.vector = vector;
+        }
     }
 
 }

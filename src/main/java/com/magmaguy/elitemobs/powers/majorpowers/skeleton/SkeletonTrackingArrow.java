@@ -24,6 +24,36 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
         super(PowersConfig.getPower("skeleton_tracking_arrow.yml"));
     }
 
+    private static void trackingArrowLoop(Player player, Arrow arrow) {
+        new BukkitRunnable() {
+            int counter = 0;
+
+            @Override
+            public void run() {
+                if (player.isValid() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())
+                        && player.getLocation().distanceSquared(arrow.getLocation()) < 900 && !arrow.isOnGround()) {
+                    if (counter % 10 == 0)
+                        arrow.setVelocity(arrow.getVelocity().add(arrowAdjustmentVector(arrow, player)));
+                    arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.01, 0.01, 0.01, 0.01);
+                } else {
+                    arrow.setGravity(true);
+                    EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
+                    cancel();
+                }
+                if (counter > 20 * 60) {
+                    EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
+                    arrow.setGravity(true);
+                    cancel();
+                }
+                counter++;
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+    }
+
+    private static Vector arrowAdjustmentVector(Arrow arrow, Player player) {
+        return player.getEyeLocation().clone().subtract(new Vector(0, 0.5, 0)).subtract(arrow.getLocation()).toVector().normalize().multiply(0.1);
+    }
+
     @EventHandler
     public void targetEvent(EliteMobTargetPlayerEvent event) {
         SkeletonTrackingArrow skeletonTrackingArrow = (SkeletonTrackingArrow) event.getEliteMobEntity().getPower(this);
@@ -56,36 +86,6 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 8);
-    }
-
-    private static void trackingArrowLoop(Player player, Arrow arrow) {
-        new BukkitRunnable() {
-            int counter = 0;
-
-            @Override
-            public void run() {
-                if (player.isValid() && arrow.isValid() && arrow.getWorld().equals(player.getWorld())
-                        && player.getLocation().distanceSquared(arrow.getLocation()) < 900 && !arrow.isOnGround()) {
-                    if (counter % 10 == 0)
-                        arrow.setVelocity(arrow.getVelocity().add(arrowAdjustmentVector(arrow, player)));
-                    arrow.getWorld().spawnParticle(Particle.FLAME, arrow.getLocation(), 10, 0.01, 0.01, 0.01, 0.01);
-                } else {
-                    arrow.setGravity(true);
-                    EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
-                    cancel();
-                }
-                if (counter > 20 * 60) {
-                    EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
-                    arrow.setGravity(true);
-                    cancel();
-                }
-                counter++;
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-    }
-
-    private static Vector arrowAdjustmentVector(Arrow arrow, Player player) {
-        return player.getEyeLocation().clone().subtract(new Vector(0, 0.5, 0)).subtract(arrow.getLocation()).toVector().normalize().multiply(0.1);
     }
 
 }

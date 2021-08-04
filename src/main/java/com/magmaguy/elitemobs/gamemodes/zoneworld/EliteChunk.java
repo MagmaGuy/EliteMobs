@@ -7,7 +7,16 @@ import java.util.Vector;
 
 public class EliteChunk {
 
+    private static final int gridSize = 50;
     public static HashMap<Vector, EliteChunk> eliteChunks = new HashMap<>();
+    private final int xCoord;
+    private final int zCoord;
+
+    public EliteChunk(int xCoord, int zCoord) {
+        this.xCoord = xCoord;
+        this.zCoord = zCoord;
+        registerChunkLocation(this);
+    }
 
     public static EliteChunk getEliteChunk(String hashCode) {
         return eliteChunks.get(hashCode);
@@ -21,19 +30,8 @@ public class EliteChunk {
         eliteChunks.put(ChunkVectorizer.hash(eliteChunk.getxCoord(), eliteChunk.getzCoord()), eliteChunk);
     }
 
-    private static final int gridSize = 50;
-
     public static int getGridSize() {
         return gridSize;
-    }
-
-    private final int xCoord;
-    private final int zCoord;
-
-    public EliteChunk(int xCoord, int zCoord) {
-        this.xCoord = xCoord;
-        this.zCoord = zCoord;
-        registerChunkLocation(this);
     }
 
     public int getxCoord() {

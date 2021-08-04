@@ -25,18 +25,6 @@ public class ArrowFireworks extends MinorPower implements Listener {
         super(PowersConfig.getPower("arrow_fireworks.yml"));
     }
 
-    @EventHandler
-    public void onEliteDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
-        if (event.isCancelled()) return;
-        if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
-        ArrowFireworks arrowFireworks = (ArrowFireworks) event.getEliteMobEntity().getPower(this);
-        if (arrowFireworks == null) return;
-
-        if (ThreadLocalRandom.current().nextDouble() > 0.15) return;
-        doArrowFireworks(event.getEliteMobEntity());
-
-    }
-
     private static void doArrowFireworks(EliteEntity eliteEntity) {
 
         Location centeredLocation = eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 3, 0));
@@ -97,6 +85,18 @@ public class ArrowFireworks extends MinorPower implements Listener {
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
 
         }
+
+    }
+
+    @EventHandler
+    public void onEliteDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
+        if (event.isCancelled()) return;
+        if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
+        ArrowFireworks arrowFireworks = (ArrowFireworks) event.getEliteMobEntity().getPower(this);
+        if (arrowFireworks == null) return;
+
+        if (ThreadLocalRandom.current().nextDouble() > 0.15) return;
+        doArrowFireworks(event.getEliteMobEntity());
 
     }
 

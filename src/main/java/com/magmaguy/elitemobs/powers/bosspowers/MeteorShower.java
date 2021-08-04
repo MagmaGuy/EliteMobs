@@ -21,23 +21,12 @@ public class MeteorShower extends BossPower implements Listener {
         super(PowersConfig.getPower("meteor_shower.yml"));
     }
 
-    @EventHandler
-    public void onDamage(EliteMobDamagedByPlayerEvent event) {
-        MeteorShower meteorShower = (MeteorShower) event.getEliteMobEntity().getPower(this);
-        if (meteorShower == null) return;
-        if (!eventIsValid(event, meteorShower)) return;
-        if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
-
-        meteorShower.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
-        doMeteorShower(event.getEliteMobEntity());
-
-    }
-
     public static void doMeteorShower(EliteEntity eliteEntity) {
         eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
-            int counter = 0;
             final Location initialLocation = eliteEntity.getLivingEntity().getLocation().clone();
+            int counter = 0;
+
             @Override
             public void run() {
 
@@ -88,6 +77,18 @@ public class MeteorShower extends BossPower implements Listener {
             fireball.setShooter(eliteEntity.getLivingEntity());
             fireball.setDirection(fireball.getDirection().multiply(0.5));
         }
+    }
+
+    @EventHandler
+    public void onDamage(EliteMobDamagedByPlayerEvent event) {
+        MeteorShower meteorShower = (MeteorShower) event.getEliteMobEntity().getPower(this);
+        if (meteorShower == null) return;
+        if (!eventIsValid(event, meteorShower)) return;
+        if (ThreadLocalRandom.current().nextDouble() > 0.25) return;
+
+        meteorShower.doGlobalCooldown(20 * 20, event.getEliteMobEntity());
+        doMeteorShower(event.getEliteMobEntity());
+
     }
 
 }

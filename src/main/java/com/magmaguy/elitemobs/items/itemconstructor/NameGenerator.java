@@ -11,16 +11,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NameGenerator {
 
+    private static final List<String> nouns = ProceduralItemGenerationSettingsConfig.nouns;
+    private static final List<String> adjectives = ProceduralItemGenerationSettingsConfig.adjectives;
+    private static final List<String> verbs = ProceduralItemGenerationSettingsConfig.verbs;
+    private static final List<String> verbers = ProceduralItemGenerationSettingsConfig.verbers;
+
     public static String generateName(String rawName) {
 
         return ChatColorConverter.convert(rawName);
 
     }
-
-    private static final List<String> nouns = ProceduralItemGenerationSettingsConfig.nouns;
-    private static final List<String> adjectives = ProceduralItemGenerationSettingsConfig.adjectives;
-    private static final List<String> verbs = ProceduralItemGenerationSettingsConfig.verbs;
-    private static final List<String> verbers = ProceduralItemGenerationSettingsConfig.verbers;
 
     public static String generateName(Material material) {
 
