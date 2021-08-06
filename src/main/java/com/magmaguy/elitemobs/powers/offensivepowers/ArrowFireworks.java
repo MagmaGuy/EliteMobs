@@ -56,7 +56,7 @@ public class ArrowFireworks extends MinorPower implements Listener {
 
                 @Override
                 public void run() {
-                    if (!rocketArrow.isValid() || eliteEntity.getLivingEntity().isDead()) {
+                    if (!rocketArrow.isValid() || !eliteEntity.isValid()) {
                         cancel();
                         return;
                     }

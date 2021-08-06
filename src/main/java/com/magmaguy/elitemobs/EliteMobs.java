@@ -13,7 +13,7 @@ import com.magmaguy.elitemobs.config.configurationimporter.ConfigurationImporter
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
-import com.magmaguy.elitemobs.config.customloot.CustomLootConfig;
+import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
@@ -227,7 +227,7 @@ public class EliteMobs extends JavaPlugin {
         ConfigurationImporter.initializeConfigs();
 
         //Import custom items after potentially importing new items
-        CustomLootConfig.initializeConfigs();
+        new CustomItemsConfig();
         CustomItem.initializeCustomItems();
         LootTables.initialize();
 

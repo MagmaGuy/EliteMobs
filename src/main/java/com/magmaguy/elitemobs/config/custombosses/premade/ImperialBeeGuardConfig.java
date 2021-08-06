@@ -13,6 +13,8 @@ public class ImperialBeeGuardConfig extends CustomBossesConfigFields {
                 true,
                 "$reinforcementLevel &eImperial Bee Soldier",
                 "dynamic");
+        setDropsEliteMobsLoot(false);
+        setDropsVanillaLoot(false);
         setHealthMultiplier(0.1);
         setDamageMultiplier(0.1);
         setTrails(Collections.singletonList(Particle.SMOKE_LARGE.toString()));

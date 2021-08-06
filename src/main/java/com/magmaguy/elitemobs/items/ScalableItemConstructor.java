@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -17,12 +18,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ScalableItemConstructor {
 
-    public static ItemStack randomizeScalableItem(int itemTier, Player player) {
+    public static ItemStack randomizeScalableItem(int itemTier, Player player, EliteEntity eliteEntity) {
         CustomItem customItem = CustomItem.getScalableItems().get(ThreadLocalRandom.current().nextInt(CustomItem.getScalableItems().size()));
-        return constructScalableItem(itemTier, customItem, player);
+        return constructScalableItem(itemTier, customItem, player, eliteEntity);
     }
 
-    public static ItemStack constructScalableItem(int itemTier, CustomItem customItem, Player player) {
+    public static ItemStack constructScalableItem(int itemTier, CustomItem customItem, Player player, EliteEntity eliteEntity) {
         HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments(), itemTier, false);
         return ItemConstructor.constructItem(
                 customItem.getName(),
@@ -31,7 +32,7 @@ public class ScalableItemConstructor {
                 customItem.getCustomEnchantments(),
                 customItem.getPotionEffects(),
                 customItem.getLore(),
-                null,
+                eliteEntity,
                 player,
                 false,
                 customItem.getCustomLootConfigFields().getCustomModelID()
@@ -111,7 +112,7 @@ public class ScalableItemConstructor {
     entry, and every other entry is just a nerfed version of that item. Basically an easy way to limit an item in a
     predictable way.
      */
-    public static ItemStack randomizeLimitedItem(int itemTier, Player player) {
+    public static ItemStack randomizeLimitedItem(int itemTier, Player player, EliteEntity eliteEntity) {
 
         List<CustomItem> localLootList = new ArrayList<>();
 
@@ -128,11 +129,11 @@ public class ScalableItemConstructor {
 
         CustomItem customItem = localLootList.get(ThreadLocalRandom.current().nextInt(localLootList.size()));
 
-        return constructLimitedItem(itemTier, customItem, player);
+        return constructLimitedItem(itemTier, customItem, player, eliteEntity);
 
     }
 
-    public static ItemStack constructLimitedItem(int itemTier, CustomItem customItem, Player player) {
+    public static ItemStack constructLimitedItem(int itemTier, CustomItem customItem, Player player, EliteEntity eliteEntity) {
 
         HashMap<Enchantment, Integer> newEnchantmentList = updateLimitedEnchantments(customItem.getEnchantments(), itemTier);
 
@@ -143,7 +144,7 @@ public class ScalableItemConstructor {
                 customItem.getCustomEnchantments(),
                 customItem.getPotionEffects(),
                 customItem.getLore(),
-                null,
+                eliteEntity,
                 player,
                 false,
                 customItem.getCustomLootConfigFields().getCustomModelID()

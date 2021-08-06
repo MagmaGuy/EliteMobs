@@ -215,7 +215,7 @@ public class CustomSpawn {
             }
         } else
             //Straight upwards check
-            location.setY(getHighestValidBlock(location));
+            location.setY(getHighestValidBlock(location, getHighestValidBlock(location, customSpawnConfigFields.getHighestYLevel())));
 
         //Prevent spawning right on top of players
         for (Player player : world.getPlayers())
@@ -247,12 +247,12 @@ public class CustomSpawn {
 
     }
 
-    private int getHighestValidBlock(Location location) {
+    public static int getHighestValidBlock(Location location, int highestYLevel) {
         int height = location.getBlockY() - 1;
         //todo: when the Minecraft max height goes over 256 (and under 0) this will need to get reviewed
         while (height < 256) {
             height++;
-            if (height > customSpawnConfigFields.getHighestYLevel())
+            if (height > highestYLevel)
                 return -1;
             Location floorLocation = new Location(location.getWorld(), location.getX(), height - 1, location.getZ());
             if (floorLocation.getBlock().isPassable())

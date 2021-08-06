@@ -5,14 +5,15 @@ import com.magmaguy.elitemobs.events.CustomEvent;
 
 import java.util.Arrays;
 
-public class TreasureGoblinEvent extends CustomEventsConfigFields {
-    public TreasureGoblinEvent() {
-        super("treasure_goblin", true);
+public class CharmsGoblinEvent extends CustomEventsConfigFields {
+    public CharmsGoblinEvent(){
+        super("charms_goblin",
+                true);
         setEventType(CustomEvent.EventType.TIMED);
-        setBossFilenames(Arrays.asList("treasure_goblin.yml"));
+        setBossFilenames(Arrays.asList("charms_goblin.yml"));
         setLocalCooldown(60D);
         setGlobalCooldown(15D);
-        setWeight(100D);
+        setWeight(50);
         setCustomSpawn("treasure_goblin_spawn.yml");
     }
 }
