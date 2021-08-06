@@ -2,12 +2,14 @@ package com.magmaguy.elitemobs.items.customitems;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.customloot.CustomLootConfigFields;
+import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
+import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,7 +37,7 @@ public class CustomItem {
     private static final HashMap<Integer, ArrayList<CustomItem>> fixedItems = new HashMap<>();
     private static final List<CustomItem> scalableItems = new ArrayList<>();
     private static final HashMap<Integer, ArrayList<CustomItem>> limitedItems = new HashMap<>();
-    private final CustomLootConfigFields customLootConfigFields;
+    private final CustomItemsConfigFields customItemsConfigFields;
     private final HashMap<Enchantment, Integer> enchantments = new HashMap();
     private final HashMap<String, Integer> customEnchantments = new HashMap();
     private String fileName;
@@ -52,10 +54,10 @@ public class CustomItem {
     /**
      * Generates a CustomItem object. This holds values for limited and dynamic items until a tier is determined for them.
      *
-     * @param customLootConfigFields Config fields upon which the values are based.
+     * @param customItemsConfigFields Config fields upon which the values are based.
      */
-    public CustomItem(CustomLootConfigFields customLootConfigFields) {
-        this.customLootConfigFields = customLootConfigFields;
+    public CustomItem(CustomItemsConfigFields customItemsConfigFields) {
+        this.customItemsConfigFields = customItemsConfigFields;
         parseFileName();
         if (!parseIsEnabled()) return;
         if (!parseMaterial()) return;
@@ -73,7 +75,7 @@ public class CustomItem {
             //item is weighed and fixed
             addFixedItem(this);
             addWeighedFixedItems(this);
-            this.scalability = Scalability.FIXED;
+            this.scalability = Scalability.fixed;
             return;
         }
         parseScalability();
@@ -103,15 +105,15 @@ public class CustomItem {
             itemTier = tier + 1;
 
         switch (customItem.getScalability()) {
-            case LIMITED:
+            case limited:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructLimitedItem(itemTier, customItem, player));
+                        ScalableItemConstructor.constructLimitedItem(itemTier, customItem, player, null));
                 break;
-            case SCALABLE:
+            case scalable:
                 loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem, player));
+                        ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem, player, null));
                 break;
-            case FIXED:
+            case fixed:
                 loot = location.getWorld().dropItem(location,
                         customItem.generateItemStack(itemTier + 1, player));
             default:
@@ -143,9 +145,9 @@ public class CustomItem {
 
     // Adds custom items to the list used by the getloot GUI
     private static void addCustomItem(CustomItem customItem) {
-        customItemStackList.add(customItem.generateDefaultsItemStack(null, false));
-        if (customItem.getItemType().equals(ItemType.UNIQUE)) return;
-        customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true));
+        customItemStackList.add(customItem.generateDefaultsItemStack(null, false, null));
+        if (customItem.getItemType().equals(ItemType.unique)) return;
+        customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
     }
 
     /**
@@ -159,7 +161,7 @@ public class CustomItem {
 
     // Adds weighed static items
     private static void addWeighedFixedItems(CustomItem customItem) {
-        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false);
+        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null);
         weighedFixedItems.put(itemStack, customItem.getDropWeight());
     }
 
@@ -168,7 +170,7 @@ public class CustomItem {
     }
 
     public static void addTieredLoot(CustomItem customItem) {
-        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false);
+        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null);
         int itemTier = customItem.getItemTier();
 
         if (tieredLoot.get(itemTier) == null)
@@ -211,45 +213,38 @@ public class CustomItem {
      * Initializes all config items on startup. Needs to run after the config initialization as it relies on those values.
      */
     public static void initializeCustomItems() {
-        for (CustomLootConfigFields configFields : CustomLootConfigFields.getCustomLootConfigFields())
+        for (CustomItemsConfigFields configFields : CustomItemsConfig.getCustomItems().values())
             try {
                 new CustomItem(configFields);
             } catch (Exception ex) {
-                new WarningMessage("Failed to generate custom item in file " + configFields.getFileName() + " !");
+                new WarningMessage("Failed to generate custom item in file " + configFields.getFilename() + " !");
                 ex.printStackTrace();
             }
     }
 
     private void parseFileName() {
-        this.fileName = this.customLootConfigFields.getFileName();
+        this.fileName = this.customItemsConfigFields.getFilename();
     }
 
     private boolean parseIsEnabled() {
-        return this.isEnabled = this.customLootConfigFields.isEnabled();
+        return this.isEnabled = this.customItemsConfigFields.isEnabled();
     }
 
     private boolean parseMaterial() {
-        try {
-            this.material = Material.valueOf(this.customLootConfigFields.getMaterial());
-            return true;
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("[EliteMobs] Item " + this.fileName + " has an invalid material name: " + this.customLootConfigFields.getItemType());
-            Bukkit.getLogger().warning("[EliteMobs] Check the Spigot API for a list of valid API material names or talk to the dev on discord!");
-        }
-
+        this.material = this.customItemsConfigFields.getMaterial();
         return material != null;
     }
 
     private void parseName() {
-        this.name = this.customLootConfigFields.getName();
+        this.name = this.customItemsConfigFields.getName();
     }
 
     private void parseLore() {
-        this.lore = this.customLootConfigFields.getLore();
+        this.lore = this.customItemsConfigFields.getLore();
     }
 
     private void parseEnchantments() {
-        for (String string : this.customLootConfigFields.getEnchantments())
+        for (String string : this.customItemsConfigFields.getEnchantments())
             try {
                 String name = string.split(",")[0];
                 int level = 1;
@@ -309,33 +304,22 @@ public class CustomItem {
     }
 
     private void parsePotionEffects() {
-        this.potionEffects = this.customLootConfigFields.getPotionEffects();
+        this.potionEffects = this.customItemsConfigFields.getPotionEffects();
     }
 
     private void parseItemType() {
-        if (this.customLootConfigFields.getItemType() == null) {
-            this.itemType = ItemType.CUSTOM;
+        if (this.customItemsConfigFields.getItemType() == null) {
+            this.itemType = ItemType.custom;
             return;
         }
-        switch (this.customLootConfigFields.getItemType()) {
-            case "custom":
-                this.itemType = ItemType.CUSTOM;
-                break;
-            case "unique":
-                this.itemType = ItemType.UNIQUE;
-                break;
-            default:
-                this.itemType = ItemType.CUSTOM;
-                Bukkit.getLogger().warning("[EliteMobs] Item " + fileName + " does not have a valid EliteMobs item type. Defaulting to custom.");
-                break;
-        }
+        this.itemType = customItemsConfigFields.getItemType();
     }
 
     private boolean parseDropWeight() {
-        if (this.customLootConfigFields.getDropWeight() == null) return false;
-        if (this.customLootConfigFields.getDropWeight().equalsIgnoreCase("dynamic")) return false;
+        if (this.customItemsConfigFields.getDropWeight() == null) return false;
+        if (this.customItemsConfigFields.getDropWeight().equalsIgnoreCase("dynamic")) return false;
         try {
-            this.dropWeight = Double.parseDouble(this.customLootConfigFields.getDropWeight());
+            this.dropWeight = Double.parseDouble(this.customItemsConfigFields.getDropWeight());
             return true;
         } catch (Exception e) {
             Bukkit.getLogger().warning("[EliteMobs] Item " + this.fileName + " does not have a valid itemWeight.");
@@ -344,29 +328,27 @@ public class CustomItem {
     }
 
     private void parseScalability() {
-        if (this.customLootConfigFields.getScalability() == null) {
-            this.scalability = Scalability.SCALABLE;
+        if (this.customItemsConfigFields.getScalability() == null) {
+            this.scalability = Scalability.scalable;
             return;
         }
-        switch (this.customLootConfigFields.getScalability()) {
-            case "fixed":
-                this.scalability = Scalability.FIXED;
-                if (!itemType.equals(ItemType.UNIQUE))
+        this.scalability = customItemsConfigFields.getScalability();
+        switch (this.customItemsConfigFields.getScalability()) {
+            case fixed:
+                if (!itemType.equals(ItemType.unique))
                     addFixedItem(this);
                 break;
-            case "limited":
-                this.scalability = Scalability.LIMITED;
-                if (!itemType.equals(ItemType.UNIQUE))
+            case limited:
+                if (!itemType.equals(ItemType.unique))
                     addLimitedItem(this);
                 break;
-            case "scalable":
-                this.scalability = Scalability.SCALABLE;
-                if (!itemType.equals(ItemType.UNIQUE))
+            case scalable:
+                if (!itemType.equals(ItemType.unique))
                     scalableItems.add(this);
                 break;
             default:
-                this.scalability = Scalability.SCALABLE;
-                if (!itemType.equals(ItemType.UNIQUE))
+                this.scalability = Scalability.scalable;
+                if (!itemType.equals(ItemType.unique))
                     scalableItems.add(this);
                 Bukkit.getLogger().warning("Item " + this.fileName + " does not have a valid scalability type! Defaulting to scalable.");
 
@@ -374,10 +356,10 @@ public class CustomItem {
     }
 
     private void parseItemTier() {
-        this.itemTier = ItemTierFinder.findBattleTier(generateDefaultsItemStack(null, false));
+        this.itemTier = ItemTierFinder.findBattleTier(generateDefaultsItemStack(null, false, null));
     }
 
-    public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth) {
+    public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity) {
         ItemStack itemStack =
                 ItemConstructor.constructItem(
                         getName(),
@@ -386,30 +368,30 @@ public class CustomItem {
                         getCustomEnchantments(),
                         getPotionEffects(),
                         getLore(),
-                        null,
+                        eliteEntity,
                         player,
                         showItemWorth,
-                        customLootConfigFields.getCustomModelID());
+                        customItemsConfigFields.getCustomModelID());
         return itemStack;
     }
 
     public ItemStack generateItemStack(int itemTier, Player player) {
         ItemStack itemStack = null;
         switch (this.scalability) {
-            case FIXED:
-                itemStack = generateDefaultsItemStack(player, false);
+            case fixed:
+                itemStack = generateDefaultsItemStack(player, false,null);
                 break;
-            case LIMITED:
-                itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this, player);
+            case limited:
+                itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this, player, null);
                 break;
-            case SCALABLE:
-                itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player);
+            case scalable:
+                itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player, null);
         }
         return itemStack;
     }
 
-    public CustomLootConfigFields getCustomLootConfigFields() {
-        return customLootConfigFields;
+    public CustomItemsConfigFields getCustomLootConfigFields() {
+        return customItemsConfigFields;
     }
 
     public String getFileName() {
@@ -461,14 +443,14 @@ public class CustomItem {
     }
 
     public enum ItemType {
-        CUSTOM,
-        UNIQUE
+        custom,
+        unique
     }
 
     public enum Scalability {
-        FIXED,
-        LIMITED,
-        SCALABLE
+        fixed,
+        limited,
+        scalable
     }
 
 }
