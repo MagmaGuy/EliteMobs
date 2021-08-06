@@ -142,13 +142,13 @@ public class LootTables implements Listener {
             case "procedural":
                 return dropProcedurallyGeneratedItem(itemTier, eliteEntity, player);
             case "weighed":
-                return dropWeighedFixedItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
+                return dropWeighedFixedItem(eliteEntity, player);
             case "fixed":
-                return dropFixedItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), itemTier, player);
+                return dropFixedItem(eliteEntity, itemTier, player);
             case "limited":
-                return dropLimitedItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), itemTier, player);
+                return dropLimitedItem(eliteEntity, itemTier, player);
             case "scalable":
-                return dropScalableItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), itemTier, player);
+                return dropScalableItem(eliteEntity, itemTier, player);
         }
 
         return null;
@@ -235,8 +235,16 @@ public class LootTables implements Listener {
 
     }
 
-    public static Item dropWeighedFixedItem(Location location, Player player) {
+    public static Item dropWeighedFixedItem(EliteEntity eliteEntity, Player player) {
+        return eliteEntity.getUnsyncedLivingEntity().getLocation().getWorld().dropItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), dropWeighedFixedItemStack(player));
+    }
 
+
+    public static Item dropWeighedFixedItem(Location location, Player player) {
+        return location.getWorld().dropItem(location, dropWeighedFixedItemStack(player));
+    }
+
+    private static ItemStack dropWeighedFixedItemStack(Player player){
         double totalWeight = 0;
 
         for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet()) {
@@ -259,9 +267,7 @@ public class LootTables implements Listener {
         }
 
         SoulbindEnchantment.addEnchantment(generatedItemStack, player);
-
-        return location.getWorld().dropItem(location, generatedItemStack);
-
+        return generatedItemStack;
     }
 
     private static Item dropProcedurallyGeneratedItem(int tierLevel, EliteEntity eliteEntity, Player player) {
@@ -274,16 +280,34 @@ public class LootTables implements Listener {
         return location.getWorld().dropItem(location, randomLoot);
     }
 
+    private static Item dropScalableItem(EliteEntity eliteEntity, int itemTier, Player player) {
+        return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), ScalableItemConstructor.randomizeScalableItem(itemTier, player, eliteEntity));
+    }
+
     private static Item dropScalableItem(Location location, int itemTier, Player player) {
-        return location.getWorld().dropItem(location, ScalableItemConstructor.randomizeScalableItem(itemTier, player));
+        return location.getWorld().dropItem(location, ScalableItemConstructor.randomizeScalableItem(itemTier, player, null));
+    }
+
+    private static Item dropLimitedItem(EliteEntity eliteEntity, int itemTier, Player player) {
+        return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(eliteEntity.getUnsyncedLivingEntity().getLocation(), ScalableItemConstructor.randomizeLimitedItem(itemTier, player, eliteEntity));
     }
 
     private static Item dropLimitedItem(Location location, int itemTier, Player player) {
-        return location.getWorld().dropItem(location, ScalableItemConstructor.randomizeLimitedItem(itemTier, player));
+        return location.getWorld().dropItem(location, ScalableItemConstructor.randomizeLimitedItem(itemTier, player, null));
+    }
+
+    private static Item dropFixedItem(EliteEntity eliteEntity, int itemTier, Player player) {
+        return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(
+                eliteEntity.getUnsyncedLivingEntity().getLocation(),
+                CustomItem.getFixedItems().get(itemTier).get(
+                        ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size()))
+                        .generateDefaultsItemStack(player, false, eliteEntity));
     }
 
     private static Item dropFixedItem(Location location, int itemTier, Player player) {
-        return location.getWorld().dropItem(location, CustomItem.getFixedItems().get(itemTier).get(ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size())).generateDefaultsItemStack(player, false));
+        return location.getWorld().dropItem(location, CustomItem.getFixedItems().get(itemTier)
+                .get(ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size()))
+                .generateDefaultsItemStack(player, false, null));
     }
 
     @EventHandler

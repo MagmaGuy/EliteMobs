@@ -61,10 +61,8 @@ public class CustomBossBossBar {
     }
 
     public void remove() {
-        bossBars.entrySet().removeIf(entry -> {
-            entry.getValue().removeAll();
-            return true;
-        });
+        bossBars.values().forEach(BossBar::removeAll);
+        bossBars.clear();
         trackingPlayers.clear();
         bossBarUpdater.cancel();
     }
@@ -131,11 +129,9 @@ public class CustomBossBossBar {
                 //nearby player check
                 if (customBossEntity.isValid())
                     for (Entity entity : customBossEntity.getLivingEntity().getNearbyEntities(30, 30, 30))
-                        if (entity.getType().equals(EntityType.PLAYER)) {
+                        if (entity.getType().equals(EntityType.PLAYER))
                             if (!freshIteration.contains((Player) entity))
                                 createBossBar((Player) entity);
-                            updateBossBar((Player) entity, bossBars.get((Player) entity));
-                        }
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
@@ -146,7 +142,7 @@ public class CustomBossBossBar {
                 ", " + (int) customBossEntity.getLocation().getY() +
                 ", " + (int) customBossEntity.getLocation().getZ();
         BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
-        bossBar.addPlayer(player);
+
 
         if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1 || customBossEntity.getHealth() / customBossEntity.getMaxHealth() < 0) {
             new WarningMessage("The following boss had more health than it should: " + customBossEntity.getName());
@@ -157,6 +153,8 @@ public class CustomBossBossBar {
         }
 
         bossBars.put(player, bossBar);
+        updateBossBar(player, bossBar);
+        bossBar.addPlayer(player);
     }
 
 }

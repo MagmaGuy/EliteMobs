@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
@@ -321,8 +322,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             ThreadLocalRandom.current().nextInt(-15, 15),
                             0,
                             ThreadLocalRandom.current().nextInt(-15, 15)));
-                    randomLocation.setY(randomLocation.getWorld().getHighestBlockAt(randomLocation).getY());
-                    if (randomLocation.getY() == -1) continue;
+                    CustomSpawn.getHighestValidBlock(randomLocation, 256);
+                    if (randomLocation.getY() == -100) continue;
                     spawnLocation = randomLocation;
                     break;
                 }

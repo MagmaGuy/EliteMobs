@@ -81,7 +81,7 @@ public class BulletHell extends BossPower implements Listener {
             @Override
             public void run() {
 
-                if (!eliteEntity.getLivingEntity().isValid() || eliteEntity.getLivingEntity().isDead()) {
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }

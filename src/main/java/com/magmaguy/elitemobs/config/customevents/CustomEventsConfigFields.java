@@ -80,6 +80,7 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
 
     @Override
     public void generateConfigDefaults() {
+        fileConfiguration.addDefault("isEnabled", isEnabled);
         if (startMessage != null) fileConfiguration.addDefault("startMessage", startMessage);
         if (endMessage != null) fileConfiguration.addDefault("endMessage", endMessage);
         if (eventStartCommands != null) fileConfiguration.addDefault("eventStartCommands", eventStartCommands);

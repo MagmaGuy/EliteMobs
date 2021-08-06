@@ -15,11 +15,13 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class SimplePersistentEntity {
 
-    private static final HashSet<Integer> chunkLocations = new HashSet<>();
+    //private static final HashSet<Integer> chunkLocations = new HashSet<>();
     //Values are stored for the chunk load events
     public static ArrayListMultimap<Integer, SimplePersistentEntity> persistentEntities = ArrayListMultimap.create();
     public static ArrayListMultimap<String, SimplePersistentEntity> persistentEntitiesForQueuedWorlds = ArrayListMultimap.create();
@@ -90,15 +92,15 @@ public class SimplePersistentEntity {
      *
      * @param chunkLocation
      */
-    private static void loadChunk(int chunkLocation) {
-        persistentEntities.get(chunkLocation).forEach((simplePersistentEntity) -> {
+    private static void loadChunk(int chunkLocation, List<SimplePersistentEntity> simplePersistentEntityList) {
+        simplePersistentEntityList.forEach((simplePersistentEntity) -> {
             if (simplePersistentEntity.customBossEntity != null)
                 simplePersistentEntity.customBossEntity.chunkLoad();
             else if (simplePersistentEntity.npcEntity != null)
                 simplePersistentEntity.npcEntity.chunkLoad();
         });
         persistentEntities.removeAll(chunkLocation);
-        chunkLocations.remove(chunkLocation);
+        //chunkLocations.remove(chunkLocation);
     }
 
     private static void unloadWorld(World world) {
@@ -139,10 +141,11 @@ public class SimplePersistentEntity {
         public void chunkLoadEvent(ChunkLoadEvent event) {
             if (ignore) return;
             int chunkLocation = chunkLocation(event.getChunk());
+            List<SimplePersistentEntity> simplePersistentEntityList = new ArrayList<>(persistentEntities.get(chunkLocation));
             if (persistentEntities.get(chunkLocation) == null) return;
-            if (chunkLocations.contains(chunkLocation)) return;
-            chunkLocations.add(chunkLocation);
-            loadChunk(chunkLocation);
+            //if (chunkLocations.contains(chunkLocation)) return;
+            //chunkLocations.add(chunkLocation);
+            loadChunk(chunkLocation, simplePersistentEntityList);
         }
 
         @EventHandler(ignoreCancelled = true)
