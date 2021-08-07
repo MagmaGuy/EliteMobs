@@ -25,11 +25,11 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Taunt extends MinorPower implements Listener {
 
-    private final static List<String> TARGET_TAUNT_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onTarget");
-    private final static List<String> GENERIC_DAMAGED_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onDamaged");
-    private final static List<String> DAMAGED_BY_BOW_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onDamagedByBow");
-    private final static List<String> HIT_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onDamage");
-    private final static List<String> DEATH_LIST = PowersConfig.getPower("taunt.yml").getConfiguration().getStringList("onDeath");
+    private final static List<String> TARGET_TAUNT_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onTarget");
+    private final static List<String> GENERIC_DAMAGED_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamaged");
+    private final static List<String> DAMAGED_BY_BOW_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamagedByBow");
+    private final static List<String> HIT_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDamage");
+    private final static List<String> DEATH_LIST = PowersConfig.getPower("taunt.yml").getFileConfiguration().getStringList("onDeath");
 
     public Taunt() {
         super(PowersConfig.getPower("taunt.yml"));
@@ -109,7 +109,7 @@ public class Taunt extends MinorPower implements Listener {
      */
     @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
-        if (!event.getEliteMobEntity().hasPower(this)) return;
+        if (!event.getEliteEntity().hasPower(this)) return;
         nametagProcessor(event.getEntity(), DEATH_LIST);
     }
 

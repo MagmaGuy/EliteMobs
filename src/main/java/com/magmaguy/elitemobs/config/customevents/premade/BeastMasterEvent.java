@@ -13,6 +13,6 @@ public class BeastMasterEvent extends CustomEventsConfigFields {
         setLocalCooldown(60D);
         setGlobalCooldown(15D);
         setWeight(80);
-        setCustomSpawn("treasure_goblin_spawn.yml");
+        setCustomSpawn("normal_surface_spawn.yml");
     }
 }

@@ -322,7 +322,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             ThreadLocalRandom.current().nextInt(-15, 15),
                             0,
                             ThreadLocalRandom.current().nextInt(-15, 15)));
-                    CustomSpawn.getHighestValidBlock(randomLocation, 256);
+                    randomLocation.setY(CustomSpawn.getHighestValidBlock(randomLocation, 256));
                     if (randomLocation.getY() == -100) continue;
                     spawnLocation = randomLocation;
                     break;

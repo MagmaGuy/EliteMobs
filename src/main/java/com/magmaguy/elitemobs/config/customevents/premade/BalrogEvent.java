@@ -15,5 +15,6 @@ public class BalrogEvent extends CustomEventsConfigFields {
         setChance(0.0001);
         setBreakableMaterials(Arrays.asList(Material.COAL_ORE, Material.IRON_ORE, Material.GOLD_ORE, Material.LAPIS_ORE,
                 Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.REDSTONE_ORE));
+        setEventDuration(20);
     }
 }

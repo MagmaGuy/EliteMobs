@@ -14,5 +14,6 @@ public class QueenBeeEvent extends CustomEventsConfigFields {
         setBossFilenames(Arrays.asList("queen_bee.yml"));
         setChance(0.001);
         setBreakableMaterials(Arrays.asList(Material.BEE_NEST));
+        setEventDuration(20);
     }
 }

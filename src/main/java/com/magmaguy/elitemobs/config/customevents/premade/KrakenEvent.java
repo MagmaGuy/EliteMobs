@@ -12,5 +12,6 @@ public class KrakenEvent extends CustomEventsConfigFields {
         setEventType(CustomEvent.EventType.FISH);
         setBossFilenames(Arrays.asList("kraken.yml"));
         setChance(0.005);
+        setEventDuration(20);
     }
 }

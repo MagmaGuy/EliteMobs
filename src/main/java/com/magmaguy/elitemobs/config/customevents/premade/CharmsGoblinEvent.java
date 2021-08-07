@@ -14,6 +14,7 @@ public class CharmsGoblinEvent extends CustomEventsConfigFields {
         setLocalCooldown(60D);
         setGlobalCooldown(15D);
         setWeight(50);
-        setCustomSpawn("treasure_goblin_spawn.yml");
+        setCustomSpawn("normal_surface_spawn.yml");
+        setEventDuration(60);
     }
 }

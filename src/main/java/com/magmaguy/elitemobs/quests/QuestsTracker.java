@@ -10,13 +10,13 @@ public class QuestsTracker implements Listener {
     @EventHandler
     public void onEntityKill(EliteMobDeathEvent event) {
 
-        if (!event.getEliteMobEntity().getHasSpecialLoot()) return;
-        if (!event.getEliteMobEntity().hasDamagers()) return;
+        if (!event.getEliteEntity().getHasSpecialLoot()) return;
+        if (!event.getEliteEntity().hasDamagers()) return;
 
-        for (Player player : event.getEliteMobEntity().getDamagers().keySet())
+        for (Player player : event.getEliteEntity().getDamagers().keySet())
             if (EliteQuest.hasPlayerQuest(player))
                 if (!EliteQuest.getPlayerQuest(player).getQuestObjective().isTurnedIn())
-                    EliteQuest.getPlayerQuest(player).processQuestProgression(event.getEliteMobEntity(), player);
+                    EliteQuest.getPlayerQuest(player).processQuestProgression(event.getEliteEntity(), player);
     }
 
 }

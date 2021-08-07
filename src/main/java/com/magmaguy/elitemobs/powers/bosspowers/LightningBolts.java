@@ -70,7 +70,7 @@ public class LightningBolts extends BossPower implements Listener {
         if (lightningBolts == null) return;
         if (lightningBolts.getGlobalCooldownActive()) return;
 
-        lightningBolts.doGlobalCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getConfiguration().getInt("delayBetweenStrikes"));
+        lightningBolts.doGlobalCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getFileConfiguration().getInt("delayBetweenStrikes"));
 
         lightningBolts.setIsFiring(true);
         setLightiningPaths(event.getEliteMobEntity());

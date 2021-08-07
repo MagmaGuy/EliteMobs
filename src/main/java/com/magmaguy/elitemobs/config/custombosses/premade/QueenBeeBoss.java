@@ -7,8 +7,8 @@ import org.bukkit.entity.EntityType;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class QueenBeeConfig extends CustomBossesConfigFields {
-    public QueenBeeConfig() {
+public class QueenBeeBoss extends CustomBossesConfigFields {
+    public QueenBeeBoss() {
         super("queen_bee",
                 EntityType.BEE,
                 true,

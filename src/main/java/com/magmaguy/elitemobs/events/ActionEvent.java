@@ -81,7 +81,6 @@ public class ActionEvent extends CustomEvent {
             }
             customBossEntity.spawn(getEventStartLocation(), false);
             primaryEliteMobs.add(customBossEntity);
-            eventEliteMobs.add(customBossEntity);
         }
 
         actionEvents.add(actionEvent);
@@ -91,19 +90,10 @@ public class ActionEvent extends CustomEvent {
 
     @Override
     public void startModifiers() {
-
     }
 
     @Override
     public void eventWatchdog() {
-        boolean primaryEventBossesAreAlive = false;
-        for (CustomBossEntity customBossEntity : primaryEliteMobs)
-            if (!(customBossEntity == null || customBossEntity.getLivingEntity() == null || customBossEntity.getLivingEntity().isDead()))
-                primaryEventBossesAreAlive = true;
-
-        if (primaryEventBossesAreAlive) return;
-
-        end();
     }
 
     @Override

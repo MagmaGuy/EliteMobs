@@ -50,6 +50,11 @@ public class GoldShotgun extends BossPower implements Listener {
             @Override
             public void run() {
 
+                if (!eliteEntity.isValid()) {
+                    cancel();
+                    return;
+                }
+
                 doSmokeEffect(eliteEntity, player);
                 counter++;
 

@@ -112,7 +112,7 @@ public class TrackingFireball extends MajorPower {
 
 
                 private Vector setFireballDirection(Entity target) {
-                    double fireballVelocity = PowersConfig.getPower("tracking_fireball.yml").getConfiguration().getDouble("fireballSpeed");
+                    double fireballVelocity = PowersConfig.getPower("tracking_fireball.yml").getFileConfiguration().getDouble("fireballSpeed");
                     if (target.getLocation().distanceSquared(repeatingFireball.getLocation()) > 1)
                         return target.getLocation().clone()
                                 .add(new Vector(0, 1, 0))

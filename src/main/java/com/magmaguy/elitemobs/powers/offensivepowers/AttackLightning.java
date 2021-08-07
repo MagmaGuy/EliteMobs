@@ -24,7 +24,7 @@ public class AttackLightning extends MinorPower implements Listener {
         if (attackLightning == null) return;
         if (attackLightning.getGlobalCooldownActive()) return;
 
-        attackLightning.doGlobalCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getConfiguration().getInt("delayBetweenStrikes"));
+        attackLightning.doGlobalCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getFileConfiguration().getInt("delayBetweenStrikes"));
 
         attackLightning.setIsFiring(true);
         fireLightning(event.getEliteMobEntity());
