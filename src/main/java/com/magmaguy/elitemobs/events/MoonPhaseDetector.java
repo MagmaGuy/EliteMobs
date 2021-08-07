@@ -37,7 +37,6 @@ public class MoonPhaseDetector {
     }
 
     public enum MoonPhase {
-
         FULL_MOON,
         WANING_GIBBOUS,
         LAST_QUARTER,
@@ -46,7 +45,6 @@ public class MoonPhaseDetector {
         WAXING_CRESCENT,
         FIRST_QUARTER,
         WAXING_GIBBOUS
-
     }
 
 }

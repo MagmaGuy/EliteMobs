@@ -9,14 +9,13 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class ZombieKingConfig extends CustomBossesConfigFields {
-    public ZombieKingConfig() {
+public class ZombieKingBoss extends CustomBossesConfigFields {
+    public ZombieKingBoss() {
         super("zombie_king",
                 EntityType.ZOMBIE,
                 true,
                 "$eventBossLevel &4Zombie King",
                 "dynamic");
-        setTimeout(30);
         setPersistent(true);
         setHealthMultiplier(4);
         setDamageMultiplier(4);
@@ -24,6 +23,7 @@ public class ZombieKingConfig extends CustomBossesConfigFields {
         setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
         setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
         setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+        setMainHand(new ItemStack(Material.GOLDEN_AXE));
         setPowers(Arrays.asList("flame_pyre.yml", "flamethrower.yml", "summon_the_returned.yml", "spirit_walk.yml"));
         setSpawnMessage("&cThe Zombie King has been sighted!");
         setDeathMessage("&aThe Zombie King has been slain by $players!");

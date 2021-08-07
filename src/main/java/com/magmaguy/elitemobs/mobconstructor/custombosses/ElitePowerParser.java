@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.bosspowers.BonusCoins;
 import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 
@@ -20,10 +21,21 @@ public class ElitePowerParser {
                     elitePowers.add(customSummonPower);
                 } else
                     customSummonPower.addEntry(powerName);
-            else if (ElitePower.getElitePower(powerName) != null)
-                elitePowers.add(ElitePower.getElitePower(powerName));
-            else
-                new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
+            else {
+                String[] parsedPowerName = powerName.split(":");
+                if (ElitePower.getElitePower(parsedPowerName[0]) != null) {
+                    ElitePower elitePower = ElitePower.getElitePower(parsedPowerName[0]);
+                    elitePowers.add(elitePower);
+                    if (elitePower instanceof BonusCoins)
+                        if (parsedPowerName.length > 1)
+                            try {
+                                ((BonusCoins) elitePower).setCoinMultiplier(Double.parseDouble(parsedPowerName[1]));
+                            } catch (Exception ex) {
+                                new WarningMessage("Multiplier " + parsedPowerName[1] + " for Bonus Coins power is not a valid multiplier!");
+                            }
+                } else
+                    new WarningMessage("Warning: power name " + powerName + " is not registered! Skipping it for custom mob construction...");
+            }
         }
         return elitePowers;
     }

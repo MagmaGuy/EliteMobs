@@ -24,9 +24,10 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     private double chance = 0;
     private List<Material> breakableMaterials;
     private double eventDuration = 0;
+    private int eventEndTime = -1;
     private boolean endEventWithBossDeath = true;
     private String customSpawn = "";
-    private int minimumPlayerCount = 0;
+    private int minimumPlayerCount = 1;
 
     /**
      * For Action Events
@@ -96,9 +97,36 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         if (globalCooldown != 0) fileConfiguration.addDefault("globalCooldown", globalCooldown);
         if (weight != 0) fileConfiguration.addDefault("weight", weight);
         if (eventDuration != 0) fileConfiguration.addDefault("eventDuration", eventDuration);
+        if (eventEndTime != -1) fileConfiguration.addDefault("eventEndTime", eventEndTime);
         if (!endEventWithBossDeath) fileConfiguration.addDefault("endEventWithBossDeath", endEventWithBossDeath);
         if (!customSpawn.isEmpty()) fileConfiguration.addDefault("spawnType", customSpawn);
         if (minimumPlayerCount != 0) fileConfiguration.addDefault("minimumPlayerCount", minimumPlayerCount);
+    }
+
+    @Override
+    public void processConfigFields() {
+        this.eventType = processEnum("eventType", eventType);
+        if (eventType == CustomEvent.EventType.DEFAULT) {
+            new WarningMessage("Failed to determine a valid event type for " + filename + " ! This event will not be registered.");
+            return;
+        }
+        this.bossFilenames = processStringList("bossFilenames", bossFilenames);
+        if (bossFilenames == null) return;
+        this.startMessage = processString("startMessage", startMessage);
+        this.endMessage = processString("endMessage", endMessage);
+        this.eventStartCommands = processStringList("eventStartCommands", eventStartCommands);
+        this.eventEndCommands = processStringList("eventEndCommands", eventEndCommands);
+        this.announcementPriority = processInt("announcementPriority", announcementPriority);
+        this.chance = processDouble("chance", chance);
+        this.breakableMaterials = processEnumList("breakableMaterials", breakableMaterials, Material.class);
+        this.localCooldown = processDouble("localCooldown", localCooldown);
+        this.globalCooldown = processDouble("globalCooldown", globalCooldown);
+        this.weight = processDouble("weight", weight);
+        this.eventDuration = processDouble("eventDuration", eventDuration);
+        this.eventEndTime = processInt("eventEndTime", eventEndTime);
+        this.endEventWithBossDeath = processBoolean("endEventWithBossDeath", endEventWithBossDeath);
+        this.customSpawn = processString("spawnType", customSpawn);
+        this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount);
     }
 
     public String getStartMessage() {
@@ -165,6 +193,14 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.eventDuration = eventDuration;
     }
 
+    public double getEventEndTime() {
+        return eventEndTime;
+    }
+
+    public void setEventEndTime(int eventEndTime) {
+        this.eventEndTime = eventEndTime;
+    }
+
     public boolean isEndEventWithBossDeath() {
         return endEventWithBossDeath;
     }
@@ -187,31 +223,6 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
 
     public void setMinimumPlayerCount(int minimumPlayerCount) {
         this.minimumPlayerCount = minimumPlayerCount;
-    }
-
-    @Override
-    public void processConfigFields() {
-        this.eventType = processEnum("eventType", eventType);
-        if (eventType == CustomEvent.EventType.DEFAULT) {
-            new WarningMessage("Failed to determine a valid event type for " + filename + " ! This event will not be registered.");
-            return;
-        }
-        this.bossFilenames = processStringList("bossFilenames", bossFilenames);
-        if (bossFilenames == null) return;
-        this.startMessage = processString("startMessage", startMessage);
-        this.endMessage = processString("endMessage", endMessage);
-        this.eventStartCommands = processStringList("eventStartCommands", eventStartCommands);
-        this.eventEndCommands = processStringList("eventEndCommands", eventEndCommands);
-        this.announcementPriority = processInt("announcementPriority", announcementPriority);
-        this.chance = processDouble("chance", chance);
-        this.breakableMaterials = processEnumList("breakableMaterials", breakableMaterials, Material.class);
-        this.localCooldown = processDouble("localCooldown", localCooldown);
-        this.globalCooldown = processDouble("globalCooldown", globalCooldown);
-        this.weight = processDouble("weight", weight);
-        this.eventDuration = processDouble("eventDuration", eventDuration);
-        this.endEventWithBossDeath = processBoolean("endEventWithBossDeath", endEventWithBossDeath);
-        this.customSpawn = processString("spawnType", customSpawn);
-        this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount);
     }
 
 }

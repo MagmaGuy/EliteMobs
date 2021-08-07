@@ -143,10 +143,10 @@ public class ElitePower {
     private boolean powerCooldownActive = false;
     private boolean isFiring = false;
     public ElitePower(PowersConfigFields powersConfigFields) {
-        this.fileName = powersConfigFields.getFileName();
+        this.fileName = powersConfigFields.getFilename();
         this.name = powersConfigFields.getName();
         this.trail = powersConfigFields.getEffect();
-        this.configuration = powersConfigFields.getConfiguration();
+        this.configuration = powersConfigFields.getFileConfiguration();
         this.powerCooldownTime = powersConfigFields.getPowerCooldown();
         this.globalCooldownTime = powersConfigFields.getGlobalCooldown();
     }

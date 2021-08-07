@@ -22,7 +22,7 @@ public class Implosion extends MinorPower implements Listener {
 
     @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
-        if (!event.getEliteMobEntity().hasPower(this)) return;
+        if (!event.getEliteEntity().hasPower(this)) return;
 
         new BukkitRunnable() {
             int counter = 0;

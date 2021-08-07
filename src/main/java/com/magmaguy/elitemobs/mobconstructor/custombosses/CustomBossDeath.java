@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
@@ -26,9 +27,9 @@ public class CustomBossDeath implements Listener {
 
     public static void dropLoot(Player player, CustomBossEntity customBossEntity) {
         if (customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
-        for (CustomItem customItem : customBossEntity.customBossesConfigFields.getUniqueLootList().keySet())
-            if (ThreadLocalRandom.current().nextDouble() < customBossEntity.customBossesConfigFields.getUniqueLootList().get(customItem))
-                CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), customItem.getFileName(), customBossEntity.getLivingEntity().getLocation());
+        for (CustomBossesConfigFields.UniqueLoot uniqueLoot : customBossEntity.customBossesConfigFields.getUniqueLootList())
+            if (ThreadLocalRandom.current().nextDouble() < uniqueLoot.chance)
+                CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.customItem.getFileName(), customBossEntity.getLivingEntity().getLocation());
     }
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {
@@ -156,8 +157,8 @@ public class CustomBossDeath implements Listener {
 
     @EventHandler
     public void onEliteMobDeath(EliteMobDeathEvent event) {
-        if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-        CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteMobEntity();
+        if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
+        CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();
 
         doLoot(customBossEntity);
         doDeathMessage(customBossEntity);

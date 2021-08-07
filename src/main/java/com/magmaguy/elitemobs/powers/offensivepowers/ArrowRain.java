@@ -23,7 +23,6 @@ public class ArrowRain extends MinorPower implements Listener {
     }
 
     public static void doArrowRain(EliteEntity eliteEntity) {
-        eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             final Location initialLocation = eliteEntity.getLivingEntity().getLocation().clone();
             int counter = 0;
@@ -38,21 +37,14 @@ public class ArrowRain extends MinorPower implements Listener {
 
                 if (counter > 10 * 20) {
                     cancel();
-                    eliteEntity.getLivingEntity().setAI(true);
                     eliteEntity.getLivingEntity().teleport(initialLocation);
                     return;
                 }
 
                 counter++;
-
                 MeteorShower.doCloudEffect(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)));
-
-                if (counter > 20) {
-
+                if (counter > 20)
                     doArrows(eliteEntity.getLivingEntity().getLocation().clone().add(new Vector(0, 10, 0)), eliteEntity);
-
-                }
-
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }

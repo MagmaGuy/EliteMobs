@@ -14,20 +14,20 @@ public class OnDeathCommands implements Listener {
     public static void parseConsoleCommand(List<String> configStrings, EliteMobDeathEvent event) {
         for (String string : configStrings) {
             if (string.contains("$level"))
-                string = string.replace("$level", event.getEliteMobEntity().getLevel() + "");
+                string = string.replace("$level", event.getEliteEntity().getLevel() + "");
             if (string.contains("$name"))
-                string = string.replace("$name", event.getEliteMobEntity().getName());
+                string = string.replace("$name", event.getEliteEntity().getName());
             if (string.contains("$locationWorldName"))
-                string = string.replace("$locationWorldName", event.getEliteMobEntity().getLivingEntity().getLocation().getWorld().getName());
+                string = string.replace("$locationWorldName", event.getEliteEntity().getLivingEntity().getLocation().getWorld().getName());
             if (string.contains("$locationX"))
-                string = string.replace("$locationX", event.getEliteMobEntity().getLivingEntity().getLocation().getX() + "");
+                string = string.replace("$locationX", event.getEliteEntity().getLivingEntity().getLocation().getX() + "");
             if (string.contains("$locationY"))
-                string = string.replace("$locationY", event.getEliteMobEntity().getLivingEntity().getLocation().getY() + "");
+                string = string.replace("$locationY", event.getEliteEntity().getLivingEntity().getLocation().getY() + "");
             if (string.contains("$locationZ"))
-                string = string.replace("$locationZ", event.getEliteMobEntity().getLivingEntity().getLocation().getZ() + "");
+                string = string.replace("$locationZ", event.getEliteEntity().getLivingEntity().getLocation().getZ() + "");
             if (string.contains("$players")) {
-                if (event.getEliteMobEntity().hasDamagers())
-                    for (Player player : event.getEliteMobEntity().getDamagers().keySet())
+                if (event.getEliteEntity().hasDamagers())
+                    for (Player player : event.getEliteEntity().getDamagers().keySet())
                         runConsoleCommand(string.replace("$players", player.getName()));
             }
             runConsoleCommand(string);

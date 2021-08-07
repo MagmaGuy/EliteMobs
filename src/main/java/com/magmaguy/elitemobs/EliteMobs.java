@@ -92,7 +92,7 @@ public class EliteMobs extends JavaPlugin {
         ValidWorldsConfig.initializeConfig();
 
         MenusConfig.initializeConfigs();
-        PowersConfig.initializeConfigs();
+        new PowersConfig();
         MobPropertiesConfig.initializeConfigs();
         CustomEnchantment.initializeCustomEnchantments();
 

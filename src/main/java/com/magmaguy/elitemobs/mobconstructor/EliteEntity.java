@@ -433,10 +433,9 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public ElitePower getPower(String elitePower) {
-        for (ElitePower iteratedPower : getPowers()) {
+        for (ElitePower iteratedPower : getPowers())
             if (iteratedPower.getFileName().equals(elitePower))
                 return iteratedPower;
-        }
         return null;
     }
 
@@ -668,6 +667,10 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         if (livingEntity != null)
             livingEntity.remove();
         this.livingEntity = null;
+    }
+
+    public boolean isDead(){
+        return !isValid();
     }
 
     /**
