@@ -5,6 +5,8 @@ import com.magmaguy.elitemobs.api.CustomEventStartEvent;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -20,13 +22,14 @@ public class TimedEvent extends CustomEvent implements Listener {
     public static ArrayList<TimedEvent> blueprintEvents = new ArrayList<>();
     public static ArrayList<TimedEvent> timedEvents = new ArrayList<>();
     //stores the time of the last global trigger
-    public static double nextEventTrigger = 0;
+    public static double nextEventTrigger = System.currentTimeMillis() + 5 * 60 * 1000;
     public double localCooldown;
     public double nextLocalEventTrigger = 0;
     public double globalCooldown;
     public double weight;
     public String filename;
     public CustomSpawn customSpawn;
+
     public TimedEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
         this.localCooldown = customEventsConfigFields.getLocalCooldown();
@@ -90,7 +93,7 @@ public class TimedEvent extends CustomEvent implements Listener {
                 customEventsConfigFields.getBossFilenames(),
                 timedEvent);
 
-        //This handles the eltiemobs-events flag
+        //This handles the elitemobs-events flag
         timedEvent.customSpawn.setEvent(true);
 
         //Note: this will finish running at an arbitrary time in the future
@@ -100,7 +103,6 @@ public class TimedEvent extends CustomEvent implements Listener {
         nextEventTrigger = System.currentTimeMillis() + globalCooldown * 60 * 1000;
 
         timedEvents.add(timedEvent);
-        timedEvent.queueEvent();
     }
 
     /**
@@ -108,6 +110,19 @@ public class TimedEvent extends CustomEvent implements Listener {
      */
     public void queueEvent() {
         this.primaryEliteMobs = customSpawn.getCustomBossEntities();
+        setEventStartLocation(customSpawn.getSpawnLocation());
+
+        boolean bossesAreValid = true;
+        for (EliteEntity eliteEntity : primaryEliteMobs)
+            if (eliteEntity.getLivingEntity() == null) {
+                bossesAreValid = false;
+                break;
+            }
+        if (!bossesAreValid) {
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> customSpawn.queueSpawn(), 20);
+            return;
+        }
+
         start();
     }
 
@@ -125,12 +140,5 @@ public class TimedEvent extends CustomEvent implements Listener {
     @Override
     public void endModifiers() {
         timedEvents.remove(this);
-    }
-
-    public static class TimeEventEvents implements Listener {
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-        public void onEliteSpawn() {
-
-        }
     }
 }

@@ -32,7 +32,7 @@ public class EliteMobDeathEvent extends Event {
         return this.entity;
     }
 
-    public EliteEntity getEliteMobEntity() {
+    public EliteEntity getEliteEntity() {
         return this.eliteEntity;
     }
 

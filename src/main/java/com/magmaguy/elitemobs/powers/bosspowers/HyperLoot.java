@@ -15,9 +15,9 @@ public class HyperLoot extends BossPower implements Listener {
 
     @EventHandler
     public void onEliteMobDeath(EliteMobDeathEvent event) {
-        if (!event.getEliteMobEntity().hasPower(this)) return;
+        if (!event.getEliteEntity().hasPower(this)) return;
         for (int i = 0; i < 10; i++)
-            LootTables.generatePlayerLoot(event.getEliteMobEntity());
+            LootTables.generatePlayerLoot(event.getEliteEntity());
     }
 
 }

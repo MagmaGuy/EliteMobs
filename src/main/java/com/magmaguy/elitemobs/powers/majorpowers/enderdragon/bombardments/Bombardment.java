@@ -28,7 +28,7 @@ public abstract class Bombardment extends MajorPower implements Listener {
 
     public Bombardment(PowersConfigFields powersConfigFields) {
         super(powersConfigFields);
-        bombardments.add(powersConfigFields.getFileName());
+        bombardments.add(powersConfigFields.getFilename());
     }
 
     public void activate(EliteEntity eliteEntity) {

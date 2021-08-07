@@ -23,6 +23,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public static HashMap<String, CustomBossesConfigFields> customBossConfigFields = new HashMap<>();
     public static HashMap<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
     private final HashMap<Material, Double> damageModifiers = new HashMap();
+    private final List<UniqueLoot> parsedUniqueLootList = new ArrayList<>();
     private int timeout = 0;
     private boolean isPersistent = false;
     private double healthMultiplier = 1;
@@ -41,7 +42,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     private String escapeMessage = null;
     private String locationMessage = null;
     private List<String> uniqueLootList = new ArrayList<>();
-    private final HashMap<CustomItem, Double> parsedUniqueLootList = new HashMap<>();
     private boolean dropsEliteMobsLoot = true;
     private boolean dropsVanillaLoot = true;
     private List<String> trails = new ArrayList<>();
@@ -234,7 +234,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.locationMessage = locationMessage;
     }
 
-    public HashMap<CustomItem, Double> getUniqueLootList() {
+    public List<UniqueLoot> getUniqueLootList() {
         return this.parsedUniqueLootList;
     }
 
@@ -572,7 +572,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                 CustomItem customItem = CustomItem.getCustomItem(entry.split(":")[0]);
                 if (customItem == null)
                     throw new Exception();
-                this.parsedUniqueLootList.put(customItem, Double.parseDouble(entry.split(":")[1]));
+                this.parsedUniqueLootList.add(new UniqueLoot(Double.parseDouble(entry.split(":")[1]), customItem));
             } catch (Exception ex) {
                 new WarningMessage("Boss " + this.getName() + " has an invalid loot entry - " + entry + " - Skipping it!");
             }
@@ -641,6 +641,16 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
             if (material != null && multiplier != null)
                 damageModifiers.put(material, multiplier);
 
+        }
+    }
+
+    public class UniqueLoot {
+        public double chance;
+        public CustomItem customItem;
+
+        public UniqueLoot(double chance, CustomItem customItem) {
+            this.chance = chance;
+            this.customItem = customItem;
         }
     }
 

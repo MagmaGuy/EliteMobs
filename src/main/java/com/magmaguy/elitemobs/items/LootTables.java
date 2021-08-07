@@ -47,7 +47,8 @@ public class LootTables implements Listener {
             if (eliteEntity.getDamagers().get(player) / eliteEntity.getMaxHealth() < 0.1)
                 continue;
 
-            new ItemLootShower(eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
+            if (eliteEntity.getPower("bonus_coins.yml") == null)
+                new ItemLootShower(eliteEntity.getLevel(), eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
 
             Item item = null;
 
@@ -244,7 +245,7 @@ public class LootTables implements Listener {
         return location.getWorld().dropItem(location, dropWeighedFixedItemStack(player));
     }
 
-    private static ItemStack dropWeighedFixedItemStack(Player player){
+    private static ItemStack dropWeighedFixedItemStack(Player player) {
         double totalWeight = 0;
 
         for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet()) {
@@ -300,7 +301,7 @@ public class LootTables implements Listener {
         return eliteEntity.getUnsyncedLivingEntity().getWorld().dropItem(
                 eliteEntity.getUnsyncedLivingEntity().getLocation(),
                 CustomItem.getFixedItems().get(itemTier).get(
-                        ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size()))
+                                ThreadLocalRandom.current().nextInt(CustomItem.getFixedItems().get(itemTier).size()))
                         .generateDefaultsItemStack(player, false, eliteEntity));
     }
 
@@ -313,14 +314,14 @@ public class LootTables implements Listener {
     @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
 
-        if (!event.getEliteMobEntity().getHasSpecialLoot()) return;
-        if (event.getEliteMobEntity().getLevel() < 1) return;
-        if (event.getEliteMobEntity().getDamagers().isEmpty()) return;
+        if (!event.getEliteEntity().getHasSpecialLoot()) return;
+        if (event.getEliteEntity().getLevel() < 1) return;
+        if (event.getEliteEntity().getDamagers().isEmpty()) return;
 
-        if (!event.getEliteMobEntity().hasVanillaLoot())
+        if (!event.getEliteEntity().hasVanillaLoot())
             event.getEntityDeathEvent().getDrops().clear();
 
-        generatePlayerLoot(event.getEliteMobEntity());
+        generatePlayerLoot(event.getEliteEntity());
 
     }
 

@@ -148,7 +148,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
     private void nameScroller(LivingEntity livingEntity, ZombieNecronomicon zombieNecronomicon) {
 
         new BukkitRunnable() {
-            final String fullChant = convert(PowersConfig.getPower("zombie_necronomicon.yml").getConfiguration().getString("summoningChant"));
+            final String fullChant = convert(PowersConfig.getPower("zombie_necronomicon.yml").getFileConfiguration().getString("summoningChant"));
 
             @Override
             public void run() {

@@ -5,12 +5,12 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.announcements.AnnouncementPriority;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class CustomEvent {
 
@@ -25,7 +26,6 @@ public abstract class CustomEvent {
     public StartConditions startConditions;
     //Common fields
     public EventType eventType;
-    public ArrayList<EliteEntity> eventEliteMobs = new ArrayList<>();
     public ArrayList<CustomBossEntity> primaryEliteMobs = new ArrayList<>();
     public BukkitTask eventWatchdog;
     public int announcementPriority;
@@ -34,6 +34,9 @@ public abstract class CustomEvent {
     public List<String> startEventCommands, endEventCommands;
     public List<String> primaryCustomBossFilenames;
     public Location eventStartLocation;
+    public float eventStartTime;
+    public int currentDay;
+
     /**
      * Instantiates a Custom Event, does not necessarily start one but starts scanning for whether one should happen
      */
@@ -89,12 +92,19 @@ public abstract class CustomEvent {
             AnnouncementPriority.announce(this.startMessage, eventStartLocation.getWorld(), this.announcementPriority);
         if (this.startEventCommands != null)
             CommandRunner.runCommandFromList(this.startEventCommands, new ArrayList<>());
+        eventStartTime = System.currentTimeMillis();
+        currentDay = dayCalculator();
         eventWatchdog = new BukkitRunnable() {
             @Override
             public void run() {
+                commonWatchdogBehavior();
                 eventWatchdog();
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20, 20);
+    }
+
+    private int dayCalculator() {
+        return (int) Math.floor(eventStartLocation.getWorld().getFullTime() / 24000f);
     }
 
     //START CHECKS - currently in each class
@@ -102,6 +112,34 @@ public abstract class CustomEvent {
     //ACTIVE
 
     public abstract void startModifiers();
+
+    /**
+     * Runs checks that are common to all event types
+     */
+    public void commonWatchdogBehavior() {
+        if (customEventsConfigFields.getEventEndTime() != -1)
+            if (currentDay != dayCalculator() ||
+                    eventStartLocation.getWorld().getTime() > customEventsConfigFields.getEventEndTime()) {
+                end();
+                return;
+            }
+        if (customEventsConfigFields.getEventDuration() > 0)
+            if (System.currentTimeMillis() - eventStartTime > customEventsConfigFields.getEventDuration() * 60 * 1000) {
+                end();
+                return;
+            }
+        if (customEventsConfigFields.isEndEventWithBossDeath()) {
+            AtomicBoolean allBossesAreDead = new AtomicBoolean(true);
+            primaryEliteMobs.forEach((primaryEliteMob) -> {
+                if (!primaryEliteMob.isDead())
+                    allBossesAreDead.set(false);
+            });
+            if (allBossesAreDead.get()) {
+                end();
+                return;
+            }
+        }
+    }
 
     /**
      * Checks whether the conditions for the event to end have been met
@@ -112,9 +150,11 @@ public abstract class CustomEvent {
      * Starts the end of the event, deletes all EliteMobEntities spawned by the event and queues further event completion requirements
      */
     public void end() {
-        eventEliteMobs.stream().forEach(eliteMobEntity -> {
-            if (eliteMobEntity != null)
-                EntityTracker.unregister(eliteMobEntity.getUnsyncedLivingEntity(), RemovalReason.BOSS_TIMEOUT);
+        new DeveloperMessage("Event ended!");
+        eventWatchdog.cancel();
+        primaryEliteMobs.forEach(eliteMobEntity -> {
+            eliteMobEntity.remove(RemovalReason.BOSS_TIMEOUT);
+            new DeveloperMessage("removing...");
         });
         if (this.endMessage != null)
             AnnouncementPriority.announce(this.endMessage, eventStartLocation.getWorld(), this.announcementPriority);
@@ -140,6 +180,4 @@ public abstract class CustomEvent {
         TILL_SOIL,
         TIMED
     }
-
-    //End broadcasts / rewards
 }

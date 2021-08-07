@@ -1,19 +1,17 @@
 package com.magmaguy.elitemobs.config.powers;
 
+import com.magmaguy.elitemobs.config.CustomConfigFields;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PowersConfigFields {
+public class PowersConfigFields extends CustomConfigFields {
 
-    private final String fileName;
-    private final boolean isEnabled;
-    private final String name;
-    private final String effect;
-    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
-    private FileConfiguration configuration;
+    private String name;
+    private String effect;
+    private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
 
     private int powerCooldown = 0;
     private int globalCooldown = 0;
@@ -22,8 +20,7 @@ public class PowersConfigFields {
                               boolean isEnabled,
                               String name,
                               String material) {
-        this.fileName = fileName + ".yml";
-        this.isEnabled = isEnabled;
+        super(fileName, isEnabled);
         this.name = name;
         this.effect = material;
     }
@@ -34,27 +31,20 @@ public class PowersConfigFields {
                               String material,
                               int powerCooldown,
                               int globalCooldown) {
-        this.fileName = fileName + ".yml";
-        this.isEnabled = isEnabled;
+        super(fileName, isEnabled);
         this.name = name;
         this.effect = material;
         this.powerCooldown = powerCooldown;
         this.globalCooldown = globalCooldown;
     }
 
-    public PowersConfigFields(FileConfiguration fileConfiguration, File file) {
-        this.fileName = file.getName();
-        this.isEnabled = fileConfiguration.getBoolean("isEnabled");
-        this.name = fileConfiguration.getString("name");
-        this.effect = fileConfiguration.getString("effect");
-        if (fileConfiguration.get("powerCooldown") != null)
-            this.powerCooldown = fileConfiguration.getInt("powerCooldown");
-        if (fileConfiguration.get("globalCooldown") != null)
-            this.globalCooldown = fileConfiguration.getInt("globalCooldown");
-        this.configuration = fileConfiguration;
+    public PowersConfigFields(String fileName,
+                              boolean isEnabled){
+        super(fileName, isEnabled);
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    @Override
+    public void generateConfigDefaults() {
         fileConfiguration.addDefault("isEnabled", isEnabled);
         fileConfiguration.addDefault("name", name);
         fileConfiguration.addDefault("effect", effect);
@@ -66,8 +56,13 @@ public class PowersConfigFields {
             fileConfiguration.addDefaults(additionalConfigOptions);
     }
 
-    public String getFileName() {
-        return fileName;
+    @Override
+    public void processConfigFields() {
+        this.isEnabled = processBoolean("isEnabled", isEnabled);
+        this.name = processString("name", name);
+        this.effect = processString("effect", effect);
+        this.powerCooldown = processInt("powerCooldown", powerCooldown);
+            this.globalCooldown = processInt("globalCooldown", globalCooldown);
     }
 
     public boolean isEnabled() {
@@ -84,10 +79,6 @@ public class PowersConfigFields {
 
     public Map<String, Object> getAdditionalConfigOptions() {
         return additionalConfigOptions;
-    }
-
-    public FileConfiguration getConfiguration() {
-        return configuration;
     }
 
     public int getGlobalCooldown() {
