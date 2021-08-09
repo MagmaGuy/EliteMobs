@@ -54,7 +54,7 @@ public class WorldGuardFlagChecker {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionQuery query = container.createQuery();
         ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
-        return set.testState(null, WorldGuardCompatibility.getEliteMobsSpawnFlag());
+        return set.testState(null, WorldGuardCompatibility.getEliteMobsEventsFlag());
     }
 
     public static boolean doEliteMobsSpawnFlag(Location location) {

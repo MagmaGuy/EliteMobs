@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -14,6 +15,8 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
@@ -29,10 +32,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class CustomBossEntity extends EliteEntity implements Listener, SimplePersistentEntityInterface {
 
@@ -50,6 +55,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     protected PhaseBossEntity phaseBossEntity = null;
     protected String worldName;
     protected boolean chunkLoad = false;
+    long lastTick = 0;
+    int attemptsCounter = 1;
+    private List<BukkitTask> globalReinforcements = new ArrayList<>();
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -113,7 +121,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         super.setHasVanillaLoot(customBossesConfigFields.getDropsVanillaLoot());
         super.setLevel(customBossesConfigFields.getLevel());
         setPluginName();
-        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields.getPowers());
+        //set powers later as reinforcements aren't ready on the first tick, since all bosses need to be initialized
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields.getPowers()), 1);
     }
 
     //spawnLocation is only used for CustomBossEntity spawns queued for later
@@ -132,11 +141,25 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     }
 
     public void spawn(Location spawnLocation, boolean silent) {
+        if (lastTick == spawnLocation.getWorld().getFullTime())
+            attemptsCounter++;
+        else
+            attemptsCounter = 1;
+        lastTick = spawnLocation.getWorld().getFullTime();
+        if (livingEntity != null) {
+            new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!");
+            return;
+        }
         this.spawnLocation = spawnLocation;
         spawn(silent);
     }
 
     public void spawn(boolean silent) {
+        if (livingEntity != null) {
+            new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn!");
+            return;
+        }
+
         //This is a bit dumb but -1 is reserved for dynamic levels
         if (level == -1)
             getDynamicLevel(spawnLocation);
@@ -149,7 +172,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (chunkLoad || ChunkLocationChecker.locationIsLoaded(spawnLocation)) {
             chunkLoad = false;
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
-            super.setLivingEntity(livingEntity, spawnReason);
             simplePersistentEntity = null;
         } else
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
@@ -182,6 +204,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
         if (summoningEntity != null)
             summoningEntity.addReinforcement(this);
+
+        if (spawnLocation.getWorld() != null)
+            for (ElitePower elitePower : elitePowers)
+                if (elitePower instanceof CustomSummonPower)
+                    ((CustomSummonPower) elitePower).getCustomBossReinforcements().forEach((customBossReinforcement -> {
+                        if (customBossReinforcement.summonType.equals(CustomSummonPower.SummonType.GLOBAL))
+                            globalReinforcements.add(CustomSummonPower.summonGlobalReinforcement(customBossReinforcement, this));
+                    }));
 
         CommandRunner.runCommandFromList(customBossesConfigFields.getOnSpawnCommands(), new ArrayList<>());
     }
@@ -275,7 +305,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     }
 
     @Override
-    public boolean isDead(){
+    public boolean isDead() {
         return !this.isValid() && simplePersistentEntity == null;
     }
 
@@ -316,6 +346,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                 customBossBossBar.remove();
             if (phaseBossEntity != null)
                 phaseBossEntity.deathReset();
+            globalReinforcements.forEach((bukkitTask -> {
+                if (bukkitTask != null)
+                    bukkitTask.cancel();
+            }));
+            globalReinforcements.clear();
+            if (!removalReason.equals(RemovalReason.REINFORCEMENT_CULL))
+                if (summoningEntity != null)
+                    summoningEntity.removeReinforcement(this);
 
             if (isPersistent && removalReason.equals(RemovalReason.WORLD_UNLOAD)) {
                 //if the world unloads, the location objects cease to be valid

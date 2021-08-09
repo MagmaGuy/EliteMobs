@@ -133,13 +133,6 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     }
 
     public void initialize() {
-        //if (spawnLocation == null) {
-        //    new WarningMessage("Spawn location for regional boss" + getCustomBossesConfigFields().getFilename() + " was null!");
-        //    if (rawLocationString != null)
-        //        new WarningMessage("Problematic entry: " + rawLocationString);
-        //    return;
-        //}
-        //if (spawnLocation.getWorld() == null) return;
         queueSpawn(false);
     }
 

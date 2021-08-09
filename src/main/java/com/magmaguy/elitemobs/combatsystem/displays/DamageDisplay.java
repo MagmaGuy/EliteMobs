@@ -24,14 +24,14 @@ public class DamageDisplay implements Listener {
 
         if (event.isCriticalStrike()) {
             DialogArmorStand.createDialogArmorStand(
-                    event.getEntity(),
+                    event.getEliteMobEntity().getUnsyncedLivingEntity(),
                     ChatColorConverter.convert(EnchantmentsConfig.getEnchantment("critical_strikes.yml").getFileConfiguration()
                             .getString("criticalHitColor") + "" + ChatColor.BOLD + "" + (int) event.getDamage() + ""), offset);
-            CriticalStrikesEnchantment.criticalStrikePopupMessage(event.getEntity(), new Vector(0, 0.2, 0));
+            CriticalStrikesEnchantment.criticalStrikePopupMessage(event.getEliteMobEntity().getUnsyncedLivingEntity(), new Vector(0, 0.2, 0));
             return;
         }
 
-        DialogArmorStand.createDialogArmorStand(event.getEntity(), ChatColor.RED + "" + ChatColor.BOLD + "" + (int) event.getDamage() + "", offset);
+        DialogArmorStand.createDialogArmorStand(event.getEliteMobEntity().getUnsyncedLivingEntity(), ChatColor.RED + "" + ChatColor.BOLD + "" + (int) event.getDamage() + "", offset);
     }
 
 }

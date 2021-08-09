@@ -122,6 +122,7 @@ public class SimplePersistentEntity {
 
     public static class PersistentEntityEvent implements Listener {
         public static boolean ignore = false;
+        private static HashSet<Integer> loadingChunks = new HashSet<>();
 
         @EventHandler(ignoreCancelled = true)
         public void worldLoadEvent(WorldLoadEvent event) {
@@ -143,9 +144,10 @@ public class SimplePersistentEntity {
             int chunkLocation = chunkLocation(event.getChunk());
             List<SimplePersistentEntity> simplePersistentEntityList = new ArrayList<>(persistentEntities.get(chunkLocation));
             if (persistentEntities.get(chunkLocation) == null) return;
-            //if (chunkLocations.contains(chunkLocation)) return;
-            //chunkLocations.add(chunkLocation);
-            loadChunk(chunkLocation, simplePersistentEntityList);
+            if (loadingChunks.contains(chunkLocation)) return;
+            loadingChunks.add(chunkLocation);
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadChunk(chunkLocation, simplePersistentEntityList), 1);
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> loadingChunks.remove(chunkLocation), 1);
         }
 
         @EventHandler(ignoreCancelled = true)
