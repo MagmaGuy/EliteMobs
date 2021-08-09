@@ -41,6 +41,10 @@ public class SummonTheReturned extends BossPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 counter++;
                 eliteEntity.getLivingEntity().getWorld().spawnParticle(Particle.PORTAL,
                         eliteEntity.getLivingEntity().getLocation().add(new Vector(0, 1, 0)), 50, 0.01, 0.01, 0.01, 1);

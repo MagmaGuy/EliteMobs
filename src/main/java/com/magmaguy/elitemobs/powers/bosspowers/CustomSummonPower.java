@@ -14,9 +14,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
@@ -49,7 +47,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
         return new BukkitRunnable() {
             @Override
             public void run() {
-                if (summoningEntity.getReinforcementsCount() > 30 * summoningEntity.getSpawnLocation().getWorld().getPlayers().size()) return;
+                if (summoningEntity.getGlobalReinforcementsCount() > 30 * summoningEntity.getSpawnLocation().getWorld().getPlayers().size()) return;
                 for (int i = 0; i < customBossReinforcement.amount; i++) {
                     CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(customBossReinforcement.bossFileName);
                     if (customBossEntity == null) {
@@ -60,7 +58,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     customSpawn.setWorld(summoningEntity.getSpawnLocation().getWorld());
                     customSpawn.setKeepTrying(false);
                     customSpawn.queueSpawn();
-                    summoningEntity.addReinforcement(customBossEntity);
+                    summoningEntity.addGlobalReinforcement(customBossEntity);
                     customBossReinforcement.isSummoned = true;
                     customBossEntity.setSummoningEntity(summoningEntity);
                 }

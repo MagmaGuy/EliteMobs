@@ -20,7 +20,6 @@ import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -284,13 +283,18 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         escapeMechanism = CustomBossEscapeMechanism.startEscape(customBossesConfigFields.getTimeout(), this);
     }
 
-    private void cullReinforcements() {
+    private void cullReinforcements(boolean cullGlobal) {
+        if (cullGlobal)
+            globalReinforcementEntities.forEach(customBossEntity -> customBossEntity.remove(RemovalReason.REINFORCEMENT_CULL));
         for (CustomBossEntity customBossEntity : eliteReinforcementEntities)
             if (customBossEntity != null)
                 customBossEntity.remove(RemovalReason.REINFORCEMENT_CULL);
         for (Entity entity : nonEliteReinforcementEntities)
             if (entity != null)
                 entity.remove();
+
+        if (cullGlobal)
+            globalReinforcements.clear();
         eliteReinforcementEntities.clear();
         nonEliteReinforcementEntities.clear();
     }
@@ -305,8 +309,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     }
 
     @Override
-    public boolean isDead() {
-        return !this.isValid() && simplePersistentEntity == null;
+    public boolean exists() {
+        return super.exists() || simplePersistentEntity != null;
     }
 
     @Override
@@ -327,7 +331,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (customBossTrail != null) customBossTrail.terminateTrails();
         if (livingEntityMount != null) livingEntityMount.remove();
         if (customBossMount != null) customBossMount.remove(RemovalReason.REINFORCEMENT_CULL);
-        if (customBossesConfigFields.getCullReinforcements()) cullReinforcements();
+        if (customBossesConfigFields.getCullReinforcements()) cullReinforcements(false);
 
         boolean bossInstanceEnd = removalReason.equals(RemovalReason.KILL_COMMAND) ||
                 removalReason.equals(RemovalReason.DEATH) ||
@@ -361,6 +365,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                 persistentLocation = spawnLocation;
                 simplePersistentEntity = new SimplePersistentEntity(this, spawnLocation);
             }
+
+            if (customBossesConfigFields.getCullReinforcements()) cullReinforcements(true);
 
         } else
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
@@ -406,7 +412,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
             if (!((CustomBossEntity) event.getEliteMobEntity()).customBossesConfigFields.getCullReinforcements())
                 return;
-            ((CustomBossEntity) event.getEliteMobEntity()).cullReinforcements();
+            ((CustomBossEntity) event.getEliteMobEntity()).cullReinforcements(false);
         }
     }
 

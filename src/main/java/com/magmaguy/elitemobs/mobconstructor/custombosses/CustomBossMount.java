@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.entity.EntityType;
@@ -22,7 +23,7 @@ public class CustomBossMount {
 
         } catch (Exception ex) {
             //This runs when it's not an API entity
-            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfigFields.customBossConfigFields.get(customBossEntity.customBossesConfigFields.getMountedEntity());
+            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossEntity.customBossesConfigFields.getMountedEntity());
             if (customBossesConfigFields != null) {
                 CustomBossEntity mountEntity = CustomBossEntity.createCustomBossEntity(customBossEntity.customBossesConfigFields.getMountedEntity());
                 if (mountEntity == null) {
