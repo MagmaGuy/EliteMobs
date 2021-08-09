@@ -111,6 +111,7 @@ public class UnbindMenu extends EliteMenu {
 
             Player player = (Player) event.getWhoClicked();
             ItemStack currentItem = event.getCurrentItem();
+            int clickedSlot = event.getSlot();
             Inventory unbinderInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
@@ -119,7 +120,7 @@ public class UnbindMenu extends EliteMenu {
                 if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), UnbindEnchantment.key)) {
                     if (unbinderInventory.getItem(scrapItemInputSlot) == null) {
                         unbinderInventory.setItem(scrapItemInputSlot, currentItem);
-                        playerInventory.remove(currentItem);
+                        playerInventory.clear(clickedSlot);
                         calculateOutput(unbinderInventory);
                     }
                     return;

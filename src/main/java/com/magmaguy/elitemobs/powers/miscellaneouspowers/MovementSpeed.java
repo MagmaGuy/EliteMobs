@@ -22,7 +22,6 @@ public class MovementSpeed extends MinorPower {
         new BukkitRunnable() {
             @Override
             public void run() {
-                //todo: shouldn't this potion effect be 1?
                 livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1));
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);

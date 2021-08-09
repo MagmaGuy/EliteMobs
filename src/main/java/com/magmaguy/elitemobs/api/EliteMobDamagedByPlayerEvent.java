@@ -209,28 +209,28 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                         strike.criticalStrike,
                         strike.customDamage);
                 damage = strike.damage;
+            } else if ((event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) ||
+                    event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK)) &&
+                    EliteMobsItemDetector.isEliteMobsItem(player.getInventory().getItemInMainHand())) {
+                Strike strike = getDamage(player, eliteEntity, event);
+                eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity,
+                        player,
+                        event,
+                        strike.damage,
+                        strike.criticalStrike,
+                        strike.customDamage);
+                damage = strike.damage;
             } else {
-                //Runs if the damage was dealt by an elite item
-                if (EliteMobsItemDetector.isEliteMobsItem(player.getInventory().getItemInMainHand())) {
-                    Strike strike = getDamage(player, eliteEntity, event);
-                    eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity,
-                            player,
-                            event,
-                            strike.damage,
-                            strike.criticalStrike,
-                            strike.customDamage);
-                    damage = strike.damage;
-                } else {
-                    //Runs if the damage was not dealt by an elite item, important for other plugins
-                    eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity,
-                            player,
-                            event,
-                            event.getFinalDamage(),
-                            false,
-                            false);
-                    damage = event.getFinalDamage();
-                }
+                //Runs if the damage was not dealt by an elite item, important for other plugins
+                eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity,
+                        player,
+                        event,
+                        event.getFinalDamage(),
+                        false,
+                        false);
+                damage = event.getFinalDamage();
             }
+
 
             damage = Round.twoDecimalPlaces(damage);
 
@@ -254,9 +254,10 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                     !WorldGuardFlagChecker.checkFlag(
                             eliteEntity.getLivingEntity().getLocation(),
                             WorldGuardCompatibility.getEliteMobsAntiExploitFlag())))
-                if (!eliteEntity.isInAntiExploitCooldown())
-                    Bukkit.getServer().getPluginManager().callEvent(
-                            new EliteMobDamagedByPlayerAntiExploitEvent(eliteEntity, eliteMobDamagedByPlayerEvent));
+                if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK))
+                    if (!eliteEntity.isInAntiExploitCooldown())
+                        Bukkit.getServer().getPluginManager().callEvent(
+                                new EliteMobDamagedByPlayerAntiExploitEvent(eliteEntity, eliteMobDamagedByPlayerEvent));
         }
 
         public Strike getDamage(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
