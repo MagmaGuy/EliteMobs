@@ -10,7 +10,8 @@ public class QuestCommand {
     }
 
     public static void doMainQuestCommand(Player player) {
-        QuestsMenu.initializeQuestsMenu(player);
+        player.sendMessage("Coming soon!");
+        //QuestsMenu.initializeQuestsMenu(player);
     }
 
 }

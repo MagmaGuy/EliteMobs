@@ -71,7 +71,8 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            QuestsMenu.initializeQuestsMenu(event.getPlayer());
+                            event.getPlayer().sendMessage("Coming soon!");
+                            //QuestsMenu.initializeQuestsMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;

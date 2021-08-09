@@ -5,12 +5,11 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.announcements.AnnouncementPriority;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
-import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -150,12 +149,9 @@ public abstract class CustomEvent {
      * Starts the end of the event, deletes all EliteMobEntities spawned by the event and queues further event completion requirements
      */
     public void end() {
-        new DeveloperMessage("Event ended!");
+        new InfoMessage("Event " + customEventsConfigFields.getFilename() + " ended!");
         eventWatchdog.cancel();
-        primaryEliteMobs.forEach(eliteMobEntity -> {
-            eliteMobEntity.remove(RemovalReason.BOSS_TIMEOUT);
-            new DeveloperMessage("removing...");
-        });
+        primaryEliteMobs.forEach(eliteMobEntity -> eliteMobEntity.remove(RemovalReason.BOSS_TIMEOUT));
         if (this.endMessage != null)
             AnnouncementPriority.announce(this.endMessage, eventStartLocation.getWorld(), this.announcementPriority);
         if (this.endEventCommands != null)

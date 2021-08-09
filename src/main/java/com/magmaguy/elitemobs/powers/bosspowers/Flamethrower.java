@@ -61,6 +61,11 @@ public class Flamethrower extends BossPower implements Listener {
             @Override
             public void run() {
 
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
+
                 doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
                 counter++;
 
@@ -113,6 +118,11 @@ public class Flamethrower extends BossPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
+
                 doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.FLAME);
                 doDamage(damagePoints, eliteEntity);
                 timer++;
@@ -134,6 +144,10 @@ public class Flamethrower extends BossPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 timer++;
                 doParticleEffect(eliteEntity, fixedPlayerLocation, Particle.SMOKE_NORMAL);
                 if (timer < 20) return;

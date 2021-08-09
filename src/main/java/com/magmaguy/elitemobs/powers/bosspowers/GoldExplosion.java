@@ -48,6 +48,11 @@ public class GoldExplosion extends BossPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
+
                 counter++;
                 if (MobCombatSettingsConfig.enableWarningVisualEffects)
                     eliteEntity.getLivingEntity().getWorld().spawnParticle(Particle.SMOKE_NORMAL, eliteEntity.getLivingEntity().getLocation(), counter, 1, 1, 1, 0);

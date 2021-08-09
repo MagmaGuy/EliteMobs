@@ -25,6 +25,7 @@ public class DefaultConfig {
     public static boolean setupDone;
     public static Location defaultSpawnLocation;
     public static boolean doExplosionRegen;
+    public static boolean preventVanillaReinforcementsForEliteEntities;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -55,6 +56,7 @@ public class DefaultConfig {
         emLeadsToStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "emLeadsToStatusMenu", true);
         otherCommandsLeadToEMStatusMenu = ConfigurationEngine.setBoolean(fileConfiguration, "otherCommandsLeadToEMStatusMenu", true);
         setupDone = ConfigurationEngine.setBoolean(fileConfiguration, "setupDoneV3", false);
+        preventVanillaReinforcementsForEliteEntities = ConfigurationEngine.setBoolean(fileConfiguration, "preventVanillaReinforcementsForEliteEntities", true);
         try {
             defaultSpawnLocation = ConfigurationLocation.deserialize(
                     ConfigurationEngine.setString(
