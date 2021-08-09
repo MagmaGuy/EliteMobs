@@ -73,6 +73,9 @@ public class EliteMobDamagedEvent extends Event implements Cancellable {
                 return;
             }
 
+            //happens if it dies
+            if (!eliteEntity.isValid()) return;
+
             if (EliteMobs.worldGuardIsEnabled && !WorldGuardFlagChecker.checkFlag(eliteEntity.getLivingEntity().getLocation(),
                     WorldGuardCompatibility.getEliteMobsAntiExploitFlag()))
                 return;

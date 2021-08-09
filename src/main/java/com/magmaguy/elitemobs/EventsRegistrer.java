@@ -252,6 +252,8 @@ public class EventsRegistrer {
         if (!VersionChecker.serverVersionOlderThan(15, 0))
             pluginManager.registerEvents(new PreventEliteBeeHiveEnter(), plugin);
         pluginManager.registerEvents(new EnderDragonUnstuck(), plugin);
+        if (DefaultConfig.preventVanillaReinforcementsForEliteEntities)
+            pluginManager.registerEvents(new VanillaReinforcementsCanceller(), plugin);
 
         //Antiexploits
         pluginManager.registerEvents(new PreventMountExploit(), plugin);

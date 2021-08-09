@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
@@ -16,6 +17,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -29,7 +31,6 @@ public class CustomBossMegaConsumer {
     private final boolean bypassesWorldGuardSpawn;
     CustomBossEntity customBossEntity;
     private final Location spawnLocation;
-
 
     /**
      * The objective of this class is to set as many fields as possible as a consumer for spawning a Custom Boss.
@@ -78,6 +79,7 @@ public class CustomBossMegaConsumer {
                     setDisguise((LivingEntity) entity);
                     setName((LivingEntity) entity);
                     setFollowRange((LivingEntity) entity);
+                    customBossEntity.setLivingEntity((LivingEntity) entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                 });
 
         return livingEntity;

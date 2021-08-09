@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import org.bukkit.Bukkit;
@@ -113,8 +114,8 @@ public class TimedEvent extends CustomEvent implements Listener {
         setEventStartLocation(customSpawn.getSpawnLocation());
 
         boolean bossesAreValid = true;
-        for (EliteEntity eliteEntity : primaryEliteMobs)
-            if (eliteEntity.getLivingEntity() == null) {
+        for (CustomBossEntity customBossEntity : primaryEliteMobs)
+            if (!customBossEntity.isValid()) {
                 bossesAreValid = false;
                 break;
             }

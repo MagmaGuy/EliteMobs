@@ -24,7 +24,8 @@ public class ZombieKingBoss extends CustomBossesConfigFields {
         setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
         setBoots(new ItemStack(Material.DIAMOND_BOOTS));
         setMainHand(new ItemStack(Material.GOLDEN_AXE));
-        setPowers(Arrays.asList("flame_pyre.yml", "flamethrower.yml", "summon_the_returned.yml", "spirit_walk.yml"));
+        setPowers(Arrays.asList("flame_pyre.yml", "flamethrower.yml", "summon_the_returned.yml", "spirit_walk.yml",
+                "summonable:summonType=GLOBAL:filename=the_living_dead.yml:amount=5:customSpawn=normal_surface_spawn.yml"));
         setSpawnMessage("&cThe Zombie King has been sighted!");
         setDeathMessage("&aThe Zombie King has been slain by $players!");
         setDeathMessages(Arrays.asList(

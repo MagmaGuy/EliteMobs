@@ -30,7 +30,7 @@ public class DefaultDropsHandler implements Listener {
 
 
         List<ItemStack> droppedItems = event.getEntityDeathEvent().getDrops();
-        int mobLevel = EntityTracker.getEliteMobEntity(event.getEntity()).getLevel();
+        int mobLevel = event.getEliteEntity().getLevel();
 
         if (mobLevel > ItemSettingsConfig.maxLevelForDefaultLootMultiplier)
             mobLevel = ItemSettingsConfig.maxLevelForDefaultLootMultiplier;

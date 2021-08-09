@@ -661,9 +661,6 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         //This prevents the entity tracker from running this code twice when removing due to specific reasaons
         if (unsyncedLivingEntity != null)
             EliteEntityTracker.eliteMobEntities.remove(unsyncedLivingEntity.getUniqueId());
-        if (removalReason.equals(RemovalReason.CHUNK_UNLOAD))
-            if (isPersistent)
-                return;
         if (livingEntity != null)
             livingEntity.remove();
         this.livingEntity = null;
@@ -671,6 +668,14 @@ public class EliteEntity implements SimplePersistentEntityInterface {
 
     public boolean isDead(){
         return !isValid();
+    }
+
+    public void removeReinforcement(CustomBossEntity customBossEntity){
+        eliteReinforcementEntities.remove(customBossEntity);
+    }
+
+    public int getReinforcementsCount(){
+        return this.eliteReinforcementEntities.size();
     }
 
     /**
