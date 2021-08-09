@@ -20,10 +20,9 @@ import java.util.List;
 public class CustomBossesConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
     private static final HashSet<CustomBossesConfigFields> naturallySpawnedElites = new HashSet<>();
-    public static HashMap<String, CustomBossesConfigFields> customBossConfigFields = new HashMap<>();
     public static HashMap<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
-    private final HashMap<Material, Double> damageModifiers = new HashMap();
     private final List<UniqueLoot> parsedUniqueLootList = new ArrayList<>();
+    private HashMap<Material, Double> damageModifiers = new HashMap();
     private int timeout = 0;
     private boolean isPersistent = false;
     private double healthMultiplier = 1;
@@ -434,6 +433,10 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         return damageModifiers;
     }
 
+    public void setDamageModifiers(HashMap<Material, Double> damageModifiers) {
+        this.damageModifiers = damageModifiers;
+    }
+
     public EntityType getEntityType() {
         return this.entityType;
     }
@@ -539,17 +542,25 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         if (!cullReinforcements) fileConfiguration.addDefault("cullReinforcements", cullReinforcements);
         if (frozen) fileConfiguration.addDefault("frozen", frozen);
         if (reinforcement) fileConfiguration.addDefault("reinforcement", reinforcement);
+        if (!damageModifiers.isEmpty()) fileConfiguration.addDefault("damageModifiers", deserializeDamageModifiers());
+    }
+
+    private List<String> deserializeDamageModifiers() {
+        List<String> deserializedDamageModifiers = new ArrayList<>();
+        damageModifiers.entrySet().forEach((entry) -> {
+            deserializedDamageModifiers.add("material=" + entry.getKey().toString() + ":" + "multiplier=" + entry.getValue());
+        });
+        return deserializedDamageModifiers;
     }
 
     @Override
     public void processConfigFields() {
-        customBossConfigFields.put(getFilename(), this);
+        this.enabled = processBoolean("isEnabled", isEnabled);
         this.entityType = processEnum("entityType", entityType);
         if (this.entityType == null) {
             new WarningMessage("Your custom boss " + getFilename() + " does not have an entity type! Make sure you set one! Defaulting to zombie.");
             return;
         }
-        this.enabled = processBoolean("isEnabled", isEnabled);
         this.name = processString("name", name);
         //Levels are strings because "dynamic" is a valid value
         this.level = processString("level", level);
@@ -616,31 +627,60 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
 
         }
 
-        //Might be worth cleaning up the damage multipliers at some point
+        processDamageModifiers();
+
+    }
+
+    private void processDamageModifiers() {
         for (String rawDamageModifier : fileConfiguration.getStringList("damageModifiers")) {
-            String[] parsedStrings = rawDamageModifier.split(",");
-            Material material = null;
-            Double multiplier = null;
-            for (String parsedDamageModifier : parsedStrings) {
-                if (parsedDamageModifier.contains("material:"))
-                    try {
-                        material = Material.getMaterial(parsedDamageModifier.replace("material:", ""));
-                    } catch (Exception ex) {
-                        new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
-                    }
-                else if (parsedDamageModifier.contains("multiplier:"))
-                    try {
-                        multiplier = Double.parseDouble(parsedDamageModifier.replace("multiplier:", ""));
-                    } catch (Exception ex) {
-                        new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
-                    }
-                else
-                    new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
+            if (rawDamageModifier.contains(",")) {
+                String[] parsedStrings = rawDamageModifier.split(",");
+                Material material = null;
+                Double multiplier = null;
+                for (String parsedDamageModifier : parsedStrings) {
+                    if (parsedDamageModifier.contains("material:"))
+                        try {
+                            material = Material.getMaterial(parsedDamageModifier.replace("material:", ""));
+                        } catch (Exception ex) {
+                            new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
+                        }
+                    else if (parsedDamageModifier.contains("multiplier:"))
+                        try {
+                            multiplier = Double.parseDouble(parsedDamageModifier.replace("multiplier:", ""));
+                        } catch (Exception ex) {
+                            new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
+                        }
+                    else
+                        new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
+                }
+
+                if (material != null && multiplier != null)
+                    damageModifiers.put(material, multiplier);
+
+            } else {
+                String[] parsedStrings = rawDamageModifier.split(":");
+                Material material = null;
+                Double multiplier = null;
+                for (String parsedDamageModifier : parsedStrings) {
+                    if (parsedDamageModifier.contains("material="))
+                        try {
+                            material = Material.getMaterial(parsedDamageModifier.replace("material=", ""));
+                        } catch (Exception ex) {
+                            new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
+                        }
+                    else if (parsedDamageModifier.contains("multiplier="))
+                        try {
+                            multiplier = Double.parseDouble(parsedDamageModifier.replace("multiplier=", ""));
+                        } catch (Exception ex) {
+                            new WarningMessage("Boss " + getFilename() + " has invalid entry " + parsedDamageModifier + " !");
+                        }
+                    else
+                        new WarningMessage("Entry " + parsedDamageModifier + " is invalid for boss file " + getFilename() + " !");
+                }
+
+                if (material != null && multiplier != null)
+                    damageModifiers.put(material, multiplier);
             }
-
-            if (material != null && multiplier != null)
-                damageModifiers.put(material, multiplier);
-
         }
     }
 

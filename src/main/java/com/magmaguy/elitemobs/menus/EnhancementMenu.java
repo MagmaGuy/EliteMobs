@@ -132,6 +132,7 @@ public class EnhancementMenu extends EliteMenu {
 
             Player player = (Player) event.getWhoClicked();
             ItemStack currentItem = event.getCurrentItem();
+            int clickedSlot = event.getSlot();
             Inventory EnhancementInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
@@ -143,7 +144,7 @@ public class EnhancementMenu extends EliteMenu {
                     if (upgradeOrbLevel >= 0) {
                         if (EnhancementInventory.getItem(scrapItemInputSlot) == null) {
                             EnhancementInventory.setItem(scrapItemInputSlot, currentItem);
-                            playerInventory.remove(currentItem);
+                            playerInventory.clear(clickedSlot);
                             calculateOutput(EnhancementInventory);
                         }
                         return;

@@ -5,13 +5,10 @@ import com.magmaguy.elitemobs.api.CustomEventStartEvent;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
-import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -115,11 +112,12 @@ public class TimedEvent extends CustomEvent implements Listener {
 
         boolean bossesAreValid = true;
         for (CustomBossEntity customBossEntity : primaryEliteMobs)
-            if (!customBossEntity.isValid()) {
+            if (!customBossEntity.exists()) {
                 bossesAreValid = false;
                 break;
             }
         if (!bossesAreValid) {
+            new WarningMessage("Boss wasn't considered to be valid");
             Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> customSpawn.queueSpawn(), 20);
             return;
         }

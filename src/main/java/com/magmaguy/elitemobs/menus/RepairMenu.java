@@ -117,6 +117,7 @@ public class RepairMenu extends EliteMenu {
 
             Player player = (Player) event.getWhoClicked();
             ItemStack currentItem = event.getCurrentItem();
+            int clickedSlot = event.getSlot();
             Inventory repairInventory = event.getView().getTopInventory();
             Inventory playerInventory = event.getView().getBottomInventory();
 
@@ -127,7 +128,7 @@ public class RepairMenu extends EliteMenu {
                     if (scrapLevel >= 0) {
                         if (repairInventory.getItem(scrapItemInputSlot) == null) {
                             repairInventory.setItem(scrapItemInputSlot, currentItem);
-                            playerInventory.remove(currentItem);
+                            playerInventory.clear(clickedSlot);
                             calculateOutput(repairInventory);
                         }
                         return;

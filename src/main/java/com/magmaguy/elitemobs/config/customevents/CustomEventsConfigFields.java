@@ -82,6 +82,8 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
     @Override
     public void generateConfigDefaults() {
         fileConfiguration.addDefault("isEnabled", isEnabled);
+        if (eventType != null) fileConfiguration.addDefault("eventType", eventType.toString());
+        if (!bossFilenames.isEmpty()) fileConfiguration.addDefault("bossFileNames", bossFilenames);
         if (startMessage != null) fileConfiguration.addDefault("startMessage", startMessage);
         if (endMessage != null) fileConfiguration.addDefault("endMessage", endMessage);
         if (eventStartCommands != null) fileConfiguration.addDefault("eventStartCommands", eventStartCommands);
@@ -105,6 +107,7 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
 
     @Override
     public void processConfigFields() {
+        this.isEnabled = processBoolean("isEnabled", isEnabled);
         this.eventType = processEnum("eventType", eventType);
         if (eventType == CustomEvent.EventType.DEFAULT) {
             new WarningMessage("Failed to determine a valid event type for " + filename + " ! This event will not be registered.");
@@ -193,7 +196,8 @@ public class CustomEventsConfigFields extends CustomConfigFields implements Cust
         this.eventDuration = eventDuration;
     }
 
-    public double getEventEndTime() {
+    public double
+    getEventEndTime() {
         return eventEndTime;
     }
 

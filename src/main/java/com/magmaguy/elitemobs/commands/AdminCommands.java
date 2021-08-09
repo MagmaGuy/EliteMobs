@@ -10,6 +10,7 @@ import cloud.commandframework.types.tuples.Triplet;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.commands.admin.*;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
@@ -153,7 +154,7 @@ public class AdminCommands {
                         commandContext.get("eliteLevel"),
                         commandContext.get("powers"))));
 
-        ArrayList<String> customBosses = new ArrayList<>(CustomBossesConfigFields.customBossConfigFields.keySet());
+        ArrayList<String> customBosses = new ArrayList<>(CustomBossesConfig.getCustomBosses().keySet());
         ArrayList<String> regionalBosses = new ArrayList<>(CustomBossesConfigFields.regionalElites.keySet());
 
         // /em spawncustom <fileName>

@@ -25,8 +25,8 @@ public class ArmorGoblinBoss extends CustomBossesConfigFields {
         setOffHand(new ItemStack(Material.SHIELD));
         setBaby(true);
         setPowers(Arrays.asList("gold_explosion.yml", "gold_shotgun.yml", "spirit_walk.yml"));
-        setSpawnMessage("&cA Armor Goblin has been sighted!");
-        setDeathMessage("&aA Armor Goblin has been slain by $players!");
+        setSpawnMessage("&cAn Armor Goblin has been sighted!");
+        setDeathMessage("&aAn Armor Goblin has been slain by $players!");
         setDeathMessages(Arrays.asList(
                 "&e&l---------------------------------------------",
                 "&eThe Armor Goblin has been pillaged!",
@@ -35,7 +35,7 @@ public class ArmorGoblinBoss extends CustomBossesConfigFields {
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
                 "&e&l---------------------------------------------"));
-        setEscapeMessage("&4A Armor Goblin has escaped!");
+        setEscapeMessage("&4An Armor Goblin has escaped!");
         setLocationMessage("&cArmor Goblin: $distance blocks away!");
         setTrails(Collections.singletonList(Material.GOLD_NUGGET.toString()));
         setAnnouncementPriority(2);

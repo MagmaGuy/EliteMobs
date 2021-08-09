@@ -130,7 +130,7 @@ public abstract class CustomEvent {
         if (customEventsConfigFields.isEndEventWithBossDeath()) {
             AtomicBoolean allBossesAreDead = new AtomicBoolean(true);
             primaryEliteMobs.forEach((primaryEliteMob) -> {
-                if (!primaryEliteMob.isDead())
+                if (primaryEliteMob.exists())
                     allBossesAreDead.set(false);
             });
             if (allBossesAreDead.get()) {

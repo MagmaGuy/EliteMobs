@@ -15,8 +15,7 @@ public class ZombieKingsAxeConfig extends CustomItemsConfigFields {
                 Arrays.asList("The axe of the one Zombies", "call their king.", "The bloodlust is palpable."));
         setEnchantments(Arrays.asList("DAMAGE_ALL,10", "DAMAGE_UNDEAD,5", "DIG_SPEED,5", "DURABILITY,5", "KNOCKBACK,3",
                 "FIRE_ASPECT,4", "LOOT_BONUS_MOBS,5", "WATER_WORKER,5", "FLAMETHROWER,1"));
-        setPotionEffects(Arrays.asList("FAST_DIGGING,0,self,onHit", "POISON,0,target,onHit", "GLOWING,0,target,onHit",
-                "NIGHT_VISION,0,self,continuous", "WITHER,0,target,onHit"));
+        setPotionEffects(Arrays.asList("FAST_DIGGING,0,self,onHit", "NIGHT_VISION,0,self,continuous", "WITHER,0,target,onHit"));
         setItemType(CustomItem.ItemType.unique);
     }
 }

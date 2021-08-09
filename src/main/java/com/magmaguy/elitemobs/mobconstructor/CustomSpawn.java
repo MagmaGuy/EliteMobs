@@ -20,7 +20,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -178,13 +177,14 @@ public class CustomSpawn {
                     }
                 }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20 * 60);
             } else {
-                customBossEntities.forEach((customBossEntity ->{
+                customBossEntities.forEach((customBossEntity -> {
                     if (customBossEntity.summoningEntity != null)
                         customBossEntity.summoningEntity.removeReinforcement(customBossEntity);
                 }));
             }
         } else {
-            new InfoMessage("Spawned bosses for event after " + allTries + " tries");
+            if (isEvent)
+                new InfoMessage("Spawned bosses for event after " + allTries + " tries");
             spawn();
         }
 
@@ -211,7 +211,6 @@ public class CustomSpawn {
 
         //If there are no players online, don't spawn anything - this condition shouldn't be reachable in the first place
         if (Bukkit.getOnlinePlayers().size() == 0) {
-            new WarningMessage("Attempted to spawn Custom Boss " + customSpawnConfigFields.getFilename() + " despite no players being online - report this to the dev!");
             return null;
         }
 

@@ -20,6 +20,7 @@ import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
@@ -76,6 +77,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     protected boolean inCombat = false;
     protected boolean inCombatGracePeriod = false;
     protected EliteEntity summoningEntity;
+    protected List<CustomBossEntity> globalReinforcementEntities = new ArrayList<>();
     protected List<CustomBossEntity> eliteReinforcementEntities = new ArrayList<>();
     //currently used to store ender crystals for the dragon boss fight
     protected List<Entity> nonEliteReinforcementEntities = new ArrayList<>();
@@ -639,6 +641,10 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.summoningEntity = summoningEntity;
     }
 
+    public void addGlobalReinforcement(CustomBossEntity customBossEntity){
+        this.globalReinforcementEntities.add(customBossEntity);
+    }
+
     public void addReinforcement(CustomBossEntity customBossEntity) {
         this.eliteReinforcementEntities.add(customBossEntity);
     }
@@ -657,6 +663,11 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return livingEntity.isValid();
     }
 
+    public boolean exists(){
+        if (livingEntity == null) return false;
+        return !livingEntity.isDead();
+    }
+
     public void remove(RemovalReason removalReason) {
         //This prevents the entity tracker from running this code twice when removing due to specific reasaons
         if (unsyncedLivingEntity != null)
@@ -666,16 +677,12 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.livingEntity = null;
     }
 
-    public boolean isDead(){
-        return !isValid();
-    }
-
     public void removeReinforcement(CustomBossEntity customBossEntity){
         eliteReinforcementEntities.remove(customBossEntity);
     }
 
-    public int getReinforcementsCount(){
-        return this.eliteReinforcementEntities.size();
+    public int getGlobalReinforcementsCount(){
+        return this.globalReinforcementEntities.size();
     }
 
     /**
