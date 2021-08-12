@@ -46,6 +46,10 @@ public class FlamePyre extends BossPower implements Listener {
             @Override
             public void run() {
                 counter++;
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 spawnPhase1Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.SMOKE_NORMAL);
                 if (counter < 20 * 2) return;
                 cancel();
@@ -74,6 +78,10 @@ public class FlamePyre extends BossPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 counter++;
                 spawnPhase1Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
                 doDamage(eliteEntity, 0.5, 50, 0.5);
@@ -113,6 +121,10 @@ public class FlamePyre extends BossPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 counter++;
                 spawnPhase2Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
                 doDamage(eliteEntity, 3, 50, 3);
@@ -137,6 +149,10 @@ public class FlamePyre extends BossPower implements Listener {
 
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 counter++;
                 spawnPhase3Particle(eliteEntity.getLivingEntity().getLocation().clone(), Particle.FLAME);
                 doDamage(eliteEntity, 5, 50, 5);

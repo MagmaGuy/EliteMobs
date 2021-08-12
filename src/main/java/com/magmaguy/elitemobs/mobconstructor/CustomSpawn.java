@@ -53,16 +53,6 @@ public class CustomSpawn {
         });
     }
 
-    public CustomSpawn(String customSpawnConfig, String customBossesFilename) {
-        this.customSpawnConfigFields = CustomSpawnConfig.customSpawnConfig.getCustomEvent(customSpawnConfig);
-        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossesFilename);
-        if (customBossesConfigFields == null) {
-            new WarningMessage("Attempted to pass invalid boss into CustomSpawn: " + customBossesFilename);
-            return;
-        }
-        customBossEntities.add(new CustomBossEntity(customBossesConfigFields));
-    }
-
     public CustomSpawn(String customSpawnConfig, CustomBossEntity customBossEntity) {
         this.customSpawnConfigFields = CustomSpawnConfig.customSpawnConfig.getCustomEvent(customSpawnConfig);
         customBossEntities.add(customBossEntity);
@@ -209,8 +199,26 @@ public class CustomSpawn {
 
     public Location generateRandomSpawnLocation() {
 
+        if (customSpawnConfigFields == null) {
+            new WarningMessage("Something tried to spawn but has invalid custom spawn config fields! This isn't good.");
+            new WarningMessage("Bosses: ");
+            getCustomBossEntities().forEach((customBossEntity) -> {
+                if (customBossEntity != null)
+                    if (customBossEntity.getName() != null)
+                        new WarningMessage(customBossEntity.getCustomBossesConfigFields().getName());
+            });
+            if (timedEvent != null) {
+                new WarningMessage("Event: " + timedEvent.getCustomEventsConfigFields().getFilename());
+                timedEvent.end();
+            }
+            return null;
+        }
+
         //If there are no players online, don't spawn anything - this condition shouldn't be reachable in the first place
         if (Bukkit.getOnlinePlayers().size() == 0) {
+            keepTrying = false;
+            if (timedEvent != null)
+                timedEvent.end();
             return null;
         }
 
@@ -306,7 +314,7 @@ public class CustomSpawn {
         }
 
         //Light level check - following 1.18 rules
-        if (!customSpawnConfigFields.canSpawnInLight())
+        if (!customSpawnConfigFields.isCanSpawnInLight())
             if (location.getBlock().getLightLevel() > 8)
                 return null;
 

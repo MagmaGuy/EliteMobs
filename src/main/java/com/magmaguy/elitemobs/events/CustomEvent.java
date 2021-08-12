@@ -159,7 +159,6 @@ public abstract class CustomEvent {
         endModifiers();
     }
 
-
     //END
 
     /**

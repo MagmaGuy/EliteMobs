@@ -127,10 +127,6 @@ public class CustomConfig {
         customConfigFields.setFile(file);
         customConfigFields.setFileConfiguration(fileConfiguration);
 
-
-        //Generate config defaults
-        customConfigFields.generateConfigDefaults();
-
         //Parse actual fields and load into RAM to be used
         customConfigFields.processConfigFields();
 

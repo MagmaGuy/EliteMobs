@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.5-SNAPSHOT-12'
+version '7.3.5-SNAPSHOT-13'
 
 repositories {
     mavenCentral()
@@ -75,6 +75,13 @@ dependencies {
     //reflections - used for config initialization
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.12'
 
+    //lombok
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+
 }
 
 artifacts { // task 'build' runs generates uberjar
@@ -95,6 +102,7 @@ shadowJar {
         relocate('cloud.commandframework', packagePath + '.cloud')
         relocate('net.kyori', packagePath + '.adventure-platform-bukkit')
         relocate('io.leangen.geantyref', packagePath + '.geantyref')
+        //relocate('org.reflections', packagePath + '.reflections')
     }
     archiveClassifier.set(null)
     archiveFileName.set(project.name + ".jar")

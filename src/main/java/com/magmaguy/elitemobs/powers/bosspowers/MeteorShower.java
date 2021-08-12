@@ -30,7 +30,7 @@ public class MeteorShower extends BossPower implements Listener {
             @Override
             public void run() {
 
-                if (!eliteEntity.getLivingEntity().isValid()) {
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }
