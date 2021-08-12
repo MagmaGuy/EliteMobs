@@ -20,13 +20,13 @@ public class TimedEvent extends CustomEvent implements Listener {
     public static ArrayList<TimedEvent> blueprintEvents = new ArrayList<>();
     public static ArrayList<TimedEvent> timedEvents = new ArrayList<>();
     //stores the time of the last global trigger
-    public static double nextEventTrigger = System.currentTimeMillis() + 5 * 60 * 1000;
-    public double localCooldown;
-    public double nextLocalEventTrigger = 0;
-    public double globalCooldown;
-    public double weight;
-    public String filename;
-    public CustomSpawn customSpawn;
+    private static double nextEventTrigger = System.currentTimeMillis() + 5 * 60 * 1000;
+    private double localCooldown;
+    private double nextLocalEventTrigger = 0;
+    private double globalCooldown;
+    private double weight;
+    private String filename;
+    private CustomSpawn customSpawn;
 
     public TimedEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
@@ -113,14 +113,11 @@ public class TimedEvent extends CustomEvent implements Listener {
         boolean bossesAreValid = true;
         for (CustomBossEntity customBossEntity : primaryEliteMobs)
             if (!customBossEntity.exists()) {
-                bossesAreValid = false;
-                break;
+                new WarningMessage("Boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " for event " +
+                        getCustomEventsConfigFields().getFilename() + " wasn't considered to be valid");
+                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> customSpawn.queueSpawn(), 20);
+                return;
             }
-        if (!bossesAreValid) {
-            new WarningMessage("Boss wasn't considered to be valid");
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> customSpawn.queueSpawn(), 20);
-            return;
-        }
 
         start();
     }

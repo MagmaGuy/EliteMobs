@@ -116,8 +116,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         this.customBossesConfigFields = customBossesConfigFields;
         super.setDamageMultiplier(customBossesConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossesConfigFields.getHealthMultiplier());
-        super.setHasSpecialLoot(customBossesConfigFields.getDropsEliteMobsLoot());
-        super.setHasVanillaLoot(customBossesConfigFields.getDropsVanillaLoot());
+        super.setHasSpecialLoot(customBossesConfigFields.isDropsEliteMobsLoot());
+        super.setHasVanillaLoot(customBossesConfigFields.isDropsVanillaLoot());
         super.setLevel(customBossesConfigFields.getLevel());
         setPluginName();
         //set powers later as reinforcements aren't ready on the first tick, since all bosses need to be initialized
@@ -159,14 +159,21 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             return;
         }
 
-        //This is a bit dumb but -1 is reserved for dynamic levels
-        if (level == -1)
-            getDynamicLevel(spawnLocation);
-
         if (spawnLocation == null) {
             new WarningMessage("Boss " + customBossesConfigFields.getFilename() + " has a null location! This is probably due to an incorrectly configured regional location!");
             return;
         }
+
+        if (level == -1 && this instanceof RegionalBossEntity)
+            new WarningMessage("Boss " + getCustomBossesConfigFields().getFilename() + " is regional and has a dynamic level!" +
+                    " This is a terrible idea. Change this as soon as possible!");
+
+        //This is a bit dumb but -1 is reserved for dynamic levels
+        if (level == -1)
+            if (!(this instanceof RegionalBossEntity) || spawnLocation.getWorld() != null)
+                getDynamicLevel(spawnLocation);
+            else
+                level = 1;
 
         if (chunkLoad || ChunkLocationChecker.locationIsLoaded(spawnLocation)) {
             chunkLoad = false;
@@ -187,9 +194,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             //Prevent custom bosses from getting removed when far away, this is important for mounts and reinforcements in large arenas
             getLivingEntity().setRemoveWhenFarAway(false);
             if (this instanceof RegionalBossEntity) {
-                if (!spawnLocation.getBlock().isPassable())
-                    new WarningMessage("Warning: Location " + customBossesConfigFields.getFilename() + " for boss " +
-                            customBossesConfigFields.getFilename() + " seems to be inside of a solid block!");
+                //if (!spawnLocation.getBlock().isPassable())
+                    //new WarningMessage("Warning: Location " + customBossesConfigFields.getFilename() + " for boss " + customBossesConfigFields.getFilename() + " seems to be inside of a solid block!");
                 ((RegionalBossEntity) this).checkLeash();
                 getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
             }
@@ -331,7 +337,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (customBossTrail != null) customBossTrail.terminateTrails();
         if (livingEntityMount != null) livingEntityMount.remove();
         if (customBossMount != null) customBossMount.remove(RemovalReason.REINFORCEMENT_CULL);
-        if (customBossesConfigFields.getCullReinforcements()) cullReinforcements(false);
+        if (customBossesConfigFields.isCullReinforcements()) cullReinforcements(false);
 
         boolean bossInstanceEnd = removalReason.equals(RemovalReason.KILL_COMMAND) ||
                 removalReason.equals(RemovalReason.DEATH) ||
@@ -343,6 +349,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
         if (bossInstanceEnd) {
             if (escapeMechanism != null) Bukkit.getScheduler().cancelTask(escapeMechanism);
+            if (removalReason.equals(RemovalReason.BOSS_TIMEOUT))
+                CustomBossEscapeMechanism.doEscapeMessage(this);
             trackableCustomBosses.remove(this);
             if (simplePersistentEntity != null)
                 simplePersistentEntity.remove();
@@ -366,7 +374,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                 simplePersistentEntity = new SimplePersistentEntity(this, spawnLocation);
             }
 
-            if (customBossesConfigFields.getCullReinforcements()) cullReinforcements(true);
+            if (customBossesConfigFields.isCullReinforcements()) cullReinforcements(true);
 
         } else
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
@@ -410,7 +418,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         @EventHandler(ignoreCancelled = true)
         public void onExitCombat(EliteMobExitCombatEvent event) {
             if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
-            if (!((CustomBossEntity) event.getEliteMobEntity()).customBossesConfigFields.getCullReinforcements())
+            if (!((CustomBossEntity) event.getEliteMobEntity()).customBossesConfigFields.isCullReinforcements())
                 return;
             ((CustomBossEntity) event.getEliteMobEntity()).cullReinforcements(false);
         }

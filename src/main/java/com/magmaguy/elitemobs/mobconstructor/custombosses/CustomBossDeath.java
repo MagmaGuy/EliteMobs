@@ -27,7 +27,7 @@ public class CustomBossDeath implements Listener {
 
     public static void dropLoot(Player player, CustomBossEntity customBossEntity) {
         if (customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
-        for (CustomBossesConfigFields.UniqueLoot uniqueLoot : customBossEntity.customBossesConfigFields.getUniqueLootList())
+        for (CustomBossesConfigFields.UniqueLoot uniqueLoot : customBossEntity.customBossesConfigFields.getParsedUniqueLootList())
             if (ThreadLocalRandom.current().nextDouble() < uniqueLoot.chance)
                 CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.customItem.getFileName(), customBossEntity.getLivingEntity().getLocation());
     }
@@ -172,7 +172,7 @@ public class CustomBossDeath implements Listener {
             OnDeathCommands.parseConsoleCommand(customBossEntity.customBossesConfigFields.getOnDeathCommands(), event);
 
         //todo this should be set by the elite entity not the custom boss
-        if (!customBossEntity.customBossesConfigFields.getDropsVanillaLoot()) {
+        if (!customBossEntity.customBossesConfigFields.isDropsVanillaLoot()) {
             event.getEntityDeathEvent().setDroppedExp(0);
             for (ItemStack itemStack : event.getEntityDeathEvent().getDrops())
                 itemStack.setAmount(0);

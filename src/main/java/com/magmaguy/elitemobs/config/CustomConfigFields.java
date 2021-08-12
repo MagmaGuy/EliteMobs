@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class CustomConfigFields implements CustomConfigFieldsInterface {
@@ -65,25 +66,6 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
     }
 
     @Override
-    public void generateConfigDefaults() {
-
-    }
-
-    protected void addDefault(String path, Object value) {
-        if (value instanceof List) {
-            if (((List) value).size() > 0 && ((List) value).get(0) instanceof Enum) {
-                List<String> stringList = new ArrayList<>();
-                for (Object object : (List) value)
-                    stringList.add(object.toString());
-                fileConfiguration.addDefault(path, stringList);
-            }
-        } else if (value instanceof Enum)
-            fileConfiguration.addDefault(path, value.toString());
-        else
-            fileConfiguration.addDefault(path, value);
-    }
-
-    @Override
     public void processConfigFields() {
 
     }
@@ -92,20 +74,26 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         return fileConfiguration.contains(configKey);
     }
 
-    protected String processString(String path, String pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
+    protected String processString(String path, String value, String pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || !Objects.equals(value, pluginDefault))
+                fileConfiguration.addDefault(path, value);
+            return value;
+        }
         try {
             return ChatColorConverter.convert(fileConfiguration.getString(path));
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
     }
 
-    protected List<String> processStringList(String path, List<String> pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
+    protected List<String> processStringList(String path, List<String> value, List<String> pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || value != pluginDefault)
+                fileConfiguration.addDefault(path, value);
+            return value;
+        }
         try {
             List<String> list = new ArrayList<>();
             for (String string : fileConfiguration.getStringList(path))
@@ -114,7 +102,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
     }
 
     /**
@@ -125,11 +113,14 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
      * @param pluginDefault Default value - should be null or empty
      * @return Worlds from the list that are loaded at the time this runs, probably on startup
      */
-    protected List<World> processWorldList(String path, List<World> pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
+    protected List<World> processWorldList(String path, List<World> value, List<World> pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (value != null && (forceWriteDefault || value != pluginDefault))
+                processStringList(path, worldListToStringListConverter(value), worldListToStringListConverter(pluginDefault), forceWriteDefault);
+            return value;
+        }
         try {
-            List<String> validWorldStrings = processStringList(path, new ArrayList<>());
+            List<String> validWorldStrings = processStringList(path, worldListToStringListConverter(pluginDefault), worldListToStringListConverter(value), forceWriteDefault);
             List<World> validWorlds = new ArrayList<>();
             if (!validWorldStrings.isEmpty())
                 for (String string : validWorldStrings) {
@@ -141,87 +132,122 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
+    }
+
+    private List<String> worldListToStringListConverter(List<World> pluginDefault) {
+        if (pluginDefault == null) return null;
+        List<String> newList = new ArrayList<>();
+        pluginDefault.forEach((element) -> newList.add(element.getName()));
+        return newList;
     }
 
 
-    protected <T extends Enum> List<T> processEnumList(String path, List<T> pluginDefault, Class enumClass) {
-        if (!configHas(path))
-            return pluginDefault;
+    protected <T extends Enum> List<T> processEnumList(String path, List<T> value, List<T> pluginDefault, Class enumClass, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || value != pluginDefault)
+                processStringList(path, enumListToStringListConverter(pluginDefault), enumListToStringListConverter(value), forceWriteDefault);
+            return value;
+        }
         try {
             List<T> newList = new ArrayList<>();
-            List<String> stringList = processStringList(path, null);
-            for (String string : stringList)
-                newList.add((T) Enum.valueOf(enumClass, string));
+            List<String> stringList = processStringList(path, enumListToStringListConverter(pluginDefault), enumListToStringListConverter(value), forceWriteDefault);
+            stringList.forEach((string) -> newList.add((T) Enum.valueOf(enumClass, string)));
             return newList;
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
     }
 
-    protected int processInt(String path, int pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
+    private <T extends Enum> List<String> enumListToStringListConverter(List<T> pluginDefault) {
+        if (pluginDefault == null) return null;
+        List<String> newList = new ArrayList<>();
+        pluginDefault.forEach((element) -> newList.add(element.toString()));
+        return newList;
+    }
+
+    protected int processInt(String path, int value, int pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || value != pluginDefault) fileConfiguration.addDefault(path, value);
+            return value;
+        }
         try {
             return fileConfiguration.getInt(path);
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
     }
 
-    protected long processLong(String path, long pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
+    protected long processLong(String path, long value, long pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || value != pluginDefault) fileConfiguration.addDefault(path, value);
+            return value;
+        }
         try {
-            return fileConfiguration.getInt(path);
+            return fileConfiguration.getLong(path);
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
     }
 
 
-    protected double processDouble(String path, double pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
+    protected double processDouble(String path, double value, double pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || value != pluginDefault) fileConfiguration.addDefault(path, value);
+            return value;
+        }
         try {
             return fileConfiguration.getDouble(path);
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
     }
 
-    protected boolean processBoolean(String path, boolean pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
+    protected boolean processBoolean(String path, boolean value, boolean pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || value != pluginDefault) fileConfiguration.addDefault(path, value);
+            return value;
+        }
         try {
             return fileConfiguration.getBoolean(path);
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
     }
 
-    public <T extends Enum> T processEnum(String path, T pluginDefault) {
-        if (!configHas(path))
-            return pluginDefault;
+    public <T extends Enum> T processEnum(String path, T value, T pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || value != pluginDefault){
+                String valueString = null;
+                if (value != null)
+                    valueString = value.toString();
+                String pluginDefaultString = null;
+                if (pluginDefault != null)
+                    pluginDefaultString = pluginDefault.toString();
+                processString(path, valueString, pluginDefaultString, forceWriteDefault);}
+            return value;
+        }
         try {
-            return (T) Enum.valueOf(pluginDefault.getClass(), fileConfiguration.getString(path));
+            return (T) Enum.valueOf(value.getClass(), fileConfiguration.getString(path));
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return pluginDefault;
+        return value;
     }
 
-    public ItemStack processItemStack(String path, ItemStack pluginDefault) {
+    public ItemStack processItemStack(String path, ItemStack value, ItemStack pluginDefault, boolean forceWriteDefault) {
         if (!configHas(path)) {
-            return pluginDefault;
+            if (forceWriteDefault || value != pluginDefault)
+                processString(path, itemStackDeserializer(value), itemStackDeserializer(pluginDefault), forceWriteDefault);
+            return value;
         }
         try {
-            String materialString = processString(path, null);
+            String materialString = processString(path, itemStackDeserializer(value), itemStackDeserializer(pluginDefault), forceWriteDefault);
             if (materialString == null)
                 return null;
             if (materialString.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")) {
@@ -250,7 +276,12 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
         }
-        return null;
+        return value;
+    }
+
+    private String itemStackDeserializer(ItemStack itemStack) {
+        if (itemStack == null) return null;
+        return itemStack.getType().toString();
     }
 
 }

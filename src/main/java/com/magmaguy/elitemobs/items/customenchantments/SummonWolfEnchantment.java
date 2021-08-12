@@ -82,9 +82,10 @@ public class SummonWolfEnchantment extends CustomEnchantment {
             }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
             if (!(event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)))
                 return;
-            if (getEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta()) < 1)
-                return;
-            summonWolf(event.getPlayer(), event.getPlayer().getInventory().getItemInMainHand());
+            if (getEnchantment(event.getPlayer().getInventory().getItemInMainHand().getItemMeta()) > 0)
+                summonWolf(event.getPlayer(), event.getPlayer().getInventory().getItemInMainHand());
+            if (getEnchantment(event.getPlayer().getInventory().getItemInOffHand().getItemMeta()) > 0)
+                summonWolf(event.getPlayer(), event.getPlayer().getInventory().getItemInOffHand());
         }
     }
 

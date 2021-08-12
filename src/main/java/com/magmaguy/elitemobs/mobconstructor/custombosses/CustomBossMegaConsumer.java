@@ -87,7 +87,7 @@ public class CustomBossMegaConsumer {
 
     private void setBaby(LivingEntity livingEntity) {
         if (livingEntity instanceof Ageable)
-            if (customBossesConfigFields.getBaby())
+            if (customBossesConfigFields.isBaby())
                 ((Ageable) livingEntity).setBaby();
             else
                 ((Ageable) livingEntity).setAdult();
@@ -105,7 +105,7 @@ public class CustomBossMegaConsumer {
     }
 
     private void setFrozen(LivingEntity livingEntity) {
-        if (!customBossesConfigFields.getFrozen()) return;
+        if (!customBossesConfigFields.isFrozen()) return;
         livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10));
         livingEntity.setCollidable(false);
         livingEntity.setGravity(false);

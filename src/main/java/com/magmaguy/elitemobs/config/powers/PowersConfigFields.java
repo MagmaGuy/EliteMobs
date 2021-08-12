@@ -1,19 +1,27 @@
 package com.magmaguy.elitemobs.config.powers;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import org.bukkit.configuration.file.FileConfiguration;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.Map;
 
 public class PowersConfigFields extends CustomConfigFields {
 
+    @Getter
+    @Setter
     private String name;
+    @Getter
+    @Setter
     private String effect;
+    @Getter
+    @Setter
     private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
-
+    @Getter
+    @Setter
     private int powerCooldown = 0;
+    @Getter
+    @Setter
     private int globalCooldown = 0;
 
     public PowersConfigFields(String fileName,
@@ -39,54 +47,17 @@ public class PowersConfigFields extends CustomConfigFields {
     }
 
     public PowersConfigFields(String fileName,
-                              boolean isEnabled){
+                              boolean isEnabled) {
         super(fileName, isEnabled);
     }
 
     @Override
-    public void generateConfigDefaults() {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("name", name);
-        fileConfiguration.addDefault("effect", effect);
-        if (this.powerCooldown > 0)
-            fileConfiguration.addDefault("powerCooldown", powerCooldown);
-        if (this.globalCooldown > 0)
-            fileConfiguration.addDefault("globalCooldown", globalCooldown);
-        if (!additionalConfigOptions.isEmpty())
-            fileConfiguration.addDefaults(additionalConfigOptions);
-    }
-
-    @Override
     public void processConfigFields() {
-        this.isEnabled = processBoolean("isEnabled", isEnabled);
-        this.name = processString("name", name);
-        this.effect = processString("effect", effect);
-        this.powerCooldown = processInt("powerCooldown", powerCooldown);
-            this.globalCooldown = processInt("globalCooldown", globalCooldown);
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEffect() {
-        return effect;
-    }
-
-    public Map<String, Object> getAdditionalConfigOptions() {
-        return additionalConfigOptions;
-    }
-
-    public int getGlobalCooldown() {
-        return globalCooldown;
-    }
-
-    public int getPowerCooldown() {
-        return powerCooldown;
+        this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
+        this.name = processString("name", name, null, true);
+        this.effect = processString("effect", effect, null, false);
+        this.powerCooldown = processInt("powerCooldown", powerCooldown, 0, false);
+        this.globalCooldown = processInt("globalCooldown", globalCooldown, 0, false);
     }
 
 }
