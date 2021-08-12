@@ -38,7 +38,7 @@ public class Implosion extends MinorPower implements Listener {
                             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
                             if (eliteEntity != null && eliteEntity instanceof CustomBossEntity) {
                                 CustomBossEntity customBossEntity = (CustomBossEntity) eliteEntity;
-                                if (customBossEntity.getCustomBossesConfigFields().getFrozen())
+                                if (customBossEntity.getCustomBossesConfigFields().isFrozen())
                                     continue;
                             }
                             entity.setVelocity(event.getEntity().getLocation().clone().subtract(entity.getLocation()).toVector().multiply(0.5));

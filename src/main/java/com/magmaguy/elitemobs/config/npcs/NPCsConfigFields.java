@@ -4,25 +4,51 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Villager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NPCsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
+    @Getter
+    @Setter
     public String noPreviousLocationMessage;
-    private String name;
-    private String role;
+    @Getter
+    @Setter
+    private String name = "";
+    @Getter
+    @Setter
+    private String role = "";
+    @Getter
+    @Setter
     private Villager.Profession profession = Villager.Profession.NITWIT;
+    @Getter
     private String location;
-    private List<String> greetings;
-    private List<String> dialog;
-    private List<String> farewell;
-    private boolean canTalk;
-    private double activationRadius;
-    private NPCInteractions.NPCInteractionType interactionType;
-    private double timeout;
+    @Getter
+    @Setter
+    private List<String> greetings = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<String> dialog = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<String> farewell = new ArrayList<>();
+    @Getter
+    @Setter
+    private boolean canTalk = true;
+    @Getter
+    @Setter
+    private double activationRadius = 3;
+    @Getter
+    @Setter
+    private NPCInteractions.NPCInteractionType interactionType = NPCInteractions.NPCInteractionType.NONE;
+    @Getter
+    @Setter
+    private double timeout = 0;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -54,34 +80,6 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         super(filename, isEnabled);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public Villager.Profession getProfession() {
-        return profession;
-    }
-
-    public void setProfession(Villager.Profession profession) {
-        this.profession = profession;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
     public void setLocation(String location) {
         this.location = location;
         this.fileConfiguration.set("spawnLocation", location);
@@ -92,100 +90,21 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         }
     }
 
-    public List<String> getGreetings() {
-        return greetings;
-    }
-
-    public void setGreetings(List<String> greetings) {
-        this.greetings = greetings;
-    }
-
-    public List<String> getDialog() {
-        return dialog;
-    }
-
-    public void setDialog(List<String> dialog) {
-        this.dialog = dialog;
-    }
-
-    public List<String> getFarewell() {
-        return farewell;
-    }
-
-    public void setFarewell(List<String> farewell) {
-        this.farewell = farewell;
-    }
-
-    public boolean isCanTalk() {
-        return canTalk;
-    }
-
-    public void setCanTalk(boolean canTalk) {
-        this.canTalk = canTalk;
-    }
-
-    public double getActivationRadius() {
-        return activationRadius;
-    }
-
-    public void setActivationRadius(double activationRadius) {
-        this.activationRadius = activationRadius;
-    }
-
-    public NPCInteractions.NPCInteractionType getInteractionType() {
-        return interactionType;
-    }
-
-    public void setInteractionType(NPCInteractions.NPCInteractionType interactionType) {
-        this.interactionType = interactionType;
-    }
-
-    public double getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(double timeout) {
-        this.timeout = timeout;
-    }
-
-    public String getNoPreviousLocationMessage() {
-        return noPreviousLocationMessage;
-    }
-
-    public void setNoPreviousLocationMessage(String noPreviousLocationMessage) {
-        this.noPreviousLocationMessage = noPreviousLocationMessage;
-    }
-
-    @Override
-    public void generateConfigDefaults() {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("name", name);
-        fileConfiguration.addDefault("role", role);
-        fileConfiguration.addDefault("profession", profession.toString());
-        fileConfiguration.addDefault("spawnLocation", location);
-        fileConfiguration.addDefault("greetings", greetings);
-        fileConfiguration.addDefault("dialog", dialog);
-        fileConfiguration.addDefault("farewell", farewell);
-        fileConfiguration.addDefault("canTalk", canTalk);
-        fileConfiguration.addDefault("activationRadius", activationRadius);
-        fileConfiguration.addDefault("interactionType", interactionType.toString());
-    }
-
     @Override
     public void processConfigFields() {
-        this.isEnabled = processBoolean("isEnabled", isEnabled);
-        this.name = processString("name", name);
-        this.role = processString("role", role);
-        this.profession = processEnum("profession", profession);
-        this.location = processString("spawnLocation", location);
-        this.greetings = processStringList("greetings", greetings);
-        this.dialog = processStringList("dialog", dialog);
-        this.farewell = processStringList("farewell", farewell);
-        this.canTalk = processBoolean("canTalk", canTalk);
-        this.activationRadius = processDouble("activationRadius", activationRadius);
-        this.interactionType = processEnum("interactionType", interactionType);
-        this.timeout = processDouble("timeout", timeout);
-        this.noPreviousLocationMessage = processString("noPreviousLocationMessage", noPreviousLocationMessage);
+        this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
+        this.name = processString("name", name, "", true);
+        this.role = processString("role", role, "", true);
+        this.profession = processEnum("profession", profession, Villager.Profession.NITWIT, true);
+        this.location = processString("spawnLocation", location, null, true);
+        this.greetings = processStringList("greetings", greetings, new ArrayList<>(), true);
+        this.dialog = processStringList("dialog", dialog, new ArrayList<>(), true);
+        this.farewell = processStringList("farewell", farewell, new ArrayList<>(), true);
+        this.canTalk = processBoolean("canTalk", canTalk, true, true);
+        this.activationRadius = processDouble("activationRadius", activationRadius, 3, true);
+        this.interactionType = processEnum("interactionType", interactionType, NPCInteractions.NPCInteractionType.NONE, true);
+        this.timeout = processDouble("timeout", timeout, 0, false);
+        this.noPreviousLocationMessage = processString("noPreviousLocationMessage", noPreviousLocationMessage, "", false);
     }
 
     public void setEnabled(boolean enabled) {

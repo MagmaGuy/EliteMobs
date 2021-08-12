@@ -52,6 +52,10 @@ public class GroundPound extends MinorPower implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 eliteEntity.getLivingEntity().setVelocity(new Vector(0, 1.5, 0));
                 cloudParticle(eliteEntity.getLivingEntity().getLocation());
 

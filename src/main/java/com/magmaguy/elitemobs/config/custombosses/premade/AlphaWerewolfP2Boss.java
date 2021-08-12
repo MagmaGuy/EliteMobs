@@ -20,8 +20,8 @@ public class AlphaWerewolfP2Boss extends CustomBossesConfigFields {
         setHealthMultiplier(4);
         setDamageMultiplier(4);
         setPowers(Arrays.asList("attack_blinding.yml", "ground_pound.yml", "moonwalk.yml", "spirit_walk.yml",
-                "summonable:summonType=ON_HIT:filename=beta_wolf.yml:amount=5:chance=0.1",
-                "summonable:summonType=ON_HIT:filename=gamma_werewolf.yml:amount=1:chance=0.1",
+                "summonable:summonType=ON_HIT:filename=beta_wolf.yml:amount=5:chance=0.1:inheritAggro=true:spawnNearby=true",
+                "summonable:summonType=ON_HIT:filename=gamma_werewolf.yml:amount=1:chance=0.1:inheritAggro=true:spawnNearby=true",
                 "summonable:summonType=GLOBAL:filename=gamma_werewolf.yml:amount=1:customSpawn=normal_surface_spawn.yml",
                 "summonable:summonType=GLOBAL:filename=omega_wolf.yml:amount=5:customSpawn=normal_surface_spawn.yml"));
         setSpawnMessage("&cThe howls of an Alpha Werewolf are heard!");
