@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -73,8 +73,7 @@ public class TimedEvent extends CustomEvent implements Listener {
                         return;
                     }
             }
-            //}.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60, 20 * 60); todo: reenable for the live build
-        }.runTaskTimer(MetadataHandler.PLUGIN, 10, 10 * 60);
+            }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60);
     }
 
     /**
@@ -83,6 +82,7 @@ public class TimedEvent extends CustomEvent implements Listener {
      * on a delay.
      */
     public void instantiateEvent() {
+        new InfoMessage("Event " + getCustomEventsConfigFields().getFilename() + " has been queued!");
         TimedEvent timedEvent = new TimedEvent(customEventsConfigFields);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(timedEvent);
         if (customEventStartEvent.isCancelled()) return;
@@ -110,14 +110,18 @@ public class TimedEvent extends CustomEvent implements Listener {
         this.primaryEliteMobs = customSpawn.getCustomBossEntities();
         setEventStartLocation(customSpawn.getSpawnLocation());
 
-        boolean bossesAreValid = true;
         for (CustomBossEntity customBossEntity : primaryEliteMobs)
             if (!customBossEntity.exists()) {
-                new WarningMessage("Boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " for event " +
-                        getCustomEventsConfigFields().getFilename() + " wasn't considered to be valid");
-                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> customSpawn.queueSpawn(), 20);
+                new InfoMessage("Boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " for event " +
+                        getCustomEventsConfigFields().getFilename() + " wasn't considered to be valid. Trying spawn again later.");
+                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+                    customSpawn.setSpawnLocation(null);
+                    customSpawn.queueSpawn();
+                }, 20);
                 return;
             }
+
+        primaryEliteMobs.forEach(CustomBossEntity::announceSpawn);
 
         start();
     }

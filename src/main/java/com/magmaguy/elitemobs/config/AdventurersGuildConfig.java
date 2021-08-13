@@ -21,7 +21,6 @@ public class AdventurersGuildConfig {
     public static String[][] shortRankNames = new String[11][21];
     public static boolean guildLootLimiter;
     public static String lootLimiterMessage;
-    public static boolean alwaysUseNpcs;
     public static List<String> onRankUpCommand, onPrestigeUpCommand;
     public static double dodge1, dodge2, dodge3, crit1, crit2, crit3, health1, health2, health3, health4;
     public static String adventurersGuildMenuName;
@@ -42,7 +41,6 @@ public class AdventurersGuildConfig {
     public static void initializeConfig() {
         file = ConfigurationEngine.fileCreator("AdventurersGuild.yml");
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-
         addMaxHealth = ConfigurationEngine.setBoolean(fileConfiguration, "Add max health when unlocking higher guild ranks", true);
         addCrit = ConfigurationEngine.setBoolean(fileConfiguration, "Add critical chance when unlocking higher guild ranks", true);
         addDodge = ConfigurationEngine.setBoolean(fileConfiguration, "Add dodge chance when unlocking higher guild ranks", true);
@@ -50,7 +48,7 @@ public class AdventurersGuildConfig {
         guildWorldName = ConfigurationEngine.setString(fileConfiguration, "Adventurer's Guild world name v3", "em_adventurers_guild");
         guildLocationString = ConfigurationEngine.setString(fileConfiguration, "Guild world coordinates", "208.5,88,236.5,-80,0");
         guildWorldLocation = null;
-        agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "Teleport players to the adventurers guild using /ag", true);
+        agTeleport = ConfigurationEngine.setBoolean(fileConfiguration, "userCommandsTeleportToAdventurersGuild", true);
         adventurersGuildMenuName = ConfigurationEngine.setString(fileConfiguration, "adventurersGuildMenuName", "&6&lAdventurer's Hub");
 
         //iterate through all prestige tiers
@@ -310,7 +308,6 @@ public class AdventurersGuildConfig {
 
         guildLootLimiter = ConfigurationEngine.setBoolean(fileConfiguration, "limitLootBasedOnGuildTier", true);
         lootLimiterMessage = ConfigurationEngine.setString(fileConfiguration, "lootLimiterMessage", "&7[EM] &cYou must unlock the next guild rank through /ag to loot better items!");
-        alwaysUseNpcs = ConfigurationEngine.setBoolean(fileConfiguration, "alwaysUseNpcsWhenAvailable", true);
         onRankUpCommand = ConfigurationEngine.setList(fileConfiguration, "onRankUpCommand", Arrays.asList());
         onPrestigeUpCommand = ConfigurationEngine.setList(fileConfiguration, "onPrestigeUpCommand", Arrays.asList());
         dodge1 = ConfigurationEngine.setDouble(fileConfiguration, "dodgePrestige3Bonus", 3);

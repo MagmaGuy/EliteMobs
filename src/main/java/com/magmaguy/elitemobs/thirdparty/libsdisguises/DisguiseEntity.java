@@ -89,8 +89,7 @@ public class DisguiseEntity {
             disguise.startDisguise();
         } catch (Exception ex) {
             new WarningMessage("Failed to set custom disguise for boss " + customBossesConfigFields.getFilename() + " !");
-            new WarningMessage("Does the disguise exist?");
-            ex.printStackTrace();
+            new WarningMessage("Does the disguise exist? Is LibsDisguises up-to-date?");
         }
     }
 

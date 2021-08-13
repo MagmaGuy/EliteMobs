@@ -13,10 +13,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Container;
-import org.bukkit.block.Lectern;
+import org.bukkit.block.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -242,9 +239,14 @@ public class Explosion {
     }
 
     private static void queueBlock(ArrayList<BlockState> blockStates, BlockState blockState) {
+        if (!DefaultConfig.doRegenerateContainers && blockState instanceof Container)
+            return;
         blockStates.add(blockState.getBlock().getState());
         if (blockState instanceof Container)
-            ((Container) blockState).getInventory().setContents(new ItemStack[0]);
+            if (blockState instanceof Chest)
+                ((Chest) blockState).getBlockInventory().setContents(new ItemStack[0]);
+            else
+                ((Container) blockState).getInventory().setContents(new ItemStack[0]);
     }
 
     public void resetAllBlocks() {

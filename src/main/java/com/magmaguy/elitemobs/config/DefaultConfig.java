@@ -26,6 +26,7 @@ public class DefaultConfig {
     public static Location defaultSpawnLocation;
     public static boolean doExplosionRegen;
     public static boolean preventVanillaReinforcementsForEliteEntities;
+    public static boolean doRegenerateContainers;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -67,6 +68,7 @@ public class DefaultConfig {
         }
 
         doExplosionRegen = ConfigurationEngine.setBoolean(fileConfiguration, "doExplosionRegen", true);
+        doRegenerateContainers = ConfigurationEngine.setBoolean(fileConfiguration, "doRegenerateContainers", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

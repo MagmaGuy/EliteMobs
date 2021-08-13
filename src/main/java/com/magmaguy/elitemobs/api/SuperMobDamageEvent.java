@@ -7,7 +7,6 @@ import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 public class SuperMobDamageEvent extends Event implements Cancellable {
-    //todo: make canceleable
 
     private static final HandlerList handlers = new HandlerList();
     private final LivingEntity livingEntity;

@@ -32,7 +32,7 @@ public class ZoneWarner implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
 
-        if (!ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + event.getPlayer().getWorld().getName()))
+        if (!ValidWorldsConfig.zoneBasedWorlds.contains(event.getPlayer().getWorld().getName()))
             return;
 
         if (!playerLocations.containsKey(event.getPlayer())) {

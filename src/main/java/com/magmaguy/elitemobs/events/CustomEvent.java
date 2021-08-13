@@ -150,8 +150,11 @@ public abstract class CustomEvent {
      */
     public void end() {
         new InfoMessage("Event " + customEventsConfigFields.getFilename() + " ended!");
-        eventWatchdog.cancel();
-        primaryEliteMobs.forEach(eliteMobEntity -> eliteMobEntity.remove(RemovalReason.BOSS_TIMEOUT));
+        if (eventWatchdog != null)
+            eventWatchdog.cancel();
+        primaryEliteMobs.forEach(eliteMobEntity -> {
+            if (eliteMobEntity.exists()) eliteMobEntity.remove(RemovalReason.BOSS_TIMEOUT);
+        });
         if (this.endMessage != null)
             AnnouncementPriority.announce(this.endMessage, eventStartLocation.getWorld(), this.announcementPriority);
         if (this.endEventCommands != null)

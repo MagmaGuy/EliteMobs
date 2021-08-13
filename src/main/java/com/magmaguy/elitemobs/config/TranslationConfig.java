@@ -8,23 +8,12 @@ import org.bukkit.configuration.Configuration;
 public class TranslationConfig {
 
     /*
-    Translation for commands
-     */
-    public static final String MISSING_PERMISSION_TITLE = "Missing permission message title";
-    public static final String MISSING_PERMISSION_SUBTITLE = "Missing permission message subtitle";
-    public static final String MISSING_PERMISSION_MESSAGE = "Missing permission message";
-    public static final String VALID_COMMANDS = "Valid commands message";
-    public static final String INVALID_COMMAND = "Invalid command message";
-
-    /*
     Translation for the economy messages
      */
     public static final String ECONOMY_PAY_MESSAGE = "Economy pay message v2";
     public static final String ECONOMY_CURRENCY_LEFT_MESSAGE = "Economy currency left message";
     public static final String ECONOMY_PAYMENT_RECEIVED_MESSAGE = "Economy money from payment message";
-    public static final String ECONOMY_NEGATIVE_VALUE_MESSAGE = "Economy payment for negative value";
     public static final String ECONOMY_PAYMENT_INSUFICIENT_CURRENCY = "Economy payment insuficient currency";
-    public static final String ECONOMY_INVALID_PAY_COMMAND_SYNTAX = "Economy invalid pay command syntax";
     public static final String ECONOMY_WALLET_COMMAND = "Wallet command message";
     public static final String ECONOMY_TAX_MESSAGE = "Tax confirmation message";
 
@@ -45,8 +34,6 @@ public class TranslationConfig {
     public static final String TELEPORT_TIME_LEFT = "Teleport time left";
     public static final String TELEPORT_CANCELLED = "Teleport cancelled";
 
-    public static final String NPC_SLEEPING_MESSAGE = "npcSleepingMessage";
-
     public static final String NO_PENDING_COMMANDS = "noPendingCommands";
 
 
@@ -56,20 +43,11 @@ public class TranslationConfig {
 
     public void initializeConfig() {
 
-        //commands
-        configuration.addDefault(MISSING_PERMISSION_TITLE, "I'm afraid I can't let you do that, $username.");
-        configuration.addDefault(MISSING_PERMISSION_SUBTITLE, "You need the following permission: $permission");
-        configuration.addDefault(MISSING_PERMISSION_MESSAGE, "[EliteMobs] You may not run this command.");
-        configuration.addDefault(VALID_COMMANDS, "Valid commands:");
-        configuration.addDefault(INVALID_COMMAND, "Command not recognized. Valid commands:");
-
         //economy commands
         configuration.addDefault(ECONOMY_PAY_MESSAGE, "&2You have paid &2$amount_sent $currency_name &2to $receiver&2, who got $amount_received after taxes!");
         configuration.addDefault(ECONOMY_CURRENCY_LEFT_MESSAGE, "You now have &2$amount_left $currency_name");
         configuration.addDefault(ECONOMY_PAYMENT_RECEIVED_MESSAGE, "You have received &2$amount_received $currency_name &ffrom $sender");
-        configuration.addDefault(ECONOMY_NEGATIVE_VALUE_MESSAGE, "&cNice try. This plugin doesn't make the same mistake as some banks have in the past.");
         configuration.addDefault(ECONOMY_PAYMENT_INSUFICIENT_CURRENCY, "&cYou don't have enough $currency_name to do that!");
-        configuration.addDefault(ECONOMY_INVALID_PAY_COMMAND_SYNTAX, "&cInput not valid. Command format: &e/em pay [playerName] [amount]");
         configuration.addDefault(ECONOMY_WALLET_COMMAND, "You have &2$balance $currency_name");
         configuration.addDefault(ECONOMY_TAX_MESSAGE, "&cSending a payment will cost $percentage% in taxes. &aDo &9$command &ato proceed!");
 
@@ -84,8 +62,6 @@ public class TranslationConfig {
 
         configuration.addDefault(TELEPORT_TIME_LEFT, "&7[EM] Teleporting in &a$time &7seconds...");
         configuration.addDefault(TELEPORT_CANCELLED, "&7[EM] &cTeleport interrupted!");
-
-        configuration.addDefault(NPC_SLEEPING_MESSAGE, "&7<Sleeping>");
 
         configuration.addDefault(NO_PENDING_COMMANDS, "&cYou don't currently have any pending commands!");
 

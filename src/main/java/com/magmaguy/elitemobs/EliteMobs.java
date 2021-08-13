@@ -108,9 +108,9 @@ public class EliteMobs extends JavaPlugin {
         for (World world : Bukkit.getWorlds())
             if (ValidWorldsConfig.fileConfiguration.getBoolean("Valid worlds." + world.getName())) {
                 validWorldList.add(world);
-                if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + world.getName()))
+                if (ValidWorldsConfig.zoneBasedWorlds.contains(world.getName()))
                     zoneBasedSpawningWorlds.add(world);
-                if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + world.getName())) {
+                if (ValidWorldsConfig.nightmareWorlds.contains(world.getName())) {
                     nightmareWorlds.add(world);
                     DaylightWatchdog.preventDaylight(world);
                 }

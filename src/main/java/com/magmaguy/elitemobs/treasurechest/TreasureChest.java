@@ -268,7 +268,6 @@ public class TreasureChest {
     }
 
     public void startEffects() {
-        //todo: this is not good
         for (String string : this.effects) {
             try {
                 Particle particle = Particle.valueOf(string);
