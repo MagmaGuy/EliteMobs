@@ -14,7 +14,6 @@ import java.util.HashSet;
 
 public abstract class MajorCombatEnterScanningPower extends MajorPower implements Listener {
 
-    //todo: check if instancing elite powers will cause this value to keep growing or if it will stop it from registering new powers
     public static HashSet<MajorCombatEnterScanningPower> majorCombatEnterScanningPowers = new HashSet<>();
     public BukkitTask bukkitTask = null;
     private boolean isActive = false;

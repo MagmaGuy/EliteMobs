@@ -368,7 +368,6 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void applyPowers(HashSet<ElitePower> elitePowers, int availablePowerAmount) {
-        //TODO: this may not be amazingly efficient
         for (Iterator<ElitePower> elitePowerIterator = elitePowers.iterator(); elitePowerIterator.hasNext(); ) {
             ElitePower elitePower = elitePowerIterator.next();
             if (!PowersConfig.getPower(elitePower.getFileName()).isEnabled())

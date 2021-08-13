@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class Minidungeon {
 
@@ -332,11 +333,12 @@ public class Minidungeon {
 
     public void quantifyWorldBosses() {
         if (!isInstalled) return;
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-            if (regionalBossEntity.getLocation().getWorld() == world) {
+        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet()) {
+            if (Objects.equals(regionalBossEntity.getWorldName(), world.getName())) {
                 regionalBossCount++;
                 quantificationFilter(regionalBossEntity.getCustomBossesConfigFields());
             }
+        }
     }
 
     private void quantificationFilter(CustomBossesConfigFields customBossesConfigFields) {

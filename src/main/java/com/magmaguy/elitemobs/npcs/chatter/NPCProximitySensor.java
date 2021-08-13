@@ -54,7 +54,6 @@ public class NPCProximitySensor implements Listener {
 
     }
 
-    //todo: optimize
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         if (event.getView().getTitle().length() > 0)

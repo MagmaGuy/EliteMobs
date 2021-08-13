@@ -82,7 +82,6 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new ElitePlayerInventory.ElitePlayerInventoryEvents(), plugin);
         pluginManager.registerEvents(new PlayerStatsTracker(), plugin);
 
-        //Load passive mobs TODO: find generic alternative to this
         pluginManager.registerEvents(new ChickenHandler(), plugin);
         pluginManager.registerEvents(new CowHandler(), plugin);
         pluginManager.registerEvents(new MushroomCowHandler(), plugin);
@@ -259,7 +258,6 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PreventMountExploit(), plugin);
         pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
         pluginManager.registerEvents(new PreventLargeDarkroomExploit(), plugin);
-        //TODO: THIS IS BROKEN DUE TO SUMMONING POWERS pluginManager.registerEvents(new PreventDensityExploit(), plugin);
         pluginManager.registerEvents(new PreventTowerExploit(), plugin);
         pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
         if (AntiExploitConfig.noItemPickup)

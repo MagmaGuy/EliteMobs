@@ -13,10 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class CustomBossesConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
@@ -372,6 +369,17 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
             this.chance = chance;
             this.customItem = customItem;
         }
+    }
+
+    protected List<String> majorBossDeathString(String slainLine){
+        return Arrays.asList(
+                "&e&l---------------------------------------------",
+                "&4" + slainLine,
+                "&c&l    1st Damager: $damager1name &cwith $damager1damage damage!",
+                "&6&l    2nd Damager: $damager2name &6with $damager2damage damage!",
+                "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
+                "&aSlayers: $players",
+                "&e&l---------------------------------------------");
     }
 
 }

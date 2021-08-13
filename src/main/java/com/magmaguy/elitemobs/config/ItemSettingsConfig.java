@@ -20,7 +20,6 @@ public class ItemSettingsConfig {
     public static int maxLevelForDefaultLootMultiplier;
     public static int maximumLootTier;
     public static boolean useEliteEnchantments;
-    public static boolean doRareDropsEffect;
     public static String eliteEnchantLoreString;
     public static boolean useHoesAsWeapons;
     public static boolean enableRareItemParticleEffects;
@@ -73,7 +72,6 @@ public class ItemSettingsConfig {
         defaultExperienceMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "defaultExperienceMultiplier", 1);
         maximumLootTier = ConfigurationEngine.setInt(fileConfiguration, "maximumLootTiers", 200);
         useEliteEnchantments = ConfigurationEngine.setBoolean(fileConfiguration, "useEliteEnchantments", true);
-        doRareDropsEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doRareDropsEffect", true);
         eliteEnchantLoreString = ChatColorConverter.convert(ConfigurationEngine.setString(fileConfiguration, "eliteEnchantmentLoreStrings", "Elite"));
         useHoesAsWeapons = ConfigurationEngine.setBoolean(fileConfiguration, "useHoesAsWeapons", false);
         enableRareItemParticleEffects = ConfigurationEngine.setBoolean(fileConfiguration, "enableRareItemParticleEffects", true);

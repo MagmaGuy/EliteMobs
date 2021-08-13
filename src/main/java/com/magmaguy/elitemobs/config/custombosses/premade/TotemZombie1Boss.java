@@ -12,7 +12,7 @@ public class TotemZombie1Boss extends CustomBossesConfigFields {
         super("totem_zombie_1", EntityType.ZOMBIE, true, "$eventBossLevel Head Zombie", "dynamic");
         setPersistent(true);
         setMountedEntity("totem_zombie_2.yml");
-        setPowers(Arrays.asList("skeleton_tracking_arrow.yml", "tracking_fireball.yml", "hyper_loot.yml"));
+        setPowers(Arrays.asList("skeleton_tracking_arrow.yml", "attack_fireball.yml", "hyper_loot.yml"));
         setCullReinforcements(false);
         setFollowDistance(100);
         setHelmet(new ItemStack(Material.NETHERITE_HELMET));
@@ -24,14 +24,7 @@ public class TotemZombie1Boss extends CustomBossesConfigFields {
         setHealthMultiplier(2);
         setSpawnMessage("&cA Dr. Craftenmine abomination has been sighted!");
         setDeathMessage("&aDr. Craftenmine's abomination been terminated by $players!");
-        setDeathMessages(Arrays.asList(
-                "&e&l---------------------------------------------",
-                "&4The Zombie Totem been slain!",
-                "&c&l    1st Damager: $damager1name &cwith $damager1damage damage!",
-                "&6&l    2nd Damager: $damager2name &6with $damager2damage damage!",
-                "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
-                "&aSlayers: $players",
-                "&e&l---------------------------------------------"));
+        setDeathMessages(majorBossDeathString("The Zombie Totem been slain!"));
         setEscapeMessage("&4Dr. Craftenmine's creation has escaped!");
         setLocationMessage("&cZombie Totem: $distance blocks away!");
         setAnnouncementPriority(2);
