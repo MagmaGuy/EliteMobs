@@ -124,13 +124,13 @@ public class NaturalMobSpawnEventHandler implements Listener {
         double huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
         validChance += huntingGearChanceAdder;
 
-        if (ValidWorldsConfig.fileConfiguration.getBoolean("Nightmare mode worlds." + event.getEntity().getWorld().getName()))
+        if (ValidWorldsConfig.nightmareWorlds.contains(event.getEntity().getWorld().getName()))
             validChance += DefaultConfig.nightmareWorldSpawnBonus;
 
         if (!(ThreadLocalRandom.current().nextDouble() < validChance))
             return;
 
-        if (ValidWorldsConfig.fileConfiguration.getBoolean("Zone-based elitemob spawning worlds." + livingEntity.getWorld().getName())) {
+        if (ValidWorldsConfig.zoneBasedWorlds.contains(livingEntity.getWorld().getName())) {
             int eliteMobLevel = (int) (Grid.getMobTierFromLocation(livingEntity.getLocation()));
             EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
             if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))

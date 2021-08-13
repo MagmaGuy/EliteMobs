@@ -202,10 +202,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         } else
             persistentLocation = spawnLocation;
 
-        if (!silent) {
+        if (!silent)
             announceSpawn();
-            startEscapeMechanismDelay();
-        }
 
         if (summoningEntity != null)
             summoningEntity.addReinforcement(this);
@@ -240,9 +238,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                     false);
     }
 
-    private void announceSpawn() {
+    public void announceSpawn() {
         setTracking();
         spawnMessage();
+        startEscapeMechanismDelay();
     }
 
     private void setTracking() {
@@ -266,7 +265,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossesConfigFields.getSpawnMessage()));
     }
 
-    //todo: review this code, is it still good?
     public void getDynamicLevel(Location bossLocation) {
         int bossLevel = 1;
         for (Entity entity : bossLocation.getWorld().getNearbyEntities(bossLocation, Math.max(Bukkit.getViewDistance() * 16, 5 * 16), 256, Bukkit.getViewDistance() * 16))

@@ -29,13 +29,11 @@ public class PlayerQuests implements Serializable {
         }
         if (getData(player).quests != null) {
             getData(player).quests.add(eliteQuest);
-            //todo check if this modifies it or is a deep copy
         } else {
             ArrayList<EliteQuest> quests = new ArrayList<>();
             quests.add(eliteQuest);
             getData(player).quests = quests;
         }
-        //todo: updateDatabase(player, getData(player));
     }
 
     public static void removeQuest(Player player, UUID uuid) {

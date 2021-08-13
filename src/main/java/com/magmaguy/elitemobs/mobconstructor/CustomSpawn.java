@@ -13,6 +13,8 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,17 +26,26 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomSpawn {
 
     private final CustomSpawnConfigFields customSpawnConfigFields;
+    @Getter
     private final ArrayList<CustomBossEntity> customBossEntities = new ArrayList<>();
-    public boolean isEvent = false;
-    public World world;
-    TimedEvent timedEvent;
+    @Getter
+    @Setter
+    private boolean isEvent = false;
+    @Getter
+    @Setter
+    private World world;
+    private TimedEvent timedEvent;
     private int allTries = 0;
+    @Getter
+    @Setter
     private Location spawnLocation;
+    @Setter
     private boolean keepTrying = true;
 
     /**
@@ -43,7 +54,7 @@ public class CustomSpawn {
     public CustomSpawn(String customSpawnConfig, List<String> customBossesFilenames, TimedEvent timedEvent) {
         this.customSpawnConfigFields = CustomSpawnConfig.customSpawnConfig.getCustomEvent(customSpawnConfig);
         this.timedEvent = timedEvent;
-        customBossesFilenames.stream().forEach(bossString -> {
+        customBossesFilenames.forEach(bossString -> {
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossString);
             if (customBossesConfigFields == null) {
                 new WarningMessage("Attempted to pass invalid boss into CustomSpawn: " + bossString);
@@ -79,30 +90,6 @@ public class CustomSpawn {
         return -100;
     }
 
-    public World getWorld() {
-        return world;
-    }
-
-    public void setWorld(World world) {
-        this.world = world;
-    }
-
-    public boolean isKeepTrying() {
-        return keepTrying;
-    }
-
-    public void setKeepTrying(boolean keepTrying) {
-        this.keepTrying = keepTrying;
-    }
-
-    public CustomSpawnConfigFields getCustomSpawnConfigFields() {
-        return customSpawnConfigFields;
-    }
-
-    public ArrayList<CustomBossEntity> getCustomBossEntities() {
-        return customBossEntities;
-    }
-
     public void queueSpawn() {
         //Make sure a location exists
         if (spawnLocation == null)
@@ -125,7 +112,7 @@ public class CustomSpawn {
 
                 if (!keepTrying) cancel();
 
-                if (spawnLocation.getWorld().getTime() < customSpawnConfigFields.getEarliestTime() ||
+                if (Objects.requireNonNull(spawnLocation.getWorld()).getTime() < customSpawnConfigFields.getEarliestTime() ||
                         spawnLocation.getWorld().getTime() > customSpawnConfigFields.getLatestTime())
                     return;
 
@@ -134,7 +121,7 @@ public class CustomSpawn {
                         return;
 
                 for (CustomBossEntity customBossEntity : customBossEntities)
-                    customBossEntity.spawn(spawnLocation, false);
+                    customBossEntity.spawn(spawnLocation, isEvent);
 
                 if (timedEvent != null)
                     timedEvent.queueEvent();
@@ -149,12 +136,13 @@ public class CustomSpawn {
         int maxTries = 100;
         int tries = 0;
         while (tries < maxTries && spawnLocation == null) {
+            if (!keepTrying)
+                return;
             tries++;
             allTries++;
             this.spawnLocation = generateRandomSpawnLocation();
-            if (spawnLocation != null) {
+            if (spawnLocation != null)
                 break;
-            }
         }
 
         if (spawnLocation == null) {
@@ -163,7 +151,7 @@ public class CustomSpawn {
                     @Override
                     public void run() {
                         generateCustomSpawn();
-                        new InfoMessage("Failed to spawn " + timedEvent.getCustomEventsConfigFields().getFilename() + " after " + allTries + " tries. Will try again in 1 minute.");
+                        //new InfoMessage("Failed to spawn " + timedEvent.getCustomEventsConfigFields().getFilename() + " after " + allTries + " tries. Will try again in 1 minute.");
                     }
                 }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20 * 60);
             } else {
@@ -177,28 +165,9 @@ public class CustomSpawn {
                 new InfoMessage("Spawned bosses for event after " + allTries + " tries");
             spawn();
         }
-
-    }
-
-    public Location getSpawnLocation() {
-        return spawnLocation;
-    }
-
-    public CustomSpawn setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
-        return this;
-    }
-
-    public boolean isEvent() {
-        return isEvent;
-    }
-
-    public void setEvent(boolean event) {
-        isEvent = event;
     }
 
     public Location generateRandomSpawnLocation() {
-
         if (customSpawnConfigFields == null) {
             new WarningMessage("Something tried to spawn but has invalid custom spawn config fields! This isn't good.");
             new WarningMessage("Bosses: ");
@@ -231,7 +200,7 @@ public class CustomSpawn {
                     if (!customSpawnConfigFields.getValidWorlds().contains(playerLocation.getWorld()))
                         continue;
                 if (!customSpawnConfigFields.getValidWorldTypes().isEmpty())
-                    if (!customSpawnConfigFields.getValidWorldTypes().contains(playerLocation.getWorld().getEnvironment()))
+                    if (!customSpawnConfigFields.getValidWorldTypes().contains(Objects.requireNonNull(playerLocation.getWorld()).getEnvironment()))
                         continue;
                 validPlayers.add(player);
             }
@@ -245,7 +214,7 @@ public class CustomSpawn {
         //Select a random player
         Player selectedPlayer = validPlayers.get(ThreadLocalRandom.current().nextInt(validPlayers.size()));
 
-        //Randomize vector between 24 to 128 block away from a source location
+        //Randomize vector between 24 and 128 block away from a source location
         Vector randomizedVector = new Vector(ThreadLocalRandom.current().nextInt(24, 128),
                 0, //this doesn't really matter, it likely gets modified later
                 ThreadLocalRandom.current().nextInt(24, 128));
@@ -268,10 +237,10 @@ public class CustomSpawn {
         //Set Y level - Location isn't final yet
         if (customSpawnConfigFields.isSurfaceSpawn())
             //this won't work for Nether environments, but who wants surface spawns on the Nether?
-            location = location.getWorld().getHighestBlockAt(location).getLocation().add(new Vector(0.5, 1, 0.5));
+            location = Objects.requireNonNull(location.getWorld()).getHighestBlockAt(location).getLocation().add(new Vector(0.5, 1, 0.5));
         else if (customSpawnConfigFields.isUndergroundSpawn()) {
             //Let's hope there's caves
-            if (location.getY() > location.getWorld().getHighestBlockAt(location).getY()) {
+            if (location.getY() > Objects.requireNonNull(location.getWorld()).getHighestBlockAt(location).getY()) {
                 for (int y = (int) location.getY(); y > -64; y--) {
                     Location tempLocation = location.clone();
                     tempLocation.setY(y);
@@ -279,9 +248,9 @@ public class CustomSpawn {
                     if (y < customSpawnConfigFields.getLowestYLevel()) return null;
                     Block groundBlock = location.clone().subtract(new Vector(0, 1, 0)).getBlock();
                     if (!groundBlock.getType().isSolid()) continue;
-                    //Check templocation block
+                    //Check temp location block
                     if (!tempLocation.getBlock().getType().isAir()) continue;
-                    //Check block above templocation
+                    //Check block above temp location
                     if (!tempLocation.add(new Vector(0, 1, 0)).getBlock().getType().isAir()) continue;
                     location = tempLocation;
                     break;
@@ -292,6 +261,7 @@ public class CustomSpawn {
             location.setY(getHighestValidBlock(location, getHighestValidBlock(location, customSpawnConfigFields.getHighestYLevel())));
 
         //Prevent spawning right on top of players
+        assert world != null;
         for (Player player : world.getPlayers())
             if (player.getLocation().distanceSquared(location) < Math.pow(24, 2))
                 return null;
@@ -319,7 +289,6 @@ public class CustomSpawn {
                 return null;
 
         return location;
-
     }
 
 }

@@ -14,8 +14,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class GuildRank {
 
-    //todo: redo documentation here
-
     public static void setGuildPrestigeRank(Player player, int prestigeRank) {
         PlayerData.setGuildPrestigeLevel(player.getUniqueId(), prestigeRank);
         ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);

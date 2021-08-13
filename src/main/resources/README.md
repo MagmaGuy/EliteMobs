@@ -44,7 +44,7 @@ Used for listening to events which trigger an antiexploit **check** - doesn't ne
 Used for listening to moments when a player damages an Elite. Uses:
 
 - Same as Bukkit's EntityDamagedByEntity event but for players damaging elites specifically
-- ***Important:*** can't be cancelled as it only fires after applying the damage //todo: fix this
+- ***Important:*** can't be cancelled as it only fires after applying the damage
 
 ### EliteMobDamagedEvent:
 Used for listening to moments when an elite is damaged in general. Uses:

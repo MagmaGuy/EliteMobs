@@ -24,7 +24,6 @@ import java.util.List;
 
 public class RegionalBossEntity extends CustomBossEntity implements SimplePersistentEntityInterface {
 
-    private static final HashSet<RegionalBossEntity> regionalBosses = new HashSet();
     private static final ArrayListMultimap<CustomBossesConfigFields, RegionalBossEntity> regionalBossesFromConfigFields = ArrayListMultimap.create();
     private final double leashRadius;
     //Format: worldName,x,y,z,pitch,yaw:unixTimeForRespawn
@@ -102,8 +101,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         return null;
     }
 
-    public static HashSet<RegionalBossEntity> getRegionalBossEntitySet() {
-        return regionalBosses;
+    public static List<RegionalBossEntity> getRegionalBossEntitySet() {
+        return  new ArrayList<>(regionalBossesFromConfigFields.values());
     }
 
     @Nullable
@@ -163,8 +162,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         RegionalBossEntity regionalBossEntity = this;
         leashTask = Bukkit.getScheduler().runTaskTimerAsynchronously(MetadataHandler.PLUGIN, () -> {
             try {
-                if (getLivingEntity() == null ||
-                        !getLivingEntity().isValid()) {
+                if (!isValid() || getLivingEntity() == null) {
                     leashTask.cancel();
                     return;
                 }
@@ -195,12 +193,9 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             leashTask.cancel();
 
         super.remove(removalReason);
-        if (customBossesConfigFields.isReinforcement()) {
-            regionalBosses.remove(this);
-        }
+
         switch (removalReason) {
             case REMOVE_COMMAND:
-                regionalBosses.remove(this);
                 regionalBossesFromConfigFields.remove(customBossesConfigFields, this);
                 getCustomBossesConfigFields().setFilesOutOfSync(true);
                 break;
