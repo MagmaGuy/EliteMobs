@@ -5,17 +5,18 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PhaseBossEntity {
 
     private final CustomBossEntity customBossEntity;
-    private ArrayList<BossPhase> bossPhases = new ArrayList();
+    private List<BossPhase> bossPhases = new ArrayList();
     private BossPhase currentPhase = null;
 
     public PhaseBossEntity(CustomBossEntity customBossEntity) {
@@ -41,19 +42,20 @@ public class PhaseBossEntity {
     }
 
     private void switchPhase(BossPhase bossPhase, RemovalReason removalReason, double healthPercentage) {
-        EntityTracker.unregister(customBossEntity.getLivingEntity(), RemovalReason.PHASE_BOSS_PHASE_END);
+        //EntityTracker.unregister(customBossEntity.getLivingEntity(), removalReason);
+        customBossEntity.remove(removalReason);
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossPhase.customBossesConfigFields);
         if (customBossesConfigFields == null) {
             new WarningMessage("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields + " was not valid! The boss will not be able to switch phases until it is fixed.");
             return;
         }
         customBossEntity.setCustomBossesConfigFields(customBossesConfigFields);
-        if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET))
-            customBossEntity.spawn(customBossEntity.getSpawnLocation(), true);
-        else {
-            Location previousSpawnLocation = customBossEntity.getSpawnLocation().clone();
-            customBossEntity.spawn(customBossEntity.getLocation(), true);
-            customBossEntity.setSpawnLocation(previousSpawnLocation);
+        if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
+            customBossEntity.spawn(true);
+        } else {
+            customBossEntity.setPhaseSwitchTempSpawnLocation(customBossEntity.getLocation());
+            customBossEntity.spawn(true);
+            customBossEntity.setPhaseSwitchTempSpawnLocation(null);
         }
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
         currentPhase = bossPhase;
@@ -66,7 +68,7 @@ public class PhaseBossEntity {
 
     public void deathReset() {
         currentPhase = bossPhases.get(0);
-        customBossEntity.setCustomBossesConfigFields(customBossEntity.getCustomBossesConfigFields());
+        customBossEntity.setCustomBossesConfigFields(CustomBossesConfig.getCustomBoss(currentPhase.customBossesConfigFields));
     }
 
     public void checkPhaseBossSwitch() {

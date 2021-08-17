@@ -63,6 +63,11 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
             @Override
             public void run() {
 
+                if (!eliteEntity.isValid()) {
+                    cancel();
+                    return;
+                }
+
                 if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
                     ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
 
@@ -76,7 +81,7 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
                 if (counter % 2 == 0) {
                     doTornadoParticles();
                     doTerrainDestruction(eliteEntity);
-                    doEntityDisplacement();
+                    doEntityDisplacement(eliteEntity.getLivingEntity());
                 }
 
                 if (counter > 20 * 6) {
@@ -116,9 +121,10 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
         Explosion.generateFakeExplosion(blockList, eliteEntity.getLivingEntity(), this, tornadoEye.clone());
     }
 
-    private void doEntityDisplacement() {
+    private void doEntityDisplacement(LivingEntity sourceEntity) {
         for (Entity entity : tornadoEye.getWorld().getNearbyEntities(tornadoEye, 7, 21, 7))
             if (entity instanceof LivingEntity) {
+                if (entity.equals(sourceEntity)) continue;
                 Vector vector = entity.getLocation().clone().subtract(tornadoEye).toVector().rotateAroundY(0.5 * Math.PI)
                         .toLocation(entity.getWorld()).subtract(entity.getLocation().clone().subtract(tornadoEye).toVector()).toVector().normalize().multiply(0.5);
                 vector.setY(0.5);

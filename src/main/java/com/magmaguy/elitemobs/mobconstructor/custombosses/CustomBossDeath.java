@@ -21,7 +21,7 @@ public class CustomBossDeath implements Listener {
 
     private static void doLoot(CustomBossEntity customBossEntity) {
         for (Player player : customBossEntity.getDamagers().keySet())
-            if (!customBossEntity.getTriggeredAntiExploit())
+            if (!customBossEntity.isTriggeredAntiExploit())
                 dropLoot(player, customBossEntity);
     }
 
@@ -29,7 +29,7 @@ public class CustomBossDeath implements Listener {
         if (customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
         for (CustomBossesConfigFields.UniqueLoot uniqueLoot : customBossEntity.customBossesConfigFields.getParsedUniqueLootList())
             if (ThreadLocalRandom.current().nextDouble() < uniqueLoot.chance)
-                CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.customItem.getFileName(), customBossEntity.getLivingEntity().getLocation());
+                CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.customItem.getFileName(), customBossEntity.getLocation());
     }
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {

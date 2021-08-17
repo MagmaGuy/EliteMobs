@@ -9,7 +9,7 @@ public class BinderOfWorldsPhase3GhastReinforcementConfig extends CustomBossesCo
                 EntityType.GHAST,
                 true,
                 "$reinforcementLevel &5Reality Shredder",
-                "250");
+                "200");
         setDropsVanillaLoot(false);
         setDropsEliteMobsLoot(false);
         setTimeout(2);

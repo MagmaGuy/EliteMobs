@@ -41,7 +41,7 @@ public class VisualItemProcessor {
 
         new BukkitRunnable() {
 
-            final boolean isObfuscated = eliteEntity.getHasVisualEffectObfuscated();
+            final boolean isObfuscated = eliteEntity.isVisualEffectObfuscated();
             int counter = 0;
 
             @Override
@@ -87,19 +87,19 @@ public class VisualItemProcessor {
                 /*
                 Check if the effect has ceased being obfuscated
                  */
-                if (isObfuscated != eliteEntity.getHasVisualEffectObfuscated()) {
+                if (isObfuscated != eliteEntity.isVisualEffectObfuscated()) {
                     VisualItemRemover.removeItems(multiDimensionalTrailTracker);
                     cancel();
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            eliteEntity.setHasVisualEffectObfuscated(false);
+                            eliteEntity.setVisualEffectObfuscated(false);
                             if (Arrays.deepEquals(cachedVectorPositions, MinorPowerStanceMath.cachedVectors)) {
-                                eliteEntity.setHasMinorVisualEffect(false);
+                                eliteEntity.setMinorVisualEffect(false);
                                 new MinorPowerPowerStance(eliteEntity);
                             }
                             if (Arrays.deepEquals(cachedVectorPositions, MajorPowerStanceMath.cachedVectors)) {
-                                eliteEntity.setHasMajorVisualEffect(false);
+                                eliteEntity.setMajorVisualEffect(false);
                                 new MajorPowerPowerStance(eliteEntity);
                             }
                         }

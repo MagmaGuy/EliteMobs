@@ -33,8 +33,8 @@ public class MinorPowerPowerStance implements Listener {
             return;
 
         this.eliteEntity = eliteEntity;
-        if (eliteEntity.hasMinorVisualEffect()) return;
-        eliteEntity.setHasMinorVisualEffect(true);
+        if (eliteEntity.isMinorVisualEffect()) return;
+        eliteEntity.setMinorVisualEffect(true);
 
         if (eliteEntity.getMinorPowerCount() < 1)
             return;
@@ -43,7 +43,7 @@ public class MinorPowerPowerStance implements Listener {
         Obfuscate powers to prevent TPS loss
          */
         if (MobCombatSettingsConfig.obfuscateMobPowers)
-            if (eliteEntity.getHasVisualEffectObfuscated()) {
+            if (eliteEntity.isVisualEffectObfuscated()) {
                 Object[][] multiDimensionalTrailTracker = new Object[trackAmount][individualEffectsPerTrack];
 
                 for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
@@ -57,7 +57,7 @@ public class MinorPowerPowerStance implements Listener {
                 }
 
                 VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                        MinorPowerStanceMath.cachedVectors, eliteEntity.hasMinorVisualEffect(),
+                        MinorPowerStanceMath.cachedVectors, eliteEntity.isMinorVisualEffect(),
                         MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
                 return;
@@ -75,7 +75,7 @@ public class MinorPowerPowerStance implements Listener {
         }
 
         VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                MinorPowerStanceMath.cachedVectors, eliteEntity.hasMinorVisualEffect(),
+                MinorPowerStanceMath.cachedVectors, eliteEntity.isMinorVisualEffect(),
                 MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
     }
@@ -88,7 +88,7 @@ public class MinorPowerPowerStance implements Listener {
 
         ArrayList<Object> effects = new ArrayList<>();
 
-        for (ElitePower elitePower : eliteEntity.getPowers())
+        for (ElitePower elitePower : eliteEntity.getElitePowers())
             if (elitePower instanceof MinorPower)
                 if (eliteEntity.getPower(elitePower).getTrail() != null)
                     effects.add(effectParser(eliteEntity.getPower(elitePower).getTrail()));

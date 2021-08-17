@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.Round;
@@ -189,6 +190,9 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
         @EventHandler(ignoreCancelled = true)
         public void onEliteMobAttack(EntityDamageByEntityEvent event) {
+            if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON) &&
+                    ((EnderDragon) event.getEntity()).getPhase().equals(EnderDragon.Phase.DYING))
+                return;
             LivingEntity livingEntity = EntityFinder.filterRangedDamagers(event.getDamager());
             if (livingEntity == null) return;
             if (!livingEntity.getType().equals(EntityType.PLAYER)) return;
@@ -210,7 +214,8 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                         strike.customDamage);
                 damage = strike.damage;
             } else if ((event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) ||
-                    event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK)) &&
+                    event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) ||
+                    event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)) &&
                     EliteMobsItemDetector.isEliteMobsItem(player.getInventory().getItemInMainHand())) {
                 Strike strike = getDamage(player, eliteEntity, event);
                 eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity,
@@ -231,7 +236,6 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                 damage = event.getFinalDamage();
             }
 
-
             damage = Round.twoDecimalPlaces(damage);
 
             new EventCaller(eliteMobDamagedByPlayerEvent);
@@ -245,6 +249,20 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             for (EntityDamageEvent.DamageModifier modifier : EntityDamageEvent.DamageModifier.values())
                 if (event.isApplicable(modifier))
                     event.setDamage(modifier, 0);
+
+            damage = ((LivingEntity) event.getEntity()).getHealth() - damage < 0 ? ((LivingEntity) event.getEntity()).getHealth() : damage;
+
+            if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
+                if (eliteEntity.getLivingEntity().getHealth() - damage < 1) {
+                    if (eliteEntity.isDying())
+                        return;
+                    damage -= 1;
+                    ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.DYING);
+                    eliteEntity.setDying(true);
+                    //remove the dragon after it is done with the light show, this death doesn't show up on events
+                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> new EventCaller(new EliteMobDeathEvent(eliteEntity)), 200);
+                }
+            }
 
             event.setDamage(damage);
             eliteEntity.syncPluginHealth(((LivingEntity) event.getEntity()).getHealth());

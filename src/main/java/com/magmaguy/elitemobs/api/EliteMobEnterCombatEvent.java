@@ -27,7 +27,7 @@ public class EliteMobEnterCombatEvent extends Event {
     public EliteMobEnterCombatEvent(EliteEntity eliteEntity, Player targetEntity) {
         this.targetEntity = targetEntity;
         this.eliteEntity = eliteEntity;
-        eliteEntity.setIsInCombat(true);
+        eliteEntity.setInCombat(true);
         if (!DefaultConfig.alwaysShowNametags)
             eliteEntity.setNameVisible(true);
         if (eliteEntity instanceof CustomBossEntity)

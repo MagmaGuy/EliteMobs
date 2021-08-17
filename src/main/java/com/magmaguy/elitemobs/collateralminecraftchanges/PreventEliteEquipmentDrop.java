@@ -12,6 +12,7 @@ public class PreventEliteEquipmentDrop implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEliteDeath(EliteMobDeathEvent event) {
+        if (event.getEntityDeathEvent() == null) return;
         if (!(event.getEntity() instanceof Mob)) return;
         if (((Mob) event.getEntity()).getEquipment().getArmorContents() == null) return;
         for (ItemStack drop : event.getEntityDeathEvent().getDrops())

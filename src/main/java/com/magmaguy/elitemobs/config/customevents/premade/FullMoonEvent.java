@@ -10,8 +10,8 @@ public class FullMoonEvent extends CustomEventsConfigFields {
         super("full_moon", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("alpha_werewolf_p1.yml"));
-        setLocalCooldown(60D);
-        setGlobalCooldown(15D);
+        setLocalCooldown(240D);
+        setGlobalCooldown(25D);
         setWeight(50D);
         setCustomSpawn("full_moon_spawn.yml");
         setEventDuration(60D);

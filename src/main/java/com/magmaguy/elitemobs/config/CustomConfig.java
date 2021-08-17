@@ -59,26 +59,7 @@ public class CustomConfig {
 
         //Runs if the directory exists
         //Check if all the defaults exist
-        for (File file : (new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + folderName)).listFiles()) {
-            try {
-                boolean isPremade = false;
-                for (Object object : customConfigFieldsArrayList) {
-                    Method getFilename = CustomConfigFields.class.getDeclaredMethod("getFilename");
-                    if (file.getName().equalsIgnoreCase((String) getFilename.invoke(object))) {
-                        customConfigFieldsArrayList.remove(object);
-                        initialize((CustomConfigFields) object);
-                        isPremade = true;
-                        break;
-                    }
-                }
-                if (!isPremade)
-                    initialize(file);
-            } catch (Exception ex) {
-                new WarningMessage("Failed to read plugin files for " + folderName + " ! This is very bad, warn the developer!");
-                ex.printStackTrace();
-                return;
-            }
-        }
+        directoryCrawler(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + folderName);
 
         try {
             //Generate missing default config files, might've been deleted or might have been added in newer version
@@ -90,6 +71,36 @@ public class CustomConfig {
             return;
         }
 
+    }
+
+    private void directoryCrawler(String path){
+        for (File file : (new File(path)).listFiles()) {
+            if (file.isFile())
+                fileInitializer(file);
+            else if (file.isDirectory())
+                directoryCrawler(file.getPath());
+        }
+    }
+
+    private void fileInitializer(File file){
+        try {
+            boolean isPremade = false;
+            for (Object object : customConfigFieldsArrayList) {
+                Method getFilename = CustomConfigFields.class.getDeclaredMethod("getFilename");
+                if (file.getName().equalsIgnoreCase((String) getFilename.invoke(object))) {
+                    customConfigFieldsArrayList.remove(object);
+                    initialize((CustomConfigFields) object);
+                    isPremade = true;
+                    break;
+                }
+            }
+            if (!isPremade)
+                initialize(file);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to read plugin files for " + folderName + " ! This is very bad, warn the developer!");
+            ex.printStackTrace();
+            return;
+        }
     }
 
     public HashMap<String, ? extends CustomConfigFields> getCustomConfigFieldsHashMap() {

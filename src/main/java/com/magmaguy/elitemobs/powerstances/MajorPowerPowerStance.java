@@ -33,8 +33,8 @@ public class MajorPowerPowerStance implements Listener {
 
         this.eliteEntity = eliteEntity;
 
-        if (eliteEntity.hasMajorVisualEffect()) return;
-        eliteEntity.setHasMajorVisualEffect(true);
+        if (eliteEntity.isMajorVisualEffect()) return;
+        eliteEntity.setMajorVisualEffect(true);
 
         if (eliteEntity.getMajorPowerCount() < 1)
             return;
@@ -43,7 +43,7 @@ public class MajorPowerPowerStance implements Listener {
         Obfuscate powers to prevent TPS loss
          */
         if (MobCombatSettingsConfig.obfuscateMobPowers)
-            if (eliteEntity.getHasVisualEffectObfuscated()) {
+            if (eliteEntity.isVisualEffectObfuscated()) {
                 Object[][] multiDimensionalTrailTracker = new Object[trackAmount][individualEffectsPerTrack];
 
                 for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
@@ -57,7 +57,7 @@ public class MajorPowerPowerStance implements Listener {
                 }
 
                 VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                        MajorPowerStanceMath.cachedVectors, eliteEntity.hasMajorVisualEffect(),
+                        MajorPowerStanceMath.cachedVectors, eliteEntity.isMajorVisualEffect(),
                         MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
                 return;
@@ -75,7 +75,7 @@ public class MajorPowerPowerStance implements Listener {
         }
 
         VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
-                MajorPowerStanceMath.cachedVectors, eliteEntity.hasMajorVisualEffect(),
+                MajorPowerStanceMath.cachedVectors, eliteEntity.isMajorVisualEffect(),
                 MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
     }
@@ -88,7 +88,7 @@ public class MajorPowerPowerStance implements Listener {
 
         ArrayList<Object> effects = new ArrayList<>();
 
-        for (ElitePower elitePower : eliteEntity.getPowers())
+        for (ElitePower elitePower : eliteEntity.getElitePowers())
             if (elitePower instanceof MajorPower)
                 if (eliteEntity.getPower(elitePower).getTrail() != null)
                     effects.add(effectParser(eliteEntity.getPower(elitePower).getTrail()));

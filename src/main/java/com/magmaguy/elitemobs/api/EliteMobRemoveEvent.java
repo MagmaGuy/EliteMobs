@@ -24,7 +24,8 @@ public class EliteMobRemoveEvent extends Event {
         this.entity = eliteEntity.getUnsyncedLivingEntity();
         this.eliteEntity = eliteEntity;
         this.removalReason = removalReason;
-        EntityTracker.unregister(eliteEntity.getUnsyncedLivingEntity().getUniqueId(), removalReason);
+        if (eliteEntity.getUnsyncedLivingEntity() != null)
+            EntityTracker.unregister(eliteEntity.getUnsyncedLivingEntity().getUniqueId(), removalReason);
     }
 
     public static HandlerList getHandlerList() {

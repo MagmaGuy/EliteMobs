@@ -10,9 +10,10 @@ public class BeastMasterEvent extends CustomEventsConfigFields {
         super("beast_master", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("beast_master.yml"));
-        setLocalCooldown(60D);
-        setGlobalCooldown(15D);
+        setLocalCooldown(120D);
+        setGlobalCooldown(25D);
         setWeight(80);
         setCustomSpawn("normal_surface_spawn.yml");
+        setEventDuration(30);
     }
 }

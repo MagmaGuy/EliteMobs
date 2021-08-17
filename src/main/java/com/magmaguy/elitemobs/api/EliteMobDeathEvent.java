@@ -16,13 +16,25 @@ public class EliteMobDeathEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
     private final EliteEntity eliteEntity;
-    private final EntityDeathEvent entityDeathEvent;
+    private EntityDeathEvent entityDeathEvent = null;
 
     public EliteMobDeathEvent(EliteEntity eliteEntity, EntityDeathEvent entityDeathEvent) {
         this.entity = eliteEntity.getUnsyncedLivingEntity();
         this.eliteEntity = eliteEntity;
         this.entityDeathEvent = entityDeathEvent;
+        new EventCaller(new EliteMobRemoveEvent(eliteEntity, RemovalReason.DEATH));
     }
+
+    /**
+     * This is necessary for End Dragons currently, as
+     * @param eliteEntity
+     */
+    public EliteMobDeathEvent(EliteEntity eliteEntity) {
+        this.entity = eliteEntity.getUnsyncedLivingEntity();
+        this.eliteEntity = eliteEntity;
+        new EventCaller(new EliteMobRemoveEvent(eliteEntity, RemovalReason.DEATH));
+    }
+
 
     public static HandlerList getHandlerList() {
         return handlers;
@@ -51,9 +63,6 @@ public class EliteMobDeathEvent extends Event {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteEntity == null) return;
             new EventCaller(new EliteMobDeathEvent(eliteEntity, event));
-            new EventCaller(new EliteMobRemoveEvent(eliteEntity, RemovalReason.DEATH));
-            if (eliteEntity.getUnsyncedLivingEntity() == null) return;
-            EntityTracker.unregister(eliteEntity.getUnsyncedLivingEntity().getUniqueId(), RemovalReason.DEATH);
         }
     }
 

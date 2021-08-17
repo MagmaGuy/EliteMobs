@@ -10,11 +10,11 @@ public class ZombieTotemEvent extends CustomEventsConfigFields {
         super("zombie_totem", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("totem_zombie_1.yml"));
-        setLocalCooldown(60D);
-        setGlobalCooldown(15D);
+        setLocalCooldown(120D);
+        setGlobalCooldown(25D);
         setWeight(100D);
         setCustomSpawn("normal_surface_spawn.yml");
-        setEventDuration(60);
+        setEventDuration(30);
     }
 
 }

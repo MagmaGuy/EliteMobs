@@ -143,7 +143,6 @@ public class CustomBossBossBar {
                 ", " + (int) customBossEntity.getLocation().getZ();
         BossBar bossBar = Bukkit.createBossBar(bossBarMessage(player, locationString), BarColor.GREEN, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 
-
         if (customBossEntity.getHealth() / customBossEntity.getMaxHealth() > 1 || customBossEntity.getHealth() / customBossEntity.getMaxHealth() < 0) {
             new WarningMessage("The following boss had more health than it should: " + customBossEntity.getName());
             new WarningMessage("This is a problem usually caused by running more than one plugin that modifies mob health!" +

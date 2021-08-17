@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
@@ -14,9 +13,7 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -29,8 +26,8 @@ public class CustomBossMegaConsumer {
     private final HashSet<ElitePower> powers;
     private final int level;
     private final boolean bypassesWorldGuardSpawn;
-    CustomBossEntity customBossEntity;
     private final Location spawnLocation;
+    CustomBossEntity customBossEntity;
 
     /**
      * The objective of this class is to set as many fields as possible as a consumer for spawning a Custom Boss.
@@ -42,8 +39,8 @@ public class CustomBossMegaConsumer {
     public CustomBossMegaConsumer(CustomBossEntity customBossEntity) {
         this.customBossesConfigFields = customBossEntity.getCustomBossesConfigFields();
         this.customBossEntity = customBossEntity;
-        this.spawnLocation = customBossEntity.getSpawnLocation();
-        this.powers = customBossEntity.getPowers();
+        this.spawnLocation = customBossEntity.getPhaseSwitchTempSpawnLocation() == null ? customBossEntity.getSpawnLocation() : customBossEntity.getPhaseSwitchTempSpawnLocation();
+        this.powers = customBossEntity.getElitePowers();
         this.level = customBossEntity.getLevel();
         this.bypassesWorldGuardSpawn = customBossEntity.getBypassesProtections();
     }
@@ -80,6 +77,10 @@ public class CustomBossMegaConsumer {
                     setName((LivingEntity) entity);
                     setFollowRange((LivingEntity) entity);
                     customBossEntity.setLivingEntity((LivingEntity) entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                    if ((entity).getType().equals(EntityType.ENDER_DRAGON)) {
+                        ((EnderDragon) entity).setPhase(EnderDragon.Phase.CIRCLING);
+                        ((EnderDragon) entity).getDragonBattle().generateEndPortal(false);
+                    }
                 });
 
         return livingEntity;

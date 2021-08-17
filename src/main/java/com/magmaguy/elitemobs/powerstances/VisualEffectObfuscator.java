@@ -17,7 +17,7 @@ public class VisualEffectObfuscator implements Listener {
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
         if (eliteEntity == null) return;
 
-        eliteEntity.setHasVisualEffectObfuscated(false);
+        eliteEntity.setVisualEffectObfuscated(false);
     }
 
     @EventHandler
@@ -26,7 +26,7 @@ public class VisualEffectObfuscator implements Listener {
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
         if (eliteEntity == null) return;
 
-        eliteEntity.setHasVisualEffectObfuscated(false);
+        eliteEntity.setVisualEffectObfuscated(false);
     }
 
 }
