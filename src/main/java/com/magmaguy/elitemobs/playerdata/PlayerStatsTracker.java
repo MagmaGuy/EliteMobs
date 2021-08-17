@@ -14,7 +14,7 @@ public class PlayerStatsTracker implements Listener {
 
     @EventHandler
     public void onEliteDeath(EliteMobDeathEvent event) {
-        if (event.getEliteEntity().getTriggeredAntiExploit()) return;
+        if (event.getEliteEntity().isTriggeredAntiExploit()) return;
         if (event.getEliteEntity().getDamagers().isEmpty()) return;
         //todo : optimize
         for (Player player : event.getEliteEntity().getDamagers().keySet()) {

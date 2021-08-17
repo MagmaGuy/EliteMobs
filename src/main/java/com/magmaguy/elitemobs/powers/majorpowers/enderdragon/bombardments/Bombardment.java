@@ -78,7 +78,8 @@ public abstract class Bombardment extends MajorPower implements Listener {
     public void deactivate() {
         firing = false;
         isActive = false;
-        task.cancel();
+        if (task != null)
+            task.cancel();
     }
 
     private boolean stopCondition(EliteEntity eliteEntity) {

@@ -20,9 +20,10 @@ import com.magmaguy.elitemobs.powers.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -44,6 +45,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     The reason they are split up in the first place is to add them in a certain ratio
     Once added, they can just be stored in a pool
      */
+    @Getter
     protected HashSet<ElitePower> elitePowers = new HashSet<>();
     //coming soon - decoupling aggro from damage to allow for tanking mechanics
     protected HashMap<Player, Double> aggro = new HashMap<>();
@@ -53,29 +55,59 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     protected LivingEntity livingEntity;
     //LivingEntity gets removed as soon as it dies, unsyncedLivingEntity only ever overwrites when a new living entity is created.
     protected LivingEntity unsyncedLivingEntity;
+    @Getter
+    @Setter
     protected int level;
+    @Getter
     protected double maxHealth;
+    @Getter
     protected String name;
+    @Getter
     protected int minorPowerCount = 0;
+    @Getter
     protected int majorPowerCount = 0;
-    protected boolean hasMinorVisualEffect = false;
-    protected boolean hasMajorVisualEffect = false;
-    protected boolean hasVisualEffectObfuscated = true;
+    @Getter
+    @Setter
+    protected boolean minorVisualEffect = false;
+    @Getter
+    @Setter
+    protected boolean majorVisualEffect = false;
+    @Getter
+    @Setter
+    protected boolean visualEffectObfuscated = true;
+    @Getter
     protected boolean isNaturalEntity;
     protected EntityType entityType;
+    @Getter
     protected Boolean isPersistent = false;
-    protected boolean hasVanillaLoot = true;
-    protected boolean hasEliteLoot = true;
+    @Getter
+    @Setter
+    protected boolean vanillaLoot = true;
+    @Getter
+    protected boolean eliteLoot = true;
+    @Getter
     protected CreatureSpawnEvent.SpawnReason spawnReason;
+    @Getter
+    @Setter
     protected double healthMultiplier = 1.0;
+    @Getter
+    @Setter
     protected double damageMultiplier = 1.0;
     protected double defaultMaxHealth;
+    @Getter
+    @Setter
     protected boolean isCooldown = false;
+    @Getter
     protected boolean triggeredAntiExploit = false;
     protected int antiExploitPoints = 0;
+    @Getter
     protected boolean inAntiExploitCooldown = false;
+    @Getter
+    @Setter
     protected boolean inCombat = false;
+    @Getter
     protected boolean inCombatGracePeriod = false;
+    @Setter
     protected EliteEntity summoningEntity;
     protected List<CustomBossEntity> globalReinforcementEntities = new ArrayList<>();
     protected List<CustomBossEntity> eliteReinforcementEntities = new ArrayList<>();
@@ -83,6 +115,9 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     protected List<Entity> nonEliteReinforcementEntities = new ArrayList<>();
     protected boolean bypassesProtections = false;
     private double health;
+    @Getter
+    @Setter
+    private boolean dying = false;
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern
@@ -205,6 +240,8 @@ public class EliteEntity implements SimplePersistentEntityInterface {
             wolf.setBreed(false);
         }
 
+        if (entityType.equals(EntityType.ENDER_DRAGON))
+            ((EnderDragon) livingEntity).getBossBar().setTitle(getName());
 
         if (!VersionChecker.serverVersionOlderThan(15, 0))
             if (livingEntity instanceof Bee)
@@ -219,17 +256,12 @@ public class EliteEntity implements SimplePersistentEntityInterface {
 
         setMaxHealth();
 
+        if (getName() == null)
+            setName(EliteMobProperties.getPluginData(entityType));
+
         this.name = livingEntity.getCustomName();
 
         EntityTracker.registerEliteMob(this);
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int eliteLevel) {
-        this.level = eliteLevel;
     }
 
     public void setNameVisible(boolean isVisible) {
@@ -414,34 +446,18 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return false;
     }
 
-    public int getMinorPowerCount() {
-        return this.minorPowerCount;
-    }
-
-    public int getMajorPowerCount() {
-        return this.majorPowerCount;
-    }
-
-    public HashSet<ElitePower> getPowers() {
-        return elitePowers;
-    }
-
     public ElitePower getPower(ElitePower elitePower) {
-        for (ElitePower iteratedPower : getPowers())
+        for (ElitePower iteratedPower : getElitePowers())
             if (iteratedPower.getClass().equals(elitePower.getClass()))
                 return iteratedPower;
         return null;
     }
 
     public ElitePower getPower(String elitePower) {
-        for (ElitePower iteratedPower : getPowers())
+        for (ElitePower iteratedPower : getElitePowers())
             if (iteratedPower.getFileName().equals(elitePower))
                 return iteratedPower;
         return null;
-    }
-
-    public double getMaxHealth() {
-        return maxHealth;
     }
 
     private void setMaxHealth(double healthMultiplier) {
@@ -453,11 +469,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         this.health = maxHealth;
     }
 
-    public String getName() {
-        return this.name;
-    }
-
-    private void setName(EliteMobProperties eliteMobProperties) {
+    public void setName(EliteMobProperties eliteMobProperties) {
         this.name = ChatColorConverter.convert(
                 eliteMobProperties.getName().replace(
                         "$level", level + ""));
@@ -472,80 +484,16 @@ public class EliteEntity implements SimplePersistentEntityInterface {
             livingEntity.setCustomName(name);
     }
 
-    public boolean hasMinorVisualEffect() {
-        return this.hasMinorVisualEffect;
-    }
-
-    public void setHasMinorVisualEffect(boolean bool) {
-        this.hasMinorVisualEffect = bool;
-    }
-
-    public boolean hasMajorVisualEffect() {
-        return this.hasMajorVisualEffect;
-    }
-
-    public void setHasMajorVisualEffect(boolean bool) {
-        this.hasMajorVisualEffect = bool;
-    }
-
-    public boolean isNaturalEntity() {
-        return this.isNaturalEntity;
-    }
-
-    public boolean getPersistent() {
-        return this.isPersistent;
-    }
-
     public void setPersistent(boolean bool) {
         this.isPersistent = bool;
         if (livingEntity != null)
             livingEntity.setRemoveWhenFarAway(!isPersistent);
     }
 
-    public boolean getHasSpecialLoot() {
-        return this.hasEliteLoot;
-    }
-
     public void setHasSpecialLoot(boolean bool) {
         this.isNaturalEntity = bool;
-        this.hasEliteLoot = bool;
-        this.hasVanillaLoot = bool;
-    }
-
-    public boolean getHasVisualEffectObfuscated() {
-        return this.hasVisualEffectObfuscated;
-    }
-
-    public void setHasVisualEffectObfuscated(boolean bool) {
-        this.hasVisualEffectObfuscated = bool;
-    }
-
-    public CreatureSpawnEvent.SpawnReason getSpawnReason() {
-        return this.spawnReason;
-    }
-
-    public void setHealthMultiplier(double healthMultiplier) {
-        this.healthMultiplier = healthMultiplier;
-    }
-
-    public double getDamageMultiplier() {
-        return this.damageMultiplier;
-    }
-
-    public void setDamageMultiplier(double damageMultiplier) {
-        this.damageMultiplier = damageMultiplier;
-    }
-
-    public double getDefaultMaxHealth() {
-        return this.defaultMaxHealth;
-    }
-
-    public boolean isCooldown() {
-        return this.isCooldown;
-    }
-
-    private void setCooldown(boolean isCooldown) {
-        this.isCooldown = isCooldown;
+        this.eliteLoot = bool;
+        this.vanillaLoot = bool;
     }
 
     public void doCooldown() {
@@ -568,23 +516,11 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }
 
-    public boolean hasVanillaLoot() {
-        return this.hasVanillaLoot;
-    }
-
-    public void setHasVanillaLoot(boolean hasVanillaLoot) {
-        this.hasVanillaLoot = hasVanillaLoot;
-    }
-
-    public boolean getTriggeredAntiExploit() {
-        return this.triggeredAntiExploit;
-    }
-
     public void setTriggeredAntiExploit(boolean triggeredAntiExploit) {
         this.triggeredAntiExploit = triggeredAntiExploit;
         if (triggeredAntiExploit) {
-            this.hasEliteLoot = false;
-            this.hasVanillaLoot = false;
+            this.eliteLoot = false;
+            this.vanillaLoot = false;
         }
     }
 
@@ -600,10 +536,6 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         antiExploitPoints -= value;
     }
 
-    public boolean isInAntiExploitCooldown() {
-        return this.inAntiExploitCooldown;
-    }
-
     public void setInAntiExploitCooldown() {
         this.inAntiExploitCooldown = true;
         new BukkitRunnable() {
@@ -612,14 +544,6 @@ public class EliteEntity implements SimplePersistentEntityInterface {
                 inAntiExploitCooldown = false;
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20);
-    }
-
-    public void setIsInCombat(boolean inCombat) {
-        this.inCombat = inCombat;
-    }
-
-    public boolean isInCombat() {
-        return this.inCombat;
     }
 
     public void setCombatGracePeriod(int delayInTicks) {
@@ -632,15 +556,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         }.runTaskLater(MetadataHandler.PLUGIN, delayInTicks);
     }
 
-    public boolean isInCombatGracePeriod() {
-        return this.inCombatGracePeriod;
-    }
-
-    public void setSummoningEntity(EliteEntity summoningEntity) {
-        this.summoningEntity = summoningEntity;
-    }
-
-    public void addGlobalReinforcement(CustomBossEntity customBossEntity){
+    public void addGlobalReinforcement(CustomBossEntity customBossEntity) {
         this.globalReinforcementEntities.add(customBossEntity);
     }
 
@@ -662,25 +578,29 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return livingEntity.isValid();
     }
 
-    public boolean exists(){
+    public boolean exists() {
         if (livingEntity == null) return false;
         return !livingEntity.isDead();
     }
 
     public void remove(RemovalReason removalReason) {
-        //This prevents the entity tracker from running this code twice when removing due to specific reasaons
-        if (unsyncedLivingEntity != null)
-            EliteEntityTracker.eliteMobEntities.remove(unsyncedLivingEntity.getUniqueId());
+        //This prevents the entity tracker from running this code twice when removing due to specific reasons
         if (livingEntity != null)
+            EliteEntityTracker.eliteMobEntities.remove(livingEntity.getUniqueId());
+        if (livingEntity != null && !removalReason.equals(RemovalReason.DEATH))
             livingEntity.remove();
+        if (livingEntity instanceof EnderDragon && removalReason.equals(RemovalReason.DEATH)) {
+            ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.DYING);
+            ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
+        }
         this.livingEntity = null;
     }
 
-    public void removeReinforcement(CustomBossEntity customBossEntity){
+    public void removeReinforcement(CustomBossEntity customBossEntity) {
         eliteReinforcementEntities.remove(customBossEntity);
     }
 
-    public int getGlobalReinforcementsCount(){
+    public int getGlobalReinforcementsCount() {
         return this.globalReinforcementEntities.size();
     }
 

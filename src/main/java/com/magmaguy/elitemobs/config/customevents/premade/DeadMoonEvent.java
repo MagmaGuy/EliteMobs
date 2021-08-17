@@ -10,8 +10,8 @@ public class DeadMoonEvent extends CustomEventsConfigFields {
         super("dead_moon", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("zombie_king.yml"));
-        setLocalCooldown(120D);
-        setGlobalCooldown(15D);
+        setLocalCooldown(240D);
+        setGlobalCooldown(25D);
         setWeight(50D);
         setCustomSpawn("dead_moon_spawn.yml");
         setEventDuration(60D);

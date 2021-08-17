@@ -47,6 +47,7 @@ public class ElitePower {
             new FrostCone(),
             new Thunderstorm(),
             new Firestorm(),
+            new BonusCoins(),
 
             //major powers
             new SkeletonPillar(),

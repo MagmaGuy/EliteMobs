@@ -10,10 +10,10 @@ public class PillagerCaravanEvent extends CustomEventsConfigFields {
         super("pillager_caravan", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("pillager_caravan_leader.yml"));
-        setLocalCooldown(60D);
-        setGlobalCooldown(15D);
+        setLocalCooldown(120D);
+        setGlobalCooldown(25D);
         setWeight(80D);
         setCustomSpawn("normal_surface_spawn.yml");
-        setEventDuration(60);
+        setEventDuration(30);
     }
 }

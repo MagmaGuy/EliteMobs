@@ -10,7 +10,7 @@ public class QuestsTracker implements Listener {
     @EventHandler
     public void onEntityKill(EliteMobDeathEvent event) {
 
-        if (!event.getEliteEntity().getHasSpecialLoot()) return;
+        if (!event.getEliteEntity().isEliteLoot()) return;
         if (!event.getEliteEntity().hasDamagers()) return;
 
         for (Player player : event.getEliteEntity().getDamagers().keySet())

@@ -26,8 +26,8 @@ public class DefaultDropsHandler implements Listener {
     public void onDeath(EliteMobDeathEvent event) {
 
         if (!(event.getEntity() instanceof LivingEntity)) return;
-        if (!event.getEliteEntity().hasVanillaLoot()) return;
-
+        if (!event.getEliteEntity().isVanillaLoot()) return;
+        if (event.getEntityDeathEvent() == null) return;
 
         List<ItemStack> droppedItems = event.getEntityDeathEvent().getDrops();
         int mobLevel = event.getEliteEntity().getLevel();
