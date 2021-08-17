@@ -9,17 +9,19 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class RegionalBossEntity extends CustomBossEntity implements SimplePersistentEntityInterface {
@@ -102,7 +104,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     }
 
     public static List<RegionalBossEntity> getRegionalBossEntitySet() {
-        return  new ArrayList<>(regionalBossesFromConfigFields.values());
+        return new ArrayList<>(regionalBossesFromConfigFields.values());
     }
 
     @Nullable
@@ -184,7 +186,11 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     public void spawn(boolean silent) {
         super.spawn(silent);
         this.isRespawning = false;
-        checkLeash();
+        if (livingEntity != null) {
+            checkLeash();
+            getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
+            //new WarningMessage("Warning: Location " + customBossesConfigFields.getFilename() + " for boss " + customBossesConfigFields.getFilename() + " seems to be inside of a solid block!");
+        }
     }
 
     @Override

@@ -9,7 +9,7 @@ public class BinderOfWorldsPhase3EndermanReinforcementConfig extends CustomBosse
                 EntityType.ENDERMAN,
                 true,
                 "$reinforcementLevel &5Reality Slayer",
-                "250");
+                "200");
         setDropsVanillaLoot(false);
         setDropsEliteMobsLoot(true);
         setFollowDistance(200);

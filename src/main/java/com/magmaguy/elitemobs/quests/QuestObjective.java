@@ -48,7 +48,7 @@ public class QuestObjective implements Serializable {
     }
 
     public boolean processQuestProgression(EliteEntity eliteEntity, Player player) {
-        if (!eliteEntity.getHasSpecialLoot()) return false;
+        if (!eliteEntity.isEliteLoot()) return false;
         if (!eliteEntity.getLivingEntity().getType().equals(getEntityType())) return false;
         if (eliteEntity.getLevel() < getMinimumEliteMobLevel()) return false;
         addKill(player);

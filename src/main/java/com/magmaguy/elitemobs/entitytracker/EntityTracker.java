@@ -36,7 +36,7 @@ public class EntityTracker implements Listener {
         EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteEntity);
         new EventCaller(eliteMobSpawnEvent);
         if (eliteMobSpawnEvent.isCancelled()) return false;
-        new EliteEntityTracker(eliteEntity, eliteEntity.getPersistent());
+        new EliteEntityTracker(eliteEntity, eliteEntity.getIsPersistent());
         return true;
     }
 

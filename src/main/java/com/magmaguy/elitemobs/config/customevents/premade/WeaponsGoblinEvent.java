@@ -10,10 +10,10 @@ public class WeaponsGoblinEvent extends CustomEventsConfigFields {
         super("weapons_goblin", true);
         setEventType(CustomEvent.EventType.TIMED);
         setBossFilenames(Arrays.asList("weapons_goblin.yml"));
-        setLocalCooldown(60D);
-        setGlobalCooldown(15D);
+        setLocalCooldown(120D);
+        setGlobalCooldown(25D);
         setWeight(100D);
         setCustomSpawn("normal_surface_spawn.yml");
-        setEventDuration(60);
+        setEventDuration(30);
     }
 }

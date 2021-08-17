@@ -21,14 +21,15 @@ public class EliteMobExitCombatEvent extends Event {
     public EliteMobExitCombatEvent(EliteEntity eliteEntity, EliteMobExitCombatReason reason) {
         this.eliteEntity = eliteEntity;
         this.eliteMobExitCombatReason = reason;
-        eliteEntity.setIsInCombat(false);
+        eliteEntity.setInCombat(false);
         if (eliteEntity.getUnsyncedLivingEntity().isDead()) return;
         //only run commands if the reason for leaving combat isn't death, onDeath commands exist for that case
         if (eliteEntity instanceof CustomBossEntity)
             CommandRunner.runCommandFromList(((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getOnCombatLeaveCommands(), new ArrayList<>());
         if (MobCombatSettingsConfig.regenerateCustomBossHealthOnCombatEnd)
-            if (!eliteEntity.getUnsyncedLivingEntity().getType().equals(EntityType.PHANTOM))
-                eliteEntity.fullHeal();
+            if (!reason.equals(EliteMobExitCombatReason.PHASE_SWITCH))
+                if (!eliteEntity.getUnsyncedLivingEntity().getType().equals(EntityType.PHANTOM))
+                    eliteEntity.fullHeal();
         if (!DefaultConfig.alwaysShowNametags)
             eliteEntity.setNameVisible(false);
     }
@@ -53,7 +54,8 @@ public class EliteMobExitCombatEvent extends Event {
     public enum EliteMobExitCombatReason {
         NO_NEARBY_PLAYERS,
         SPIRIT_WALK,
-        ELITE_NOT_VALID
+        ELITE_NOT_VALID,
+        PHASE_SWITCH
     }
 
 }

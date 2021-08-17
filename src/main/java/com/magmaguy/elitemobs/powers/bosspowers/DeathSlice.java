@@ -33,7 +33,7 @@ public class DeathSlice extends BossPower implements Listener {
 
             @Override
             public void run() {
-                if (counter > 20 * 5 || !eliteEntity.getLivingEntity().isValid()) {
+                if (counter > 20 * 5 || !eliteEntity.isValid()) {
                     eliteEntity.getLivingEntity().setAI(true);
                     cancel();
                     return;

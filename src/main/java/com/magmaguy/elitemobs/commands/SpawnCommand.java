@@ -83,6 +83,7 @@ public class SpawnCommand {
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
             if (customBossesConfigFields == null) {
                 commandSender.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+                return;
             }
             CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
             customBossEntity.setSpawnLocation(location);
@@ -103,6 +104,7 @@ public class SpawnCommand {
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
             if (customBossesConfigFields == null) {
                 commandSender.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+                return;
             }
             CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
             customBossEntity.setSpawnLocation(location);
@@ -118,6 +120,7 @@ public class SpawnCommand {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
         if (customBossesConfigFields == null) {
             player.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+            return;
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
         customBossEntity.setSpawnLocation(getLocation(player));
@@ -129,6 +132,7 @@ public class SpawnCommand {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
         if (customBossesConfigFields == null) {
             player.sendMessage("Filename " + fileName + " is not valid! Make sure you are writing the name of a configuration file in the custombosses folder!");
+            return;
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
         customBossEntity.setSpawnLocation(getLocation(player));

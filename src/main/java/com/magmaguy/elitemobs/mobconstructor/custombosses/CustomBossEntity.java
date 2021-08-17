@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -18,9 +17,9 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
-import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,7 +28,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -40,23 +38,35 @@ import java.util.List;
 
 public class CustomBossEntity extends EliteEntity implements Listener, SimplePersistentEntityInterface {
 
+    @Getter
     protected static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
+    @Getter
     protected CustomBossesConfigFields customBossesConfigFields;
     protected CustomBossEntity customBossMount = null;
     protected LivingEntity livingEntityMount = null;
     protected CustomBossEntity mount;
     protected SimplePersistentEntity simplePersistentEntity;
     protected Location persistentLocation;
+    @Getter
+    @Setter
     protected Location spawnLocation;
     protected CustomBossTrail customBossTrail;
+    @Getter
     protected CustomBossBossBar customBossBossBar;
     protected Integer escapeMechanism;
+    @Getter
     protected PhaseBossEntity phaseBossEntity = null;
+    @Getter
     protected String worldName;
     protected boolean chunkLoad = false;
-    long lastTick = 0;
-    int attemptsCounter = 1;
+    private long lastTick = 0;
+    private int attemptsCounter = 1;
     private List<BukkitTask> globalReinforcements = new ArrayList<>();
+    //For use by the phase switcher, which requires passing a specific spawn location for the phase, but when it's for a
+    //regional boss this causes issues such as reinforcements getting shifted over to the new spawn location
+    @Getter
+    @Setter
+    private Location phaseSwitchTempSpawnLocation;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -87,26 +97,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         return new CustomBossEntity(customBossesConfigFields);
     }
 
-    public static HashSet<CustomBossEntity> getTrackableCustomBosses() {
-        return trackableCustomBosses;
-    }
-
-    public PhaseBossEntity getPhaseBossEntity() {
-        return phaseBossEntity;
-    }
-
-    public String getWorldName() {
-        return worldName;
-    }
-
-    public CustomBossBossBar getCustomBossBossBar() {
-        return customBossBossBar;
-    }
-
-    public CustomBossesConfigFields getCustomBossesConfigFields() {
-        return customBossesConfigFields;
-    }
-
     /**
      * The customBossesConfigFields is not final, and changes if the boss has phases, loading the configuration from the phases as the fight goes along.
      *
@@ -117,20 +107,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         super.setDamageMultiplier(customBossesConfigFields.getDamageMultiplier());
         super.setHealthMultiplier(customBossesConfigFields.getHealthMultiplier());
         super.setHasSpecialLoot(customBossesConfigFields.isDropsEliteMobsLoot());
-        super.setHasVanillaLoot(customBossesConfigFields.isDropsVanillaLoot());
+        super.setVanillaLoot(customBossesConfigFields.isDropsVanillaLoot());
         super.setLevel(customBossesConfigFields.getLevel());
         setPluginName();
-        //set powers later as reinforcements aren't ready on the first tick, since all bosses need to be initialized
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields.getPowers()), 1);
-    }
-
-    //spawnLocation is only used for CustomBossEntity spawns queued for later
-    public Location getSpawnLocation() {
-        return spawnLocation;
-    }
-
-    public void setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
+        super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields.getPowers());
     }
 
     public void spawn(Location spawnLocation, int level, boolean silent) {
@@ -193,12 +173,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             mountEntity();
             //Prevent custom bosses from getting removed when far away, this is important for mounts and reinforcements in large arenas
             getLivingEntity().setRemoveWhenFarAway(false);
-            if (this instanceof RegionalBossEntity) {
-                //if (!spawnLocation.getBlock().isPassable())
-                    //new WarningMessage("Warning: Location " + customBossesConfigFields.getFilename() + " for boss " + customBossesConfigFields.getFilename() + " seems to be inside of a solid block!");
-                ((RegionalBossEntity) this).checkLeash();
-                getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
-            }
         } else
             persistentLocation = spawnLocation;
 
@@ -319,7 +293,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     @Override
     public void fullHeal() {
-        if (phaseBossEntity == null || !phaseBossEntity.isInFirstPhase()) {
+        if (phaseBossEntity == null || phaseBossEntity.isInFirstPhase()) {
             super.fullHeal();
             return;
         }
@@ -335,7 +309,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (customBossTrail != null) customBossTrail.terminateTrails();
         if (livingEntityMount != null) livingEntityMount.remove();
         if (customBossMount != null) customBossMount.remove(RemovalReason.REINFORCEMENT_CULL);
-        if (customBossesConfigFields.isCullReinforcements()) cullReinforcements(false);
+        if (customBossesConfigFields.isCullReinforcements() || removalReason.equals(RemovalReason.PHASE_BOSS_RESET))
+            cullReinforcements(false);
+
+        if (removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END))
+            if(inCombat)
+                new EventCaller(new EliteMobExitCombatEvent(this, EliteMobExitCombatEvent.EliteMobExitCombatReason.PHASE_SWITCH));
 
         boolean bossInstanceEnd = removalReason.equals(RemovalReason.KILL_COMMAND) ||
                 removalReason.equals(RemovalReason.DEATH) ||

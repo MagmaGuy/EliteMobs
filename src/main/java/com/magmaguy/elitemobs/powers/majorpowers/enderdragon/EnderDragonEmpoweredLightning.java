@@ -63,6 +63,10 @@ public class EnderDragonEmpoweredLightning extends MajorPower {
         bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 if (isInCooldown(eliteEntity)) return;
                 fireLightning(eliteEntity);
             }
@@ -72,7 +76,8 @@ public class EnderDragonEmpoweredLightning extends MajorPower {
 
     private void deactivate() {
         isActive = false;
-        bukkitTask.cancel();
+        if (bukkitTask != null)
+            bukkitTask.cancel();
     }
 
     public void fireLightning(EliteEntity eliteEntity) {

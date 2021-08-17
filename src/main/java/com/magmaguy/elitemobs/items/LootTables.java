@@ -40,7 +40,7 @@ public class LootTables implements Listener {
     private static boolean scalableItemsExist;
 
     public static void generatePlayerLoot(EliteEntity eliteEntity) {
-        if (eliteEntity.getTriggeredAntiExploit())
+        if (eliteEntity.isTriggeredAntiExploit())
             return;
         for (Player player : eliteEntity.getDamagers().keySet()) {
 
@@ -313,16 +313,14 @@ public class LootTables implements Listener {
 
     @EventHandler
     public void onDeath(EliteMobDeathEvent event) {
-
-        if (!event.getEliteEntity().getHasSpecialLoot()) return;
+        if (!event.getEliteEntity().isEliteLoot()) return;
         if (event.getEliteEntity().getLevel() < 1) return;
         if (event.getEliteEntity().getDamagers().isEmpty()) return;
 
-        if (!event.getEliteEntity().hasVanillaLoot())
+        if (!event.getEliteEntity().isVanillaLoot())
             event.getEntityDeathEvent().getDrops().clear();
 
         generatePlayerLoot(event.getEliteEntity());
-
     }
 
 }

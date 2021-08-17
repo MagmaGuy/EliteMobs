@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
@@ -9,6 +10,7 @@ import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -284,7 +286,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                 if (locations.size() < 1)
                     new InfoMessage(getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
                 for (String string : locations)
-                    new RegionalBossEntity(this, string).initialize();
+                    //Give time for all custom bosses to be loaded as some powers require other bosses to be loaded in order to generate reinforcements
+                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> new RegionalBossEntity(this, string).initialize(), 1);
             }
 
         }
@@ -361,17 +364,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         return deserializedDamageModifiers;
     }
 
-    public class UniqueLoot {
-        public double chance;
-        public CustomItem customItem;
-
-        public UniqueLoot(double chance, CustomItem customItem) {
-            this.chance = chance;
-            this.customItem = customItem;
-        }
-    }
-
-    protected List<String> majorBossDeathString(String slainLine){
+    protected List<String> majorBossDeathString(String slainLine) {
         return Arrays.asList(
                 "&e&l---------------------------------------------",
                 "&4" + slainLine,
@@ -380,6 +373,16 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
                 "&e&l---------------------------------------------");
+    }
+
+    public class UniqueLoot {
+        public double chance;
+        public CustomItem customItem;
+
+        public UniqueLoot(double chance, CustomItem customItem) {
+            this.chance = chance;
+            this.customItem = customItem;
+        }
     }
 
 }
