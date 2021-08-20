@@ -39,7 +39,12 @@ public class CustomBossMegaConsumer {
     public CustomBossMegaConsumer(CustomBossEntity customBossEntity) {
         this.customBossesConfigFields = customBossEntity.getCustomBossesConfigFields();
         this.customBossEntity = customBossEntity;
-        this.spawnLocation = customBossEntity.getPhaseSwitchTempSpawnLocation() == null ? customBossEntity.getSpawnLocation() : customBossEntity.getPhaseSwitchTempSpawnLocation();
+        if (customBossEntity.getRespawnOverrideLocation() != null) {
+            this.spawnLocation = customBossEntity.getRespawnOverrideLocation();
+            customBossEntity.setRespawnOverrideLocation(null);
+        } else {
+            this.spawnLocation = customBossEntity.getSpawnLocation();
+        }
         this.powers = customBossEntity.getElitePowers();
         this.level = customBossEntity.getLevel();
         this.bypassesWorldGuardSpawn = customBossEntity.getBypassesProtections();
@@ -65,7 +70,7 @@ public class CustomBossMegaConsumer {
                 WorldGuardSpawnEventBypasser.forceSpawn();
         }
 
-        LivingEntity livingEntity = (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
+        return (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
                 customBossesConfigFields.getEntityType().getEntityClass(),
                 (entity) -> {
                     for (ElitePower elitePower : powers)
@@ -82,8 +87,6 @@ public class CustomBossMegaConsumer {
                         ((EnderDragon) entity).getDragonBattle().generateEndPortal(false);
                     }
                 });
-
-        return livingEntity;
     }
 
     private void setBaby(LivingEntity livingEntity) {

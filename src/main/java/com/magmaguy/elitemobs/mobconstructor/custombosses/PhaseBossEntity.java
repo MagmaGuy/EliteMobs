@@ -4,8 +4,6 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -53,9 +51,8 @@ public class PhaseBossEntity {
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
             customBossEntity.spawn(true);
         } else {
-            customBossEntity.setPhaseSwitchTempSpawnLocation(customBossEntity.getLocation());
+            customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
             customBossEntity.spawn(true);
-            customBossEntity.setPhaseSwitchTempSpawnLocation(null);
         }
         customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
         currentPhase = bossPhase;

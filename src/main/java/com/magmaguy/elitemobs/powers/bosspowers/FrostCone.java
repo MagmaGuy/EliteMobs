@@ -83,7 +83,7 @@ public class FrostCone extends BossPower implements Listener {
     }
 
     private static boolean isPowerStillValid(EliteEntity eliteEntity, Location playerLocation) {
-        if (!eliteEntity.getLivingEntity().isValid())
+        if (!eliteEntity.isValid())
             return false;
         return eliteEntity.getLivingEntity().getWorld().equals(playerLocation.getWorld());
     }

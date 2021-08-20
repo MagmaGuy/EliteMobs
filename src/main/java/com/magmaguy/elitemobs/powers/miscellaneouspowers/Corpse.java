@@ -19,7 +19,7 @@ public class Corpse extends MinorPower implements Listener {
         if (!event.getEliteEntity().hasPower(this)) return;
         if (!event.getEntity().getLocation().getBlock().getType().equals(Material.AIR)) return;
 
-        EntityTracker.addTemporaryBlock(event.getEliteEntity().getLivingEntity().getLocation().getBlock(), 20 * 60 * 2, Material.BONE_BLOCK);
+        EntityTracker.addTemporaryBlock(event.getEliteEntity().getUnsyncedLivingEntity().getLocation().getBlock(), 20 * 60 * 2, Material.BONE_BLOCK);
     }
 
 }
