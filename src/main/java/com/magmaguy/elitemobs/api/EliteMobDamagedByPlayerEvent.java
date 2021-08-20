@@ -250,13 +250,11 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                 if (event.isApplicable(modifier))
                     event.setDamage(modifier, 0);
 
-            damage = ((LivingEntity) event.getEntity()).getHealth() - damage < 0 ? ((LivingEntity) event.getEntity()).getHealth() : damage;
-
             if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) {
                 if (eliteEntity.getLivingEntity().getHealth() - damage < 1) {
                     if (eliteEntity.isDying())
                         return;
-                    damage -= 1;
+                    damage = 0;
                     ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.DYING);
                     eliteEntity.setDying(true);
                     //remove the dragon after it is done with the light show, this death doesn't show up on events

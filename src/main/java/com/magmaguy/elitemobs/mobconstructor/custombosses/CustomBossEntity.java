@@ -66,7 +66,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     //regional boss this causes issues such as reinforcements getting shifted over to the new spawn location
     @Getter
     @Setter
-    private Location phaseSwitchTempSpawnLocation;
+    private Location respawnOverrideLocation;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -159,11 +159,16 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             chunkLoad = false;
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
             simplePersistentEntity = null;
-        } else
+        } else if (isPersistent)
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
 
-        if (livingEntity == null && simplePersistentEntity == null) {
-            new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename());
+        if (!exists() && simplePersistentEntity == null) {
+            //this may seem odd but not setting it to null can cause double spawn attempts as the plugin catches itself
+            //correctly as not have a valid living entity but the checks are set up in such a way that if a living entity
+            //object is referenced then trying to spawn it again is a double spawn of the same entity
+            super.livingEntity = null;
+            new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " . Possible reasons for this:");
+            new WarningMessage("- The region was protected by a plugin (most likely)");
             return;
         }
 
@@ -361,7 +366,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Override
     public void chunkLoad() {
         chunkLoad = true;
-        spawn(persistentLocation, true);
+        respawnOverrideLocation = persistentLocation;
+        spawn( true);
     }
 
     @Override

@@ -55,7 +55,7 @@ public class DefaultDropsHandler implements Listener {
             }
         }
 
-        mobLevel = (int) (EntityTracker.getEliteMobEntity(event.getEntity()).getLevel() * ItemSettingsConfig.defaultExperienceMultiplier);
+        mobLevel = (int) (event.getEliteEntity().getLevel() * ItemSettingsConfig.defaultExperienceMultiplier);
 
         int droppedXP = (int) (event.getEntityDeathEvent().getDroppedExp() + event.getEntityDeathEvent().getDroppedExp() * 0.1 * mobLevel);
         event.getEntityDeathEvent().setDroppedExp(0);
