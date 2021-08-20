@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -36,6 +35,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     private int respawnCoolDownInMinutes = 0;
     private boolean isRespawning = false;
     private BukkitTask leashTask;
+    private boolean temporaryRegionalBoss = false;
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
         super(customBossesConfigFields);
@@ -59,6 +59,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
 
     private RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent) {
         super(customBossesConfigFields);
+        this.temporaryRegionalBoss = !permanent;
+        super.setPersistent(false);
         super.spawnLocation = location;
         this.leashRadius = customBossesConfigFields.getLeashRadius();
         if (permanent) {
