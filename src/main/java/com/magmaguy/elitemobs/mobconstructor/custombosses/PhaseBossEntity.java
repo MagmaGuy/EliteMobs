@@ -40,7 +40,6 @@ public class PhaseBossEntity {
     }
 
     private void switchPhase(BossPhase bossPhase, RemovalReason removalReason, double healthPercentage) {
-        //EntityTracker.unregister(customBossEntity.getLivingEntity(), removalReason);
         customBossEntity.remove(removalReason);
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossPhase.customBossesConfigFields);
         if (customBossesConfigFields == null) {
