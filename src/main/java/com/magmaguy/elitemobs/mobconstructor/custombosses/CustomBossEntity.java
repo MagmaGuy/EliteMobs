@@ -17,7 +17,10 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
-import com.magmaguy.elitemobs.utils.*;
+import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
+import com.magmaguy.elitemobs.utils.CommandRunner;
+import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -127,6 +130,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         lastTick = spawnLocation.getWorld().getFullTime();
         if (livingEntity != null) {
             new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!");
+            new WarningMessage("Report this stacktrace to the developer:");
+            for (StackTraceElement element : Thread.currentThread().getStackTrace())
+                Bukkit.getLogger().info(element.toString());
             return;
         }
         this.spawnLocation = spawnLocation;
@@ -159,8 +165,15 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             chunkLoad = false;
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
             simplePersistentEntity = null;
-        } else if (isPersistent)
+        } else if (isPersistent) {
+            if (simplePersistentEntity != null) {
+                new WarningMessage("Attempted to create more than one SimplePersistentEntity for boss " + customBossesConfigFields.getFilename() + " . This issue should be reported to the developer, as well as the stacktrace below:");
+                for (StackTraceElement element : Thread.currentThread().getStackTrace())
+                    Bukkit.getLogger().info(element.toString());
+                return;
+            }
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
+        }
 
         if (!exists() && simplePersistentEntity == null) {
             //this may seem odd but not setting it to null can cause double spawn attempts as the plugin catches itself
@@ -318,7 +331,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             cullReinforcements(false);
 
         if (removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END))
-            if(inCombat)
+            if (inCombat)
                 new EventCaller(new EliteMobExitCombatEvent(this, EliteMobExitCombatEvent.EliteMobExitCombatReason.PHASE_SWITCH));
 
         boolean bossInstanceEnd = removalReason.equals(RemovalReason.KILL_COMMAND) ||
@@ -367,7 +380,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     public void chunkLoad() {
         chunkLoad = true;
         respawnOverrideLocation = persistentLocation;
-        spawn( true);
+        spawn(true);
     }
 
     @Override

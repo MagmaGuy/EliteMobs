@@ -99,9 +99,8 @@ public class GroundPound extends MinorPower implements Listener {
 
                             for (Entity entity : eliteEntity.getLivingEntity().getNearbyEntities(10, 10, 10)) {
                                 entity.setVelocity(entity.getLocation().clone().subtract(eliteEntity.getLivingEntity().getLocation()).toVector().normalize().multiply(2).setY(1.5));
-                                if (entity instanceof LivingEntity) {
+                                if (entity instanceof LivingEntity)
                                     ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 2));
-                                }
                             }
 
 

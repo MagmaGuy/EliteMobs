@@ -55,6 +55,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
                     0 : (unixRespawnTime - System.currentTimeMillis()) / 1000 * 20;
         super.worldName = rawLocationString.split(",")[0];
         super.spawnLocation = ConfigurationLocation.deserialize(rawLocationString);
+
+        super.setPersistent(true);
     }
 
     private RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent) {
@@ -69,6 +71,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             this.unixRespawnTime = 0;
             this.respawnCoolDownInMinutes = customBossesConfigFields.getSpawnCooldown();
             regionalBossesFromConfigFields.put(customBossesConfigFields, this);
+            super.setPersistent(true);
             saveNewLocation();
         }
     }
@@ -151,6 +154,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
 
     public void respawn() {
         this.isRespawning = true;
+        super.getDamagers().clear();
         if (super.phaseBossEntity != null)
             super.phaseBossEntity.deathReset();
         unixRespawnTime = (respawnCoolDownInMinutes * 60L * 1000L) + System.currentTimeMillis();
