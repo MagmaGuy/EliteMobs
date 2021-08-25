@@ -129,10 +129,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             attemptsCounter = 1;
         lastTick = spawnLocation.getWorld().getFullTime();
         if (livingEntity != null) {
-            new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!");
-            new WarningMessage("Report this stacktrace to the developer:");
-            for (StackTraceElement element : Thread.currentThread().getStackTrace())
-                Bukkit.getLogger().info(element.toString());
+            new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!", true);
             return;
         }
         this.spawnLocation = spawnLocation;
@@ -141,7 +138,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     public void spawn(boolean silent) {
         if (livingEntity != null) {
-            new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn!");
+            new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn!", true);
             return;
         }
 
@@ -167,9 +164,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             simplePersistentEntity = null;
         } else if (isPersistent) {
             if (simplePersistentEntity != null) {
-                new WarningMessage("Attempted to create more than one SimplePersistentEntity for boss " + customBossesConfigFields.getFilename() + " . This issue should be reported to the developer, as well as the stacktrace below:");
-                for (StackTraceElement element : Thread.currentThread().getStackTrace())
-                    Bukkit.getLogger().info(element.toString());
+                new WarningMessage("Attempted to create more than one SimplePersistentEntity for boss " + customBossesConfigFields.getFilename() + " ." ,true);
                 return;
             }
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
@@ -316,6 +311,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             return;
         }
         phaseBossEntity.resetToFirstPhase();
+        super.damagers.clear();
     }
 
     @Override
@@ -371,7 +367,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
             if (customBossesConfigFields.isCullReinforcements()) cullReinforcements(true);
 
-        } else
+        } else if (removalReason.equals(RemovalReason.CHUNK_UNLOAD))
+            //when bosses get removed due to chunk unloads and are persistent they should remain stored
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
 
     }
