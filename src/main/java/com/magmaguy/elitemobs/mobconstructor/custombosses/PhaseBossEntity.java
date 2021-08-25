@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -40,6 +41,10 @@ public class PhaseBossEntity {
     }
 
     private void switchPhase(BossPhase bossPhase, RemovalReason removalReason, double healthPercentage) {
+        if (bossPhase.equals(currentPhase)){
+            new WarningMessage("Attempted to change the boss phase to what it already was.", true);
+            return;
+        }
         customBossEntity.remove(removalReason);
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossPhase.customBossesConfigFields);
         if (customBossesConfigFields == null) {
@@ -58,7 +63,6 @@ public class PhaseBossEntity {
     }
 
     public void resetToFirstPhase() {
-        customBossEntity.getDamagers().clear();
         switchPhase(bossPhases.get(0), RemovalReason.PHASE_BOSS_RESET, 1);
     }
 
