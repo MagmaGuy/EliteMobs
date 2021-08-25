@@ -149,14 +149,12 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             ticksBeforeRespawn = 0;
             //Reminder: this might not spawn a living entity as it gets queued for when the chunk loads
             regionalBossEntity.spawn(silent);
+            super.getDamagers().clear();
         }, ticksBeforeRespawn);
     }
 
     public void respawn() {
         this.isRespawning = true;
-        super.getDamagers().clear();
-        if (super.phaseBossEntity != null)
-            super.phaseBossEntity.deathReset();
         unixRespawnTime = (respawnCoolDownInMinutes * 60L * 1000L) + System.currentTimeMillis();
         ticksBeforeRespawn = respawnCoolDownInMinutes * 60L * 20L;
         rawString = rawLocationString + ":" + unixRespawnTime;
