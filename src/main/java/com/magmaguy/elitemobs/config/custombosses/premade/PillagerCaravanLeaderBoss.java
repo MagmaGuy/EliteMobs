@@ -25,5 +25,9 @@ public class PillagerCaravanLeaderBoss extends CustomBossesConfigFields {
                 "summon_merchant_scroll.yml:0.5",
                 "summon_merchant_scroll.yml:0.5",
                 "summon_merchant_scroll.yml:0.5"));
+        setSpawnMessage("&cA pillager caravan has been sighted!");
+        majorBossDeathString( "The pillager caravan has been vanquished!");
+        setLocationMessage("&cPillager Caravan: $distance blocks away!");
+        setAnnouncementPriority(2);
     }
 }

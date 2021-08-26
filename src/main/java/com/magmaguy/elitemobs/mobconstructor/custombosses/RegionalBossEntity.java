@@ -62,7 +62,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     private RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent) {
         super(customBossesConfigFields);
         this.temporaryRegionalBoss = !permanent;
-        super.setPersistent(false);
+        super.setPersistent(permanent);
         super.spawnLocation = location;
         this.leashRadius = customBossesConfigFields.getLeashRadius();
         if (permanent) {
@@ -71,7 +71,6 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             this.unixRespawnTime = 0;
             this.respawnCoolDownInMinutes = customBossesConfigFields.getSpawnCooldown();
             regionalBossesFromConfigFields.put(customBossesConfigFields, this);
-            super.setPersistent(true);
             saveNewLocation();
         }
     }
