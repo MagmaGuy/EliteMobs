@@ -47,6 +47,7 @@ public class Minidungeon {
     public Minidungeon(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         minidungeons.put(dungeonPackagerConfigFields.getFileName(), this);
         this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
+        regionalBossCount = 0;
         switch (dungeonPackagerConfigFields.getDungeonLocationType()) {
             case WORLD:
                 setupWorldBasedMinidungeon();

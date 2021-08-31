@@ -91,6 +91,8 @@ public class CustomBossBossBar {
     }
 
     private void updateBossBar(Player player, BossBar bossBar) {
+        if (player == null) return;
+        if (bossBar == null) return;
         String locationString = customBossEntity.getLocation().getBlockX() +
                 ", " + customBossEntity.getLocation().getBlockY() +
                 ", " + customBossEntity.getLocation().getBlockZ();

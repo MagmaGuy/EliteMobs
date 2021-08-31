@@ -9,7 +9,8 @@ import java.util.HashSet;
 
 public class TemporaryBlockTracker {
 
-    public static final HashSet<Block> temporaryBlocks = new HashSet<>();
+    public static final HashSet<Block>
+            temporaryBlocks = new HashSet<>();
 
     //Temporary blocks - blocks in powers
     public static void addTemporaryBlock(Block block, int ticks, Material replacementMaterial) {

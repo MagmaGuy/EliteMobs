@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -168,6 +169,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private boolean filesOutOfSync = false;
+    @Getter
+    private List<String> onSpawnBlockStates = new ArrayList<>(), onRemoveBlockStates = new ArrayList<>();
+
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -219,6 +223,19 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                 return 1;
             }
         }
+    }
+
+    public void setOnSpawnBlockStates(List<String> onSpawnBlockStates) {
+        this.onSpawnBlockStates = onSpawnBlockStates;
+        fileConfiguration.set("onSpawnBlockStates", onSpawnBlockStates);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+
+    }
+
+    public void setOnRemoveBlockStates(List<String> onRemoveBlockStates) {
+        this.onRemoveBlockStates = onRemoveBlockStates;
+        fileConfiguration.set("onRemoveBlockStates", onRemoveBlockStates);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
 
     @Override
