@@ -20,9 +20,11 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.menus.GetLootMenu;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
+import com.sk89q.minecraft.util.commands.CommandContext;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -33,7 +35,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public class AdminCommands {
 
@@ -577,6 +581,20 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Fires a test Elite Fireball for explosion protection and regeneration testing purposes.")
                 .handler(commandContext -> testFireball((Player) commandContext.getSender())));
+
+        List<String> blockTransitionPhases = new ArrayList<>(Arrays.asList("ON_SPAWN", "ON_REMOVE"));
+
+        // /em registerblocks <regional_boss_file.yml> <on_spawn/on_death>
+        manager.command(builder.literal("registerblocks")
+                .senderType(Player.class)
+                .argument(StringArgument.<CommandSender>newBuilder("regionalBoss").withSuggestionsProvider(((objectCommandContext, s) -> regionalBosses)),
+                        ArgumentDescription.of("Regional Boss configuration file name"))
+                .argument(StringArgument.<CommandSender>newBuilder("blockTransitionPhase").withSuggestionsProvider(((objectCommandContext, s) -> blockTransitionPhases)),
+                        ArgumentDescription.of("Block transition phase"))
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Registers transitive blocks for use by regional bosses.")
+                .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
+                        commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"))));
 
 
     }
