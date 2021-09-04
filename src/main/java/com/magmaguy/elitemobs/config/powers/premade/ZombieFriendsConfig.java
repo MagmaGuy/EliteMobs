@@ -1,21 +1,30 @@
 package com.magmaguy.elitemobs.config.powers.premade;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ZombieFriendsConfig extends PowersConfigFields {
+    public static String friend1Name, friend2Name;
+    public static List<String> friendDeathMessage, originalEntityDialog, reinforcementDialog;
+
     public ZombieFriendsConfig() {
         super("zombie_friends",
                 true,
                 "Friends",
                 Material.ZOMBIE_HEAD.toString());
+    }
 
-        super.getAdditionalConfigOptions().put("friend1Name", "BFF #1");
-        super.getAdditionalConfigOptions().put("friend2Name", "BFF #2");
+    @Override
+    public void processAdditionalFields() {
 
-        super.getAdditionalConfigOptions().put("friendDeathMessage", Arrays.asList(
+        friend1Name = ConfigurationEngine.setString(fileConfiguration, "friend1Name", "BFF #1");
+        friend2Name = ConfigurationEngine.setString(fileConfiguration, "friend2Name", "BFF #2");
+
+        friendDeathMessage = ConfigurationEngine.setList(fileConfiguration, "friendDeathMessage", Arrays.asList(
                 "Noooo!",
                 "Mediocre!",
                 "Zacharias!",
@@ -24,7 +33,7 @@ public class ZombieFriendsConfig extends PowersConfigFields {
                 "Revenge!",
                 "I can't believe you've done this."));
 
-        super.getAdditionalConfigOptions().put("originalEntityDialog", Arrays.asList(
+        originalEntityDialog = ConfigurationEngine.setList(fileConfiguration, "originalEntityDialog", Arrays.asList(
                 "Let's play ZombieCraft later!",
                 "Feel the power of friendship!",
                 "El pueblo, unido!",
@@ -34,7 +43,7 @@ public class ZombieFriendsConfig extends PowersConfigFields {
                 "Get him!",
                 "Screw you guys, I'm going home!"));
 
-        super.getAdditionalConfigOptions().put("reinforcementDialog", Arrays.asList(
+        reinforcementDialog = ConfigurationEngine.setList(fileConfiguration, "reinforcementDialog", Arrays.asList(
                 "Don't mess with our friends!",
                 "We got your back Zach!",
                 "Backup has arrived!",
@@ -52,6 +61,5 @@ public class ZombieFriendsConfig extends PowersConfigFields {
                 "The more the merrier!",
                 "I got you fam!",
                 "All for one!"));
-
     }
 }

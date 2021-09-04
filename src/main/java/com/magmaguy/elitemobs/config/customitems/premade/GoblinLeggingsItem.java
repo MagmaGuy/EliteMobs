@@ -15,6 +15,6 @@ public class GoblinLeggingsItem  extends CustomItemsConfigFields {
                 Arrays.asList("&8A treasure among goblins!"));
         setEnchantments(Arrays.asList("PROTECTION_ENVIRONMENTAL,1", "PROTECTION_EXPLOSIONS,1", "PROTECTION_PROJECTILE,1", "DURABILITY,1"));
         setPotionEffects(Arrays.asList("JUMP,0,self,continuous"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

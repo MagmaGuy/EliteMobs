@@ -15,6 +15,6 @@ public class DepthsSeekerConfig extends CustomItemsConfigFields {
                 Arrays.asList("&9Come from depths immeasurable", "&9and looted from monster most vile,", "&9there is no telling what horrors", "&9this fishing rod has seen."));
         setEnchantments(Arrays.asList("LURE,3", "LUCK,3", "DURABILITY,10", "FIRE_ASPECT,1", "VANISHING_CURSE,1"));
         setPotionEffects(Arrays.asList("WATER_BREATHING,0,self,continuous", "LUCK,0,self,continuous"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.enchantments.premade.SoulbindConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.utils.VisualArmorStand;
@@ -64,8 +65,7 @@ public class SoulbindEnchantment extends CustomEnchantment {
                 if (item == null)
                     return;
                 ArmorStand soulboundPlayer = VisualArmorStand.VisualArmorStand(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
-                        EnchantmentsConfig.getEnchantment("soulbind.yml")
-                                .getFileConfiguration().getString("hologramString").replace("$player", player.getDisplayName())));
+                        SoulbindConfig.hologramStrings.replace("$player", player.getDisplayName())));
                 new BukkitRunnable() {
                     final Location lastLocation = item.getLocation().clone();
                     int counter = 0;

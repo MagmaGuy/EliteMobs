@@ -1,18 +1,25 @@
 package com.magmaguy.elitemobs.config.powers.premade;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ZombieParentsConfig extends PowersConfigFields {
+    public static List<String> deathMessage, bossEntityDialog, zombieDad, zombieMom;
+
     public ZombieParentsConfig() {
         super("zombie_parents",
                 true,
                 "Parents",
                 Material.SKELETON_SKULL.toString());
+    }
 
-        super.getAdditionalConfigOptions().put("deathMessage", Arrays.asList(
+    @Override
+    public void processAdditionalFields() {
+        deathMessage = ConfigurationEngine.setList(fileConfiguration, "deathMessage", Arrays.asList(
                 "You monster!",
                 "My baby!",
                 "What have you done!?",
@@ -24,7 +31,7 @@ public class ZombieParentsConfig extends PowersConfigFields {
                 "He's deader than before!",
                 "You broke him!"));
 
-        super.getAdditionalConfigOptions().put("bossEntityDialog", Arrays.asList(
+        bossEntityDialog = ConfigurationEngine.setList(fileConfiguration, "bossEntityDialog", Arrays.asList(
                 "You're embarrassing me!",
                 "He's bullying me!",
                 "He's the one picking on me!",
@@ -35,7 +42,7 @@ public class ZombieParentsConfig extends PowersConfigFields {
                 "He took my lunch money!",
                 "He's bullying me!"));
 
-        super.getAdditionalConfigOptions().put("zombieDad", Arrays.asList(
+        zombieDad = ConfigurationEngine.setList(fileConfiguration, "zombieDad", Arrays.asList(
                 "Get away from my son!",
                 "Stand up for yourself son!",
                 "I'll deal with him!",
@@ -46,7 +53,7 @@ public class ZombieParentsConfig extends PowersConfigFields {
                 "Show him who's boss kiddo!",
                 "Nice punch kiddo!"));
 
-        super.getAdditionalConfigOptions().put("zombieMom", Arrays.asList(
+        zombieMom = ConfigurationEngine.setList(fileConfiguration, "zombieMom", Arrays.asList(
                 "Hands off my child!",
                 "Are you hurt sweetie?",
                 "Did he hurt you sweetie?",
@@ -58,4 +65,5 @@ public class ZombieParentsConfig extends PowersConfigFields {
                 "Stop this!",
                 "Did you take out the garbage?"));
     }
+
 }

@@ -40,6 +40,7 @@ public abstract class CustomEnchantment {
         new SummonMerchantEnchantment();
         new SummonWolfEnchantment();
         new UnbindEnchantment();
+        new LightningEnchantment();
     }
 
     /*

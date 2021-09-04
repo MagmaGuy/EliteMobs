@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
 
 /**
  * Created by MagmaGuy on 12/05/2017.
@@ -36,10 +37,12 @@ public class TranslationConfig {
 
     public static final String NO_PENDING_COMMANDS = "noPendingCommands";
 
+    public static String TRACK_MESSAGE;
+
 
     public static final String CONFIG_NAME = "translation.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+    FileConfiguration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
 
     public void initializeConfig() {
 
@@ -64,6 +67,8 @@ public class TranslationConfig {
         configuration.addDefault(TELEPORT_CANCELLED, "&7[EM] &cTeleport interrupted!");
 
         configuration.addDefault(NO_PENDING_COMMANDS, "&cYou don't currently have any pending commands!");
+
+        TRACK_MESSAGE = ConfigurationEngine.setString(configuration, "trackMessage", "Track the $name");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

@@ -88,7 +88,7 @@ public class SetupMenu {
                         addSchematicDungeon(minidungeon, counter);
                         break;
                     default:
-                        new WarningMessage("Dungeon " + minidungeon.dungeonPackagerConfigFields.getFileName() + " does not have a valid location type and therefore can't be set up automatically!");
+                        new WarningMessage("Dungeon " + minidungeon.dungeonPackagerConfigFields.getFilename() + " does not have a valid location type and therefore can't be set up automatically!");
                         break;
                 }
             minidungeonHashMap.put(validSlots.get(counter), minidungeon);

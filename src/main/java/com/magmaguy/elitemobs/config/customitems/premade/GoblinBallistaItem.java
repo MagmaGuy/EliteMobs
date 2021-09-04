@@ -15,6 +15,6 @@ public class GoblinBallistaItem extends CustomItemsConfigFields {
                 Arrays.asList("&8A treasure among goblins!"));
         setEnchantments(Arrays.asList("ARROW_DAMAGE,1", "DURABILITY,1", "QUICK_CHARGE,3", "MULTISHOT,1"));
         setPotionEffects(Arrays.asList("HEAL,0,self,onHit"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

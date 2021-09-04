@@ -75,7 +75,7 @@ public class CustomItem {
             //item is weighed and fixed
             addFixedItem(this);
             addWeighedFixedItems(this);
-            this.scalability = Scalability.fixed;
+            this.scalability = Scalability.FIXED;
             return;
         }
         parseScalability();
@@ -105,15 +105,15 @@ public class CustomItem {
             itemTier = tier + 1;
 
         switch (customItem.getScalability()) {
-            case limited:
+            case LIMITED:
                 loot = location.getWorld().dropItem(location,
                         ScalableItemConstructor.constructLimitedItem(itemTier, customItem, player, null));
                 break;
-            case scalable:
+            case SCALABLE:
                 loot = location.getWorld().dropItem(location,
                         ScalableItemConstructor.constructScalableItem(itemTier + 1, customItem, player, null));
                 break;
-            case fixed:
+            case FIXED:
                 loot = location.getWorld().dropItem(location,
                         customItem.generateItemStack(itemTier + 1, player));
             default:
@@ -146,7 +146,7 @@ public class CustomItem {
     // Adds custom items to the list used by the getloot GUI
     private static void addCustomItem(CustomItem customItem) {
         customItemStackList.add(customItem.generateDefaultsItemStack(null, false, null));
-        if (customItem.getItemType().equals(ItemType.unique)) return;
+        if (customItem.getItemType().equals(ItemType.UNIQUE)) return;
         customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
     }
 
@@ -274,7 +274,8 @@ public class CustomItem {
                         name.equalsIgnoreCase(IceBreakerEnchantment.key) ||
                         name.equalsIgnoreCase(SummonMerchantEnchantment.key) ||
                         name.equalsIgnoreCase(SummonWolfEnchantment.key) ||
-                        name.equalsIgnoreCase(UnbindEnchantment.key)) {
+                        name.equalsIgnoreCase(UnbindEnchantment.key) ||
+                        name.equalsIgnoreCase(LightningEnchantment.key)) {
                     customEnchantments.put(name.toLowerCase(), level);
                     continue;
                 }
@@ -309,7 +310,7 @@ public class CustomItem {
 
     private void parseItemType() {
         if (this.customItemsConfigFields.getItemType() == null) {
-            this.itemType = ItemType.custom;
+            this.itemType = ItemType.CUSTOM;
             return;
         }
         this.itemType = customItemsConfigFields.getItemType();
@@ -329,26 +330,26 @@ public class CustomItem {
 
     private void parseScalability() {
         if (this.customItemsConfigFields.getScalability() == null) {
-            this.scalability = Scalability.scalable;
+            this.scalability = Scalability.SCALABLE;
             return;
         }
         this.scalability = customItemsConfigFields.getScalability();
         switch (this.customItemsConfigFields.getScalability()) {
-            case fixed:
-                if (!itemType.equals(ItemType.unique))
+            case FIXED:
+                if (!itemType.equals(ItemType.UNIQUE))
                     addFixedItem(this);
                 break;
-            case limited:
-                if (!itemType.equals(ItemType.unique))
+            case LIMITED:
+                if (!itemType.equals(ItemType.UNIQUE))
                     addLimitedItem(this);
                 break;
-            case scalable:
-                if (!itemType.equals(ItemType.unique))
+            case SCALABLE:
+                if (!itemType.equals(ItemType.UNIQUE))
                     scalableItems.add(this);
                 break;
             default:
-                this.scalability = Scalability.scalable;
-                if (!itemType.equals(ItemType.unique))
+                this.scalability = Scalability.SCALABLE;
+                if (!itemType.equals(ItemType.UNIQUE))
                     scalableItems.add(this);
                 Bukkit.getLogger().warning("Item " + this.fileName + " does not have a valid scalability type! Defaulting to scalable.");
 
@@ -378,13 +379,13 @@ public class CustomItem {
     public ItemStack generateItemStack(int itemTier, Player player) {
         ItemStack itemStack = null;
         switch (this.scalability) {
-            case fixed:
-                itemStack = generateDefaultsItemStack(player, false,null);
+            case FIXED:
+                itemStack = generateDefaultsItemStack(player, false, null);
                 break;
-            case limited:
+            case LIMITED:
                 itemStack = ScalableItemConstructor.constructLimitedItem(itemTier, this, player, null);
                 break;
-            case scalable:
+            case SCALABLE:
                 itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player, null);
         }
         return itemStack;
@@ -443,14 +444,14 @@ public class CustomItem {
     }
 
     public enum ItemType {
-        custom,
-        unique
+        CUSTOM,
+        UNIQUE
     }
 
     public enum Scalability {
-        fixed,
-        limited,
-        scalable
+        FIXED,
+        LIMITED,
+        SCALABLE
     }
 
 }

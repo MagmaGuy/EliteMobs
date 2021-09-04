@@ -15,6 +15,6 @@ public class WolfsbaneItem extends CustomItemsConfigFields {
                 Arrays.asList("&aMade from the remains of", "&aan alpha werewolf, all", "&awolves cower at the sight of it."));
         setEnchantments(Arrays.asList("DAMAGE_ALL,1", "FIRE_ASPECT,4", "DURABILITY,5", "LOOT_BONUS_MOBS,5"));
         setPotionEffects(Arrays.asList("FAST_DIGGING,2,self,onHit",  "NIGHT_VISION,0,self,continuous"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

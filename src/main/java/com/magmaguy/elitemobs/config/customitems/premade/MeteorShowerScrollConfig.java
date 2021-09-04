@@ -14,6 +14,6 @@ public class MeteorShowerScrollConfig extends CustomItemsConfigFields {
                 "&7Meteor Shower Scroll",
                 Arrays.asList("&4Call forth destruction.", "&4Single-use."));
         setEnchantments(Arrays.asList("METEOR_SHOWER,1"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

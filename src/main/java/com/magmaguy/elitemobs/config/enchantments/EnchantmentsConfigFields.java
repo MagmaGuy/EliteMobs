@@ -1,89 +1,47 @@
 package com.magmaguy.elitemobs.config.enchantments;
 
-import org.bukkit.configuration.file.FileConfiguration;
+import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
+import lombok.Getter;
 import org.bukkit.enchantments.Enchantment;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+public class EnchantmentsConfigFields extends CustomConfigFields {
+    @Getter
+    private String name = "name";
+    @Getter
+    private int maxLevel = 5;
+    @Getter
+    private double value = 1;
+    @Getter
+    private Enchantment enchantment = Enchantment.DAMAGE_ALL;
 
-public class EnchantmentsConfigFields {
-
-    private final String fileName;
-    private final boolean isEnabled;
-    private final String name;
-    private final int maxLevel;
-    private final double value;
-    private final HashMap<String, Object> additionalConfigOptions = new HashMap<>();
-    private Enchantment enchantment;
-    private FileConfiguration fileConfiguration;
-
-    public EnchantmentsConfigFields(String fileName,
+    public EnchantmentsConfigFields(String filename,
                                     boolean isEnabled,
                                     String name,
                                     int maxLevel,
                                     double value) {
-        this.fileName = fileName + ".yml";
+        super(filename, isEnabled);
         this.isEnabled = isEnabled;
         this.name = name;
         this.maxLevel = maxLevel;
         this.value = value;
     }
 
-    public EnchantmentsConfigFields(FileConfiguration fileConfiguration, File file) {
-        this.fileName = file.getName();
-        this.fileConfiguration = fileConfiguration;
-        this.isEnabled = fileConfiguration.getBoolean("isEnabled");
-        this.name = fileConfiguration.getString("name");
-        this.maxLevel = fileConfiguration.getInt("maxLevel");
-        String cleanName = this.fileName.replace(".yml", "").toUpperCase();
+    @Override
+    public void processConfigFields() {
+        this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
+        this.name = processString("name", name, "name", true);
+        this.maxLevel = processInt("maxLevel", maxLevel, 1, true);
+        String cleanName = this.filename.replace(".yml", "").toUpperCase();
         try {
             this.enchantment = Enchantment.getByName(cleanName);
         } catch (Exception ex) {
             this.enchantment = null;
         }
-        this.value = fileConfiguration.getDouble("value");
+        this.value = processDouble("value", value, 1, true);
+        processAdditionalFields();
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("name", name);
-        fileConfiguration.addDefault("maxLevel", maxLevel);
-        fileConfiguration.addDefault("value", value);
-        if (!additionalConfigOptions.isEmpty())
-            fileConfiguration.addDefaults(additionalConfigOptions);
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    public Enchantment getEnchantment() {
-        return enchantment;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public FileConfiguration getFileConfiguration() {
-        return fileConfiguration;
-    }
-
-    public Map<String, Object> getAdditionalConfigOptions() {
-        return additionalConfigOptions;
-    }
+    public void processAdditionalFields(){}
 
 }

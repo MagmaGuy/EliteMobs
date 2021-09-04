@@ -12,7 +12,7 @@ public class FaeEvent extends CustomEventsConfigFields {
                 true);
         setEventType(CustomEvent.EventType.BREAK_BLOCK);
         setBossFilenames(Arrays.asList("fire_fae.yml", "ice_fae.yml", "lightning_fae.yml"));
-        setChance(0.0001);
+        setChance(0.001);
         setBreakableMaterials(Arrays.asList(Material.BIRCH_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG,
                 Material.OAK_LOG, Material.SPRUCE_LOG, Material.JUNGLE_LOG));
         setEventDuration(20);

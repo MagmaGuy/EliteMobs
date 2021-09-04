@@ -45,7 +45,7 @@ public class TeleportsPage {
                             .replace("$lowestTier", minidungeon.lowestTier + "")
                             .replace("$highestTier", minidungeon.highestTier + ""));
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + minidungeon.dungeonPackagerConfigFields.getFileName()));
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + minidungeon.dungeonPackagerConfigFields.getFilename()));
             textComponents.add(message);
 
             counter++;

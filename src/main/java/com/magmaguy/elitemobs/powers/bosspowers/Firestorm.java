@@ -33,7 +33,7 @@ public class Firestorm extends BossPower implements Listener {
             public void run() {
                 counter++;
 
-                if (counter > 20 * 10 | !eliteEntity.getLivingEntity().isValid()) {
+                if (counter > 20 * 10 | !eliteEntity.isValid()) {
                     if (eliteEntity.getLivingEntity().isValid())
                         eliteEntity.getLivingEntity().setAI(true);
                     cancel();

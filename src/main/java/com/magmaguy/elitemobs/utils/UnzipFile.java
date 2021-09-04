@@ -51,7 +51,7 @@ public class UnzipFile {
         String destDirPath = destinationDir.getCanonicalPath();
         String destFilePath = destFile.getCanonicalPath();
 
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+        if (!destFilePath.startsWith(destDirPath + File.separatorChar)) {
             throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
         }
 

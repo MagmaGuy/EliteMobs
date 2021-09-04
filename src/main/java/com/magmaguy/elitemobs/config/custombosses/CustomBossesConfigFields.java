@@ -5,7 +5,9 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -24,6 +26,8 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public static HashMap<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
     @Getter
     private final List<UniqueLoot> parsedUniqueLootList = new ArrayList<>();
+    @Getter
+    private final HashMap<String, SpecialLoot> specialLoot = new HashMap();
     @Getter
     @Setter
     private EntityType entityType = EntityType.ZOMBIE;
@@ -260,6 +264,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.deathMessages = processStringList("deathMessages", deathMessages, new ArrayList<>(), false);
         this.uniqueLootList = processStringList("uniqueLootList", uniqueLootList, new ArrayList<>(), false);
         for (String entry : this.uniqueLootList) {
+            if (SpecialLoot.isSpecialLootEntry(entry)) continue;
             try {
                 CustomItem customItem = CustomItem.getCustomItem(entry.split(":")[0]);
                 if (customItem == null)
@@ -269,6 +274,9 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                 new WarningMessage("Boss " + this.getName() + " has an invalid loot entry - " + entry + " - Skipping it!");
             }
         }
+        for (String string : uniqueLootList)
+            if (SpecialLoot.isSpecialLootEntry(string))
+                specialLoot.put(string, new SpecialLoot(string));
         //this can't be converted directly to an enum list because there are some special string features in here
         this.powers = processStringList("powers", powers, new ArrayList<>(), false);
         this.onDamageMessages = processStringList("onDamageMessages", onDamageMessages, new ArrayList<>(), false);

@@ -43,80 +43,55 @@ public class PassiveEliteMobDeathHandler implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(EntityDeathEvent event) {
-
         if (EntityTracker.isSuperMob(event.getEntity())) {
-
             event.getEntity().getLocation().getWorld().spawnEntity(event.getEntity().getLocation(), event.getEntityType());
             event.getEntity().getLocation().getWorld().spawnEntity(event.getEntity().getLocation(), event.getEntityType());
-
         }
-
     }
 
     public static class SuperMobScanner {
-
         private static final int passiveRange = MobCombatSettingsConfig.superMobsStackRange;
 
         public static void scanSuperMobs() {
-
             for (World world : validWorldList) {
-
                 if (world.getLivingEntities().isEmpty()) continue;
-
                 Iterator<LivingEntity> iterator = world.getLivingEntities().iterator();
-
                 while (iterator.hasNext()) {
-
                     LivingEntity livingEntity = iterator.next();
-
                     if (!SuperMobProperties.isValidSuperMobType(livingEntity)) continue;
-
                             /*
                             Re-register lost passive mob
                             */
                     checkLostSuperMob(livingEntity);
-
                             /*
                            Check passive mobs to register new super mobs
                            */
                     newSuperMobScan(livingEntity);
-
                 }
-
             }
-
         }
 
         private static void checkLostSuperMob(LivingEntity livingEntity) {
-
             if (Objects.requireNonNull(livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue() !=
                     SuperMobProperties.getSuperMobMaxHealth(livingEntity))
                 return;
-
             if (!EntityTracker.isSuperMob(livingEntity))
                 EntityTracker.registerSuperMob(livingEntity);
-
         }
 
         public static void newSuperMobScan(LivingEntity livingEntity) {
-
             if (livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() ==
                     SuperMobProperties.getSuperMobMaxHealth(livingEntity))
                 return;
-
             if (ThreadLocalRandom.current().nextDouble() < 1 / DefaultConfig.superMobStackAmount)
                 return;
-
             ArrayList<LivingEntity> livingEntities = new ArrayList<>();
-
             for (Entity entity : livingEntity.getNearbyEntities(passiveRange, passiveRange, passiveRange)) {
-
                 if (!entity.getType().equals(livingEntity.getType())) continue;
                 if (EntityTracker.isSuperMob(entity)) continue;
                 livingEntities.add((LivingEntity) entity);
                 if (livingEntities.size() >= DefaultConfig.superMobStackAmount)
                     break;
-
             }
 
             if (livingEntities.size() < DefaultConfig.superMobStackAmount)

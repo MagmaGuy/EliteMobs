@@ -84,7 +84,7 @@ public class EliteMobs extends JavaPlugin {
         ConfigValues.initializeConfigurations();
         ConfigValues.initializeCachedConfigurations();
         EconomySettingsConfig.initializeConfig();
-        EnchantmentsConfig.initializeConfigs();
+        new EnchantmentsConfig();
         AntiExploitConfig.initializeConfig();
         CombatTagConfig.initializeConfig();
         AntiExploitConfig.initializeConfig();
@@ -232,7 +232,7 @@ public class EliteMobs extends JavaPlugin {
         LootTables.initialize();
 
         //Load minidungeons, most of all load the worlds of minidungeons
-        DungeonPackagerConfig.initializeConfigs();
+        new DungeonPackagerConfig();
         //Load Adventurer's Guild
         if (AdventurersGuildConfig.guildWorldIsEnabled) {
             try {
@@ -261,8 +261,7 @@ public class EliteMobs extends JavaPlugin {
             }
         }
 
-        CustomTreasureChestsConfig.initializeConfigs();
-        TreasureChest.initializeTreasureChest();
+        new CustomTreasureChestsConfig();
 
         //Initialize npcs
         new NPCsConfig();
@@ -293,22 +292,34 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onDisable() {
 
+        new InfoMessage("Starting EliteMobs shutdown sequence...");
+
+        new InfoMessage("Regenerating exploded blocks...");
         Explosion.regenerateAllPendingBlocks();
 
+        new InfoMessage("Cancelling tasks...");
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
 
+        new InfoMessage("Spinning Regional Bosses down...");
         //save all pending respawns
         RegionalBossEntity.save();
         RegionalBossEntity.getTrackableCustomBosses().clear();
         RegionalBossEntity.getRegionalBossEntitySet().clear();
 
+        new InfoMessage("Wiping Elite entities clean...");
         EntityTracker.wipeShutdown();
 
+        new InfoMessage("Clearing valid worlds...");
         validWorldList.clear();
+        new InfoMessage("Clearing zone based worlds...");
         zoneBasedSpawningWorlds.clear();
+        new InfoMessage("Clearing config regional elites...");
         CustomBossesConfigFields.regionalElites.clear();
+        new InfoMessage("Clearing config natural elites...");
         CustomBossesConfigFields.getNaturallySpawnedElites().clear();
+        new InfoMessage("Clearing custom enchantments...");
         CustomEnchantment.getCustomEnchantments().clear();
+        new InfoMessage("Clearing custom items...");
         CustomItem.getCustomItems().clear();
         CustomItem.getCustomItemStackList().clear();
         CustomItem.getCustomItemStackShopList().clear();
@@ -317,17 +328,20 @@ public class EliteMobs extends JavaPlugin {
         CustomItem.getFixedItems().clear();
         CustomItem.getTieredLoot().clear();
         CustomItem.getWeighedFixedItems().clear();
+        new InfoMessage("Clearing Minidungeons...");
         Minidungeon.minidungeons.clear();
 
+        new InfoMessage("Unregistering placeholders...");
         if (this.placeholders != null)
             ((Placeholders) placeholders).unregister();
 
+        new InfoMessage("Unregistering handlers...");
         HandlerList.unregisterAll(MetadataHandler.PLUGIN);
 
         //save cached data
-        PlayerData.closeConnection();
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");
-        Bukkit.getLogger().info("[EliteMobs] All saved! Good night.");
+        PlayerData.closeConnection();
+        Bukkit.getLogger().info("[EliteMobs] All done! Good night.");
 
     }
 

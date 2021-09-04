@@ -1,15 +1,22 @@
 package com.magmaguy.elitemobs.config.powers.premade;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import org.bukkit.Material;
 
 public class ZombieNecronomiconConfig extends PowersConfigFields {
+    public static String summoningChant;
+
     public ZombieNecronomiconConfig() {
         super("zombie_necronomicon",
                 true,
                 "Necronomicon",
                 Material.ENCHANTED_BOOK.toString());
-        super.getAdditionalConfigOptions().put("summoningChant", "Nor is it to be thought..." +
+    }
+
+    @Override
+    public void processAdditionalFields() {
+        summoningChant = ConfigurationEngine.setString(fileConfiguration, "summoningChant", "Nor is it to be thought..." +
                 "that man is either the oldest " +
                 "or the last of earth's masters, or that the common bulk of life and substance walks alone. The Old Ones" +
                 " were, the Old Ones are, and the Old Ones shall be. Not in the spaces we know, but between them, they " +
@@ -32,4 +39,5 @@ public class ZombieNecronomiconConfig extends PowersConfigFields {
                 "where man rules now. After summer is winter, after winter summer. They wait patient and potent, for " +
                 "here shall They reign again.");
     }
+
 }

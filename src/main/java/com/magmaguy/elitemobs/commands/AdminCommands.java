@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.commands.admin.*;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -24,7 +25,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.Trans
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
-import com.sk89q.minecraft.util.commands.CommandContext;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -247,6 +247,18 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> CustomBossCommandHandler.addSpawnLocation(
                         commandContext.get("fileName"), (Player) commandContext.getSender())));
+
+        List<String> treasureChestFilenames = new ArrayList<>(CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().keySet());
+
+        // /em addTreasureChest <filename>
+        manager.command(builder.literal("addTreasureChest", "atc")
+                .argument(StringArgument.<CommandSender>newBuilder("fileName").withSuggestionsProvider(((objectCommandContext, s) -> treasureChestFilenames)),
+                        ArgumentDescription.of("Treasure Chest configuration file name"))
+                .meta(CommandMeta.DESCRIPTION, "Adds a location to a Treasure Chest.")
+                .senderType(Player.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> CustomTreasureChestsConfig.addTreasureChestEntry(
+                        (Player) commandContext.getSender(), commandContext.get("fileName"))));
 
         ArrayList<String> minidungeonFileNames = new ArrayList<>(Minidungeon.minidungeons.keySet());
 

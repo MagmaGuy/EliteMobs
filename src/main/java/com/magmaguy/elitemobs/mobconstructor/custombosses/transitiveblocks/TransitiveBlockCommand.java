@@ -3,13 +3,8 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.WarningMessage;
-import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -98,7 +93,7 @@ public class TransitiveBlockCommand {
     public void commitLocations() {
         List<String> deserializedData = new ArrayList<>();
         for (TransitiveBlock transitiveBlock : transitiveBlockList)
-            deserializedData.add(ConfigurationLocation.serialize(transitiveBlock.getLocation()) + ":" + transitiveBlock.getBlockData().getAsString());
+            deserializedData.add(ConfigurationLocation.deserialize(transitiveBlock.getLocation()) + ":" + transitiveBlock.getBlockData().getAsString());
         switch (transitiveBlockType) {
             case ON_SPAWN:
                 customBossesConfigFields.setOnSpawnBlockStates(deserializedData);
