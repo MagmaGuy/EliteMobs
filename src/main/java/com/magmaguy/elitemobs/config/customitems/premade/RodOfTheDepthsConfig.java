@@ -15,6 +15,6 @@ public class RodOfTheDepthsConfig extends CustomItemsConfigFields {
                 Arrays.asList("&3You want to hear about where", "&3I got this from? Sit down lad,", "&3I've got a tale for ye..."));
         setEnchantments(Arrays.asList("LURE,3", "LUCK,1", "DURABILITY,6", "VANISHING_CURSE,1"));
         setPotionEffects(Arrays.asList("INVISIBILITY,0,self,onHit", "SLOW,0,self,onHit", "BLINDNESS,0,self,onHit"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -70,6 +71,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Getter
     @Setter
     private Location respawnOverrideLocation;
+    private boolean worldIsLoading = false;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -164,7 +166,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             simplePersistentEntity = null;
         } else if (isPersistent) {
             if (simplePersistentEntity != null) {
-                new WarningMessage("Attempted to create more than one SimplePersistentEntity for boss " + customBossesConfigFields.getFilename() + " ." ,true);
+                new WarningMessage("Attempted to create more than one SimplePersistentEntity for boss " + customBossesConfigFields.getFilename() + " .", true);
                 return;
             }
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
@@ -375,6 +377,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     @Override
     public void chunkLoad() {
+        if (worldIsLoading) {
+            worldIsLoading = false;
+            return;
+        }
         chunkLoad = true;
         respawnOverrideLocation = persistentLocation;
         spawn(true);
@@ -387,9 +393,13 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     @Override
     public void worldLoad() {
-        if (spawnLocation != null)
+        worldIsLoading = true;
+        simplePersistentEntity = null;
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> worldIsLoading = false, 1);
+        if (spawnLocation != null) {
             spawnLocation.setWorld(Bukkit.getWorld(worldName));
-        spawn(true);
+            spawn(true);
+        }
     }
 
     @Override

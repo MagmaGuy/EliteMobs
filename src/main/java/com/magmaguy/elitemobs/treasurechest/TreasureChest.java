@@ -1,20 +1,20 @@
 package com.magmaguy.elitemobs.treasurechest;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
-import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import com.magmaguy.elitemobs.utils.*;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -25,95 +25,55 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TreasureChest {
 
-    private static final HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
+    @Getter
+    private static ArrayListMultimap<String, TreasureChest> unloadedChests = ArrayListMultimap.create();
+    private static HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
-    private final String fileName;
-    private final String key;
-    private final boolean isEnabled;
     public boolean chunkIsLoaded = true;
     public boolean effectIsOn = true;
-    private Material chestMaterial;
-    private BlockFace facing;
-    private int chestTier;
-    private Location location;
-    private List<String> locations;
-    private DropStyle dropStyle;
-    private int restockTimer;
-    private List<String> lootList;
-    private double mimicChance;
-    private List<String> mimicCustomBossesList;
     private long restockTime;
-    private List<String> restockTimes;
-    private List<String> effects;
-    public TreasureChest(CustomTreasureChestConfigFields customTreasureChestConfigFields) {
+    private Location location;
 
+    public TreasureChest(CustomTreasureChestConfigFields customTreasureChestConfigFields, Location location, long restockTime) {
         this.customTreasureChestConfigFields = customTreasureChestConfigFields;
-        this.fileName = customTreasureChestConfigFields.getFileName();
-        this.key = ChatColorConverter.convert(fileName);
-        this.isEnabled = customTreasureChestConfigFields.isEnabled();
-        if (!isEnabled)
-            return;
-        try {
-            this.chestMaterial = Material.getMaterial(customTreasureChestConfigFields.getChestMaterial());
-        } catch (Exception ex) {
-            new WarningMessage("Malformed material for " + this.fileName + " !");
-            new WarningMessage("Material " + customTreasureChestConfigFields.getChestMaterial() + " is not a valid material!");
-            return;
-        }
-        if (chestMaterial == null)
+        this.location = location;
+        this.restockTime = restockTime;
+        if (!customTreasureChestConfigFields.isEnabled())
             return;
 
-        if (this.chestMaterial.equals(Material.CHEST) || this.chestMaterial.equals(Material.TRAPPED_CHEST) ||
-                this.chestMaterial.equals(Material.ENDER_CHEST) || this.chestMaterial.equals(Material.SHULKER_BOX))
+        if (customTreasureChestConfigFields.getChestMaterial() == null)
+            return;
+
+        if (location == null)
+            return;
+
+        if (location.getWorld() == null) {
+            unloadedChests.put(customTreasureChestConfigFields.getWorldName(), this);
+            return;
+        } else
             try {
-                if (customTreasureChestConfigFields.getFacing() != null)
-                    this.facing = BlockFace.valueOf(customTreasureChestConfigFields.getFacing().toUpperCase());
+                location.getChunk().load();
             } catch (Exception ex) {
-                new WarningMessage("Malformed direction for " + this.fileName + " !");
-                new WarningMessage("Valid directions: NORTH, SOUTH, EAST, WEST. Your input: " + customTreasureChestConfigFields.getFacing());
+                new InfoMessage("Location for treasure chest " + customTreasureChestConfigFields.getFilename() + " is not loaded, so a treasure chest will not be placed!");
+                new WarningMessage(ex.getMessage());
+                return;
             }
 
-        this.chestTier = customTreasureChestConfigFields.getChestTier();
-        this.location = customTreasureChestConfigFields.getLocation();
-        if (location == null || location.getWorld() == null)
-            return;
-
-        try {
-            location.getChunk().load();
-        } catch (Exception ex) {
-            new InfoMessage("Location " + customTreasureChestConfigFields.getLocationString() + " is not loaded, so a treasure chest will not be placed!");
-            new WarningMessage(ex.getMessage());
-            return;
-        }
-
-        if (!customTreasureChestConfigFields.getDropStyle().equalsIgnoreCase("single") &&
-                !customTreasureChestConfigFields.getDropStyle().equalsIgnoreCase("group"))
-            this.dropStyle = DropStyle.SINGLE;
-        else
-            this.dropStyle = DropStyle.valueOf(customTreasureChestConfigFields.getDropStyle().toUpperCase());
-        this.restockTimer = customTreasureChestConfigFields.getRestockTimer();
-        this.lootList = customTreasureChestConfigFields.getLootList();
-        this.mimicChance = customTreasureChestConfigFields.getMimicChance();
-        this.mimicCustomBossesList = customTreasureChestConfigFields.getMimicCustomBossesList();
-        this.restockTime = customTreasureChestConfigFields.getRestockTime();
-        this.restockTimes = customTreasureChestConfigFields.getRestockTimes();
-        if (this.restockTimes == null) this.restockTimes = new ArrayList<>();
-        this.effects = customTreasureChestConfigFields.getEfffects();
-
         generateChest();
-
         treasureChestHashMap.put(location, this);
 
     }
@@ -126,22 +86,18 @@ public class TreasureChest {
         return getTreasureChestHashMap().get(location);
     }
 
-    public static void initializeTreasureChest() {
-        for (CustomTreasureChestConfigFields customTreasureChestConfigFields : CustomTreasureChestsConfig.getCustomTreasureChestConfigFields().values())
-            new TreasureChest(customTreasureChestConfigFields);
-    }
-
     private void generateChest() {
         try {
-            if (!location.getWorld().getBlockAt(location).getType().equals(chestMaterial))
-                location.getWorld().getBlockAt(location).setType(chestMaterial);
+            if (!location.getWorld()
+                    .getBlockAt(location).getType().equals(customTreasureChestConfigFields.getChestMaterial()))
+                location.getWorld().getBlockAt(location).setType(customTreasureChestConfigFields.getChestMaterial());
         } catch (Exception ex) {
-            new WarningMessage("Custom Treasure Chest " + fileName + " has an invalid location and can not be placed.");
+            new WarningMessage("Custom Treasure Chest " + customTreasureChestConfigFields.getFilename() + " has an invalid location and can not be placed.");
             return;
         }
         //todo: this doesn't support non- chest block types like the ender chest
         Chest chest = (Chest) location.getBlock().getBlockData();
-        chest.setFacing(facing);
+        chest.setFacing(customTreasureChestConfigFields.getFacing());
         location.getBlock().setBlockData(chest);
         location.getBlock().getState().update();
 
@@ -150,32 +106,32 @@ public class TreasureChest {
 
     public void doInteraction(Player player) {
 
-        if (dropStyle.equals(DropStyle.GROUP))
+        if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP))
             if (playerIsInCooldown(player)) {
                 groupTimerCooldownMessage(player, getPlayerCooldown(player));
                 return;
             }
 
-        if (ThreadLocalRandom.current().nextDouble() < mimicChance)
+        if (ThreadLocalRandom.current().nextDouble() < customTreasureChestConfigFields.getMimicChance())
             doMimic();
         else
             doTreasure(player);
 
-        if (dropStyle.equals(DropStyle.GROUP)) {
-            restockTimes.add(cooldownStringConstructor(player));
+        if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP)) {
+            customTreasureChestConfigFields.getRestockTimers().add(cooldownStringConstructor(player));
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    restockTimes.removeIf(restockTime -> restockTime.split(":")[0].equals(player.getUniqueId().toString()));
+                    customTreasureChestConfigFields.getRestockTimers().removeIf(restockTime -> restockTime.split(":")[0].equals(player.getUniqueId().toString()));
                 }
-            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * this.restockTimer);
+            }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
             return;
         }
 
         location.getBlock().setType(Material.AIR);
 
         restockTime = cooldownTime();
-        customTreasureChestConfigFields.setRestockTime(restockTime);
+        customTreasureChestConfigFields.setRestockTime(location, restockTime);
         effectIsOn = false;
         new BukkitRunnable() {
             @Override
@@ -184,35 +140,43 @@ public class TreasureChest {
                 effectIsOn = true;
                 startEffects();
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * this.restockTimer);
+        }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * this.customTreasureChestConfigFields.getRestockTimer());
 
     }
 
     private void doMimic() {
         HashMap<String, Double> weighedValues = new HashMap<>();
-        for (String string : this.mimicCustomBossesList)
+        for (String string : this.customTreasureChestConfigFields.getMimicCustomBossesList()) {
+            String filename = string.split(":")[0];
+            double weight = 1;
             try {
-                String filename = string.split(":")[0];
-                double weight = Double.valueOf(string.split(":")[1]);
-                weighedValues.put(filename, weight);
+                weight = Double.valueOf(string.split(":")[1]);
             } catch (Exception ex) {
-                new WarningMessage("Malformed custom boss entry for " + this.fileName + " !");
-                new WarningMessage("Entry: " + string);
-                new WarningMessage("Correct format: filename.yml:weight");
+                weight = 1;
             }
+            weighedValues.put(filename, weight);
+        }
         CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(WeightedProbability.pickWeighedProbability(weighedValues));
         customBossEntity.spawn(location, randomizeTier(), false);
     }
 
     private void doTreasure(Player player) {
-        for (String string : this.lootList)
+        for (String string : this.customTreasureChestConfigFields.getLootList())
             try {
                 String filename = string.split(":")[0];
-                double odds = Double.valueOf(string.split(":")[1]);
+                double odds;
+                if (customTreasureChestConfigFields.getSpecialLootList().get(string) != null) {
+                    odds = customTreasureChestConfigFields.getSpecialLootList().get(string).getChance();
+                } else
+                    odds = Double.valueOf(string.split(":")[1]);
                 if (ThreadLocalRandom.current().nextDouble() < odds)
-                    CustomItem.dropPlayerLoot(player, randomizeTier(), filename, location);
+                    if (customTreasureChestConfigFields.getSpecialLootList().get(string) != null) {
+                        location.getWorld().dropItem(location, customTreasureChestConfigFields.getSpecialLootList().
+                                get(string).generateItemStack(player, customTreasureChestConfigFields.getChestTier() * 10, (customTreasureChestConfigFields.getChestTier() + 1) * 10));
+                    } else
+                        CustomItem.dropPlayerLoot(player, randomizeTier(), filename, location);
             } catch (Exception ex) {
-                new WarningMessage("Malformed loot entry for " + this.fileName + " !");
+                new WarningMessage("Malformed loot entry for " + this.customTreasureChestConfigFields.getFile() + " !");
                 new WarningMessage("Entry: " + string);
                 new WarningMessage("Correct format: filename.yml:odds");
                 ex.printStackTrace();
@@ -220,12 +184,12 @@ public class TreasureChest {
     }
 
     private int randomizeTier() {
-        return chestTier * 10 + ThreadLocalRandom.current().nextInt(11);
+        return customTreasureChestConfigFields.getChestTier() * 10 + ThreadLocalRandom.current().nextInt(11);
     }
 
     private void lowRankMessage(Player player) {
         //todo: fix treasure chests to incorporate prestige ranks into them
-        player.sendMessage(ChatColorConverter.convert("&7[EM] &cYour guild rank needs to be " + GuildRank.getRankName(0, chestTier)
+        player.sendMessage(ChatColorConverter.convert("&7[EM] &cYour guild rank needs to be " + GuildRank.getRankName(0, customTreasureChestConfigFields.getChestTier())
                 + " &cin order to open this chest!"));
     }
 
@@ -235,14 +199,14 @@ public class TreasureChest {
     }
 
     private boolean playerIsInCooldown(Player player) {
-        for (String string : restockTimes)
+        for (String string : customTreasureChestConfigFields.getRestockTimers())
             if (string.split(":")[0].equals(player.getUniqueId().toString()))
                 return true;
         return false;
     }
 
     private long getPlayerCooldown(Player player) {
-        for (String string : restockTimes)
+        for (String string : customTreasureChestConfigFields.getRestockTimers())
             if (string.split(":")[0].equals(player.getUniqueId().toString()))
                 return Long.parseLong(string.split(":")[1]);
         return 0;
@@ -253,7 +217,7 @@ public class TreasureChest {
     }
 
     private long cooldownTime() {
-        return Instant.now().getEpochSecond() + 60 * this.restockTimer;
+        return Instant.now().getEpochSecond() + 60L * this.customTreasureChestConfigFields.getRestockTimer();
     }
 
     private String timeConverter(long seconds) {
@@ -268,7 +232,7 @@ public class TreasureChest {
     }
 
     public void startEffects() {
-        for (String string : this.effects) {
+        for (String string : this.customTreasureChestConfigFields.getEffects()) {
             try {
                 Particle particle = Particle.valueOf(string);
                 doParticleTrail(particle);
@@ -331,7 +295,7 @@ public class TreasureChest {
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
-    private enum DropStyle {
+    public enum DropStyle {
         SINGLE,
         GROUP
     }
@@ -343,7 +307,7 @@ public class TreasureChest {
             TreasureChest treasureChest = getTreasureChest(event.getClickedBlock().getLocation());
             if (treasureChest == null) return;
             event.setCancelled(true);
-            if (GuildRank.getMaxGuildRank(event.getPlayer()) < treasureChest.chestTier)
+            if (GuildRank.getMaxGuildRank(event.getPlayer()) < treasureChest.customTreasureChestConfigFields.getChestTier())
                 treasureChest.lowRankMessage(event.getPlayer());
             else
                 treasureChest.doInteraction(event.getPlayer());
@@ -363,6 +327,28 @@ public class TreasureChest {
                     treasureChest.effectIsOn = true;
                     treasureChest.startEffects();
                 }
+        }
+
+        @EventHandler
+        public void onWorldLoad(WorldLoadEvent event) {
+            for (TreasureChest treasureChest : getUnloadedChests().get(event.getWorld().getName())) {
+                treasureChest.location.setWorld(event.getWorld());
+                treasureChest.generateChest();
+                treasureChestHashMap.put(treasureChest.location, treasureChest);
+            }
+            getUnloadedChests().removeAll(event.getWorld().getName());
+        }
+
+        @EventHandler
+        public void onWorldUnload(WorldUnloadEvent event) {
+            for (Iterator<Map.Entry<Location, TreasureChest>> iterator = getTreasureChestHashMap().entrySet().iterator(); iterator.hasNext(); ) {
+                Map.Entry<Location, TreasureChest> entry = iterator.next();
+                TreasureChest treasureChest = entry.getValue();
+                if (treasureChest.customTreasureChestConfigFields.getWorldName().equals(event.getWorld().getName()))
+                    treasureChest.effectIsOn = false;
+                getUnloadedChests().put(event.getWorld().getName(), treasureChest);
+                iterator.remove();
+            }
         }
 
         @EventHandler

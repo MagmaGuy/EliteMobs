@@ -45,7 +45,7 @@ public class Minidungeon {
     public Integer lowestTier, highestTier, regionalBossCount = 0;
 
     public Minidungeon(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
-        minidungeons.put(dungeonPackagerConfigFields.getFileName(), this);
+        minidungeons.put(dungeonPackagerConfigFields.getFilename(), this);
         this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
         regionalBossCount = 0;
         switch (dungeonPackagerConfigFields.getDungeonLocationType()) {
@@ -56,7 +56,7 @@ public class Minidungeon {
                 setupSchematicBasedMinidungeon();
                 break;
             default:
-                new WarningMessage("Mindungeon " + dungeonPackagerConfigFields.getFileName() + " does not have a valid dungeonLocationType! Valid types: schematic, world");
+                new WarningMessage("Mindungeon " + dungeonPackagerConfigFields.getFilename() + " does not have a valid dungeonLocationType! Valid types: schematic, world");
                 this.isDownloaded = this.isInstalled = false;
                 break;
         }
@@ -66,7 +66,7 @@ public class Minidungeon {
     private void setupWorldBasedMinidungeon() {
         if (dungeonPackagerConfigFields.getWorldName() == null || dungeonPackagerConfigFields.getWorldName().isEmpty()) {
             this.isDownloaded = this.isInstalled = false;
-            new WarningMessage("Minidungeon " + dungeonPackagerConfigFields.getFileName() + " does not have a valid world name in the dungeon packager!");
+            new WarningMessage("Minidungeon " + dungeonPackagerConfigFields.getFilename() + " does not have a valid world name in the dungeon packager!");
             return;
         }
 
@@ -74,7 +74,7 @@ public class Minidungeon {
         if (Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName()) != null) {
             this.isDownloaded = this.isInstalled = true;
             world = Bukkit.getWorld(dungeonPackagerConfigFields.getWorldName());
-            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportPoint());
             quantifyWorldBosses();
             return;
         }
@@ -90,7 +90,7 @@ public class Minidungeon {
                 world = MinidungeonWorldLoader.loadWorld(this);
 
         if (world != null) {
-            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportPoint());
         }
     }
 
@@ -98,7 +98,7 @@ public class Minidungeon {
         //If the configuration of the package is wrong
         if (this.dungeonPackagerConfigFields.getSchematicName() == null || this.dungeonPackagerConfigFields.getSchematicName().isEmpty()) {
             this.isDownloaded = false;
-            new WarningMessage("The minidungeon package " + this.dungeonPackagerConfigFields.getFileName() + " does not have a valid schematic file name!");
+            new WarningMessage("The minidungeon package " + this.dungeonPackagerConfigFields.getFilename() + " does not have a valid schematic file name!");
         }
 
         //If worldedit isn't installed, the checks can't be continued
@@ -136,7 +136,7 @@ public class Minidungeon {
             this.teleportLocation = GenericRotationMatrixMath.rotateVectorYAxis(
                     dungeonPackagerConfigFields.getRotation(),
                     dungeonPackagerConfigFields.getAnchorPoint(),
-                    dungeonPackagerConfigFields.getTeleportOffset()).toLocation(dungeonPackagerConfigFields.getAnchorPoint().getWorld());
+                    dungeonPackagerConfigFields.getTeleportPoint()).toLocation(dungeonPackagerConfigFields.getAnchorPoint().getWorld());
     }
 
     /**
@@ -211,7 +211,7 @@ public class Minidungeon {
             player.sendMessage("Minidungeon " + dungeonPackagerConfigFields.getWorldName() +
                     " has been loaded! The world is now loaded and the regional bosses are up.");
             isInstalled = true;
-            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportOffset());
+            teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportPoint());
         } catch (Exception exception) {
             new WarningMessage("Warning: Failed to load the " + dungeonPackagerConfigFields.getWorldName() + " world!");
             player.sendMessage("Warning: Failed to load the " + dungeonPackagerConfigFields.getWorldName() + " world!");
@@ -260,10 +260,10 @@ public class Minidungeon {
                 player.sendMessage(ChatColorConverter.convert("&2-------------------------------------------------"));
                 player.sendMessage(ChatColorConverter.convert("&7[EliteMobs] &2Ready to install " + dungeonPackagerConfigFields.getDungeonSizeCategory().toString().toLowerCase() + "!"));
                 TextComponent pasteString = new TextComponent(ChatColorConverter.convert("&aClick here to place the &lbuilding and bosses &awhere you're standing!"));
-                pasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName()));
+                pasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFilename()));
                 pasteString.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColorConverter.convert("&2Click me!")).create()));
                 TextComponent noPasteString = new TextComponent(ChatColorConverter.convert("&4&lOr &4click here to &lonly set the bosses with no building&4!"));
-                noPasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFileName() + " noPaste"));
+                noPasteString.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup minidungeon " + dungeonPackagerConfigFields.getFilename() + " noPaste"));
                 noPasteString.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColorConverter.convert("&cOnly click if you're already standing at the bulding's anchor point!")).create()));
                 player.spigot().sendMessage(pasteString);
                 player.spigot().sendMessage(noPasteString);
@@ -293,7 +293,7 @@ public class Minidungeon {
         teleportLocation = GenericRotationMatrixMath.rotateVectorYAxis(
                 dungeonPackagerConfigFields.getRotation(),
                 dungeonPackagerConfigFields.getAnchorPoint(),
-                dungeonPackagerConfigFields.getTeleportOffset()).toLocation(player.getWorld());
+                dungeonPackagerConfigFields.getTeleportPoint()).toLocation(player.getWorld());
 
         for (int i = 0; i < 20; i++)
             player.sendMessage("");
@@ -301,9 +301,9 @@ public class Minidungeon {
         player.sendMessage(ChatColorConverter.convert("&2" + dungeonPackagerConfigFields.getName() + " installed!"));
         TextComponent setupOptions = new TextComponent(ChatColorConverter.convert("&4Click here to uninstall!"));
         if (pastedSchematic)
-            setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFileName()));
+            setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFilename()));
         else
-            setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFileName() + " noPaste"));
+            setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeon " + dungeonPackagerConfigFields.getFilename() + " noPaste"));
         player.spigot().sendMessage(setupOptions);
         quantifySchematicBosses();
     }

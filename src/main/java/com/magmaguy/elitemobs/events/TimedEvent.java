@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.CustomEventStartEvent;
+import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
@@ -37,6 +38,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     }
 
     public static void initializeBlueprintEvents() {
+        if (!EventsConfig.timedEventsEnabled) return;
         for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values())
             if (customEventsConfigFields.isEnabled())
                 switch (customEventsConfigFields.getEventType()) {

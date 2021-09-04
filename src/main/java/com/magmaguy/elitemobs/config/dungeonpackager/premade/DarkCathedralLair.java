@@ -26,8 +26,8 @@ public class DarkCathedralLair extends DungeonPackagerConfigFields {
                 new Vector(17, -27, 0),
                 new Vector(-19, 54, 32),
                 new Vector(0, 0, 0),
-                null,
-                null,
+                0,
+                0,
                 3,
                 "Difficulty: &cHard\n" +
                         "$bossCount level $highestTier Big Boss!\n" +

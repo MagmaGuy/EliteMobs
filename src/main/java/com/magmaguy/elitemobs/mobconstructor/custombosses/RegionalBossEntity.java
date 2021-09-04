@@ -54,7 +54,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             ticksBeforeRespawn = (unixRespawnTime - System.currentTimeMillis()) / 1000 * 20 < 0 ?
                     0 : (unixRespawnTime - System.currentTimeMillis()) / 1000 * 20;
         super.worldName = rawLocationString.split(",")[0];
-        super.spawnLocation = ConfigurationLocation.deserialize(rawLocationString);
+        super.spawnLocation = ConfigurationLocation.serialize(rawLocationString);
 
         super.setPersistent(true);
     }
@@ -66,7 +66,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         super.spawnLocation = location;
         this.leashRadius = customBossesConfigFields.getLeashRadius();
         if (permanent) {
-            this.rawString = ConfigurationLocation.serialize(location);
+            this.rawString = ConfigurationLocation.deserialize(location);
             this.rawLocationString = rawString.split(":")[0];
             this.unixRespawnTime = 0;
             this.respawnCoolDownInMinutes = customBossesConfigFields.getSpawnCooldown();
@@ -134,7 +134,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             new WarningMessage("Failed to save regional boss because it failed to spawn correctly!");
         }
         customBossesConfigFields.setFilesOutOfSync(true);
-        rawString = ConfigurationLocation.serialize(spawnLocation);
+        rawString = ConfigurationLocation.deserialize(spawnLocation);
     }
 
     public void initialize() {
@@ -253,7 +253,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     public static class RegionalBossEntityEvents implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void onNewMinidungeonRelativeBossLocationEvent(NewMinidungeonRelativeBossLocationEvent event) {
-            new RegionalBossEntity(event.getCustomBossConfigFields(), ConfigurationLocation.serialize(event.getRealLocation()));
+            new RegionalBossEntity(event.getCustomBossConfigFields(), ConfigurationLocation.deserialize(event.getRealLocation()));
             event.getCustomBossConfigFields().setFilesOutOfSync(true);
         }
     }

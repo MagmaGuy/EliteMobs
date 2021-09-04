@@ -18,6 +18,7 @@ public class ElitePlayerInventory {
     public static HashMap<UUID, ElitePlayerInventory> playerInventories = new HashMap<>();
     public final PlayerItem helmet, chestplate, leggings, boots, mainhand, offhand;
     private final Player player;
+
     /**
      * Object of the player's inventory for EliteMobs.
      * For performance reasons, values are cached and updated only when strictly necessary.
@@ -119,6 +120,10 @@ public class ElitePlayerInventory {
 
     public double getCritChance(boolean update) {
         return mainhand.getCritChance(player.getInventory().getItemInMainHand(), update);
+    }
+
+    public double getLightningChance(boolean update) {
+        return mainhand.getLightningChance(player.getInventory().getItemInMainHand(), update);
     }
 
     public double getHunterChance(boolean update) {

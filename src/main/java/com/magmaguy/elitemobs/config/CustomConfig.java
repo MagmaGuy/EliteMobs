@@ -144,7 +144,7 @@ public class CustomConfig {
         //Save all configuration values as they exist
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
 
-        if (customConfigFields.isEnabled)
+        //if (customConfigFields.isEnabled)
             //Store for use by the plugin
             addCustomConfigFields(file.getName(), customConfigFields);
     }
@@ -164,7 +164,7 @@ public class CustomConfig {
             instancedCustomConfigFields.setFile(file);
             //Parse actual fields and load into RAM to be used
             instancedCustomConfigFields.processConfigFields();
-            if (instancedCustomConfigFields.isEnabled)
+            //if (instancedCustomConfigFields.isEnabled)
                 //Store for use by the plugin
                 addCustomConfigFields(file.getName(), instancedCustomConfigFields);
         } catch (Exception ex) {

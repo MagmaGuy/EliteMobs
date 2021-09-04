@@ -5,8 +5,10 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -30,6 +32,10 @@ public class CustomBossDeath implements Listener {
         for (CustomBossesConfigFields.UniqueLoot uniqueLoot : customBossEntity.customBossesConfigFields.getParsedUniqueLootList())
             if (ThreadLocalRandom.current().nextDouble() < uniqueLoot.chance)
                 CustomItem.dropPlayerLoot(player, customBossEntity.getLevel(), uniqueLoot.customItem.getFileName(), customBossEntity.getLocation());
+        for (SpecialLoot specialLoot : customBossEntity.customBossesConfigFields.getSpecialLoot().values())
+            if (ThreadLocalRandom.current().nextDouble() < specialLoot.getChance())
+                customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(),
+                        specialLoot.generateItemStack(player, Math.max(customBossEntity.getLevel() - 3, 1), customBossEntity.getLevel() + 3));
     }
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {

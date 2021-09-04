@@ -32,10 +32,10 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
     private String dropWeight = "dynamic";
     @Getter
     @Setter
-    private CustomItem.Scalability scalability = CustomItem.Scalability.scalable;
+    private CustomItem.Scalability scalability = CustomItem.Scalability.SCALABLE;
     @Getter
     @Setter
-    private CustomItem.ItemType itemType = CustomItem.ItemType.custom;
+    private CustomItem.ItemType itemType = CustomItem.ItemType.CUSTOM;
     @Getter
     @Setter
     private Integer customModelID = -1;
@@ -68,8 +68,8 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
         this.enchantments = processStringList("enchantments", enchantments, new ArrayList<>(), false);
         this.potionEffects = processStringList("potionEffects", potionEffects, new ArrayList<>(), false);
         this.dropWeight = processString("dropWeight", dropWeight, "dynamic", false);
-        this.scalability = processEnum("scalability", scalability, CustomItem.Scalability.scalable, false);
-        this.itemType = processEnum("itemType", itemType, CustomItem.ItemType.custom, false);
+        this.scalability = processEnum("scalability", scalability, CustomItem.Scalability.SCALABLE, false);
+        this.itemType = processEnum("itemType", itemType, CustomItem.ItemType.CUSTOM, false);
         this.customModelID = processInt("customModelID", customModelID, -1, false);
     }
 }

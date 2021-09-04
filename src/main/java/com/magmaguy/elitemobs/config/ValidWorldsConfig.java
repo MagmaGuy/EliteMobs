@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ValidWorldsConfig {
 
-    public static List<String> zoneBasedWorlds, nightmareWorlds = new ArrayList<>();
+    public static List<World> validWorlds = new ArrayList<>(), zoneBasedWorlds = new ArrayList<>(), nightmareWorlds = new ArrayList<>();
 
     public static FileConfiguration fileConfiguration;
     private static File file;
@@ -19,8 +19,11 @@ public class ValidWorldsConfig {
         file = ConfigurationEngine.fileCreator("ValidWorlds.yml");
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-        for (World world : Bukkit.getWorlds())
+        for (World world : Bukkit.getWorlds()) {
             fileConfiguration.addDefault("Valid worlds." + world.getName(), true);
+            if (fileConfiguration.getBoolean("Valid worlds." + world.getName()))
+                validWorlds.add(world);
+        }
 
         zoneBasedWorlds = ConfigurationEngine.setList(fileConfiguration, "zoneBasedWorlds", new ArrayList());
         nightmareWorlds = ConfigurationEngine.setList(fileConfiguration, "nightmareWorlds", new ArrayList());

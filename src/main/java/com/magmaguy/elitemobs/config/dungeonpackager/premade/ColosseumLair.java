@@ -36,8 +36,8 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                 new Vector(40, -14, 0),
                 new Vector(-41, 31, 88),
                 new Vector(0, 0, 0),
-                null,
-                null,
+                0,
+                0,
                 2,
                 "Difficulty: &4Very Hard\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +

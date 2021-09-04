@@ -1,17 +1,16 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -84,6 +83,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return ChatColorConverter.convert(fileConfiguration.getString(path));
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -101,6 +101,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return list;
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -131,6 +132,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return validWorlds;
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -156,6 +158,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return newList;
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -176,6 +179,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return fileConfiguration.getInt(path);
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -189,6 +193,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return fileConfiguration.getLong(path);
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -203,6 +208,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return fileConfiguration.getDouble(path);
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -216,26 +222,29 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
             return fileConfiguration.getBoolean(path);
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
 
     public <T extends Enum> T processEnum(String path, T value, T pluginDefault, boolean forceWriteDefault) {
         if (!configHas(path)) {
-            if (forceWriteDefault || value != pluginDefault){
+            if (forceWriteDefault || value != pluginDefault) {
                 String valueString = null;
                 if (value != null)
-                    valueString = value.toString();
+                    valueString = value.toString().toUpperCase();
                 String pluginDefaultString = null;
                 if (pluginDefault != null)
-                    pluginDefaultString = pluginDefault.toString();
-                processString(path, valueString, pluginDefaultString, forceWriteDefault);}
+                    pluginDefaultString = pluginDefault.toString().toUpperCase();
+                processString(path, valueString, pluginDefaultString, forceWriteDefault);
+            }
             return value;
         }
         try {
-            return (T) Enum.valueOf(value.getClass(), fileConfiguration.getString(path));
+            return (T) Enum.valueOf(value.getClass(), fileConfiguration.getString(path).toUpperCase());
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -275,6 +284,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
                 return ItemStackGenerator.generateItemStack(Material.getMaterial(materialString));
         } catch (Exception ex) {
             new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
         }
         return value;
     }
@@ -282,6 +292,46 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
     private String itemStackDeserializer(ItemStack itemStack) {
         if (itemStack == null) return null;
         return itemStack.getType().toString();
+    }
+
+    protected Location processLocation(String path, Location value, String pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || !Objects.equals(value, pluginDefault))
+                fileConfiguration.addDefault(path, ConfigurationLocation.deserialize(value));
+            return value;
+        }
+        try {
+            return ConfigurationLocation.serialize(fileConfiguration.getString(path));
+        } catch (Exception ex) {
+            new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
+        }
+        return null;
+    }
+
+    protected Vector processVector(String path, Vector value, Vector pluginDefault, boolean forceWriteDefault) {
+        if (!configHas(path)) {
+            if (forceWriteDefault || !Objects.equals(value, pluginDefault))
+                if (pluginDefault != null) {
+                    String vectorString = value.getX() + "," + value.getY() + "," + value.getZ();
+                    fileConfiguration.addDefault(path, vectorString);
+                }
+            return value;
+        }
+        try {
+            String string = fileConfiguration.getString(path);
+            if (string == null) return null;
+            String[] strings = string.split(",");
+            if (strings.length < 3) {
+                new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+                return null;
+            }
+            return new Vector(Double.parseDouble(strings[0]), Double.parseDouble(strings[1]), Double.parseDouble(strings[2]));
+        } catch (Exception ex) {
+            new WarningMessage("File " + filename + " has an incorrect entry for " + path);
+            new WarningMessage("Entry: " + value);
+        }
+        return null;
     }
 
 }

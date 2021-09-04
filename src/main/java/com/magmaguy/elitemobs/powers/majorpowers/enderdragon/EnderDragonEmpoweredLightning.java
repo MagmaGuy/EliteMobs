@@ -43,7 +43,7 @@ public class EnderDragonEmpoweredLightning extends MajorPower {
                     EntityTracker.registerProjectileEntity(fireball);
                     fireball.setDirection(new Vector(0, -3, 0));
                     fireball.setVelocity(new Vector(0, -3, 0));
-                    fireball.setYield(15F);
+                    fireball.setYield(5F);
                     EliteProjectile.signExplosiveWithPower(fireball, "ender_dragon_empowered_lightning.yml");
                     cancel();
                     return;

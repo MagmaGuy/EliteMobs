@@ -1,17 +1,25 @@
 package com.magmaguy.elitemobs.config.powers.premade;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class TauntConfig extends PowersConfigFields {
+    public static List<String> onDamaged, onDamagedByBow, onDamage, onDeath, onTarget;
+
     public TauntConfig() {
         super("taunt",
                 true,
                 "Taunt",
                 Material.JUKEBOX.toString());
-        super.getAdditionalConfigOptions().put("onDamaged", Arrays.asList(
+    }
+
+    @Override
+    public void processAdditionalFields() {
+        onDamaged = ConfigurationEngine.setList(fileConfiguration, "onDamaged", Arrays.asList(
                 "Ow!",
                 "Oi!",
                 "Stop that!",
@@ -61,7 +69,7 @@ public class TauntConfig extends PowersConfigFields {
                 "No retreat!",
                 "Hit me with your best shot!"));
 
-        super.getAdditionalConfigOptions().put("onDamagedByBow", Arrays.asList(
+        onDamagedByBow = ConfigurationEngine.setList(fileConfiguration, "onDamagedByBow", Arrays.asList(
                 "Fight me like a Player!",
                 "Afraid to come up-close?",
                 "I can smell your fear from here!",
@@ -124,7 +132,7 @@ public class TauntConfig extends PowersConfigFields {
                 "No retreat!",
                 "Hit me with your best shot!"));
 
-        super.getAdditionalConfigOptions().put("onDamage", Arrays.asList(
+        onDamage = ConfigurationEngine.setList(fileConfiguration,"onDamage", Arrays.asList(
                 "A solid hit!",
                 "He shoots, and he scores!",
                 "You'll feel that in the morning!",
@@ -189,7 +197,7 @@ public class TauntConfig extends PowersConfigFields {
                 "A taste of pain to come!",
                 "I'll make you endangered!"));
 
-        super.getAdditionalConfigOptions().put("onDeath", Arrays.asList(
+        onDeath = ConfigurationEngine.setList(fileConfiguration,"onDeath", Arrays.asList(
                 "Alas, poor Yorick!",
                 "The rest is silence",
                 "I shall return",
@@ -234,7 +242,7 @@ public class TauntConfig extends PowersConfigFields {
                 "You monster...",
                 "Mediocre..."));
 
-        super.getAdditionalConfigOptions().put("onTarget", Arrays.asList(
+        onTarget = ConfigurationEngine.setList(fileConfiguration,"onTarget", Arrays.asList(
                 "OI! Get over here!",
                 "What's that I see? A coward?",
                 "Sir, prepare your fisticuffs!",

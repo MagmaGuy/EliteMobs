@@ -12,7 +12,7 @@ public class BalrogEvent extends CustomEventsConfigFields {
                 true);
         setEventType(CustomEvent.EventType.BREAK_BLOCK);
         setBossFilenames(Arrays.asList("balrog.yml"));
-        setChance(0.0001);
+        setChance(0.001);
         setBreakableMaterials(Arrays.asList(Material.COAL_ORE, Material.IRON_ORE, Material.GOLD_ORE, Material.LAPIS_ORE,
                 Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.REDSTONE_ORE));
         setEventDuration(20);
