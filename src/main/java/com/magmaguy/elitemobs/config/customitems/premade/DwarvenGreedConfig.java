@@ -15,6 +15,6 @@ public class DwarvenGreedConfig extends CustomItemsConfigFields {
                 Arrays.asList("&cThose who delve too greedily", "&cand too deep may wake ancient", "&chorrors of shadow and flame", "&cbest left undisturbed."));
         setEnchantments(Arrays.asList("LOOT_BONUS_BLOCKS,4", "DURABILITY,6", "DIG_SPEED,6", "VANISHING_CURSE,1"));
         setPotionEffects(Arrays.asList("FAST_DIGGING,1,self,continuous", "NIGHT_VISION,0,self,continuous"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

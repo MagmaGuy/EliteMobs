@@ -48,9 +48,9 @@ public class MinidungeonWorldLoader {
     public static World runtimeLoadWorld(Minidungeon minidungeon) {
         World world = loadWorld(minidungeon);
         if (world == null) return null;
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
-            if (regionalBossEntity.getWorldName().equals(world.getName()))
-                regionalBossEntity.worldLoad();
+        //for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet())
+        //    if (regionalBossEntity.getWorldName().equals(world.getName()))
+        //        regionalBossEntity.worldLoad();
         return world;
     }
 }

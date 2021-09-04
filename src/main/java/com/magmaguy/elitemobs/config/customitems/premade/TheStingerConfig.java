@@ -15,6 +15,6 @@ public class TheStingerConfig extends CustomItemsConfigFields {
                 Arrays.asList("&aFloat like a butterfly,", "&asting like a bee!"));
         setEnchantments(Arrays.asList("DAMAGE_ALL,1", "DURABILITY,1", "VANISHING_CURSE,1"));
         setPotionEffects(Arrays.asList("POISON,0,target,onHit"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

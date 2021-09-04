@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
@@ -169,7 +170,7 @@ public class CustomSpawn {
 
     public Location generateRandomSpawnLocation() {
         if (customSpawnConfigFields == null) {
-            new WarningMessage("Something tried to spawn but has invalid custom spawn config fields! This isn't good.");
+            new WarningMessage("Something tried to spawn but has invalid custom spawn config fields! This isn't good.", true);
             new WarningMessage("Bosses: ");
             getCustomBossEntities().forEach((customBossEntity) -> {
                 if (customBossEntity != null)
@@ -196,6 +197,8 @@ public class CustomSpawn {
         if (world == null)
             for (Player player : Bukkit.getOnlinePlayers()) {
                 Location playerLocation = player.getLocation();
+                if (!ValidWorldsConfig.validWorlds.contains(world))
+                    continue;
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())
                     if (!customSpawnConfigFields.getValidWorlds().contains(playerLocation.getWorld()))
                         continue;

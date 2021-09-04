@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.LightningEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
@@ -30,6 +31,7 @@ public class PlayerItem {
     public int thornsLevel = 0;
     private double critChance = 0;
     private double hunterChance = 0;
+    private double lightningChance = 0;
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
      * of checks done by EliteMobs during combat and for passive potion effect applications. It should (largely) only update
@@ -80,6 +82,7 @@ public class PlayerItem {
             this.damageArthropodsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_ARTHROPODS.getKey());
             this.damageUndeadLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_UNDEAD.getKey());
             this.critChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key)) / 10D;
+            this.lightningChance = Math.pow(ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LightningEnchantment.key)), 2)  / 1000D;
         }
 
         this.hunterChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, HunterEnchantment.key)) * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus");
@@ -148,6 +151,12 @@ public class PlayerItem {
         if (update)
             fullUpdate(itemStack);
         return this.hunterChance;
+    }
+
+    public double getLightningChance(ItemStack itemStack, boolean update) {
+        if (update)
+            fullUpdate(itemStack);
+        return this.lightningChance;
     }
 
     public enum EquipmentSlot {

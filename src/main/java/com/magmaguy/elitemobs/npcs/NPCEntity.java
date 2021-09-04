@@ -105,7 +105,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
     }
 
     public boolean setSpawnLocation() {
-        Location location = ConfigurationLocation.deserialize(npCsConfigFields.getLocation());
+        Location location = ConfigurationLocation.serialize(npCsConfigFields.getLocation());
         if (location == null) return false;
         this.spawnLocation = location;
         return true;

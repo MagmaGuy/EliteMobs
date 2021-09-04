@@ -16,9 +16,6 @@ public class PowersConfigFields extends CustomConfigFields {
     private String effect;
     @Getter
     @Setter
-    private HashMap<String, Object> additionalConfigOptions = new HashMap<>();
-    @Getter
-    @Setter
     private int powerCooldown = 0;
     @Getter
     @Setter
@@ -58,6 +55,9 @@ public class PowersConfigFields extends CustomConfigFields {
         this.effect = processString("effect", effect, null, false);
         this.powerCooldown = processInt("powerCooldown", powerCooldown, 0, false);
         this.globalCooldown = processInt("globalCooldown", globalCooldown, 0, false);
+        processAdditionalFields();
     }
+
+    public void processAdditionalFields(){}
 
 }

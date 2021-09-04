@@ -48,7 +48,7 @@ public class DefaultConfig {
         fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
         alwaysShowNametags = ConfigurationEngine.setBoolean(fileConfiguration, "alwaysShowEliteMobNameTags", false);
-        superMobStackAmount = ConfigurationEngine.setInt(fileConfiguration, "superMobStackAmount", 50);
+        superMobStackAmount = Math.max(ConfigurationEngine.setInt(fileConfiguration, "superMobStackAmount", 50), 1);
         preventCreeperDamageToPassiveMobs = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteCreeperDamageToPassiveMobs", true);
         doPermissionTitles = ConfigurationEngine.setBoolean(fileConfiguration, "useTitlesForMissingPermissionMessages", true);
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);
@@ -59,10 +59,10 @@ public class DefaultConfig {
         setupDone = ConfigurationEngine.setBoolean(fileConfiguration, "setupDoneV3", false);
         preventVanillaReinforcementsForEliteEntities = ConfigurationEngine.setBoolean(fileConfiguration, "preventVanillaReinforcementsForEliteEntities", true);
         try {
-            defaultSpawnLocation = ConfigurationLocation.deserialize(
+            defaultSpawnLocation = ConfigurationLocation.serialize(
                     ConfigurationEngine.setString(
                             fileConfiguration, "defaultSpawnLocation",
-                            ConfigurationLocation.serialize(Bukkit.getWorlds().get(0).getSpawnLocation())));
+                            ConfigurationLocation.deserialize(Bukkit.getWorlds().get(0).getSpawnLocation())));
         } catch (Exception ex) {
             new WarningMessage("There is an issue with your defaultSpawnLocation in the config.yml configuration file! Fix it!");
         }

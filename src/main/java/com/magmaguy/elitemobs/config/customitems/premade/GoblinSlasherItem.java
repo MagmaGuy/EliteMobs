@@ -15,6 +15,6 @@ public class GoblinSlasherItem extends CustomItemsConfigFields {
                 Arrays.asList("&8A treasure among goblins!"));
         setEnchantments(Arrays.asList("DAMAGE_ALL,1", "DAMAGE_UNDEAD,1", "DURABILITY,1", "KNOCKBACK,1", "LOOT_BONUS_MOBS,5"));
         setPotionEffects(Arrays.asList("FAST_DIGGING,0,self,onHit"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

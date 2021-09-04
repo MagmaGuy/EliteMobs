@@ -13,15 +13,18 @@ public class ConfigurationLocation {
     /*
     Location format: worldname,x,y,z,pitch,yaw
      */
-    public static String serialize(String worldName, double x, double y, double z, float pitch, float yaw) {
+    public static String deserialize(String worldName, double x, double y, double z, float pitch, float yaw) {
         return worldName + "," + x + "," + y + "," + z + "," + pitch + "," + yaw;
     }
 
-    public static String serialize(Location location) {
-        return serialize(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
+    public static String deserialize(Location location) {
+        return deserialize(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
     }
 
-    public static Location deserialize(String locationString) {
+    public static Location serialize(String locationString) {
+
+        if (locationString == null)
+            return null;
 
         World world = null;
         double x = 0;
@@ -47,7 +50,7 @@ public class ConfigurationLocation {
             yaw = Float.parseFloat(slicedString[4]);
             pitch = Float.parseFloat(slicedString[5]);
         } catch (Exception ex) {
-            if (locationString == null || locationString.equals("null"))
+            if (locationString.equals("null"))
                 return null;
             new WarningMessage("Attempted to deserialize an invalid location!");
             new WarningMessage("Expected location format: worldname,x,y,z,pitch,yaw");

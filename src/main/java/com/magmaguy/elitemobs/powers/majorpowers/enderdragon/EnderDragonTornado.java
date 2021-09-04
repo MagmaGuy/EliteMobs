@@ -71,7 +71,7 @@ public class EnderDragonTornado extends MajorCombatEnterScanningPower {
                 if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
                     ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
 
-                if (doExit(eliteEntity) || !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteEntity.getLivingEntity()).getPhase())) {
+                if (doExit(eliteEntity) || eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON) && !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteEntity.getLivingEntity()).getPhase())) {
                     cancel();
                     return;
                 }

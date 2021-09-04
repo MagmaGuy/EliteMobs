@@ -1,13 +1,17 @@
 package com.magmaguy.elitemobs.events;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.CustomEventStartEvent;
+import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,6 +22,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -25,8 +30,10 @@ public class ActionEvent extends CustomEvent {
 
     public static ArrayList<ActionEvent> blueprintEvents = new ArrayList<>();
     public static ArrayList<ActionEvent> actionEvents = new ArrayList<>();
+    private static HashSet<Player> playerCooldowns = new HashSet<>();
     public double chance;
     public List<Material> breakableMaterials;
+    private Player player;
 
     public ActionEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
@@ -42,6 +49,7 @@ public class ActionEvent extends CustomEvent {
      * @return Instantiated ActionEvent
      */
     public static void initializeBlueprintEvents() {
+        if (!EventsConfig.actionEventsEnabled) return;
         for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values()) {
             if (customEventsConfigFields.isEnabled())
                 switch (customEventsConfigFields.getEventType()) {
@@ -66,7 +74,8 @@ public class ActionEvent extends CustomEvent {
         return !(ThreadLocalRandom.current().nextDouble() >= chance);
     }
 
-    private void instantiateEvent(Location location) {
+    private void instantiateEvent(Location location, Player player) {
+        this.player = player;
         ActionEvent actionEvent = new ActionEvent(customEventsConfigFields);
         actionEvent.setEventStartLocation(location);
         CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);
@@ -90,6 +99,8 @@ public class ActionEvent extends CustomEvent {
 
     @Override
     public void startModifiers() {
+        playerCooldowns.add(player);
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playerCooldowns.remove(player), 20L * 60L * EventsConfig.actionEventMinimumCooldown);
     }
 
     @Override
@@ -104,28 +115,31 @@ public class ActionEvent extends CustomEvent {
     public static class ActionEventEvents implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onBlockBreakEvent(BlockBreakEvent event) {
+            if (playerCooldowns.contains(event.getPlayer())) return;
             if (!CustomEvent.isLocationValid(event.getBlock().getLocation())) return;
             for (ActionEvent actionEvent : blueprintEvents)
                 if (actionEvent.eventType.equals(EventType.BREAK_BLOCK))
                     if (actionEvent.checkBlockBreakStartConditions(event.getBlock().getType()))
-                        actionEvent.instantiateEvent(event.getBlock().getLocation().clone().add(new Vector(0.5, 0, 0.5)));
+                        actionEvent.instantiateEvent(event.getBlock().getLocation().clone().add(new Vector(0.5, 0, 0.5)), event.getPlayer());
         }
 
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onFishEvent(PlayerFishEvent event) {
             if (event.getCaught() == null) return;
+            if (playerCooldowns.contains(event.getPlayer())) return;
             if (!CustomEvent.isLocationValid(event.getCaught().getLocation())) return;
             for (ActionEvent actionEvent : blueprintEvents)
                 if (actionEvent.eventType.equals(EventType.FISH))
                     if (actionEvent.checkFishStartConditions())
-                        actionEvent.instantiateEvent(event.getCaught().getLocation());
+                        actionEvent.instantiateEvent(event.getCaught().getLocation(), event.getPlayer());
         }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onTillSoil(PlayerInteractEvent event) {
             if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
             if (event.getClickedBlock() == null) return;
+            if (playerCooldowns.contains(event.getPlayer())) return;
             Location location = event.getClickedBlock().getLocation().clone().add(new Vector(0.5, 1, 0.5));
             if (!CustomEvent.isLocationValid(location)) return;
             if (!(event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.DIAMOND_HOE) ||
@@ -141,7 +155,7 @@ public class ActionEvent extends CustomEvent {
             for (ActionEvent actionEvent : blueprintEvents)
                 if (actionEvent.eventType.equals(EventType.TILL_SOIL))
                     if (actionEvent.checkTillSoilStartConditions())
-                        actionEvent.instantiateEvent(location);
+                        actionEvent.instantiateEvent(location, event.getPlayer());
         }
     }
 }

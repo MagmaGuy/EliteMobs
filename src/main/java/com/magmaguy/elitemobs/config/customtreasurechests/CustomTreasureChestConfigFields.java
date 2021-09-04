@@ -1,45 +1,71 @@
 package com.magmaguy.elitemobs.config.customtreasurechests;
 
+import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 
-import java.io.File;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class CustomTreasureChestConfigFields {
+public class CustomTreasureChestConfigFields extends CustomConfigFields {
 
-    private static final HashSet<CustomTreasureChestConfigFields> customTreasureChestConfigFields = new HashSet<>();
-    private final String fileName;
-    private final boolean isEnabled;
-    private final String chestMaterial;
-    private final String facing;
-    private final int chestTier;
-    private final String dropStyle;
-    private final int restockTimer;
-    private final List<String> lootList;
-    private final double mimicChance;
-    private final List<String> mimicCustomBossesList;
-    private final List<String> restockTimers;
-    private final List<String> effects;
-    private File file;
-    private FileConfiguration fileConfiguration;
-    private String locationString;
+    @Getter
+    private Material chestMaterial = Material.CHEST;
+    @Getter
+    private BlockFace facing = BlockFace.NORTH;
+    @Getter
+    private int chestTier = 0;
+    @Getter
+    private TreasureChest.DropStyle dropStyle = TreasureChest.DropStyle.SINGLE;
+    @Getter
+    private int restockTimer = 0;
+    @Getter
+    private List<String> lootList = new ArrayList<>();
+    @Getter
+    private HashMap<String, SpecialLoot> specialLootList = new HashMap<>();
+    @Getter
+    private double mimicChance = 0;
+    @Getter
+    private List<String> mimicCustomBossesList = new ArrayList<>();
+    @Getter
+    private List<String> restockTimers = new ArrayList<>();
+    @Getter
+    private List<String> effects = new ArrayList<>();
+    @Getter
+    private String worldName;
+    @Getter
     private Location location;
-    private long restockTime;
+    @Getter
+    private long restockTime = 0L;
+    @Getter
+    private List<String> locations = new ArrayList<>();
+
+
+    public CustomTreasureChestConfigFields(String filename, boolean isEnabled) {
+        super(filename, isEnabled);
+    }
+
     /**
      * Called to write defaults for a new Custom Boss Mob Entity
      */
     public CustomTreasureChestConfigFields(String fileName,
                                            boolean isEnabled,
-                                           String chestMaterial,
-                                           String facing,
+                                           Material chestMaterial,
+                                           BlockFace facing,
                                            int chestTier,
                                            Location location,
-                                           String dropStyle,
+                                           TreasureChest.DropStyle dropStyle,
                                            int restockTimer,
                                            List<String> lootList,
                                            double mimicChance,
@@ -48,8 +74,7 @@ public class CustomTreasureChestConfigFields {
                                            List<String> restockTimers,
                                            List<String> effects) {
 
-        this.fileName = fileName + ".yml";
-        this.isEnabled = isEnabled;
+        super(fileName, isEnabled);
         this.chestMaterial = chestMaterial;
         this.facing = facing;
         this.chestTier = chestTier;
@@ -62,132 +87,78 @@ public class CustomTreasureChestConfigFields {
         this.restockTime = restockTime;
         this.restockTimers = restockTimers;
         this.effects = effects;
-
     }
 
-    /**
-     * Pulls from the config so it can be used in other spots
-     */
-    public CustomTreasureChestConfigFields(FileConfiguration configuration, File file) {
+    @Override
+    public void processConfigFields() {
+        this.isEnabled = processBoolean("isEnabled", isEnabled, false, false);
+        this.chestMaterial = processEnum("chestType", chestMaterial, Material.CHEST, true);
+        this.facing = processEnum("facing", facing, BlockFace.NORTH, true);
+        this.chestTier = processInt("chestTier", chestTier, 0, true);
+        this.worldName = processString("location", worldName, null, false);
+        if (worldName != null)
+            worldName = worldName.split(",")[0];
+        this.dropStyle = processEnum("dropStyle", dropStyle, TreasureChest.DropStyle.SINGLE, true);
+        this.restockTimer = processInt("restockTimer", restockTimer, 0, true);
+        this.lootList = processStringList("lootList", lootList, new ArrayList<>(), true);
+        for (String string : lootList)
+            if (SpecialLoot.isSpecialLootEntry(string))
+                specialLootList.put(string, new SpecialLoot(string));
+        this.mimicChance = processDouble("mimicChance", mimicChance, 0, true);
+        this.mimicCustomBossesList = processStringList("mimicCustomBossesList", mimicCustomBossesList, new ArrayList<>(), true);
+        this.restockTime = processLong("restockTime", restockTimer, 0, false);
+        this.restockTimers = processStringList("restockTimers", restockTimers, new ArrayList<>(), false);
+        this.effects = processStringList("effects", effects, new ArrayList<>(), false);
+        this.locations = processStringList("locations", locations, new ArrayList<>(), false);
+        this.location = processLocation("location", location, null, false);
+        if (location == null && locations.isEmpty())
+            new InfoMessage("Custom Treasure Chest in file " + filename + " does not have a defined location(s)! It will not spawn.");
+        else
+            new TreasureChest(this, location, restockTime);
+        for (String string : locations) {
+            String[] strings = string.split(":");
+            Location location = ConfigurationLocation.serialize(strings[0]);
+            if (location == null) {
+                new WarningMessage("Bad location entry in locations for " + filename + " . Entry: " + strings[0]);
+                continue;
+            }
+            long timestamp = 0;
+            if (!strings[1].isEmpty()) {
+                try {
+                    timestamp = Long.parseLong(strings[1]);
+                } catch (Exception exception) {
+                    new WarningMessage("Bad unix timestamp in locations for " + filename + " . Entry: " + strings[0]);
+                }
+            }
+            new TreasureChest(this, location, timestamp);
+        }
+    }
 
-        this.fileName = file.getName();
-
-        this.file = file;
-
-        this.fileConfiguration = configuration;
-
-        this.isEnabled = configuration.getBoolean("isEnabled");
-
-        this.chestMaterial = configuration.getString("chestType");
-
-        this.facing = configuration.getString("facing");
-
-        this.chestTier = configuration.getInt("chestTier");
-
-        String location = configuration.getString("location");
-        if (location == null) {
-            new InfoMessage("Custom Treasure Chest in file " + fileName + " does not have a defined location! It will not spawn.");
+    public void updateLocations(Location chestInstanceLocation, long unixTimeStamp) {
+        int index = -1;
+        String deserializedLocation = ConfigurationLocation.deserialize(chestInstanceLocation.getBlock().getLocation());
+        for (String string : locations)
+            if (string.split(":")[0].equals(deserializedLocation)) {
+                index = locations.indexOf(string);
+                break;
+            }
+        String serializedUpdatedLocation = deserializedLocation + ":" + unixTimeStamp;
+        if (index != -1) {
+            locations.set(index, serializedUpdatedLocation);
         } else {
-            this.locationString = configuration.getString("location");
-            this.location = ConfigurationLocation.deserialize(configuration.getString("location"));
+            locations.add(serializedUpdatedLocation);
+            new TreasureChest(this, chestInstanceLocation, unixTimeStamp);
+        }
+        fileConfiguration.set("locations", locations);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+    }
+
+    public void setRestockTime(Location location, long newRestockTime) {
+        if (!locations.isEmpty()) {
+            updateLocations(location, newRestockTime);
+            return;
         }
 
-        this.dropStyle = configuration.getString("dropStyle");
-
-        this.restockTimer = configuration.getInt("restockTimer");
-
-        this.lootList = configuration.getStringList("lootList");
-
-        this.mimicChance = configuration.getDouble("mimicChance");
-
-        this.mimicCustomBossesList = configuration.getStringList("mimicCustomBossesList");
-
-        this.restockTime = configuration.getLong("restockTime");
-
-        this.restockTimers = configuration.getStringList("restockTimers");
-
-        this.effects = configuration.getStringList("effects");
-
-    }
-
-    public static HashSet<CustomTreasureChestConfigFields> getCustomTreasureChestConfigFields() {
-        return customTreasureChestConfigFields;
-    }
-
-    /**
-     * Generates config defaults to be used by CustomBossesConfig
-     */
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-
-        fileConfiguration.addDefault("isEnabled", isEnabled);
-        fileConfiguration.addDefault("chestType", chestMaterial);
-        fileConfiguration.addDefault("facing", facing);
-        fileConfiguration.addDefault("chestTier", chestTier);
-        fileConfiguration.addDefault("location", location);
-        fileConfiguration.addDefault("dropStyle", dropStyle);
-        fileConfiguration.addDefault("restockTimer", restockTimer);
-        fileConfiguration.addDefault("lootList", lootList);
-        fileConfiguration.addDefault("mimicChance", mimicChance);
-        fileConfiguration.addDefault("mimicCustomBossesList", mimicCustomBossesList);
-        fileConfiguration.addDefault("restockTime", restockTime);
-        fileConfiguration.addDefault("restockTimers", restockTimers);
-        fileConfiguration.addDefault("effects", effects);
-
-    }
-
-    public String getFileName() {
-        return this.fileName;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public String getChestMaterial() {
-        return this.chestMaterial;
-    }
-
-    public String getFacing() {
-        return this.facing;
-    }
-
-    public int getChestTier() {
-        return this.chestTier;
-    }
-
-    public String getLocationString() {
-        return locationString;
-    }
-
-    public Location getLocation() {
-        return this.location;
-    }
-
-    public String getDropStyle() {
-        return this.dropStyle;
-    }
-
-    public int getRestockTimer() {
-        return this.restockTimer;
-    }
-
-    public List<String> getLootList() {
-        return this.lootList;
-    }
-
-    public double getMimicChance() {
-        return this.mimicChance;
-    }
-
-    public List<String> getMimicCustomBossesList() {
-        return this.mimicCustomBossesList;
-    }
-
-    public long getRestockTime() {
-        return restockTime;
-    }
-
-    public void setRestockTime(long newRestockTime) {
         this.restockTime = newRestockTime;
         this.fileConfiguration.set("restockTime", newRestockTime);
         try {
@@ -195,14 +166,6 @@ public class CustomTreasureChestConfigFields {
         } catch (Exception ex) {
             Bukkit.getLogger().warning("[EliteMobs] Attempted to update restock time for a custom treasure chest and failed, did you delete it during runtime?");
         }
-    }
-
-    public List<String> getRestockTimes() {
-        return this.restockTimers;
-    }
-
-    public List<String> getEfffects() {
-        return this.effects;
     }
 
 }

@@ -16,6 +16,6 @@ public class UnbindScrollConfig extends CustomItemsConfigFields {
                         "&5soulbound item at an anvil!",
                         "&5Use wisely!"));
         setEnchantments(Arrays.asList("UNBIND,1"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

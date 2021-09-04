@@ -15,6 +15,6 @@ public class TheFellerConfig extends CustomItemsConfigFields {
                 Arrays.asList("&aEven in your sleep,", "&ayou can feel this axe''s", "&asaplust"));
         setEnchantments(Arrays.asList("LOOT_BONUS_BLOCKS,4", "SILK_TOUCH,1", "DURABILITY,6", "DIG_SPEED,6", "VANISHING_CURSE,1"));
         setPotionEffects(Arrays.asList("FAST_DIGGING,1,self,continuous", "NIGHT_VISION,0,self,continuous"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

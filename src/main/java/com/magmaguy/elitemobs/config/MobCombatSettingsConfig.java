@@ -41,7 +41,7 @@ public class MobCombatSettingsConfig {
         doNaturalMobSpawning = ConfigurationEngine.setBoolean(fileConfiguration, "doNaturalEliteMobSpawning", true);
         doSpawnersSpawnEliteMobs = ConfigurationEngine.setBoolean(fileConfiguration, "doSpawnersSpawnEliteMobs", false);
         aggressiveMobConversionPercentage = ConfigurationEngine.setDouble(fileConfiguration, "eliteMobsSpawnPercentage", 0.05);
-        superMobsStackRange = ConfigurationEngine.setInt(fileConfiguration, "superMobStackRange", 15);
+        superMobsStackRange = Math.max(ConfigurationEngine.setInt(fileConfiguration, "superMobStackRange", 15), 2);
         naturalElitemobLevelCap = ConfigurationEngine.setInt(fileConfiguration, "naturalEliteMobsLevelCap", 250);
         doEliteArmor = ConfigurationEngine.setBoolean(fileConfiguration, "doElitesWearArmor", true);
         doEliteHelmets = ConfigurationEngine.setBoolean(fileConfiguration, "doElitesWearHelmets", true);

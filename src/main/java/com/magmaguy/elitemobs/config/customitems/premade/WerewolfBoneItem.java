@@ -14,6 +14,6 @@ public class WerewolfBoneItem extends CustomItemsConfigFields {
                 "&6Werewolf Bone",
                 Arrays.asList("&aHaving killed the alpha,", "&athis temporarily makes you!", "&athe wolves' new leader"));
         setEnchantments(Arrays.asList("SUMMON_WOLF,1"));
-        setItemType(CustomItem.ItemType.unique);
+        setItemType(CustomItem.ItemType.UNIQUE);
     }
 }
