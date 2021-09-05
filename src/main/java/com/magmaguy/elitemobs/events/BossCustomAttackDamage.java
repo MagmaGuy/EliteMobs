@@ -9,6 +9,7 @@ public class BossCustomAttackDamage {
 
     public static double dealCustomDamage(LivingEntity damager, LivingEntity damagee, double damage) {
 
+        if (damager == null || damagee == null) return 0;
         if (damager.equals(damagee)) return 0;
         if (damagee.isInvulnerable() || damagee.getHealth() <= 0) return 0;
 

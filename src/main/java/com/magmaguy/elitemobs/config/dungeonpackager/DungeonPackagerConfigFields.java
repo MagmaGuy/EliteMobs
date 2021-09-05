@@ -59,6 +59,10 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private String regionLeaveMessage = "";
 
+    public DungeonPackagerConfigFields(String fileName, boolean isEnabled){
+        super(fileName, isEnabled);
+    }
+
     public DungeonPackagerConfigFields(String fileName,
                                        boolean isEnabled,
                                        String name,
