@@ -1,8 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.utils.ItemStackGenerator;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import java.util.Arrays;

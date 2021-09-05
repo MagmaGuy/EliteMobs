@@ -18,10 +18,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
-import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
-import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.elitemobs.utils.WarningMessage;
+import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -318,6 +315,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     @Override
     public void remove(RemovalReason removalReason) {
+        if (DebugMessage.isDebugMode())
+            if (this instanceof RegionalBossEntity && this.phaseBossEntity != null)
+                new DebugMessage("Regional + Phase boss removal. Reason: " + removalReason);
         if (livingEntity != null) persistentLocation = livingEntity.getLocation();
         //Remove the living entity
         super.remove(removalReason);

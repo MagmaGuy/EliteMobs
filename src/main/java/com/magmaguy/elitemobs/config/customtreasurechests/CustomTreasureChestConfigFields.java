@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;

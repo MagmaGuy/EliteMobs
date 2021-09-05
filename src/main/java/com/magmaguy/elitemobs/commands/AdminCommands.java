@@ -24,6 +24,7 @@ import com.magmaguy.elitemobs.menus.GetLootMenu;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
@@ -608,6 +609,12 @@ public class AdminCommands {
                 .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
                         commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"))));
 
+        // /em debugmode
+        manager.command(builder.literal("debugmode")
+                .senderType(CommandSender.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Toggles debug messages off and on.")
+                .handler(commandContext -> DebugMessage.toggleDebugMode()));
 
     }
 

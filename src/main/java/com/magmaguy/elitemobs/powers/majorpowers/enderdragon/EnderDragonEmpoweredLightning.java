@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.majorpowers.enderdragon;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
+import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -38,6 +39,7 @@ public class EnderDragonEmpoweredLightning extends MajorPower {
             public void run() {
                 counter++;
                 if (counter > 20 * 3) {
+                    LightningSpawnBypass.bypass();
                     location.getWorld().strikeLightning(location);
                     Fireball fireball = (Fireball) location.getWorld().spawnEntity(location, EntityType.FIREBALL);
                     EntityTracker.registerProjectileEntity(fireball);

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BossPower;
@@ -54,6 +55,7 @@ public class LightningBolts extends BossPower implements Listener {
             public void run() {
                 counter++;
                 if (counter > 20 * 2) {
+                    LightningSpawnBypass.bypass();
                     location.getWorld().strikeLightning(location);
                     cancel();
                     return;

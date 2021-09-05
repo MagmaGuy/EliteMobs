@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import org.bukkit.Material;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.LivingEntity;

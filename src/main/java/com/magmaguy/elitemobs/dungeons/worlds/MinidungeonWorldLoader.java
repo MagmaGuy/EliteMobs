@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.dungeons.worlds;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;

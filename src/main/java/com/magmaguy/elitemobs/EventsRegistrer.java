@@ -254,6 +254,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new EnderDragonUnstuck(), plugin);
         if (DefaultConfig.preventVanillaReinforcementsForEliteEntities)
             pluginManager.registerEvents(new VanillaReinforcementsCanceller(), plugin);
+        pluginManager.registerEvents(new LightningSpawnBypass(), plugin);
 
         //Antiexploits
         pluginManager.registerEvents(new PreventMountExploit(), plugin);

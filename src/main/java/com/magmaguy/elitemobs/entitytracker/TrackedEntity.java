@@ -49,10 +49,19 @@ public class TrackedEntity {
             @Override
             public void run() {
                 //sometimes this seems to not get cancelled properly, so first check if it's still even registered
+
+                //Tracked hashmap gets removed by #remove() methods in the elite boss entity and potentially elsewhere
+                if (!trackedHashMap.containsKey(uuid)) {
+                    trackedEntities.remove(uuid);
+                    cancel();
+                    return;
+                }
+                //This check is isolated from the rest of EliteMobs, usually caused by clearlagg and similar plugins
                 if (!trackedEntities.containsKey(uuid)) {
                     cancel();
                     return;
                 }
+                //This check is catastrophic if the two previous checks aren't tuned correctly
                 if (entity == null || !entity.isValid())
                     remove(RemovalReason.OTHER);
             }

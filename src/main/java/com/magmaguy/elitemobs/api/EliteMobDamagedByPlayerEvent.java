@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.Round;
@@ -198,7 +197,8 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
             if (!livingEntity.getType().equals(EntityType.PLAYER)) return;
             Player player = (Player) livingEntity;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity().getUniqueId());
-            if (eliteEntity == null) return;
+            //Living entity is sometimes null when the damage is dealt to an already dead entity - might happen with mcmmo due to DOTs and stuff
+            if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
             //If the damage wasn't caused by an elite item, just allow the event to go as raw
             EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent;
             double damage;

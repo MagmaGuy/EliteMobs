@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
-import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;

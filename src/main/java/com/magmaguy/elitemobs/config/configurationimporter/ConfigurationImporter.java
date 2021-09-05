@@ -140,17 +140,12 @@ public class ConfigurationImporter {
 
     private static void moveFile(File file, Path targetPath) {
         try {
-            new DeveloperMessage("Adding from " + targetPath);
             if (file.isDirectory()) {
                 if (Paths.get(targetPath + "" + File.separatorChar + file.getName()).toFile().exists())
                     for (File iteratedFile : file.listFiles())
                         moveFile(iteratedFile, Paths.get(targetPath + "" + File.separatorChar + file.getName()));
-                else {
-                    new DeveloperMessage("Adding from " + file.toPath());
-                    new DeveloperMessage("To " + Paths.get(targetPath + "" + File.separatorChar + file.getName()));
+                else
                     Files.move(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
-                }
-
             } else
                 Files.move(file.toPath(), Paths.get(targetPath + "" + File.separatorChar + file.getName()), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {

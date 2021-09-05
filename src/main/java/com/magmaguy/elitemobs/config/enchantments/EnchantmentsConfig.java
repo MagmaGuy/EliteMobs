@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config.enchantments;
 
 import com.magmaguy.elitemobs.config.CustomConfig;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.HashMap;

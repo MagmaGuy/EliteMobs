@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config.enchantments;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import lombok.Getter;
 import org.bukkit.enchantments.Enchantment;
 
