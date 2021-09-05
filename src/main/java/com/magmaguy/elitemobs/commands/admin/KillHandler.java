@@ -12,17 +12,16 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 
 public class KillHandler {
 
+    //TODO: FIX NPE ISSUE YOU FUCKING MORON
+
     public static void killAggressiveMobs(CommandSender commandSender) {
         int counter = 0;
-        Iterator<EliteEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().values().iterator();
-        while (eliteMobEntityIterator.hasNext()) {
-            EliteEntity eliteEntity = eliteMobEntityIterator.next();
-            EntityTracker.unregister(eliteEntity.getLivingEntity().getUniqueId(), RemovalReason.KILL_COMMAND);
-            eliteMobEntityIterator.remove();
+        for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobs().values())) {
+            eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
             counter++;
         }
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
@@ -31,11 +30,8 @@ public class KillHandler {
 
     public static void killPassiveMobs(CommandSender commandSender) {
         int counter = 0;
-        Iterator<LivingEntity> eliteMobEntityIterator = EntityTracker.getSuperMobs().values().iterator();
-        while (eliteMobEntityIterator.hasNext()) {
-            LivingEntity superMobEntity = eliteMobEntityIterator.next();
+        for (LivingEntity superMobEntity : new ArrayList<>(EntityTracker.getSuperMobs().values())) {
             EntityTracker.unregister(superMobEntity.getUniqueId(), RemovalReason.KILL_COMMAND);
-            eliteMobEntityIterator.remove();
             counter++;
         }
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Super Mobs."));
@@ -44,23 +40,17 @@ public class KillHandler {
     public static void killEntityType(CommandSender commandSender, EntityType entityType) {
         if (EliteMobProperties.getValidMobTypes().contains(entityType)) {
             int counter = 0;
-            Iterator<EliteEntity> eliteMobEntityIterator = EntityTracker.getEliteMobs().values().iterator();
-            while (eliteMobEntityIterator.hasNext()) {
-                EliteEntity eliteEntity = eliteMobEntityIterator.next();
+            for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobs().values())) {
                 if (!eliteEntity.getLivingEntity().getType().equals(entityType)) continue;
-                EntityTracker.unregister(eliteEntity.getLivingEntity().getUniqueId(), RemovalReason.KILL_COMMAND);
-                eliteMobEntityIterator.remove();
+                eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
                 counter++;
             }
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite " + entityType.toString() + "."));
         } else if (SuperMobProperties.superMobTypeList.contains(entityType)) {
             int counter = 0;
-            Iterator<LivingEntity> eliteMobEntityIterator = EntityTracker.getSuperMobs().values().iterator();
-            while (eliteMobEntityIterator.hasNext()) {
-                LivingEntity superMobEntity = eliteMobEntityIterator.next();
+            for (LivingEntity superMobEntity : new ArrayList<>(EntityTracker.getSuperMobs().values())) {
                 if (!superMobEntity.getType().equals(entityType)) continue;
                 EntityTracker.unregister(superMobEntity.getUniqueId(), RemovalReason.KILL_COMMAND);
-                eliteMobEntityIterator.remove();
                 counter++;
             }
             commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Super " + entityType.toString() + "."));
@@ -97,7 +87,7 @@ public class KillHandler {
                 EntityTracker.unregister(entity, RemovalReason.KILL_COMMAND);
                 counter++;
             }
-        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Super Mobs."));
+        player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
     }
 
 }

@@ -4,10 +4,7 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
@@ -90,7 +87,11 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
             else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity) {
                 eliteEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getDamager()).getShooter());
                 projectile = (Projectile) event.getDamager();
+            } else if (event.getDamager().getType().equals(EntityType.EVOKER_FANGS)) {
+                if (((EvokerFangs)event.getDamager()).getOwner() != null)
+                    eliteEntity = EntityTracker.getEliteMobEntity(((EvokerFangs)event.getDamager()).getOwner());
             }
+
             if (eliteEntity == null) return;
 
             //dodge chance

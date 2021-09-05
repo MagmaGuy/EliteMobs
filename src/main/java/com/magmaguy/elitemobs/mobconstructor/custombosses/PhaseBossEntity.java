@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -22,9 +21,12 @@ public class PhaseBossEntity {
         this.customBossEntity = customBossEntity;
         try {
             ArrayList<BossPhase> unsortedBossPhases = new ArrayList<>();
-            unsortedBossPhases.add(new BossPhase(customBossEntity.getCustomBossesConfigFields().getFilename(), 1));
+            unsortedBossPhases.add(new BossPhase(customBossEntity.getCustomBossesConfigFields(), 1));
             for (String phaseConfigFile : customBossEntity.getCustomBossesConfigFields().getPhases()) {
-                String customBossesConfigFields = phaseConfigFile.split(":")[0];
+                CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(phaseConfigFile.split(":")[0]);
+                if (customBossesConfigFields == null){
+                    new WarningMessage("Phase boss " + customBossEntity.getCustomBossesConfigFields() + " has an invalid config entry for phase " + phaseConfigFile + " - this file could not be found. The boss will not be able to do this phase until it is fixed!");
+                }
                 double healthPercentage = Double.parseDouble(phaseConfigFile.split(":")[1]);
                 unsortedBossPhases.add(new BossPhase(customBossesConfigFields, healthPercentage));
             }
@@ -46,12 +48,11 @@ public class PhaseBossEntity {
             return;
         }
         customBossEntity.remove(removalReason);
-        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossPhase.customBossesConfigFields);
-        if (customBossesConfigFields == null) {
+        if (bossPhase.customBossesConfigFields == null) {
             new WarningMessage("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields + " was not valid! The boss will not be able to switch phases until it is fixed.");
             return;
         }
-        customBossEntity.setCustomBossesConfigFields(customBossesConfigFields);
+        customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
             customBossEntity.spawn(true);
         } else {
@@ -68,7 +69,7 @@ public class PhaseBossEntity {
 
     public void deathReset() {
         currentPhase = bossPhases.get(0);
-        customBossEntity.setCustomBossesConfigFields(CustomBossesConfig.getCustomBoss(currentPhase.customBossesConfigFields));
+        customBossEntity.setCustomBossesConfigFields(currentPhase.customBossesConfigFields);
     }
 
     public void checkPhaseBossSwitch() {
@@ -88,10 +89,10 @@ public class PhaseBossEntity {
     }
 
     private class BossPhase {
-        public String customBossesConfigFields;
+        public CustomBossesConfigFields customBossesConfigFields;
         public double healthPercentage;
 
-        public BossPhase(String customBossesConfigFields, double healthPercentage) {
+        public BossPhase(CustomBossesConfigFields customBossesConfigFields, double healthPercentage) {
             this.customBossesConfigFields = customBossesConfigFields;
             this.healthPercentage = healthPercentage;
         }

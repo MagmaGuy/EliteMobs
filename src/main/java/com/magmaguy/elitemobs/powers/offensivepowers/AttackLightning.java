@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.MinorPower;
@@ -44,6 +45,7 @@ public class AttackLightning extends MinorPower implements Listener {
             public void run() {
                 counter++;
                 if (counter > 20 * 3) {
+                    LightningSpawnBypass.bypass();
                     location.getWorld().strikeLightning(location);
                     cancel();
                     return;
