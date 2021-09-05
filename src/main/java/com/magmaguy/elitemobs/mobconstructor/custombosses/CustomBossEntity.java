@@ -122,11 +122,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     }
 
     public void spawn(Location spawnLocation, boolean silent) {
-        if (lastTick == spawnLocation.getWorld().getFullTime())
+        if (spawnLocation != null && spawnLocation.getWorld() != null && lastTick == spawnLocation.getWorld().getFullTime())
             attemptsCounter++;
         else
             attemptsCounter = 1;
-        lastTick = spawnLocation.getWorld().getFullTime();
+        if (spawnLocation != null && spawnLocation.getWorld() != null)
+            lastTick = spawnLocation.getWorld().getFullTime();
         if (livingEntity != null) {
             new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!", true);
             return;
