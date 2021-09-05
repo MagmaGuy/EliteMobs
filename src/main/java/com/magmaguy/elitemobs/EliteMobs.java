@@ -251,13 +251,14 @@ public class EliteMobs extends JavaPlugin {
 
         //Find the stats of bosses in minidungeons
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
-            if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
-                minidungeon.quantifyWorldBosses();
-            else if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC)) {
-                minidungeon.quantifySchematicBosses();
-                //Due to boot order this needs to run after the minidungeons and the custom bosses are initialized
-                minidungeon.completeSchematicMinidungeonInitialization();
-            }
+            if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType() != null)
+                if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
+                    minidungeon.quantifyWorldBosses();
+                else if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC)) {
+                    minidungeon.quantifySchematicBosses();
+                    //Due to boot order this needs to run after the minidungeons and the custom bosses are initialized
+                    minidungeon.completeSchematicMinidungeonInitialization();
+                }
         }
 
         new CustomTreasureChestsConfig();

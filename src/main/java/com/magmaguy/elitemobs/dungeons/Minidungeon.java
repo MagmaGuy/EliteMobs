@@ -48,6 +48,10 @@ public class Minidungeon {
         minidungeons.put(dungeonPackagerConfigFields.getFilename(), this);
         this.dungeonPackagerConfigFields = dungeonPackagerConfigFields;
         regionalBossCount = 0;
+        if (dungeonPackagerConfigFields.getDungeonLocationType() == null) {
+            new WarningMessage("Dungeon " + dungeonPackagerConfigFields.getFilename() + " has an invalid location type! It will not boot.");
+            return;
+        }
         switch (dungeonPackagerConfigFields.getDungeonLocationType()) {
             case WORLD:
                 setupWorldBasedMinidungeon();
