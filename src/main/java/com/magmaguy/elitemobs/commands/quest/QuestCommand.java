@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.commands.quest;
 
-import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.entity.Player;
 
 public class QuestCommand {

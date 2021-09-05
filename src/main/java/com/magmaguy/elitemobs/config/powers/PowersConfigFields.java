@@ -4,8 +4,6 @@ import com.magmaguy.elitemobs.config.CustomConfigFields;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
-
 public class PowersConfigFields extends CustomConfigFields {
 
     @Getter

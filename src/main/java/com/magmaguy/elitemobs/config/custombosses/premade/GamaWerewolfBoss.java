@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import github.scarsz.discordsrv.api.events.GameChatMessagePostProcessEvent;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 

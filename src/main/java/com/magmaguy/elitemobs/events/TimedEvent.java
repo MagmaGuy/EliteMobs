@@ -28,6 +28,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     private double weight;
     private String filename;
     private CustomSpawn customSpawn;
+    private boolean silentRetry = false;
 
     public TimedEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
@@ -58,10 +59,11 @@ public class TimedEvent extends CustomEvent implements Listener {
                 for (TimedEvent timedEvent : blueprintEvents) {
                     boolean isRunning = false;
                     for (TimedEvent activeTimedEvent : timedEvents)
-                        if (activeTimedEvent.getCustomEventsConfigFields().getFilename().equals(timedEvent.getCustomEventsConfigFields().getFilename())) {
-                            isRunning = true;
-                            break;
-                        }
+                        if (activeTimedEvent != null)
+                            if (activeTimedEvent.getCustomEventsConfigFields().getFilename().equals(timedEvent.getCustomEventsConfigFields().getFilename())) {
+                                isRunning = true;
+                                break;
+                            }
                     if (isRunning)
                         continue;
                     if (timedEvent.nextLocalEventTrigger < System.currentTimeMillis())
@@ -75,7 +77,7 @@ public class TimedEvent extends CustomEvent implements Listener {
                         return;
                     }
             }
-            }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60);
     }
 
     /**
@@ -114,15 +116,20 @@ public class TimedEvent extends CustomEvent implements Listener {
 
         for (CustomBossEntity customBossEntity : primaryEliteMobs)
             if (!customBossEntity.exists()) {
-                new InfoMessage("Boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " for event " +
-                        getCustomEventsConfigFields().getFilename() + " wasn't considered to be valid. Trying spawn again later.");
+                if (!silentRetry) {
+                    new InfoMessage("Boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " for event " +
+                            getCustomEventsConfigFields().getFilename() + " wasn't considered to be valid. Trying spawn again .");
+                    new InfoMessage("Note: further failures will be silent. EliteMobs can only predict WorldGuard protections," +
+                            " so it will keep trying to spawn things until plugins preventing spawning allow it to do so. This might take a while.");
+                    silentRetry = true;
+                }
+
                 Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
                     customSpawn.setSpawnLocation(null);
                     customSpawn.queueSpawn();
-                }, 20);
+                }, 1);
                 return;
             }
-
         primaryEliteMobs.forEach(CustomBossEntity::announceSpawn);
 
         start();

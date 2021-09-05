@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.config.enchantments.premade.LightningConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -24,6 +25,7 @@ public class LightningEnchantment extends CustomEnchantment {
     }
 
     public static void playerLightning(Player player, Location location) {
+        LightningSpawnBypass.bypass();
         location.getWorld().strikeLightningEffect(location);
         location.getWorld().getNearbyEntities(location, 2.5, 2.5, 2.5).forEach((entity -> {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
