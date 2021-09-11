@@ -21,7 +21,7 @@ import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.utils.WarningMessage;
-import org.bukkit.configuration.file.FileConfiguration;
+import lombok.Getter;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -75,6 +75,7 @@ public class ElitePower {
             new InvulnerabilityFallDamage(),
             new InvulnerabilityFire(),
             new InvulnerabilityKnockback(),
+            new ShieldWall(),
 
             //Miscellaneous powers
             new BonusLoot(),
@@ -103,12 +104,13 @@ public class ElitePower {
             new ArrowRain(),
             new GroundPound()
     ));
-    private static final HashSet<MinorPower> defensivePowers = new HashSet<>(Arrays.asList(
+    private static final HashSet<MinorPower> defensivePowers = new HashSet<MinorPower>(Arrays.asList(
             new Invisibility(),
             new InvulnerabilityArrow(),
             new InvulnerabilityFallDamage(),
             new InvulnerabilityFire(),
-            new InvulnerabilityKnockback()));
+            new InvulnerabilityKnockback(),
+            new ShieldWall()));
     private static final HashSet<MinorPower> miscellaneousPowers = new HashSet<>(Arrays.asList(
             new BonusLoot(),
             new Corpse(),
@@ -139,15 +141,17 @@ public class ElitePower {
     private final String name;
     private final int powerCooldownTime;
     private final int globalCooldownTime;
-    private final FileConfiguration configuration;
     private boolean cooldown = false;
     private boolean powerCooldownActive = false;
     private boolean isFiring = false;
+    @Getter
+    private PowersConfigFields powersConfigFields;
+
     public ElitePower(PowersConfigFields powersConfigFields) {
+        this.powersConfigFields = powersConfigFields;
         this.fileName = powersConfigFields.getFilename();
         this.name = powersConfigFields.getName();
         this.trail = powersConfigFields.getEffect();
-        this.configuration = powersConfigFields.getFileConfiguration();
         this.powerCooldownTime = powersConfigFields.getPowerCooldown();
         this.globalCooldownTime = powersConfigFields.getGlobalCooldown();
     }
@@ -182,6 +186,7 @@ public class ElitePower {
 
     protected static boolean eventIsValid(EliteMobDamagedByPlayerEvent event, ElitePower elitePower) {
         if (event.isCancelled()) return false;
+        if (event.getEliteMobEntity().getLivingEntity() == null) return false;
         if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
         if (elitePower.getGlobalCooldownActive()) return false;
         return !event.getEliteMobEntity().isCooldown();
@@ -205,10 +210,6 @@ public class ElitePower {
 
     public String getName() {
         return name;
-    }
-
-    public FileConfiguration getConfiguration() {
-        return configuration;
     }
 
     public boolean getGlobalCooldownActive() {

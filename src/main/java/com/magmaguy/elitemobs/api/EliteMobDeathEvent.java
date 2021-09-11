@@ -26,7 +26,7 @@ public class EliteMobDeathEvent extends Event {
     }
 
     /**
-     * This is necessary for End Dragons currently, as
+     * This is necessary for End Dragons
      * @param eliteEntity
      */
     public EliteMobDeathEvent(EliteEntity eliteEntity) {

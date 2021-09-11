@@ -70,7 +70,7 @@ public class CustomBossMegaConsumer {
                 WorldGuardSpawnEventBypasser.forceSpawn();
         }
 
-        return (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
+        LivingEntity livingEntity = (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
                 customBossesConfigFields.getEntityType().getEntityClass(),
                 (entity) -> {
                     for (ElitePower elitePower : powers)
@@ -81,12 +81,14 @@ public class CustomBossMegaConsumer {
                     setDisguise((LivingEntity) entity);
                     setName((LivingEntity) entity);
                     setFollowRange((LivingEntity) entity);
-                    customBossEntity.setLivingEntity((LivingEntity) entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
                     if ((entity).getType().equals(EntityType.ENDER_DRAGON)) {
                         ((EnderDragon) entity).setPhase(EnderDragon.Phase.CIRCLING);
                         ((EnderDragon) entity).getDragonBattle().generateEndPortal(false);
                     }
                 });
+        customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        return livingEntity;
     }
 
     private void setBaby(LivingEntity livingEntity) {

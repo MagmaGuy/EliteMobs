@@ -186,6 +186,7 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         if (roleDisplay != null)
             roleDisplay.remove();
         if (villager != null) {
+            villager.remove();
             NPCEntityTracker.npcEntities.remove(villager.getUniqueId());
             this.villager = null;
         }
