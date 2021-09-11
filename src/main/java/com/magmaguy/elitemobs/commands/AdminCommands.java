@@ -600,7 +600,7 @@ public class AdminCommands {
         // /em registerblocks <regional_boss_file.yml> <on_spawn/on_death>
         manager.command(builder.literal("registerblocks")
                 .senderType(Player.class)
-                .argument(StringArgument.<CommandSender>newBuilder("regionalBoss").withSuggestionsProvider(((objectCommandContext, s) -> regionalBosses)),
+                .argument(StringArgument.<CommandSender>newBuilder("regionalBoss").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
                         ArgumentDescription.of("Regional Boss configuration file name"))
                 .argument(StringArgument.<CommandSender>newBuilder("blockTransitionPhase").withSuggestionsProvider(((objectCommandContext, s) -> blockTransitionPhases)),
                         ArgumentDescription.of("Block transition phase"))
@@ -608,6 +608,13 @@ public class AdminCommands {
                 .meta(CommandMeta.DESCRIPTION, "Registers transitive blocks for use by regional bosses.")
                 .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
                         commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"))));
+
+        // /em registerblocks cancel
+        manager.command(builder.literal("cancelblocks")
+                .senderType(Player.class)
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Cancels transitive block registration for a player.")
+                .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender())));
 
         // /em debugmode
         manager.command(builder.literal("debugmode")

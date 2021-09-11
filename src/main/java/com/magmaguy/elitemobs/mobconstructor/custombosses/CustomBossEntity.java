@@ -4,16 +4,19 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
+import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
@@ -113,6 +116,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         super.setLevel(customBossesConfigFields.getLevel());
         setPluginName();
         super.elitePowers = ElitePowerParser.parsePowers(customBossesConfigFields.getPowers());
+        if (this instanceof RegionalBossEntity) {
+            ((RegionalBossEntity) this).setOnSpawnTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename()));
+            ((RegionalBossEntity) this).setOnRemoveTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename()));
+        }
     }
 
     public void spawn(Location spawnLocation, int level, boolean silent) {
@@ -333,6 +340,17 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             if (inCombat)
                 new EventCaller(new EliteMobExitCombatEvent(this, EliteMobExitCombatEvent.EliteMobExitCombatReason.PHASE_SWITCH));
 
+        if (removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) || removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
+            if (livingEntity != null) {
+                EliteEntityTracker.eliteMobEntities.remove(livingEntity.getUniqueId());
+                EliteEntityTracker.trackedEntities.remove(livingEntity.getUniqueId());
+            }
+            new EventCaller(new EliteMobRemoveEvent(this, removalReason));
+        }
+
+        if (removalReason.equals(RemovalReason.BOSS_TIMEOUT))
+            new EventCaller(new EliteMobRemoveEvent(this, removalReason));
+
         boolean bossInstanceEnd = removalReason.equals(RemovalReason.KILL_COMMAND) ||
                 removalReason.equals(RemovalReason.DEATH) ||
                 removalReason.equals(RemovalReason.BOSS_TIMEOUT) ||
@@ -343,15 +361,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
         if (bossInstanceEnd) {
             if (escapeMechanism != null) Bukkit.getScheduler().cancelTask(escapeMechanism);
-            if (removalReason.equals(RemovalReason.BOSS_TIMEOUT))
-                CustomBossEscapeMechanism.doEscapeMessage(this);
             trackableCustomBosses.remove(this);
             if (simplePersistentEntity != null)
                 simplePersistentEntity.remove();
             if (customBossBossBar != null)
                 customBossBossBar.remove();
-            if (phaseBossEntity != null)
-                phaseBossEntity.deathReset();
+            if (!removalReason.equals(RemovalReason.SHUTDOWN) && !removalReason.equals(RemovalReason.DEATH))
+                if (phaseBossEntity != null)
+                    phaseBossEntity.deathReset();
             globalReinforcements.forEach((bukkitTask -> {
                 if (bukkitTask != null)
                     bukkitTask.cancel();

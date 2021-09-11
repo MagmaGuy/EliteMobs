@@ -230,14 +230,21 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     public void setOnSpawnBlockStates(List<String> onSpawnBlockStates) {
         this.onSpawnBlockStates = onSpawnBlockStates;
         fileConfiguration.set("onSpawnBlockStates", onSpawnBlockStates);
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-
+        try {
+            fileConfiguration.save(file);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to save on spawn block states!", true);
+        }
     }
 
     public void setOnRemoveBlockStates(List<String> onRemoveBlockStates) {
         this.onRemoveBlockStates = onRemoveBlockStates;
         fileConfiguration.set("onRemoveBlockStates", onRemoveBlockStates);
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+        try {
+            fileConfiguration.save(file);
+        } catch (Exception ex) {
+            new WarningMessage("Failed to save on remove block states!", true);
+        }
     }
 
     @Override
@@ -312,11 +319,13 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
                     //Give time for all custom bosses to be loaded as some powers require other bosses to be loaded in order to generate reinforcements
                     Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> new RegionalBossEntity(this, string).initialize(), 1);
             }
-
         }
+
+        this.onSpawnBlockStates = processStringList("onSpawnBlockStates", onSpawnBlockStates, new ArrayList<>(), false);
+        this.onRemoveBlockStates = processStringList("onRemoveBlockStates", onRemoveBlockStates, new ArrayList<>(), false);
+
         cullReinforcements = processBoolean("cullReinforcements", cullReinforcements, true, false);
         damageModifiers = processDamageModifiers("damageModifiers", damageModifiers);
-
     }
 
     private HashMap<Material, Double> processDamageModifiers(String path, HashMap<Material, Double> pluginDefaults) {

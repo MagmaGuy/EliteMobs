@@ -24,7 +24,6 @@ public class CustomBossEscapeMechanism {
                     player.sendMessage(ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getEscapeMessage()));
         if (customBossEntity.customBossesConfigFields.getAnnouncementPriority() < 3) return;
         new DiscordSRVAnnouncement(ChatColorConverter.convert(customBossEntity.customBossesConfigFields.getEscapeMessage()));
-        if (customBossEntity.getUnsyncedLivingEntity() != null)
-            EntityTracker.unregister(customBossEntity.getUnsyncedLivingEntity().getUniqueId(), RemovalReason.BOSS_TIMEOUT);
+        customBossEntity.remove(RemovalReason.BOSS_TIMEOUT);
     }
 }

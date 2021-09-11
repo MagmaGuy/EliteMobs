@@ -1,11 +1,15 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedEvent;
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -14,6 +18,7 @@ import java.util.List;
 public class PhaseBossEntity {
 
     private final CustomBossEntity customBossEntity;
+    @Getter
     private List<BossPhase> bossPhases = new ArrayList();
     private BossPhase currentPhase = null;
 
@@ -86,9 +91,16 @@ public class PhaseBossEntity {
             if (((CustomBossEntity) event.getEliteMobEntity()).getPhaseBossEntity() == null) return;
             ((CustomBossEntity) event.getEliteMobEntity()).getPhaseBossEntity().checkPhaseBossSwitch();
         }
+        @EventHandler (priority = EventPriority.MONITOR)
+        public void onEliteDeath(EliteMobDeathEvent event){
+            if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
+            CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();
+            if (customBossEntity.getPhaseBossEntity() != null)
+                customBossEntity.phaseBossEntity.deathReset();
+        }
     }
 
-    private class BossPhase {
+    public class BossPhase {
         public CustomBossesConfigFields customBossesConfigFields;
         public double healthPercentage;
 
@@ -97,5 +109,4 @@ public class PhaseBossEntity {
             this.healthPercentage = healthPercentage;
         }
     }
-
 }

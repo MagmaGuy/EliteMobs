@@ -7,9 +7,12 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.powers.bosspowers.SpiritWalk;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -36,6 +39,10 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     private boolean isRespawning = false;
     private BukkitTask leashTask;
     private boolean temporaryRegionalBoss = false;
+    @Getter
+    @Setter
+    private List<TransitiveBlock> onSpawnTransitiveBlocks = new ArrayList<>(), onRemoveTransitiveBlocks = new ArrayList<>();
+
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
         super(customBossesConfigFields);
@@ -43,6 +50,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         this.rawLocationString = rawString.split(":")[0];
         this.respawnCoolDownInMinutes = customBossesConfigFields.getSpawnCooldown();
         this.leashRadius = customBossesConfigFields.getLeashRadius();
+        this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
+        this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
 
         regionalBossesFromConfigFields.put(customBossesConfigFields, this);
 
@@ -61,6 +70,10 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
 
     private RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent) {
         super(customBossesConfigFields);
+        this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
+        this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
+        this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
+        this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
         this.temporaryRegionalBoss = !permanent;
         super.setPersistent(permanent);
         super.spawnLocation = location;
@@ -73,6 +86,10 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             regionalBossesFromConfigFields.put(customBossesConfigFields, this);
             saveNewLocation();
         }
+    }
+
+    public static List<RegionalBossEntity> getRegionalBossEntities(CustomBossesConfigFields customBossesConfigFields) {
+        return regionalBossesFromConfigFields.get(customBossesConfigFields);
     }
 
     public static void regionalDataSaver() {

@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.config.AntiExploitConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
@@ -444,6 +445,20 @@ public class EliteEntity implements SimplePersistentEntityInterface {
             if (elitePower.getClass().equals(mobPower.getClass()))
                 return true;
         return false;
+    }
+
+    public boolean hasPower(PowersConfigFields powersConfigFields) {
+        for (ElitePower elitePower : elitePowers)
+            if (elitePower.getPowersConfigFields().equals(powersConfigFields))
+                return true;
+        return false;
+    }
+
+    public ElitePower getPower(PowersConfigFields powersConfigFields) {
+        for (ElitePower elitePower : elitePowers)
+            if (elitePower.getPowersConfigFields().equals(powersConfigFields))
+                return elitePower;
+        return null;
     }
 
     public ElitePower getPower(ElitePower elitePower) {
