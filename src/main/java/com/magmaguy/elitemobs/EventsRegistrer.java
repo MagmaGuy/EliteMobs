@@ -29,6 +29,8 @@ import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.*;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBossBlock;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
@@ -38,11 +40,11 @@ import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
-import com.magmaguy.elitemobs.powers.AggroPrevention;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFallDamage;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityKnockback;
+import com.magmaguy.elitemobs.powers.defensivepowers.ShieldWall;
 import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.MajorCombatEnterScanningPower;
@@ -166,6 +168,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new Thunderstorm(), plugin);
         pluginManager.registerEvents(new Firestorm(), plugin);
         pluginManager.registerEvents(new Bombardment.BombardmentEvents(), plugin);
+        pluginManager.registerEvents(new ShieldWall.ShieldWallEvents(), plugin);
 
         //Major mob powers
         pluginManager.registerEvents(new SkeletonPillar(), plugin);
@@ -207,6 +210,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PhaseBossEntity.PhaseBossEntityListener(), plugin);
         pluginManager.registerEvents(new RegionalBossEntity.RegionalBossEntityEvents(), plugin);
         pluginManager.registerEvents(new AdvancedAggroManager(), plugin);
+        pluginManager.registerEvents(new TransitiveBossBlock(), plugin);
+        pluginManager.registerEvents(new TransitiveBlockCommand.TemporaryBossBlockCommandEvents(), plugin);
 
         //Metadata (player purger)
         pluginManager.registerEvents(new MetadataHandler(), plugin);
@@ -298,7 +303,7 @@ public class EventsRegistrer {
 
 
         //Prevent elitemob on elitemob aggro
-        pluginManager.registerEvents(new AggroPrevention(), plugin);
+        pluginManager.registerEvents(new EnderDragonUnstuck.AggroPrevention(), plugin);
 
         //Player effect when a rare item is on the ground
         pluginManager.registerEvents(new RareDropEffect(), plugin);

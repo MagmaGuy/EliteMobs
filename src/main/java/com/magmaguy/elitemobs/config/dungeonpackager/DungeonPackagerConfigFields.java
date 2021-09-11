@@ -19,7 +19,7 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private String name;
     @Getter
-    private DungeonLocationType dungeonLocationType;
+    private DungeonLocationType dungeonLocationType = DungeonLocationType.WORLD;
     @Getter
     private List<String> customInfo = new ArrayList<>();
     @Getter
@@ -29,23 +29,23 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     @Getter
     private String downloadLink = "";
     @Getter
-    private DungeonSizeCategory dungeonSizeCategory;
+    private DungeonSizeCategory dungeonSizeCategory = DungeonSizeCategory.LAIR;
     @Getter
     private String worldName;
     @Getter
     private String schematicName = "";
     @Getter
-    private World.Environment environment = null;
+    private World.Environment environment = World.Environment.NORMAL;
     @Getter
-    private Boolean protect = null;
+    private boolean protect = true;
     @Getter
     private Location anchorPoint;
     @Getter
     private double rotation;
     @Getter
-    private Vector corner1, corner2;
+    private Vector corner1 = new Vector(0,0,0), corner2 = new Vector(0,0,0);
     @Getter
-    private Vector teleportPoint;
+    private Vector teleportPoint = new Vector(0,0,0);
     @Getter
     private double teleportPointPitch = 0d;
     @Getter

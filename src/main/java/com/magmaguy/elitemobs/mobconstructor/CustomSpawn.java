@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
+import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -152,7 +153,7 @@ public class CustomSpawn {
                     @Override
                     public void run() {
                         generateCustomSpawn();
-                        //new InfoMessage("Failed to spawn " + timedEvent.getCustomEventsConfigFields().getFilename() + " after " + allTries + " tries. Will try again in 1 minute.");
+                        new DebugMessage("Failed to spawn " + timedEvent.getCustomEventsConfigFields().getFilename() + " after " + allTries + " tries. Will try again in 1 minute.");
                     }
                 }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20 * 60);
             } else {
@@ -197,7 +198,7 @@ public class CustomSpawn {
         if (world == null)
             for (Player player : Bukkit.getOnlinePlayers()) {
                 Location playerLocation = player.getLocation();
-                if (!ValidWorldsConfig.validWorlds.contains(world))
+                if (!ValidWorldsConfig.validWorlds.contains(playerLocation.getWorld().getName()))
                     continue;
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())
                     if (!customSpawnConfigFields.getValidWorlds().contains(playerLocation.getWorld()))

@@ -283,7 +283,7 @@ public class Minidungeon {
         commitLocations();
         this.isInstalled = true;
 
-        if (dungeonPackagerConfigFields.getProtect()) {
+        if (dungeonPackagerConfigFields.isProtect()) {
             Vector realCorner1 = GenericRotationMatrixMath.rotateVectorYAxis(
                     dungeonPackagerConfigFields.getRotation(),
                     dungeonPackagerConfigFields.getAnchorPoint(),
@@ -314,7 +314,7 @@ public class Minidungeon {
     }
 
     public void uninstallSchematicMinidungeon(Player player) {
-        if (dungeonPackagerConfigFields.getProtect())
+        if (dungeonPackagerConfigFields.isProtect())
             if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
                 WorldGuardCompatibility.removeMinidungeon(
                         dungeonPackagerConfigFields.getSchematicName(),
