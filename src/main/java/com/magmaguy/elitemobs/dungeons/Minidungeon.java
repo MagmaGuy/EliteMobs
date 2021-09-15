@@ -137,10 +137,20 @@ public class Minidungeon {
         checkIfBossesInstalled();
 
         if (isInstalled)
-            this.teleportLocation = GenericRotationMatrixMath.rotateVectorYAxis(
-                    dungeonPackagerConfigFields.getRotation(),
-                    dungeonPackagerConfigFields.getAnchorPoint(),
-                    dungeonPackagerConfigFields.getTeleportPoint()).toLocation(dungeonPackagerConfigFields.getAnchorPoint().getWorld());
+            this.teleportLocation = getRotatedFinalLocation(dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getTeleportPoint());
+    }
+
+    /**
+     * Used to rotate any relative coordinates for a dungeon - transitive blocks / custom reinforcements
+     * @param localAnchorPoint
+     * @param relativeCoordinate
+     * @return
+     */
+    public Location getRotatedFinalLocation(Location localAnchorPoint, Vector relativeCoordinate){
+        return GenericRotationMatrixMath.rotateVectorYAxis(
+                dungeonPackagerConfigFields.getRotation(),
+                localAnchorPoint,
+                relativeCoordinate).toLocation(localAnchorPoint.getWorld());
     }
 
     /**
@@ -332,6 +342,7 @@ public class Minidungeon {
             String bossFileName = regionalBossLocations.split(":")[0];
             CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(bossFileName);
             quantificationFilter(customBossesConfigFields);
+            RegionalBossEntity.getRegionalBossEntities(customBossesConfigFields).forEach((regionalBossEntity -> regionalBossEntity.setMinidungeon(this)));
             if (customBossesConfigFields != null && customBossesConfigFields.isRegionalBoss())
                 regionalBossCount++;
         }
@@ -341,6 +352,7 @@ public class Minidungeon {
         if (!isInstalled) return;
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet()) {
             if (Objects.equals(regionalBossEntity.getWorldName(), world.getName())) {
+                regionalBossEntity.setMinidungeon(this);
                 regionalBossCount++;
                 quantificationFilter(regionalBossEntity.getCustomBossesConfigFields());
             }

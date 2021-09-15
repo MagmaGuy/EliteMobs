@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.playerdata;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -74,6 +75,7 @@ public class ElitePlayerInventory {
     }
 
     public int getNaturalMobSpawnLevel(boolean update) {
+        if (player.getGameMode().equals(GameMode.SPECTATOR)) return 0;
         return (int) ((helmet.getTier(player.getInventory().getHelmet(), update) +
                 chestplate.getTier(player.getInventory().getChestplate(), update) +
                 leggings.getTier(player.getInventory().getLeggings(), update) +

@@ -98,6 +98,9 @@ public class Placeholders extends PlaceholderExpansion {
         databases for safety purposes. All of the queries should be in memory regardless.
          */
 
+        if (!PlayerData.isInMemory(player.getUniqueId()))
+            return "Uninitialized player data!";
+
         switch (identifier) {
             case "player_combat_tier":
                 return "" + ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(true);

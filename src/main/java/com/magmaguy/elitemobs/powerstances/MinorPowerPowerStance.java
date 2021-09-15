@@ -69,7 +69,7 @@ public class MinorPowerPowerStance implements Listener {
             ArrayList<Object> localObjects = new ArrayList<>();
             for (int a = 0; a < multiDimensionalTrailTracker.length; a++)
                 localObjects.addAll(addAllEffects());
-            for (int j = 0; j < multiDimensionalTrailTracker[0].length; j++)
+            for (int j = 0; j < localObjects.size(); j++)
                 if (localObjects.get(j) != null)
                     multiDimensionalTrailTracker[i][j] = localObjects.get(j);
         }

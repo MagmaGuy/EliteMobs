@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class TransitiveBlockCommand {
     private TransitiveBlockType transitiveBlockType;
     private RegionalBossEntity regionalBossEntity;
 
-    public TransitiveBlockCommand(Player player, CustomBossesConfigFields customBossesConfigFields, TransitiveBlockType transitiveBlockType) {
+    public TransitiveBlockCommand(Player player, CustomBossesConfigFields customBossesConfigFields, TransitiveBlockType transitiveBlockType, boolean edit) {
         this.player = player;
         this.customBossesConfigFields = customBossesConfigFields;
         this.transitiveBlockType = transitiveBlockType;
@@ -62,13 +63,23 @@ public class TransitiveBlockCommand {
             this.regionalBossEntity = regionalBossEntities.get(0);
         }
 
+        if (edit)
+            switch (transitiveBlockType){
+                case ON_SPAWN:
+                    transitiveBlockList = regionalBossEntity.getOnSpawnTransitiveBlocks();
+                    break;
+                case ON_REMOVE:
+                    transitiveBlockList = regionalBossEntity.getOnRemoveTransitiveBlocks();
+            }
+
+
         activePlayers.put(player, this);
         player.sendMessage(ChatColor.GREEN + "[EliteMobs] Now registering " + transitiveBlockType.toString() + " blocks! " + ChatColor.DARK_GREEN + "Punch blocks to register air at that location, or right click blocks to register the block you right clicked!");
         player.sendMessage(ChatColor.GOLD + "[EliteMobs] Run the same command to stop registering blocks and save!");
-        player.sendMessage(ChatColor.GOLD + "[EliteMobs] Or run the command " + "/em registerblocks cancel" + " to cancel the registration!");
+        player.sendMessage(ChatColor.GOLD + "[EliteMobs] Or run the command " + "/em cancelblocks " + " to cancel the registration!");
     }
 
-    public static void processCommand(Player player, String filename, String transitiveBlockType) {
+    public static void processCommand(Player player, String filename, String transitiveBlockType, boolean edit) {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(filename);
         if (customBossesConfigFields == null) {
             player.sendMessage("Boss file isn't valid! Try again with a valid filename for your custom boss.");
@@ -88,7 +99,7 @@ public class TransitiveBlockCommand {
         if (activePlayers.containsKey(player))
             activePlayers.get(player).commitLocations();
         else
-            new TransitiveBlockCommand(player, customBossesConfigFields, tbt);
+            new TransitiveBlockCommand(player, customBossesConfigFields, tbt, edit);
     }
 
     /**
@@ -148,10 +159,12 @@ public class TransitiveBlockCommand {
         switch (transitiveBlockType) {
             case ON_SPAWN:
                 customBossesConfigFields.setOnSpawnBlockStates(deserializedData);
+                regionalBossEntity.setOnSpawnTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(deserializedData, customBossesConfigFields.getFilename()));
                 player.sendMessage("Locations registered correctly!");
                 break;
             case ON_REMOVE:
                 customBossesConfigFields.setOnRemoveBlockStates(deserializedData);
+                regionalBossEntity.setOnRemoveTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(deserializedData, customBossesConfigFields.getFilename()));
                 player.sendMessage("Locations registered correctly!");
                 break;
             default:
@@ -182,6 +195,7 @@ public class TransitiveBlockCommand {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onPlayerInteractBlockEvent(PlayerInteractEvent event) {
             if (!activePlayers.containsKey(event.getPlayer())) return;
+            if (event.getHand() != EquipmentSlot.HAND) return;
             if (event.getClickedBlock() == null) return;
             if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 if (event.getClickedBlock().getType().isAir()) return;

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -40,14 +41,15 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     public static BukkitTask summonGlobalReinforcement(CustomBossReinforcement customBossReinforcement, CustomBossEntity summoningEntity) {
-        if (customBossReinforcement.customSpawn == null || customBossReinforcement.customSpawn.isEmpty()){
+        if (customBossReinforcement.customSpawn == null || customBossReinforcement.customSpawn.isEmpty()) {
             new WarningMessage("Reinforcement for boss " + summoningEntity.getCustomBossesConfigFields().getFilename() + " has an incorrectly configured global reinforcement for " + customBossReinforcement.bossFileName);
             return null;
         }
         return new BukkitRunnable() {
             @Override
             public void run() {
-                if (summoningEntity.getGlobalReinforcementsCount() > 30 * summoningEntity.getSpawnLocation().getWorld().getPlayers().size()) return;
+                if (summoningEntity.getGlobalReinforcementsCount() > 30 * summoningEntity.getSpawnLocation().getWorld().getPlayers().size())
+                    return;
                 for (int i = 0; i < customBossReinforcement.amount; i++) {
                     CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(customBossReinforcement.bossFileName);
                     if (customBossEntity == null) {
@@ -74,8 +76,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
         /*
         valid formats:
         summonable:
-        summonType=ONCE/ON_HIT/ON_COMBAT_ENTER/ON_COMBAT_ENTER_PLACE_CRYSTAL/GLOBAL:
-            file=filename.yml:
+        summonType=ONCE/ON_HIT/ON_COMBAT_ENTER/ON_COMBAT_ENTER_PLACE_CRYSTAL/GLOBAL/ON_DEATH:
+            filename=filename.yml:
             chance=double;
             location=x,y,z:
             lightningRod=true/false:
@@ -188,7 +190,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     case "customspawn":
                         if (CustomSpawnConfig.customSpawnConfig.getCustomEvent(getSubstringField(substring)) == null)
                             new WarningMessage("Failed to determine Custom Spawn file for filename " + substring);
-                         else
+                        else
                             customSpawn = getSubstringField(substring);
                         break;
                     default:
@@ -210,8 +212,11 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 case ON_HIT:
                     customBossReinforcement = doOnHit(filename, chance);
                     break;
+                case ON_DEATH:
+                    customBossReinforcement = doOnDeath(filename);
+                    break;
                 case ON_COMBAT_ENTER:
-                    customBossReinforcement = doOnCombatEnter(filename, location);
+                    customBossReinforcement = doOnCombatEnter(filename);
                     break;
                 case ON_COMBAT_ENTER_PLACE_CRYSTAL:
                     customBossReinforcement = dOnCombatEnterPlaceCrystal(location, lightningRod);
@@ -232,6 +237,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
             customBossReinforcement.inheritLevel = inheritLevel;
             customBossReinforcement.spawnNearby = spawnNearby;
             customBossReinforcement.customSpawn = customSpawn;
+            customBossReinforcement.summonChance = chance;
+            customBossReinforcement.setSpawnLocationOffset(location);
 
         }
     }
@@ -273,6 +280,16 @@ public class CustomSummonPower extends ElitePower implements Listener {
         return customBossReinforcement;
     }
 
+    private CustomBossReinforcement doOnDeath(String filename) {
+        CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_DEATH, filename);
+        if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
+            new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
+            return null;
+        }
+        customBossReinforcements.add(customBossReinforcement);
+        return customBossReinforcement;
+    }
+
     //summon:onCombatEnter:x,y,z:filename.yml
     private void parseOnCombatEnter(String powerString) {
         String[] strings = powerString.split(":");
@@ -280,11 +297,17 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 Double.parseDouble(strings[2].split(",")[0]),
                 Double.parseDouble(strings[2].split(",")[1]),
                 Double.parseDouble(strings[2].split(",")[2])));
+
     }
 
-    private CustomBossReinforcement doOnCombatEnter(String filename, Vector location) {
+    private CustomBossReinforcement doOnCombatEnter(String filename, Vector vector) {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, filename);
-        customBossReinforcement.setSpawnLocationOffset(location);
+        customBossReinforcement.setSpawnLocationOffset(vector);
+        return doOnCombatEnter(filename);
+    }
+
+    private CustomBossReinforcement doOnCombatEnter(String filename) {
+        CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, filename);
 
         if (CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
             new WarningMessage("Reinforcement mob " + customBossReinforcement.bossFileName + " is not valid!");
@@ -327,7 +350,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             if (customBossReinforcement.summonType.equals(SummonType.ONCE) && !customBossReinforcement.isSummoned)
                 summonReinforcement(spawningEntity, customBossReinforcement);
 
-            if (customBossReinforcement.summonType.equals(SummonType.ON_HIT) && ThreadLocalRandom.current().nextDouble() < customBossReinforcement.summonChance)
+            if (customBossReinforcement.summonType.equals(SummonType.ON_HIT))
                 summonReinforcement(spawningEntity, customBossReinforcement);
         }
     }
@@ -370,9 +393,17 @@ public class CustomSummonPower extends ElitePower implements Listener {
 
     }
 
+    private void onDeathSummonReinforcement(EliteEntity spawningEntity) {
+        for (CustomBossReinforcement customBossReinforcement : customBossReinforcements)
+            if (customBossReinforcement.summonType.equals(SummonType.ON_DEATH))
+                summonReinforcement(spawningEntity, customBossReinforcement);
+    }
+
     private void summonReinforcement(EliteEntity eliteEntity, CustomBossReinforcement customBossReinforcement) {
+        if (customBossReinforcement.summonChance != null && ThreadLocalRandom.current().nextDouble() > customBossReinforcement.summonChance)
+            return;
         for (int i = 0; i < customBossReinforcement.amount; i++) {
-            Location spawnLocation = eliteEntity.getLivingEntity().getLocation();
+            Location spawnLocation = eliteEntity.getLocation();
             if (customBossReinforcement.spawnLocationOffset != null)
                 spawnLocation = getFinalSpawnLocation(eliteEntity, customBossReinforcement.spawnLocationOffset);
             if (customBossReinforcement.spawnNearby)
@@ -395,7 +426,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 }
                 if (customBossReinforcement.inheritLevel)
                     regionalBossEntity.setLevel(eliteEntity.getLevel());
-                eliteEntity.addReinforcement(regionalBossEntity);
+                if (!customBossReinforcement.summonType.equals(SummonType.ON_DEATH))
+                    eliteEntity.addReinforcement(regionalBossEntity);
                 customBossReinforcement.isSummoned = true;
                 regionalBossEntity.setSummoningEntity(eliteEntity);
                 regionalBossEntity.initialize();
@@ -410,7 +442,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 if (customBossReinforcement.inheritLevel)
                     customBossEntity.setLevel(eliteEntity.getLevel());
                 customBossEntity.spawn(false);
-                eliteEntity.addReinforcement(customBossEntity);
+                if (!customBossReinforcement.summonType.equals(SummonType.ON_DEATH))
+                    eliteEntity.addReinforcement(customBossEntity);
                 customBossReinforcement.isSummoned = true;
                 customBossEntity.setSummoningEntity(eliteEntity);
             }
@@ -418,17 +451,27 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     private Location getFinalSpawnLocation(EliteEntity summoningEntity, Vector spawnLocationOffset) {
+        Location finalSpawnLocation;
         if (summoningEntity instanceof RegionalBossEntity)
-            return ((RegionalBossEntity) summoningEntity).getSpawnLocation().clone().add(spawnLocationOffset);
-        if (summoningEntity == null)
-            return null;
-        return summoningEntity.getLivingEntity().getLocation().add(spawnLocationOffset);
+            finalSpawnLocation = ((RegionalBossEntity) summoningEntity).getSpawnLocation().clone().add(spawnLocationOffset);
+        else if (summoningEntity == null)
+            finalSpawnLocation = null;
+        else
+            finalSpawnLocation = summoningEntity.getLocation().add(spawnLocationOffset);
+        if (summoningEntity instanceof CustomBossEntity && ((CustomBossEntity) summoningEntity).getMinidungeon() != null)
+            if (summoningEntity instanceof RegionalBossEntity)
+                return ((CustomBossEntity) summoningEntity).getMinidungeon().getRotatedFinalLocation(((RegionalBossEntity) summoningEntity).getSpawnLocation(), spawnLocationOffset);
+            else
+                return ((CustomBossEntity) summoningEntity).getMinidungeon().getRotatedFinalLocation((summoningEntity).getLocation(), spawnLocationOffset);
+
+        else return finalSpawnLocation;
     }
 
     public enum SummonType {
         ONCE,
         ON_HIT,
         ON_COMBAT_ENTER,
+        ON_DEATH,
         ON_COMBAT_ENTER_PLACE_CRYSTAL,
         GLOBAL
     }
@@ -448,11 +491,18 @@ public class CustomSummonPower extends ElitePower implements Listener {
             if (customSummonPower == null) return;
             customSummonPower.onCombatEnterSummonReinforcement(event.getEliteMobEntity());
         }
+
+        @EventHandler
+        public void onDeath(EliteMobDeathEvent event) {
+            CustomSummonPower customSummonPower = (CustomSummonPower) event.getEliteEntity().getPower("custom_summon.yml");
+            if (customSummonPower == null) return;
+            customSummonPower.onDeathSummonReinforcement(event.getEliteEntity());
+        }
     }
 
     public class CustomBossReinforcement {
         public final SummonType summonType;
-        public double summonChance;
+        public Double summonChance;
         public String bossFileName = null;
         public Vector spawnLocationOffset;
         public EntityType entityType;
