@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
@@ -72,6 +73,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Setter
     private Location respawnOverrideLocation;
     private boolean worldIsLoading = false;
+    @Getter
+    @Setter
+    private Minidungeon minidungeon = null;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -100,6 +104,13 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (customBossesConfigFields == null)
             return null;
         return new CustomBossEntity(customBossesConfigFields);
+    }
+
+    @Override
+    public void setSummoningEntity(EliteEntity summoningEntity) {
+        this.summoningEntity = summoningEntity;
+        if (summoningEntity instanceof CustomBossEntity)
+        this.minidungeon = ((CustomBossEntity)summoningEntity).minidungeon;
     }
 
     /**
@@ -297,6 +308,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         nonEliteReinforcementEntities.clear();
     }
 
+    @Override
     public Location getLocation() {
         if (getLivingEntity() != null) return getLivingEntity().getLocation();
         else return persistentLocation;

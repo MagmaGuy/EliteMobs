@@ -597,7 +597,7 @@ public class AdminCommands {
 
         List<String> blockTransitionPhases = new ArrayList<>(Arrays.asList("ON_SPAWN", "ON_REMOVE"));
 
-        // /em registerblocks <regional_boss_file.yml> <on_spawn/on_death>
+        // /em registerblocks <regional_boss_file.yml> <on_spawn/on_remove>
         manager.command(builder.literal("registerblocks")
                 .senderType(Player.class)
                 .argument(StringArgument.<CommandSender>newBuilder("regionalBoss").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
@@ -607,9 +607,21 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Registers transitive blocks for use by regional bosses.")
                 .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
-                        commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"))));
+                        commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"), false)));
 
-        // /em registerblocks cancel
+        // /em registerblocksedit <regional_boss_file.yml> <on_spawn/on_remove>
+        manager.command(builder.literal("registerblocksedit")
+                .senderType(Player.class)
+                .argument(StringArgument.<CommandSender>newBuilder("regionalBoss").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
+                        ArgumentDescription.of("Regional Boss configuration file name"))
+                .argument(StringArgument.<CommandSender>newBuilder("blockTransitionPhase").withSuggestionsProvider(((objectCommandContext, s) -> blockTransitionPhases)),
+                        ArgumentDescription.of("Block transition phase"))
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Registers transitive blocks for use by regional bosses.")
+                .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
+                        commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"), true)));
+
+        // /em cancelblocks
         manager.command(builder.literal("cancelblocks")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
