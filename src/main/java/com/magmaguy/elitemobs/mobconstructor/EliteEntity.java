@@ -598,6 +598,11 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return !livingEntity.isDead();
     }
 
+    public Location getLocation(){
+        if (livingEntity != null) return livingEntity.getLocation();
+        return null;
+    }
+
     public void remove(RemovalReason removalReason) {
         //This prevents the entity tracker from running this code twice when removing due to specific reasons
         if (livingEntity != null)
