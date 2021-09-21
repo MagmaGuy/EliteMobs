@@ -122,7 +122,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
                 continue;
             }
             long timestamp = 0;
-            if (!strings[1].isEmpty()) {
+            if (strings.length > 1) {
                 try {
                     timestamp = Long.parseLong(strings[1]);
                 } catch (Exception exception) {
@@ -133,7 +133,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         }
     }
 
-    public void updateLocations(Location chestInstanceLocation, long unixTimeStamp) {
+    public TreasureChest updateTreasureChest(Location chestInstanceLocation, long unixTimeStamp) {
         int index = -1;
         String deserializedLocation = ConfigurationLocation.deserialize(chestInstanceLocation.getBlock().getLocation());
         for (String string : locations)
@@ -142,19 +142,38 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
                 break;
             }
         String serializedUpdatedLocation = deserializedLocation + ":" + unixTimeStamp;
+        TreasureChest treasureChest = null;
         if (index != -1) {
             locations.set(index, serializedUpdatedLocation);
         } else {
             locations.add(serializedUpdatedLocation);
-            new TreasureChest(this, chestInstanceLocation, unixTimeStamp);
+            treasureChest = new TreasureChest(this, chestInstanceLocation, unixTimeStamp);
         }
+        fileConfiguration.set("locations", locations);
+        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+        return treasureChest;
+    }
+
+    public void removeTreasureChest(Location chestInstanceLocation) {
+        if (locations.size() < 1) return;
+        int index = -1;
+        String deserializedLocation = ConfigurationLocation.deserialize(chestInstanceLocation.getBlock().getLocation());
+        for (String string : locations)
+            if (string.split(":")[0].equals(deserializedLocation)) {
+                index = locations.indexOf(string);
+                break;
+            }
+        if (index < 0)
+            return;
+        String location = locations.get(index);
+        locations.remove(location);
         fileConfiguration.set("locations", locations);
         ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
     }
 
     public void setRestockTime(Location location, long newRestockTime) {
         if (!locations.isEmpty()) {
-            updateLocations(location, newRestockTime);
+            updateTreasureChest(location, newRestockTime);
             return;
         }
 

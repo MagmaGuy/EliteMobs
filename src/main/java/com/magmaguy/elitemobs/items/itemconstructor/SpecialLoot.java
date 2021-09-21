@@ -33,6 +33,7 @@ public class SpecialLoot {
         }
 
         for (String option : configSubstrings)
+            try{
             if (option.contains("level")) {
                 String finalOption = option.split("=")[1];
                 if (finalOption.contains("-")) {
@@ -63,6 +64,8 @@ public class SpecialLoot {
             } else if (option.contains("chance")) {
                 String finalOption = option.split("=")[1];
                 chance = Double.parseDouble(finalOption);
+            }} catch (Exception exception){
+                new WarningMessage("Failed to load Special Item! Problematic entry: " + option);
             }
     }
 

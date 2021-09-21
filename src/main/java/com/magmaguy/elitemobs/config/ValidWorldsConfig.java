@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config;
 
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;

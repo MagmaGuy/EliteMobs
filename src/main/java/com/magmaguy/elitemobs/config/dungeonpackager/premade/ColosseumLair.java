@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfigFields
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ColosseumLair extends DungeonPackagerConfigFields {
@@ -26,7 +27,7 @@ public class ColosseumLair extends DungeonPackagerConfigFields {
                         "colosseum_tier_70_gladiator.yml:-14.5,-7.5,23.5",
                         "colosseum_tier_70_gladiator.yml:-30.5,-7.5,31.5",
                         "colosseum_tier_70_gladiator.yml:-30.5,-7.5,31.5"),
-                Arrays.asList(),
+                new ArrayList<>(),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
                 null,

@@ -141,7 +141,10 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
          * @return Debuff multiplier
          */
         private static float getCooledAttackStrength(Player player) {
-            if (!playerHitCooldownHashMap.containsKey(player)) return 1;
+            if (!playerHitCooldownHashMap.containsKey(player)) {
+                playerHitCooldownHashMap.put(player, clock);
+                return 1;
+            }
             float swingDelay = clock - playerHitCooldownHashMap.get(player);
             float cooldownPeriod = getCooldownPeriod(player);
             if (swingDelay > cooldownPeriod) return 1;

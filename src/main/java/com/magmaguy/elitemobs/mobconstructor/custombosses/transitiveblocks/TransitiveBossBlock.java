@@ -16,23 +16,24 @@ import org.bukkit.util.Vector;
 public class TransitiveBossBlock implements Listener {
 
     private static void setBlockData(CustomBossEntity customBossEntity, TransitiveBlock transitiveBlock, Location spawnLocation) {
-        Location location = new Location(spawnLocation.getWorld(),
-                spawnLocation.getX() + transitiveBlock.getRelativeLocation().getX(),
-                spawnLocation.getY() + transitiveBlock.getRelativeLocation().getY(),
-                spawnLocation.getZ() + transitiveBlock.getRelativeLocation().getZ());
+        Location location;
         double rotation = 0;
-        BlockData blockData = transitiveBlock.getBlockData();
-        if (customBossEntity.getMinidungeon() != null) {
+        if (customBossEntity.getMinidungeon() != null)
             rotation = customBossEntity.getMinidungeon().dungeonPackagerConfigFields.getRotation();
-            if (rotation == 0)
-                location.getBlock().setBlockData(transitiveBlock.getBlockData());
-            else {
-                location = customBossEntity.getMinidungeon().getRotatedFinalLocation(customBossEntity.getSpawnLocation(),
-                        new Vector(transitiveBlock.getRelativeLocation().getX(), transitiveBlock.getRelativeLocation().getY(), transitiveBlock.getRelativeLocation().getZ()));
-                if (blockData instanceof Directional)
-                    ((Directional) blockData).setFacing(rotateBlockFace(((Directional) blockData).getFacing(), rotation));
-            }
+        BlockData blockData = transitiveBlock.getBlockData();
+
+        if (rotation == 0)
+            location = new Location(spawnLocation.getWorld(),
+                    spawnLocation.getX() + transitiveBlock.getRelativeLocation().getX(),
+                    spawnLocation.getY() + transitiveBlock.getRelativeLocation().getY(),
+                    spawnLocation.getZ() + transitiveBlock.getRelativeLocation().getZ());
+        else {
+            location = customBossEntity.getMinidungeon().getRotatedFinalLocation(spawnLocation.getBlock().getLocation().add(new Vector(0.5, 0.5, 0.5)),
+                    transitiveBlock.getRelativeLocation().add(new Vector(0.5,0.5,0.5)));
+            if (blockData instanceof Directional)
+                ((Directional) blockData).setFacing(rotateBlockFace(((Directional) blockData).getFacing(), rotation));
         }
+
         location.getBlock().setBlockData(blockData);
     }
 

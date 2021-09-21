@@ -85,6 +85,8 @@ public class PlayerPotionEffects implements Listener {
         if (player.hasMetadata("NPC"))
             return;
 
+        if (ElitePlayerInventory.playerInventories.get(player.getUniqueId()) == null) return;
+
         LivingEntity damagee;
         if (event.getEntity() instanceof LivingEntity)
             damagee = (LivingEntity) event.getEntity();
