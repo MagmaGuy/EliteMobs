@@ -75,17 +75,16 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> SetupHandler.setupMinidungeonCommand((Player) commandContext.getSender(), commandContext.get("minidungeonName"))));
 
-        // /em setup minidungeon <minidungeonName> noPaste
+        // /em setup minidungeonNoPaste <minidungeonName>
         manager.command(builder.literal("setup")
-                .literal("minidungeon")
+                .literal("minidungeonNoPaste")
                 .argument(StringArgument.newBuilder("minidungeonName"), ArgumentDescription.of("minidungeon name"))
-                .literal("noPaste")
                 .meta(CommandMeta.DESCRIPTION, "Installs a Minidungeon without pasting the WorldEdit schematic")
                 .senderType(Player.class)
                 .permission("elitemobs.*")
                 .handler(commandContext -> SetupHandler.setupMinidungeonNoPasteCommand((Player) commandContext.getSender(), commandContext.get("minidungeonName"))));
 
-        // /em setup minidungeon <minidungeonName>
+        // /em setup unminidungeon <minidungeonName>
         manager.command(builder.literal("setup")
                 .literal("unminidungeon")
                 .argument(StringArgument.newBuilder("minidungeonName"), ArgumentDescription.of("minidungeon name"))
@@ -94,9 +93,9 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> SetupHandler.setupUnminidungeonCommand((Player) commandContext.getSender(), commandContext.get("minidungeonName"))));
 
-        // /em setup unminidungeon <minidungeonName> noPaste
+        // /em setup unminidungeonNoPaste <minidungeonName>
         manager.command(builder.literal("setup")
-                .literal("unminidungeon")
+                .literal("unminidungeonNoPaste")
                 .argument(StringArgument.newBuilder("minidungeonName"), ArgumentDescription.of("minidungeon name"))
                 .literal("noPaste")
                 .meta(CommandMeta.DESCRIPTION, "Uninstalls a Minidungeon without undoing a WorldEdit paste.")
@@ -274,6 +273,18 @@ public class AdminCommands {
                 .permission("elitemobs.*")
                 .handler(commandContext -> CustomBossCommandHandler.addRelativeSpawnLocation(
                         (Player) commandContext.getSender(), commandContext.get("bossFileName"), commandContext.get("minidungeonFileName"))));
+
+        // /em addRelativeTreasureChest <treasureChestName> <minidungeonFileName>
+        manager.command(builder.literal("addRelativeTreasureChest", "artc")
+                .argument(StringArgument.<CommandSender>newBuilder("treasureChestFilename").withSuggestionsProvider(((objectCommandContext, s) -> treasureChestFilenames)),
+                        ArgumentDescription.of("Treasure Chest configuration file name"))
+                .argument(StringArgument.<CommandSender>newBuilder("minidungeonFileName").withSuggestionsProvider(((objectCommandContext, s) -> minidungeonFileNames)),
+                        ArgumentDescription.of("Minidungeon configuration file name"))
+                .meta(CommandMeta.DESCRIPTION, "Adds a spawn location to a Regional Boss.")
+                .senderType(Player.class)
+                .permission("elitemobs.*")
+                .handler(commandContext -> TreasureChestCommands.addRelativeTreasureChest(
+                        (Player) commandContext.getSender(), commandContext.get("treasureChestFilename"), commandContext.get("minidungeonFileName"))));
 
         // /em setLeashRadius <fileName> <radius>
         manager.command(builder.literal("setLeashRadius")
@@ -620,6 +631,30 @@ public class AdminCommands {
                 .meta(CommandMeta.DESCRIPTION, "Registers transitive blocks for use by regional bosses.")
                 .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
                         commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"), true)));
+
+        // /em registerblocksarea <regional_boss_file.yml> <on_spawn/on_remove>
+        manager.command(builder.literal("registerblocksarea")
+                .senderType(Player.class)
+                .argument(StringArgument.<CommandSender>newBuilder("regionalBoss").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
+                        ArgumentDescription.of("Regional Boss configuration file name"))
+                .argument(StringArgument.<CommandSender>newBuilder("blockTransitionPhase").withSuggestionsProvider(((objectCommandContext, s) -> blockTransitionPhases)),
+                        ArgumentDescription.of("Block transition phase"))
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Registers large transitive blocks areas for use by regional bosses.")
+                .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
+                        commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"), false, true)));
+
+        // /em registerblocksarea <regional_boss_file.yml> <on_spawn/on_remove>
+        manager.command(builder.literal("registerblocksareaedit")
+                .senderType(Player.class)
+                .argument(StringArgument.<CommandSender>newBuilder("regionalBoss").withSuggestionsProvider(((objectCommandContext, s) -> customBosses)),
+                        ArgumentDescription.of("Regional Boss configuration file name"))
+                .argument(StringArgument.<CommandSender>newBuilder("blockTransitionPhase").withSuggestionsProvider(((objectCommandContext, s) -> blockTransitionPhases)),
+                        ArgumentDescription.of("Block transition phase"))
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Registers large transitive blocks areas for use by regional bosses.")
+                .handler(commandContext -> TransitiveBlockCommand.processCommand((Player) commandContext.getSender(),
+                        commandContext.get("regionalBoss"), commandContext.get("blockTransitionPhase"), true, true)));
 
         // /em cancelblocks
         manager.command(builder.literal("cancelblocks")

@@ -18,7 +18,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
@@ -336,7 +335,7 @@ public class WorldGuardCompatibility {
      * @param corner1
      * @param corner2
      */
-    public static void defineMinidungeon(Vector corner1, Vector corner2, Location anchorLocation, String schematicName, Minidungeon minidungeon) {
+    public static void defineMinidungeon(Location corner1, Location corner2, Location anchorLocation, String schematicName, Minidungeon minidungeon) {
         try {
             RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager regionManager = regionContainer.get(BukkitAdapter.adapt(anchorLocation.getWorld()));

@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.config.configurationimporter;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.UnzipFile;
 import com.magmaguy.elitemobs.utils.WarningMessage;

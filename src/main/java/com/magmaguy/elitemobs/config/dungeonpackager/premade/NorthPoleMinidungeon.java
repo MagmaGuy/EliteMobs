@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
@@ -15,8 +16,8 @@ public class NorthPoleMinidungeon extends DungeonPackagerConfigFields {
                 DungeonLocationType.WORLD,
                 Arrays.asList("&fThe Christmas minidungeon!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                null,
-                null,
+                new ArrayList<>(),
+                new ArrayList<>(),
                 DiscordLinks.freeMinidungeons,
                 DungeonSizeCategory.MINIDUNGEON,
                 "em_north_pole",

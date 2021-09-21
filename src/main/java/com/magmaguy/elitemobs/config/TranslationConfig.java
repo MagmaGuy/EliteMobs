@@ -38,6 +38,9 @@ public class TranslationConfig {
 
     public static String TRACK_MESSAGE;
 
+    public static String CHEST_LOW_RANK_MESSAGE;
+    public static String CHEST_COOLDOWN_MESSAGE;
+
 
     public static final String CONFIG_NAME = "translation.yml";
     CustomConfigLoader customConfigLoader = new CustomConfigLoader();
@@ -68,6 +71,9 @@ public class TranslationConfig {
         configuration.addDefault(NO_PENDING_COMMANDS, "&cYou don't currently have any pending commands!");
 
         TRACK_MESSAGE = ConfigurationEngine.setString(configuration, "trackMessage", "Track the $name");
+
+        CHEST_LOW_RANK_MESSAGE = ConfigurationEngine.setString(configuration, "chestLowRankMessage","&7[EM] &cYour guild rank needs to be at least $rank &cin order to open this chest!");
+        CHEST_COOLDOWN_MESSAGE = ConfigurationEngine.setString(configuration, "chestCooldownMessage", "&7[EM] &cYou've already opened this chest recently! Wait $time!");
 
         configuration.options().copyDefaults(true);
         UnusedNodeHandler.clearNodes(configuration);

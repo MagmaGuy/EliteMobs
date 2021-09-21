@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.dungeonpackager;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -89,8 +90,8 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
         this.name = name;
         this.dungeonLocationType = dungeonLocationType;
         this.customInfo = customInfo;
-        this.relativeBossLocations = relativeBossLocations;
-        this.relativeTreasureChestLocations = relativeTreasureChestLocations;
+        this.relativeBossLocations = new ArrayList<>(relativeBossLocations);
+        this.relativeTreasureChestLocations = new ArrayList<>(relativeTreasureChestLocations);
         this.downloadLink = downloadLink;
         this.dungeonSizeCategory = dungeonSizeCategory;
         this.worldName = worldName;
@@ -160,10 +161,22 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
             removeAnchorPoint();
     }
 
-    public boolean setRelativeBossLocations(CustomBossesConfigFields customBossesConfigFields, Location relativeLocation) {
+    public boolean addRelativeBossLocation(CustomBossesConfigFields customBossesConfigFields, Location relativeLocation) {
         String configurationLocation = customBossesConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
         relativeBossLocations.add(configurationLocation);
         return ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
+    }
+
+    public void removeRelativeBossLocation(CustomBossesConfigFields customBossesConfigFields, Vector relativeLocation){
+        String configurationLocation = customBossesConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
+        relativeBossLocations.remove(configurationLocation);
+        ConfigurationEngine.writeValue(relativeBossLocations, file, fileConfiguration, "relativeBossLocations");
+    }
+
+    public boolean addRelativeTreasureChests(CustomTreasureChestConfigFields treasureChestConfigFields, Location relativeLocation) {
+        String configurationLocation = treasureChestConfigFields.getFilename() + ":" + relativeLocation.getX() + "," + relativeLocation.getY() + "," + relativeLocation.getZ();
+        relativeTreasureChestLocations.add(configurationLocation);
+        return ConfigurationEngine.writeValue(relativeTreasureChestLocations, file, fileConfiguration, "relativeTreasureChestLocations");
     }
 
     private void setAnchorPoint(Location location) {

@@ -88,7 +88,7 @@ public class CustomConfigFields implements CustomConfigFieldsInterface {
         return value;
     }
 
-    protected List<String> processStringList(String path, List<String> value, List<String> pluginDefault, boolean forceWriteDefault) {
+    public List<String> processStringList(String path, List<String> value, List<String> pluginDefault, boolean forceWriteDefault) {
         if (!configHas(path)) {
             if (forceWriteDefault || value != pluginDefault)
                 fileConfiguration.addDefault(path, value);

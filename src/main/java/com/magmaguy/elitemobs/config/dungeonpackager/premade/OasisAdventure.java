@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OasisAdventure extends DungeonPackagerConfigFields {
@@ -15,8 +16,8 @@ public class OasisAdventure extends DungeonPackagerConfigFields {
                 DungeonLocationType.WORLD,
                 Arrays.asList("&fA massive adventure for beginners!",
                         "&6Credits: 69OzCanOfBepis"),
-                null,
-                null,
+                new ArrayList<>(),
+                new ArrayList<>(),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.ADVENTURE,
                 "em_oasis",

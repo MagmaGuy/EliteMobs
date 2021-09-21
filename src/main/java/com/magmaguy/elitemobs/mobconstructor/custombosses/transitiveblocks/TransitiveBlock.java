@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;

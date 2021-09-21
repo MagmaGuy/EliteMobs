@@ -82,10 +82,10 @@ public class CustomSpawn {
             if (floorLocation.getBlock().isPassable())
                 continue;
             Location tempLocation = new Location(location.getWorld(), location.getX(), height, location.getZ());
-            if (!tempLocation.getBlock().getType().equals(Material.AIR) && !tempLocation.getBlock().getType().equals(Material.CAVE_AIR))
+            if (!tempLocation.getBlock().getType().isAir())
                 continue;
             Location locationAbove = new Location(location.getWorld(), location.getX(), height + 1, location.getZ());
-            if (!locationAbove.getBlock().getType().equals(Material.AIR) && !locationAbove.getBlock().getType().equals(Material.CAVE_AIR))
+            if (!locationAbove.getBlock().getType().isAir())
                 continue;
             return height;
         }
