@@ -25,6 +25,7 @@ import org.bukkit.scheduler.BukkitTask;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RegionalBossEntity extends CustomBossEntity implements SimplePersistentEntityInterface {
 
@@ -68,7 +69,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         super.setPersistent(true);
     }
 
-    private RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent) {
+    public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent) {
         super(customBossesConfigFields);
         this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
         this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
@@ -119,7 +120,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
 
     public static RegionalBossEntity getRegionalBoss(CustomBossesConfigFields customBossesConfigFields, Location spawnLocation) {
         for (RegionalBossEntity regionalBossEntity : regionalBossesFromConfigFields.get(customBossesConfigFields))
-            if (regionalBossEntity.getSpawnLocation() == spawnLocation)
+            if (Objects.equals(regionalBossEntity.getSpawnLocation(), spawnLocation))
                 return regionalBossEntity;
         return null;
     }
@@ -147,7 +148,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     }
 
     public void saveNewLocation() {
-        if (spawnLocation == null || getLocation() == null) {
+        if (spawnLocation == null) {
             new WarningMessage("Failed to save regional boss because it failed to spawn correctly!");
         }
         customBossesConfigFields.setFilesOutOfSync(true);

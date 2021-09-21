@@ -5,7 +5,9 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
+import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -188,14 +190,11 @@ public class TreasureChest {
     }
 
     private void lowRankMessage(Player player) {
-        //todo: fix treasure chests to incorporate prestige ranks into them
-        player.sendMessage(ChatColorConverter.convert("&7[EM] &cYour guild rank needs to be " + GuildRank.getRankName(0, customTreasureChestConfigFields.getChestTier())
-                + " &cin order to open this chest!"));
+        player.sendMessage(ChatColorConverter.convert(TranslationConfig.CHEST_LOW_RANK_MESSAGE.replace("$rank", GuildRank.getRankName(Math.max(0, customTreasureChestConfigFields.getChestTier() - 10), customTreasureChestConfigFields.getChestTier()))));
     }
 
     private void groupTimerCooldownMessage(Player player, long targetTime) {
-        player.sendMessage(ChatColorConverter.convert("&7[EM] &cYou've already opened this chest recently! Wait "
-                + timeConverter(targetTime - Instant.now().getEpochSecond()) + "!"));
+        player.sendMessage(ChatColorConverter.convert(TranslationConfig.CHEST_COOLDOWN_MESSAGE.replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond()))));
     }
 
     private boolean playerIsInCooldown(Player player) {
@@ -293,6 +292,12 @@ public class TreasureChest {
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+    }
+
+    public void removeTreasureChest() {
+        CustomTreasureChestsConfig.removeTreasureChestEntry(location, customTreasureChestConfigFields.getFilename());
+        location.getBlock().setBlockData(Material.AIR.createBlockData());
+        treasureChestHashMap.remove(location);
     }
 
     public enum DropStyle {

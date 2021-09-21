@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,6 +38,9 @@ public class RemoveCommand {
                     event.getDamager().sendMessage(ChatColorConverter.convert(
                             "&8[EliteMobs] &cRemoved a spawn location for boss " +
                                     ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
+                if (eliteEntity instanceof RegionalBossEntity)
+                    if (((CustomBossEntity) eliteEntity).getMinidungeon() != null )
+                       ((CustomBossEntity) eliteEntity).getMinidungeon().removeRelativeLocation((RegionalBossEntity) eliteEntity);
             EntityTracker.unregister(event.getEntity().getUniqueId(), RemovalReason.REMOVE_COMMAND);
             event.setCancelled(true);
         }

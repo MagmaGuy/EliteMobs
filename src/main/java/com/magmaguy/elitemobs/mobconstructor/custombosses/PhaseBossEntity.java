@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.event.EventHandler;
@@ -54,7 +53,7 @@ public class PhaseBossEntity {
         }
         customBossEntity.remove(removalReason);
         if (bossPhase.customBossesConfigFields == null) {
-            new WarningMessage("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields + " was not valid! The boss will not be able to switch phases until it is fixed.");
+            new WarningMessage("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields.getFilename() + " was not valid! The boss will not be able to switch phases until it is fixed.");
             return;
         }
         customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);

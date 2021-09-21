@@ -1,17 +1,13 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
-import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -307,19 +303,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.mainHand = processItemStack("mainHand", mainHand, null, false);
         this.offHand = processItemStack("offHand", offHand, null, false);
         this.regionalBoss = processBoolean("isRegionalBoss", isRegionalBoss(), false, false);
-        if (isRegionalBoss()) {
-            regionalElites.put(getFilename(), this);
-            //Reinforcement elites are only temporary and situational, don't initialize them
-            if (!isReinforcement()) {
-                //Initialize the regional bosses in the world
-                List<String> locations = processStringList("spawnLocations", new ArrayList<>(), new ArrayList<>(), false);
-                if (locations.size() < 1)
-                    new InfoMessage(getFilename() + " does not have a set location yet! It will not spawn. Did you install its minidungeon?");
-                for (String string : locations)
-                    //Give time for all custom bosses to be loaded as some powers require other bosses to be loaded in order to generate reinforcements
-                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> new RegionalBossEntity(this, string).initialize(), 1);
-            }
-        }
 
         this.onSpawnBlockStates = processStringList("onSpawnBlockStates", onSpawnBlockStates, new ArrayList<>(), false);
         this.onRemoveBlockStates = processStringList("onRemoveBlockStates", onRemoveBlockStates, new ArrayList<>(), false);

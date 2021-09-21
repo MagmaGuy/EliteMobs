@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.utils.DiscordLinks;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BinderOfWorldsLair extends DungeonPackagerConfigFields {
@@ -15,8 +16,8 @@ public class BinderOfWorldsLair extends DungeonPackagerConfigFields {
                 DungeonLocationType.WORLD,
                 Arrays.asList("&5The ultimate challenge. Be prepared!",
                         "&6Credits: MagmaGuy & 69OzCanOfBepis"),
-                null,
-                null,
+                new ArrayList<>(),
+                new ArrayList<>(),
                 DiscordLinks.premiumMinidungeons,
                 DungeonSizeCategory.LAIR,
                 "em_binder_of_worlds",
