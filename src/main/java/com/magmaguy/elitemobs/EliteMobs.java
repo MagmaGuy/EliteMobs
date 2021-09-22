@@ -255,7 +255,7 @@ public class EliteMobs extends JavaPlugin {
                 if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
                     minidungeon.quantifyWorldBosses();
                 else if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
-                    minidungeon.quantifySchematicBosses();
+                    minidungeon.quantifySchematicBosses(false);
         }
 
         new CustomTreasureChestsConfig();

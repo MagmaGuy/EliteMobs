@@ -442,6 +442,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 if (customBossReinforcement.inheritLevel)
                     customBossEntity.setLevel(eliteEntity.getLevel());
                 customBossEntity.spawn(false);
+                if (customBossEntity.getLivingEntity() != null)
+                    customBossEntity.getLivingEntity().setVelocity(new Vector(ThreadLocalRandom.current().nextDouble(0.2), 0.2, ThreadLocalRandom.current().nextDouble(0.2)));
                 if (!customBossReinforcement.summonType.equals(SummonType.ON_DEATH))
                     eliteEntity.addReinforcement(customBossEntity);
                 customBossReinforcement.isSummoned = true;
