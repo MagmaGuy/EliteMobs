@@ -39,7 +39,7 @@ public class DebugScreen {
                 page += "Has AI: " + !regionalBossEntity.getLivingEntity().hasAI() + "\n";
             } else
                 page += "Is Alive (MC): false\n";
-            if (player.getWorld().equals(regionalBossEntity.getLocation().getWorld()))
+            if (regionalBossEntity.getLocation() != null && player.getWorld().equals(regionalBossEntity.getLocation().getWorld()))
                 page += "Spawn distance: X=" + (int) (player.getLocation().getX() - regionalBossEntity.getSpawnLocation().getX())
                         + " | Y=" + (int) (player.getLocation().getY() - regionalBossEntity.getSpawnLocation().getY()) +
                         " | Z=" + (int) (player.getLocation().getZ() - regionalBossEntity.getSpawnLocation().getZ()) + "\n";

@@ -45,8 +45,6 @@ public class TreasureChest {
     private static ArrayListMultimap<String, TreasureChest> unloadedChests = ArrayListMultimap.create();
     private static HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
-    public boolean chunkIsLoaded = true;
-    public boolean effectIsOn = true;
     private long restockTime;
     private Location location;
 
@@ -103,7 +101,6 @@ public class TreasureChest {
         location.getBlock().setBlockData(chest);
         location.getBlock().getState().update();
 
-        startEffects();
     }
 
     public void doInteraction(Player player) {
@@ -134,15 +131,6 @@ public class TreasureChest {
 
         restockTime = cooldownTime();
         customTreasureChestConfigFields.setRestockTime(location, restockTime);
-        effectIsOn = false;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                generateChest();
-                effectIsOn = true;
-                startEffects();
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * this.customTreasureChestConfigFields.getRestockTimer());
 
     }
 
@@ -230,70 +218,6 @@ public class TreasureChest {
             return Round.twoDecimalPlaces(seconds / 60 / 60 / 48) + "days";
     }
 
-    public void startEffects() {
-        for (String string : this.customTreasureChestConfigFields.getEffects()) {
-            try {
-                Particle particle = Particle.valueOf(string);
-                doParticleTrail(particle);
-            } catch (Exception ex) {
-            }
-            try {
-                Material material = Material.valueOf(string);
-                doItemTrail(material);
-            } catch (Exception ex) {
-            }
-        }
-    }
-
-    private void doParticleTrail(Particle particle) {
-        effectIsOn = true;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                //In case of chunk unload, stop the effect
-                if (!chunkIsLoaded || !effectIsOn) {
-                    cancel();
-                    effectIsOn = false;
-                    return;
-                }
-                //All conditions cleared, do the particle effect
-                location.getWorld().spawnParticle(particle, location.clone().add(new Vector(0.5, 0.5, 0.5)), 1, 0.1, 0.1, 0.1, 0.05);
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-    }
-
-    private void doItemTrail(Material material) {
-        effectIsOn = true;
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                //In case of chunk unload, stop the effect
-                if (!chunkIsLoaded || !effectIsOn) {
-                    cancel();
-                    effectIsOn = false;
-                    return;
-                }
-
-                //All conditions cleared, do the boss flair effect
-                Item item = VisualItemInitializer.initializeItem(ItemStackGenerator.generateItemStack
-                        (material, "visualItem", Arrays.asList(ThreadLocalRandom.current().nextDouble() + "")), location.clone().add(new Vector(0.5, 0.5, 0.5)));
-                item.setVelocity(new Vector(
-                        ThreadLocalRandom.current().nextDouble() / 5 - 0.10,
-                        ThreadLocalRandom.current().nextDouble() / 5 - 0.10,
-                        ThreadLocalRandom.current().nextDouble() / 5 - 0.10));
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        item.remove();
-                        EntityTracker.wipeEntity(item, RemovalReason.EFFECT_TIMEOUT);
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 20);
-
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
-    }
-
     public void removeTreasureChest() {
         CustomTreasureChestsConfig.removeTreasureChestEntry(location, customTreasureChestConfigFields.getFilename());
         location.getBlock().setBlockData(Material.AIR.createBlockData());
@@ -319,22 +243,6 @@ public class TreasureChest {
         }
 
         @EventHandler
-        public void onChunkUnload(ChunkUnloadEvent event) {
-            for (TreasureChest treasureChest : getTreasureChestHashMap().values())
-                if (ChunkLocationChecker.chunkLocationCheck(treasureChest.location, event.getChunk()))
-                    treasureChest.effectIsOn = false;
-        }
-
-        @EventHandler
-        public void onChunkLoad(ChunkLoadEvent event) {
-            for (TreasureChest treasureChest : getTreasureChestHashMap().values())
-                if (ChunkLocationChecker.chunkLocationCheck(treasureChest.location, event.getChunk())) {
-                    treasureChest.effectIsOn = true;
-                    treasureChest.startEffects();
-                }
-        }
-
-        @EventHandler
         public void onWorldLoad(WorldLoadEvent event) {
             for (TreasureChest treasureChest : getUnloadedChests().get(event.getWorld().getName())) {
                 treasureChest.location.setWorld(event.getWorld());
@@ -349,8 +257,6 @@ public class TreasureChest {
             for (Iterator<Map.Entry<Location, TreasureChest>> iterator = getTreasureChestHashMap().entrySet().iterator(); iterator.hasNext(); ) {
                 Map.Entry<Location, TreasureChest> entry = iterator.next();
                 TreasureChest treasureChest = entry.getValue();
-                if (treasureChest.customTreasureChestConfigFields.getWorldName().equals(event.getWorld().getName()))
-                    treasureChest.effectIsOn = false;
                 getUnloadedChests().put(event.getWorld().getName(), treasureChest);
                 iterator.remove();
             }

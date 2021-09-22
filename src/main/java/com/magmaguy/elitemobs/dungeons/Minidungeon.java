@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -128,9 +129,6 @@ public class Minidungeon {
             this.isDownloaded = false;
         }
 
-        this.relativeBossLocations = new RelativeDungeonLocations(dungeonPackagerConfigFields.getRelativeBossLocations(), true);
-        this.relativeTreasureChestLocations = new RelativeDungeonLocations(dungeonPackagerConfigFields.getRelativeTreasureChestLocations(), false);
-
         if (dungeonPackagerConfigFields.getAnchorPoint() != null)
             this.isInstalled = true;
 
@@ -181,7 +179,8 @@ public class Minidungeon {
         new EventCaller(event);
         if (event.isCancelled()) return false;
 
-        new RegionalBossEntity(customBossesConfigFields, location, true);
+
+        RegionalBossEntity.createPermanentRegionalBossEntity(customBossesConfigFields, location);
 
         return relativeLocation != null;
     }
@@ -199,6 +198,7 @@ public class Minidungeon {
     public void removeRelativeLocation(RegionalBossEntity regionalBossEntity) {
         RealDungeonLocations.RealDungeonLocation realDungeonLocation = null;
         for (RealDungeonLocations.RealDungeonLocation iterated : realDungeonLocations.realDungeonLocations) {
+            if (iterated.regionalBossEntity == null) new DeveloperMessage("Boss was null");
             if (iterated.regionalBossEntity != null)
                 if (iterated.regionalBossEntity.equals(regionalBossEntity)) {
                     realDungeonLocation = iterated;
@@ -355,7 +355,7 @@ public class Minidungeon {
         else
             setupOptions.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/em setup unminidungeonNoPaste " + dungeonPackagerConfigFields.getFilename()));
         player.spigot().sendMessage(setupOptions);
-        quantifySchematicBosses();
+        quantifySchematicBosses(true);
     }
 
     public void uninstallSchematicMinidungeon(Player player) {
@@ -371,9 +371,13 @@ public class Minidungeon {
         player.sendMessage("[EliteMobs] EliteMobs attempted to uninstall a minidungeon. Further WorldEdit commands might be required to remove the physical structure of the minidungeon.");
     }
 
-    public void quantifySchematicBosses() {
+    public void quantifySchematicBosses(boolean freshInstall) {
         if (!isInstalled) return;
-        this.realDungeonLocations = new RealDungeonLocations();
+        if (!freshInstall){
+            this.relativeBossLocations = new RelativeDungeonLocations(dungeonPackagerConfigFields.getRelativeBossLocations(), true);
+            this.relativeTreasureChestLocations = new RelativeDungeonLocations(dungeonPackagerConfigFields.getRelativeTreasureChestLocations(), false);
+            this.realDungeonLocations = new RealDungeonLocations();
+        }
         this.teleportLocation = getRotatedFinalLocation(dungeonPackagerConfigFields.getAnchorPoint(), dungeonPackagerConfigFields.getTeleportPoint());
         for (String regionalBossLocations : dungeonPackagerConfigFields.getRelativeBossLocations()) {
             String bossFileName = regionalBossLocations.split(":")[0];
@@ -433,7 +437,7 @@ public class Minidungeon {
                 else
                     realDungeonLocations.add(
                             new RealDungeonLocation(relativeDungeonLocation.location,
-                                    getRotatedFinalLocation(dungeonPackagerConfigFields.getAnchorPoint(), relativeDungeonLocation.location.add(new Vector(0.5,0.5,0.5))),
+                                    getRotatedFinalLocation(dungeonPackagerConfigFields.getAnchorPoint(), relativeDungeonLocation.location.add(new Vector(0.5, 0.5, 0.5))),
                                     relativeDungeonLocation.customTreasureChestConfigFields));
         }
 
@@ -522,6 +526,8 @@ public class Minidungeon {
                             vectorGetter(rawLocationString, 1),
                             //z
                             vectorGetter(rawLocationString, 2));
+                    if (customBossesConfigFields == null && customTreasureChestConfigFields == null)
+                        new WarningMessage("Failed to correctly parse line " + rawLocationString + " for minidungeon " + dungeonPackagerConfigFields.getFilename());
                     //unfortunately pitch and yaw won't work here, not that it really matters
                     //(float) vectorGetter(rawLocationString, 3),
                     //(float) vectorGetter(rawLocationString, 4));

@@ -87,10 +87,9 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
             else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof LivingEntity) {
                 eliteEntity = EntityTracker.getEliteMobEntity((LivingEntity) ((Projectile) event.getDamager()).getShooter());
                 projectile = (Projectile) event.getDamager();
-            } else if (event.getDamager().getType().equals(EntityType.EVOKER_FANGS)) {
-                if (((EvokerFangs)event.getDamager()).getOwner() != null)
-                    eliteEntity = EntityTracker.getEliteMobEntity(((EvokerFangs)event.getDamager()).getOwner());
-            }
+            } else if (event.getDamager().getType().equals(EntityType.EVOKER_FANGS))
+                if (((EvokerFangs) event.getDamager()).getOwner() != null)
+                    eliteEntity = EntityTracker.getEliteMobEntity(((EvokerFangs) event.getDamager()).getOwner());
 
             if (eliteEntity == null) return;
 
