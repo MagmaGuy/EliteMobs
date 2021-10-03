@@ -6,7 +6,7 @@ jdk:
 deploy:
   provider: releases
   token: $GITHUB_TOKEN
-  file: "target/EliteMobs*.jar"
+  file: "build/libs/EliteMobs*.jar"
   file_glob: true
   skip_cleanup: true
   on:
