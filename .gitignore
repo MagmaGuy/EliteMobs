@@ -1,4 +1,6 @@
-/.idea/
-/.gradle/
-/testbed/
-/build/
+.idea/
+*.iml
+.gradle/
+testbed/
+build/
+target/

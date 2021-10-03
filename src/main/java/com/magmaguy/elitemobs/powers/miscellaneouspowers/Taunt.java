@@ -46,9 +46,11 @@ public class Taunt extends MinorPower implements Listener {
             public void run() {
                 if (!entity.isValid())
                     return;
-                entity.setCustomName(EntityTracker.getEliteMobEntity(entity).getName());
+                final EliteEntity mobEntity = EntityTracker.getEliteMobEntity(entity);
+                if (mobEntity != null) {
+                    entity.setCustomName(mobEntity.getName());
+                }
             }
-
 
         }.runTaskLater(MetadataHandler.PLUGIN, 4 * 20);
     }

@@ -1,0 +1,13 @@
+os: linux
+dist: bionic
+language: java
+jdk:
+  - openjdk8
+deploy:
+  provider: releases
+  token: $GITHUB_TOKEN
+  file: "target/EliteMobs*.jar"
+  file_glob: true
+  skip_cleanup: true
+  on:
+    tags: true
