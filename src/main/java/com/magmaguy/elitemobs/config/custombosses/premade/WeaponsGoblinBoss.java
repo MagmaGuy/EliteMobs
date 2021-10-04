@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -17,12 +18,14 @@ public class WeaponsGoblinBoss extends CustomBossesConfigFields {
                 "dynamic");
         setHealthMultiplier(4);
         setDamageMultiplier(4);
-        setHelmet(new ItemStack(Material.NETHERITE_HELMET));
-        setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
-        setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
-        setBoots(new ItemStack(Material.NETHERITE_BOOTS));
-        setMainHand(new ItemStack(Material.NETHERITE_SWORD));
-        setOffHand(new ItemStack(Material.NETHERITE_AXE));
+        if (!VersionChecker.serverVersionOlderThan(16, 0)) {
+            setHelmet(new ItemStack(Material.NETHERITE_HELMET));
+            setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
+            setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
+            setBoots(new ItemStack(Material.NETHERITE_BOOTS));
+            setMainHand(new ItemStack(Material.NETHERITE_SWORD));
+            setOffHand(new ItemStack(Material.NETHERITE_AXE));
+        }
         setBaby(true);
         setPowers(Arrays.asList("gold_explosion.yml", "gold_shotgun.yml", "spirit_walk.yml"));
         setSpawnMessage("&cA Weapons Goblin has been sighted!");

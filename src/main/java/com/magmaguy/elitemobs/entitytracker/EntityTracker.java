@@ -52,7 +52,6 @@ public class EntityTracker implements Listener {
         return EliteEntityTracker.eliteMobEntities.get(uuid);
     }
 
-
     //Super Mobs
     public static void registerSuperMob(LivingEntity livingEntity) {
         SuperMobSpawnEvent superMobSpawnEvent = new SuperMobSpawnEvent(livingEntity);

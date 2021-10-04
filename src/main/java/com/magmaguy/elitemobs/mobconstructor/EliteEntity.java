@@ -603,7 +603,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
         return null;
     }
 
-    public void remove(RemovalReason removalReason) {
+    public void  remove(RemovalReason removalReason) {
         //This prevents the entity tracker from running this code twice when removing due to specific reasons
         if (livingEntity != null)
             EliteEntityTracker.eliteMobEntities.remove(livingEntity.getUniqueId());

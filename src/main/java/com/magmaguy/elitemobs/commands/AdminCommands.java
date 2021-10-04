@@ -21,6 +21,8 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.menus.GetLootMenu;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
@@ -668,7 +670,40 @@ public class AdminCommands {
                 .senderType(CommandSender.class)
                 .permission("elitemobs.*")
                 .meta(CommandMeta.DESCRIPTION, "Toggles debug messages off and on.")
-                .handler(commandContext -> DebugMessage.toggleDebugMode()));
+                .handler(commandContext -> DebugMessage.toggleDebugMode(commandContext.getSender())));
+
+        // /em trace <uuid>
+        manager.command(builder.literal("trace")
+                .senderType(CommandSender.class)
+                .argument(StringArgument.<CommandSender>newBuilder("uuid"),
+                        ArgumentDescription.of("EliteMobs UUID of the Custom Boss"))
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Traces the life of a custom boss entity. Used by the debug menu.")
+                .handler(commandContext -> {
+                    for (EliteEntity eliteEntity : EntityTracker.getEliteMobs().values())
+                        if (eliteEntity.getEliteUUID().toString().equals(commandContext.get("uuid")))
+                            if (eliteEntity instanceof CustomBossEntity) {
+                                ((CustomBossEntity) eliteEntity).getBossTrace().postLog((Player) commandContext.getSender());
+                                return;
+                            }
+                }));
+
+        // /em debugtp <uuid>
+        manager.command(builder.literal("debugtp")
+                .senderType(CommandSender.class)
+                .argument(StringArgument.<CommandSender>newBuilder("uuid"),
+                        ArgumentDescription.of("EliteMobs UUID of the Custom Boss"))
+                .permission("elitemobs.*")
+                .meta(CommandMeta.DESCRIPTION, "Traces the life of a custom boss entity. Used by the debug menu.")
+                .handler(commandContext -> {
+                    for (EliteEntity eliteEntity : EntityTracker.getEliteMobs().values())
+                        if (eliteEntity.getEliteUUID().toString().equals(commandContext.get("uuid")))
+                            if (eliteEntity instanceof CustomBossEntity) {
+                                if (eliteEntity.getLocation() != null)
+                                    ((Player) commandContext.getSender()).teleport(eliteEntity.getLocation());
+                                return;
+                            }
+                }));
 
     }
 

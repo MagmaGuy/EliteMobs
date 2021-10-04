@@ -198,7 +198,6 @@ public class Minidungeon {
     public void removeRelativeLocation(RegionalBossEntity regionalBossEntity) {
         RealDungeonLocations.RealDungeonLocation realDungeonLocation = null;
         for (RealDungeonLocations.RealDungeonLocation iterated : realDungeonLocations.realDungeonLocations) {
-            if (iterated.regionalBossEntity == null) new DeveloperMessage("Boss was null");
             if (iterated.regionalBossEntity != null)
                 if (iterated.regionalBossEntity.equals(regionalBossEntity)) {
                     realDungeonLocation = iterated;

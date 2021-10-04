@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 
 public class DebugMessage {
     private static boolean debugMode = false;
@@ -13,8 +14,12 @@ public class DebugMessage {
         }
     }
 
-    public static void toggleDebugMode() {
+    public static void toggleDebugMode(CommandSender commandSender) {
         debugMode = !debugMode;
+        if (debugMode)
+            commandSender.sendMessage("[EliteMobs] Debug mode on!");
+        else
+            commandSender.sendMessage("[EliteMobs] Debug mode off!");
     }
 
     public static boolean isDebugMode() {

@@ -1,15 +1,17 @@
 package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.utils.BookMaker;
+import com.magmaguy.elitemobs.utils.SpigotMessage;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DebugScreen {
 
@@ -21,33 +23,48 @@ public class DebugScreen {
 
     private static void openBossScreen(Player player, String argument) {
 
-        List<String> pages = new ArrayList<String>();
+        TextComponent[] pages = new TextComponent[100];
 
-        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntitySet()) {
-            if (!regionalBossEntity.getCustomBossesConfigFields().getFilename().contains(argument) &&
-                    !regionalBossEntity.getCustomBossesConfigFields().getName().toLowerCase().contains(argument.toLowerCase()))
-                continue;
-            String page = regionalBossEntity.getCustomBossesConfigFields().getFilename() + "\n";
-            page += "Name: " + ChatColorConverter.convert(regionalBossEntity.getCustomBossesConfigFields().getName()) + ChatColor.BLACK + "\n";
-            page += "Level: " + regionalBossEntity.getCustomBossesConfigFields().getLevel() + "\n";
-            if (regionalBossEntity.getLivingEntity() != null) {
-                page += "Is Alive (MC): " + !regionalBossEntity.getLivingEntity().isDead() + "\n";
-                page += "XYZ: " +
-                        regionalBossEntity.getLocation().getBlockX() + ", " +
-                        regionalBossEntity.getLocation().getBlockY() + ", " +
-                        regionalBossEntity.getLocation().getBlockZ() + "\n";
-                page += "Has AI: " + !regionalBossEntity.getLivingEntity().hasAI() + "\n";
-            } else
-                page += "Is Alive (MC): false\n";
-            if (regionalBossEntity.getLocation() != null && player.getWorld().equals(regionalBossEntity.getLocation().getWorld()))
-                page += "Spawn distance: X=" + (int) (player.getLocation().getX() - regionalBossEntity.getSpawnLocation().getX())
-                        + " | Y=" + (int) (player.getLocation().getY() - regionalBossEntity.getSpawnLocation().getY()) +
-                        " | Z=" + (int) (player.getLocation().getZ() - regionalBossEntity.getSpawnLocation().getZ()) + "\n";
-            page += "Is Persistent: " + regionalBossEntity.getCustomBossesConfigFields().isPersistent() + "\n";
-            if (regionalBossEntity.getCustomBossesConfigFields().isPersistent())
-                page += "Is Respawning: " + regionalBossEntity.isRespawning() + "\n";
-            pages.add(page);
-        }
+        int counter = 0;
+        for (EliteEntity eliteEntity : EntityTracker.getEliteMobs().values())
+            if (eliteEntity instanceof CustomBossEntity) {
+                CustomBossEntity customBossEntity = (CustomBossEntity) eliteEntity;
+
+                if (!customBossEntity.getCustomBossesConfigFields().getFilename().contains(argument) &&
+                        !customBossEntity.getCustomBossesConfigFields().getName().toLowerCase().contains(argument.toLowerCase()))
+                    continue;
+                TextComponent page = new TextComponent();
+                page.addExtra(customBossEntity.getCustomBossesConfigFields().getFilename() + "\n");
+                page.addExtra("Name: " + ChatColorConverter.convert(customBossEntity.getCustomBossesConfigFields().getName()) + ChatColor.BLACK + "\n");
+                page.addExtra("Level: " + customBossEntity.getCustomBossesConfigFields().getLevel() + "\n");
+                if (customBossEntity.getLivingEntity() != null) {
+                    page.addExtra("Is Alive (MC): " + !customBossEntity.getLivingEntity().isDead() + "\n");
+                    page.addExtra(SpigotMessage.commandHoverMessage(ChatColor.BLUE + "XYZ: " + "\n",
+                            customBossEntity.getLocation().getBlockX() + ", " +
+                            customBossEntity.getLocation().getBlockY() + ", " +
+                            customBossEntity.getLocation().getBlockZ() + "\n" +
+                            ChatColor.BLUE + "Click to teleport! (if alive)",
+                            "/em debugtp " + customBossEntity.getEliteUUID().toString()));
+                    page.addExtra("Has AI: " + !customBossEntity.getLivingEntity().hasAI() + "\n");
+                } else
+                    page.addExtra("Is Alive (MC): false\n");
+                if (customBossEntity.getLocation() != null && player.getWorld().equals(customBossEntity.getLocation().getWorld()))
+                    page.addExtra(SpigotMessage.hoverMessage(ChatColor.BLUE + "Spawn distance",
+                            "Spawn distance: X=" + (int) (player.getLocation().getX() - customBossEntity.getSpawnLocation().getX())
+                            + " | Y=" + (int) (player.getLocation().getY() - customBossEntity.getSpawnLocation().getY()) +
+                            " | Z=" + (int) (player.getLocation().getZ() - customBossEntity.getSpawnLocation().getZ()) + "\n"));
+                page.addExtra("Is Persistent: " + customBossEntity.getCustomBossesConfigFields().isPersistent() + "\n");
+                if (customBossEntity instanceof RegionalBossEntity) {
+                    page.addExtra("Is Respawning: " + ((RegionalBossEntity) customBossEntity).isRespawning() + "\n");
+                }
+
+                page.addExtra(SpigotMessage.commandHoverMessage(ChatColor.BLUE + "Boss trace!",
+                        "Remember, it requires debug mode to be on! This is used for advanced debugging, ask on discord if you want to know more about it.",
+                        "/elitemobs trace " + customBossEntity.getEliteUUID().toString()));
+
+                pages[counter] = page;
+                counter++;
+            }
 
         BookMaker.generateBook(player, pages);
 

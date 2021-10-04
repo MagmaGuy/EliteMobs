@@ -76,6 +76,11 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Getter
     @Setter
     private Minidungeon minidungeon = null;
+    @Getter
+    private BossTrace bossTrace = new BossTrace();
+    @Setter
+    private CustomSpawn customSpawn = null;
+    private int existsFailureCount = 0;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -110,7 +115,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     public void setSummoningEntity(EliteEntity summoningEntity) {
         this.summoningEntity = summoningEntity;
         if (summoningEntity instanceof CustomBossEntity)
-        this.minidungeon = ((CustomBossEntity)summoningEntity).minidungeon;
+            this.minidungeon = ((CustomBossEntity) summoningEntity).minidungeon;
     }
 
     /**
@@ -134,12 +139,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     }
 
     public void spawn(Location spawnLocation, int level, boolean silent) {
+        bossTrace.spawnPreprocessor(1);
         super.level = level;
         this.spawnLocation = spawnLocation;
         spawn(spawnLocation, silent);
     }
 
     public void spawn(Location spawnLocation, boolean silent) {
+        bossTrace.spawnPreprocessor(2);
         if (spawnLocation != null && spawnLocation.getWorld() != null && lastTick == spawnLocation.getWorld().getFullTime())
             attemptsCounter++;
         else
@@ -155,6 +162,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     }
 
     public void spawn(boolean silent) {
+        bossTrace.setSpawn();
         if (livingEntity != null) {
             new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn!", true);
             return;
@@ -189,12 +197,31 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         }
 
         if (!exists() && simplePersistentEntity == null) {
+            existsFailureCount++;
+            if (existsFailureCount > 10){
+                if (existsFailureCount == 11){
+                    new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
+                    new WarningMessage("To avoid cluttering up console, these warnings will now only appear once 6000 attempts for this boss. ");
+                }
+                if (existsFailureCount % 6000 == 0){
+                    new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
+                    new WarningMessage("To avoid cluttering up console, these warnings will now only appear once 6000 attempts for this boss. ");
+                }
+                return;
+            }
+            if (existsFailureCount > 1) {
+                new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections.");
+                return;
+            }
             //this may seem odd but not setting it to null can cause double spawn attempts as the plugin catches itself
             //correctly as not have a valid living entity but the checks are set up in such a way that if a living entity
             //object is referenced then trying to spawn it again is a double spawn of the same entity
             super.livingEntity = null;
             new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " . Possible reasons for this:");
             new WarningMessage("- The region was protected by a plugin (most likely)");
+            new WarningMessage("- The spawn was interfered with by some incompatible third party plugin");
+            new WarningMessage("Debug data: ");
+            new WarningMessage("Attempted spawn location: " + spawnLocation.toString());
             return;
         }
 
@@ -335,6 +362,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     @Override
     public void remove(RemovalReason removalReason) {
+        bossTrace.setRemove(removalReason);
         if (DebugMessage.isDebugMode())
             if (this instanceof RegionalBossEntity && this.phaseBossEntity != null)
                 new DebugMessage("Regional + Phase boss removal. Reason: " + removalReason);
@@ -386,9 +414,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                     bukkitTask.cancel();
             }));
             globalReinforcements.clear();
-            if (!removalReason.equals(RemovalReason.REINFORCEMENT_CULL))
+            if (!removalReason.equals(RemovalReason.REINFORCEMENT_CULL)) {
                 if (summoningEntity != null)
                     summoningEntity.removeReinforcement(this);
+                if (customSpawn != null)
+                    customSpawn.setKeepTrying(false);
+            }
 
             if (isPersistent && removalReason.equals(RemovalReason.WORLD_UNLOAD)) {
                 //if the world unloads, the location objects cease to be valid

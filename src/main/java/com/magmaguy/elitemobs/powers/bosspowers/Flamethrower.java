@@ -40,7 +40,6 @@ public class Flamethrower extends BossPower implements Listener {
             for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
                 if (entity instanceof LivingEntity) {
                     if (eliteEntity.getLivingEntity().equals(entity)) continue;
-                    if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
                     BossCustomAttackDamage.dealCustomDamage(eliteEntity.getLivingEntity(), (LivingEntity) entity, 1);
                 }
 

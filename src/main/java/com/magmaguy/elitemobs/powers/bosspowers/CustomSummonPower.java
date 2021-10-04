@@ -15,6 +15,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -58,7 +59,6 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     }
                     CustomSpawn customSpawn = new CustomSpawn(customBossReinforcement.customSpawn, customBossEntity);
                     customSpawn.setWorld(summoningEntity.getSpawnLocation().getWorld());
-                    customSpawn.setKeepTrying(false);
                     customSpawn.queueSpawn();
                     summoningEntity.addGlobalReinforcement(customBossEntity);
                     customBossReinforcement.isSummoned = true;

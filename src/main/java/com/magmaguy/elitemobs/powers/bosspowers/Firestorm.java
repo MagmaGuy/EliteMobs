@@ -24,7 +24,7 @@ public class Firestorm extends BossPower implements Listener {
     }
 
     private static void doFirestorm(EliteEntity eliteEntity) {
-        if (eliteEntity == null || !eliteEntity.getLivingEntity().isValid()) return;
+        if (eliteEntity == null || !eliteEntity.isValid()) return;
         eliteEntity.getLivingEntity().setAI(false);
         new BukkitRunnable() {
             int counter = 0;
@@ -34,7 +34,7 @@ public class Firestorm extends BossPower implements Listener {
                 counter++;
 
                 if (counter > 20 * 10 | !eliteEntity.isValid()) {
-                    if (eliteEntity.getLivingEntity().isValid())
+                    if (eliteEntity.isValid())
                         eliteEntity.getLivingEntity().setAI(true);
                     cancel();
                     return;
