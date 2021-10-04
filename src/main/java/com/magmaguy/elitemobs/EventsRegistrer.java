@@ -271,7 +271,9 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new PreventItemPickupByMobs(), plugin);
         if (AntiExploitConfig.ambientDamageExploit)
             pluginManager.registerEvents(new AmbientDamageExploit(), plugin);
-        pluginManager.registerEvents(new HoneyBlockJumpExploit(), plugin);
+        if (!VersionChecker.serverVersionOlderThan(14, 0)) {
+            pluginManager.registerEvents(new HoneyBlockJumpExploit(), plugin);
+        }
         pluginManager.registerEvents(new EliteMobDamagedByPlayerAntiExploitListener(), plugin);
 
         pluginManager.registerEvents(new ActionEvent.ActionEventEvents(), plugin);

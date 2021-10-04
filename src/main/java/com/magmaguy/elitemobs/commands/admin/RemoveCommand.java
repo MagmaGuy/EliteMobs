@@ -33,15 +33,15 @@ public class RemoveCommand {
         public void otherDamageEvents(EntityDamageByEntityEvent event) {
             if (!removingPlayers.contains(event.getDamager().getUniqueId())) return;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteEntity != null)
-                if (eliteEntity instanceof RegionalBossEntity)
-                    event.getDamager().sendMessage(ChatColorConverter.convert(
-                            "&8[EliteMobs] &cRemoved a spawn location for boss " +
-                                    ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
-                if (eliteEntity instanceof RegionalBossEntity)
-                    if (((CustomBossEntity) eliteEntity).getMinidungeon() != null )
-                       ((CustomBossEntity) eliteEntity).getMinidungeon().removeRelativeLocation((RegionalBossEntity) eliteEntity);
-            EntityTracker.unregister(event.getEntity().getUniqueId(), RemovalReason.REMOVE_COMMAND);
+            if (eliteEntity == null) return;
+            if (eliteEntity instanceof RegionalBossEntity)
+                event.getDamager().sendMessage(ChatColorConverter.convert(
+                        "&8[EliteMobs] &cRemoved a spawn location for boss " +
+                                ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
+            if (eliteEntity instanceof RegionalBossEntity)
+                if (((CustomBossEntity) eliteEntity).getMinidungeon() != null)
+                    ((CustomBossEntity) eliteEntity).getMinidungeon().removeRelativeLocation((RegionalBossEntity) eliteEntity);
+            eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
             event.setCancelled(true);
         }
     }

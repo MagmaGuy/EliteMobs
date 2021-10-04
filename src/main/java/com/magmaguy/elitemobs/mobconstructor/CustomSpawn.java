@@ -12,7 +12,7 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.DebugMessage;
-import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -62,7 +62,9 @@ public class CustomSpawn {
                 new WarningMessage("Attempted to pass invalid boss into CustomSpawn: " + bossString);
                 return;
             }
-            customBossEntities.add(new CustomBossEntity(customBossesConfigFields));
+            CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
+            customBossEntities.add(customBossEntity);
+            customBossEntity.setCustomSpawn(this);
         });
     }
 
@@ -125,10 +127,10 @@ public class CustomSpawn {
                 for (CustomBossEntity customBossEntity : customBossEntities)
                     customBossEntity.spawn(spawnLocation, isEvent);
 
+                cancel();
+
                 if (timedEvent != null)
                     timedEvent.queueEvent();
-
-                cancel();
 
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
@@ -164,7 +166,7 @@ public class CustomSpawn {
             }
         } else {
             if (isEvent)
-                new InfoMessage("Spawned bosses for event after " + allTries + " tries");
+                new DebugMessage("Spawned bosses for event after " + allTries + " tries");
             spawn();
         }
     }

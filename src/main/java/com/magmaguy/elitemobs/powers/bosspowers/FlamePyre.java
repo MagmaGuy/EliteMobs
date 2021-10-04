@@ -46,7 +46,7 @@ public class FlamePyre extends BossPower implements Listener {
             @Override
             public void run() {
                 counter++;
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }
@@ -78,7 +78,7 @@ public class FlamePyre extends BossPower implements Listener {
 
             @Override
             public void run() {
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }
@@ -121,7 +121,7 @@ public class FlamePyre extends BossPower implements Listener {
 
             @Override
             public void run() {
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }
@@ -149,7 +149,7 @@ public class FlamePyre extends BossPower implements Listener {
 
             @Override
             public void run() {
-                if (!eliteEntity.isValid()){
+                if (!eliteEntity.isValid()) {
                     cancel();
                     return;
                 }

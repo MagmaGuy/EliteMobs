@@ -54,6 +54,8 @@ public class DialogArmorStand {
 
     public static ArmorStand createDialogArmorStand(LivingEntity sourceEntity, String dialog) {
 
+        if (sourceEntity == null) return null;
+
         ArmorStand armorStand = VisualArmorStand.VisualArmorStand(sourceEntity.getLocation().clone().add(getDisplacementVector(sourceEntity)), dialog);
         //This part is necessary because armorstands are visible on their first tick to players
         new BukkitRunnable() {

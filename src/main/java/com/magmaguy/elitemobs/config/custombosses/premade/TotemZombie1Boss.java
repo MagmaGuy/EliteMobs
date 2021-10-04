@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -15,11 +16,13 @@ public class TotemZombie1Boss extends CustomBossesConfigFields {
         setPowers(Arrays.asList("skeleton_tracking_arrow.yml", "attack_fireball.yml", "hyper_loot.yml"));
         setCullReinforcements(false);
         setFollowDistance(100);
-        setHelmet(new ItemStack(Material.NETHERITE_HELMET));
-        setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
-        setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
-        setBoots(new ItemStack(Material.NETHERITE_BOOTS));
-        setMainHand(new ItemStack(Material.NETHERITE_SWORD));
+        if (!VersionChecker.serverVersionOlderThan(16, 0)) {
+            setHelmet(new ItemStack(Material.NETHERITE_HELMET));
+            setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
+            setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
+            setBoots(new ItemStack(Material.NETHERITE_BOOTS));
+            setMainHand(new ItemStack(Material.NETHERITE_SWORD));
+        }
         setDamageMultiplier(2);
         setHealthMultiplier(2);
         setSpawnMessage("&cA Dr. Craftenmine abomination has been sighted!");

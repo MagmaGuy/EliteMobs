@@ -130,6 +130,7 @@ public class TimedEvent extends CustomEvent implements Listener {
                 }, 1);
                 return;
             }
+
         primaryEliteMobs.forEach(CustomBossEntity::announceSpawn);
 
         start();
