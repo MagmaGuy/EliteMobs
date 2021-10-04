@@ -63,7 +63,7 @@ public class TrackedEntity {
                 }
                 //This check is catastrophic if the two previous checks aren't tuned correctly
                 if (entity == null || !entity.isValid())
-                    remove(RemovalReason.OTHER);
+                    remove(RemovalReason.UNSPECIFIED_WATCHDOG_REMOVAL);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60 * 5);
     }

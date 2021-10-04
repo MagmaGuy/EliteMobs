@@ -49,6 +49,7 @@ import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.ServerTime;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.elitemobs.versionnotifier.VersionWarner;
@@ -128,6 +129,8 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("\\____/\\_____/\\___/  \\_/ \\____/\\_|  |_/\\___/\\____/ \\____/");
         MetadataHandler.PLUGIN = this;
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
+
+        ServerTime.startTickCounter();
 
         if (Bukkit.getServer().spigot().getConfig().getDouble("settings.attribute.maxHealth.max") < 100000000) {
             Bukkit.getServer().spigot().getConfig().set("settings.attribute.maxHealth.max", 100000000);
@@ -264,7 +267,16 @@ public class EliteMobs extends JavaPlugin {
         new NPCsConfig();
 
         //Initialize custom spawn methods, this runs late because it compares loaded worlds against worlds listed in the config
-        new CustomSpawnConfig();
+        try {
+            new CustomSpawnConfig();
+        } catch (Exception ex) {
+            new WarningMessage("You are using a version of Spigot or a branch thereof (Paper, Purpur, so on) that is (probably) HORRIBLY outdated!" +
+                    " This issue will probably be fixed if you update your server version to the latest patch of the version you are running.");
+            new WarningMessage(
+                    " This does not mean that you have to update your Minecraft version, but it does mean you must update your server version to the latest patch" +
+                            " available for that Minecraft version. Download from trustworthy sources, as if you download Spigot from some random website other than Spigot," +
+                            " you are probably not getting the latest version (and also there's a high chance you'll get a virus).");
+        }
 
         //Commands
         new CommandHandler();

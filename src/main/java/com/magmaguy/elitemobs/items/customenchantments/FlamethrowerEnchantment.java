@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.CooldownHandler;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -49,7 +50,7 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                     if (entity.getType().equals(EntityType.PLAYER))
                         continue;
                     if (((LivingEntity) entity).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) continue;
-                    BossCustomAttackDamage.dealCustomDamage(player, (LivingEntity) entity, 1);
+                    BossCustomAttackDamage.dealCustomDamage(player, (LivingEntity) entity, ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponTier(false));
                 }
 
     }
@@ -135,7 +136,8 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                 @Override
                 public void run() {
                     doParticleEffect(player, target, Particle.FLAME);
-                    doDamage(damagePoints, player);
+                    if (timer % 10 == 0)
+                        doDamage(damagePoints, player);
                     timer++;
                     if (timer < 20 * 3) return;
                     doFlamethrowerPhase3(player, target);

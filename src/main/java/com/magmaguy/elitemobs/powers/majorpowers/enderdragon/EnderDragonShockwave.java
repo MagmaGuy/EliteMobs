@@ -65,8 +65,9 @@ public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
             @Override
             public void run() {
 
-                if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
-                    ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
+                if (eliteEntity.isValid())
+                    if (eliteEntity.getLivingEntity().getType().equals(EntityType.ENDER_DRAGON))
+                        ((EnderDragon) eliteEntity.getLivingEntity()).setPhase(EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET);
 
                 if (doExit(eliteEntity) || !EnderDragonPhaseSimplifier.isLanded(((EnderDragon) eliteEntity.getLivingEntity()).getPhase())) {
                     cancel();

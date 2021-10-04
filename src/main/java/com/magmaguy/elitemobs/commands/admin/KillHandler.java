@@ -60,11 +60,11 @@ public class KillHandler {
 
     public static void radiusKillAggressiveMobs(Player player, int radius) {
         int counter = 0;
-        for (Entity entity : player.getNearbyEntities(radius, radius, radius))
-            if (EntityTracker.isEliteMob(entity)) {
-                EntityTracker.unregister(entity, RemovalReason.KILL_COMMAND);
-                counter++;
-            }
+        for (Entity entity : player.getNearbyEntities(radius, radius, radius)) {
+            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
+            if (eliteEntity != null)
+                eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
+        }
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
     }
 
@@ -80,13 +80,15 @@ public class KillHandler {
 
     public static void radiusKillSpecificMobs(Player player, EntityType entityType, int radius) {
         int counter = 0;
-        for (Entity entity : player.getNearbyEntities(radius, radius, radius))
-            if (entity.getType().equals(entityType) &&
-                    (EntityTracker.isEliteMob(entity) ||
-                            EntityTracker.isSuperMob(entity))) {
+        for (Entity entity : player.getNearbyEntities(radius, radius, radius)) {
+            if (entity.getType().equals(entityType) && (EntityTracker.isEliteMob(entity))) {
+                ((EliteEntity) entity).remove(RemovalReason.KILL_COMMAND);
+                counter++;
+            } else if (entity.getType().equals(entityType) && EntityTracker.isSuperMob(entity)) {
                 EntityTracker.unregister(entity, RemovalReason.KILL_COMMAND);
                 counter++;
             }
+        }
         player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Killed " + counter + " Elite Mobs."));
     }
 

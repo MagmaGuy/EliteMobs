@@ -22,7 +22,7 @@ public class EliteMobDeathEvent extends Event {
         this.entity = eliteEntity.getUnsyncedLivingEntity();
         this.eliteEntity = eliteEntity;
         this.entityDeathEvent = entityDeathEvent;
-        new EventCaller(new EliteMobRemoveEvent(eliteEntity, RemovalReason.DEATH));
+        eliteEntity.remove(RemovalReason.DEATH);
     }
 
     /**

@@ -64,6 +64,12 @@ public class ConfigurationImporter {
                         case "dungeonpackages":
                             moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "dungeonpackages"));
                             break;
+                        case "customevents":
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customevents"));
+                            break;
+                        case "customspawns":
+                            moveDirectory(file, Paths.get(configurationsPath.normalize() + "" + File.separatorChar + "customspawns"));
+                            break;
                         case "worldcontainer":
                             moveWorlds(file);
                             break;
