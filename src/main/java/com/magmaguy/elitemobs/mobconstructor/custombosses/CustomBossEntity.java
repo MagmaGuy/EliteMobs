@@ -380,17 +380,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             if (inCombat)
                 new EventCaller(new EliteMobExitCombatEvent(this, EliteMobExitCombatEvent.EliteMobExitCombatReason.PHASE_SWITCH));
 
-        if (removalReason.equals(RemovalReason.PHASE_BOSS_PHASE_END) || removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
-            if (livingEntity != null) {
-                EliteEntityTracker.eliteMobEntities.remove(livingEntity.getUniqueId());
-                EliteEntityTracker.trackedEntities.remove(livingEntity.getUniqueId());
-            }
-            new EventCaller(new EliteMobRemoveEvent(this, removalReason));
-        }
-
-        if (removalReason.equals(RemovalReason.BOSS_TIMEOUT))
-            new EventCaller(new EliteMobRemoveEvent(this, removalReason));
-
         boolean bossInstanceEnd = removalReason.equals(RemovalReason.KILL_COMMAND) ||
                 removalReason.equals(RemovalReason.DEATH) ||
                 removalReason.equals(RemovalReason.BOSS_TIMEOUT) ||
@@ -400,6 +389,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
         if (!isPersistent) bossInstanceEnd = true;
 
         if (bossInstanceEnd) {
+            new EventCaller(new EliteMobRemoveEvent(this, removalReason));
             if (escapeMechanism != null) Bukkit.getScheduler().cancelTask(escapeMechanism);
             trackableCustomBosses.remove(this);
             if (simplePersistentEntity != null)

@@ -28,6 +28,7 @@ public class EliteEntityTracker extends TrackedEntity implements AbstractTracked
                 eliteEntity.worldUnload();
                 break;
             case UNSPECIFIED_WATCHDOG_REMOVAL:
+            case SHUTDOWN:
                 eliteEntity.remove(removalReason);
         }
     }
