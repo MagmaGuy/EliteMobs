@@ -605,8 +605,10 @@ public class EliteEntity implements SimplePersistentEntityInterface {
 
     public void  remove(RemovalReason removalReason) {
         //This prevents the entity tracker from running this code twice when removing due to specific reasons
-        if (livingEntity != null)
+        if (livingEntity != null){
             EliteEntityTracker.eliteMobEntities.remove(livingEntity.getUniqueId());
+            EliteEntityTracker.trackedEntities.remove(livingEntity.getUniqueId());
+        }
         if (livingEntity != null && !removalReason.equals(RemovalReason.DEATH))
             livingEntity.remove();
         if (livingEntity instanceof EnderDragon && removalReason.equals(RemovalReason.DEATH)) {
