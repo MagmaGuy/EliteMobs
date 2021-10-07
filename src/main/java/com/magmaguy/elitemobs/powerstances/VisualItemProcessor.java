@@ -142,9 +142,10 @@ public class VisualItemProcessor {
 
     private void rotateParticle(Object particleObject, Vector vector, EliteEntity eliteEntity) {
         Particle particle = (Particle) particleObject;
-        eliteEntity.getLivingEntity().getWorld().spawnParticle(
-                particle, eliteEntity.getLivingEntity().getLocation().add(0, 1, 0).add(vector),
-                1, 0, 0, 0, 0.01);
+        if (eliteEntity.isValid())
+            eliteEntity.getLivingEntity().getWorld().spawnParticle(
+                    particle, eliteEntity.getLivingEntity().getLocation().add(0, 1, 0).add(vector),
+                    1, 0, 0, 0, 0.01);
     }
 
 }

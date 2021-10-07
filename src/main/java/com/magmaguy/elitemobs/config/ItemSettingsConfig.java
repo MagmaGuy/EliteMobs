@@ -31,6 +31,7 @@ public class ItemSettingsConfig {
     public static String noSoulbindLore;
     public static boolean preventEliteItemEnchantment;
     public static boolean preventEliteItemDiamondToNetheriteUpgrade;
+    public static boolean eliteDurability;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
@@ -85,6 +86,7 @@ public class ItemSettingsConfig {
         noSoulbindLore = ConfigurationEngine.setString(fileConfiguration, "noSoulbindLore", "&7Not Soulbound!");
         preventEliteItemEnchantment = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemEnchantment", true);
         preventEliteItemDiamondToNetheriteUpgrade = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemDiamondToNetheriteUpgrade", true);
+        eliteDurability = ConfigurationEngine.setBoolean(fileConfiguration, "eliteItemsDurabilityLossOnlyOnDeath", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

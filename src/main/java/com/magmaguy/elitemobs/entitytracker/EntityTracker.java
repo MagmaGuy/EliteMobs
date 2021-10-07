@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -175,7 +176,8 @@ public class EntityTracker implements Listener {
     }
 
     public static void wipeShutdown() {
-        for (TrackedEntity trackedEntity : TrackedEntity.trackedEntities.values())
+        HashMap<UUID, TrackedEntity> trackedEntities = new HashMap<>(TrackedEntity.trackedEntities);
+        for (TrackedEntity trackedEntity : trackedEntities.values())
             trackedEntity.doShutdown();
         TrackedEntity.trackedEntities.clear();
         EliteEntityTracker.eliteMobEntities.clear();
