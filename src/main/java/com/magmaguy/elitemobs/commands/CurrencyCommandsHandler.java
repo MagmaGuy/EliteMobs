@@ -117,7 +117,7 @@ public class CurrencyCommandsHandler {
         }
         subtractCommand(onlinePlayer, amount);
         commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &2You have subtracted " + amount + " from " + onlinePlayer));
-        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]They now have " + EconomyHandler.checkCurrency(Bukkit.getPlayer(commandSender.getName()).getUniqueId())));
+        commandSender.sendMessage(ChatColorConverter.convert("&8[EliteMobs]They now have " + EconomyHandler.checkCurrency(player.getUniqueId())));
     }
 
     public static void setCommand(CommandSender commandSender, String onlinePlayer, double amount) {
