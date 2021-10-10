@@ -414,6 +414,7 @@ public class EnchantmentGenerator {
         if (enchantmentsConfigFields.isEnabled()) {
             Enchantment enchantment = enchantmentsConfigFields.getEnchantment();
             int enchantmentLevel = (enchantmentsConfigFields.getMaxLevel() < itemTier) ? enchantmentsConfigFields.getMaxLevel() : (int) itemTier;
+            if (enchantmentLevel < 0) enchantmentLevel = 0;
             enchantmentMap.put(enchantment, enchantmentLevel);
         }
 

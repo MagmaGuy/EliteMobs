@@ -124,7 +124,8 @@ public class CustomSpawn {
                         return;
 
                 for (CustomBossEntity customBossEntity : customBossEntities)
-                    customBossEntity.spawn(spawnLocation, isEvent);
+                    if (!customBossEntity.exists())
+                        customBossEntity.spawn(spawnLocation, isEvent);
 
                 cancel();
 

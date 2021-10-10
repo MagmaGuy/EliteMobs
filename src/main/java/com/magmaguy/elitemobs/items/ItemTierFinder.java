@@ -151,6 +151,41 @@ public class ItemTierFinder {
         }
     }
 
+    public static boolean isWeaponMaterial(ItemStack itemStack) {
+        if (itemStack == null) return false;
+        Material material = itemStack.getType();
+        switch (material) {
+            case DIAMOND_SWORD:
+            case DIAMOND_AXE:
+            case TRIDENT:
+            case IRON_AXE:
+            case IRON_SWORD:
+            case STONE_SWORD:
+            case STONE_AXE:
+            case WOODEN_SWORD:
+            case WOODEN_AXE:
+            case GOLDEN_SWORD:
+            case GOLDEN_AXE:
+            case BOW:
+            case CROSSBOW:
+                return true;
+            case DIAMOND_HOE:
+            case IRON_HOE:
+            case STONE_HOE:
+            case GOLDEN_HOE:
+            case WOODEN_HOE:
+                if (!ItemSettingsConfig.useHoesAsWeapons) return false;
+                return true;
+            default:
+                if (!VersionChecker.serverVersionOlderThan(16, 0))
+                    if (material.equals(Material.NETHERITE_SWORD) ||
+                            material.equals(Material.NETHERITE_AXE) ||
+                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
+                        return true;
+                return false;
+        }
+    }
+
     private static int findMainEnchantment(ItemStack itemStack, Enchantment enchantment) {
         if (itemStack == null)
             return 0;
