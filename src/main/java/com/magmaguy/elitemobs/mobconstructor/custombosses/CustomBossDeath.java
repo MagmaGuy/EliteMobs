@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
@@ -160,7 +161,7 @@ public class CustomBossDeath implements Listener {
         return sortedMap;
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onEliteMobDeath(EliteMobDeathEvent event) {
         if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
         CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();

@@ -76,6 +76,7 @@ public class CustomBossBossBar {
      * @return
      */
     public String bossBarMessage(Player player, String locationString) {
+        if (customBossEntity.getCustomBossesConfigFields().getLocationMessage() == null) return "";
         if (customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$distance") ||
                 customBossEntity.getCustomBossesConfigFields().getLocationMessage().contains("$location")) {
             if (!player.getLocation().getWorld().equals(customBossEntity.getLocation().getWorld()))

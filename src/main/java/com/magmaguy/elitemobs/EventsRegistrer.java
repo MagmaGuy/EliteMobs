@@ -260,6 +260,10 @@ public class EventsRegistrer {
         if (DefaultConfig.preventVanillaReinforcementsForEliteEntities)
             pluginManager.registerEvents(new VanillaReinforcementsCanceller(), plugin);
         pluginManager.registerEvents(new LightningSpawnBypass(), plugin);
+        if (ItemSettingsConfig.eliteDurability)
+            pluginManager.registerEvents(new AlternativeDurabilityLoss(), plugin);
+        pluginManager.registerEvents(new EnderCrystalDamageProtectionBypass(), plugin);
+
 
         //Antiexploits
         pluginManager.registerEvents(new PreventMountExploit(), plugin);
