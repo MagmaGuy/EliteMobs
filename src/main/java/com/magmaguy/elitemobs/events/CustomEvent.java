@@ -82,7 +82,7 @@ public abstract class CustomEvent {
     public void start() {
         startModifiers();
         if (primaryEliteMobs.isEmpty()) {
-            new WarningMessage("Event (event name) has failed to start because the bosses failed to spawn correctly!" +
+            new WarningMessage("Event " + customEventsConfigFields.getFilename() + " has failed to start because the bosses failed to spawn correctly!" +
                     "This could be due to an issue with the configuration of the bosses in the event, with the configuration" +
                     " of the event or due to a protection in the target location!");
             new WarningMessage("Target location: " + getEventStartLocation().toString());

@@ -12,14 +12,12 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.DebugMessage;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -203,6 +201,7 @@ public class CustomSpawn {
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.validWorlds.contains(playerLocation.getWorld().getName()))
                     continue;
+                if (!playerLocation.getWorld().getGameRuleValue(GameRule.DO_MOB_SPAWNING)) continue;
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())
                     if (!customSpawnConfigFields.getValidWorlds().contains(playerLocation.getWorld()))
                         continue;
@@ -287,6 +286,9 @@ public class CustomSpawn {
                 return null;
 
             if (!WorldGuardFlagChecker.doEliteMobsSpawnFlag(location))
+                return null;
+
+            if (!WorldGuardFlagChecker.doMobSpawnFlag(location))
                 return null;
         }
 

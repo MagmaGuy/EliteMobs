@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.dungeons.Minidungeon;
-import com.magmaguy.elitemobs.entitytracker.EliteEntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -398,7 +397,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                 customBossBossBar.remove();
             if (!removalReason.equals(RemovalReason.SHUTDOWN) && !removalReason.equals(RemovalReason.DEATH))
                 if (phaseBossEntity != null)
-                    phaseBossEntity.deathReset();
+                    phaseBossEntity.silentReset();
             globalReinforcements.forEach((bukkitTask -> {
                 if (bukkitTask != null)
                     bukkitTask.cancel();
