@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
+import com.magmaguy.elitemobs.combatsystem.PlayerDamagedByEliteMobHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -70,8 +72,10 @@ public class PlayerDamagedByEliteMobEvent extends Event implements Cancellable {
 
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
 
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler
         public void onEliteMobAttack2(EntityDamageByEntityEvent event) {
+            if (event.isCancelled() && !PlayerDamagedByEliteMobHandler.bypass) return;
+            if (event.isCancelled()) event.setCancelled(false);
             if (!(event.getEntity() instanceof Player)) return;
             Player player = (Player) event.getEntity();
 
