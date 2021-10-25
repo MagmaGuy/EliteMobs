@@ -4,6 +4,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
@@ -63,6 +64,14 @@ public class WorldGuardFlagChecker {
         RegionQuery query = container.createQuery();
         ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
         return set.testState(null, WorldGuardCompatibility.getEliteMobsSpawnFlag());
+    }
+
+    public static boolean doMobSpawnFlag(Location location) {
+        com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionQuery query = container.createQuery();
+        ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
+        return set.testState(null, Flags.MOB_SPAWNING);
     }
 
 }

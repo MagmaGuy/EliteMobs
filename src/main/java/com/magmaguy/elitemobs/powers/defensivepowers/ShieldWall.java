@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.defensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -17,6 +18,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -193,7 +195,7 @@ public class ShieldWall extends MinorPower {
 
     private void armorStandTracker(EliteEntity eliteEntity) {
         Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, (task) -> {
-            if (!eliteEntity.isValid() || (northHealthPool == 0 && southHealthPool == 0 && eastHealthPool == 0 && westHealthPool == 0)) {
+            if (!eliteEntity.isValid() || (northHealthPool == 0 && southHealthPool == 0 && eastHealthPool == 0 && westHealthPool == 0) || !isActive) {
                 task.cancel();
                 setActive(false);
 
@@ -261,6 +263,14 @@ public class ShieldWall extends MinorPower {
                 if (shieldWall.preventDamage(event.getPlayer(), event.getEliteMobEntity(), event.getDamage()))
                     event.setCancelled(true);
             }
+        }
+
+        @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
+        public void onCombatLeaveEvent(EliteMobExitCombatEvent event){
+            ElitePower elitePower = event.getEliteMobEntity().getPower(PowersConfig.getPower("shield_wall.yml"));
+            if (elitePower == null) return;
+            ShieldWall shieldWall = (ShieldWall) elitePower;
+            if (shieldWall.isActive) shieldWall.setActive(false);
         }
     }
 

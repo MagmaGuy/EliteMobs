@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -52,20 +51,21 @@ public class AlternativeDurabilityLoss implements Listener {
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> cancelledPlayers.remove(event.getPlayer()), 1);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         for (ItemStack itemStack : event.getDrops())
-            if (EliteMobsItemDetector.isEliteMobsItem(itemStack))
-                if (itemStack.getItemMeta() instanceof Damageable) {
-                    Damageable damageable = (Damageable) itemStack.getItemMeta();
-                    int maxDurability = itemStack.getType().getMaxDurability();
-                    int durabilityLoss = (int) (maxDurability * durabilityLoss(itemStack));
-                    int currentDurability = damageable.getDamage();
-                    int newDurability = currentDurability + durabilityLoss;
-                    damageable.setDamage(newDurability);
-                    itemStack.setItemMeta((ItemMeta) damageable);
-                    if (currentDurability >= maxDurability)
-                        itemStack.setAmount(0);
-                }
+            if (itemStack != null)
+                if (EliteMobsItemDetector.isEliteMobsItem(itemStack))
+                    if (itemStack.getItemMeta() instanceof Damageable) {
+                        Damageable damageable = (Damageable) itemStack.getItemMeta();
+                        int maxDurability = itemStack.getType().getMaxDurability();
+                        int durabilityLoss = (int) (maxDurability * durabilityLoss(itemStack));
+                        int currentDurability = damageable.getDamage();
+                        int newDurability = currentDurability + durabilityLoss;
+                        damageable.setDamage(newDurability);
+                        itemStack.setItemMeta((ItemMeta) damageable);
+                        if (currentDurability >= maxDurability)
+                            itemStack.setAmount(0);
+                    }
     }
 }

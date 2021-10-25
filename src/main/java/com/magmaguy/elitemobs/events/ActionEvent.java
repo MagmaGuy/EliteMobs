@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
@@ -88,8 +89,8 @@ public class ActionEvent extends CustomEvent {
                 new WarningMessage("Failed to generate custom boss " + filename + " ! This has cancelled action event " + customEventsConfigFields.getFilename() + " !");
                 return;
             }
-            customBossEntity.spawn(getEventStartLocation(), false);
-            primaryEliteMobs.add(customBossEntity);
+            customBossEntity.spawn(actionEvent.getEventStartLocation(), false);
+            actionEvent.primaryEliteMobs.add(customBossEntity);
         }
 
         actionEvents.add(actionEvent);

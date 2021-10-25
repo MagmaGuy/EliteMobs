@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.ProjectileTagger;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -43,7 +44,7 @@ public class PlayerDamagedByEliteMobHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void eliteMobDamageHandler(PlayerDamagedByEliteMobEvent event) {
 
-        if (event.getEntityDamageByEntityEvent().isCancelled()) return;
+        if (event.getEntityDamageByEntityEvent().isCancelled() && !bypass) return;
 
         //From this point on, the damage event is fully altered by Elite Mobs
 

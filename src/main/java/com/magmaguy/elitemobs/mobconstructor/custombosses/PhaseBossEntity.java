@@ -28,7 +28,7 @@ public class PhaseBossEntity {
             unsortedBossPhases.add(new BossPhase(customBossEntity.getCustomBossesConfigFields(), 1));
             for (String phaseConfigFile : customBossEntity.getCustomBossesConfigFields().getPhases()) {
                 CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(phaseConfigFile.split(":")[0]);
-                if (customBossesConfigFields == null){
+                if (customBossesConfigFields == null) {
                     new WarningMessage("Phase boss " + customBossEntity.getCustomBossesConfigFields() + " has an invalid config entry for phase " + phaseConfigFile + " - this file could not be found. The boss will not be able to do this phase until it is fixed!");
                 }
                 double healthPercentage = Double.parseDouble(phaseConfigFile.split(":")[1]);
@@ -47,7 +47,7 @@ public class PhaseBossEntity {
     }
 
     private void switchPhase(BossPhase bossPhase, RemovalReason removalReason, double healthPercentage) {
-        if (bossPhase.equals(currentPhase)){
+        if (bossPhase.equals(currentPhase)) {
             new WarningMessage("Attempted to change the boss phase to what it already was.", true);
             return;
         }
@@ -71,9 +71,17 @@ public class PhaseBossEntity {
         switchPhase(bossPhases.get(0), RemovalReason.PHASE_BOSS_RESET, 1);
     }
 
-    public void deathReset() {
+    public void silentReset() {
         currentPhase = bossPhases.get(0);
         customBossEntity.setCustomBossesConfigFields(currentPhase.customBossesConfigFields);
+    }
+
+    /**
+     * Used to set the respawn time in the config file of Regional Bosses
+     * @return The configuration file for phase 1 of Phase Bosses
+     */
+    public CustomBossesConfigFields getPhase1Config(){
+        return bossPhases.get(0).customBossesConfigFields;
     }
 
     public void checkPhaseBossSwitch() {
@@ -90,12 +98,13 @@ public class PhaseBossEntity {
             if (((CustomBossEntity) event.getEliteMobEntity()).getPhaseBossEntity() == null) return;
             ((CustomBossEntity) event.getEliteMobEntity()).getPhaseBossEntity().checkPhaseBossSwitch();
         }
-        @EventHandler (priority = EventPriority.MONITOR)
-        public void onEliteDeath(EliteMobDeathEvent event){
+
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onEliteDeath(EliteMobDeathEvent event) {
             if (!(event.getEliteEntity() instanceof CustomBossEntity)) return;
             CustomBossEntity customBossEntity = (CustomBossEntity) event.getEliteEntity();
             if (customBossEntity.getPhaseBossEntity() != null)
-                customBossEntity.phaseBossEntity.deathReset();
+                customBossEntity.phaseBossEntity.silentReset();
         }
     }
 

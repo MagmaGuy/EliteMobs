@@ -163,6 +163,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         RegionalBossEntity regionalBossEntity = this;
         this.isRespawning = true;
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
+            if (phaseBossEntity != null) phaseBossEntity.silentReset();
             ticksBeforeRespawn = 0;
             //Reminder: this might not spawn a living entity as it gets queued for when the chunk loads
             regionalBossEntity.spawn(silent);
@@ -175,7 +176,10 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         unixRespawnTime = (respawnCoolDownInMinutes * 60L * 1000L) + System.currentTimeMillis();
         ticksBeforeRespawn = respawnCoolDownInMinutes * 60L * 20L;
         rawString = rawLocationString + ":" + unixRespawnTime;
-        customBossesConfigFields.setFilesOutOfSync(true);
+        if (phaseBossEntity != null)
+            phaseBossEntity.getPhase1Config().setFilesOutOfSync(true);
+        else
+            customBossesConfigFields.setFilesOutOfSync(true);
         queueSpawn(false);
     }
 
@@ -223,6 +227,8 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
 
         switch (removalReason) {
             case REMOVE_COMMAND:
+                if (phaseBossEntity != null)
+                    phaseBossEntity.silentReset();
                 regionalBossesFromConfigFields.remove(customBossesConfigFields, this);
                 getCustomBossesConfigFields().setFilesOutOfSync(true);
                 break;

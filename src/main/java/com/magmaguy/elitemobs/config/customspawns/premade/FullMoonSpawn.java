@@ -11,7 +11,12 @@ public class FullMoonSpawn extends CustomSpawnConfigFields {
     public FullMoonSpawn(){
         super("full_moon_spawn", true);
         setSurfaceSpawn(true);
-        setValidWorldTypes(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
+        try {
+            setValidWorldTypes(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
+        } catch (Exception ex) {
+            //So this happens when CUSTOM doesn't exist, which it should but in some bugged releases it doesn't.
+            setValidWorldTypes(new ArrayList<>(Arrays.asList(World.Environment.NORMAL)));
+        }
         setEarliestTime(12000);
         setMoonPhase(MoonPhaseDetector.MoonPhase.FULL_MOON);
     }
