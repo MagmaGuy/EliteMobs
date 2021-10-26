@@ -4,12 +4,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
-import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.LightningEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
-import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -29,9 +25,11 @@ public class PlayerItem {
     public int damageArthropodsLevel = 0;
     public int damageUndeadLevel = 0;
     public int thornsLevel = 0;
+    private double plasmaBootsLevel = 0;
     private double critChance = 0;
     private double hunterChance = 0;
     private double lightningChance = 0;
+
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
      * of checks done by EliteMobs during combat and for passive potion effect applications. It should (largely) only update
@@ -82,7 +80,11 @@ public class PlayerItem {
             this.damageArthropodsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_ARTHROPODS.getKey());
             this.damageUndeadLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DAMAGE_UNDEAD.getKey());
             this.critChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key)) / 10D;
-            this.lightningChance = Math.pow(ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LightningEnchantment.key)), 2)  / 1000D;
+            this.lightningChance = Math.pow(ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LightningEnchantment.key)), 2) / 1000D;
+        }
+
+        if (equipmentSlot.equals(EquipmentSlot.BOOTS)) {
+            this.plasmaBootsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, PlasmaBootsEnchantment.key));
         }
 
         this.hunterChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, HunterEnchantment.key)) * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus");
@@ -94,12 +96,16 @@ public class PlayerItem {
     }
 
     private boolean fillNullItem() {
-        this.itemStack = ItemStackGenerator.generateItemStack(Material.AIR);
-        this.itemTier = 0;
-        this.continuousPotionEffects = new ArrayList<>();
-        this.onHitPotionEffects = new ArrayList<>();
-        this.damageArthropodsLevel = 0;
-        this.damageUndeadLevel = 0;
+        itemTier = 0;
+        continuousPotionEffects = new ArrayList<>();
+        onHitPotionEffects = new ArrayList<>();
+        damageArthropodsLevel = 0;
+        damageUndeadLevel = 0;
+        thornsLevel = 0;
+        plasmaBootsLevel = 0;
+        critChance = 0;
+        hunterChance = 0;
+        lightningChance = 0;
         return true;
     }
 
@@ -158,6 +164,13 @@ public class PlayerItem {
             fullUpdate(itemStack);
         return this.lightningChance;
     }
+
+    public double getPlasmaBootsLevel(ItemStack itemStack, boolean update) {
+        if (update)
+            fullUpdate(itemStack);
+        return this.plasmaBootsLevel;
+    }
+
 
     public enum EquipmentSlot {
         HELMET,
