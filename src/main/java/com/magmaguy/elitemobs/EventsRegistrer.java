@@ -183,6 +183,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new GoldShotgun(), plugin);
         pluginManager.registerEvents(new GoldExplosion(), plugin);
         pluginManager.registerEvents(new Flamethrower(), plugin);
+        pluginManager.registerEvents(new PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents(), plugin);
         if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
             pluginManager.registerEvents(new SoulbindEnchantment.SoulbindEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new FlamePyre(), plugin);

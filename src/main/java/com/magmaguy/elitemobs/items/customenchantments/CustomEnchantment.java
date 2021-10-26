@@ -32,6 +32,7 @@ public abstract class CustomEnchantment {
 
     public static void initializeCustomEnchantments() {
         new FlamethrowerEnchantment();
+        new PlasmaBootsEnchantment();
         new HunterEnchantment();
         new CriticalStrikesEnchantment();
         new DrillingEnchantment();
