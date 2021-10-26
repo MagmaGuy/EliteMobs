@@ -275,7 +275,8 @@ public class CustomItem {
                         name.equalsIgnoreCase(SummonMerchantEnchantment.key) ||
                         name.equalsIgnoreCase(SummonWolfEnchantment.key) ||
                         name.equalsIgnoreCase(UnbindEnchantment.key) ||
-                        name.equalsIgnoreCase(LightningEnchantment.key)) {
+                        name.equalsIgnoreCase(LightningEnchantment.key) ||
+                        name.equalsIgnoreCase(PlasmaBootsEnchantment.key)) {
                     customEnchantments.put(name.toLowerCase(), level);
                     continue;
                 }

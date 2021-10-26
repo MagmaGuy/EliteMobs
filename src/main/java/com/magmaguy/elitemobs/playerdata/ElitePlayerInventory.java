@@ -135,6 +135,10 @@ public class ElitePlayerInventory {
                 boots.getHunterChance(player.getInventory().getBoots(), update);
     }
 
+    public double getPlasmaBootsLevel(boolean update){
+        return boots.getPlasmaBootsLevel(player.getInventory().getBoots(), update);
+    }
+
     /**
      * Outputs the base damage of the player given the current gear. Does not take secondary enchantments into account,
      * such as Smite

@@ -251,6 +251,8 @@ public class EliteMobs extends JavaPlugin {
 
         //Load all regional bosses
         new CustomBossesConfig();
+        new CustomTreasureChestsConfig();
+
 
         //Find the stats of bosses in minidungeons
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
@@ -260,8 +262,6 @@ public class EliteMobs extends JavaPlugin {
                 else if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
                     minidungeon.quantifySchematicBosses(false);
         }
-
-        new CustomTreasureChestsConfig();
 
         //Initialize npcs
         new NPCsConfig();

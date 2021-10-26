@@ -17,7 +17,6 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -372,7 +371,7 @@ public class Minidungeon {
 
     public void quantifySchematicBosses(boolean freshInstall) {
         if (!isInstalled) return;
-        if (!freshInstall){
+        if (!freshInstall) {
             this.relativeBossLocations = new RelativeDungeonLocations(dungeonPackagerConfigFields.getRelativeBossLocations(), true);
             this.relativeTreasureChestLocations = new RelativeDungeonLocations(dungeonPackagerConfigFields.getRelativeTreasureChestLocations(), false);
             this.realDungeonLocations = new RealDungeonLocations();
@@ -540,7 +539,7 @@ public class Minidungeon {
                 try {
                     return Double.parseDouble(rawLocationString.split(":")[1].split(",")[position]);
                 } catch (Exception e) {
-                    new WarningMessage("Failed to parse relative location for " + rawLocationString);
+                    new WarningMessage("Failed to parse relative location " + rawLocationString + " for minidungeon" + dungeonPackagerConfigFields.getFilename());
                     return 0;
                 }
             }
