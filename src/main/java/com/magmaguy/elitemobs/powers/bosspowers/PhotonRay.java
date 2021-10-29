@@ -25,12 +25,11 @@ public class PhotonRay extends MajorCombatEnterScanningPower {
 
     private int range = 60;
     private List<Location> playerLocations = new ArrayList<>(5);
+    private int tickCounter = 0;
 
     public PhotonRay() {
         super(PowersConfig.getPower("photon_ray.yml"));
     }
-
-    private int tickCounter = 0;
 
     private void doDamage(Location location, EliteEntity eliteEntity) {
         for (Entity entity : location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5))
@@ -77,12 +76,11 @@ public class PhotonRay extends MajorCombatEnterScanningPower {
             @Override
             public void run() {
                 if (counter > 30 || !target.isValid() || target.getLocation().distanceSquared(sourceLocation) > range * range || !sourceEntity.isValid()) {
-                    sourceEntity.getLivingEntity().setAI(true);
+                    if (sourceEntity.getLivingEntity() != null)
+                        sourceEntity.getLivingEntity().setAI(true);
                     cancel();
                     return;
                 }
-
-                //laserVector = target.getLocation().clone().add(new Vector(0, 1, 0)).subtract(sourceEntity.getLocation().clone().add(new Vector(0, 1, 0))).toVector().normalize().multiply(.5);
 
                 laserVector = dragTarget(laserVector, sourceEntity.getLocation(), target.getLocation());
 

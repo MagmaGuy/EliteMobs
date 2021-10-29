@@ -32,6 +32,7 @@ public class ItemSettingsConfig {
     public static boolean preventEliteItemEnchantment;
     public static boolean preventEliteItemDiamondToNetheriteUpgrade;
     public static boolean eliteDurability;
+    public static double eliteDurabilityMultiplier;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");
@@ -87,6 +88,7 @@ public class ItemSettingsConfig {
         preventEliteItemEnchantment = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemEnchantment", true);
         preventEliteItemDiamondToNetheriteUpgrade = ConfigurationEngine.setBoolean(fileConfiguration, "preventEliteItemDiamondToNetheriteUpgrade", true);
         eliteDurability = ConfigurationEngine.setBoolean(fileConfiguration, "eliteItemsDurabilityLossOnlyOnDeath", true);
+        eliteDurabilityMultiplier = ConfigurationEngine.setDouble(fileConfiguration, "eliteItemsDurabilityLossMultiplier", 1d);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }

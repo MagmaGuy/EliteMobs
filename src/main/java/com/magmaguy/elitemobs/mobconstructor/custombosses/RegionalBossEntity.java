@@ -44,6 +44,10 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     @Setter
     private List<TransitiveBlock> onSpawnTransitiveBlocks = new ArrayList<>(), onRemoveTransitiveBlocks = new ArrayList<>();
 
+    public static void regionalBossesShutdown(){
+        regionalBossesFromConfigFields.clear();
+    }
+
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
         super(customBossesConfigFields);

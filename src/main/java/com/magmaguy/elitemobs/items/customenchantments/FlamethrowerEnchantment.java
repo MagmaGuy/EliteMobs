@@ -95,6 +95,11 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
                 @Override
                 public void run() {
 
+                    if (!player.isValid() || !player.getLocation().getWorld().equals(targetLocation.getWorld())){
+                        cancel();
+                        return;
+                    }
+
                     doParticleEffect(player, targetLocation, Particle.SMOKE_NORMAL);
                     counter++;
 
@@ -135,6 +140,10 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
                 @Override
                 public void run() {
+                    if (!player.isValid() || !player.getLocation().getWorld().equals(target.getWorld())){
+                        cancel();
+                        return;
+                    }
                     doParticleEffect(player, target, Particle.FLAME);
                     if (timer % 10 == 0)
                         doDamage(damagePoints, player);
@@ -158,6 +167,10 @@ public class FlamethrowerEnchantment extends CustomEnchantment {
 
                 @Override
                 public void run() {
+                    if (!player.isValid() || !player.getLocation().getWorld().equals(fixedPlayerLocation.getWorld())){
+                        cancel();
+                        return;
+                    }
                     timer++;
                     doParticleEffect(player, fixedPlayerLocation, Particle.SMOKE_NORMAL);
                     if (timer < 20) return;

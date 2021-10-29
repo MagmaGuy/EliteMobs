@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -10,6 +11,7 @@ import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfigFields;
 import com.magmaguy.elitemobs.events.MoonPhaseDetector;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
@@ -197,6 +199,7 @@ public class CustomSpawn {
         List<Player> validPlayers = new ArrayList<>();
         if (world == null)
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!PlayerData.isInMemory(player.getUniqueId())) continue;
                 Location playerLocation = player.getLocation();
                 if (!ValidWorldsConfig.validWorlds.contains(playerLocation.getWorld().getName()))
                     continue;
@@ -207,6 +210,7 @@ public class CustomSpawn {
                 if (!customSpawnConfigFields.getValidWorldTypes().isEmpty())
                     if (!customSpawnConfigFields.getValidWorldTypes().contains(Objects.requireNonNull(playerLocation.getWorld()).getEnvironment()))
                         continue;
+                if (GuildRank.getActiveGuildRank(player) == 0) continue;
                 validPlayers.add(player);
             }
         else

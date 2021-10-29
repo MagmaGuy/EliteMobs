@@ -59,7 +59,7 @@ public class ZombieBloat extends MajorPower implements Listener {
                     eventZombie.getWorld().spawnParticle(Particle.TOTEM, new Location(eventZombie.getWorld(),
                                     eventZombie.getLocation().getX(), eventZombie.getLocation().getY() +
                                     eventZombie.getHeight(), eventZombie.getLocation().getZ()), 20, timer / 24,
-                            timer / 9, timer / 24, 0.1);
+                            timer / 9d, timer / 24d, 0.1);
 
                 timer++;
             }
@@ -101,6 +101,7 @@ public class ZombieBloat extends MajorPower implements Listener {
             try {
                 livingEntity.setVelocity(normalizedVector);
             } catch (Exception e) {
+                livingEntity.setVelocity(new Vector(0, 1.5, 0));
             }
 
         }

@@ -26,7 +26,10 @@ public class AttackPush extends MinorPower implements Listener {
         if (attackPush.getGlobalCooldownActive()) return;
 
         attackPush.doGlobalCooldown(20 * 10);
-        event.getPlayer().setVelocity(event.getPlayer().getLocation().clone().subtract(event.getEliteMobEntity().getLivingEntity().getLocation()).toVector().normalize().multiply(3));
+        try {
+            event.getPlayer().setVelocity(event.getPlayer().getLocation().clone().subtract(event.getEliteMobEntity().getLivingEntity().getLocation()).toVector().normalize().multiply(3));
+        } catch (Exception ex) {
+        }
     }
 
 }
