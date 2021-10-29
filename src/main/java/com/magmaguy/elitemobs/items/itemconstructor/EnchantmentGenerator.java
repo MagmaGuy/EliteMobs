@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.MaterialTier;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
+import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -450,6 +451,8 @@ public class EnchantmentGenerator {
 
         if (enchantmentsConfigFields.isEnabled())
             enchantmentMap.put(string, ThreadLocalRandom.current().nextInt(enchantmentsConfigFields.getMaxLevel()) + 1);
+
+        new DeveloperMessage("Enchantment " + string + " has a max level of " + enchantmentsConfigFields.getMaxLevel() + " and randomized to " + enchantmentMap.get(string));
 
         return enchantmentMap;
 

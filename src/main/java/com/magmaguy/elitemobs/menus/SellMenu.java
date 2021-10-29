@@ -164,20 +164,31 @@ public class SellMenu extends EliteMenu implements Listener {
             //sell items in shop
             if (event.getSlot() == SellMenuConfig.confirmSlot) {
 
+                int amount = (int) validSlots.stream().filter(validSlot -> shopInventory.getItem(validSlot) != null).count();
+                double totalItemValue = 0;
+
                 for (Integer validSlot : validSlots) {
                     ItemStack itemStack = shopInventory.getItem(validSlot);
                     if (itemStack == null)
                         continue;
                     double itemValue = ItemWorthCalculator.determineResaleWorth(itemStack, player) * itemStack.getAmount();
                     EconomyHandler.addCurrency(player.getUniqueId(), itemValue);
+                    totalItemValue += itemValue;
 
-                    player.sendMessage(ChatColorConverter.convert(
-                            ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SELL_MESSAGE)
-                                    .replace("$item_name", itemStack.getItemMeta().getDisplayName())
-                                    .replace("$currency_amount", itemValue + "")
-                                    .replace("$currency_name", EconomySettingsConfig.currencyName)));
+                    if (amount < 4)
+                        player.sendMessage(ChatColorConverter.convert(
+                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_SELL_MESSAGE)
+                                        .replace("$item_name", itemStack.getItemMeta().getDisplayName())
+                                        .replace("$currency_amount", itemValue + "")
+                                        .replace("$currency_name", EconomySettingsConfig.currencyName)));
                     shopInventory.clear(validSlot);
                 }
+
+                if (amount >= 3)
+                    player.sendMessage(ChatColorConverter.convert(
+                            TranslationConfig.shopBatchSellMessage
+                                    .replace("$currency_amount", totalItemValue + "")
+                                    .replace("$currency_name", EconomySettingsConfig.currencyName)));
 
                 player.sendMessage(ChatColorConverter.convert(
                         ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)

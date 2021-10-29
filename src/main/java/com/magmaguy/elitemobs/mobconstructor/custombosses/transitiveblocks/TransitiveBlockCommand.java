@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.PhaseBossEntity;
@@ -139,7 +140,7 @@ public class TransitiveBlockCommand {
 
         if (corner1 != null && corner2 != null && corner1.getWorld() == corner2.getWorld()) {
             int blockCount = (int) ((Math.abs(corner1.getX() - corner2.getX()) + 1) * (Math.abs(corner1.getY() - corner2.getY()) + 1) * (Math.abs(corner1.getZ() - corner2.getZ()) + 1));
-            player.sendMessage("[EliteMobs] Current selection has " + blockCount + " blocks selected. For performance reasons, you are not allowed to go over 200 blocks!");
+            player.sendMessage("[EliteMobs] Current selection has " + blockCount + " blocks selected. For performance reasons, you are not allowed to go over " + DefaultConfig.defaultTransitiveBlockLimiter + " blocks!");
         }
 
     }
@@ -183,8 +184,8 @@ public class TransitiveBlockCommand {
 
         if (regionalSelection) {
             int blockCount = (int) ((Math.abs(corner1.getX() - corner2.getX()) + 1) * (Math.abs(corner1.getY() - corner2.getY()) + 1) * (Math.abs(corner1.getZ() - corner2.getZ()) + 1));
-            if (blockCount > 200) {
-                player.sendMessage("[EliteMobs] You attempted to register more than 200 blocks at once. For performance reasons, you are not allowed to do this in one registration command." +
+            if (blockCount > DefaultConfig.defaultTransitiveBlockLimiter) {
+                player.sendMessage("[EliteMobs] You attempted to register more than " + DefaultConfig.defaultTransitiveBlockLimiter + " blocks at once. For performance reasons, you are not allowed to do this in one registration command." +
                         " Please keep in mind that air blocks are also getting registered, and consider whether you should be using the manual input instead!");
                 return;
             }

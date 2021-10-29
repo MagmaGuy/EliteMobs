@@ -391,8 +391,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             new EventCaller(new EliteMobRemoveEvent(this, removalReason));
             if (escapeMechanism != null) Bukkit.getScheduler().cancelTask(escapeMechanism);
             trackableCustomBosses.remove(this);
-            if (simplePersistentEntity != null)
+            if (simplePersistentEntity != null){
                 simplePersistentEntity.remove();
+                simplePersistentEntity = null;
+            }
             if (customBossBossBar != null)
                 customBossBossBar.remove();
             if (!removalReason.equals(RemovalReason.SHUTDOWN) && !removalReason.equals(RemovalReason.DEATH))

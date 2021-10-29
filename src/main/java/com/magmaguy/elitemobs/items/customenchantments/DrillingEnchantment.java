@@ -124,9 +124,12 @@ public class DrillingEnchantment extends CustomEnchantment {
             ItemMeta itemMeta = itemStack.getItemMeta();
             Damageable damageable = (Damageable) itemMeta;
 
-            if (itemStack.getItemMeta().hasEnchant(Enchantment.DURABILITY))
-                if (itemStack.getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D > ThreadLocalRandom.current().nextDouble())
-                    damageable.setDamage(damageable.getDamage() + 1);
+            //if (itemStack.getItemMeta().hasEnchant(Enchantment.DURABILITY))
+            //    if (itemStack.getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D > ThreadLocalRandom.current().nextDouble())
+            //        damageable.setDamage(damageable.getDamage() + 1);
+            //    else
+            //        damageable.setDamage(damageable.getDamage() + 1);
+
             itemStack.setItemMeta(itemMeta);
             if (itemStack.getType().getMaxDurability() < damageable.getDamage())
                 player.getInventory().setItemInMainHand(null);

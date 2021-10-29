@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobsItemDetector;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import org.bukkit.Bukkit;
@@ -18,7 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 public class AlternativeDurabilityLoss implements Listener {
     private static final HashSet<Player> cancelledPlayers = new HashSet<>();
@@ -27,7 +31,7 @@ public class AlternativeDurabilityLoss implements Listener {
         boolean isWeaponMaterial = ItemTierFinder.isWeaponMaterial(itemStack);
         int maxDurability = itemStack.getType().getMaxDurability() > (isWeaponMaterial ? 2000 : 1000) ? (isWeaponMaterial ? 2000 : 1000) : itemStack.getType().getMaxDurability();
         double baseModifier = isWeaponMaterial ? 2000 : 1000;
-        double durabilityLoss = (baseModifier - maxDurability) / baseModifier;
+        double durabilityLoss = ((baseModifier - maxDurability) / baseModifier) * ItemSettingsConfig.eliteDurabilityMultiplier;
         double durabilityLevel = 1 + (ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DURABILITY.getKey()) / 4d);
         return durabilityLoss / durabilityLevel;
     }
@@ -53,7 +57,11 @@ public class AlternativeDurabilityLoss implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        for (ItemStack itemStack : event.getDrops())
+        ArrayList<ItemStack> itemsList = new ArrayList<>(Arrays.asList(event.getEntity().getInventory().getArmorContents()));
+        itemsList.add(event.getEntity().getInventory().getItemInMainHand());
+        itemsList.add(event.getEntity().getInventory().getItemInOffHand());
+
+        for (ItemStack itemStack : itemsList)
             if (itemStack != null)
                 if (EliteMobsItemDetector.isEliteMobsItem(itemStack))
                     if (itemStack.getItemMeta() instanceof Damageable) {
