@@ -339,6 +339,7 @@ public class EliteMobs extends JavaPlugin {
         CustomItem.getWeighedFixedItems().clear();
         new InfoMessage("Clearing Minidungeons...");
         Minidungeon.minidungeons.clear();
+        RegionalBossEntity.regionalBossesShutdown();
 
         new InfoMessage("Unregistering placeholders...");
         if (this.placeholders != null)

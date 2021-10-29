@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class Implosion extends MinorPower implements Listener {
 
@@ -41,7 +42,11 @@ public class Implosion extends MinorPower implements Listener {
                                 if (customBossEntity.getCustomBossesConfigFields().isFrozen())
                                     continue;
                             }
-                            entity.setVelocity(event.getEntity().getLocation().clone().subtract(entity.getLocation()).toVector().multiply(0.5));
+                            try {
+                                entity.setVelocity(event.getEntity().getLocation().clone().subtract(entity.getLocation()).toVector().multiply(0.5));
+                            } catch (Exception ex) {
+                                entity.setVelocity(new Vector(0, 1.5, 0));
+                            }
                         }
                     cancel();
                 }

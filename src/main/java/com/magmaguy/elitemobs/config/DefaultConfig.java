@@ -27,6 +27,7 @@ public class DefaultConfig {
     public static boolean doExplosionRegen;
     public static boolean preventVanillaReinforcementsForEliteEntities;
     public static boolean doRegenerateContainers;
+    public static int defaultTransitiveBlockLimiter;
 
     private static File file = null;
     private static FileConfiguration fileConfiguration = null;
@@ -69,6 +70,7 @@ public class DefaultConfig {
 
         doExplosionRegen = ConfigurationEngine.setBoolean(fileConfiguration, "doExplosionRegen", true);
         doRegenerateContainers = ConfigurationEngine.setBoolean(fileConfiguration, "doRegenerateContainers", true);
+        defaultTransitiveBlockLimiter = ConfigurationEngine.setInt(fileConfiguration, "defaultTransitiveBlockLimiter", 200);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
