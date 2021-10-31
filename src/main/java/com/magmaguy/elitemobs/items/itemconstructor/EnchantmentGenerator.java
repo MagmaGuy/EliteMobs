@@ -452,8 +452,6 @@ public class EnchantmentGenerator {
         if (enchantmentsConfigFields.isEnabled())
             enchantmentMap.put(string, ThreadLocalRandom.current().nextInt(enchantmentsConfigFields.getMaxLevel()) + 1);
 
-        new DeveloperMessage("Enchantment " + string + " has a max level of " + enchantmentsConfigFields.getMaxLevel() + " and randomized to " + enchantmentMap.get(string));
-
         return enchantmentMap;
 
     }
