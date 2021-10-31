@@ -199,6 +199,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new EnderDragonEmpoweredLightning.EnderDragonEmpoweredLightningEvents(), plugin);
         pluginManager.registerEvents(new MajorCombatEnterScanningPower.MajorCombatEnterScanningPowerEvents(), plugin);
         pluginManager.registerEvents(new LightningEnchantment.LightningEnchantmentEvents(), plugin);
+        pluginManager.registerEvents(new BonusCoins.BonusCoinsEvents(), plugin);
 
         //special powers
         pluginManager.registerEvents(new EnderCrystalLightningRod.EnderCrystalLightningRodEvents(), plugin);

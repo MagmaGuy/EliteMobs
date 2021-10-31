@@ -72,7 +72,7 @@ public class AlternativeDurabilityLoss implements Listener {
                         int newDurability = currentDurability + durabilityLoss;
                         damageable.setDamage(newDurability);
                         itemStack.setItemMeta((ItemMeta) damageable);
-                        if (currentDurability >= maxDurability)
+                        if (newDurability >= maxDurability)
                             itemStack.setAmount(0);
                     }
     }
