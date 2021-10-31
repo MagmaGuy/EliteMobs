@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.utils.WeightedProbability;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -90,7 +91,7 @@ public class TreasureChest {
             return;
         }
         //todo: this doesn't support non- chest block types like the ender chest
-        Chest chest = (Chest) location.getBlock().getBlockData();
+        Directional chest = (Directional) location.getBlock().getBlockData();
         chest.setFacing(customTreasureChestConfigFields.getFacing());
         location.getBlock().setBlockData(chest);
         location.getBlock().getState().update();

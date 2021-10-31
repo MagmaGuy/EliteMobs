@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 public class AnnouncementPriority {
     public static void announce(String message, World world, int announcementPriority) {
-        if (announcementPriority == 1 && !EventsConfig.ANNOUNCEMENT_BROADCAST_WORLD_ONLY)
+        if (announcementPriority == 1 && !EventsConfig.announcementBroadcastWorldOnly)
             Bukkit.broadcastMessage(ChatColorConverter.convert(message));
         else
             for (Player player : world.getPlayers())
