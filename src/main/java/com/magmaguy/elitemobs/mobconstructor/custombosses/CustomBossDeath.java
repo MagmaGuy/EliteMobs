@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.VanillaItemDrop;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
@@ -36,6 +37,9 @@ public class CustomBossDeath implements Listener {
             if (ThreadLocalRandom.current().nextDouble() < specialLoot.getChance())
                 customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(),
                         specialLoot.generateItemStack(player, Math.max(customBossEntity.getLevel() - 3, 1), customBossEntity.getLevel() + 3));
+            for (VanillaItemDrop vanillaItemDrop : customBossEntity.customBossesConfigFields.getParsedVanillaLootList())
+                if (ThreadLocalRandom.current().nextDouble() < vanillaItemDrop.getChance())
+                    customBossEntity.getLocation().getWorld().dropItem(customBossEntity.getLocation(), vanillaItemDrop.getItemStack());
     }
 
     private static void doDeathMessage(CustomBossEntity customBossEntity) {

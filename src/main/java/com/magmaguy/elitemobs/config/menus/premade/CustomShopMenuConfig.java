@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -18,11 +17,11 @@ public class CustomShopMenuConfig extends MenusConfigFields {
     public static List<Integer> storeSlots;
     public static String messageFullInventory;
     public CustomShopMenuConfig() {
-        super("custom_shop_menu");
+        super("custom_shop_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
         shopName = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Buy or Sell");
         ItemStackSerializer.serialize("Reroll button",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",

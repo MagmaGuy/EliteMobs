@@ -60,8 +60,7 @@ import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
-import com.magmaguy.elitemobs.quests.QuestsMenu;
-import com.magmaguy.elitemobs.quests.QuestsTracker;
+import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -302,8 +301,10 @@ public class EventsRegistrer {
         //Initialize adventurer's guild
         pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);
         //register quests
-        pluginManager.registerEvents(new QuestsMenu(), plugin);
-        pluginManager.registerEvents(new QuestsTracker(), plugin);
+        pluginManager.registerEvents(new KillObjective.KillQuestEvents(), plugin);
+        pluginManager.registerEvents(new QuestAcceptEvent.QuestAcceptEventHandler(), plugin);
+        pluginManager.registerEvents(new QuestCompleteEvent.QuestCompleteEventHandler(), plugin);
+        pluginManager.registerEvents(new QuestLeaveEvent.QuestLeaveEventHandler(), plugin);
 
         //Combat tag
         if (CombatTagConfig.enableCombatTag)

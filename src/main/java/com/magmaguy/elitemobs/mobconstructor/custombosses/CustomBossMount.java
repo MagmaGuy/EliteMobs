@@ -33,6 +33,7 @@ public class CustomBossMount {
                 mountEntity.setSpawnLocation(customBossEntity.getLivingEntity().getLocation());
                 mountEntity.setBypassesProtections(customBossEntity.getBypassesProtections());
                 mountEntity.setPersistent(false);
+                mountEntity.setMount(true);
                 mountEntity.spawn(false);
 
                 new BukkitRunnable() {

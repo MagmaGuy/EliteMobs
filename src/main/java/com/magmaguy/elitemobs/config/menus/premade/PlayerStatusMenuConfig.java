@@ -17,7 +17,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     public static String[] questTrackerTextLines = new String[13], questTrackerHoverLines = new String[13], questTrackerCommandLines = new String[13];
     public static String onBossTrackHover, onQuestTrackHover, onTeleportHover;
     public PlayerStatusMenuConfig() {
-        super("player_status_screen");
+        super("player_status_screen", true);
     }
 
     private static void indexLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration) {
@@ -63,7 +63,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
 
         doIndexPage = ConfigurationEngine.setBoolean(fileConfiguration, "doIndexPage", true);
         doStatsPage = ConfigurationEngine.setBoolean(fileConfiguration, "doStatsPage", true);

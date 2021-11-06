@@ -1,24 +1,20 @@
 package com.magmaguy.elitemobs.config.menus;
 
-import org.bukkit.configuration.file.FileConfiguration;
+import com.magmaguy.elitemobs.config.CustomConfigFields;
+import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 
-public class MenusConfigFields {
+public class MenusConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
-    private String fileName;
-
-    public MenusConfigFields(String fileName) {
-        this.fileName = fileName + ".yml";
+    public MenusConfigFields(String fileName, boolean isEnabled) {
+        super(fileName, isEnabled);
     }
 
-    public MenusConfigFields(FileConfiguration configuration) {
-
+    @Override
+    public void processConfigFields() {
+        this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
+        processAdditionalFields();
     }
 
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
+    public void processAdditionalFields(){}
 
 }

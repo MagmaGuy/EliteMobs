@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -18,11 +17,11 @@ public class GuildRankMenuConfig extends MenusConfigFields {
     public static String spawnRateModifierMessage, lootModifierMessage, difficultyModifierMessage, lootTierMessage, currencyBonusMessage,
             healthBonusMessage, critBonusMessage, dodgeBonusMessage;
     public GuildRankMenuConfig() {
-        super("guild_rank_selector_menu");
+        super("guild_rank_selector_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
         menuName = ConfigurationEngine.setString(fileConfiguration, "questTierSelectorMenuTitle", "[EM] Guild Rank Selection");
         lowTierWarning = ConfigurationEngine.setString(fileConfiguration, "lowTierWarning", "&cElites can't drop better loot!");
         normalTierWarning = ConfigurationEngine.setString(fileConfiguration, "normalTierWarning", "&aElite can drop better loot!");

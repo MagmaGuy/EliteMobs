@@ -22,7 +22,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
 public class AlternativeDurabilityLoss implements Listener {
     private static final HashSet<Player> cancelledPlayers = new HashSet<>();

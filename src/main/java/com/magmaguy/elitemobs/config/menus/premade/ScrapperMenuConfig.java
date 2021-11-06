@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -22,11 +21,11 @@ public class ScrapperMenuConfig extends MenusConfigFields {
     public static ItemStack confirmButton;
     public static int confirmSlot;
     public ScrapperMenuConfig() {
-        super("scrapper_menu");
+        super("scrapper_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
         shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Scrapper");
         ItemStackSerializer.serialize(
                 "infoButton",

@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -124,7 +125,7 @@ public class SimplePersistentEntity {
         public static boolean ignore = false;
         private static HashSet<Integer> loadingChunks = new HashSet<>();
 
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void worldLoadEvent(WorldLoadEvent event) {
             if (persistentEntitiesForQueuedWorlds.get(event.getWorld().getName()) == null) return;
             Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> {
@@ -138,7 +139,7 @@ public class SimplePersistentEntity {
         }
 
         //Store world names and serialized locations
-        @EventHandler(ignoreCancelled = true)
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void chunkLoadEvent(ChunkLoadEvent event) {
             if (ignore) return;
             int chunkLocation = chunkLocation(event.getChunk());

@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -15,11 +14,11 @@ public class GetLootMenuConfig extends MenusConfigFields {
     public static ItemStack leftArrowItem, rightArrowItem, previousLootItem, nextLootItem;
     public static String tierTranslation, itemFilterTranslation;
     public GetLootMenuConfig() {
-        super("get_loot_menu");
+        super("get_loot_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
 
         menuName = ConfigurationEngine.setString(fileConfiguration, "Menu name", "[EM] Getloot menu");
 
