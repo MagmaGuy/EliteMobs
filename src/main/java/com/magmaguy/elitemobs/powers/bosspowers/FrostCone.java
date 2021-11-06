@@ -50,7 +50,7 @@ public class FrostCone extends BossPower implements Listener {
                 //ending phase
                 if (counter > 20 * 6 || !isPowerStillValid(eliteEntity, damager)) {
                     cancel();
-                    if (!eliteEntity.getLivingEntity().isDead())
+                    if (eliteEntity.getLivingEntity() != null && !eliteEntity.getLivingEntity().isDead())
                         eliteEntity.getLivingEntity().setAI(true);
                     return;
                 }

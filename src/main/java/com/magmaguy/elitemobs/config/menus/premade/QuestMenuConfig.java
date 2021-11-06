@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -18,11 +17,11 @@ public class QuestMenuConfig extends MenusConfigFields {
     public static String questCancelMessage, questStartTitle, questStartSubtitle, questCompleteTitle, questCompleteSubtitle,
             objectiveString, rewardMessage, questCompleteBroadcastMessage, questStatusMessage, questStartBroadcastMessage;
     public QuestMenuConfig() {
-        super("quest_menu");
+        super("quest_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
         menuName = ConfigurationEngine.setString(fileConfiguration, "menuName", "[EM] Quest Selection");
 
         ItemStackSerializer.serialize(

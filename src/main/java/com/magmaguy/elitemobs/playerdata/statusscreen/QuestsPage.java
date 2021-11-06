@@ -1,11 +1,10 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
-import com.magmaguy.elitemobs.quests.EliteQuest;
-import com.magmaguy.elitemobs.quests.PlayerQuests;
+import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.menus.CustomQuestMenu;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -13,6 +12,9 @@ import java.util.ArrayList;
 public class QuestsPage {
     protected static TextComponent[] questsPage(Player targetPlayer) {
 
+        return CustomQuestMenu.generateQuestPages(targetPlayer);
+
+        /*
         TextComponent configTextComponent = new TextComponent();
 
         for (int i = 0; i < 3; i++) {
@@ -31,6 +33,9 @@ public class QuestsPage {
         ArrayList<TextComponent> textComponents = new ArrayList<>();
         int counter = 0;
 
+         */
+
+        /*
         if (PlayerQuests.getData(targetPlayer) != null && PlayerQuests.getData(targetPlayer).quests != null)
             for (EliteQuest eliteQuest : PlayerQuests.getData(targetPlayer).quests) {
                 TextComponent quest = new TextComponent(ChatColor.BLACK + ChatColor.stripColor(eliteQuest.getQuestStatus()) + " \n");
@@ -57,5 +62,8 @@ public class QuestsPage {
             }
             return textComponent;
         }
+
+         */
+        //return new TextComponent[1];
     }
 }

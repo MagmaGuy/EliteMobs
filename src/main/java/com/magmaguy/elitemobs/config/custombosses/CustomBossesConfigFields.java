@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
+import com.magmaguy.elitemobs.config.VanillaItemDrop;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.SpecialLoot;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -16,10 +18,13 @@ import java.util.*;
 
 public class CustomBossesConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
+
     private static final HashSet<CustomBossesConfigFields> naturallySpawnedElites = new HashSet<>();
     public static HashMap<String, CustomBossesConfigFields> regionalElites = new HashMap<>();
     @Getter
     private final List<UniqueLoot> parsedUniqueLootList = new ArrayList<>();
+    @Getter
+    private final List<VanillaItemDrop> parsedVanillaLootList = new ArrayList<>();
     @Getter
     private final HashMap<String, SpecialLoot> specialLoot = new HashMap();
     @Getter
@@ -170,7 +175,6 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
     @Getter
     private List<String> onSpawnBlockStates = new ArrayList<>(), onRemoveBlockStates = new ArrayList<>();
 
-
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
      *
@@ -198,6 +202,16 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
 
     public static HashSet<CustomBossesConfigFields> getNaturallySpawnedElites() {
         return naturallySpawnedElites;
+    }
+
+    //This method unifies all level placeholders down to $level and applies a custom level for quest display purposes
+    public String getCleanName(int level) {
+        return ChatColorConverter.convert(getName().replace("$level", level + "")
+                .replace("$normalLevel", ChatColorConverter.convert("&2[&a" + level + "&2]&f"))
+                .replace("$minibossLevel", ChatColorConverter.convert("&6〖&e" + level + "&6〗&f"))
+                .replace("$bossLevel", ChatColorConverter.convert("&4『&c" + level + "&4』&f"))
+                .replace("$reinforcementLevel", ChatColorConverter.convert("&8〔&7") + level + "&8〕&f")
+                .replace("$eventBossLevel", ChatColorConverter.convert("&4「&c" + level + "&4」&f")));
     }
 
     public void runtimeSetLeashRadius(double leashRadius) {
@@ -266,6 +280,7 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         this.uniqueLootList = processStringList("uniqueLootList", uniqueLootList, new ArrayList<>(), false);
         for (String entry : this.uniqueLootList) {
             if (SpecialLoot.isSpecialLootEntry(entry)) continue;
+            if (entry.contains("minecraft:")) continue;
             try {
                 CustomItem customItem = CustomItem.getCustomItem(entry.split(":")[0]);
                 if (customItem == null)
@@ -278,6 +293,48 @@ public class CustomBossesConfigFields extends CustomConfigFields implements Cust
         for (String string : uniqueLootList)
             if (SpecialLoot.isSpecialLootEntry(string))
                 specialLoot.put(string, new SpecialLoot(string));
+        // minecraft:type=ITEM_TYPE:amount=AMOUNT
+        for (String string : uniqueLootList)
+            if (string.contains("minecraft:")) {
+                try {
+                    String[] processedStrings = string.split(":");
+                    Material type = null;
+                    int amount = 1;
+                    double chance = 1d;
+                    for (String processedString : processedStrings) {
+                        if (processedString.equals("minecraft"))
+                            continue;
+                        else if (processedString.contains("type="))
+                            try {
+                                type = Material.valueOf(processedString.split("=")[1]);
+                            } catch (Exception ex) {
+                                new WarningMessage("Custom Item entry " + string + " for boss " + getFilename() + " is not a valid entry!");
+                                new WarningMessage("Material type " + processedString.split("=")[1] + " is not valid! Make sure you are using valid Spigot API material values! These may not be the same as Minecraft item names.");
+                            }
+                        else if (processedString.contains("amount="))
+                            try {
+                                amount = Integer.parseInt(processedString.split("=")[1]);
+                            } catch (Exception ex) {
+                                new WarningMessage("Custom Item entry " + string + " for boss " + getFilename() + " is not a valid entry!");
+                                new WarningMessage("Amount " + processedString.split("=")[1] + " is not valid! Make sure you have a valid natural number.");
+                            }
+                        else if (processedString.contains("chance="))
+                            try {
+                                chance = Double.parseDouble(processedString.split("=")[1]);
+                            } catch (Exception ex) {
+                                new WarningMessage("Custom Item entry " + string + " for boss " + getFilename() + " is not a valid entry!");
+                                new WarningMessage("Chance " + processedString.split("=")[1] + " is not valid! Make sure you have a valid number between 0 and 1.");
+                            }
+                    }
+                    if (type == null) continue;
+                    ItemStack processedItemStack = new ItemStack(type, amount);
+                    parsedVanillaLootList.add(new VanillaItemDrop(processedItemStack, chance));
+                } catch (Exception ex) {
+                    new WarningMessage("Custom Item entry " + string + " for boss " + getFilename() + " is not a valid entry! Are you using the correct spigot API material names?");
+                    new WarningMessage("Correct format: " + "minecraft:type=MATERIAL_TYPE:amount=AMOUNT");
+                }
+            }
+
         //this can't be converted directly to an enum list because there are some special string features in here
         this.powers = processStringList("powers", powers, new ArrayList<>(), false);
         this.onDamageMessages = processStringList("onDamageMessages", onDamageMessages, new ArrayList<>(), false);

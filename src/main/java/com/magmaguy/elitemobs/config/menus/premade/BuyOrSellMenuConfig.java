@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -20,11 +19,11 @@ public class BuyOrSellMenuConfig extends MenusConfigFields {
     public static ItemStack SELL_ITEM;
     public static int SELL_SLOT;
     public BuyOrSellMenuConfig() {
-        super("buy_or_sell_menu");
+        super("buy_or_sell_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
         SHOP_NAME = ConfigurationEngine.setString(fileConfiguration, "Shop name", "[EM] Custom Item Shop");
         ItemStackSerializer.serialize(
                 "Information button",

@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.items.EliteEnchantments;
 import com.magmaguy.elitemobs.items.MaterialTier;
 import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;

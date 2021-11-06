@@ -8,12 +8,16 @@ import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.paper.PaperCommandManager;
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.commands.admin.CheckTierOthersCommand;
 import com.magmaguy.elitemobs.commands.combat.CheckTierCommand;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
-import com.magmaguy.elitemobs.commands.quest.QuestCommand;
+import com.magmaguy.elitemobs.commands.quests.QuestCommand;
+import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.menus.*;
@@ -25,6 +29,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class UserCommands {
 
@@ -151,13 +156,51 @@ public class UserCommands {
                 }));
 
         // /em quest
+        // /em quest join <fileName>
         manager.command(builder.literal("quest")
-                .meta(CommandMeta.DESCRIPTION, "Checks the EliteMobs currency")
+                .meta(CommandMeta.DESCRIPTION, "Joins a quest")
                 .senderType(Player.class)
                 .permission("elitemobs.quest.command")
                 .handler(commandContext -> {
-                    if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
-                        new QuestCommand((Player) commandContext.getSender());
+
+                    //todo: readd
+                    //if (!AdventurersGuildCommand.adventurersGuildTeleport((Player) commandContext.getSender()))
+                    //    new QuestCommand((Player) commandContext.getSender());
+                }));
+
+
+        // /em quest accept <fileName>
+        manager.command(builder.literal("quest")
+                .literal("accept")
+                .argument(StringArgument.newBuilder("questFilename"), ArgumentDescription.of("Quest ID"))
+                .meta(CommandMeta.DESCRIPTION, "Accepts a quest")
+                .senderType(Player.class)
+                .permission("elitemobs.quest.command")
+                .handler(commandContext -> {
+                    QuestCommand.joinQuest(commandContext.get("questFilename"), (Player) commandContext.getSender());
+                }));
+
+        // Create the confirmation manager. This allows us to require certain commands to be
+        // confirmed before they can be executed
+        CommandConfirmationManager<CommandSender> questLeaveManager = new CommandConfirmationManager<>(
+                /* Timeout */ 30L,
+                /* Timeout unit */ TimeUnit.SECONDS,
+                /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(QuestsConfig.questLeaveConfirmationMessage),
+                /* Action when no confirmation is pending */ sender -> sender.sendMessage(
+                ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.NO_PENDING_COMMANDS)))
+        );
+
+        // /em quest leave <fileName>
+        manager.command(builder.literal("quest")
+                .literal("leave")
+                .argument(StringArgument.newBuilder("questFilename"), ArgumentDescription.of("Quest ID"))
+                .meta(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true)
+                .meta(CommandMeta.DESCRIPTION, "Leaves a quest")
+                .senderType(Player.class)
+                .permission("elitemobs.quest.command")
+                .handler(commandContext -> {
+                    QuestCommand.leaveQuest(commandContext.get("questFilename"), (Player) commandContext.getSender());
+                    questLeaveManager.createConfirmationExecutionHandler();
                 }));
 
         CommandArgument<CommandSender, String> onlinePlayers = StringArgument.<CommandSender>newBuilder("onlinePlayer")

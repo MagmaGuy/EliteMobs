@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -29,11 +28,11 @@ public class EnhancementMenuConfig extends MenusConfigFields {
     public static int confirmSlot;
 
     public EnhancementMenuConfig() {
-        super("enhancement_menu");
+        super("enhancement_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
         shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Enhancement menu!");
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         eliteItemInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputInformationSlot", 20);
