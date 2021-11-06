@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -27,11 +26,11 @@ public class RefinerMenuConfig extends MenusConfigFields {
     public static int confirmSlot;
 
     public RefinerMenuConfig() {
-        super("refiner_menu");
+        super("refiner_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
         shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Place 10 scrap!");
         ItemStackSerializer.serialize(
                 "infoButton",

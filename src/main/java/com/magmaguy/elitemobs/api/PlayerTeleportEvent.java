@@ -18,6 +18,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     private final Location originalLocation;
     private final Player player;
     private boolean isCancelled = false;
+
     /**
      * Event fired when players teleport due to EliteMobs. This is used for teleporting to the Adventurer's Guild and to
      * Dungeons.

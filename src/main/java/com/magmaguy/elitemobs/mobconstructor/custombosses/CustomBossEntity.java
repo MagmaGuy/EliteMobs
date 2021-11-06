@@ -80,6 +80,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
     @Setter
     private CustomSpawn customSpawn = null;
     private int existsFailureCount = 0;
+    @Getter
+    @Setter
+    private boolean isMount = false;
 
     /**
      * Uses a builder pattern in order to construct a CustomBossEntity at an arbitrary point in the future. Does not
@@ -183,9 +186,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             else
                 level = 1;
 
-        if (chunkLoad || ChunkLocationChecker.locationIsLoaded(spawnLocation)) {
+            Boolean isChunkLoadedSpawn = null;
+
+        if (chunkLoad || ChunkLocationChecker.locationIsLoaded(spawnLocation) || isMount)  {
             chunkLoad = false;
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
+            isChunkLoadedSpawn = true;
+            if (super.livingEntity == null)
+                new WarningMessage("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
             simplePersistentEntity = null;
         } else if (isPersistent) {
             if (simplePersistentEntity != null) {
@@ -193,6 +201,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                 return;
             }
             simplePersistentEntity = new SimplePersistentEntity(this, getLocation());
+            isChunkLoadedSpawn = false;
         }
 
         if (!exists() && simplePersistentEntity == null) {
@@ -220,7 +229,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             new WarningMessage("- The region was protected by a plugin (most likely)");
             new WarningMessage("- The spawn was interfered with by some incompatible third party plugin");
             new WarningMessage("Debug data: ");
-            new WarningMessage("Attempted spawn location: " + spawnLocation.toString());
+            new WarningMessage("Chunk is loaded: " + ChunkLocationChecker.locationIsLoaded(spawnLocation));
+            new WarningMessage("Spawn type is normal spawn with chunk loaded: " + isChunkLoadedSpawn);
+            new WarningMessage("Attempted spawn location: " + spawnLocation.toString(), true);
             return;
         }
 

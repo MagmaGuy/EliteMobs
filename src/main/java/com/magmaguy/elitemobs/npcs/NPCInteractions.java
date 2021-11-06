@@ -7,6 +7,8 @@ import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
+import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.menus.CustomQuestMenu;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -74,6 +76,24 @@ public class NPCInteractions implements Listener {
                             //QuestsMenu.initializeQuestsMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                break;
+            case CUSTOM_QUEST_GIVER:
+                try {
+                    CustomQuest customQuest = CustomQuest.getQuest(npcEntity.getNpCsConfigFields().getQuestFilename(), event.getPlayer());
+                    if (customQuest == null) {
+                        event.getPlayer().sendMessage("[EliteMobs] This NPC's quest is not valid! This might be a configuration error on the NPC or on the quest.");
+                        return;
+                    }
+                    if (customQuest.getCustomQuestsConfigFields().getPermission() == null || event.getPlayer().hasPermission(customQuest.getCustomQuestsConfigFields().getPermission()))
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                new CustomQuestMenu(customQuest, event.getPlayer());
+                            }
+                        }.runTaskLater(MetadataHandler.PLUGIN, 1);
+                } catch (Exception ex) {
+
+                }
                 break;
             case BAR:
                 event.getPlayer().sendMessage("[EliteMobs] This feature is coming soon!");
@@ -195,6 +215,7 @@ public class NPCInteractions implements Listener {
         BAR,
         ARENA,
         QUEST_GIVER,
+        CUSTOM_QUEST_GIVER,
         NONE,
         SELL,
         TELEPORT_BACK,

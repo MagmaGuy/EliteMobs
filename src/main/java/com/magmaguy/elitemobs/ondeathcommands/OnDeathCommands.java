@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.ondeathcommands;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -49,17 +48,17 @@ public class OnDeathCommands implements Listener {
                 string = string.replace("$locationZ", event.getEliteEntity().getLivingEntity().getLocation().getZ() + "");
             if (string.contains("$damager1name"))
                 if (topDamager != null)
-                    string = string.replace("$damager1name", topDamager.getDisplayName());
+                    string = string.replace("$damager1name", topDamager.getName());
                 else
                     string = "";
             if (string.contains("$damager2name"))
                 if (secondDamager != null)
-                    string = string.replace("$damager2name", secondDamager.getDisplayName());
+                    string = string.replace("$damager2name", secondDamager.getName());
                 else
                     string = "";
             if (string.contains("$damager3name"))
                 if (thirdDamager != null)
-                    string = string.replace("$damager3name", thirdDamager.getDisplayName());
+                    string = string.replace("$damager3name", thirdDamager.getName());
                 else
                     string = "";
             if (string.contains("$players")) {

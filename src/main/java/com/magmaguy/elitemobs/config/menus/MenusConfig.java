@@ -1,53 +1,22 @@
 package com.magmaguy.elitemobs.config.menus;
 
-import com.magmaguy.elitemobs.config.ConfigurationEngine;
-import com.magmaguy.elitemobs.config.menus.premade.*;
-import org.bukkit.configuration.file.FileConfiguration;
+import com.magmaguy.elitemobs.config.CustomConfig;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 
-public class MenusConfig {
+public class MenusConfig extends CustomConfig {
 
-    private static final ArrayList<MenusConfigFields> menusConfigFieldsList = new ArrayList<MenusConfigFields>(Arrays.asList(
-            new ProceduralShopMenuConfig(),
-            new CustomShopMenuConfig(),
-            new BuyOrSellMenuConfig(),
-            new SellMenuConfig(),
-            new GetLootMenuConfig(),
-            new GuildRankMenuConfig(),
-            new QuestMenuConfig(),
-            new PlayerStatusMenuConfig(),
-            new ScrapperMenuConfig(),
-            new SmeltMenuConfig(),
-            new RepairMenuConfig(),
-            new RefinerMenuConfig(),
-            new EnhancementMenuConfig(),
-            new UnbinderMenuConfig()
-    ));
+    private static HashMap<String, MenusConfigFields> menusConfigFields = new HashMap<>();
 
-    public static void initializeConfigs() {
-        //Checks if the directory doesn't exist
-        for (MenusConfigFields menusConfigFields : menusConfigFieldsList)
-            initializeConfiguration(menusConfigFields);
+    public MenusConfig(){
+        super("menus", "com.magmaguy.elitemobs.config.menus.premade", MenusConfigFields.class);
+        menusConfigFields = new HashMap<>();
+        for (String key : super.getCustomConfigFieldsHashMap().keySet())
+            menusConfigFields.put(key, (MenusConfigFields) super.getCustomConfigFieldsHashMap().get(key));
     }
 
-    /**
-     * Initializes a single instance of a premade configuration using the default values.
-     *
-     * @param menusConfigFields
-     * @return
-     */
-    private static FileConfiguration initializeConfiguration(MenusConfigFields menusConfigFields) {
-
-        File file = ConfigurationEngine.fileCreator("menus", menusConfigFields.getFileName());
-        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
-        menusConfigFields.generateConfigDefaults(fileConfiguration);
-        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
-
-        return fileConfiguration;
-
+    public static HashMap<String, MenusConfigFields> getCustomQuests(){
+        return menusConfigFields;
     }
 
 }

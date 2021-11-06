@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customspawns.CustomSpawnConfig;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.config.dungeonpackager.DungeonPackagerConfig;
@@ -44,7 +45,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.powerstances.MajorPowerStanceMath;
 import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
-import com.magmaguy.elitemobs.quests.QuestsMenu;
+import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
@@ -91,7 +92,7 @@ public class EliteMobs extends JavaPlugin {
         AdventurersGuildConfig.initializeConfig();
         ValidWorldsConfig.initializeConfig();
 
-        MenusConfig.initializeConfigs();
+        new MenusConfig();
         new PowersConfig();
         MobPropertiesConfig.initializeConfigs();
         CustomEnchantment.initializeCustomEnchantments();
@@ -102,6 +103,7 @@ public class EliteMobs extends JavaPlugin {
         ReadMeForTranslationsConfig.initialize();
         ItemUpgradeSystemConfig.initializeConfig();
         new CustomEventsConfig();
+        QuestsConfig.initializeConfig();
     }
 
     public static void worldScanner() {
@@ -278,6 +280,8 @@ public class EliteMobs extends JavaPlugin {
                             " you are probably not getting the latest version (and also there's a high chance you'll get a virus).");
         }
 
+        new CustomQuestsConfig();
+
         //Commands
         new CommandHandler();
     }
@@ -363,7 +367,6 @@ public class EliteMobs extends JavaPlugin {
             Grid.initializeGrid();
         int eggTimerInterval = 20 * 60 * 10 / DefaultConfig.superMobStackAmount;
         new PlayerPotionEffects();
-        QuestsMenu.questRefresher();
         if (MobPropertiesConfig.getMobProperties().get(EntityType.CHICKEN).isEnabled() && DefaultConfig.superMobStackAmount > 0) {
             new EggRunnable().runTaskTimer(this, eggTimerInterval, eggTimerInterval);
         }

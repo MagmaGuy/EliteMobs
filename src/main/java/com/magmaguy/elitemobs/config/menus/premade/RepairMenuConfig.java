@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import com.magmaguy.elitemobs.utils.ItemStackSerializer;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -30,11 +29,11 @@ public class RepairMenuConfig extends MenusConfigFields {
     public static int confirmSlot;
 
     public RepairMenuConfig() {
-        super("repair_menu");
+        super("repair_menu", true);
     }
 
     @Override
-    public void generateConfigDefaults(FileConfiguration fileConfiguration) {
+    public void processAdditionalFields() {
         shopName = ConfigurationEngine.setString(fileConfiguration, "shopName", "[EM] Repair menu!");
         ItemStackSerializer.serialize(
                 "infoButton",
