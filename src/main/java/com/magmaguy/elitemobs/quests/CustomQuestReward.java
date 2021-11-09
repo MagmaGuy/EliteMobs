@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.quests;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomQuestReward implements Serializable {
 
+    @Getter
     private List<RewardEntry> rewardEntries = new ArrayList<>();
 
     /**
@@ -87,7 +89,7 @@ public class CustomQuestReward implements Serializable {
         rewardEntries.forEach((rewardEntries) -> rewardEntries.doReward(playerUUID, questLevel));
     }
 
-    private class RewardEntry {
+    public class RewardEntry {
         public CustomItem customItem;
         public ItemStack itemStack;
         public String command;
@@ -120,7 +122,7 @@ public class CustomQuestReward implements Serializable {
             if (ThreadLocalRandom.current().nextDouble() < chance)
                 for (int i = 0; i < amount; i++)
                     if (customItem != null)
-                        CustomItem.dropPlayerLoot(player, questLevel, customItem.getFileName(), player.getLocation());
+                        CustomItem.dropPlayerLoot(player, questLevel * 10, customItem.getFileName(), player.getLocation());
                     else if (itemStack != null)
                         player.getInventory().addItem(itemStack);
                     else if (command != null)

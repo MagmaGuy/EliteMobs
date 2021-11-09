@@ -2,10 +2,6 @@ package com.magmaguy.elitemobs.config.customquests;
 
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
-import com.magmaguy.elitemobs.quests.CustomQuestReward;
-import com.magmaguy.elitemobs.quests.objectives.CustomKillObjective;
-import com.magmaguy.elitemobs.quests.objectives.Objective;
-import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +11,12 @@ import java.util.List;
 
 public class CustomQuestsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface, Serializable {
 
+    @Getter
+    @Setter
+    List<String> temporaryPermissions = new ArrayList<>();
+    @Getter
+    @Setter
+    List<String> questAcceptDialog = new ArrayList<>();
     @Getter
     @Setter
     private int questLevel = 0;
@@ -27,7 +29,14 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     //Required permission to accept quest
-    private String permission = "";
+    private String questAcceptPermission = "";
+    @Getter
+    @Setter
+    //Permission which locks players out of a quest
+    private String questLockoutPermission = "";
+    @Getter
+    @Setter
+    private int questLockoutMinutes = -1;
     @Getter
     @Setter
     private String questName = "";
@@ -36,11 +45,14 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     private String questLore = "";
     @Getter
     @Setter
-    private String questAcceptMessage;
+    private List<String> questCompleteDialog = new ArrayList<>();
     @Getter
     @Setter
-    private String questCompleteMessage;
-
+    //placeholders: $player, $getX, $getY, $getZ
+    private List<String> questCompleteCommands = new ArrayList<>();
+    @Getter
+    @Setter
+    private String turnInNPC = "";
 
     public CustomQuestsConfigFields(String filename,
                                     boolean isEnabled,
@@ -73,14 +85,17 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.customObjectivesList = processStringList("customObjectives", customObjectivesList, new ArrayList<>(), true);
         this.customRewardsList = processStringList("customRewards", customRewardsList, new ArrayList<>(), true);
-        this.permission = processString("permission", permission, null, false);
+        this.questAcceptPermission = processString("questAcceptPermission", questAcceptPermission, null, false);
+        this.questLockoutPermission = processString("questLockoutPermission", questLockoutPermission, null, false);
+        this.questLockoutMinutes = processInt("questLockoutMinutes", questLockoutMinutes, -1, false);
         this.questName = processString("name", questName, filename, true);
         this.questLore = processString("questLore", questLore, "", false);
-        this.questAcceptMessage = processString("acceptMessage", questAcceptMessage, null, false);
-        this.questCompleteMessage = processString("questCompleteMessage", questCompleteMessage, null, false);
+        this.temporaryPermissions = processStringList("temporaryPermissions", temporaryPermissions, new ArrayList<>(), false);
+        this.questAcceptDialog = processStringList("questAcceptDialog", questAcceptDialog, new ArrayList<>(), false);
+        this.questCompleteDialog = processStringList("questCompleteMessage", questCompleteDialog, new ArrayList<>(), false);
+        this.questCompleteCommands = processStringList("questCompleteCommands", questCompleteCommands, new ArrayList<>(), false);
+        this.turnInNPC = processString("turnInNPC", turnInNPC, "", false);
     }
-
-
 
 
 }
