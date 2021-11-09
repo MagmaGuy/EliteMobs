@@ -180,6 +180,17 @@ public class UserCommands {
                     QuestCommand.joinQuest(commandContext.get("questFilename"), (Player) commandContext.getSender());
                 }));
 
+        // /em quest complete
+        manager.command(builder.literal("quest")
+                .literal("complete")
+                .argument(StringArgument.newBuilder("questFilename"), ArgumentDescription.of("Quest ID"))
+                .meta(CommandMeta.DESCRIPTION, "Completes a quest")
+                .senderType(Player.class)
+                .permission("elitemobs.quest.command")
+                .handler(commandContext -> {
+                    QuestCommand.completeQuest(commandContext.get("questFilename"), (Player) commandContext.getSender());
+                }));
+
         // Create the confirmation manager. This allows us to require certain commands to be
         // confirmed before they can be executed
         CommandConfirmationManager<CommandSender> questLeaveManager = new CommandConfirmationManager<>(

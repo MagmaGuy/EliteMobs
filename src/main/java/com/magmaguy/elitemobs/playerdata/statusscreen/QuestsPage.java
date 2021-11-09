@@ -1,18 +1,13 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
-import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
-import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.menus.CustomQuestMenu;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
 
 public class QuestsPage {
     protected static TextComponent[] questsPage(Player targetPlayer) {
 
-        return CustomQuestMenu.generateQuestPages(targetPlayer);
+        return CustomQuestMenu.generateQuestEntry(targetPlayer, null);
 
         /*
         TextComponent configTextComponent = new TextComponent();

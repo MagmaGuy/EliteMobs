@@ -14,7 +14,7 @@ public class TestCustomBossesConfig extends CustomBossesConfigFields {
         super("test_boss",
                 EntityType.ZOMBIE,
                 true,
-                "$eventBossLevel &eTest boss",
+                "$eventBossLevel &6Test boss",
                 "dynamic");
         setTimeout(10);
         setHealthMultiplier(2);

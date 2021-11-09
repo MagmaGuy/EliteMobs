@@ -20,6 +20,6 @@ public class TestNPCConfig extends NPCsConfigFields {
                 true,
                 3,
                 NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER);
-        super.setQuestFilename("test_quest.yml");
+        super.setQuestFilename(Arrays.asList("test_quest.yml"));
     }
 }
