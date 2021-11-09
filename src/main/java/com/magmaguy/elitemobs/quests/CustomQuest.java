@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
+import com.magmaguy.elitemobs.api.QuestCompleteEvent;
 import com.magmaguy.elitemobs.api.QuestLeaveEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
@@ -64,5 +65,14 @@ public class CustomQuest implements Serializable {
         return customQuest;
     }
 
+    public static CustomQuest completeQuest(String questFilename, Player player){
+        CustomQuest customQuest = playerQuests.get(player.getUniqueId());
+        if (customQuest == null) return null;
+        if (!customQuest.getCustomQuestsConfigFields().getFilename().equals(questFilename)) return null;
+        if (!customQuest.getCustomQuestObjectives().isOver()) return null;
+        QuestCompleteEvent questCompleteEvent = new QuestCompleteEvent(player, customQuest);
+        new EventCaller(questCompleteEvent);
+        return customQuest;
+    }
 
 }

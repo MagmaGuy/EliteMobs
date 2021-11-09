@@ -51,7 +51,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     private double timeout = 0;
     @Getter
     @Setter
-    private String questFilename = null;
+    private List<String> questFilename = null;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -108,7 +108,7 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.interactionType = processEnum("interactionType", interactionType, NPCInteractions.NPCInteractionType.NONE, true);
         this.timeout = processDouble("timeout", timeout, 0, false);
         this.noPreviousLocationMessage = processString("noPreviousLocationMessage", noPreviousLocationMessage, "", false);
-        this.questFilename = processString("questFileName", questFilename,  null, false);
+        this.questFilename = processStringList("questFileName", questFilename,  new ArrayList<>(), false);
     }
 
     public void setEnabled(boolean enabled) {

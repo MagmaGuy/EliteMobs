@@ -1,13 +1,12 @@
 package com.magmaguy.elitemobs.api;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.quests.CustomQuest;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-import org.jetbrains.annotations.NotNull;
-
+import org.bukkit.permissions.PermissionAttachment;
 
 public class QuestAcceptEvent extends Event implements Cancellable {
 
@@ -23,6 +22,10 @@ public class QuestAcceptEvent extends Event implements Cancellable {
         this.customQuest = customQuest;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     @Override
     public boolean isCancelled() {
         return isCancelled;
@@ -33,10 +36,6 @@ public class QuestAcceptEvent extends Event implements Cancellable {
         isCancelled = cancel;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     @Override
     public HandlerList getHandlers() {
         return handlers;
@@ -45,12 +44,26 @@ public class QuestAcceptEvent extends Event implements Cancellable {
     public static class QuestAcceptEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestAccept(QuestAcceptEvent event) {
-            new DeveloperMessage("Quest accepted");
             event.getPlayer().sendMessage(QuestsConfig.questJoinMessage.replace("$questName", event.getCustomQuest().getCustomQuestsConfigFields().getQuestName()));
-            if (event.getCustomQuest().getCustomQuestsConfigFields().getQuestAcceptMessage() != null)
-                event.getPlayer().sendMessage(event.getCustomQuest().getCustomQuestsConfigFields().getQuestAcceptMessage());
             CustomQuest.getPlayerQuests().put(event.getPlayer().getUniqueId(), event.getCustomQuest());
             event.getCustomQuest().setQuestIsAccepted(true);
+
+            if (!event.getCustomQuest().getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
+                PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
+                for (String permission : event.getCustomQuest().getCustomQuestsConfigFields().getTemporaryPermissions())
+                    permissionAttachment.setPermission(permission, true);
+            }
+
+            if (!event.getCustomQuest().getCustomQuestsConfigFields().getQuestAcceptDialog().isEmpty())
+                for (String dialog : event.getCustomQuest().getCustomQuestsConfigFields().getQuestAcceptDialog())
+                    event.getPlayer().sendMessage(dialog);
+
+            if (QuestsConfig.useQuestAcceptTitles)
+                event.getPlayer().sendTitle(
+                        QuestsConfig.questStartTitle.replace("$questName", event.getCustomQuest().getCustomQuestsConfigFields().getQuestName()),
+                        QuestsConfig.questStartSubtitle.replace("$questName", event.getCustomQuest().getCustomQuestsConfigFields().getQuestName()),
+                        20, 60, 20);
+
         }
     }
 }

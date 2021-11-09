@@ -305,6 +305,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new QuestAcceptEvent.QuestAcceptEventHandler(), plugin);
         pluginManager.registerEvents(new QuestCompleteEvent.QuestCompleteEventHandler(), plugin);
         pluginManager.registerEvents(new QuestLeaveEvent.QuestLeaveEventHandler(), plugin);
+        pluginManager.registerEvents(new QuestProgressionEvent.QuestProgressionEventHandler(), plugin);
 
         //Combat tag
         if (CombatTagConfig.enableCombatTag)

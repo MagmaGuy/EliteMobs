@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -32,6 +33,8 @@ public class NPCProximitySensor implements Listener {
                         for (Entity entity : npcEntity.getVillager().getNearbyEntities(npcEntity.getNpCsConfigFields().getActivationRadius(),
                                 npcEntity.getNpCsConfigFields().getActivationRadius(), npcEntity.getNpCsConfigFields().getActivationRadius()))
                             if (entity.getType().equals(EntityType.PLAYER)) {
+                                Location rotatedLocation = npcEntity.getVillager().getLocation().setDirection(entity.getLocation().subtract(npcEntity.getVillager().getLocation()).toVector());
+                                npcEntity.getVillager().teleport(rotatedLocation);
                                 if (nearbyPlayers.contains(entity)) {
                                     if (!npcEntity.getNpCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT))
                                         npcEntity.sayDialog((Player) entity);
@@ -49,7 +52,7 @@ public class NPCProximitySensor implements Listener {
 
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 5);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 5L);
 
 
     }

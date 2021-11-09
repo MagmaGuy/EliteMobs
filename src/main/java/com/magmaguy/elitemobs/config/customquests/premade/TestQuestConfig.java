@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.config.customquests.premade;
 
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TestQuestConfig extends CustomQuestsConfigFields {

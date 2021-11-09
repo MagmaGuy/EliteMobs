@@ -1,14 +1,17 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
-import com.magmaguy.elitemobs.api.QuestCompleteEvent;
+import com.magmaguy.elitemobs.api.QuestObjectivesCompletedEvent;
+import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.CustomQuestReward;
-import com.magmaguy.elitemobs.utils.DeveloperMessage;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ import java.util.UUID;
 
 public class CustomQuestObjectives implements Serializable {
 
+    @Getter
     @Setter
     protected CustomQuestReward customQuestReward;
     @Getter
@@ -48,16 +52,12 @@ public class CustomQuestObjectives implements Serializable {
         return over;
     }
 
-    public void updateQuestStatus(UUID playerUUID, int questLevel) {
-        new DeveloperMessage("Checking quest status");
+    public void updateQuestStatus(UUID playerUUID) {
         if (isOver) return;
-        new DeveloperMessage("2");
         if (!isOver()) return;
-        new DeveloperMessage("Completing event");
         isOver = true;
-        QuestCompleteEvent questCompleteEvent = new QuestCompleteEvent(Bukkit.getPlayer(playerUUID), customQuest);
-        new EventCaller(questCompleteEvent);
-        customQuestReward.doRewards(playerUUID, questLevel);
+        QuestObjectivesCompletedEvent questObjectivesCompletedEvent = new QuestObjectivesCompletedEvent(Bukkit.getPlayer(playerUUID), customQuest);
+        new EventCaller(questObjectivesCompletedEvent);
     }
 
     /**
@@ -83,7 +83,7 @@ public class CustomQuestObjectives implements Serializable {
     }
 
     private List<Objective> processObjectiveType(String[] rawStrings, ObjectiveType objectiveType) {
-        List<Objective> parsedCustomQuestObjetivesBuffer = new ArrayList<>();
+        List<Objective> parsedCustomQuestObjectivesBuffer = new ArrayList<>();
         String filename = null;
         int amount = 1;
         for (String rawString : rawStrings) {
@@ -107,7 +107,7 @@ public class CustomQuestObjectives implements Serializable {
         }
         try {
             if (objectiveType.equals(ObjectiveType.KILL_CUSTOM))
-                parsedCustomQuestObjetivesBuffer.add(new CustomKillObjective(filename, amount, customQuest.getQuestLevel()));
+                parsedCustomQuestObjectivesBuffer.add(new CustomKillObjective(filename, amount, customQuest.getQuestLevel()));
             else if (objectiveType.equals(ObjectiveType.FETCH_ITEM))
                 //todo: not done yet
                 return new ArrayList<>();
@@ -115,13 +115,22 @@ public class CustomQuestObjectives implements Serializable {
             new WarningMessage("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
         }
 
-        return parsedCustomQuestObjetivesBuffer;
+        return parsedCustomQuestObjectivesBuffer;
 
     }
 
     private enum ObjectiveType {
         KILL_CUSTOM,
         FETCH_ITEM
+    }
+
+    public Scoreboard displayObjectivesScoreboard(Player player){
+        List<String> strings = new ArrayList<>();
+        for (Objective objective : objectives){
+            if (objective instanceof KillObjective)
+                strings.add(QuestsConfig.getKillQuestScoreboardProgressionLine(objective));
+        }
+        return SimpleScoreboard.temporaryScoreboard(player, getCustomQuest().getCustomQuestsConfigFields().getQuestName(), strings, 20 * 5);
     }
 
 }
