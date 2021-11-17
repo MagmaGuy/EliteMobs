@@ -5,6 +5,8 @@ import com.magmaguy.elitemobs.events.TimedEvent;
 import org.bukkit.command.CommandSender;
 
 public class EventCommand {
+    private EventCommand() {
+    }
 
     public static void trigger(CommandSender commandSender, String eventName) {
         for (TimedEvent timedEvent : TimedEvent.blueprintEvents)

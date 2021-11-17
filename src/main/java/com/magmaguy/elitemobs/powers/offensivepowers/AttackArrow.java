@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import org.bukkit.GameMode;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -30,9 +30,9 @@ public class AttackArrow extends MinorPower implements Listener {
         if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
         AttackArrow attackArrow = (AttackArrow) event.getEliteMobEntity().getPower(this);
         if (attackArrow == null) return;
-        if (attackArrow.getIsFiring()) return;
+        if (attackArrow.isFiring()) return;
 
-        attackArrow.setIsFiring(true);
+        attackArrow.setFiring(true);
         repeatingArrowTask(attackArrow, event.getEliteMobEntity());
     }
 
@@ -44,7 +44,7 @@ public class AttackArrow extends MinorPower implements Listener {
             public void run() {
 
                 if (!eliteEntity.isValid() || ((Monster) eliteEntity.getLivingEntity()).getTarget() == null) {
-                    attackArrow.setIsFiring(false);
+                    attackArrow.setFiring(false);
                     cancel();
                     return;
                 }

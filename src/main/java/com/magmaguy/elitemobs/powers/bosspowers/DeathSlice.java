@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.BossPower;
+import com.magmaguy.elitemobs.powers.meta.BossPower;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -85,7 +85,7 @@ public class DeathSlice extends BossPower implements Listener {
     public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
         DeathSlice deathSlice = (DeathSlice) event.getEliteMobEntity().getPower(this);
         if (deathSlice == null) return;
-        if (deathSlice.getGlobalCooldownActive()) return;
+        if (deathSlice.isInGlobalCooldown()) return;
 
         if (ThreadLocalRandom.current().nextDouble() > 0.10) return;
         deathSlice.doGlobalCooldown(20 * 20);

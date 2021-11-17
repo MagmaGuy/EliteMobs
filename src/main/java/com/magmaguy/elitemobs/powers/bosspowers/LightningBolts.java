@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.BossPower;
+import com.magmaguy.elitemobs.powers.meta.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -44,7 +44,7 @@ public class LightningBolts extends BossPower implements Listener {
                 if (eliteEntity != null && eliteEntity.getLivingEntity() != null)
                     eliteEntity.getLivingEntity().setAI(true);
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 4 * 20);
+        }.runTaskLater(MetadataHandler.PLUGIN, 4L * 20);
     }
 
     public static void lightningTask(Location location, int counter) {
@@ -70,11 +70,11 @@ public class LightningBolts extends BossPower implements Listener {
     public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
         LightningBolts lightningBolts = (LightningBolts) event.getEliteMobEntity().getPower(this);
         if (lightningBolts == null) return;
-        if (lightningBolts.getGlobalCooldownActive()) return;
+        if (lightningBolts.isInGlobalCooldown()) return;
 
         lightningBolts.doGlobalCooldown(20 * PowersConfig.getPower("attack_lightning.yml").getFileConfiguration().getInt("delayBetweenStrikes"));
 
-        lightningBolts.setIsFiring(true);
+        lightningBolts.setFiring(true);
         setLightiningPaths(event.getEliteMobEntity());
     }
 

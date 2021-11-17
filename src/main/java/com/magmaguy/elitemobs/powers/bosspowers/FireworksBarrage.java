@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.BossPower;
+import com.magmaguy.elitemobs.powers.meta.BossPower;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;

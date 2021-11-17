@@ -4,6 +4,9 @@ import com.magmaguy.elitemobs.dungeons.Minidungeon;
 import org.bukkit.entity.Player;
 
 public class TreasureChestCommands {
+    private TreasureChestCommands() {
+    }
+
     public static void addRelativeTreasureChest(Player player, String treasureChestFilename, String minidungeonName) {
         Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
         if (minidungeon == null) {

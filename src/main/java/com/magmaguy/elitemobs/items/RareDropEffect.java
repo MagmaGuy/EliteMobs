@@ -14,7 +14,7 @@ public class RareDropEffect implements Listener {
 
     public static void runEffect(Item item) {
 
-        if (!ItemSettingsConfig.enableRareItemParticleEffects) return;
+        if (!ItemSettingsConfig.isEnableRareItemParticleEffects()) return;
         if (!(ItemQualityColorizer.getItemQuality(item.getItemStack()).equals(ItemQualityColorizer.ItemQuality.LIGHT_BLUE) ||
                 ItemQualityColorizer.getItemQuality(item.getItemStack()).equals(ItemQualityColorizer.ItemQuality.GOLD)))
             return;

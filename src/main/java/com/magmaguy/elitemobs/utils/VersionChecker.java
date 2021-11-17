@@ -4,6 +4,9 @@ import org.bukkit.Bukkit;
 
 public class VersionChecker {
 
+    private VersionChecker() {
+    }
+
     /**
      * Compares a Minecraft version with the current version on the server. Returns true if the version on the server is older.
      *

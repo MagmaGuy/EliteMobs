@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SummonWolfEnchantment extends CustomEnchantment {
@@ -68,7 +69,7 @@ public class SummonWolfEnchantment extends CustomEnchantment {
     }
 
     public static class SummonWolfEnchantmentEvent implements Listener {
-        private static final ArrayList<Player> playerCooldowns = new ArrayList<>();
+        private static final List<Player> playerCooldowns = new ArrayList<>();
 
         @EventHandler(ignoreCancelled = true)
         public void onRightClick(PlayerInteractEvent event) {

@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.entitytracker.TemporaryBlockTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Location;

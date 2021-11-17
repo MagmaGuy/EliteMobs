@@ -47,14 +47,15 @@ import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityKnockback;
 import com.magmaguy.elitemobs.powers.defensivepowers.ShieldWall;
 import com.magmaguy.elitemobs.powers.majorpowers.blaze.TrackingFireball;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
-import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.MajorCombatEnterScanningPower;
-import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments.Bombardment;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
 import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieFriends;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
+import com.magmaguy.elitemobs.powers.meta.Bombardment;
+import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
+import com.magmaguy.elitemobs.powers.meta.MajorCombatEnterScanningPower;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
@@ -90,9 +91,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PigHandler(), plugin);
         pluginManager.registerEvents(new SheepHandler(), plugin);
         pluginManager.registerEvents(new FindSuperMobs(), plugin);
-        if (ItemSettingsConfig.preventEliteItemEnchantment)
+        if (ItemSettingsConfig.isPreventEliteItemEnchantment())
             pluginManager.registerEvents(new ItemEnchantmentPrevention(), plugin);
-        if (ItemSettingsConfig.preventEliteItemDiamondToNetheriteUpgrade)
+        if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
             pluginManager.registerEvents(new PreventUpgradeDiamondToNetherite(), plugin);
 
         //Mob damage
@@ -234,7 +235,7 @@ public class EventsRegistrer {
             pluginManager.registerEvents(new VisualEffectObfuscator(), plugin);
 
         //Loot
-        if (ItemSettingsConfig.doEliteMobsLoot) {
+        if (ItemSettingsConfig.isDoEliteMobsLoot()) {
             pluginManager.registerEvents(new LootTables(), plugin);
             pluginManager.registerEvents(new PlaceEventPrevent(), plugin);
         }
@@ -261,7 +262,7 @@ public class EventsRegistrer {
         if (DefaultConfig.preventVanillaReinforcementsForEliteEntities)
             pluginManager.registerEvents(new VanillaReinforcementsCanceller(), plugin);
         pluginManager.registerEvents(new LightningSpawnBypass(), plugin);
-        if (ItemSettingsConfig.eliteDurability)
+        if (ItemSettingsConfig.isEliteDurability())
             pluginManager.registerEvents(new AlternativeDurabilityLoss(), plugin);
         pluginManager.registerEvents(new EnderCrystalDamageProtectionBypass(), plugin);
 
@@ -327,7 +328,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new WorldGuardEliteMobOnlySpawnFlag(), plugin);
         pluginManager.registerEvents(new WorldGuardDungeonFlag(), plugin);
 
-        pluginManager.registerEvents(new EntityTransformPreventer(), plugin);
+        pluginManager.registerEvents(new EntityTransformHandler(), plugin);
         pluginManager.registerEvents(new EliteBlazeWaterDamagePrevention(), plugin);
         pluginManager.registerEvents(new PreventEliteEquipmentDrop(), plugin);
 

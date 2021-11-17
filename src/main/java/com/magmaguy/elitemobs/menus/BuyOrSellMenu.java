@@ -60,7 +60,6 @@ public class BuyOrSellMenu implements Listener {
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(BuyOrSellMenuConfig.SELL_ITEM.getItemMeta().getDisplayName())) {
             SellMenu sellMenu = new SellMenu();
             sellMenu.constructSellMenu((Player) event.getWhoClicked());
-            return;
         }
 
     }

@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SummonMerchantEnchantment extends CustomEnchantment implements Listener {
 
@@ -57,7 +58,7 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
     }
 
     public static class SummonMerchantEvents implements Listener {
-        private static final ArrayList<Player> playerCooldowns = new ArrayList<>();
+        private static final List<Player> playerCooldowns = new ArrayList<>();
 
         @EventHandler
         public void onItemInteract(PlayerInteractEvent event) {

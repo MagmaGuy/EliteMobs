@@ -24,6 +24,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,10 +44,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     @Getter
     @Setter
     private List<TransitiveBlock> onSpawnTransitiveBlocks = new ArrayList<>(), onRemoveTransitiveBlocks = new ArrayList<>();
-
-    public static void regionalBossesShutdown(){
-        regionalBossesFromConfigFields.clear();
-    }
+    private boolean leashIsRunning = false;
 
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
@@ -93,8 +91,16 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         }
     }
 
+    public static void regionalBossesShutdown() {
+        regionalBossesFromConfigFields.clear();
+    }
+
     public static List<RegionalBossEntity> getRegionalBossEntities(CustomBossesConfigFields customBossesConfigFields) {
         return regionalBossesFromConfigFields.get(customBossesConfigFields);
+    }
+
+    public static Collection<RegionalBossEntity> getRegionalBossEntities() {
+        return regionalBossesFromConfigFields.values();
     }
 
     public static void regionalDataSaver() {
@@ -191,10 +197,12 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         if (leashRadius < 1)
             return;
         RegionalBossEntity regionalBossEntity = this;
+        if (leashIsRunning) return;
+        leashIsRunning = true;
         leashTask = Bukkit.getScheduler().runTaskTimerAsynchronously(MetadataHandler.PLUGIN, () -> {
             try {
-                if (!isValid() || getLivingEntity() == null) {
-                    leashTask.cancel();
+                if (!isValid()) {
+                    cancelLeash();
                     return;
                 }
                 if (getLivingEntity().getLocation().distanceSquared(spawnLocation) > Math.pow(leashRadius, 2))
@@ -203,7 +211,13 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             } catch (Exception ex) {
                 new WarningMessage("Async leash task errored!");
             }
-        }, 20 * 3, 20 * 3);
+        }, 20L * 3, 20L * 3);
+    }
+
+    private void cancelLeash() {
+        if (leashTask == null) return;
+        leashTask.cancel();
+        leashIsRunning = false;
     }
 
     public void setLeashRadius(int leashRadius) {
@@ -224,8 +238,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
 
     @Override
     public void remove(RemovalReason removalReason) {
-        if (leashTask != null)
-            leashTask.cancel();
+        cancelLeash();
 
         super.remove(removalReason);
 

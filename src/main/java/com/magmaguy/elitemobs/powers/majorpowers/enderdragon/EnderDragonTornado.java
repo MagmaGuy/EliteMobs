@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.powers.meta.MajorCombatEnterScanningPower;
 import com.magmaguy.elitemobs.utils.EnderDragonPhaseSimplifier;
 import org.bukkit.Location;
 import org.bukkit.Particle;

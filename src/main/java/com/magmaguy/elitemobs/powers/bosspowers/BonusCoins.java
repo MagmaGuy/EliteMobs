@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.items.ItemLootShower;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.BossPower;
+import com.magmaguy.elitemobs.powers.meta.BossPower;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

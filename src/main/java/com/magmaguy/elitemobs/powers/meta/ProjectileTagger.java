@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.powers;
+package com.magmaguy.elitemobs.powers.meta;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.NamespacedKey;

@@ -10,6 +10,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
 public class StatsPage {
+    private StatsPage() {
+    }
 
     protected static TextComponent statsPage(Player targetPlayer) {
 

@@ -12,6 +12,9 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 public class BossTrackingPage {
+    private BossTrackingPage() {
+    }
+
     protected static TextComponent[] bossTrackingPage(Player player) {
 
         TextComponent configTextComponent = new TextComponent();

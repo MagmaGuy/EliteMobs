@@ -47,8 +47,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
                         .replace("$chance", (int) (rewardEntry.chance * 100) + ""));
                 textComponent.addExtra("\n");
             } else if (rewardEntry.customItem != null) {
-                TextComponent customItemTextComponent = new TextComponent();
-                textComponent.addExtra(rewardsDefaultSummaryLine
+                TextComponent customItemTextComponent = new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.amount + "")
                         .replace("$rewardName", rewardEntry.customItem.getName())
                         .replace("$chance", (int) (rewardEntry.chance * 100) + ""));
@@ -73,7 +72,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
         acceptedHoverLines = ConfigurationEngine.setString(fileConfiguration, "acceptedHoverLines", "&aClick to abandon quest!");
         acceptedCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptedCommandLines", "/em quest leave $questID");
 
-        completedTextLines = ConfigurationEngine.setString(fileConfiguration, "completedTextLines", "&2&lTurn in!");
+        completedTextLines = ConfigurationEngine.setString(fileConfiguration, "completedTextLines", "&2&l[Turn in!]");
         completedHoverLines = ConfigurationEngine.setString(fileConfiguration, "completedHoverLines", "&aClick to turn quest in!");
         completedCommandLines = ConfigurationEngine.setString(fileConfiguration, "completedCommandLines", "/em quest complete $questID");
 

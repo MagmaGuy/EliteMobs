@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -37,7 +37,7 @@ public class GroundPound extends MinorPower implements Listener {
     public void onEliteDamaged(EliteMobDamagedByPlayerEvent event) {
         GroundPound groundPound = (GroundPound) event.getEliteMobEntity().getPower(this);
         if (groundPound == null) return;
-        if (groundPound.getGlobalCooldownActive()) return;
+        if (groundPound.isInGlobalCooldown()) return;
 
         if (ThreadLocalRandom.current().nextDouble() > 0.10) return;
         groundPound.doGlobalCooldown(20 * 10);

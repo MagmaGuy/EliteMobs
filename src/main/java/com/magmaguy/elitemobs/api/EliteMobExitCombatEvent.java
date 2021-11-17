@@ -26,10 +26,11 @@ public class EliteMobExitCombatEvent extends Event {
         //only run commands if the reason for leaving combat isn't death, onDeath commands exist for that case
         if (eliteEntity instanceof CustomBossEntity)
             CommandRunner.runCommandFromList(((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getOnCombatLeaveCommands(), new ArrayList<>());
-        if (MobCombatSettingsConfig.regenerateCustomBossHealthOnCombatEnd)
-            if (!reason.equals(EliteMobExitCombatReason.PHASE_SWITCH))
-                if (!eliteEntity.getUnsyncedLivingEntity().getType().equals(EntityType.PHANTOM))
-                    eliteEntity.fullHeal();
+        if (eliteEntity.isValid() &&
+                MobCombatSettingsConfig.regenerateCustomBossHealthOnCombatEnd &&
+                !reason.equals(EliteMobExitCombatReason.PHASE_SWITCH) &&
+                !eliteEntity.getUnsyncedLivingEntity().getType().equals(EntityType.PHANTOM))
+            eliteEntity.fullHeal();
         if (!DefaultConfig.alwaysShowNametags)
             eliteEntity.setNameVisible(false);
     }

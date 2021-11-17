@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.BossPower;
+import com.magmaguy.elitemobs.powers.meta.BossPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -33,7 +33,7 @@ public class Firestorm extends BossPower implements Listener {
             public void run() {
                 counter++;
 
-                if (counter > 20 * 10 | !eliteEntity.isValid()) {
+                if (counter > 20 * 10 || !eliteEntity.isValid()) {
                     if (eliteEntity.isValid())
                         eliteEntity.getLivingEntity().setAI(true);
                     cancel();

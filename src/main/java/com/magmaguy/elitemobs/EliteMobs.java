@@ -257,10 +257,10 @@ public class EliteMobs extends JavaPlugin {
 
         //Find the stats of bosses in minidungeons
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
-            if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType() != null)
-                if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
+            if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType() != null)
+                if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.WORLD))
                     minidungeon.quantifyWorldBosses();
-                else if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
+                else if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
                     minidungeon.quantifySchematicBosses(false);
         }
 

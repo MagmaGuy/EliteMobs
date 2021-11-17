@@ -8,21 +8,21 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class VisualItemRemover {
 
-    public static void removeItems(Object[][] multiDimensionalTrailTracker) {
-        for (int i = 0; i < multiDimensionalTrailTracker.length; i++)
-            for (int j = 0; j < multiDimensionalTrailTracker[i].length; j++) {
-                if (!(multiDimensionalTrailTracker[i][j] instanceof Item)) continue;
-                Item item = (Item) multiDimensionalTrailTracker[i][j];
+    private VisualItemRemover() {
+    }
 
+    public static void removeItems(Object[][] multiDimensionalTrailTracker) {
+        for (Object[] objects : multiDimensionalTrailTracker)
+            for (Object object : objects) {
+                if (!(object instanceof Item)) continue;
+                Item item = (Item) object;
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (item == null) return;
                         item.remove();
                         EntityTracker.unregister(item, RemovalReason.EFFECT_TIMEOUT);
                     }
                 }.runTask(MetadataHandler.PLUGIN);
-
             }
     }
 

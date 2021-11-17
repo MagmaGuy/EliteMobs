@@ -89,10 +89,15 @@ public class TreasureChest {
             new WarningMessage("Custom Treasure Chest " + customTreasureChestConfigFields.getFilename() + " has an invalid location and can not be placed.");
             return;
         }
-        //todo: this doesn't support non- chest block types like the ender chest
-        Directional chest = (Directional) location.getBlock().getBlockData();
-        chest.setFacing(customTreasureChestConfigFields.getFacing());
-        location.getBlock().setBlockData(chest);
+        if (location.getBlock().getBlockData() instanceof Directional) {
+            Directional chest = (Directional) location.getBlock().getBlockData();
+            chest.setFacing(customTreasureChestConfigFields.getFacing());
+            location.getBlock().setBlockData(chest);
+        } else {
+            new WarningMessage("Treasure chest " + customTreasureChestConfigFields.getFilename() +
+                    " does not have a directional block for the Treasure Chest material " +
+                    customTreasureChestConfigFields.getChestMaterial() + " ! Chest materials are directional, is your chest a chest?");
+        }
         location.getBlock().getState().update();
 
     }

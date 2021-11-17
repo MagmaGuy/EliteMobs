@@ -8,11 +8,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class PotionEffectsConfig {
 
     private static final HashMap<String, PotionEffectsConfigFields> potionEffects = new HashMap();
-    private static final ArrayList<PotionEffectsConfigFields> potionEffectsConfigFields = new ArrayList<>(Arrays.asList(
+    private static final List<PotionEffectsConfigFields> potionEffectsConfigFields = new ArrayList<>(Arrays.asList(
             new AbsorptionConfig(),
             new BlindnessConfig(),
             new ConduitPowerConfig(),

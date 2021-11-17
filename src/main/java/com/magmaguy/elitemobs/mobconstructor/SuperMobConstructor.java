@@ -10,6 +10,8 @@ import org.bukkit.entity.LivingEntity;
 
 
 public class SuperMobConstructor {
+    private SuperMobConstructor() {
+    }
 
     /*
     This class assumes that the entity has already been filtered and validated before being invoked

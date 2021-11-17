@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.premade.AttackFreezeConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
@@ -29,7 +29,7 @@ public class AttackFreeze extends MinorPower implements Listener {
         if (event.isCancelled()) return;
         AttackFreeze attackFreeze = (AttackFreeze) event.getEliteMobEntity().getPower(this);
         if (attackFreeze == null) return;
-        if (attackFreeze.getGlobalCooldownActive()) return;
+        if (attackFreeze.isInGlobalCooldown()) return;
 
         attackFreeze.doGlobalCooldown(20 * 15);
 

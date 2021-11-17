@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -23,7 +23,7 @@ public class AttackPush extends MinorPower implements Listener {
         if (!event.getEliteMobEntity().isValid()) return;
         if (!event.getPlayer().getWorld().equals(event.getEliteMobEntity().getLivingEntity().getWorld())) return;
         if (attackPush == null) return;
-        if (attackPush.getGlobalCooldownActive()) return;
+        if (attackPush.isInGlobalCooldown()) return;
 
         attackPush.doGlobalCooldown(20 * 10);
         try {

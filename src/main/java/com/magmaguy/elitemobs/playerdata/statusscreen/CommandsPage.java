@@ -5,6 +5,10 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandsPage {
+
+    private CommandsPage() {
+    }
+
     protected static TextComponent commandsPage() {
 
         TextComponent textComponent = new TextComponent();

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;

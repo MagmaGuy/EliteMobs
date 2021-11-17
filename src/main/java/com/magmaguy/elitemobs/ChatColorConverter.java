@@ -10,6 +10,9 @@ import java.util.List;
  */
 public class ChatColorConverter {
 
+    private ChatColorConverter() {
+    }
+
     public static String convert(String string) {
         return ChatColor.translateAlternateColorCodes('&', string);
     }

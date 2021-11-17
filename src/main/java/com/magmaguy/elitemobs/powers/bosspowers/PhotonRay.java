@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.MajorCombatEnterScanningPower;
+import com.magmaguy.elitemobs.powers.meta.MajorCombatEnterScanningPower;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -75,7 +75,11 @@ public class PhotonRay extends MajorCombatEnterScanningPower {
 
             @Override
             public void run() {
-                if (counter > 30 || !target.isValid() || target.getLocation().distanceSquared(sourceLocation) > range * range || !sourceEntity.isValid()) {
+                if (counter > 30 ||
+                        !target.isValid() ||
+                        !target.getLocation().getWorld().equals(sourceLocation.getWorld()) ||
+                        target.getLocation().distanceSquared(sourceLocation) > range * range ||
+                        !sourceEntity.isValid()) {
                     if (sourceEntity.getLivingEntity() != null)
                         sourceEntity.getLivingEntity().setAI(true);
                     cancel();

@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.defensivepowers;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;

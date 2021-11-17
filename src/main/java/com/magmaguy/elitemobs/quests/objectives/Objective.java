@@ -14,6 +14,6 @@ public abstract class Objective implements Serializable {
     public Objective() {
     }
 
-    abstract void progressObjective(CustomQuestObjectives customQuestObjectives);
+    abstract void progressObjective(QuestObjectives questObjectives);
 
 }

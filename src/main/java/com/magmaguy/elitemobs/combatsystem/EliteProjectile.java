@@ -13,6 +13,9 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 public class EliteProjectile {
+    private EliteProjectile() {
+    }
+
     public static Projectile create(EntityType entityType, Entity shooter, Entity victim, Vector shotVector, boolean gravity) {
         Location projectileLocation = generateLocation(shooter, victim);
         Projectile projectile = (Projectile) projectileLocation.getWorld().spawnEntity(projectileLocation, entityType);

@@ -10,6 +10,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AdvancedAggroManager implements Listener {
 
@@ -20,7 +21,7 @@ public class AdvancedAggroManager implements Listener {
         if (event.getEliteMobEntity().getDamagers().size() < 2) return;
         if (!(event.getEliteMobEntity().getLivingEntity() instanceof Mob)) return;
 
-        ArrayList<Player> nearbyPlayers = new ArrayList<>();
+        List<Player> nearbyPlayers = new ArrayList<>();
         for (Entity entity : event.getEliteMobEntity().getLivingEntity().getNearbyEntities(35, 35, 35))
             if (entity.getType().equals(EntityType.PLAYER))
                 nearbyPlayers.add((Player) entity);
@@ -35,12 +36,11 @@ public class AdvancedAggroManager implements Listener {
             }
         }
 
-        if (player != null) {
-            if (((Mob) event.getEliteMobEntity().getLivingEntity()).getTarget() == null ||
-                    !((Mob) event.getEliteMobEntity().getLivingEntity()).getTarget().getUniqueId().equals(player.getUniqueId())) {
-                ((Mob) event.getEliteMobEntity().getLivingEntity()).setTarget(player);
-            }
-
+        if (player == null) return;
+        
+        if (((Mob) event.getEliteMobEntity().getLivingEntity()).getTarget() == null ||
+                !((Mob) event.getEliteMobEntity().getLivingEntity()).getTarget().getUniqueId().equals(player.getUniqueId())) {
+            ((Mob) event.getEliteMobEntity().getLivingEntity()).setTarget(player);
         }
 
     }

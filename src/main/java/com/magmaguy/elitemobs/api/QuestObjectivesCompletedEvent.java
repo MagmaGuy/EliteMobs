@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.config.QuestsConfig;
-import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -12,11 +12,11 @@ public class QuestObjectivesCompletedEvent extends Event {
     @Getter
     private final Player player;
     @Getter
-    private final CustomQuest customQuest;
+    private final Quest quest;
 
-    public QuestObjectivesCompletedEvent(Player player, CustomQuest customQuest) {
+    public QuestObjectivesCompletedEvent(Player player, Quest customQuest) {
         this.player = player;
-        this.customQuest = customQuest;
+        this.quest = customQuest;
     }
 
     public static HandlerList getHandlerList() {
@@ -32,7 +32,7 @@ public class QuestObjectivesCompletedEvent extends Event {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onObjectivesCompleted(QuestObjectivesCompletedEvent event) {
             if (!QuestsConfig.requireQuestTurnIn) {
-                QuestCompleteEvent questCompleteEvent = new QuestCompleteEvent(event.getPlayer(), event.getCustomQuest());
+                QuestCompleteEvent questCompleteEvent = new QuestCompleteEvent(event.getPlayer(), event.getQuest());
                 new EventCaller(questCompleteEvent);
             }
         }

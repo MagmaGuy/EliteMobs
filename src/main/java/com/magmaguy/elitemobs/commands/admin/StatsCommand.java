@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.entitytracker.TrackedEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.Bukkit;
@@ -96,6 +97,11 @@ public class StatsCommand {
         commandSender.sendMessage(ChatColorConverter.convert(
                 "§5§m-----------------------------------------------------"));
         commandSender.sendMessage("Tracked entity count: " + TrackedEntity.trackedEntities.size());
+        int loadedCounter = 0;
+        for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntities())
+            if (regionalBossEntity.isValid())
+                loadedCounter++;
+        commandSender.sendMessage(ChatColorConverter.convert("&7[EM] &2There are &c" + RegionalBossEntity.getRegionalBossEntities().size() + " &2Regional Bosses installed, of which &c" + loadedCounter + " &2are currently loaded."));
     }
 
 }

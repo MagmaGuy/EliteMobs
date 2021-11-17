@@ -5,6 +5,9 @@ import org.bukkit.Material;
 
 public class MaterialTier {
 
+    private MaterialTier() {
+    }
+
     public static double getMaterialTier(Material material) {
         switch (material) {
             case DIAMOND_AXE:

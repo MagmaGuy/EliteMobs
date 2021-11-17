@@ -15,9 +15,9 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
-import com.magmaguy.elitemobs.powers.ElitePower;
-import com.magmaguy.elitemobs.powers.MajorPower;
-import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.powers.meta.MajorPower;
+import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
@@ -97,7 +97,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     protected double defaultMaxHealth;
     @Getter
     @Setter
-    protected boolean isCooldown = false;
+    protected boolean inCooldown = false;
     @Getter
     protected boolean triggeredAntiExploit = false;
     protected int antiExploitPoints = 0;
@@ -219,6 +219,7 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void setLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
+        if (this.livingEntity != null) EntityTracker.unregister(this.livingEntity.getUniqueId(), RemovalReason.ENTITY_REPLACEMENT);
         if (livingEntity == null) return;
         this.livingEntity = livingEntity;
         this.unsyncedLivingEntity = livingEntity;
@@ -266,6 +267,8 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void setNameVisible(boolean isVisible) {
+        //Check if the boss is already dead
+        if (livingEntity == null) return;
         livingEntity.setCustomNameVisible(isVisible);
         if (isCustomBossEntity())
             DisguiseEntity.setDisguiseNameVisibility(isVisible, livingEntity);
@@ -512,21 +515,21 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void doCooldown() {
-        setCooldown(true);
+        setInCooldown(true);
         new BukkitRunnable() {
             @Override
             public void run() {
-                setCooldown(false);
+                setInCooldown(false);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20 * 15);
     }
 
     public void doGlobalPowerCooldown(int ticks) {
-        setCooldown(true);
+        setInCooldown(true);
         new BukkitRunnable() {
             @Override
             public void run() {
-                setCooldown(false);
+                setInCooldown(false);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticks);
     }

@@ -20,6 +20,8 @@ import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -41,14 +43,23 @@ public class Minidungeon {
     //Stores the filename and an instance of this object
     public static HashMap<String, Minidungeon> minidungeons = new HashMap<>();
 
-    public boolean isDownloaded, isInstalled;
-    public boolean bossesDownloaded = true;
-    public DungeonPackagerConfigFields dungeonPackagerConfigFields;
-    public RelativeDungeonLocations relativeBossLocations, relativeTreasureChestLocations;
-    public RealDungeonLocations realDungeonLocations;
-    public World world;
-    public Location teleportLocation;
-    public Integer lowestTier, highestTier, regionalBossCount = 0;
+    @Getter
+    @Setter
+    private boolean isDownloaded, isInstalled;
+    @Getter
+    private boolean bossesDownloaded = true;
+    @Getter
+    private DungeonPackagerConfigFields dungeonPackagerConfigFields;
+    @Getter
+    private RelativeDungeonLocations relativeBossLocations, relativeTreasureChestLocations;
+    @Getter
+    private RealDungeonLocations realDungeonLocations;
+    @Getter
+    private World world;
+    @Getter
+    private Location teleportLocation;
+    @Getter
+    private Integer lowestTier, highestTier, regionalBossCount = 0;
 
     public Minidungeon(DungeonPackagerConfigFields dungeonPackagerConfigFields) {
         minidungeons.put(dungeonPackagerConfigFields.getFilename(), this);
@@ -211,7 +222,7 @@ public class Minidungeon {
 
         dungeonPackagerConfigFields.removeRelativeBossLocation(regionalBossEntity.getCustomBossesConfigFields(), realDungeonLocation.relativeLocation);
         RealDungeonLocations.RealDungeonLocation finalRealDungeonLocation = realDungeonLocation;
-        relativeBossLocations.relativeDungeonLocations.removeIf((relativeDungeonLocation) -> relativeDungeonLocation.location.equals(finalRealDungeonLocation.relativeLocation) &&
+        relativeBossLocations.relativeDungeonLocations.removeIf(relativeDungeonLocation -> relativeDungeonLocation.location.equals(finalRealDungeonLocation.relativeLocation) &&
                 relativeDungeonLocation.customBossesConfigFields.equals(regionalBossEntity.getCustomBossesConfigFields()));
         realDungeonLocations.realDungeonLocations.remove(realDungeonLocation);
         new InfoMessage("Correctly unregistered entry from dungeon packager!");
@@ -243,6 +254,8 @@ public class Minidungeon {
             case SCHEMATIC:
                 schematicButtonToggleBehavior(player);
                 break;
+            default:
+                new WarningMessage("Invalid dungeon location type for Minidungeon " + dungeonPackagerConfigFields.getFilename() + " !");
         }
     }
 
@@ -465,12 +478,12 @@ public class Minidungeon {
         }
 
         public class RealDungeonLocation {
-            public Location location;
-            public Vector relativeLocation;
-            public CustomBossesConfigFields customBossesConfigFields;
-            public CustomTreasureChestConfigFields customTreasureChestConfigFields;
-            public RegionalBossEntity regionalBossEntity;
-            public TreasureChest treasureChest;
+            private final Location location;
+            private final Vector relativeLocation;
+            private CustomBossesConfigFields customBossesConfigFields;
+            private CustomTreasureChestConfigFields customTreasureChestConfigFields;
+            private RegionalBossEntity regionalBossEntity;
+            private TreasureChest treasureChest;
 
             public RealDungeonLocation(Vector relativeLocation, Location location, CustomBossesConfigFields customBossesConfigFields) {
                 this.relativeLocation = relativeLocation;
@@ -495,11 +508,13 @@ public class Minidungeon {
      * do not take the rotation into account, that is done when converting for the real locations
      */
     public class RelativeDungeonLocations {
-        public int bossCount = 0;
-        ArrayList<RelativeDungeonLocation> relativeDungeonLocations = new ArrayList<>();
+        private ArrayList<RelativeDungeonLocation> relativeDungeonLocations = new ArrayList<>();
+        @Getter
+        private int bossCount = 0;
 
         public RelativeDungeonLocations(List<String> rawStrings, boolean boss) {
             for (String rawString : rawStrings) {
+                if (rawString.isEmpty()) continue;
                 relativeDungeonLocations.add(new RelativeDungeonLocation(rawString, boss));
                 bossCount++;
             }
@@ -539,7 +554,7 @@ public class Minidungeon {
                 try {
                     return Double.parseDouble(rawLocationString.split(":")[1].split(",")[position]);
                 } catch (Exception e) {
-                    new WarningMessage("Failed to parse relative location " + rawLocationString + " for minidungeon" + dungeonPackagerConfigFields.getFilename());
+                    new WarningMessage("Failed to parse relative location " + rawLocationString + " for minidungeon " + dungeonPackagerConfigFields.getFilename());
                     return 0;
                 }
             }
