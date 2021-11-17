@@ -80,7 +80,7 @@ public class SetupMenu {
                         ChatColorConverter.convert("&4You need WorldGuard to install Minidungeons correctly!")));
             else
 
-                switch (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType()) {
+                switch (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType()) {
                     case WORLD:
                         addWorldDungeon(minidungeon, counter);
                         break;
@@ -88,7 +88,7 @@ public class SetupMenu {
                         addSchematicDungeon(minidungeon, counter);
                         break;
                     default:
-                        new WarningMessage("Dungeon " + minidungeon.dungeonPackagerConfigFields.getFilename() + " does not have a valid location type and therefore can't be set up automatically!");
+                        new WarningMessage("Dungeon " + minidungeon.getDungeonPackagerConfigFields().getFilename() + " does not have a valid location type and therefore can't be set up automatically!");
                         break;
                 }
             minidungeonHashMap.put(validSlots.get(counter), minidungeon);
@@ -99,7 +99,7 @@ public class SetupMenu {
 
     private void addWorldDungeon(Minidungeon minidungeon, int counter) {
 
-        String itemName = minidungeon.dungeonPackagerConfigFields.getName();
+        String itemName = minidungeon.getDungeonPackagerConfigFields().getName();
         List<String> lore = new ArrayList<>();
 
         addSize(lore, minidungeon);
@@ -116,11 +116,11 @@ public class SetupMenu {
             return;
         }
 
-        String itemName = minidungeon.dungeonPackagerConfigFields.getName();
+        String itemName = minidungeon.getDungeonPackagerConfigFields().getName();
 
         List<String> lore = new ArrayList<>();
-        if (minidungeon.dungeonPackagerConfigFields.getCustomInfo() != null)
-            lore.addAll(minidungeon.dungeonPackagerConfigFields.getCustomInfo());
+        if (minidungeon.getDungeonPackagerConfigFields().getCustomInfo() != null)
+            lore.addAll(minidungeon.getDungeonPackagerConfigFields().getCustomInfo());
         addSize(lore, minidungeon);
         addBossCount(lore, minidungeon);
         addInstallationString(lore, minidungeon);
@@ -131,22 +131,22 @@ public class SetupMenu {
     }
 
     private Material getMaterial(Minidungeon minidungeon) {
-        if (minidungeon.isInstalled)
+        if (minidungeon.isInstalled())
             return Material.GREEN_STAINED_GLASS_PANE;
-        if (minidungeon.isDownloaded && minidungeon.bossesDownloaded)
+        if (minidungeon.isDownloaded() && minidungeon.isBossesDownloaded())
             return Material.YELLOW_STAINED_GLASS_PANE;
-        if (minidungeon.isDownloaded && !minidungeon.bossesDownloaded)
+        if (minidungeon.isDownloaded() && !minidungeon.isBossesDownloaded())
             return Material.ORANGE_STAINED_GLASS_PANE;
         return Material.RED_STAINED_GLASS_PANE;
     }
 
     private void addSize(List<String> lore, Minidungeon minidungeon) {
-        lore.add("&fSize: " + minidungeon.dungeonPackagerConfigFields.getDungeonSizeCategory().toString());
+        lore.add("&fSize: " + minidungeon.getDungeonPackagerConfigFields().getDungeonSizeCategory().toString());
     }
 
     private void addBossCount(List<String> lore, Minidungeon minidungeon) {
         try {
-            lore.add("&fRegional boss count: " + minidungeon.relativeBossLocations.bossCount);
+            lore.add("&fRegional boss count: " + minidungeon.getRelativeBossLocations().getBossCount());
         } catch (Exception ex) {
             new WarningMessage("Failed to determine regional boss count! Are the relative dungeon locations correct?");
         }
@@ -154,21 +154,21 @@ public class SetupMenu {
 
     private void addInstallationString(List<String> lore, Minidungeon minidungeon) {
         String status = "&fStatus: ";
-        if (minidungeon.isInstalled) {
+        if (minidungeon.isInstalled()) {
             lore.add(status + "&2already installed!");
             lore.add("&cClick to uninstall!");
             return;
         }
-        if (!minidungeon.isDownloaded) {
+        if (!minidungeon.isDownloaded()) {
             lore.add(status + "&4not downloaded!");
             lore.add("&4Download this at");
-            lore.add("&9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink() + " &f!");
+            lore.add("&9" + minidungeon.getDungeonPackagerConfigFields().getDownloadLink() + " &f!");
             return;
         }
-        if (!minidungeon.bossesDownloaded) {
+        if (!minidungeon.isBossesDownloaded()) {
             lore.add("&4Minidungeon boss files are not downloaded!");
             lore.add("&4Download this at");
-            lore.add("&9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink() + " &f!");
+            lore.add("&9" + minidungeon.getDungeonPackagerConfigFields().getDownloadLink() + " &f!");
             return;
         }
         lore.add(status + "&aready to install!");
@@ -245,18 +245,18 @@ public class SetupMenu {
             //for minidungeons
             Minidungeon minidungeon = setupMenu.minidungeonHashMap.get(event.getSlot());
             if (minidungeon != null) {
-                if (!minidungeon.isDownloaded) {
+                if (!minidungeon.isDownloaded()) {
                     player.sendMessage("----------------------------------------------------");
-                    player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink() + " &4!"));
+                    player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + minidungeon.getDungeonPackagerConfigFields().getDownloadLink() + " &4!"));
                     player.sendMessage("----------------------------------------------------");
                     player.closeInventory();
                     setupMenus.remove(event.getInventory());
                     return;
                 }
-                if (!minidungeon.bossesDownloaded) {
+                if (!minidungeon.isBossesDownloaded()) {
                     player.sendMessage("----------------------------------------------------");
                     player.sendMessage(ChatColorConverter.convert("&4You are missing the boss files for this minidungeon!"));
-                    player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + minidungeon.dungeonPackagerConfigFields.getDownloadLink() + " &4!"));
+                    player.sendMessage(ChatColorConverter.convert("&4Download this at &9" + minidungeon.getDungeonPackagerConfigFields().getDownloadLink() + " &4!"));
                     player.sendMessage("----------------------------------------------------");
                     player.closeInventory();
                     setupMenus.remove(event.getInventory());

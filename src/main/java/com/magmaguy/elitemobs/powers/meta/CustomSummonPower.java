@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.powers.bosspowers;
+package com.magmaguy.elitemobs.powers.meta;
 
 import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -13,7 +13,6 @@ import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Location;
@@ -28,7 +27,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.ThreadLocalRandom;at t
 
 public class CustomSummonPower extends ElitePower implements Listener {
 
@@ -64,7 +63,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     customBossEntity.setSummoningEntity(summoningEntity);
                 }
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 10);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 10);
     }
 
     public List<CustomBossReinforcement> getCustomBossReinforcements() {
@@ -218,7 +217,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     customBossReinforcement = doOnCombatEnter(filename);
                     break;
                 case ON_COMBAT_ENTER_PLACE_CRYSTAL:
-                    customBossReinforcement = dOnCombatEnterPlaceCrystal(location, lightningRod);
+                    customBossReinforcement = doOnCombatEnterPlaceCrystal(location, lightningRod);
                     break;
                 case GLOBAL:
                     customBossReinforcement = doGlobalSummonReinforcement(filename);
@@ -319,13 +318,13 @@ public class CustomSummonPower extends ElitePower implements Listener {
     //summon:onCombatEnterPlaceCrystal:x,y,z:boolean
     private void parseOnCombatEnterPlaceCrystal(String powerString) {
         String[] strings = powerString.split(":");
-        dOnCombatEnterPlaceCrystal(new Vector(
+        doOnCombatEnterPlaceCrystal(new Vector(
                 Double.parseDouble(strings[2].split(",")[0]),
                 Double.parseDouble(strings[2].split(",")[1]),
                 Double.parseDouble(strings[2].split(",")[2])), Boolean.parseBoolean(strings[3]));
     }
 
-    private CustomBossReinforcement dOnCombatEnterPlaceCrystal(Vector location, boolean lightningRod) {
+    private CustomBossReinforcement doOnCombatEnterPlaceCrystal(Vector location, boolean lightningRod) {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, EntityType.ENDER_CRYSTAL, lightningRod);
         customBossReinforcement.setSpawnLocationOffset(location);
         customBossReinforcements.add(customBossReinforcement);

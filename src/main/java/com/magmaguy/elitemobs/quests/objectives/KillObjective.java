@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.quests.objectives;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.QuestProgressionEvent;
 import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,28 +27,28 @@ public abstract class KillObjective extends Objective {
     }
 
     @Override
-    public void progressObjective(CustomQuestObjectives customQuestObjectives) {
+    public void progressObjective(QuestObjectives questObjectives) {
         currentAmount++;
         if (currentAmount < targetAmount) return;
         objectiveCompleted = true;
         QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
-                Bukkit.getPlayer(customQuestObjectives.getCustomQuest().getPlayerUUID()),
-                customQuestObjectives.getCustomQuest(),
+                Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
+                questObjectives.getQuest(),
                 this);
         new EventCaller(questProgressionEvent);
     }
 
-    public abstract void checkProgress(EliteMobDeathEvent event, CustomQuestObjectives customQuestObjectives);
+    public abstract void checkProgress(EliteMobDeathEvent event, QuestObjectives questObjectives);
 
     public static class KillQuestEvents implements Listener {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
             for (Player player : event.getEliteEntity().getDamagers().keySet()) {
-                CustomQuest customQuest = CustomQuest.getPlayerQuests().get(player.getUniqueId());
-                if (customQuest != null)
-                    for (Objective objective : customQuest.getCustomQuestObjectives().getObjectives())
+                Quest quest = CustomQuest.getPlayerQuests().get(player.getUniqueId());
+                if (quest != null)
+                    for (Objective objective : quest.getQuestObjectives().getObjectives())
                         if (objective instanceof KillObjective)
-                            ((KillObjective) objective).checkProgress(event, customQuest.getCustomQuestObjectives());
+                            ((KillObjective) objective).checkProgress(event, quest.getQuestObjectives());
             }
         }
     }

@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -30,7 +30,7 @@ public class ZombieBloat extends MajorPower implements Listener {
     public void onHit(EliteMobDamagedByPlayerEvent event) {
         ZombieBloat zombieBloat = (ZombieBloat) event.getEliteMobEntity().getPower(this);
         if (zombieBloat == null) return;
-        if (zombieBloat.getGlobalCooldownActive()) return;
+        if (zombieBloat.isInGlobalCooldown()) return;
 
         if (ThreadLocalRandom.current().nextDouble() > 0.20) return;
         zombieBloat.doGlobalCooldown(20 * 10);

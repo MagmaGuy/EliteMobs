@@ -174,7 +174,7 @@ public class ItemConstructor {
         itemStack = ItemStackGenerator.generateItemStack(getScrapMaterial(scrapLevel));
         itemMeta = itemStack.getItemMeta();
 
-        itemMeta.setDisplayName(ChatColorConverter.convert(ItemUpgradeSystemConfig.scrapItemName.replace("$level", scrapLevel + "")));
+        itemMeta.setDisplayName(ChatColorConverter.convert(ItemUpgradeSystemConfig.getScrapItemName().replace("$level", scrapLevel + "")));
 
         /*
         Register the elite scrap level
@@ -186,7 +186,7 @@ public class ItemConstructor {
         /*
         Generate item lore
          */
-        ItemTagger.registerCustomLore(itemMeta, ItemUpgradeSystemConfig.scrapItemLore);
+        ItemTagger.registerCustomLore(itemMeta, ItemUpgradeSystemConfig.getScrapItemLore());
 
         itemStack.setItemMeta(itemMeta);
 
@@ -206,7 +206,7 @@ public class ItemConstructor {
         itemStack = ItemStackGenerator.generateItemStack(Material.HEART_OF_THE_SEA);
         itemMeta = itemStack.getItemMeta();
 
-        itemMeta.setDisplayName(ChatColorConverter.convert(ItemUpgradeSystemConfig.upgradeItemName.replace("$level", upgradeLevel + "")));
+        itemMeta.setDisplayName(ChatColorConverter.convert(ItemUpgradeSystemConfig.getUpgradeItemName().replace("$level", upgradeLevel + "")));
 
         /*
         Register the elite scrap level
@@ -219,7 +219,7 @@ public class ItemConstructor {
         Generate item lore
          */
         List<String> parsedLore = new ArrayList<>();
-        for (String string : ItemUpgradeSystemConfig.upgradeItemLore)
+        for (String string : ItemUpgradeSystemConfig.getUpgradeItemLore())
             parsedLore.add(string.replace("$orbLevel", upgradeLevel + "").replace("$itemLevel", (upgradeLevel - 1) + ""));
         ItemTagger.registerCustomLore(itemMeta, parsedLore);
 

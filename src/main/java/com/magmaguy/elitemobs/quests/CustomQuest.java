@@ -1,78 +1,51 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
-import com.magmaguy.elitemobs.api.QuestCompleteEvent;
-import com.magmaguy.elitemobs.api.QuestLeaveEvent;
-import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
-import com.magmaguy.elitemobs.quests.objectives.CustomQuestObjectives;
+import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.entity.Player;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.UUID;
 
-public class CustomQuest implements Serializable {
+public class CustomQuest extends Quest implements Serializable {
 
-    @Getter
-    private static HashMap<UUID, CustomQuest> playerQuests = new HashMap<>();
-    @Getter
-    @Setter
-    private UUID playerUUID;
-    @Getter
-    private CustomQuestObjectives customQuestObjectives;
-    @Getter
-    @Setter
-    private int questLevel;
     @Getter
     private CustomQuestsConfigFields customQuestsConfigFields;
-    @Getter
-    private String questID;
-    @Getter
-    @Setter
-    private boolean questIsAccepted = false;
 
     public CustomQuest(Player player, CustomQuestsConfigFields customQuestsConfigFields) {
-        this.playerUUID = player.getUniqueId();
+        super(player, new QuestObjectives(new CustomQuestReward(customQuestsConfigFields)), customQuestsConfigFields.getQuestLevel());
         this.customQuestsConfigFields = customQuestsConfigFields;
-        this.customQuestObjectives = new CustomQuestObjectives(this, new CustomQuestReward(customQuestsConfigFields));
-        this.questLevel = getCustomQuestsConfigFields().getQuestLevel();
-        this.questID = customQuestsConfigFields.getFilename();
+        super.questObjectives.setQuest(this);
+        super.questName = customQuestsConfigFields.getQuestName();
+        super.turnInNPC = customQuestsConfigFields.getTurnInNPC();
     }
 
-    public static void stopPlayerQuest(Player player) {
-        if (!playerQuests.containsKey(player.getUniqueId())) {
-            player.sendMessage(QuestsConfig.leaveWhenNoActiveQuestsExist);
-            return;
-        }
-        new QuestLeaveEvent(player, playerQuests.get(player.getUniqueId()));
-    }
-
-    public static CustomQuest getQuest(String questFilename, Player player) {
+    public static CustomQuest getCustomQuest(String questFilename, Player player) {
         if (CustomQuestsConfig.getCustomQuests().get(questFilename) == null) return null;
-        return new CustomQuest(player, CustomQuestsConfig.getCustomQuests().get(questFilename));
+        Quest quest = Quest.getPlayerQuests().get(player.getUniqueId());
+        if (quest instanceof CustomQuest && ((CustomQuest) quest).getCustomQuestsConfigFields().getFilename().equals(questFilename))
+            return (CustomQuest) quest;
+        else
+            return new CustomQuest(player, CustomQuestsConfig.getCustomQuests().get(questFilename));
     }
 
-    public static CustomQuest startQuest(String questFilename, Player player){
-        CustomQuest customQuest = getQuest(questFilename, player);
-        QuestAcceptEvent questAcceptEvent = new QuestAcceptEvent(player, customQuest);
+    public static Quest startQuest(String questID, Player player) {
+        Quest quest = null;
+        for (Quest iteratedQuest : pendingPlayerQuests.get(player.getUniqueId()))
+            if (iteratedQuest.getQuestID().equals(UUID.fromString(questID))) {
+                quest = iteratedQuest;
+                break;
+            }
+        if (quest == null) player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &cInvalid quest ID!"));
+        QuestAcceptEvent questAcceptEvent = new QuestAcceptEvent(player, quest);
         new EventCaller(questAcceptEvent);
         if (questAcceptEvent.isCancelled()) return null;
-        return customQuest;
-    }
-
-    public static CustomQuest completeQuest(String questFilename, Player player){
-        CustomQuest customQuest = playerQuests.get(player.getUniqueId());
-        if (customQuest == null) return null;
-        if (!customQuest.getCustomQuestsConfigFields().getFilename().equals(questFilename)) return null;
-        if (!customQuest.getCustomQuestObjectives().isOver()) return null;
-        QuestCompleteEvent questCompleteEvent = new QuestCompleteEvent(player, customQuest);
-        new EventCaller(questCompleteEvent);
-        return customQuest;
+        return quest;
     }
 
 }

@@ -73,7 +73,7 @@ public class ItemTierFinder {
             case STONE_HOE:
             case GOLDEN_HOE:
             case WOODEN_HOE:
-                if (!ItemSettingsConfig.useHoesAsWeapons) return 0;
+                if (!ItemSettingsConfig.isUseHoesAsWeapons()) return 0;
                 if (material.equals(Material.DIAMOND_HOE))
                     return DIAMOND_TIER + mainEnchantment;
                 if (material.equals(Material.IRON_HOE))
@@ -91,7 +91,7 @@ public class ItemTierFinder {
                         return CombatSystem.NETHERITE_TIER_LEVEL + mainEnchantment2;
                     if (material.equals(Material.NETHERITE_SWORD) ||
                             material.equals(Material.NETHERITE_AXE) ||
-                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
+                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.isUseHoesAsWeapons())
                         return CombatSystem.NETHERITE_TIER_LEVEL + mainEnchantment;
                 }
                 return 0;
@@ -132,7 +132,7 @@ public class ItemTierFinder {
             case STONE_HOE:
             case GOLDEN_HOE:
             case WOODEN_HOE:
-                if (!ItemSettingsConfig.useHoesAsWeapons) return 0;
+                if (!ItemSettingsConfig.isUseHoesAsWeapons()) return 0;
                 if (material.equals(Material.DIAMOND_HOE))
                     return DIAMOND_TIER + mainEnchantment;
                 if (material.equals(Material.IRON_HOE))
@@ -145,7 +145,7 @@ public class ItemTierFinder {
                 if (!VersionChecker.serverVersionOlderThan(16, 0))
                     if (material.equals(Material.NETHERITE_SWORD) ||
                             material.equals(Material.NETHERITE_AXE) ||
-                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
+                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.isUseHoesAsWeapons())
                         return CombatSystem.NETHERITE_TIER_LEVEL + mainEnchantment;
                 return 0;
         }
@@ -174,13 +174,13 @@ public class ItemTierFinder {
             case STONE_HOE:
             case GOLDEN_HOE:
             case WOODEN_HOE:
-                if (!ItemSettingsConfig.useHoesAsWeapons) return false;
+                if (!ItemSettingsConfig.isUseHoesAsWeapons()) return false;
                 return true;
             default:
                 if (!VersionChecker.serverVersionOlderThan(16, 0))
                     if (material.equals(Material.NETHERITE_SWORD) ||
                             material.equals(Material.NETHERITE_AXE) ||
-                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
+                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.isUseHoesAsWeapons())
                         return true;
                 return false;
         }
@@ -210,7 +210,7 @@ public class ItemTierFinder {
             case IRON_HOE:
             case STONE_HOE:
             case WOODEN_HOE:
-                if (!ItemSettingsConfig.useHoesAsWeapons) return null;
+                if (!ItemSettingsConfig.isUseHoesAsWeapons()) return null;
             case TRIDENT:
             case DIAMOND_SWORD:
             case GOLDEN_SWORD:
@@ -252,7 +252,7 @@ public class ItemTierFinder {
                 if (!VersionChecker.serverVersionOlderThan(16, 0)) {
                     if (material.equals(Material.NETHERITE_SWORD) ||
                             material.equals(Material.NETHERITE_AXE) ||
-                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.useHoesAsWeapons)
+                            material.equals(Material.NETHERITE_HOE) && ItemSettingsConfig.isUseHoesAsWeapons())
                         return Enchantment.DAMAGE_ALL;
 
                     if (material.equals(Material.NETHERITE_HELMET) ||

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.MajorCombatEnterScanningPower;
+import com.magmaguy.elitemobs.powers.meta.MajorCombatEnterScanningPower;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;

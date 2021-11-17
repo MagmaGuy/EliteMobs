@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.powers;
+package com.magmaguy.elitemobs.powers.meta;
 
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 
@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
  * Created by MagmaGuy on 05/11/2016.
  */
 public abstract class MinorPower extends ElitePower {
-    public MinorPower(PowersConfigFields powersConfigFields) {
+    protected MinorPower(PowersConfigFields powersConfigFields) {
         super(powersConfigFields);
     }
 }

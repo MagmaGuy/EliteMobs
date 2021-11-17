@@ -16,8 +16,8 @@ public class CustomCharts {
             Map<String, Integer> valueMap = new HashMap<>();
             for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
                 valueMap.put(
-                        ChatColor.stripColor(minidungeon.dungeonPackagerConfigFields.getFilename()),
-                        minidungeon.isInstalled ? 1 : 0);
+                        ChatColor.stripColor(minidungeon.getDungeonPackagerConfigFields().getFilename()),
+                        minidungeon.isInstalled() ? 1 : 0);
             }
             return valueMap;
         }));

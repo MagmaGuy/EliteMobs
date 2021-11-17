@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,11 +16,11 @@ public class QuestCompleteEvent extends Event {
     @Getter
     private final Player player;
     @Getter
-    private final CustomQuest customQuest;
+    private final Quest quest;
 
-    public QuestCompleteEvent(Player player, CustomQuest customQuest) {
+    public QuestCompleteEvent(Player player, Quest quest) {
         this.player = player;
-        this.customQuest = customQuest;
+        this.quest = quest;
     }
 
     public static HandlerList getHandlerList() {
@@ -34,33 +35,33 @@ public class QuestCompleteEvent extends Event {
     public static class QuestCompleteEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestAccept(QuestCompleteEvent event) {
-            event.getCustomQuest().getCustomQuestObjectives().getCustomQuestReward().doRewards(event.getPlayer().getUniqueId(), event.getCustomQuest().getQuestLevel());
-
-            CustomQuestsConfigFields customQuestsConfigFields = event.getCustomQuest().getCustomQuestsConfigFields();
-            event.getPlayer().sendMessage(QuestsConfig.questCompleteMesage.replace("$questName", event.getCustomQuest().getCustomQuestsConfigFields().getQuestName()));
+            event.getPlayer().sendMessage(QuestsConfig.questCompleteMesage.replace("$questName", event.getQuest().getQuestName()));
             CustomQuest.getPlayerQuests().remove(event.getPlayer().getUniqueId());
-            if (!event.getCustomQuest().getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
-                PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
-                for (String permission : event.getCustomQuest().getCustomQuestsConfigFields().getTemporaryPermissions())
-                    permissionAttachment.setPermission(permission, false);
-            }
-
-            if (!event.getCustomQuest().getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())
-                for (String dialog : event.getCustomQuest().getCustomQuestsConfigFields().getQuestCompleteDialog())
-                    event.getPlayer().sendMessage(dialog);
-
+            event.getQuest().getQuestObjectives().getCustomQuestReward().doRewards(event.getPlayer().getUniqueId(), event.getQuest().getQuestLevel());
             if (QuestsConfig.useQuestCompleteTitles)
                 event.getPlayer().sendTitle(
-                        QuestsConfig.questCompleteTitle.replace("$questName", event.getCustomQuest().getCustomQuestsConfigFields().getQuestName()),
-                        QuestsConfig.questCompleteSubtitle.replace("$questName", event.getCustomQuest().getCustomQuestsConfigFields().getQuestName()),
+                        QuestsConfig.questCompleteTitle.replace("$questName", event.getQuest().getQuestName()),
+                        QuestsConfig.questCompleteSubtitle.replace("$questName", event.getQuest().getQuestName()),
                         20, 60, 20);
+            if (event.getQuest() instanceof CustomQuest) {
+                CustomQuest customQuest = (CustomQuest) event.getQuest();
+                CustomQuestsConfigFields customQuestsConfigFields = customQuest.getCustomQuestsConfigFields();
+                if (!customQuest.getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
+                    PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
+                    for (String permission : customQuest.getCustomQuestsConfigFields().getTemporaryPermissions())
+                        permissionAttachment.setPermission(permission, false);
+                }
+                if (!customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())
+                    for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog())
+                        event.getPlayer().sendMessage(dialog);
+                for (String command : customQuestsConfigFields.getQuestCompleteCommands())
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                            command.replace("$player", event.getPlayer().getName())
+                                    .replace("$getX", event.getPlayer().getLocation().getX() + "")
+                                    .replace("$getY", event.getPlayer().getLocation().getY() + "")
+                                    .replace("$getZ", event.getPlayer().getLocation().getZ() + ""));
+            }
 
-            for (String command : customQuestsConfigFields.getQuestCompleteCommands())
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                        command.replace("$player", event.getPlayer().getName())
-                                .replace("$getX", event.getPlayer().getLocation().getX() + "")
-                                .replace("$getY", event.getPlayer().getLocation().getY() + "")
-                                .replace("$getZ", event.getPlayer().getLocation().getZ() + ""));
         }
     }
 }

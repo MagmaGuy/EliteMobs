@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import org.bukkit.GameMode;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -32,9 +32,9 @@ public class TrackingFireball extends MajorPower {
             if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
             TrackingFireball trackingFireball = (TrackingFireball) event.getEliteMobEntity().getPower(new TrackingFireball());
             if (trackingFireball == null) return;
-            if (trackingFireball.getIsFiring()) return;
+            if (trackingFireball.isFiring()) return;
 
-            trackingFireball.setIsFiring(true);
+            trackingFireball.setFiring(true);
             new TrackingFireballTasks((Monster) event.getEntity(), trackingFireball);
         }
 
@@ -55,7 +55,7 @@ public class TrackingFireball extends MajorPower {
                     public void run() {
 
                         if (!monster.isValid() || monster.getTarget() == null) {
-                            trackingFireball.setIsFiring(false);
+                            trackingFireball.setFiring(false);
                             cancel();
                             return;
                         }

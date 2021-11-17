@@ -3,12 +3,13 @@ package com.magmaguy.elitemobs.utils;
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class CooldownHandler {
+    private CooldownHandler() {
+    }
 
-    public static void initialize(ArrayList list, Object object, int cooldownInTicks) {
-
+    public static void initialize(List list, Object object, int cooldownInTicks) {
         list.add(object);
 
         new BukkitRunnable() {
@@ -19,6 +20,5 @@ public class CooldownHandler {
         }.runTaskLater(MetadataHandler.PLUGIN, cooldownInTicks);
 
     }
-
 
 }

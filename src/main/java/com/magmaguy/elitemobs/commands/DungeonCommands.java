@@ -10,16 +10,16 @@ public class DungeonCommands {
     public static void teleport(Player player, String minidungeonName) {
         Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
         if (minidungeon != null)
-            if (minidungeon.dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
-                PlayerPreTeleportEvent.teleportPlayer(player, minidungeon.teleportLocation);
+            if (minidungeon.getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
+                PlayerPreTeleportEvent.teleportPlayer(player, minidungeon.getTeleportLocation());
             else
                 PlayerPreTeleportEvent.teleportPlayer(player,
-                        new Location(minidungeon.teleportLocation.getWorld(),
-                                minidungeon.teleportLocation.getX(),
-                                minidungeon.teleportLocation.getY(),
-                                minidungeon.teleportLocation.getZ(),
-                                Float.parseFloat("" + minidungeon.dungeonPackagerConfigFields.getTeleportPointPitch()),
-                                Float.parseFloat("" + minidungeon.dungeonPackagerConfigFields.getTeleportPointYaw())));
+                        new Location(minidungeon.getTeleportLocation().getWorld(),
+                                minidungeon.getTeleportLocation().getX(),
+                                minidungeon.getTeleportLocation().getY(),
+                                minidungeon.getTeleportLocation().getZ(),
+                                Float.parseFloat("" + minidungeon.getDungeonPackagerConfigFields().getTeleportPointPitch()),
+                                Float.parseFloat("" + minidungeon.getDungeonPackagerConfigFields().getTeleportPointYaw())));
         else
             player.sendMessage("[EliteMobs] That dungeon isn't valid!");
     }

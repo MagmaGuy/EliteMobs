@@ -24,7 +24,7 @@ import com.magmaguy.elitemobs.menus.GetLootMenu;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlockCommand;
-import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
@@ -115,7 +115,7 @@ public class AdminCommands {
                 .handler(commandContext -> SetupHandler.setupAreaCommand((Player) commandContext.getSender(), commandContext.get("areaName"))));
 
         ArrayList<String> powers = new ArrayList<>();
-        for (ElitePower elitePower : ElitePower.elitePowers)
+        for (ElitePower elitePower : ElitePower.getElitePowers())
             powers.add(elitePower.getFileName());
         powers.add("custom");
 

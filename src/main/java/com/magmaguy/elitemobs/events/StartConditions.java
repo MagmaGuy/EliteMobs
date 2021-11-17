@@ -5,7 +5,7 @@ import org.bukkit.Bukkit;
 
 public class StartConditions {
 
-    public int minimumPlayerCount;
+    private final int minimumPlayerCount;
 
     public StartConditions(CustomEventsConfigFields customEventsConfigFields) {
         this.minimumPlayerCount = customEventsConfigFields.getMinimumPlayerCount();

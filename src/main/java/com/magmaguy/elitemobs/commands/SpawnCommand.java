@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.mobconstructor.SuperMobConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.passivemobs.SuperMobProperties;
-import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -160,7 +160,7 @@ public class SpawnCommand {
                 if (elitePower == null) {
                     commandSender.sendMessage("[EliteMobs] Power " + string + " is not a valid power! Valid powers:");
                     StringBuilder allPowers = new StringBuilder();
-                    for (ElitePower iteratedPower : ElitePower.elitePowers)
+                    for (ElitePower iteratedPower : ElitePower.getElitePowers())
                         allPowers.append(iteratedPower.getName()).append(", ");
                     allPowers.append("custom");
                     commandSender.sendMessage(allPowers.toString());

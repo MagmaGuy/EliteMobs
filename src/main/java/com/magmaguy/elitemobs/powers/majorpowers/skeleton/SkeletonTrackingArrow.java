@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import com.magmaguy.elitemobs.powers.offensivepowers.AttackArrow;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
@@ -58,9 +58,9 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
     public void targetEvent(EliteMobTargetPlayerEvent event) {
         SkeletonTrackingArrow skeletonTrackingArrow = (SkeletonTrackingArrow) event.getEliteMobEntity().getPower(this);
         if (skeletonTrackingArrow == null) return;
-        if (skeletonTrackingArrow.getIsFiring()) return;
+        if (skeletonTrackingArrow.isFiring()) return;
 
-        skeletonTrackingArrow.setIsFiring(true);
+        skeletonTrackingArrow.setFiring(true);
         repeatingTrackingArrowTask(event.getEliteMobEntity(), skeletonTrackingArrow);
     }
 
@@ -70,7 +70,7 @@ public class SkeletonTrackingArrow extends MajorPower implements Listener {
             @Override
             public void run() {
                 if (!eliteEntity.isValid()) {
-                    skeletonTrackingArrow.setIsFiring(false);
+                    skeletonTrackingArrow.setFiring(false);
                     cancel();
                     return;
                 }

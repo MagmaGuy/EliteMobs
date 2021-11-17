@@ -9,6 +9,10 @@ import org.bukkit.inventory.meta.BookMeta;
 import java.util.List;
 
 public class BookMaker {
+
+    private BookMaker() {
+    }
+
     public static ItemStack generateBook(Player player, List<String> pages) {
         ItemStack writtenBook = new ItemStack(Material.WRITTEN_BOOK);
         BookMeta bookMeta = (BookMeta) writtenBook.getItemMeta();

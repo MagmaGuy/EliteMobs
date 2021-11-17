@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class HunterEnchantment extends CustomEnchantment {
 
@@ -13,7 +13,7 @@ public class HunterEnchantment extends CustomEnchantment {
         super(key, false);
     }
 
-    public static double getHuntingGearBonus(ArrayList<Player> players) {
+    public static double getHuntingGearBonus(List<Player> players) {
         double huntingGearChanceAdder = 0;
         for (Player player : players)
             huntingGearChanceAdder += ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getHunterChance(true);

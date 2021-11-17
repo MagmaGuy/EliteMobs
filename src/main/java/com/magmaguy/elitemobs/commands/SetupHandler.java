@@ -18,7 +18,7 @@ public class SetupHandler {
     public static void setupMinidungeonCommand(Player player, String minidungeonName) {
         Minidungeon minidungeon = Minidungeon.minidungeons.get(minidungeonName);
         minidungeon.finalizeMinidungeonInstallation(player, true);
-        player.performCommand("/rotate " + minidungeon.dungeonPackagerConfigFields.getRotation());
+        player.performCommand("/rotate " + minidungeon.getDungeonPackagerConfigFields().getRotation());
         player.performCommand("/paste");
     }
 

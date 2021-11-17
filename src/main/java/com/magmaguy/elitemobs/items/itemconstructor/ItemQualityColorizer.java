@@ -58,7 +58,7 @@ public class ItemQualityColorizer {
 
     public static void dropQualityColorizer(ItemStack itemStack) {
 
-        if (ItemSettingsConfig.doMmorpgColors) {
+        if (ItemSettingsConfig.isDoMmorpgColors()) {
 
             ItemMeta itemMeta = itemStack.getItemMeta();
 

@@ -42,16 +42,16 @@ public class ScalableItemConstructor {
     private static HashMap<Enchantment, Integer> updateDynamicEnchantments(HashMap<Enchantment, Integer> enchantmentsList, int itemTier, boolean isLimited) {
 
         if (enchantmentsList.containsKey(Enchantment.PROTECTION_ENVIRONMENTAL) &&
-                enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL) > ItemSettingsConfig.maximumLootTier)
-            itemTier = ItemSettingsConfig.maximumLootTier;
+                enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL) > ItemSettingsConfig.getMaximumLootTier())
+            itemTier = ItemSettingsConfig.getMaximumLootTier();
 
         if (enchantmentsList.containsKey(Enchantment.DAMAGE_ALL) &&
-                enchantmentsList.get(Enchantment.DAMAGE_ALL) > ItemSettingsConfig.maximumLootTier)
-            itemTier = ItemSettingsConfig.maximumLootTier;
+                enchantmentsList.get(Enchantment.DAMAGE_ALL) > ItemSettingsConfig.getMaximumLootTier())
+            itemTier = ItemSettingsConfig.getMaximumLootTier();
 
         if (enchantmentsList.containsKey(Enchantment.ARROW_DAMAGE) &&
-                enchantmentsList.get(Enchantment.ARROW_DAMAGE) > ItemSettingsConfig.maximumLootTier)
-            itemTier = ItemSettingsConfig.maximumLootTier;
+                enchantmentsList.get(Enchantment.ARROW_DAMAGE) > ItemSettingsConfig.getMaximumLootTier())
+            itemTier = ItemSettingsConfig.getMaximumLootTier();
 
         HashMap<Enchantment, Integer> newEnchantmentList = new HashMap<>();
         HashMap<Enchantment, Integer> secondaryEnchantmentList = new HashMap<>();
@@ -159,11 +159,11 @@ public class ScalableItemConstructor {
             itemTier = enchantmentsList.get(Enchantment.PROTECTION_ENVIRONMENTAL);
 
         if (enchantmentsList.containsKey(Enchantment.DAMAGE_ALL) &&
-                enchantmentsList.get(Enchantment.DAMAGE_ALL) > ItemSettingsConfig.maximumLootTier)
+                enchantmentsList.get(Enchantment.DAMAGE_ALL) > ItemSettingsConfig.getMaximumLootTier())
             itemTier = enchantmentsList.get(Enchantment.DAMAGE_ALL);
 
         if (enchantmentsList.containsKey(Enchantment.ARROW_DAMAGE) &&
-                enchantmentsList.get(Enchantment.ARROW_DAMAGE) > ItemSettingsConfig.maximumLootTier)
+                enchantmentsList.get(Enchantment.ARROW_DAMAGE) > ItemSettingsConfig.getMaximumLootTier())
             itemTier = enchantmentsList.get(Enchantment.ARROW_DAMAGE);
 
 

@@ -36,16 +36,16 @@ public class TeleportsPage {
         ArrayList<TextComponent> textComponents = new ArrayList<>();
 
         for (Minidungeon minidungeon : Minidungeon.minidungeons.values()) {
-            if (!minidungeon.isInstalled) continue;
+            if (!minidungeon.isInstalled()) continue;
 
-            TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(minidungeon.dungeonPackagerConfigFields.getName() + "\n"));
+            TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(minidungeon.getDungeonPackagerConfigFields().getName() + "\n"));
             String hoverMessage = ChatColorConverter.convert(PlayerStatusMenuConfig.onTeleportHover + "\n" +
-                    minidungeon.dungeonPackagerConfigFields.getPlayerInfo()
-                            .replace("$bossCount", minidungeon.regionalBossCount + "")
-                            .replace("$lowestTier", minidungeon.lowestTier + "")
-                            .replace("$highestTier", minidungeon.highestTier + ""));
+                    minidungeon.getDungeonPackagerConfigFields().getPlayerInfo()
+                            .replace("$bossCount", minidungeon.getRegionalBossCount() + "")
+                            .replace("$lowestTier", minidungeon.getLowestTier() + "")
+                            .replace("$highestTier", minidungeon.getHighestTier() + ""));
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + minidungeon.dungeonPackagerConfigFields.getFilename()));
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + minidungeon.getDungeonPackagerConfigFields().getFilename()));
             textComponents.add(message);
 
             counter++;

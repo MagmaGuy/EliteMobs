@@ -30,7 +30,7 @@ public class AlternativeDurabilityLoss implements Listener {
         boolean isWeaponMaterial = ItemTierFinder.isWeaponMaterial(itemStack);
         int maxDurability = itemStack.getType().getMaxDurability() > (isWeaponMaterial ? 2000 : 1000) ? (isWeaponMaterial ? 2000 : 1000) : itemStack.getType().getMaxDurability();
         double baseModifier = isWeaponMaterial ? 2000 : 1000;
-        double durabilityLoss = ((baseModifier - maxDurability) / baseModifier) * ItemSettingsConfig.eliteDurabilityMultiplier;
+        double durabilityLoss = ((baseModifier - maxDurability) / baseModifier) * ItemSettingsConfig.getEliteDurabilityMultiplier();
         double durabilityLevel = 1 + (ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.DURABILITY.getKey()) / 4d);
         return durabilityLoss / durabilityLevel;
     }

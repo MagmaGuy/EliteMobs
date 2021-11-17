@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import com.magmaguy.elitemobs.powerstances.VisualItemInitializer;
 import org.bukkit.Location;
@@ -46,9 +46,9 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
     public void onPlayerDetect(EliteMobDamagedByPlayerEvent event) {
         ZombieNecronomicon zombieNecronomicon = (ZombieNecronomicon) event.getEliteMobEntity().getPower(this);
         if (zombieNecronomicon == null) return;
-        if (zombieNecronomicon.getIsFiring()) return;
+        if (zombieNecronomicon.isFiring()) return;
 
-        zombieNecronomicon.setIsFiring(true);
+        zombieNecronomicon.setFiring(true);
         necronomiconVisualEffect(event.getEliteMobEntity(), zombieNecronomicon);
         spawnReinforcements(event.getEliteMobEntity(), event.getPlayer(), zombieNecronomicon);
     }
@@ -57,7 +57,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
         LivingEntity livingEntity = eliteEntity.getLivingEntity();
         livingEntity.setAI(false);
-        zombieNecronomicon.setIsFiring(true);
+        zombieNecronomicon.setFiring(true);
         nameScroller(livingEntity, zombieNecronomicon);
 
         if (!MobCombatSettingsConfig.enableWarningVisualEffects)
@@ -75,7 +75,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
                             item.remove();
                     if (livingEntity.isValid())
                         livingEntity.setCustomName(EntityTracker.getEliteMobEntity(livingEntity).getName());
-                    zombieNecronomicon.setIsFiring(false);
+                    zombieNecronomicon.setFiring(false);
                     cancel();
                     return;
                 }
@@ -203,7 +203,7 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
 
                     targetter.setAI(false);
 
-                    if (!zombieNecronomicon.getIsFiring())
+                    if (!zombieNecronomicon.isFiring())
                         necronomiconVisualEffect(eliteEntity, zombieNecronomicon);
 
                     if (randomizedNumber < 5) {

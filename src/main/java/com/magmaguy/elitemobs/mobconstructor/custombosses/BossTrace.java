@@ -18,7 +18,7 @@ public class BossTrace {
 
     public BossTrace() {
         creationTimeStamp = System.currentTimeMillis();
-        creationTicksStamp = ServerTime.getServerTime();
+        creationTicksStamp = ServerTime.getTime();
         String creationString = ChatColor.DARK_GREEN + "Creation timestamp: " + creationTimeStamp;
         trace.add(creationString);
     }
@@ -43,7 +43,7 @@ public class BossTrace {
     }
 
     private String getPrefix() {
-        return "[" + (ServerTime.getServerTime() - creationTicksStamp) + "t] ";
+        return "[" + (ServerTime.getTime() - creationTicksStamp) + "t] ";
     }
 
     private long getTime() {

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -9,30 +10,54 @@ import java.util.List;
 
 public class ItemSettingsConfig {
 
-    public static boolean doEliteMobsLoot;
-    public static boolean doMmorpgColors;
-    public static boolean preventCustomItemPlacement;
-    public static List<String> loreStructure;
-    public static String shopItemSource, mobItemSource, loreWorth, loreResale;
-    public static double flatDropRate, tierIncreaseDropRate;
-    public static double proceduralItemWeight, weighedItemWeight, fixedItemWeight, limitedItemWeight, scalableItemWeight;
-    public static double defaultLootMultiplier, defaultExperienceMultiplier;
-    public static int maxLevelForDefaultLootMultiplier;
-    public static int maximumLootTier;
-    public static boolean useEliteEnchantments;
-    public static String eliteEnchantLoreString;
-    public static boolean useHoesAsWeapons;
-    public static boolean enableRareItemParticleEffects;
-    public static String potionEffectOnHitTargetLore, potionEffectOnHitSelfLore, potionEffectContinuousLore;
-    public static String eliteEnchantmentColor;
-    public static String vanillaEnchantmentColor;
-    public static String customEnchantmentColor;
-    public static String potionEffectColor;
-    public static String noSoulbindLore;
-    public static boolean preventEliteItemEnchantment;
-    public static boolean preventEliteItemDiamondToNetheriteUpgrade;
-    public static boolean eliteDurability;
-    public static double eliteDurabilityMultiplier;
+    @Getter
+    private static boolean doEliteMobsLoot;
+    @Getter
+    private static boolean doMmorpgColors;
+    @Getter
+    private static boolean preventCustomItemPlacement;
+    @Getter
+    private static List<String> loreStructure;
+    @Getter
+    private static String shopItemSource, mobItemSource, loreWorth, loreResale;
+    @Getter
+    private static double flatDropRate, tierIncreaseDropRate;
+    @Getter
+    private static double proceduralItemWeight, weighedItemWeight, fixedItemWeight, limitedItemWeight, scalableItemWeight;
+    @Getter
+    private static double defaultLootMultiplier, defaultExperienceMultiplier;
+    @Getter
+    private static int maxLevelForDefaultLootMultiplier;
+    @Getter
+    private static int maximumLootTier;
+    @Getter
+    private static boolean useEliteEnchantments;
+    @Getter
+    private static String eliteEnchantLoreString;
+    @Getter
+    private static boolean useHoesAsWeapons;
+    @Getter
+    private static boolean enableRareItemParticleEffects;
+    @Getter
+    private static String potionEffectOnHitTargetLore, potionEffectOnHitSelfLore, potionEffectContinuousLore;
+    @Getter
+    private static String eliteEnchantmentColor;
+    @Getter
+    private static String vanillaEnchantmentColor;
+    @Getter
+    private static String customEnchantmentColor;
+    @Getter
+    private static String potionEffectColor;
+    @Getter
+    private static String noSoulbindLore;
+    @Getter
+    private static boolean preventEliteItemEnchantment;
+    @Getter
+    private static boolean preventEliteItemDiamondToNetheriteUpgrade;
+    @Getter
+    private static boolean eliteDurability;
+    @Getter
+    private static double eliteDurabilityMultiplier;
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ItemSettings.yml");

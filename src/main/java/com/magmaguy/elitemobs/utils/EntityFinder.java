@@ -8,6 +8,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 
 public class EntityFinder {
+    private EntityFinder() {
+    }
 
     public static LivingEntity filterRangedDamagers(Entity entity) {
         if (entity instanceof LivingEntity)

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.majorpowers.skeleton;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import com.magmaguy.elitemobs.powerstances.GenericRotationMatrixMath;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -27,7 +27,7 @@ public class SkeletonPillar extends MajorPower implements Listener {
     public void onHit(EliteMobDamagedByPlayerEvent event) {
         SkeletonPillar skeletonPillar = (SkeletonPillar) event.getEliteMobEntity().getPower(this);
         if (skeletonPillar == null) return;
-        if (skeletonPillar.getGlobalCooldownActive()) return;
+        if (skeletonPillar.isInGlobalCooldown()) return;
 
         /*
         Run random check to see if the power should activate

@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobTargetPlayerEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import org.bukkit.GameMode;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -36,9 +36,9 @@ public class AttackFireball extends MinorPower implements Listener {
         if (!(event.getEliteMobEntity().getLivingEntity() instanceof Monster)) return;
         AttackFireball attackFireball = (AttackFireball) event.getEliteMobEntity().getPower(this);
         if (attackFireball == null) return;
-        if (attackFireball.getIsFiring()) return;
+        if (attackFireball.isFiring()) return;
 
-        attackFireball.setIsFiring(true);
+        attackFireball.setFiring(true);
         repeatingFireballTask((Monster) event.getEntity(), attackFireball);
     }
 
@@ -50,20 +50,20 @@ public class AttackFireball extends MinorPower implements Listener {
             public void run() {
 
                 if (!monster.isValid() || monster.getTarget() == null) {
-                    attackFireball.setIsFiring(false);
+                    attackFireball.setFiring(false);
                     cancel();
                     return;
                 }
 
                 for (Entity nearbyEntity : monster.getNearbyEntities(20, 20, 20))
-                    if (nearbyEntity instanceof Player)
-                        if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
-                                ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL))
-                            shootFireball(monster, (Player) nearbyEntity);
+                    if (nearbyEntity instanceof Player &&
+                            (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
+                                    ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)))
+                        shootFireball(monster, (Player) nearbyEntity);
 
             }
 
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20 * 8);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 8);
 
     }
 

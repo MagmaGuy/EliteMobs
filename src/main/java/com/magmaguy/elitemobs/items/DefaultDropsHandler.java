@@ -31,12 +31,12 @@ public class DefaultDropsHandler implements Listener {
         List<ItemStack> droppedItems = event.getEntityDeathEvent().getDrops();
         int mobLevel = event.getEliteEntity().getLevel();
 
-        if (mobLevel > ItemSettingsConfig.maxLevelForDefaultLootMultiplier)
-            mobLevel = ItemSettingsConfig.maxLevelForDefaultLootMultiplier;
+        if (mobLevel > ItemSettingsConfig.getMaxLevelForDefaultLootMultiplier())
+            mobLevel = ItemSettingsConfig.getMaxLevelForDefaultLootMultiplier();
 
         inventoryItemsConstructor((LivingEntity) event.getEntity());
 
-        if (ItemSettingsConfig.defaultLootMultiplier != 0) {
+        if (ItemSettingsConfig.getDefaultLootMultiplier() != 0) {
             for (ItemStack itemStack : droppedItems) {
 
                 if (itemStack == null) continue;
@@ -48,13 +48,13 @@ public class DefaultDropsHandler implements Listener {
                         itemIsWorn = true;
 
                 if (!itemIsWorn)
-                    for (int i = 0; i < mobLevel * 0.1 * ItemSettingsConfig.defaultLootMultiplier; i++)
+                    for (int i = 0; i < mobLevel * 0.1 * ItemSettingsConfig.getDefaultLootMultiplier(); i++)
                         event.getEntity().getLocation().getWorld().dropItem(event.getEntity().getLocation(), itemStack);
 
             }
         }
 
-        mobLevel = (int) (event.getEliteEntity().getLevel() * ItemSettingsConfig.defaultExperienceMultiplier);
+        mobLevel = (int) (event.getEliteEntity().getLevel() * ItemSettingsConfig.getDefaultExperienceMultiplier());
 
         int droppedXP = (int) (event.getEntityDeathEvent().getDroppedExp() + event.getEntityDeathEvent().getDroppedExp() * 0.1 * mobLevel);
         event.getEntityDeathEvent().setDroppedExp(0);

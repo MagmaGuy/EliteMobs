@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.premade.ZombieFriendsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powers.meta.MajorPower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -27,10 +27,10 @@ public class ZombieFriends extends MajorPower implements Listener {
     public void onHit(EliteMobDamagedByPlayerEvent event) {
         ZombieFriends zombieFriendConfig = (ZombieFriends) event.getEliteMobEntity().getPower(this);
         if (zombieFriendConfig == null) return;
-        if (zombieFriendConfig.getIsFiring()) return;
+        if (zombieFriendConfig.isFiring()) return;
 
         if (ThreadLocalRandom.current().nextDouble() > 0.01) return;
-        zombieFriendConfig.setIsFiring(true);
+        zombieFriendConfig.setFiring(true);
 
         CustomBossEntity reinforcement1 = CustomBossEntity.createCustomBossEntity("zombie_friends_friend.yml");
         reinforcement1.spawn(event.getEntity().getLocation(), event.getEliteMobEntity().getLevel(), false);

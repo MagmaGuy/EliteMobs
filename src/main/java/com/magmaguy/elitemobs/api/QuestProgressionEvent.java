@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.config.QuestsConfig;
-import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -12,13 +12,13 @@ public class QuestProgressionEvent extends Event {
     @Getter
     private final Player player;
     @Getter
-    private final CustomQuest customQuest;
+    private final Quest quest;
     @Getter
     private final Objective objective;
 
-    public QuestProgressionEvent(Player player, CustomQuest customQuest, Objective objective) {
+    public QuestProgressionEvent(Player player, Quest quest, Objective objective) {
         this.player = player;
-        this.customQuest = customQuest;
+        this.quest = quest;
         this.objective = objective;
     }
 
@@ -34,10 +34,10 @@ public class QuestProgressionEvent extends Event {
     public static class QuestProgressionEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestProgression(QuestProgressionEvent event) {
-            event.getCustomQuest().getCustomQuestObjectives().updateQuestStatus(event.getPlayer().getUniqueId());
+            event.getQuest().getQuestObjectives().updateQuestStatus(event.getPlayer().getUniqueId());
             if (QuestsConfig.doQuestChatProgression)
                 event.getPlayer().sendMessage(QuestsConfig.getKillQuestChatProgressionMessage(event.getObjective()));
-            event.getCustomQuest().getCustomQuestObjectives().displayObjectivesScoreboard(event.getPlayer());
+            event.getQuest().getQuestObjectives().displayObjectivesScoreboard(event.getPlayer());
         }
     }
 }

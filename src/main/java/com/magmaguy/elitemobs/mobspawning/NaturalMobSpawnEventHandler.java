@@ -26,7 +26,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM;
@@ -43,7 +43,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
      * @param spawnLocation Location to scan around for players
      * @return
      */
-    public static int getNaturalMobLevel(Location spawnLocation, ArrayList<Player> nearbyPlayers) {
+    public static int getNaturalMobLevel(Location spawnLocation, List<Player> nearbyPlayers) {
 
         int eliteMobLevel = 1;
         int playerCount = 0;
@@ -119,7 +119,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         double validChance = MobCombatSettingsConfig.aggressiveMobConversionPercentage;
 
-        ArrayList<Player> nearbyPlayers = PlayerScanner.getNearbyPlayers(livingEntity.getLocation());
+        List<Player> nearbyPlayers = PlayerScanner.getNearbyPlayers(livingEntity.getLocation());
 
         double huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
         validChance += huntingGearChanceAdder;

@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Projectile;
@@ -42,7 +43,7 @@ public class EnderDragonArrowBombardment extends Bombardment {
                             EntityTracker.unregister(arrow.getUniqueId(), RemovalReason.EFFECT_TIMEOUT);
                         arrow.remove();
                     }
-                }.runTaskLater(MetadataHandler.PLUGIN, 20 * 4);
+                }.runTaskLater(MetadataHandler.PLUGIN, 20L * 4);
             }
     }
 }

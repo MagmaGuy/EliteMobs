@@ -2,13 +2,15 @@ package com.magmaguy.elitemobs.config.powers.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import lombok.Getter;
 import org.bukkit.Material;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class ZombieParentsConfig extends PowersConfigFields {
-    public static List<String> deathMessage, bossEntityDialog, zombieDad, zombieMom;
+    @Getter
+    private static List<String> deathMessage, bossEntityDialog, zombieDad, zombieMom;
 
     public ZombieParentsConfig() {
         super("zombie_parents",

@@ -10,6 +10,9 @@ import java.io.File;
 
 public class CustomWorldLoading {
 
+    private CustomWorldLoading() {
+    }
+
     public static void startupWorldInitialization() {
         File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
