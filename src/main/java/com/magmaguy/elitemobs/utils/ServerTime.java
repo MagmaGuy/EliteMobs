@@ -6,9 +6,12 @@ import org.bukkit.Bukkit;
 
 public class ServerTime {
     @Getter
-    private static double serverTime = 0;
+    private static double time = 0;
+
+    private ServerTime() {
+    }
 
     public static void startTickCounter() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(MetadataHandler.PLUGIN, () -> serverTime++, 0, 1);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(MetadataHandler.PLUGIN, () -> time++, 0, 1);
     }
 }

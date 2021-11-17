@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.quests.menus;
 import com.magmaguy.elitemobs.config.menus.premade.CustomQuestMenuConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.utils.BookMaker;
@@ -16,8 +17,11 @@ import java.util.List;
 
 public class CustomQuestMenu {
 
-    public static void generateCustomQuestMenu(List<CustomQuest> customQuest, Player player, NPCEntity npcEntity) {
-        BookMaker.generateBook(player, generateQuestEntries(customQuest, player, npcEntity));
+    private CustomQuestMenu() {
+    }
+
+    public static void generateCustomQuestMenu(List<CustomQuest> customQuestList, Player player, NPCEntity npcEntity) {
+        BookMaker.generateBook(player, generateQuestEntries(customQuestList, player, npcEntity));
     }
 
     public static TextComponent[] generateQuestEntries(List<CustomQuest> customQuestList, Player player, NPCEntity npcEntity) {
@@ -42,17 +46,18 @@ public class CustomQuestMenu {
     }
 
     //NPC entity is null when the entry is generated based on a command and not a npc interaction
-    public static TextComponent[] generateQuestEntry(CustomQuest customQuest, Player player, NPCEntity npcEntity) {
+    public static TextComponent[] generateQuestEntry(Quest quest, Player player, NPCEntity npcEntity) {
 
-        TextComponent header = SpigotMessage.simpleMessage(CustomQuestMenuConfig.headerTextLines.replace("$questName", customQuest.getCustomQuestsConfigFields().getQuestName()));
+        TextComponent header = SpigotMessage.simpleMessage(CustomQuestMenuConfig.headerTextLines.replace("$questName", quest.getQuestName()));
         TextComponent body = new TextComponent();
-        body.addExtra(customQuest.getCustomQuestsConfigFields().getQuestLore());
+        if (quest instanceof CustomQuest)
+            body.addExtra(((CustomQuest) quest).getCustomQuestsConfigFields().getQuestLore());
 
         TextComponent fixedSummary = new TextComponent(CustomQuestMenuConfig.objectivesLine);
 
         TextComponent summary = new TextComponent();
 
-        for (Objective objective : customQuest.getCustomQuestObjectives().getObjectives())
+        for (Objective objective : quest.getQuestObjectives().getObjectives())
             if (objective instanceof KillObjective) {
                 //todo: hover should show more boss details, command string should allow players to try to track the boss
                 summary.addExtra(SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getKillQuestDefaultSummaryLine(objective), "", ""));
@@ -61,25 +66,28 @@ public class CustomQuestMenu {
         TextComponent fixedRewards = new TextComponent(CustomQuestMenuConfig.rewardsLine);
 
         TextComponent rewards = CustomQuestMenuConfig.getRewardsDefaultSummaryLine(
-                customQuest.getCustomQuestObjectives().getCustomQuestReward(), customQuest.getQuestLevel(), player);
+                quest.getQuestObjectives().getCustomQuestReward(), quest.getQuestLevel(), player);
 
         TextComponent accept;
-        if (!customQuest.isQuestIsAccepted())
+        if (!quest.isQuestIsAccepted())
             accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptTextLines,
                     CustomQuestMenuConfig.acceptHoverLines,
-                    CustomQuestMenuConfig.acceptCommandLines.replace("$questID", customQuest.getQuestID()));
-        else if (!customQuest.getCustomQuestObjectives().isOver() ||
-                npcEntity != null &&
-                customQuest.getCustomQuestObjectives().isOver() &&
-                        !customQuest.getCustomQuestsConfigFields().getTurnInNPC().isEmpty() &&
-                        !customQuest.getCustomQuestsConfigFields().getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename()))
+                    CustomQuestMenuConfig.acceptCommandLines.replace("$questID", quest.getQuestID().toString()));
+        else if (!quest.getQuestObjectives().isOver())
             accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptedTextLines,
                     CustomQuestMenuConfig.acceptedHoverLines,
-                    CustomQuestMenuConfig.acceptedCommandLines.replace("$questID", customQuest.getQuestID()));
-        else
+                    CustomQuestMenuConfig.acceptedCommandLines.replace("$questID", quest.getQuestID().toString()));
+        else if (quest.getQuestObjectives().isOver() &&
+                (npcEntity == null && quest.getTurnInNPC().isEmpty() ||
+                        npcEntity != null && quest.getTurnInNPC().isEmpty() ||
+                        npcEntity != null && !quest.getTurnInNPC().isEmpty() && quest.getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
             accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.completedTextLines,
                     CustomQuestMenuConfig.completedHoverLines,
-                    CustomQuestMenuConfig.completedCommandLines.replace("$questID", customQuest.getQuestID()));
+                    CustomQuestMenuConfig.completedCommandLines.replace("$questID", quest.getQuestID().toString()));
+        else {
+            //todo: add a way to tell players where to go before this ever runs
+            accept = SpigotMessage.simpleMessage("");
+        }
 
         List<TextComponent> pagesList = new ArrayList<>();
         pagesList.add(header);
@@ -118,8 +126,8 @@ public class CustomQuestMenu {
     }
 
     public static TextComponent[] generateQuestEntry(Player player, NPCEntity npcEntity) {
-        if (CustomQuest.getPlayerQuests().get(player.getUniqueId()) == null) return new TextComponent[0];
-        return generateQuestEntry(CustomQuest.getPlayerQuests().get(player.getUniqueId()), player, npcEntity);
+        if (Quest.getPlayerQuests().get(player.getUniqueId()) == null) return new TextComponent[0];
+        return generateQuestEntry(Quest.getPlayerQuests().get(player.getUniqueId()), player, npcEntity);
     }
 
 }

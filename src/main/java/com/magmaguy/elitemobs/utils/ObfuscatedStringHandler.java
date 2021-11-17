@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.utils;
 
 public class ObfuscatedStringHandler {
+    private ObfuscatedStringHandler() {
+    }
 
     public static String obfuscateString(String originalString) {
 

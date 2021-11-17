@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
+import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -8,10 +9,17 @@ import java.util.List;
 
 public class ItemUpgradeSystemConfig {
 
-    public static String scrapItemName;
-    public static List<String> scrapItemLore;
-    public static String upgradeItemName;
-    public static List<String> upgradeItemLore;
+    @Getter
+    private static String scrapItemName;
+    @Getter
+    private static List<String> scrapItemLore;
+    @Getter
+    private static String upgradeItemName;
+    @Getter
+    private static List<String> upgradeItemLore;
+
+    private ItemUpgradeSystemConfig() {
+    }
 
     public static void initializeConfig() {
         File file = ConfigurationEngine.fileCreator("ScrapItemSettings.yml");

@@ -29,9 +29,8 @@ public class DiscordSRVAnnouncement {
                 if (textChannel == null)
                     textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(DiscordSRVConfig.announcementRoomName);
 
-                if (textChannel == null)
-                    if (DiscordUtil.getJda().getTextChannelsByName(DiscordSRVConfig.announcementRoomName, true).size() > 0)
-                        textChannel = DiscordUtil.getJda().getTextChannelsByName(DiscordSRVConfig.announcementRoomName, true).get(0);
+                if (textChannel == null && !DiscordUtil.getJda().getTextChannelsByName(DiscordSRVConfig.announcementRoomName, true).isEmpty())
+                    textChannel = DiscordUtil.getJda().getTextChannelsByName(DiscordSRVConfig.announcementRoomName, true).get(0);
 
                 isInitialized = true;
             }

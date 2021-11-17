@@ -1,11 +1,9 @@
-package com.magmaguy.elitemobs.powers.majorpowers.enderdragon;
+package com.magmaguy.elitemobs.powers.meta;
 
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.ElitePower;
-import com.magmaguy.elitemobs.powers.MajorPower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;

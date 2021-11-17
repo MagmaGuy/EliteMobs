@@ -258,8 +258,8 @@ public class WorldGuardCompatibility {
         protectedRegion.setFlag(Flags.ENDERDRAGON_BLOCK_DAMAGE, deny);
         protectedRegion.setFlag(Flags.LIGHTER, deny);
         protectedRegion.setFlag(Flags.ENDERPEARL, deny);
-        protectedRegion.setFlag(Flags.GREET_MESSAGE, minidungeon.dungeonPackagerConfigFields.getRegionEnterMessage());
-        protectedRegion.setFlag(Flags.FAREWELL_MESSAGE, minidungeon.dungeonPackagerConfigFields.getRegionLeaveMessage());
+        protectedRegion.setFlag(Flags.GREET_MESSAGE, minidungeon.getDungeonPackagerConfigFields().getRegionEnterMessage());
+        protectedRegion.setFlag(Flags.FAREWELL_MESSAGE, minidungeon.getDungeonPackagerConfigFields().getRegionLeaveMessage());
     }
 
     public static boolean protectMinidungeonArea(String regionName, Location location) {

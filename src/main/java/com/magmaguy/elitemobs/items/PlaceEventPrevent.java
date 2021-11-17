@@ -11,7 +11,7 @@ public class PlaceEventPrevent implements Listener {
     @EventHandler
     public void onPlaceForbiddenItem(PlayerInteractEvent event) {
 
-        if (!ItemSettingsConfig.preventCustomItemPlacement)
+        if (!ItemSettingsConfig.isPreventCustomItemPlacement())
             return;
 
         if (!event.isBlockInHand()) return;

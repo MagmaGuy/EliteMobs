@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.BossPower;
+import com.magmaguy.elitemobs.powers.meta.BossPower;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -89,13 +89,13 @@ public class BulletHell extends BossPower implements Listener {
                 eliteEntity.getLivingEntity().getWorld().spawnParticle(Particle.DRIP_WATER, eliteEntity.getLivingEntity().getLocation(), 10, 1, 1, 1);
 
                 for (Entity nearbyEntity : eliteEntity.getLivingEntity().getNearbyEntities(20, 20, 20))
-                    if (nearbyEntity instanceof Player)
-                        if (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
-                                ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL)) {
-                            Arrow arrow = (Arrow) EliteProjectile.create(EntityType.ARROW, eliteEntity.getLivingEntity(), (Player) nearbyEntity, false);
-                            arrow.setVelocity(arrow.getVelocity().multiply(0.1));
-                            trackingArrowLoop((Player) nearbyEntity, arrow);
-                        }
+                    if (nearbyEntity instanceof Player &&
+                            (((Player) nearbyEntity).getGameMode().equals(GameMode.ADVENTURE) ||
+                                    ((Player) nearbyEntity).getGameMode().equals(GameMode.SURVIVAL))) {
+                        Arrow arrow = (Arrow) EliteProjectile.create(EntityType.ARROW, eliteEntity.getLivingEntity(), (Player) nearbyEntity, false);
+                        arrow.setVelocity(arrow.getVelocity().multiply(0.1));
+                        trackingArrowLoop((Player) nearbyEntity, arrow);
+                    }
 
                 counter++;
                 if (counter > 20) {

@@ -15,11 +15,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class TimedEvent extends CustomEvent implements Listener {
 
-    public static ArrayList<TimedEvent> blueprintEvents = new ArrayList<>();
-    public static ArrayList<TimedEvent> timedEvents = new ArrayList<>();
+    public static List<TimedEvent> blueprintEvents = new ArrayList<>();
+    public static List<TimedEvent> timedEvents = new ArrayList<>();
     //stores the time of the last global trigger
     private static double nextEventTrigger = System.currentTimeMillis() + 5 * 60 * 1000;
     private double localCooldown;

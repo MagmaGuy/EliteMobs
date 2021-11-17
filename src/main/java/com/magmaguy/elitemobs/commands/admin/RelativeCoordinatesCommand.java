@@ -16,12 +16,12 @@ public class RelativeCoordinatesCommand {
             return;
         }
 
-        if (!minidungeon.isInstalled) {
+        if (!minidungeon.isInstalled()) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Minidungeon isn't installed! Can't get the relative location for uninstalled Minidungeons!"));
             return;
         }
 
-        Location anchorpoint = minidungeon.dungeonPackagerConfigFields.getAnchorPoint();
+        Location anchorpoint = minidungeon.getDungeonPackagerConfigFields().getAnchorPoint();
 
         if (anchorpoint == null) {
             player.sendMessage(ChatColorConverter.convert("&8[EliteMobs] &4Something went wrong and made the anchor point not valid!"));
@@ -29,15 +29,15 @@ public class RelativeCoordinatesCommand {
         }
 
         Vector relativeVector = player.getLocation().clone().subtract(anchorpoint).toVector();
-        if (minidungeon.dungeonPackagerConfigFields.getRotation() != 0)
-            GenericRotationMatrixMath.rotateVectorYAxis(minidungeon.dungeonPackagerConfigFields.getRotation(), anchorpoint, relativeVector);
+        if (minidungeon.getDungeonPackagerConfigFields().getRotation() != 0)
+            GenericRotationMatrixMath.rotateVectorYAxis(minidungeon.getDungeonPackagerConfigFields().getRotation(), anchorpoint, relativeVector);
 
         String relativePosition = relativeVector.getBlockX() + ", "
                 + relativeVector.getBlockY() + ", "
                 + relativeVector.getBlockZ();
 
         player.sendMessage(ChatColorConverter.convert(
-                "[EliteMobs] Relative position to anchor point of " + minidungeon.dungeonPackagerConfigFields.getName() + ": " + relativePosition));
+                "[EliteMobs] Relative position to anchor point of " + minidungeon.getDungeonPackagerConfigFields().getName() + ": " + relativePosition));
 
     }
 

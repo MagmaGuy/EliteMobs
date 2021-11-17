@@ -19,7 +19,7 @@ public class TransitiveBossBlock implements Listener {
         Location location;
         double rotation = 0;
         if (customBossEntity.getMinidungeon() != null)
-            rotation = customBossEntity.getMinidungeon().dungeonPackagerConfigFields.getRotation();
+            rotation = customBossEntity.getMinidungeon().getDungeonPackagerConfigFields().getRotation();
         BlockData blockData = transitiveBlock.getBlockData().clone();
 
         if (rotation == 0)

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -116,16 +117,15 @@ public class DrillingEnchantment extends CustomEnchantment {
         private Block processBlock(Block originalBlock, Vector addedVector) {
             Block finalBlock = originalBlock.getWorld().getBlockAt(originalBlock.getLocation().clone().add(addedVector));
             if (!this.material.equals(finalBlock.getType())) return finalBlock;
+
+            BlockBreakEvent blockBreakEvent = new BlockBreakEvent(finalBlock, player);
+            new EventCaller(blockBreakEvent);
+            if (blockBreakEvent.isCancelled()) return null;
+
             finalBlock.breakNaturally(this.itemStack);
 
             ItemMeta itemMeta = itemStack.getItemMeta();
             Damageable damageable = (Damageable) itemMeta;
-
-            //if (itemStack.getItemMeta().hasEnchant(Enchantment.DURABILITY))
-            //    if (itemStack.getItemMeta().getEnchantLevel(Enchantment.DURABILITY) / 20D > ThreadLocalRandom.current().nextDouble())
-            //        damageable.setDamage(damageable.getDamage() + 1);
-            //    else
-            //        damageable.setDamage(damageable.getDamage() + 1);
 
             itemStack.setItemMeta(itemMeta);
             if (itemStack.getType().getMaxDurability() < damageable.getDamage())

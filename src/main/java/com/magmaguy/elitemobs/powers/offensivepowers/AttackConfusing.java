@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.powers.offensivepowers;
 
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
-import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
@@ -22,7 +22,7 @@ public class AttackConfusing extends MinorPower implements Listener {
         if (event.isCancelled()) return;
         AttackConfusing attackConfusing = (AttackConfusing) event.getEliteMobEntity().getPower(this);
         if (attackConfusing == null) return;
-        if (attackConfusing.getGlobalCooldownActive()) return;
+        if (attackConfusing.isInGlobalCooldown()) return;
 
         attackConfusing.doGlobalCooldown(20 * 10);
         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 10, 3));

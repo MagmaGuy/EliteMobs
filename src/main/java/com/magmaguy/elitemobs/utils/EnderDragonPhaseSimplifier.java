@@ -3,6 +3,9 @@ package com.magmaguy.elitemobs.utils;
 import org.bukkit.entity.EnderDragon;
 
 public class EnderDragonPhaseSimplifier {
+    private EnderDragonPhaseSimplifier() {
+    }
+
     /**
      * Returns whether the dragon's phase has it flying. Strict considers edge behaviors as true (charging, landing and taking off)
      *

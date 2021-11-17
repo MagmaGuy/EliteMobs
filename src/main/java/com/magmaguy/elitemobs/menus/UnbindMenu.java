@@ -23,20 +23,20 @@ import java.util.HashMap;
 import java.util.List;
 
 public class UnbindMenu extends EliteMenu {
-    private static final int eliteItemInputSlot = UnbinderMenuConfig.eliteItemInputSlot;
-    private static final int scrapItemInputSlot = UnbinderMenuConfig.eliteUnbindInputSlot;
-    private static final int outputSlot = UnbinderMenuConfig.outputSlot;
-    private static final int eliteItemInformationInputSlot = UnbinderMenuConfig.eliteItemInputInformationSlot;
-    private static final int eliteScrapInformationInputSlot = UnbinderMenuConfig.eliteScrapInputInformationSlot;
-    private static final int informationOutputSlot = UnbinderMenuConfig.outputInformationSlot;
+    private static final int eliteItemInputSlot = UnbinderMenuConfig.getEliteItemInputSlot();
+    private static final int scrapItemInputSlot = UnbinderMenuConfig.getEliteUnbindInputSlot();
+    private static final int outputSlot = UnbinderMenuConfig.getOutputSlot();
+    private static final int eliteItemInformationInputSlot = UnbinderMenuConfig.getEliteItemInputInformationSlot();
+    private static final int eliteScrapInformationInputSlot = UnbinderMenuConfig.getEliteScrapInputInformationSlot();
+    private static final int informationOutputSlot = UnbinderMenuConfig.getOutputInformationSlot();
     public static HashMap<Player, Inventory> inventories = new HashMap<>();
 
     private static void calculateOutput(Inventory UnbinderInventory) {
-        if (UnbinderInventory.getItem(UnbinderMenuConfig.eliteUnbindInputSlot) == null || UnbinderInventory.getItem(UnbinderMenuConfig.eliteItemInputSlot) == null) {
-            UnbinderInventory.setItem(UnbinderMenuConfig.outputSlot, null);
+        if (UnbinderInventory.getItem(UnbinderMenuConfig.getEliteUnbindInputSlot()) == null || UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()) == null) {
+            UnbinderInventory.setItem(UnbinderMenuConfig.getOutputSlot(), null);
             return;
         }
-        ItemStack outputItem = UnbinderInventory.getItem(UnbinderMenuConfig.eliteItemInputSlot).clone();
+        ItemStack outputItem = UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()).clone();
         UnbinderInventory.setItem(outputSlot, UnbindEnchantment.unbindItem(outputItem));
     }
 
@@ -46,44 +46,44 @@ public class UnbindMenu extends EliteMenu {
      * @param player Player for whom the inventory will be created
      */
     public void constructUnbinderMenu(Player player) {
-        Inventory UnbinderInventory = Bukkit.createInventory(player, 54, UnbinderMenuConfig.shopName);
+        Inventory UnbinderInventory = Bukkit.createInventory(player, 54, UnbinderMenuConfig.getShopName());
 
         for (int i = 0; i < UnbinderInventory.getSize(); i++) {
 
-            if (i == UnbinderMenuConfig.infoSlot) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.infoButton);
+            if (i == UnbinderMenuConfig.getInfoSlot()) {
+                UnbinderInventory.setItem(i, UnbinderMenuConfig.getInfoButton());
                 continue;
             }
 
-            if (i == UnbinderMenuConfig.cancelSlot) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.cancelButton);
+            if (i == UnbinderMenuConfig.getCancelSlot()) {
+                UnbinderInventory.setItem(i, UnbinderMenuConfig.getCancelButton());
                 continue;
             }
 
             if (i == eliteItemInformationInputSlot) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.eliteItemInputInfoButton);
+                UnbinderInventory.setItem(i, UnbinderMenuConfig.getEliteItemInputInfoButton());
                 continue;
             }
 
             if (i == eliteScrapInformationInputSlot) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.eliteUnbindInputInfoButton);
+                UnbinderInventory.setItem(i, UnbinderMenuConfig.getEliteUnbindInputInfoButton());
                 continue;
             }
 
             if (i == informationOutputSlot) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.outputInfoButton);
+                UnbinderInventory.setItem(i, UnbinderMenuConfig.getOutputInfoButton());
                 continue;
             }
 
 
-            if (i == UnbinderMenuConfig.confirmSlot) {
+            if (i == UnbinderMenuConfig.getConfirmSlot()) {
 
-                ItemStack clonedConfirmButton = UnbinderMenuConfig.confirmButton.clone();
+                ItemStack clonedConfirmButton = UnbinderMenuConfig.getConfirmButton().clone();
 
                 List<String> lore = new ArrayList<>();
-                for (String string : UnbinderMenuConfig.confirmButton.getItemMeta().getLore())
+                for (String string : UnbinderMenuConfig.getConfirmButton().getItemMeta().getLore())
                     lore.add(string);
-                UnbinderMenuConfig.confirmButton.getItemMeta().setLore(lore);
+                UnbinderMenuConfig.getConfirmButton().getItemMeta().setLore(lore);
                 ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
                 clonedMeta.setLore(lore);
                 clonedConfirmButton.setItemMeta(clonedMeta);
@@ -93,7 +93,7 @@ public class UnbindMenu extends EliteMenu {
             }
 
 
-            if (i == UnbinderMenuConfig.eliteItemInputSlot || i == UnbinderMenuConfig.eliteUnbindInputSlot || i == UnbinderMenuConfig.outputSlot)
+            if (i == UnbinderMenuConfig.getEliteItemInputSlot() || i == UnbinderMenuConfig.getEliteUnbindInputSlot() || i == UnbinderMenuConfig.getOutputSlot())
                 continue;
             UnbinderInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
@@ -146,16 +146,16 @@ public class UnbindMenu extends EliteMenu {
                 }
 
                 //cancel button
-                if (event.getSlot() == UnbinderMenuConfig.cancelSlot) {
+                if (event.getSlot() == UnbinderMenuConfig.getCancelSlot()) {
                     player.closeInventory();
                     return;
                 }
 
                 //confirm button
-                if (event.getSlot() == UnbinderMenuConfig.confirmSlot) {
+                if (event.getSlot() == UnbinderMenuConfig.getConfirmSlot()) {
                     if (unbinderInventory.getItem(outputSlot) != null) {
-                        unbinderInventory.setItem(UnbinderMenuConfig.eliteItemInputSlot, null);
-                        unbinderInventory.setItem(UnbinderMenuConfig.eliteUnbindInputSlot, null);
+                        unbinderInventory.setItem(UnbinderMenuConfig.getEliteItemInputSlot(), null);
+                        unbinderInventory.setItem(UnbinderMenuConfig.getEliteUnbindInputSlot(), null);
                         playerInventory.addItem(unbinderInventory.getItem(outputSlot));
                         unbinderInventory.remove(unbinderInventory.getItem(outputSlot));
                         unbinderInventory.setItem(outputSlot, null);

@@ -6,8 +6,8 @@ import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.combatsystem.EliteProjectile;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.BossPower;
-import com.magmaguy.elitemobs.powers.ProjectileTagger;
+import com.magmaguy.elitemobs.powers.meta.BossPower;
+import com.magmaguy.elitemobs.powers.meta.ProjectileTagger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -103,7 +103,7 @@ public class FrostCone extends BossPower implements Listener {
         Projectile snowball = EliteProjectile.create(EntityType.SNOWBALL, eliteEntity.getLivingEntity(), getShotVector(eliteEntity, location), false);
         ProjectileTagger.tagProjectileWithCustomDamage(snowball, 2);
         snowball.getPersistentDataContainer().set(frostConeSnowballKey, PersistentDataType.STRING, "true");
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, snowball::remove, 20*3);
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, snowball::remove, 20L * 3);
         return (Snowball) snowball;
     }
 
@@ -111,11 +111,11 @@ public class FrostCone extends BossPower implements Listener {
     public void onDamagedEvent(EliteMobDamagedByPlayerEvent event) {
         FrostCone frostCone = (FrostCone) event.getEliteMobEntity().getPower(this);
         if (frostCone == null) return;
-        if (frostCone.getGlobalCooldownActive()) return;
+        if (frostCone.isInGlobalCooldown()) return;
 
         frostCone.doGlobalCooldown(20 * 10, event.getEliteMobEntity());
 
-        frostCone.setIsFiring(true);
+        frostCone.setFiring(true);
         startFrostCone(event.getEliteMobEntity(), event.getPlayer().getLocation().clone());
     }
 
@@ -138,7 +138,7 @@ public class FrostCone extends BossPower implements Listener {
                 if (amount != frostconePlayer.get(event.getPlayer())) return;
                 frostconePlayer.remove(event.getPlayer());
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 5);
+        }.runTaskLater(MetadataHandler.PLUGIN, 20L * 5);
     }
 
 }

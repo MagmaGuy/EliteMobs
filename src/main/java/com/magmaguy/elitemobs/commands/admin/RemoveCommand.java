@@ -41,7 +41,7 @@ public class RemoveCommand {
                                 ((RegionalBossEntity) eliteEntity).getCustomBossesConfigFields().getFilename()));
             if (eliteEntity instanceof RegionalBossEntity)
                 if (((CustomBossEntity) eliteEntity).getMinidungeon() != null)
-                    if (((CustomBossEntity) eliteEntity).getMinidungeon().dungeonPackagerConfigFields.getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
+                    if (((CustomBossEntity) eliteEntity).getMinidungeon().getDungeonPackagerConfigFields().getDungeonLocationType().equals(DungeonPackagerConfigFields.DungeonLocationType.SCHEMATIC))
                         ((CustomBossEntity) eliteEntity).getMinidungeon().removeRelativeLocation((RegionalBossEntity) eliteEntity);
             eliteEntity.remove(RemovalReason.REMOVE_COMMAND);
             event.setCancelled(true);

@@ -8,6 +8,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 public class VisualItemInitializer {
+    private VisualItemInitializer() {
+    }
 
     public static Item initializeItem(ItemStack itemStack, Location location) {
         Item item = location.getWorld().dropItem(location, itemStack);

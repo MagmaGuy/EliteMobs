@@ -18,8 +18,8 @@ import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.powers.ElitePower;
-import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
+import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.utils.*;
 import lombok.Getter;
@@ -32,6 +32,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -155,7 +156,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             attemptsCounter = 1;
         if (spawnLocation != null && spawnLocation.getWorld() != null)
             lastTick = spawnLocation.getWorld().getFullTime();
-        if (livingEntity != null) {
+        //Use exists() here as the persistent entities will not try to respawn through this method
+        if (exists()) {
             new WarningMessage("Warning: " + customBossesConfigFields.getFilename() + " attempted to double spawn " + attemptsCounter + " times!", true);
             return;
         }
@@ -204,8 +206,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
             isChunkLoadedSpawn = false;
         }
 
-        if (!exists() && simplePersistentEntity == null) {
+        if (!exists()) {
             existsFailureCount++;
+            //this may seem odd but not setting it to null can cause double spawn attempts as the plugin catches itself
+            //correctly as not have a valid living entity but the checks are set up in such a way that if a living entity
+            //object is referenced then trying to spawn it again is a double spawn of the same entity
+            super.livingEntity = null;
             if (existsFailureCount > 10){
                 if (existsFailureCount == 11){
                     new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
@@ -221,10 +227,6 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
                 new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections.");
                 return;
             }
-            //this may seem odd but not setting it to null can cause double spawn attempts as the plugin catches itself
-            //correctly as not have a valid living entity but the checks are set up in such a way that if a living entity
-            //object is referenced then trying to spawn it again is a double spawn of the same entity
-            super.livingEntity = null;
             new WarningMessage("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " . Possible reasons for this:");
             new WarningMessage("- The region was protected by a plugin (most likely)");
             new WarningMessage("- The spawn was interfered with by some incompatible third party plugin");
@@ -353,6 +355,11 @@ public class CustomBossEntity extends EliteEntity implements Listener, SimplePer
 
     public double getDamageModifier(Material material) {
         return customBossesConfigFields.getDamageModifier(material);
+    }
+
+    public void resetLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
+        super.setLivingEntity(livingEntity, spawnReason);
+        new CustomBossMegaConsumer(this).applyBossFeatures(livingEntity);
     }
 
     @Override

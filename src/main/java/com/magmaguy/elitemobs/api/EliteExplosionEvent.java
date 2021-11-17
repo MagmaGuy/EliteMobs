@@ -3,9 +3,9 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.CrashFix;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonEmpoweredLightning;
 import com.magmaguy.elitemobs.powers.majorpowers.enderdragon.EnderDragonTornado;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
@@ -16,14 +16,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EliteExplosionEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    public static ArrayList<FallingBlock> fallingBlocks = new ArrayList<>();
+    public static List<FallingBlock> fallingBlocks = new ArrayList<>();
     private final EliteEntity eliteEntity;
-    private final ArrayList<BlockState> blockStates;
+    private final List<BlockState> blockStates;
     private final ElitePower elitePower;
     private Location explosionSourceLocation;
     private boolean isCancelled = false;
@@ -31,7 +32,7 @@ public class EliteExplosionEvent extends Event implements Cancellable {
     public EliteExplosionEvent(EliteEntity eliteEntity,
                                ElitePower elitePower,
                                Location explosionSourceLocation,
-                               ArrayList<BlockState> blockStates) {
+                               List<BlockState> blockStates) {
         this.eliteEntity = eliteEntity;
         this.explosionSourceLocation = explosionSourceLocation;
         this.elitePower = elitePower;
@@ -58,7 +59,7 @@ public class EliteExplosionEvent extends Event implements Cancellable {
         return elitePower;
     }
 
-    public ArrayList<BlockState> getBlockStates() {
+    public List<BlockState> getBlockStates() {
         return blockStates;
     }
 

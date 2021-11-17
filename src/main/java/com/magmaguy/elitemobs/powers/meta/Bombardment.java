@@ -1,11 +1,10 @@
-package com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments;
+package com.magmaguy.elitemobs.powers.meta;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.utils.EnderDragonPhaseSimplifier;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;

@@ -8,6 +8,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 public class PersistentVanillaData {
+    private PersistentVanillaData() {
+    }
 
     public static void write(Entity entity, String key, String value) {
         entity.getPersistentDataContainer().set(getKey(key), PersistentDataType.STRING, value);

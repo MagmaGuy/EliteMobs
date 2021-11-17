@@ -19,9 +19,8 @@ public class WorldGuardDungeonFlag implements Listener {
             return;
         if (WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getEliteMobsDungeonFlag())) {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
-            if (eliteEntity != null)
-                if (eliteEntity instanceof CustomBossEntity)
-                    return;
+            if (eliteEntity instanceof CustomBossEntity)
+                return;
             event.setCancelled(true);
             event.getEntity().remove();
         }

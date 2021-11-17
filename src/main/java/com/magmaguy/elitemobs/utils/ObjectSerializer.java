@@ -5,6 +5,9 @@ import java.util.Base64;
 
 public class ObjectSerializer {
 
+    private ObjectSerializer() {
+    }
+
     /**
      * Read the object from Base64 string.
      */

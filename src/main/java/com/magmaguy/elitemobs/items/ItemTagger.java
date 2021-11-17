@@ -164,10 +164,10 @@ public class ItemTagger {
 
     public static void registerItemSource(EliteEntity eliteEntity, ItemMeta itemMeta) {
         if (eliteEntity == null) {
-            itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.shopItemSource));
+            itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.getShopItemSource()));
             return;
         }
-        itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.mobItemSource.replace("$mob", eliteEntity.getName())));
+        itemMeta.getPersistentDataContainer().set(itemSource, PersistentDataType.STRING, ChatColorConverter.convert(ItemSettingsConfig.getMobItemSource().replace("$mob", eliteEntity.getName())));
     }
 
     public static String getItemSource(ItemMeta itemMeta) {

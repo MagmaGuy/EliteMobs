@@ -14,6 +14,9 @@ import javax.annotation.Nullable;
 
 public class WorldGuardFlagChecker {
 
+    private WorldGuardFlagChecker() {
+    }
+
     public static boolean checkFlag(Location location, StateFlag stateFlag) {
         com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(location);
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();

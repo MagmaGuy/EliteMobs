@@ -26,7 +26,7 @@ public class EliteItemLore {
 
     ItemStack itemStack;
     ItemMeta itemMeta;
-    ArrayList<String> vanillaEnchantmentsLore = new ArrayList<>();
+    List<String> vanillaEnchantmentsLore = new ArrayList<>();
     HashMap<Enchantment, Integer> eliteVanillaEnchantments = new HashMap<>();
     ArrayList<String> eliteVanillaEnchantmentsLore = new ArrayList<>();
     HashMap<CustomEnchantment, Integer> customEnchantments = new HashMap<>();
@@ -110,7 +110,7 @@ public class EliteItemLore {
     private void constructEliteEnchantments() {
         for (Enchantment enchantment : eliteVanillaEnchantments.keySet())
             eliteVanillaEnchantmentsLore.add(ChatColorConverter.convert(
-                    "&7" + ItemSettingsConfig.eliteEnchantLoreString + " "
+                    "&7" + ItemSettingsConfig.getEliteEnchantLoreString() + " "
                             + EnchantmentsConfig.getEnchantment(enchantment).getName()
                             + " " + eliteVanillaEnchantments.get(enchantment)));
 
@@ -137,7 +137,7 @@ public class EliteItemLore {
     private void constructSoulbindEntry() {
         Player player = SoulbindEnchantment.getSoulboundPlayer(itemMeta);
         if (player == null) {
-            soulbindInfo = ChatColorConverter.convert(ItemSettingsConfig.noSoulbindLore);
+            soulbindInfo = ChatColorConverter.convert(ItemSettingsConfig.getNoSoulbindLore());
             return;
         }
         soulbindInfo = ChatColorConverter.convert(
@@ -157,11 +157,11 @@ public class EliteItemLore {
         ItemTagger.writeItemValue(itemStack, soulboundPlayer);
         itemMeta = itemStack.getItemMeta();
         if (showItemWorth)
-            itemWorth = ItemSettingsConfig.loreWorth
+            itemWorth = ItemSettingsConfig.getLoreWorth()
                     .replace("$worth", ItemWorthCalculator.determineItemWorth(itemStack, soulboundPlayer) + "")
                     .replace("$currencyName", EconomySettingsConfig.currencyName);
         else
-            itemWorth = ItemSettingsConfig.loreResale
+            itemWorth = ItemSettingsConfig.getLoreResale()
                     .replace("$resale", ItemWorthCalculator.determineResaleWorth(itemStack, soulboundPlayer) + "")
                     .replace("$currencyName", EconomySettingsConfig.currencyName);
     }
@@ -182,20 +182,20 @@ public class EliteItemLore {
         for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, ItemTagger.continuousPotionEffectKey))
             potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
                     elitePotionEffect.getPotionEffect().getType().getName().toLowerCase() + ".yml").getName()
-                    + ItemSettingsConfig.potionEffectContinuousLore + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
+                    + ItemSettingsConfig.getPotionEffectContinuousLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
         for (ElitePotionEffect elitePotionEffect : ElitePotionEffectContainer.getElitePotionEffectContainer(itemMeta, ItemTagger.onHitPotionEffectKey))
             if (elitePotionEffect.getTarget().equals(ElitePotionEffect.Target.SELF))
                 potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
                         elitePotionEffect.getPotionEffect().getType().getName().toLowerCase() + ".yml").getName()
-                        + ItemSettingsConfig.potionEffectOnHitSelfLore + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
+                        + ItemSettingsConfig.getPotionEffectOnHitSelfLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
             else
                 potionListLore.add(ChatColorConverter.convert(PotionEffectsConfig.getPotionEffect(
                         elitePotionEffect.getPotionEffect().getType().getName().toLowerCase() + ".yml").getName()
-                        + ItemSettingsConfig.potionEffectOnHitTargetLore + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
+                        + ItemSettingsConfig.getPotionEffectOnHitTargetLore() + " " + (elitePotionEffect.getPotionEffect().getAmplifier() + 1)));
     }
 
     private void writeNewLore() {
-        for (String string : ItemSettingsConfig.loreStructure) {
+        for (String string : ItemSettingsConfig.getLoreStructure()) {
 
             if (string.contains("$prestigeLevel"))
                 string = string.replace("$prestigeLevel", prestigeLevel + "");
@@ -205,19 +205,19 @@ public class EliteItemLore {
 
             if (string.contains("$enchantments")) {
                 for (String entry : vanillaEnchantmentsLore)
-                    lore.add(ChatColorConverter.convert(ItemSettingsConfig.vanillaEnchantmentColor + entry));
+                    lore.add(ChatColorConverter.convert(ItemSettingsConfig.getVanillaEnchantmentColor() + entry));
             } else if (string.contains("$eliteEnchantments")) {
                 for (String entry : eliteVanillaEnchantmentsLore)
-                    lore.add(ChatColorConverter.convert(ItemSettingsConfig.eliteEnchantmentColor + ChatColor.stripColor(entry)));
+                    lore.add(ChatColorConverter.convert(ItemSettingsConfig.getEliteEnchantmentColor() + ChatColor.stripColor(entry)));
             } else if (string.contains("$itemSource")) {
                 if (itemSource != null)
                     lore.add(itemSource);
             } else if (string.contains("$potionEffect")) {
                 for (String entry : potionListLore)
-                    lore.add(ChatColorConverter.convert(ItemSettingsConfig.potionEffectColor + entry));
+                    lore.add(ChatColorConverter.convert(ItemSettingsConfig.getPotionEffectColor() + entry));
             } else if (string.contains("$customEnchantments")) {
                 for (String entry : customEnchantmentLore)
-                    lore.add(ChatColorConverter.convert(ItemSettingsConfig.customEnchantmentColor + ChatColor.stripColor(entry)));
+                    lore.add(ChatColorConverter.convert(ItemSettingsConfig.getCustomEnchantmentColor() + ChatColor.stripColor(entry)));
             } else if (string.contains("$loreResaleValue")) {
                 lore.add(itemWorth);
             } else if (string.contains("$customLore")) {

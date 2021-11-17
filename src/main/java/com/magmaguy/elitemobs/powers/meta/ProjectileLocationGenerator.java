@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.powers;
+package com.magmaguy.elitemobs.powers.meta;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;

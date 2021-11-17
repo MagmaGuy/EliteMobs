@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.majorpowers.enderdragon.bombardments;
 
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.powers.meta.Bombardment;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ThrownPotion;

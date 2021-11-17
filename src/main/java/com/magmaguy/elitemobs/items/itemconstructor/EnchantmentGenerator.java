@@ -24,7 +24,7 @@ public class EnchantmentGenerator {
 
         for (Enchantment enchantment : enchantmentMap.keySet()) {
             if (enchantment != null)
-                if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() && ItemSettingsConfig.useEliteEnchantments) {
+                if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel() && ItemSettingsConfig.isUseEliteEnchantments()) {
                     if (EliteEnchantments.isPotentialEliteEnchantment(enchantment)) {
                         if (enchantmentMap.get(enchantment) > enchantment.getMaxLevel()) {
                             itemMeta.addEnchant(enchantment, enchantment.getMaxLevel(), true);
@@ -142,7 +142,7 @@ public class EnchantmentGenerator {
             case IRON_HOE:
             case STONE_HOE:
             case WOODEN_HOE:
-                if (ItemSettingsConfig.useHoesAsWeapons)
+                if (ItemSettingsConfig.isUseHoesAsWeapons())
                     enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DAMAGE_ALL", itemTier));
                 enchantmentMap.putAll(validateAndApplyPrimaryEnchantment("DIG_SPEED", itemTier));
                 validSecondaryEnchantments.putAll(validateSecondaryEnchantments("DURABILITY"));

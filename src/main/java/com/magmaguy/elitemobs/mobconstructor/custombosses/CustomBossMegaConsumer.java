@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
-import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
@@ -72,23 +72,25 @@ public class CustomBossMegaConsumer {
 
         LivingEntity livingEntity = (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
                 customBossesConfigFields.getEntityType().getEntityClass(),
-                (entity) -> {
-                    for (ElitePower elitePower : powers)
-                        elitePower.applyPowers((LivingEntity) entity);
-                    setEquipment((LivingEntity) entity);
-                    setBaby((LivingEntity) entity);
-                    setFrozen((LivingEntity) entity);
-                    setDisguise((LivingEntity) entity);
-                    setName((LivingEntity) entity);
-                    setFollowRange((LivingEntity) entity);
-
-                    if ((entity).getType().equals(EntityType.ENDER_DRAGON)) {
-                        ((EnderDragon) entity).setPhase(EnderDragon.Phase.CIRCLING);
-                        ((EnderDragon) entity).getDragonBattle().generateEndPortal(false);
-                    }
-                });
+                entity -> applyBossFeatures((LivingEntity) entity));
         customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return livingEntity;
+    }
+
+    public void applyBossFeatures(LivingEntity livingEntity) {
+        for (ElitePower elitePower : powers)
+            elitePower.applyPowers(livingEntity);
+        setEquipment(livingEntity);
+        setBaby(livingEntity);
+        setFrozen(livingEntity);
+        setDisguise(livingEntity);
+        setName(livingEntity);
+        setFollowRange(livingEntity);
+
+        if (livingEntity.getType().equals(EntityType.ENDER_DRAGON)) {
+            ((EnderDragon) livingEntity).setPhase(EnderDragon.Phase.CIRCLING);
+            ((EnderDragon) livingEntity).getDragonBattle().generateEndPortal(false);
+        }
     }
 
     private void setBaby(LivingEntity livingEntity) {

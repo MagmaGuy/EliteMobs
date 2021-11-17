@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
-import com.magmaguy.elitemobs.powers.ElitePower;
 import com.magmaguy.elitemobs.powers.bosspowers.BonusCoins;
-import com.magmaguy.elitemobs.powers.bosspowers.CustomSummonPower;
+import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
+import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 
 import java.util.HashSet;
