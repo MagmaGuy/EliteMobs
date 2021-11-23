@@ -48,6 +48,7 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerStanceMath;
 import com.magmaguy.elitemobs.thirdparty.bstats.CustomCharts;
 import com.magmaguy.elitemobs.thirdparty.placeholderapi.Placeholders;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
+import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ServerTime;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -350,6 +351,9 @@ public class EliteMobs extends JavaPlugin {
 
         new InfoMessage("Unregistering handlers...");
         HandlerList.unregisterAll(MetadataHandler.PLUGIN);
+
+        new InfoMessage("Clearing Treasure Chests...");
+        TreasureChest.clearTreasureChests();
 
         //save cached data
         Bukkit.getLogger().info("[EliteMobs] Saving EliteMobs databases...");

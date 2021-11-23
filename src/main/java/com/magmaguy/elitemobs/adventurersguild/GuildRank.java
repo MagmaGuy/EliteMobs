@@ -12,7 +12,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.UUID;
+
 public class GuildRank {
+
+    private GuildRank() {
+    }
 
     public static void setGuildPrestigeRank(Player player, int prestigeRank) {
         PlayerData.setGuildPrestigeLevel(player.getUniqueId(), prestigeRank);
@@ -20,7 +25,11 @@ public class GuildRank {
     }
 
     public static int getGuildPrestigeRank(Player player) {
-        return PlayerData.getGuildPrestigeLevel(player.getUniqueId());
+        return getGuildPrestigeRank(player.getUniqueId());
+    }
+
+    public static int getGuildPrestigeRank(UUID player) {
+        return PlayerData.getGuildPrestigeLevel(player);
     }
 
     public static int getGuildPrestigeRank(Player player, boolean databaseAccess) {
@@ -106,7 +115,11 @@ public class GuildRank {
     }
 
     public static double currencyBonusMultiplier(int prestigeLevel) {
-        return 1 + prestigeLevel * 5;
+        return 1D + prestigeLevel * 5;
+    }
+
+    public static double currencyBonusMultiplier(UUID player) {
+        return currencyBonusMultiplier(getGuildPrestigeRank(player));
     }
 
     /**

@@ -1,7 +1,12 @@
 package com.magmaguy.elitemobs.quests;
 
+import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
+import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -15,19 +20,27 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CustomQuestReward implements Serializable {
+public class QuestReward implements Serializable {
 
     @Getter
     private List<RewardEntry> rewardEntries = new ArrayList<>();
+
+    public QuestReward(int questLevel, QuestObjectives questObjectives, Player player) {
+        int mobLevel = questLevel * 10;
+        int killAmount = questObjectives.getObjectives().stream().mapToInt(Objective::getTargetAmount).sum();
+        double baselineReward = mobLevel / 2D * killAmount;
+        new RewardEntry(baselineReward, 1d, 1, player);
+        ItemStack itemReward = LootTables.generateItemStack(questLevel * 10, player, null);
+        new RewardEntry(itemReward, 1d, 1);
+    }
 
     /**
      * This generates a list of custom quest rewards based on configuration file entries. It uses the following formats:
      * Custom Items: filename=X.yml:amount=Y:chance=Z
      * Vanilla Items: material=X:amount=Y:chance=Z
      * Commands: command=$player XYZ
-     *
      */
-    public CustomQuestReward(CustomQuestsConfigFields customQuestsConfigFields) {
+    public QuestReward(CustomQuestsConfigFields customQuestsConfigFields, Player player) {
         for (String string : customQuestsConfigFields.getCustomRewardsList()) {
             String[] splitByColon = string.split(":");
             String filename = null;
@@ -35,6 +48,7 @@ public class CustomQuestReward implements Serializable {
             double chance = 1d;
             Material material = null;
             String command = null;
+            double currencyAmount = 0;
             for (String subString : splitByColon) {
                 String[] splitByEquals = subString.split("=");
                 switch (splitByEquals[0]) {
@@ -65,6 +79,14 @@ public class CustomQuestReward implements Serializable {
                         } catch (Exception ex) {
                             new WarningMessage("Invalid material in entry " + splitByEquals[1] + " for quest " + customQuestsConfigFields + " ! Skipping...");
                         }
+                        break;
+                    case "currencyAmount":
+                        try {
+                            currencyAmount = Double.parseDouble(splitByEquals[1]);
+                        } catch (Exception ex) {
+                            new WarningMessage("Invalid currencyAmount in entry " + splitByEquals[1] + " for quest " + customQuestsConfigFields + " ! Skipping...");
+                        }
+                        break;
                     case "command":
                         command = splitByEquals[1];
                         break;
@@ -79,6 +101,8 @@ public class CustomQuestReward implements Serializable {
                 new RewardEntry(new ItemStack(material), chance, amount);
             } else if (command != null) {
                 new RewardEntry(command, chance, amount);
+            } else if (currencyAmount != 0) {
+                new RewardEntry(currencyAmount, chance, amount, player);
             } else {
                 new WarningMessage("Failed to correctly register reward " + string + " for quest " + customQuestsConfigFields.getFilename());
             }
@@ -90,11 +114,18 @@ public class CustomQuestReward implements Serializable {
     }
 
     public class RewardEntry {
-        public CustomItem customItem;
-        public ItemStack itemStack;
-        public String command;
-        public double chance;
-        public int amount;
+        @Getter
+        private final double chance;
+        @Getter
+        private final int amount;
+        @Getter
+        private CustomItem customItem;
+        @Getter
+        private ItemStack itemStack;
+        @Getter
+        private String command;
+        @Getter
+        private double currencyAmount = 0;
 
         public RewardEntry(CustomItem customItem, double chance, int amount) {
             this.customItem = customItem;
@@ -117,6 +148,13 @@ public class CustomQuestReward implements Serializable {
             rewardEntries.add(this);
         }
 
+        public RewardEntry(double currencyAmount, double chance, int amount, Player player) {
+            this.currencyAmount = currencyAmount * GuildRank.currencyBonusMultiplier(player.getUniqueId());
+            this.chance = chance;
+            this.amount = amount;
+            rewardEntries.add(this);
+        }
+
         public void doReward(UUID playerUUID, int questLevel) {
             Player player = Bukkit.getPlayer(playerUUID);
             if (ThreadLocalRandom.current().nextDouble() < chance)
@@ -127,6 +165,8 @@ public class CustomQuestReward implements Serializable {
                         player.getInventory().addItem(itemStack);
                     else if (command != null)
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("$player", player.getName()));
+                    else if (currencyAmount != 0)
+                        EconomyHandler.addCurrency(playerUUID, currencyAmount);
                     else
                         new WarningMessage("Quest failed to dispatch reward! Report this to the dev!", true);
         }
