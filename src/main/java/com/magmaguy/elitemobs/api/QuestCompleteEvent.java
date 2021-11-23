@@ -37,7 +37,7 @@ public class QuestCompleteEvent extends Event {
         public void onQuestAccept(QuestCompleteEvent event) {
             event.getPlayer().sendMessage(QuestsConfig.questCompleteMesage.replace("$questName", event.getQuest().getQuestName()));
             CustomQuest.getPlayerQuests().remove(event.getPlayer().getUniqueId());
-            event.getQuest().getQuestObjectives().getCustomQuestReward().doRewards(event.getPlayer().getUniqueId(), event.getQuest().getQuestLevel());
+            event.getQuest().getQuestObjectives().getQuestReward().doRewards(event.getPlayer().getUniqueId(), event.getQuest().getQuestLevel());
             if (QuestsConfig.useQuestCompleteTitles)
                 event.getPlayer().sendTitle(
                         QuestsConfig.questCompleteTitle.replace("$questName", event.getQuest().getQuestName()),

@@ -72,6 +72,11 @@ public class TreasureChest {
 
     }
 
+    public static void clearTreasureChests() {
+        unloadedChests.clear();
+        treasureChestHashMap.clear();
+    }
+
     public static HashMap<Location, TreasureChest> getTreasureChestHashMap() {
         return treasureChestHashMap;
     }
@@ -210,11 +215,11 @@ public class TreasureChest {
         if (seconds < 60 * 2)
             return seconds + " seconds";
         if (seconds < 60 * 60 * 2)
-            return Round.twoDecimalPlaces(seconds / 60) + "minutes";
+            return Round.twoDecimalPlaces(seconds / 60D) + "minutes";
         if (seconds < 60 * 60 * 48)
-            return Round.twoDecimalPlaces(seconds / 60 / 60) + "hours";
+            return Round.twoDecimalPlaces(seconds / 60D / 60) + "hours";
         else
-            return Round.twoDecimalPlaces(seconds / 60 / 60 / 48) + "days";
+            return Round.twoDecimalPlaces(seconds / 60D / 60 / 48) + "days";
     }
 
     public void removeTreasureChest() {

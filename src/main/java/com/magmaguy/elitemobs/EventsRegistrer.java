@@ -302,7 +302,7 @@ public class EventsRegistrer {
         //Initialize adventurer's guild
         pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);
         //register quests
-        pluginManager.registerEvents(new KillObjective.KillQuestEvents(), plugin);
+        pluginManager.registerEvents(new KillObjective.KillObjectiveEvents(), plugin);
         pluginManager.registerEvents(new QuestAcceptEvent.QuestAcceptEventHandler(), plugin);
         pluginManager.registerEvents(new QuestCompleteEvent.QuestCompleteEventHandler(), plugin);
         pluginManager.registerEvents(new QuestLeaveEvent.QuestLeaveEventHandler(), plugin);

@@ -9,23 +9,22 @@ import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
-import java.io.Serializable;
 import java.util.UUID;
 
-public class CustomQuest extends Quest implements Serializable {
+public class CustomQuest extends Quest {
 
     @Getter
-    private CustomQuestsConfigFields customQuestsConfigFields;
+    private final CustomQuestsConfigFields customQuestsConfigFields;
 
     public CustomQuest(Player player, CustomQuestsConfigFields customQuestsConfigFields) {
-        super(player, new QuestObjectives(new CustomQuestReward(customQuestsConfigFields)), customQuestsConfigFields.getQuestLevel());
+        super(player, new QuestObjectives(new QuestReward(customQuestsConfigFields, player)), customQuestsConfigFields.getQuestLevel());
         this.customQuestsConfigFields = customQuestsConfigFields;
         super.questObjectives.setQuest(this);
         super.questName = customQuestsConfigFields.getQuestName();
         super.turnInNPC = customQuestsConfigFields.getTurnInNPC();
     }
 
-    public static CustomQuest getCustomQuest(String questFilename, Player player) {
+    public static CustomQuest getQuest(String questFilename, Player player) {
         if (CustomQuestsConfig.getCustomQuests().get(questFilename) == null) return null;
         Quest quest = Quest.getPlayerQuests().get(player.getUniqueId());
         if (quest instanceof CustomQuest && ((CustomQuest) quest).getCustomQuestsConfigFields().getFilename().equals(questFilename))

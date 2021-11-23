@@ -1,6 +1,10 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
+import com.magmaguy.elitemobs.api.QuestProgressionEvent;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.Bukkit;
 
 import java.io.Serializable;
 
@@ -11,9 +15,29 @@ public abstract class Objective implements Serializable {
     @Getter
     protected boolean objectiveCompleted = false;
 
-    public Objective() {
+    @Getter
+    @Setter
+    protected int currentAmount = 0;
+    @Getter
+    protected int targetAmount;
+
+    @Getter
+    protected String objectiveName;
+
+    public Objective(int targetAmount, String objectiveName) {
+        this.targetAmount = targetAmount;
+        this.objectiveName = objectiveName;
     }
 
-    abstract void progressObjective(QuestObjectives questObjectives);
+    public void progressObjective(QuestObjectives questObjectives) {
+        currentAmount++;
+        QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
+                Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
+                questObjectives.getQuest(),
+                this);
+        new EventCaller(questProgressionEvent);
+        if (currentAmount < targetAmount) return;
+        objectiveCompleted = true;
+    }
 
 }

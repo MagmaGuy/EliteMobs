@@ -26,6 +26,10 @@ public abstract class PluginMobProperties {
         return this.name;
     }
 
+    public String getName(int level) {
+        return this.name.replace("$level", level + "");
+    }
+
     public EntityType getEntityType() {
         return this.entityType;
     }

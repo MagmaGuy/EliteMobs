@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
-import com.magmaguy.elitemobs.quests.CustomQuestInteractionHandler;
+import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -71,13 +71,12 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            event.getPlayer().sendMessage("Coming soon!");
-                            //QuestsMenu.initializeQuestsMenu(event.getPlayer());
+                            QuestInteractionHandler.processDynamicQuests(event.getPlayer(), npcEntity);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
             case CUSTOM_QUEST_GIVER:
-                CustomQuestInteractionHandler.processNPCQuests(event.getPlayer(), npcEntity);
+                QuestInteractionHandler.processNPCQuests(event.getPlayer(), npcEntity);
                 break;
             case BAR:
                 event.getPlayer().sendMessage("[EliteMobs] This feature is coming soon!");
