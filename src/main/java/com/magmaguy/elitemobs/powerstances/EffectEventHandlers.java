@@ -25,7 +25,6 @@ public class EffectEventHandlers implements Listener {
             event.setCancelled(true);
     }
 
-    //todo: this prevents elite mobs from going through portals, might want to change it at some point
     @EventHandler
     public void portalPickupSafeguard(EntityPortalEvent event) {
         if (EntityTracker.isItemVisualEffect(event.getEntity()) || EntityTracker.isEliteMob(event.getEntity()))

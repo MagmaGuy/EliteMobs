@@ -27,7 +27,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;at t
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomSummonPower extends ElitePower implements Listener {
 

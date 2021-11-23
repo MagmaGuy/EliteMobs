@@ -3,25 +3,28 @@ package com.magmaguy.elitemobs.quests.objectives;
 import com.magmaguy.elitemobs.api.QuestObjectivesCompletedEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.quests.CustomQuest;
-import com.magmaguy.elitemobs.quests.CustomQuestReward;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class QuestObjectives {
 
     @Getter
     @Setter
-    protected CustomQuestReward customQuestReward;
+    protected QuestReward questReward;
     @Getter
     @Setter
     protected List<Objective> objectives;
@@ -30,8 +33,27 @@ public class QuestObjectives {
     private Quest quest;
     private boolean isOver = false;
 
-    public QuestObjectives(CustomQuestReward customQuestReward) {
-        this.customQuestReward = customQuestReward;
+    /**
+     * Used for dynamic quests
+     */
+    public QuestObjectives(int questLevel) {
+        generateRandomObjective(questLevel);
+    }
+
+    /**
+     * Used for custom quests
+     *
+     * @param customQuestReward Predetermined Quest Reward
+     */
+    public QuestObjectives(QuestReward customQuestReward) {
+        this.questReward = customQuestReward;
+    }
+
+    private void generateRandomObjective(int questLevel) {
+        int killAmount = ThreadLocalRandom.current().nextInt(1 + questLevel, 1 + questLevel * 10);
+        EntityType entityType = QuestsConfig.getQuestEntityTypes().get(ThreadLocalRandom.current().nextInt(QuestsConfig.getQuestEntityTypes().size()));
+        KillObjective killObjective = new DynamicKillObjective(killAmount, entityType, questLevel);
+        this.objectives = Collections.singletonList(killObjective);
     }
 
     public void setQuest(Quest quest) {
