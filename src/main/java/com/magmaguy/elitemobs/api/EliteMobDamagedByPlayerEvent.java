@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.Round;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -31,14 +32,25 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
+    @Getter
     private final Entity entity;
-    private final EliteEntity eliteEntity;
+    @Getter
+    private final EliteEntity eliteMobEntity;
+    @Getter
     private final Player player;
+    @Getter
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
+    @Getter
     private final double damage;
+    @Getter
     private final boolean criticalStrike;
+    @Getter
     private final boolean isCustomDamage;
+    @Getter
+    private final double damageModifier;
+    @Getter
     public boolean rangedAttack;
+    @Getter
     private boolean isCancelled = false;
 
     public EliteMobDamagedByPlayerEvent(EliteEntity eliteEntity,
@@ -46,52 +58,21 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                                         EntityDamageByEntityEvent event,
                                         double damage,
                                         boolean criticalStrike,
-                                        boolean isCustomDamage) {
+                                        boolean isCustomDamage,
+                                        double damageModifier) {
         this.damage = damage;
         this.entity = eliteEntity.getLivingEntity();
-        this.eliteEntity = eliteEntity;
+        this.eliteMobEntity = eliteEntity;
         this.player = player;
         this.entityDamageByEntityEvent = event;
         this.rangedAttack = event.getDamager() instanceof Projectile;
         this.criticalStrike = criticalStrike;
         this.isCustomDamage = isCustomDamage;
+        this.damageModifier = damageModifier;
     }
 
     public static HandlerList getHandlerList() {
         return handlers;
-    }
-
-    public Entity getEntity() {
-        return entity;
-    }
-
-    public EliteEntity getEliteMobEntity() {
-        return eliteEntity;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public EntityDamageByEntityEvent getEntityDamageByEntityEvent() {
-        return entityDamageByEntityEvent;
-    }
-
-    public double getDamage() {
-        return damage;
-    }
-
-    public boolean isCriticalStrike() {
-        return criticalStrike;
-    }
-
-    public boolean isCustomDamage() {
-        return isCustomDamage;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.isCancelled;
     }
 
     @Override
@@ -214,7 +195,8 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                         event,
                         strike.damage,
                         strike.criticalStrike,
-                        strike.customDamage);
+                        strike.customDamage,
+                        strike.damageModifier);
                 damage = strike.damage;
             } else if ((event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) ||
                     event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) ||
@@ -226,7 +208,8 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                         event,
                         strike.damage,
                         strike.criticalStrike,
-                        strike.customDamage);
+                        strike.customDamage,
+                        strike.damageModifier);
                 damage = strike.damage;
             } else {
                 //Runs if the damage was not dealt by an elite item, important for other plugins
@@ -235,7 +218,8 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
                         event,
                         event.getFinalDamage(),
                         false,
-                        false);
+                        false,
+                        1);
                 damage = event.getFinalDamage();
             }
 
@@ -334,11 +318,15 @@ public class EliteMobDamagedByPlayerEvent extends Event implements Cancellable {
 
         }
 
-        private class Strike {
-            public double damage;
-            public boolean criticalStrike;
-            public boolean customDamage;
-            public double damageModifier;
+        private static class Strike {
+            @Getter
+            private final double damage;
+            @Getter
+            private final boolean criticalStrike;
+            @Getter
+            private final boolean customDamage;
+            @Getter
+            private final double damageModifier;
 
             public Strike(double damage, boolean criticalStrike, boolean customDamage, double damageModifier) {
                 this.damage = damage;

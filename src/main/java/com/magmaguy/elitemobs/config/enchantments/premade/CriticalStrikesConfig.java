@@ -2,10 +2,13 @@ package com.magmaguy.elitemobs.config.enchantments.premade;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
+import lombok.Getter;
 
 public class CriticalStrikesConfig extends EnchantmentsConfigFields {
-    public static String criticalHitPopup;
-    public static String criticalHitColor;
+    @Getter
+    private static String criticalHitPopup;
+    @Getter
+    private static String criticalHitColor;
 
     public CriticalStrikesConfig() {
         super("critical_strikes",

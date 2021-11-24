@@ -42,6 +42,8 @@ public abstract class CustomEnchantment {
         new SummonWolfEnchantment();
         new UnbindEnchantment();
         new LightningEnchantment();
+        new GrapplingHookEnchantment();
+        new EarthquakeEnchantment();
     }
 
     /*

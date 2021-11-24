@@ -29,6 +29,7 @@ public class PlayerItem {
     private double critChance = 0;
     private double hunterChance = 0;
     private double lightningChance = 0;
+    private double earthquakeLevel = 0;
 
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
@@ -88,6 +89,8 @@ public class PlayerItem {
         }
 
         this.hunterChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, HunterEnchantment.key)) * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus");
+
+        this.earthquakeLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, EarthquakeEnchantment.key));
 
         checkArmorSpecificFeatures();
 
@@ -169,6 +172,12 @@ public class PlayerItem {
         if (update)
             fullUpdate(itemStack);
         return this.plasmaBootsLevel;
+    }
+
+    public double getEarthquakeLevel(ItemStack itemStack, boolean update){
+        if (update)
+            fullUpdate(itemStack);
+        return this.earthquakeLevel;
     }
 
 

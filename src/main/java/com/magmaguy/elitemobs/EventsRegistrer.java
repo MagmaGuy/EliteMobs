@@ -93,8 +93,9 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FindSuperMobs(), plugin);
         if (ItemSettingsConfig.isPreventEliteItemEnchantment())
             pluginManager.registerEvents(new ItemEnchantmentPrevention(), plugin);
-        if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
-            pluginManager.registerEvents(new PreventUpgradeDiamondToNetherite(), plugin);
+        if (!VersionChecker.serverVersionOlderThan(15, 2))
+            if (ItemSettingsConfig.isPreventEliteItemDiamondToNetheriteUpgrade())
+                pluginManager.registerEvents(new PreventUpgradeDiamondToNetherite(), plugin);
 
         //Mob damage
         pluginManager.registerEvents(new PlayerDamagedByEliteMobHandler(), plugin);
@@ -297,6 +298,8 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new MeteorShowerEnchantment.MeteorShowerEvents(), plugin);
         pluginManager.registerEvents(new DrillingEnchantment.DrillingEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new IceBreakerEnchantment.IceBreakerEnchantmentEvent(), plugin);
+        pluginManager.registerEvents(new GrapplingHookEnchantment.GrapplingHookEnchantmentEvents(), plugin);
+        pluginManager.registerEvents(new EarthquakeEnchantment.EarthquakeEnchantmentEvents(), plugin);
         //pluginManager.registerEvents(new UnbindEnchantment.UnbindEvents(), plugin);
 
         //Initialize adventurer's guild
