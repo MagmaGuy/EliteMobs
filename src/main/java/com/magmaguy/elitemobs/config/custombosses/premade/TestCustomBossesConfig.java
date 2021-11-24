@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.config.custombosses.premade;
 
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
@@ -39,7 +40,8 @@ public class TestCustomBossesConfig extends CustomBossesConfigFields {
         setEscapeMessage("A test boss entity has escaped!");
         setLocationMessage("Test entity: $distance");
         setUniqueLootList(Collections.singletonList("magmaguys_toothpick.yml:1"));
-        setTrails(Collections.singletonList(Particle.BARRIER.toString()));
+        if (!VersionChecker.serverVersionOlderThan(18, 0))
+            setTrails(Collections.singletonList(Particle.BLOCK_MARKER.toString()));
         setOnDamageMessages(Collections.singletonList("I've hit you!"));
         setOnDamagedMessages(Collections.singletonList("I've been hit!"));
         setOnDeathCommands(Collections.singletonList("broadcast $players has killed $name! That was level $level!"));

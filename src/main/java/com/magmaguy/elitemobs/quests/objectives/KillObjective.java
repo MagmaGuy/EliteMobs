@@ -8,11 +8,9 @@ import org.bukkit.event.Listener;
 
 public abstract class KillObjective extends Objective {
 
-    public KillObjective(int targetAmount, String objectiveName) {
+    protected KillObjective(int targetAmount, String objectiveName) {
         super(targetAmount, objectiveName);
     }
-
-    public abstract void checkProgress(EliteMobDeathEvent event, QuestObjectives questObjectives);
 
     public static class KillObjectiveEvents implements Listener {
         @EventHandler

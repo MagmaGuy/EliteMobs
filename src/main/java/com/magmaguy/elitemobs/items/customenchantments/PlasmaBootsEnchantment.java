@@ -125,7 +125,7 @@ public class PlasmaBootsEnchantment extends CustomEnchantment {
             }
             players.remove(event.getPlayer().getUniqueId());
             cooldownPlayers.add(event.getPlayer().getUniqueId());
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> cooldownPlayers.remove(event.getPlayer().getUniqueId()), 20 * 60 * 2);
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> cooldownPlayers.remove(event.getPlayer().getUniqueId()), 20L * 60 * 2);
 
             doPlasmaBootsEnchantment((int) plasmaBootLevel, event.getPlayer());
 
