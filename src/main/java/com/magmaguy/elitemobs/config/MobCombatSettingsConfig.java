@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.config;
 
+import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -32,6 +33,18 @@ public class MobCombatSettingsConfig {
     public static String bossKillParticipationMessage;
     public static boolean regenerateCustomBossHealthOnCombatEnd;
     public static String defaultOtherWorldBossLocationMessage;
+    @Getter
+    private static String weakTextColor;
+    @Getter
+    private static String resistTextColor;
+    @Getter
+    private static String weakText;
+    @Getter
+    private static String resistText;
+    @Getter
+    private static boolean doWeakEffect;
+    @Getter
+    private static boolean doResistEffect;
 
     public static void initializeConfig() {
 
@@ -65,6 +78,12 @@ public class MobCombatSettingsConfig {
         bossKillParticipationMessage = ConfigurationEngine.setString(fileConfiguration, "bossKillParticipationMessage", "&eYour damage: &2$playerDamage");
         regenerateCustomBossHealthOnCombatEnd = ConfigurationEngine.setBoolean(fileConfiguration, "regenerateCustomBossHealthOnCombatEnd", true);
         defaultOtherWorldBossLocationMessage = ConfigurationEngine.setString(fileConfiguration, "defaultOtherWorldBossLocationMessage", "$name: In different world!");
+        weakTextColor = ConfigurationEngine.setString(fileConfiguration, "weakTextColor", "&9");
+        resistTextColor = ConfigurationEngine.setString(fileConfiguration, "resistTextColor", "&c");
+        weakText = ConfigurationEngine.setString(fileConfiguration, "weakText", "&9&lWeak!");
+        resistText = ConfigurationEngine.setString(fileConfiguration, "resistText", "&c&lResist!");
+        doWeakEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doWeakEffect", true);
+        doResistEffect = ConfigurationEngine.setBoolean(fileConfiguration, "doResistEffect", true);
 
         ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
 

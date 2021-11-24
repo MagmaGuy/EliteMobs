@@ -139,6 +139,13 @@ public class ElitePlayerInventory {
         return boots.getPlasmaBootsLevel(player.getInventory().getBoots(), update);
     }
 
+    public double getEarthquakeLevel(boolean update){
+        return helmet.getEarthquakeLevel(player.getInventory().getHelmet(), update) +
+                chestplate.getEarthquakeLevel(player.getInventory().getChestplate(), update) +
+                leggings.getEarthquakeLevel(player.getInventory().getLeggings(), update) +
+                boots.getEarthquakeLevel(player.getInventory().getBoots(), update);
+    }
+
     /**
      * Outputs the base damage of the player given the current gear. Does not take secondary enchantments into account,
      * such as Smite
