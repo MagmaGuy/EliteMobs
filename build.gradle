@@ -10,7 +10,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
 group 'com.magmaguy'
-version '7.3.10-SNAPSHOT-5'
+version '7.3.10'
 
 repositories {
     maven {
@@ -55,7 +55,7 @@ repositories {
 
 dependencies {
     //Spigot API
-    compileOnly "org.spigotmc:spigot-api:1.18-pre5-R0.1-SNAPSHOT"
+    compileOnly "org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT"
 
     //compileOnly 'org.spigotmc:spigot:1.17-R0.1-SNAPSHOT'
     // The full CraftBukkit server with no shadowing. Requires mavenLocal.
@@ -115,7 +115,6 @@ String packagePath = 'com.magmaguy.shaded'
 shadowJar {
     dependencies {
         relocate('org.bstats', packagePath + '.bstats')
-
         relocate('cloud.commandframework', packagePath + '.cloud')
         relocate('net.kyori', packagePath + '.adventure-platform-bukkit')
         relocate('io.leangen.geantyref', packagePath + '.geantyref')

@@ -4,18 +4,13 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.EconomySettingsConfig;
-import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -25,7 +20,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static net.kyori.adventure.text.Component.text;
@@ -37,7 +31,7 @@ import static net.kyori.adventure.text.Component.text;
 public class CommandHandler {
 
     private PaperCommandManager<CommandSender> manager;
-    private CommandConfirmationManager<CommandSender> paymentConfirmationManager;
+    //private CommandConfirmationManager<CommandSender> paymentConfirmationManager;
     private MinecraftHelp<CommandSender> minecraftHelp;
     private BukkitAudiences bukkitAudiences;
 
@@ -82,22 +76,6 @@ public class CommandHandler {
                 bukkitAudiences::sender,
                 manager
         );
-
-        // Create the confirmation manager. This allows us to require certain commands to be
-        // confirmed before they can be executed
-        paymentConfirmationManager = new CommandConfirmationManager<>(
-                /* Timeout */ 30L,
-                /* Timeout unit */ TimeUnit.SECONDS,
-                /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
-                ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.ECONOMY_TAX_MESSAGE)
-                        .replace("$command", "/em confirm")
-                        .replace("$percentage", (EconomySettingsConfig.playerToPlayerTaxes * 100) + ""))),
-                /* Action when no confirmation is pending */ sender -> sender.sendMessage(
-                ChatColorConverter.convert(ConfigValues.translationConfig.getString(TranslationConfig.NO_PENDING_COMMANDS)))
-        );
-
-        // Register the confirmation processor. This will enable confirmations for commands that require it
-        paymentConfirmationManager.registerConfirmationProcessor(manager);
 
         // Override the default exception handlers
         new MinecraftExceptionHandler<CommandSender>()
@@ -146,11 +124,6 @@ public class CommandHandler {
                     minecraftHelp.queryCommands(context.getOrDefault("query", ""), context.getSender());
                 }));
 
-        // Add a confirmation command
-        manager.command(builder.literal("confirm")
-                .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
-                .handler(paymentConfirmationManager.createConfirmationExecutionHandler()));
-
         //// Create a world argument
         //final CommandArgument<CommandSender, World> worldArgument = WorldArgument.of("world");
 
@@ -164,7 +137,7 @@ public class CommandHandler {
                 }));
 
         new AdminCommands(manager, builder);
-        new UserCommands(manager, builder, paymentConfirmationManager);
+        new UserCommands(manager, builder);
 
     }
 

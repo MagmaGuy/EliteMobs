@@ -17,8 +17,10 @@ public final class SpigotMessage {
     }
 
     public static TextComponent commandHoverMessage(String message, String hoverMessage, String commandString) {
+
         TextComponent textComponent = hoverMessage(message, hoverMessage);
-        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandString));
+        if (!commandString.isEmpty())
+            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandString));
         return textComponent;
     }
 }

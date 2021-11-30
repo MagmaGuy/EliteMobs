@@ -5,11 +5,10 @@ import com.magmaguy.elitemobs.config.CustomConfigFieldsInterface;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomQuestsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface, Serializable {
+public class CustomQuestsConfigFields extends CustomConfigFields implements CustomConfigFieldsInterface {
 
     @Getter
     @Setter

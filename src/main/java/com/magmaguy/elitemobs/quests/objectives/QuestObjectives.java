@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.api.QuestObjectivesCompletedEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
-import com.magmaguy.elitemobs.quests.QuestReward;
+import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import lombok.Getter;
@@ -14,13 +14,14 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class QuestObjectives {
+public class QuestObjectives implements Serializable {
 
     @Getter
     @Setter
@@ -31,7 +32,10 @@ public class QuestObjectives {
     //The CustomQuest this objective belongs to
     @Getter
     private Quest quest;
-    private boolean isOver = false;
+    private boolean over = false;
+    @Getter
+    @Setter
+    private boolean turnedIn = false;
 
     /**
      * Used for dynamic quests
@@ -78,9 +82,12 @@ public class QuestObjectives {
     }
 
     public void updateQuestStatus(UUID playerUUID) {
-        if (isOver) return;
+        //This checks if the player managed to try to progress an already over and turned in quest, which would reward them again.
+        //This would in theory only be possible for quests that display the "completed" status, but should still be inaccessible in theory.
+        if (turnedIn) return;
+        if (over) return;
         if (!isOver()) return;
-        isOver = true;
+        over = true;
         QuestObjectivesCompletedEvent questObjectivesCompletedEvent = new QuestObjectivesCompletedEvent(Bukkit.getPlayer(playerUUID), quest);
         new EventCaller(questObjectivesCompletedEvent);
     }

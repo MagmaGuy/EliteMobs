@@ -207,7 +207,7 @@ public class Minidungeon {
 
     public void removeRelativeLocation(RegionalBossEntity regionalBossEntity) {
         RealDungeonLocations.RealDungeonLocation realDungeonLocation = null;
-        for (RealDungeonLocations.RealDungeonLocation iterated : realDungeonLocations.realDungeonLocations) {
+        for (RealDungeonLocations.RealDungeonLocation iterated : realDungeonLocations.locations) {
             if (iterated.regionalBossEntity != null)
                 if (iterated.regionalBossEntity.equals(regionalBossEntity)) {
                     realDungeonLocation = iterated;
@@ -224,7 +224,7 @@ public class Minidungeon {
         RealDungeonLocations.RealDungeonLocation finalRealDungeonLocation = realDungeonLocation;
         relativeBossLocations.relativeDungeonLocations.removeIf(relativeDungeonLocation -> relativeDungeonLocation.location.equals(finalRealDungeonLocation.relativeLocation) &&
                 relativeDungeonLocation.customBossesConfigFields.equals(regionalBossEntity.getCustomBossesConfigFields()));
-        realDungeonLocations.realDungeonLocations.remove(realDungeonLocation);
+        realDungeonLocations.locations.remove(realDungeonLocation);
         new InfoMessage("Correctly unregistered entry from dungeon packager!");
 
     }
@@ -423,17 +423,17 @@ public class Minidungeon {
      * This can only exist if the anchor point actually exists
      */
     public class RealDungeonLocations {
-        ArrayList<RealDungeonLocation> realDungeonLocations = new ArrayList<>();
+        ArrayList<RealDungeonLocation> locations = new ArrayList<>();
 
         public RealDungeonLocations() {
             for (RelativeDungeonLocations.RelativeDungeonLocation relativeDungeonLocation : relativeBossLocations.relativeDungeonLocations)
                 if (dungeonPackagerConfigFields.getRotation() == 0F)
-                    realDungeonLocations.add(
+                    locations.add(
                             new RealDungeonLocation(relativeDungeonLocation.location,
                                     dungeonPackagerConfigFields.getAnchorPoint().clone().add(relativeDungeonLocation.location),
                                     relativeDungeonLocation.customBossesConfigFields));
                 else {
-                    realDungeonLocations.add(
+                    locations.add(
                             new RealDungeonLocation(relativeDungeonLocation.location,
                                     getRotatedFinalLocation(dungeonPackagerConfigFields.getAnchorPoint(), relativeDungeonLocation.location),
                                     relativeDungeonLocation.customBossesConfigFields));
@@ -441,12 +441,12 @@ public class Minidungeon {
 
             for (RelativeDungeonLocations.RelativeDungeonLocation relativeDungeonLocation : relativeTreasureChestLocations.relativeDungeonLocations)
                 if (dungeonPackagerConfigFields.getRotation() == 0F)
-                    realDungeonLocations.add(
+                    locations.add(
                             new RealDungeonLocation(relativeDungeonLocation.location,
                                     dungeonPackagerConfigFields.getAnchorPoint().clone().add(relativeDungeonLocation.location),
                                     relativeDungeonLocation.customTreasureChestConfigFields));
                 else
-                    realDungeonLocations.add(
+                    locations.add(
                             new RealDungeonLocation(relativeDungeonLocation.location,
                                     getRotatedFinalLocation(dungeonPackagerConfigFields.getAnchorPoint(), relativeDungeonLocation.location.add(new Vector(0.5, 0.5, 0.5))),
                                     relativeDungeonLocation.customTreasureChestConfigFields));
@@ -456,7 +456,7 @@ public class Minidungeon {
          * This runs when an admin tries to install a dungeon
          */
         public void commitLocations() {
-            for (RealDungeonLocation realDungeonLocation : realDungeonLocations)
+            for (RealDungeonLocation realDungeonLocation : locations)
                 if (realDungeonLocation.customBossesConfigFields != null)
                     realDungeonLocation.regionalBossEntity = RegionalBossEntity.createPermanentRegionalBossEntity(realDungeonLocation.customBossesConfigFields, realDungeonLocation.location);
                 else if (realDungeonLocation.customTreasureChestConfigFields != null)

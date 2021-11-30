@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
@@ -59,6 +60,10 @@ public class DungeonPackagerConfigFields extends CustomConfigFields {
     private String regionEnterMessage = "";
     @Getter
     private String regionLeaveMessage = "";
+    @Getter
+    @Setter
+    private List<String> worldGuardFlags = new ArrayList<>();
+
 
     public DungeonPackagerConfigFields(String fileName, boolean isEnabled){
         super(fileName, isEnabled);

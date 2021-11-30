@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.menus.premade.CustomQuestMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -87,7 +88,10 @@ public class QuestMenu {
     }
 
     private static TextComponent generateHeader(Quest quest) {
-        return SpigotMessage.simpleMessage(CustomQuestMenuConfig.headerTextLines.replace("$questName", quest.getQuestName()));
+        if (quest instanceof CustomQuest)
+            return SpigotMessage.simpleMessage(CustomQuestMenuConfig.headerTextLines.replace("$questName", quest.getQuestName()));
+        else
+            return SpigotMessage.simpleMessage(DynamicQuestMenuConfig.getHeaderTextLines().replace("$questName", quest.getQuestName()));
     }
 
     private static TextComponent generateBody(Quest quest) {
@@ -149,14 +153,20 @@ public class QuestMenu {
     private static TextComponent generateAccept(Quest quest, NPCEntity npcEntity) {
         TextComponent accept = new TextComponent();
         if (quest instanceof CustomQuest) {
-            if (!quest.isQuestIsAccepted())
+            if (!quest.isAccepted()) {
                 accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptTextLines,
                         CustomQuestMenuConfig.acceptHoverLines,
                         CustomQuestMenuConfig.acceptCommandLines.replace("$questID", quest.getQuestID().toString()));
-            else if (!quest.getQuestObjectives().isOver())
+            }else if (!quest.getQuestObjectives().isOver())
                 accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptedTextLines,
                         CustomQuestMenuConfig.acceptedHoverLines,
                         CustomQuestMenuConfig.acceptedCommandLines.replace("$questID", quest.getQuestID().toString()));
+            else if (quest.getQuestObjectives().isOver() && quest.getQuestObjectives().isTurnedIn() &&
+                    (npcEntity == null && quest.getTurnInNPC().isEmpty() ||
+                            npcEntity != null && quest.getTurnInNPC().isEmpty() ||
+                            npcEntity != null && !quest.getTurnInNPC().isEmpty() && quest.getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
+                accept = SpigotMessage.hoverMessage(DynamicQuestMenuConfig.getTurnedInTextLines(),
+                        DynamicQuestMenuConfig.getTurnedInHoverLines());
             else if (quest.getQuestObjectives().isOver() &&
                     (npcEntity == null && quest.getTurnInNPC().isEmpty() ||
                             npcEntity != null && quest.getTurnInNPC().isEmpty() ||
@@ -169,7 +179,7 @@ public class QuestMenu {
                 accept = SpigotMessage.simpleMessage("");
             }
         } else if (quest instanceof DynamicQuest) {
-            if (!quest.isQuestIsAccepted())
+            if (!quest.isAccepted())
                 accept = SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptTextLines(),
                         DynamicQuestMenuConfig.getAcceptedHoverLines(),
                         DynamicQuestMenuConfig.getAcceptCommandLines().replace("$questID", quest.getQuestID().toString()));
@@ -177,6 +187,9 @@ public class QuestMenu {
                 accept = SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptedTextLines(),
                         DynamicQuestMenuConfig.getAcceptedHoverLines(),
                         DynamicQuestMenuConfig.getAcceptedCommandLines().replace("$questID", quest.getQuestID().toString()));
+            else if (quest.getQuestObjectives().isOver() && quest.getQuestObjectives().isTurnedIn())
+                accept = SpigotMessage.hoverMessage(DynamicQuestMenuConfig.getTurnedInTextLines(),
+                        DynamicQuestMenuConfig.getTurnedInHoverLines());
             else if (quest.getQuestObjectives().isOver() &&
                     (npcEntity == null && quest.getTurnInNPC().isEmpty() ||
                             npcEntity != null && quest.getTurnInNPC().isEmpty() ||
@@ -208,8 +221,8 @@ public class QuestMenu {
     }
 
     public static TextComponent[] generateQuestEntry(Player player, NPCEntity npcEntity) {
-        if (Quest.getPlayerQuests().get(player.getUniqueId()) == null) return new TextComponent[0];
-        return generateQuestEntry(Quest.getPlayerQuests().get(player.getUniqueId()), player, npcEntity);
+        if (PlayerData.getQuest(player.getUniqueId()) == null) return new TextComponent[0];
+        return generateQuestEntry(PlayerData.getQuest(player.getUniqueId()), player, npcEntity);
     }
 
 }
