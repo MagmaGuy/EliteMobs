@@ -5,9 +5,9 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.items.ShareItem;
-import com.magmaguy.elitemobs.quests.QuestReward;
-import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.quests.rewards.QuestReward;
+import com.magmaguy.elitemobs.quests.rewards.RewardEntry;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
@@ -27,6 +27,8 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
     @Getter
     private static String completedTextLines, completedHoverLines, completedCommandLines;
     @Getter
+    private static String turnedInTextLines, turnedInHoverLines;
+    @Getter
     private static String ongoingColorCode, completedColorCode;
     @Getter
     private static String objectivesLine;
@@ -42,9 +44,9 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
 
     public static String getKillQuestDefaultSummaryLine(Objective objective) {
         String newString = killQuestDefaultSummaryLine;
-        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(((KillObjective) objective).getObjectiveName()));
-        newString = newString.replace("$current", ((KillObjective) objective).getCurrentAmount() + "");
-        newString = newString.replace("$target", ((KillObjective) objective).getTargetAmount() + "");
+        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor((objective).getObjectiveName()));
+        newString = newString.replace("$current", objective.getCurrentAmount() + "");
+        newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())
             return newString.replace("$color", ongoingColorCode);
         else
@@ -53,7 +55,7 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
 
     public static TextComponent getRewardsDefaultSummaryLine(QuestReward questReward, int questLevel, Player player) {
         TextComponent textComponent = new TextComponent();
-        for (QuestReward.RewardEntry rewardEntry : questReward.getRewardEntries())
+        for (RewardEntry rewardEntry : questReward.getRewardEntries())
             if (rewardEntry.getItemStack() != null) {
                 TextComponent customItemTextComponent = new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.getAmount() + "")
@@ -78,7 +80,7 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
         questName = ConfigurationEngine.setString(fileConfiguration, "questName", "Slay $amount $name");
 
         headerTextLines = ConfigurationEngine.setString(fileConfiguration, "headerTextLines",
-                ChatColorConverter.convert("&c&l$questName\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
+                ChatColorConverter.convert("&c&lGuild request!\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
 
         defaultLoreTextLines = ConfigurationEngine.setString(fileConfiguration, "defaultLoreTextLines", "&8Slay $amount $name!");
 
@@ -88,11 +90,14 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
 
         acceptedTextLines = ConfigurationEngine.setString(fileConfiguration, "acceptedTextLines", "&2&lAccepted! &4[Abandon]");
         acceptedHoverLines = ConfigurationEngine.setString(fileConfiguration, "acceptedHoverLines", "&aClick to abandon quest!");
-        acceptedCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptedCommandLines", "/em quest leave $questID");
+        acceptedCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptedCommandLines2", "/em quest leave");
 
         completedTextLines = ConfigurationEngine.setString(fileConfiguration, "completedTextLines", "&2&l[Turn in!]");
         completedHoverLines = ConfigurationEngine.setString(fileConfiguration, "completedHoverLines", "&aClick to turn quest in!");
         completedCommandLines = ConfigurationEngine.setString(fileConfiguration, "completedCommandLines", "/em quest complete $questID");
+
+        turnedInTextLines = ConfigurationEngine.setString(fileConfiguration, "turnedInTextLines", "&8[Completed!]");
+        turnedInHoverLines = ConfigurationEngine.setString(fileConfiguration, "turnedInHoverLines", "&8Already turned in!");
 
         objectivesLine = ConfigurationEngine.setString(fileConfiguration, "objectivesLine", "&c&lObjectives:");
         killQuestDefaultSummaryLine = ConfigurationEngine.setString(fileConfiguration, "killQuestDefaultSummaryLine", "&c➤Kill $name:$color$current&0/$color$target");

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands.quests;
 
 import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.quests.Quest;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -17,13 +18,13 @@ public class QuestCommand {
     }
 
     // /em quest join questFilename
-    public static void joinQuest(String questFilename, Player player) {
-        CustomQuest.startQuest(questFilename, player);
+    public static void joinQuest(String questID, Player player) {
+        CustomQuest.startQuest(questID, player);
     }
 
     // /em quest leave questFilename
-    public static void leaveQuest(String questFilename, Player player) {
-        CustomQuest.stopPlayerQuest(player);
+    public static void leaveQuest(Player player) {
+        Quest.stopPlayerQuest(player);
     }
 
 }

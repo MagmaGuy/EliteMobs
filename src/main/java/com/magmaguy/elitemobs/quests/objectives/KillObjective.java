@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,7 +17,7 @@ public abstract class KillObjective extends Objective {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
             for (Player player : event.getEliteEntity().getDamagers().keySet()) {
-                Quest quest = Quest.getPlayerQuests().get(player.getUniqueId());
+                Quest quest = PlayerData.getQuest(player.getUniqueId());
                 if (quest != null)
                     for (Objective objective : quest.getQuestObjectives().getObjectives())
                         if (objective instanceof KillObjective)

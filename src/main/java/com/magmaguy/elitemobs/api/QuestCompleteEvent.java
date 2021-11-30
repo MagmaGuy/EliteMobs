@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
@@ -35,8 +36,8 @@ public class QuestCompleteEvent extends Event {
     public static class QuestCompleteEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestAccept(QuestCompleteEvent event) {
+            event.getQuest().getQuestObjectives().setTurnedIn(true);
             event.getPlayer().sendMessage(QuestsConfig.questCompleteMesage.replace("$questName", event.getQuest().getQuestName()));
-            CustomQuest.getPlayerQuests().remove(event.getPlayer().getUniqueId());
             event.getQuest().getQuestObjectives().getQuestReward().doRewards(event.getPlayer().getUniqueId(), event.getQuest().getQuestLevel());
             if (QuestsConfig.useQuestCompleteTitles)
                 event.getPlayer().sendTitle(
@@ -61,7 +62,7 @@ public class QuestCompleteEvent extends Event {
                                     .replace("$getY", event.getPlayer().getLocation().getY() + "")
                                     .replace("$getZ", event.getPlayer().getLocation().getZ() + ""));
             }
-
+            PlayerData.removeQuest(event.getPlayer().getUniqueId());
         }
     }
 }

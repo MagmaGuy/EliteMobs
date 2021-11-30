@@ -4,8 +4,10 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
+import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -52,10 +54,19 @@ public class DynamicQuest extends Quest {
     }
 
     public static List<DynamicQuest> getQuests(Player player) {
+        List<DynamicQuest> dynamicQuests = new ArrayList<>();
+
+        if (PlayerData.getQuest(player.getUniqueId()) instanceof DynamicQuest)
+            dynamicQuests.add((DynamicQuest) PlayerData.getQuest(player.getUniqueId()));
+
         if (dynamicPlayerQuests.get(player.getUniqueId()) == null)
-            return generateQuests(player);
+            dynamicQuests.addAll(generateQuests(player));
         else
-            return dynamicPlayerQuests.get(player.getUniqueId());
+            for (DynamicQuest dynamicQuest : dynamicPlayerQuests.get(player.getUniqueId()))
+                if (!(!dynamicQuests.isEmpty() && dynamicQuests.get(0).getQuestID().equals(dynamicQuest.getQuestID())))
+                    dynamicQuests.add(dynamicQuest);
+
+        return dynamicQuests;
     }
 
 }

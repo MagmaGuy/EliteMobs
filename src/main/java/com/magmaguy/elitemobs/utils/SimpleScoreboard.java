@@ -18,7 +18,9 @@ public class SimpleScoreboard {
         Objective objective = scoreboard.registerNewObjective("test", "dummy", displayName);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         for (int i = 0; i < lineCount; i++) {
-            Score score = objective.getScore(scoreboardContents.get(i));
+            String scoreString = scoreboardContents.get(i);
+            if (scoreString.length() > 40) scoreString = scoreString.substring(0, 39);
+            Score score = objective.getScore(scoreString);
             score.setScore(i);
         }
 

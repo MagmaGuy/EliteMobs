@@ -41,11 +41,11 @@ public class CurrencyCommandsHandler {
             return;
         }
 
-        double actuallyRecievedAmount = Round.twoDecimalPlaces(amount - amount * EconomySettingsConfig.playerToPlayerTaxes);
+        double actuallyReceivedAmount = Round.twoDecimalPlaces(amount - amount * EconomySettingsConfig.playerToPlayerTaxes);
         double taxes = Round.twoDecimalPlaces(amount * EconomySettingsConfig.playerToPlayerTaxes);
 
         //CASE: Successful payment
-        EconomyHandler.addCurrency(recipient.getUniqueId(), actuallyRecievedAmount);
+        EconomyHandler.addCurrency(recipient.getUniqueId(), actuallyReceivedAmount);
         EconomyHandler.subtractCurrency(sender.getUniqueId(), amount);
 
         sender.sendMessage(
@@ -53,7 +53,7 @@ public class CurrencyCommandsHandler {
                         ConfigValues.translationConfig
                                 .getString(TranslationConfig.ECONOMY_PAY_MESSAGE)
                                 .replace("$amount_sent", amount + "")
-                                .replace("$amount_received", actuallyRecievedAmount + "")
+                                .replace("$amount_received", actuallyReceivedAmount + "")
                                 .replace("$taxes", taxes + "")
                                 .replace("$currency_name", EconomySettingsConfig.currencyName)
                                 .replace("$receiver", recipient.getDisplayName())));
@@ -70,7 +70,7 @@ public class CurrencyCommandsHandler {
                         ConfigValues.translationConfig
                                 .getString(TranslationConfig.ECONOMY_PAYMENT_RECEIVED_MESSAGE)
                                 .replace("$amount_sent", amount + "")
-                                .replace("$amount_received", actuallyRecievedAmount + "")
+                                .replace("$amount_received", actuallyReceivedAmount + "")
                                 .replace("$taxes", taxes + "")
                                 .replace("$sender", sender.getDisplayName())
                                 .replace("$currency_name", EconomySettingsConfig.currencyName)));

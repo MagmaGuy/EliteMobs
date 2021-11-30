@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.utils.InfoMessage;
+import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,6 +28,7 @@ public class PlayerData {
     private final boolean update = false;
     private double currency;
     private int guildPrestigeLevel, maxGuildLevel, activeGuildLevel, score, kills, highestLevelKilled, deaths, questsCompleted;
+    private Quest quest;
 
     /**
      * Called when a player logs in, storing their data in memory
@@ -52,6 +55,19 @@ public class PlayerData {
                         highestLevelKilled = resultSet.getInt("HighestLevelKilled");
                         deaths = resultSet.getInt("Deaths");
                         questsCompleted = resultSet.getInt("QuestsCompleted");
+                        try {
+                            quest = (Quest) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), "UTF-8"));
+                            //Serializes ItemStack which require specific handling
+                            quest.getQuestObjectives().getQuestReward().serializeRewards();
+                        } catch (Exception ex) {
+                            new WarningMessage("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
+                            try{
+                                setQuestStatus(uuid, null);
+                            } catch (Exception ex2){
+                                new WarningMessage("Failed to reset quest data! Ironic.");
+                                ex2.printStackTrace();
+                            }
+                        }
 
                         playerDataHashMap.put(uuid, playerData);
 
@@ -247,36 +263,35 @@ public class PlayerData {
             playerDataHashMap.get(uuid).activeGuildLevel = activeGuildLevel;
     }
 
-    //public static PlayerQuests getQuestStatus(UUID uuid) {
-    //    try {
-    //        //todo: store quest progress long-term
-    //        //if (!isInMemory(uuid))
-    //        //return (PlayerQuests) getDatabaseBlob(uuid, "QuestStatus");
-    //        return playerDataHashMap.get(uuid).questStatus;
-    //    } catch (Exception ex) {
-    //        return null;
-    //    }
-    //}
+    public static Quest getQuest(UUID uuid) {
+        try {
+            if (!isInMemory(uuid))
+                return (Quest) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestStatus"));
+            return playerDataHashMap.get(uuid).quest;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
 
-   //public static void removeQuest(UUID uuid, UUID questUUID) {
-   //    //todo: better handling, tie in to db
-   //    EliteQuest eliteQuest = null;
-   //    for (EliteQuest eliteQuest1 : playerDataHashMap.get(uuid).questStatus.quests)
-   //        if (eliteQuest1.getUuid().equals(questUUID))
-   //            eliteQuest = eliteQuest1;
-   //    playerDataHashMap.get(uuid).questStatus.quests.remove(eliteQuest);
-   //}
+    public static void removeQuest(UUID uuid) {
+        Quest quest = null;
+        //for (EliteQuest eliteQuest1 : playerDataHashMap.get(uuid).questStatus.quests)
+        //    if (eliteQuest1.getUuid().equals(questUUID))
+        //        quest = eliteQuest1;
+        setQuestStatus(uuid, null);
+        playerDataHashMap.get(uuid).quest = null;
+    }
 
-   // public static void setQuestStatus(UUID uuid, PlayerQuests questStatus) {
-   //     //todo: proper serialization
-   //     try {
-   //         setDatabaseValue(uuid, "QuestStatus", questStatus);
-   //         if (playerDataHashMap.containsKey(uuid))
-   //             playerDataHashMap.get(uuid).questStatus = questStatus;
-   //     } catch (Exception ex) {
-   //         new WarningMessage("Failed to serialize player quest data!");
-   //     }
-   // }
+    public static void setQuestStatus(UUID uuid, Quest quest) {
+        //todo: proper serialization
+        try {
+            setDatabaseValue(uuid, "QuestStatus", ObjectSerializer.toString(quest));
+            if (playerDataHashMap.containsKey(uuid))
+                playerDataHashMap.get(uuid).quest = quest;
+        } catch (Exception ex) {
+            new WarningMessage("Failed to serialize player quest data!");
+        }
+    }
 
     public static int getScore(UUID uuid) {
         if (!isInMemory(uuid))
