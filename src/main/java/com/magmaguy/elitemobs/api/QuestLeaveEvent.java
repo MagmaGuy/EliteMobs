@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
@@ -33,13 +34,13 @@ public class QuestLeaveEvent extends Event {
     public static class QuestLeaveEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestLeave(QuestLeaveEvent event) {
+            PlayerData.removeQuest(event.getPlayer().getUniqueId());
             event.getPlayer().sendMessage(QuestsConfig.questLeaveMessage.replace("$questName", event.getQuest().getQuestName()));
             if (QuestsConfig.useQuestLeaveTitles)
                 event.getPlayer().sendTitle(
                         QuestsConfig.questLeaveTitle.replace("$questName", event.getQuest().getQuestName()),
                         QuestsConfig.questLeaveSubtitle.replace("$questName", event.getQuest().getQuestName()),
                         20, 60, 20);
-            Quest.getPlayerQuests().remove(event.getPlayer().getUniqueId());
             if (event.getQuest() instanceof CustomQuest) {
                 CustomQuest customQuest = (CustomQuest) event.getQuest();
                 if (!customQuest.getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {

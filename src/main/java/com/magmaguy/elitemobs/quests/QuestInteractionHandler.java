@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -37,7 +38,7 @@ public class QuestInteractionHandler {
                     customQuestList.add(customQuest);
             }
 
-        Quest quest = Quest.getPlayerQuests().get(player.getUniqueId());
+        Quest quest = PlayerData.getQuest(player.getUniqueId());
         if (quest instanceof CustomQuest &&
                 (((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().isEmpty() ||
                         !((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().isEmpty()

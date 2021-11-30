@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import lombok.Getter;
@@ -38,6 +39,7 @@ public class QuestProgressionEvent extends Event {
             if (QuestsConfig.doQuestChatProgression)
                 event.getPlayer().sendMessage(QuestsConfig.getKillQuestChatProgressionMessage(event.getObjective()));
             event.getQuest().getQuestObjectives().displayObjectivesScoreboard(event.getPlayer());
+            PlayerData.setQuestStatus(event.getPlayer().getUniqueId(), event.getQuest());
         }
     }
 }

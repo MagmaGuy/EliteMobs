@@ -4,9 +4,13 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
+import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -14,11 +18,13 @@ import java.util.UUID;
 public class CustomQuest extends Quest {
 
     @Getter
-    private final CustomQuestsConfigFields customQuestsConfigFields;
+    private final String configurationFilename;
+    private transient CustomQuestsConfigFields customQuestsConfigFields;
 
     public CustomQuest(Player player, CustomQuestsConfigFields customQuestsConfigFields) {
         super(player, new QuestObjectives(new QuestReward(customQuestsConfigFields, player)), customQuestsConfigFields.getQuestLevel());
         this.customQuestsConfigFields = customQuestsConfigFields;
+        this.configurationFilename = customQuestsConfigFields.getFilename();
         super.questObjectives.setQuest(this);
         super.questName = customQuestsConfigFields.getQuestName();
         super.turnInNPC = customQuestsConfigFields.getTurnInNPC();
@@ -26,7 +32,7 @@ public class CustomQuest extends Quest {
 
     public static CustomQuest getQuest(String questFilename, Player player) {
         if (CustomQuestsConfig.getCustomQuests().get(questFilename) == null) return null;
-        Quest quest = Quest.getPlayerQuests().get(player.getUniqueId());
+        Quest quest = PlayerData.getQuest(player.getUniqueId());
         if (quest instanceof CustomQuest && ((CustomQuest) quest).getCustomQuestsConfigFields().getFilename().equals(questFilename))
             return (CustomQuest) quest;
         else
@@ -45,6 +51,18 @@ public class CustomQuest extends Quest {
         new EventCaller(questAcceptEvent);
         if (questAcceptEvent.isCancelled()) return null;
         return quest;
+    }
+
+    public CustomQuestsConfigFields getCustomQuestsConfigFields() {
+        if (customQuestsConfigFields == null)
+            this.customQuestsConfigFields = CustomQuestsConfig.getCustomQuests().get(configurationFilename);
+        if (customQuestsConfigFields == null) {
+            new WarningMessage("Detected that Custom Quest " + configurationFilename + " got removed even though player "
+                    + Bukkit.getPlayer(getPlayerUUID()).getName() + " is still trying to complete it. This player's quest will now be wiped.");
+            PlayerData.removeQuest(getPlayerUUID());
+            return null;
+        }
+        return customQuestsConfigFields;
     }
 
 }

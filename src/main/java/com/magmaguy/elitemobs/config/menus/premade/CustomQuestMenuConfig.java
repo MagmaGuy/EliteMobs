@@ -4,10 +4,11 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
-import com.magmaguy.elitemobs.items.ShareItem;
-import com.magmaguy.elitemobs.quests.QuestReward;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.quests.rewards.QuestReward;
+import com.magmaguy.elitemobs.quests.rewards.RewardEntry;
+import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
@@ -18,6 +19,8 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     public static String acceptTextLines, acceptHoverLines, acceptCommandLines;
     public static String acceptedTextLines, acceptedHoverLines, acceptedCommandLines;
     public static String completedTextLines, completedHoverLines, completedCommandLines;
+    @Getter
+    private static String turnedInTextLines, turnedInHoverLines;
     public static String ongoingColorCode, completedColorCode;
     public static String objectivesLine;
     public static String rewardsLine;
@@ -41,20 +44,12 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
 
     public static TextComponent getRewardsDefaultSummaryLine(QuestReward questReward, int questLevel, Player player) {
         TextComponent textComponent = new TextComponent();
-        for (QuestReward.RewardEntry rewardEntry : questReward.getRewardEntries())
+        for (RewardEntry rewardEntry : questReward.getRewardEntries())
             if (rewardEntry.getItemStack() != null) {
                 textComponent.addExtra(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.getAmount() + "")
                         .replace("$rewardName", WordUtils.capitalizeFully(rewardEntry.getItemStack().getType().toString()).replace("_", " "))
                         .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
-                textComponent.addExtra("\n");
-            } else if (rewardEntry.getCustomItem() != null) {
-                TextComponent customItemTextComponent = new TextComponent(rewardsDefaultSummaryLine
-                        .replace("$amount", rewardEntry.getAmount() + "")
-                        .replace("$rewardName", rewardEntry.getCustomItem().getName())
-                        .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
-                ShareItem.setItemHoverEvent(customItemTextComponent, rewardEntry.getCustomItem().generateItemStack(questLevel * 10, player));
-                textComponent.addExtra(customItemTextComponent);
                 textComponent.addExtra("\n");
             } else if (rewardEntry.getCurrencyAmount() != 0) {
                 TextComponent customItemTextComponent = new TextComponent(rewardsDefaultSummaryLine
@@ -79,11 +74,14 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
 
         acceptedTextLines = ConfigurationEngine.setString(fileConfiguration, "acceptedTextLines", "&2&lAccepted! &4[Abandon]");
         acceptedHoverLines = ConfigurationEngine.setString(fileConfiguration, "acceptedHoverLines", "&aClick to abandon quest!");
-        acceptedCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptedCommandLines", "/em quest leave $questID");
+        acceptedCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptedCommandLines2", "/em quest leave");
 
         completedTextLines = ConfigurationEngine.setString(fileConfiguration, "completedTextLines", "&2&l[Turn in!]");
         completedHoverLines = ConfigurationEngine.setString(fileConfiguration, "completedHoverLines", "&aClick to turn quest in!");
         completedCommandLines = ConfigurationEngine.setString(fileConfiguration, "completedCommandLines", "/em quest complete $questID");
+
+        turnedInTextLines = ConfigurationEngine.setString(fileConfiguration, "turnedInTextLines", "&8[Completed!]");
+        turnedInHoverLines = ConfigurationEngine.setString(fileConfiguration, "turnedInHoverLines", "&8Already turned in!");
 
         objectivesLine = ConfigurationEngine.setString(fileConfiguration, "objectivesLine", "&c&lObjectives:");
         killQuestDefaultSummaryLine = ConfigurationEngine.setString(fileConfiguration, "killQuestDefaultSummaryLine", "&c➤Kill $name:$color$current&0/$color$target");

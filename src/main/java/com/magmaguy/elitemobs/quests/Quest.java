@@ -3,22 +3,24 @@ package com.magmaguy.elitemobs.quests;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
 import com.magmaguy.elitemobs.api.QuestLeaveEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class Quest {
+public class Quest implements Serializable {
 
     @Getter
     //Player UUID as key
-    protected static final HashMap<UUID, Quest> playerQuests = new HashMap<>();
+    //protected static final HashMap<UUID, Quest> playerQuests = new HashMap<>();
     //Temporarily stores a list of quests a player might be considering joining
     protected static final HashMap<UUID, List<Quest>> pendingPlayerQuests = new HashMap<>();
     @Getter
@@ -38,30 +40,34 @@ public class Quest {
     private int questLevel;
     @Getter
     @Setter
-    private boolean questIsAccepted = false;
+    private boolean accepted = false;
 
     public Quest(Player player, QuestObjectives questObjectives, int questLevel) {
         this.playerUUID = player.getUniqueId();
         this.questObjectives = questObjectives;
         this.questLevel = questLevel;
-        if (pendingPlayerQuests.get(playerUUID) == null){
+        if (pendingPlayerQuests.get(playerUUID) == null) {
             List<Quest> quests = new ArrayList<>();
             quests.add(this);
             pendingPlayerQuests.put(playerUUID, quests);
-        } else
-            pendingPlayerQuests.put(playerUUID, pendingPlayerQuests.get(getPlayerUUID())).add(this);
+        } else{
+            List<Quest> quests =  pendingPlayerQuests.get(playerUUID);
+            quests.add(this);
+            pendingPlayerQuests.put(playerUUID, quests);
+        }
     }
 
     public static void stopPlayerQuest(Player player) {
-        if (!playerQuests.containsKey(player.getUniqueId())) {
+        if (PlayerData.getQuest(player.getUniqueId()) == null) {
             player.sendMessage(QuestsConfig.leaveWhenNoActiveQuestsExist);
             return;
         }
-        new QuestLeaveEvent(player, playerQuests.get(player.getUniqueId()));
+        QuestLeaveEvent questLeaveEvent = new QuestLeaveEvent(player, PlayerData.getQuest(player.getUniqueId()));
+        new EventCaller(questLeaveEvent);
     }
 
     public static Quest completeQuest(UUID questUUID, Player player) {
-        Quest quest = playerQuests.get(player.getUniqueId());
+        Quest quest = PlayerData.getQuest(player.getUniqueId());
         if (quest == null) return null;
         if (!quest.getQuestID().equals(questUUID)) return null;
         if (!quest.getQuestObjectives().isOver()) return null;
