@@ -277,7 +277,7 @@ public class Minidungeon {
             player.teleport(world.getSpawnLocation());
             player.sendMessage("Minidungeon " + dungeonPackagerConfigFields.getWorldName() +
                     " has been loaded! The world is now loaded and the regional bosses are up.");
-            player.sendMessage("&cYou might want to do &a/em reload &cto fix the initial spawns and skins!");
+            player.sendMessage(ChatColorConverter.convert("&cYou might want to do &a/em reload &cto fix the initial spawns and skins!"));
             isInstalled = true;
             teleportLocation = world.getSpawnLocation().clone().add(dungeonPackagerConfigFields.getTeleportPoint());
         } catch (Exception exception) {

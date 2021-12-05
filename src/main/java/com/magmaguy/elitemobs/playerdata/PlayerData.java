@@ -16,7 +16,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerData {
@@ -28,7 +30,7 @@ public class PlayerData {
     private final boolean update = false;
     private double currency;
     private int guildPrestigeLevel, maxGuildLevel, activeGuildLevel, score, kills, highestLevelKilled, deaths, questsCompleted;
-    private Quest quest;
+    private List<Quest> quests = new ArrayList<>();
 
     /**
      * Called when a player logs in, storing their data in memory
@@ -55,17 +57,21 @@ public class PlayerData {
                         highestLevelKilled = resultSet.getInt("HighestLevelKilled");
                         deaths = resultSet.getInt("Deaths");
                         questsCompleted = resultSet.getInt("QuestsCompleted");
-                        try {
-                            quest = (Quest) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), "UTF-8"));
-                            //Serializes ItemStack which require specific handling
-                            quest.getQuestObjectives().getQuestReward().serializeRewards();
-                        } catch (Exception ex) {
-                            new WarningMessage("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
-                            try{
-                                setQuestStatus(uuid, null);
-                            } catch (Exception ex2){
-                                new WarningMessage("Failed to reset quest data! Ironic.");
-                                ex2.printStackTrace();
+
+                        if (resultSet.getBytes("QuestStatus") != null) {
+                            try {
+                                quests = (List<Quest>) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), "UTF-8"));
+                                //Serializes ItemStack which require specific handling, necessary recovering the rewards
+                                for (Quest quest : quests)
+                                    quest.getQuestObjectives().getQuestReward().serializeRewards();
+                            } catch (Exception ex) {
+                                new WarningMessage("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
+                                try {
+                                    resetQuests(uuid);
+                                } catch (Exception ex2) {
+                                    new WarningMessage("Failed to reset quest data! Ironic.");
+                                    ex2.printStackTrace();
+                                }
                             }
                         }
 
@@ -263,31 +269,68 @@ public class PlayerData {
             playerDataHashMap.get(uuid).activeGuildLevel = activeGuildLevel;
     }
 
-    public static Quest getQuest(UUID uuid) {
+    public static List<Quest> getQuests(UUID uuid) {
         try {
             if (!isInMemory(uuid))
-                return (Quest) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestStatus"));
-            return playerDataHashMap.get(uuid).quest;
+                return (List<Quest>) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestStatus"));
+            return playerDataHashMap.get(uuid).quests;
         } catch (Exception ex) {
             return null;
         }
     }
 
-    public static void removeQuest(UUID uuid) {
-        Quest quest = null;
-        //for (EliteQuest eliteQuest1 : playerDataHashMap.get(uuid).questStatus.quests)
-        //    if (eliteQuest1.getUuid().equals(questUUID))
-        //        quest = eliteQuest1;
-        setQuestStatus(uuid, null);
-        playerDataHashMap.get(uuid).quest = null;
+    public static Quest getQuest(UUID uuid, String questID) {
+        try {
+            UUID questUUID = UUID.fromString(questID);
+            return getQuest(uuid, questUUID);
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
-    public static void setQuestStatus(UUID uuid, Quest quest) {
-        //todo: proper serialization
+    public static Quest getQuest(UUID uuid, UUID questUUID) {
+        List<Quest> questList = null;
         try {
-            setDatabaseValue(uuid, "QuestStatus", ObjectSerializer.toString(quest));
+            if (!isInMemory(uuid))
+                questList = (List<Quest>) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestStatus"));
+            else
+                questList = playerDataHashMap.get(uuid).quests;
+        } catch (Exception ex) {
+            return null;
+        }
+        for (Quest iteratedQuest : questList)
+            if (iteratedQuest.getQuestID().equals(questUUID))
+                return iteratedQuest;
+        return null;
+    }
+
+    public static void resetQuests(UUID uuid) {
+        playerDataHashMap.get(uuid).quests.clear();
+        updateQuestStatus(uuid);
+    }
+
+    public static void removeQuest(UUID uuid, Quest quest) {
+        Quest finalQuest = quest;
+        playerDataHashMap.get(uuid).quests.removeIf(iteratedQuest -> iteratedQuest.getQuestID().equals(finalQuest.getQuestID()));
+        updateQuestStatus(uuid);
+    }
+
+    public static void addQuest(UUID uuid, Quest quest) {
+        playerDataHashMap.get(uuid).quests.add(quest);
+        updateQuestStatus(uuid);
+    }
+
+    public static void updateQuestStatus(UUID uuid, Quest quest) {
+        //this might be removed in the future
+        updateQuestStatus(uuid);
+    }
+
+    public static void updateQuestStatus(UUID uuid) {
+        List<Quest> playerQuests = playerDataHashMap.get(uuid).quests;
+        try {
+            setDatabaseValue(uuid, "QuestStatus", ObjectSerializer.toString((ArrayList) playerQuests));
             if (playerDataHashMap.containsKey(uuid))
-                playerDataHashMap.get(uuid).quest = quest;
+                playerDataHashMap.get(uuid).quests = playerQuests;
         } catch (Exception ex) {
             new WarningMessage("Failed to serialize player quest data!");
         }

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.combatsystem.displays;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.premade.CriticalStrikesConfig;
@@ -27,7 +28,7 @@ import org.bukkit.util.Vector;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class DamageDisplay implements Listener {
+public class PopupDisplay implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHit(EliteMobDamagedByPlayerEvent event) {
@@ -63,6 +64,23 @@ public class DamageDisplay implements Listener {
 
         DialogArmorStand.createDialogArmorStand(event.getEliteMobEntity().getUnsyncedLivingEntity(), ChatColor.RED +
                 colorPrefix + "" + ChatColor.BOLD + "" + (int) event.getDamage() + "", offset);
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onHit(EliteMobHealEvent event) {
+        if (!MobCombatSettingsConfig.displayDamageOnHit) return;
+        if (!event.getEliteEntity().isValid()) return;
+
+        Vector offset = new Vector(ThreadLocalRandom.current().nextDouble(-1, 1), 0, ThreadLocalRandom.current().nextDouble(-1, 1));
+
+        if (event.isFullHeal()){
+            DialogArmorStand.createDialogArmorStand(event.getEliteEntity().getUnsyncedLivingEntity(),
+                    ChatColor.GREEN + "FULL HEAL!", offset.clone().subtract(new Vector(0, 0.2, 0)));
+        } else {
+            DialogArmorStand.createDialogArmorStand(event.getEliteEntity().getUnsyncedLivingEntity(),
+                    ChatColor.GREEN + "" + event.getHealAmount() + " HP HEAL!", offset.clone().subtract(new Vector(0, 0.2, 0)));
+        }
 
     }
 

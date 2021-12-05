@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.powers.bosspowers;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.meta.MajorCombatEnterScanningPower;
+import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 
 
-public class PlasmaBlaster extends MajorCombatEnterScanningPower {
+public class PlasmaBlaster extends CombatEnterScanPower {
 
     public PlasmaBlaster() {
         super(PowersConfig.getPower("plasma_blaster.yml"));

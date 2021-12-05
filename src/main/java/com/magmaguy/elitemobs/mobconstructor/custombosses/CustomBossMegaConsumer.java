@@ -106,7 +106,7 @@ public class CustomBossMegaConsumer {
         if (customBossesConfigFields.getDisguise() == null) return;
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
         try {
-            DisguiseEntity.disguise(customBossesConfigFields.getDisguise(), livingEntity, customBossesConfigFields);
+            DisguiseEntity.disguise(customBossesConfigFields.getDisguise(), livingEntity, customBossesConfigFields.getCustomDisguiseData(), customBossesConfigFields.getFilename());
         } catch (Exception ex) {
             new WarningMessage("Failed to load LibsDisguises disguise correctly!");
         }

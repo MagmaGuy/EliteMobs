@@ -17,11 +17,11 @@ public abstract class KillObjective extends Objective {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
             for (Player player : event.getEliteEntity().getDamagers().keySet()) {
-                Quest quest = PlayerData.getQuest(player.getUniqueId());
-                if (quest != null)
-                    for (Objective objective : quest.getQuestObjectives().getObjectives())
-                        if (objective instanceof KillObjective)
-                            ((KillObjective) objective).checkProgress(event, quest.getQuestObjectives());
+                for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
+                    if (quest != null)
+                        for (Objective objective : quest.getQuestObjectives().getObjectives())
+                            if (objective instanceof KillObjective)
+                                objective.checkProgress(event, quest.getQuestObjectives());
             }
         }
     }

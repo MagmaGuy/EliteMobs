@@ -52,6 +52,15 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
     @Getter
     @Setter
     private List<String> questFilename = null;
+    /**
+     * Integration with LibsDisguises. Only used if that plugin is loaded.
+     */
+    @Getter
+    @Setter
+    private String disguise = null;
+    @Getter
+    @Setter
+    private String customDisguiseData = null;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -109,6 +118,8 @@ public class NPCsConfigFields extends CustomConfigFields implements CustomConfig
         this.timeout = processDouble("timeout", timeout, 0, false);
         this.noPreviousLocationMessage = processString("noPreviousLocationMessage", noPreviousLocationMessage, "", false);
         this.questFilename = processStringList("questFileName", questFilename,  new ArrayList<>(), false);
+        this.disguise = processString("disguise", disguise, null, false);
+        this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
     }
 
     public void setEnabled(boolean enabled) {

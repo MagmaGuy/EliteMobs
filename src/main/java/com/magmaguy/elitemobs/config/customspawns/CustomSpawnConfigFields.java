@@ -24,7 +24,7 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
     List<World> validWorlds = new ArrayList<>();
     @Getter
     @Setter
-    List<World.Environment> validWorldTypes = new ArrayList<>();
+    List<World.Environment> validWorldEnvironments = new ArrayList<>();
     @Getter
     @Setter
     List<Biome> validBiomes = new ArrayList<>();
@@ -60,7 +60,7 @@ public class CustomSpawnConfigFields extends CustomConfigFields implements Custo
         this.lowestYLevel = processInt("lowestYLevel", lowestYLevel, 0, false);
         this.highestYLevel = processInt("highestYLevel", highestYLevel, 320, false);
         this.validWorlds = processWorldList("validWorlds", validWorlds, new ArrayList<>(), false);
-        this.validWorldTypes = processEnumList("validWorldTypes", validWorldTypes, new ArrayList<>(), World.Environment.class, false);
+        this.validWorldEnvironments = processEnumList("validWorldEnvironments", validWorldEnvironments, new ArrayList<>(), World.Environment.class, false);
         this.validBiomes = processEnumList("validBiomes", validBiomes, new ArrayList<>(), Biome.class, false);
         this.earliestTime = processLong("earliestTime", earliestTime, 0, false);
         this.latestTime = processLong("latestTime", latestTime, 24000, false);

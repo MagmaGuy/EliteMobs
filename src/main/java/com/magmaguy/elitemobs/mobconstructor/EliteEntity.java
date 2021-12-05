@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.CombatSystem;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.AntiExploitMessage;
@@ -21,6 +22,7 @@ import com.magmaguy.elitemobs.powers.meta.MinorPower;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
@@ -302,12 +304,19 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void setHealth(double health) {
-        this.health = health;
-        livingEntity.setHealth(health);
+        this.health =  Math.min(health, this.maxHealth);
+        livingEntity.setHealth(this.health);
     }
 
     public void syncPluginHealth(double health) {
         this.health = health;
+    }
+
+    public void heal(double healAmount){
+        EliteMobHealEvent eliteMobHealEvent = new EliteMobHealEvent(this, healAmount);
+        new EventCaller(eliteMobHealEvent);
+        if (eliteMobHealEvent.isCancelled()) return;
+        setHealth(health + healAmount);
     }
 
     public double damage(double damage) {
@@ -317,6 +326,9 @@ public class EliteEntity implements SimplePersistentEntityInterface {
     }
 
     public void fullHeal() {
+        EliteMobHealEvent eliteMobHealEvent = new EliteMobHealEvent(this, true);
+        new EventCaller(eliteMobHealEvent);
+        if (eliteMobHealEvent.isCancelled()) return;
         setHealth(this.maxHealth);
         this.health = maxHealth;
         damagers.clear();

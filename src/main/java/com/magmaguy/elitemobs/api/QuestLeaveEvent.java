@@ -34,7 +34,7 @@ public class QuestLeaveEvent extends Event {
     public static class QuestLeaveEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestLeave(QuestLeaveEvent event) {
-            PlayerData.removeQuest(event.getPlayer().getUniqueId());
+            PlayerData.removeQuest(event.getPlayer().getUniqueId(), event.getQuest());
             event.getPlayer().sendMessage(QuestsConfig.questLeaveMessage.replace("$questName", event.getQuest().getQuestName()));
             if (QuestsConfig.useQuestLeaveTitles)
                 event.getPlayer().sendTitle(

@@ -32,8 +32,13 @@ public class CustomQuest extends Quest {
 
     public static CustomQuest getQuest(String questFilename, Player player) {
         if (CustomQuestsConfig.getCustomQuests().get(questFilename) == null) return null;
-        Quest quest = PlayerData.getQuest(player.getUniqueId());
-        if (quest instanceof CustomQuest && ((CustomQuest) quest).getCustomQuestsConfigFields().getFilename().equals(questFilename))
+        Quest quest = null;
+        for (Quest iteratedQuest : PlayerData.getQuests(player.getUniqueId()))
+            if (iteratedQuest instanceof CustomQuest && ((CustomQuest) iteratedQuest).getConfigurationFilename().equals(questFilename)) {
+                quest = iteratedQuest;
+                break;
+            }
+        if (quest != null)
             return (CustomQuest) quest;
         else
             return new CustomQuest(player, CustomQuestsConfig.getCustomQuests().get(questFilename));
@@ -59,7 +64,7 @@ public class CustomQuest extends Quest {
         if (customQuestsConfigFields == null) {
             new WarningMessage("Detected that Custom Quest " + configurationFilename + " got removed even though player "
                     + Bukkit.getPlayer(getPlayerUUID()).getName() + " is still trying to complete it. This player's quest will now be wiped.");
-            PlayerData.removeQuest(getPlayerUUID());
+            PlayerData.removeQuest(getPlayerUUID(), this);
             return null;
         }
         return customQuestsConfigFields;

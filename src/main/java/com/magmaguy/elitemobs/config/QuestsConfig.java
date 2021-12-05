@@ -34,6 +34,10 @@ public class QuestsConfig {
     public static FileConfiguration fileConfiguration;
     private static String killQuestScoreboardProgressionLine, fetchQuestScoreboardProgressionLine;
     @Getter
+    private static int maximumActiveQuests;
+    @Getter
+    private static String questCapMessage;
+    @Getter
     private static List<EntityType> questEntityTypes = new ArrayList<>();
     private static File file;
 
@@ -61,8 +65,11 @@ public class QuestsConfig {
         completedColorCode = ConfigurationEngine.setString(fileConfiguration, "ongoingQuestColorCode", "&2");
         killQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs]&c➤Kill $name:$color$current&0/$color$target");
         fetchQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "fetchQuestChatProgressionMessage", "&8[EliteMobs]&c➤Get $name:$color$current&0/$color$target");
+        maximumActiveQuests = ConfigurationEngine.setInt(fileConfiguration, "maximumActiveQuests", 10);
+        questCapMessage = ConfigurationEngine.setString(fileConfiguration, "questCapMessage", "&8[EliteMobs] &cYou have reached the maximum amount of active quests (10)! " +
+                "&4Abandon or complete at least one active quest if you want to get more quests!");
 
-        killQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target");
+                killQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target");
         fetchQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target");
 
         questEntityTypes = setEntityTypes(fileConfiguration);

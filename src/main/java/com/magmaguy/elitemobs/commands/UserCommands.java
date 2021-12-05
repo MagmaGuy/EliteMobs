@@ -195,10 +195,11 @@ public class UserCommands {
         // /em quest leave
         manager.command(builder.literal("quest")
                 .literal("leave")
+                .argument(StringArgument.newBuilder("questID"), ArgumentDescription.of("Quest ID"))
                 .meta(CommandMeta.DESCRIPTION, "Leaves a quest")
                 .senderType(Player.class)
                 .permission("elitemobs.quest.command")
-                .handler(commandContext -> QuestCommand.leaveQuest((Player) commandContext.getSender())));
+                .handler(commandContext -> QuestCommand.leaveQuest((Player) commandContext.getSender(), commandContext.get("questID"))));
 
         CommandArgument<CommandSender, String> onlinePlayers = StringArgument.<CommandSender>newBuilder("onlinePlayer")
                 .withSuggestionsProvider(((objectCommandContext, s) -> {

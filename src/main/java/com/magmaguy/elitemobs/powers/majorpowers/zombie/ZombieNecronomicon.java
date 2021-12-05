@@ -181,14 +181,15 @@ public class ZombieNecronomicon extends MajorPower implements Listener {
             @Override
             public void run() {
 
-                if (!targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
+                if (!eliteEntity.isValid() || !targetted.isValid() || !targetter.isValid() || targetted.getWorld() != targetter.getWorld()
                         || targetted.getLocation().distance(targetter.getLocation()) > 30) {
 
                     for (Entity entity : entityList)
                         if (entity.isValid())
                             entity.remove();
 
-                    targetter.setAI(true);
+                    if (eliteEntity.isValid())
+                        targetter.setAI(true);
                     chantingMobs.remove(targetter);
                     cancel();
                     return;

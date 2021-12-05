@@ -129,6 +129,11 @@ public class ElitePower {
         return this.powerCooldownActive || eliteEntity.isInCooldown();
     }
 
+    public void setInCooldown(EliteEntity eliteEntity, boolean inCooldown){
+        eliteEntity.setInCooldown(inCooldown);
+        setInGlobalCooldown(inCooldown);
+    }
+
     public void doCooldown(EliteEntity eliteEntity) {
         this.powerCooldownActive = true;
         eliteEntity.doGlobalPowerCooldown(globalCooldownTime * 20);
