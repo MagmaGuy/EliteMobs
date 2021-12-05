@@ -23,8 +23,8 @@ public class QuestCommand {
     }
 
     // /em quest leave questFilename
-    public static void leaveQuest(Player player) {
-        Quest.stopPlayerQuest(player);
+    public static void leaveQuest(Player player, String questID) {
+        Quest.stopPlayerQuest(player, questID);
     }
 
 }

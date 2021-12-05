@@ -56,8 +56,8 @@ public class DynamicQuest extends Quest {
     public static List<DynamicQuest> getQuests(Player player) {
         List<DynamicQuest> dynamicQuests = new ArrayList<>();
 
-        if (PlayerData.getQuest(player.getUniqueId()) instanceof DynamicQuest)
-            dynamicQuests.add((DynamicQuest) PlayerData.getQuest(player.getUniqueId()));
+        if (PlayerData.getQuests(player.getUniqueId()) instanceof DynamicQuest)
+            dynamicQuests.add((DynamicQuest) PlayerData.getQuests(player.getUniqueId()));
 
         if (dynamicPlayerQuests.get(player.getUniqueId()) == null)
             dynamicQuests.addAll(generateQuests(player));

@@ -12,10 +12,10 @@ public class NighttimeSurfaceSpawn extends CustomSpawnConfigFields {
                 true);
         setSurfaceSpawn(true);
         try {
-            setValidWorldTypes(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
+            setValidWorldEnvironments(new ArrayList<>(Arrays.asList(World.Environment.NORMAL, World.Environment.CUSTOM)));
         } catch (Exception ex) {
             //So this happens when CUSTOM doesn't exist, which it should but in some bugged releases it doesn't.
-            setValidWorldTypes(new ArrayList<>(Arrays.asList(World.Environment.NORMAL)));
+            setValidWorldEnvironments(new ArrayList<>(Arrays.asList(World.Environment.NORMAL)));
         }
         setEarliestTime(12000);
         setBypassWorldGuard(false);

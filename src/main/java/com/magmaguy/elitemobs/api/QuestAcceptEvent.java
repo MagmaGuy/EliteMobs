@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.api;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.playerdata.PlayerData;
@@ -44,6 +45,14 @@ public class QuestAcceptEvent extends Event implements Cancellable {
     }
 
     public static class QuestAcceptEventHandler implements Listener {
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+        public void questAcceptLimiter(QuestAcceptEvent event) {
+            if (PlayerData.getQuests(event.getPlayer().getUniqueId()).size() < QuestsConfig.getMaximumActiveQuests())
+                return;
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColorConverter.convert(QuestsConfig.getQuestCapMessage()));
+        }
+
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestAccept(QuestAcceptEvent event) {
             event.getPlayer().sendMessage(QuestsConfig.questJoinMessage.replace("$questName", event.getQuest().getQuestName()));
@@ -67,7 +76,7 @@ public class QuestAcceptEvent extends Event implements Cancellable {
                     for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestAcceptDialog())
                         event.getPlayer().sendMessage(dialog);
             }
-            PlayerData.setQuestStatus(event.getPlayer().getUniqueId(), event.getQuest());
+            PlayerData.addQuest(event.getPlayer().getUniqueId(), event.getQuest());
         }
     }
 }

@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.meta.MajorCombatEnterScanningPower;
+import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PhotonRay extends MajorCombatEnterScanningPower {
+public class PhotonRay extends CombatEnterScanPower {
 
     private int range = 60;
     private List<Location> playerLocations = new ArrayList<>(5);

@@ -10,8 +10,8 @@ import com.magmaguy.elitemobs.combatsystem.EliteMobGenericDamagedHandler;
 import com.magmaguy.elitemobs.combatsystem.PlayerDamagedByEliteMobHandler;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.*;
 import com.magmaguy.elitemobs.combatsystem.combattag.CombatTag;
-import com.magmaguy.elitemobs.combatsystem.displays.DamageDisplay;
 import com.magmaguy.elitemobs.combatsystem.displays.HealthDisplay;
+import com.magmaguy.elitemobs.combatsystem.displays.PopupDisplay;
 import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.commands.setup.SetupMenu;
 import com.magmaguy.elitemobs.config.*;
@@ -54,8 +54,8 @@ import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieFriends;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
 import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
 import com.magmaguy.elitemobs.powers.meta.Bombardment;
+import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
-import com.magmaguy.elitemobs.powers.meta.MajorCombatEnterScanningPower;
 import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
 import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
@@ -198,7 +198,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FireworksBarrage.FireworksBarrageEvents(), plugin);
         pluginManager.registerEvents(new CustomSummonPower.CustomSummonPowerEvent(), plugin);
         pluginManager.registerEvents(new EnderDragonEmpoweredLightning.EnderDragonEmpoweredLightningEvents(), plugin);
-        pluginManager.registerEvents(new MajorCombatEnterScanningPower.MajorCombatEnterScanningPowerEvents(), plugin);
+        pluginManager.registerEvents(new CombatEnterScanPower.MajorCombatEnterScanningPowerEvents(), plugin);
         pluginManager.registerEvents(new LightningEnchantment.LightningEnchantmentEvents(), plugin);
         pluginManager.registerEvents(new BonusCoins.BonusCoinsEvents(), plugin);
 
@@ -289,7 +289,7 @@ public class EventsRegistrer {
         if (MobCombatSettingsConfig.displayHealthOnHit)
             pluginManager.registerEvents(new HealthDisplay(), plugin);
         if (MobCombatSettingsConfig.displayDamageOnHit)
-            pluginManager.registerEvents(new DamageDisplay(), plugin);
+            pluginManager.registerEvents(new PopupDisplay(), plugin);
 
         //Initialize items from custom events
         pluginManager.registerEvents(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents(), plugin);

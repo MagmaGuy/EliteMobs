@@ -10,12 +10,16 @@ import com.magmaguy.elitemobs.entitytracker.NPCEntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntity;
 import com.magmaguy.elitemobs.mobconstructor.SimplePersistentEntityInterface;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
+import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.ChunkLocationChecker;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.NonSolidBlockTypes;
+import com.magmaguy.elitemobs.utils.WarningMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -74,6 +78,8 @@ public class NPCEntity implements SimplePersistentEntityInterface {
         simplePersistentEntity = new SimplePersistentEntity(this);
     }
 
+    private boolean isDisguised = false;
+
     private void spawn() {
         if (villager != null && villager.isValid()) return;
         WorldGuardSpawnEventBypasser.forceSpawn();
@@ -84,12 +90,26 @@ public class NPCEntity implements SimplePersistentEntityInterface {
             villager.setCustomName(ChatColorConverter.convert(npCsConfigFields.getName()));
             villager.setCustomNameVisible(true);
             villager.setProfession(npCsConfigFields.getProfession());
+            setDisguise(villager);
         });
         EntityTracker.registerNPCEntity(this);
         initializeRole();
         uuid = villager.getUniqueId();
         setTimeout();
         simplePersistentEntity = null;
+    }
+
+    private void setDisguise(LivingEntity livingEntity) {
+        if (npCsConfigFields.getDisguise() == null) return;
+        if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
+        try {
+            DisguiseEntity.disguise(npCsConfigFields.getDisguise(), livingEntity, npCsConfigFields.getCustomDisguiseData(), npCsConfigFields.getFilename());
+            DisguiseEntity.setDisguiseNameVisibility(true, livingEntity);
+            villager.setCustomNameVisible(true);
+            isDisguised = true;
+        } catch (Exception ex) {
+            new WarningMessage("Failed to load LibsDisguises disguise correctly!");
+        }
     }
 
     public Villager getVillager() {
@@ -145,7 +165,12 @@ public class NPCEntity implements SimplePersistentEntityInterface {
 
     //Can't be used after the NPCEntity is done initialising
     private void initializeRole() {
-        roleDisplay = this.villager.getWorld().spawn(villager.getLocation().add(new Vector(0, 1.72, 0)), ArmorStand.class, new Consumer<ArmorStand>() {
+        Vector offSet;
+        if (!isDisguised)
+            offSet = new Vector(0, 1.72, 0);
+        else
+            offSet = new Vector(0, 1.70, 0);
+        roleDisplay = this.villager.getWorld().spawn(villager.getLocation().add(offSet), ArmorStand.class, new Consumer<ArmorStand>() {
             @Override
             public void accept(ArmorStand armorStand) {
                 armorStand.setCustomName(npCsConfigFields.getRole());

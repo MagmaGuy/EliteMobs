@@ -38,12 +38,13 @@ public class QuestInteractionHandler {
                     customQuestList.add(customQuest);
             }
 
-        Quest quest = PlayerData.getQuest(player.getUniqueId());
-        if (quest instanceof CustomQuest &&
-                (((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().isEmpty() ||
-                        !((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().isEmpty()
-                                && ((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
-            customQuestList.add((CustomQuest) quest);
+        List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
+        if (quests != null)
+            for (Quest quest : quests)
+                if (quest instanceof CustomQuest &&
+                        (!((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().isEmpty() &&
+                                ((CustomQuest) quest).getCustomQuestsConfigFields().getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
+                    customQuestList.add((CustomQuest) quest);
 
         if (!customQuestList.isEmpty())
             new BukkitRunnable() {

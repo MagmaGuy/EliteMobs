@@ -39,7 +39,7 @@ public class QuestProgressionEvent extends Event {
             if (QuestsConfig.doQuestChatProgression)
                 event.getPlayer().sendMessage(QuestsConfig.getKillQuestChatProgressionMessage(event.getObjective()));
             event.getQuest().getQuestObjectives().displayObjectivesScoreboard(event.getPlayer());
-            PlayerData.setQuestStatus(event.getPlayer().getUniqueId(), event.getQuest());
+            PlayerData.updateQuestStatus(event.getPlayer().getUniqueId(), event.getQuest());
         }
     }
 }
