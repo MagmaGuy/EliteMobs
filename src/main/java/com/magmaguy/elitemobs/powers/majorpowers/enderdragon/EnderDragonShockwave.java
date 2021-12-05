@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.meta.MajorCombatEnterScanningPower;
+import com.magmaguy.elitemobs.powers.meta.CombatEnterScanPower;
 import com.magmaguy.elitemobs.utils.EnderDragonPhaseSimplifier;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class EnderDragonShockwave extends MajorCombatEnterScanningPower {
+public class EnderDragonShockwave extends CombatEnterScanPower {
 
     private final int radius = 30;
     //this is structured like this because the relative block generator is moving out of this class

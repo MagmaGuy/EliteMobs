@@ -10,14 +10,14 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 
-public abstract class MajorCombatEnterScanningPower extends MajorPower implements Listener {
+public abstract class CombatEnterScanPower extends MajorPower implements Listener {
 
-    public static HashSet<MajorCombatEnterScanningPower> majorCombatEnterScanningPowers = new HashSet<>();
+    public static HashSet<CombatEnterScanPower> combatEnterScanPowers = new HashSet<>();
     public BukkitTask bukkitTask = null;
     private boolean isActive = false;
-    public MajorCombatEnterScanningPower(PowersConfigFields powersConfigFields) {
+    public CombatEnterScanPower(PowersConfigFields powersConfigFields) {
         super(powersConfigFields);
-        majorCombatEnterScanningPowers.add(this);
+        combatEnterScanPowers.add(this);
     }
 
     protected void activate(EliteEntity eliteEntity) {
@@ -50,22 +50,22 @@ public abstract class MajorCombatEnterScanningPower extends MajorPower implement
     public static class MajorCombatEnterScanningPowerEvents implements Listener {
         @EventHandler
         public void onCombatEnter(EliteMobEnterCombatEvent event) {
-            for (MajorCombatEnterScanningPower majorCombatEnterScanningPower : majorCombatEnterScanningPowers) {
-                ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(majorCombatEnterScanningPower);
+            for (CombatEnterScanPower combatEnterScanPower : combatEnterScanPowers) {
+                ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(combatEnterScanPower);
                 if (elitePowerInstance == null)
                     continue;
-                ((MajorCombatEnterScanningPower) elitePowerInstance).activate(event.getEliteMobEntity());
+                ((CombatEnterScanPower) elitePowerInstance).activate(event.getEliteMobEntity());
             }
 
         }
 
         @EventHandler
         public void onCombatExit(EliteMobExitCombatEvent event) {
-            for (MajorCombatEnterScanningPower majorCombatEnterScanningPower : majorCombatEnterScanningPowers) {
-                ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(majorCombatEnterScanningPower);
+            for (CombatEnterScanPower combatEnterScanPower : combatEnterScanPowers) {
+                ElitePower elitePowerInstance = event.getEliteMobEntity().getPower(combatEnterScanPower);
                 if (elitePowerInstance == null)
                     continue;
-                ((MajorCombatEnterScanningPower) elitePowerInstance).deactivate(event.getEliteMobEntity());
+                ((CombatEnterScanPower) elitePowerInstance).deactivate(event.getEliteMobEntity());
             }
         }
     }

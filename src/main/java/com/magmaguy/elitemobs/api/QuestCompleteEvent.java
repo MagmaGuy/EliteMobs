@@ -62,7 +62,8 @@ public class QuestCompleteEvent extends Event {
                                     .replace("$getY", event.getPlayer().getLocation().getY() + "")
                                     .replace("$getZ", event.getPlayer().getLocation().getZ() + ""));
             }
-            PlayerData.removeQuest(event.getPlayer().getUniqueId());
+            PlayerData.removeQuest(event.getPlayer().getUniqueId(), event.getQuest());
+            PlayerData.incrementQuestsCompleted(event.getPlayer().getUniqueId());
         }
     }
 }

@@ -57,17 +57,17 @@ public class Quest implements Serializable {
         }
     }
 
-    public static void stopPlayerQuest(Player player) {
-        if (PlayerData.getQuest(player.getUniqueId()) == null) {
+    public static void stopPlayerQuest(Player player, String questID) {
+        if (PlayerData.getQuests(player.getUniqueId()) == null) {
             player.sendMessage(QuestsConfig.leaveWhenNoActiveQuestsExist);
             return;
         }
-        QuestLeaveEvent questLeaveEvent = new QuestLeaveEvent(player, PlayerData.getQuest(player.getUniqueId()));
+        QuestLeaveEvent questLeaveEvent = new QuestLeaveEvent(player, PlayerData.getQuest(player.getUniqueId(), questID));
         new EventCaller(questLeaveEvent);
     }
 
     public static Quest completeQuest(UUID questUUID, Player player) {
-        Quest quest = PlayerData.getQuest(player.getUniqueId());
+        Quest quest = PlayerData.getQuest(player.getUniqueId(), questUUID);
         if (quest == null) return null;
         if (!quest.getQuestID().equals(questUUID)) return null;
         if (!quest.getQuestObjectives().isOver()) return null;

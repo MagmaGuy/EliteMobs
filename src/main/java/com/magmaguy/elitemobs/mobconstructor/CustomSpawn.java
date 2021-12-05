@@ -207,8 +207,8 @@ public class CustomSpawn {
                 if (!customSpawnConfigFields.getValidWorlds().isEmpty())
                     if (!customSpawnConfigFields.getValidWorlds().contains(playerLocation.getWorld()))
                         continue;
-                if (!customSpawnConfigFields.getValidWorldTypes().isEmpty())
-                    if (!customSpawnConfigFields.getValidWorldTypes().contains(Objects.requireNonNull(playerLocation.getWorld()).getEnvironment()))
+                if (!customSpawnConfigFields.getValidWorldEnvironments().isEmpty())
+                    if (!customSpawnConfigFields.getValidWorldEnvironments().contains(Objects.requireNonNull(playerLocation.getWorld()).getEnvironment()))
                         continue;
                 if (GuildRank.getActiveGuildRank(player) == 0) continue;
                 validPlayers.add(player);

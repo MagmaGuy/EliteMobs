@@ -40,6 +40,10 @@ public class SummonEmbers extends BossPower implements Listener {
             @Override
             public void run() {
                 counter++;
+                if (!eliteEntity.isValid()){
+                    cancel();
+                    return;
+                }
                 eliteEntity.getLivingEntity().getWorld().spawnParticle(Particle.FLAME,
                         eliteEntity.getLivingEntity().getLocation().add(new Vector(0, 1, 0)), 50, 0.0001, 0.0001, 0.0001);
                 if (counter < 20 * 3) return;

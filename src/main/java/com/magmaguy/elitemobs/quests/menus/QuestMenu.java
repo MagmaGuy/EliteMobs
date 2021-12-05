@@ -34,6 +34,7 @@ public class QuestMenu {
     }
 
     public static TextComponent[] generateQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+
         List<TextComponent[]> textComponents = new ArrayList<>();
         int counter = 0;
         for (Quest quest : quests) {
@@ -157,7 +158,7 @@ public class QuestMenu {
                 accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptTextLines,
                         CustomQuestMenuConfig.acceptHoverLines,
                         CustomQuestMenuConfig.acceptCommandLines.replace("$questID", quest.getQuestID().toString()));
-            }else if (!quest.getQuestObjectives().isOver())
+            } else if (!quest.getQuestObjectives().isOver())
                 accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptedTextLines,
                         CustomQuestMenuConfig.acceptedHoverLines,
                         CustomQuestMenuConfig.acceptedCommandLines.replace("$questID", quest.getQuestID().toString()));
@@ -221,8 +222,8 @@ public class QuestMenu {
     }
 
     public static TextComponent[] generateQuestEntry(Player player, NPCEntity npcEntity) {
-        if (PlayerData.getQuest(player.getUniqueId()) == null) return new TextComponent[0];
-        return generateQuestEntry(PlayerData.getQuest(player.getUniqueId()), player, npcEntity);
+        if (PlayerData.getQuests(player.getUniqueId()) == null) return new TextComponent[0];
+        return generateQuestEntries(PlayerData.getQuests(player.getUniqueId()), player, npcEntity);
     }
 
 }

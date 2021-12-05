@@ -6,59 +6,6 @@ import org.bukkit.entity.Player;
 
 public class QuestsPage {
     protected static TextComponent[] questsPage(Player targetPlayer) {
-
         return QuestMenu.generateQuestEntry(targetPlayer, null);
-
-        /*
-        TextComponent configTextComponent = new TextComponent();
-
-        for (int i = 0; i < 3; i++) {
-
-            TextComponent line = new TextComponent(PlayerStatusMenuConfig.questTrackerTextLines[i] + "\n");
-
-            if (!PlayerStatusMenuConfig.questTrackerHoverLines[i].isEmpty())
-                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.questTrackerHoverLines[i]);
-
-            if (!PlayerStatusMenuConfig.questTrackerCommandLines[i].isEmpty())
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.questTrackerCommandLines[i]));
-
-            configTextComponent.addExtra(line);
-        }
-
-        ArrayList<TextComponent> textComponents = new ArrayList<>();
-        int counter = 0;
-
-         */
-
-        /*
-        if (PlayerQuests.getData(targetPlayer) != null && PlayerQuests.getData(targetPlayer).quests != null)
-            for (EliteQuest eliteQuest : PlayerQuests.getData(targetPlayer).quests) {
-                TextComponent quest = new TextComponent(ChatColor.BLACK + ChatColor.stripColor(eliteQuest.getQuestStatus()) + " \n");
-                quest.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs quest cancel " + eliteQuest.getUuid()));
-                PlayerStatusScreen.setHoverText(quest, PlayerStatusMenuConfig.onQuestTrackHover);
-                textComponents.add(quest);
-                counter++;
-            }
-
-        if (counter == 0) {
-            TextComponent[] textComponent = new TextComponent[1];
-            textComponent[0] = configTextComponent;
-            return textComponent;
-        } else {
-            TextComponent[] textComponent = new TextComponent[(int) Math.floor(counter / 6D) + 1];
-            int internalCounter = 0;
-            textComponent[0] = configTextComponent;
-            for (TextComponent text : textComponents) {
-                int currentPage = (int) Math.floor(internalCounter / 6D);
-                if (textComponent[currentPage] == null)
-                    textComponent[currentPage] = new TextComponent();
-                textComponent[currentPage].addExtra(text);
-                internalCounter++;
-            }
-            return textComponent;
-        }
-
-         */
-        //return new TextComponent[1];
     }
 }
