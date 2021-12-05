@@ -275,7 +275,7 @@ public class PlayerData {
                 return (List<Quest>) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestStatus"));
             return playerDataHashMap.get(uuid).quests;
         } catch (Exception ex) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
