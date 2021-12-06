@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
+import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -29,10 +31,10 @@ public class QuestsConfig {
     public static String questLeaveTitle, questLeaveSubtitle;
     public static boolean doQuestChatProgression;
     public static String ongoingColorCode, completedColorCode;
-    public static String killQuestChatProgressionMessage, fetchQuestChatProgressionMessage;
+    public static String killQuestChatProgressionMessage, fetchQuestChatProgressionMessage, dialogQuestChatProgressionMessage;
     public static boolean showQuestProgressionOnScoreboard;
     public static FileConfiguration fileConfiguration;
-    private static String killQuestScoreboardProgressionLine, fetchQuestScoreboardProgressionLine;
+    private static String killQuestScoreboardProgressionLine, fetchQuestScoreboardProgressionLine, dialogQuestScoreboardProgressionLine;
     @Getter
     private static int maximumActiveQuests;
     @Getter
@@ -65,12 +67,14 @@ public class QuestsConfig {
         completedColorCode = ConfigurationEngine.setString(fileConfiguration, "ongoingQuestColorCode", "&2");
         killQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "killQuestChatProgressionMessage", "&8[EliteMobs]&c➤Kill $name:$color$current&0/$color$target");
         fetchQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "fetchQuestChatProgressionMessage", "&8[EliteMobs]&c➤Get $name:$color$current&0/$color$target");
+        dialogQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "dialogQuestChatProgressionMessage", "&8[EliteMobs]&c➤Talk to $name:$color$current&0/$color$target");
         maximumActiveQuests = ConfigurationEngine.setInt(fileConfiguration, "maximumActiveQuests", 10);
         questCapMessage = ConfigurationEngine.setString(fileConfiguration, "questCapMessage", "&8[EliteMobs] &cYou have reached the maximum amount of active quests (10)! " +
                 "&4Abandon or complete at least one active quest if you want to get more quests!");
 
-                killQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target");
-        fetchQuestChatProgressionMessage = ConfigurationEngine.setString(fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target");
+        killQuestScoreboardProgressionLine = ConfigurationEngine.setString(fileConfiguration, "killQuestScoreboardProgressionMessage", "&c➤Kill $name:$color$current&0/$color$target");
+        fetchQuestScoreboardProgressionLine = ConfigurationEngine.setString(fileConfiguration, "fetchQuestScoreboardProgressionMessage", "&c➤Get $name:$color$current&0/$color$target");
+        dialogQuestScoreboardProgressionLine = ConfigurationEngine.setString(fileConfiguration, "dialogQuestScoreboardProgressionMessage", "&c➤Talk to $name:$color$current&0/$color$target");
 
         questEntityTypes = setEntityTypes(fileConfiguration);
 
@@ -118,22 +122,34 @@ public class QuestsConfig {
         return parsedTypes;
     }
 
-    public static String getKillQuestChatProgressionMessage(Objective objective) {
-        String newString = killQuestChatProgressionMessage;
-        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(((KillObjective) objective).getObjectiveName()));
-        newString = newString.replace("$current", ((KillObjective) objective).getCurrentAmount() + "");
-        newString = newString.replace("$target", ((KillObjective) objective).getTargetAmount() + "");
+    public static String getQuestChatProgressionMessage(Objective objective) {
+        String newString = "";
+        if (objective instanceof KillObjective)
+            newString = killQuestChatProgressionMessage;
+        else if (objective instanceof CustomFetchObjective)
+            newString = fetchQuestChatProgressionMessage;
+        else if (objective instanceof DialogObjective)
+            newString = dialogQuestChatProgressionMessage;
+        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$current", objective.getCurrentAmount() + "");
+        newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())
             return newString.replace("$color", ongoingColorCode);
         else
             return newString.replace("$color", completedColorCode);
     }
 
-    public static String getKillQuestScoreboardProgressionLine(Objective objective) {
-        String newString = killQuestChatProgressionMessage;
-        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(((KillObjective) objective).getObjectiveName()));
-        newString = newString.replace("$current", ((KillObjective) objective).getCurrentAmount() + "");
-        newString = newString.replace("$target", ((KillObjective) objective).getTargetAmount() + "");
+    public static String getQuestScoreboardProgressionLine(Objective objective) {
+        String newString = "";
+        if (objective instanceof KillObjective)
+            newString = killQuestScoreboardProgressionLine;
+        else if (objective instanceof CustomFetchObjective)
+            newString = fetchQuestScoreboardProgressionLine;
+        else if (objective instanceof DialogObjective)
+            newString = dialogQuestScoreboardProgressionLine;
+        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$current", objective.getCurrentAmount() + "");
+        newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())
             return newString.replace("$color", ongoingColorCode);
         else

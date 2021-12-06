@@ -73,8 +73,8 @@ public class QuestObjectives implements Serializable {
      */
     public boolean isOver() {
         boolean over = true;
-        for (Objective customQuestObjective : objectives)
-            if (!customQuestObjective.isObjectiveCompleted()) {
+        for (Objective objective : objectives)
+            if (!objective.isObjectiveCompleted()) {
                 over = false;
                 break;
             }
@@ -95,11 +95,10 @@ public class QuestObjectives implements Serializable {
 
     public Scoreboard displayObjectivesScoreboard(Player player) {
         List<String> strings = new ArrayList<>();
-        for (Objective objective : objectives) {
-            if (objective instanceof KillObjective)
-                strings.add(QuestsConfig.getKillQuestScoreboardProgressionLine(objective));
-        }
-        return SimpleScoreboard.temporaryScoreboard(player, getQuest().getQuestName(), strings, 20 * 5);
+        for (Objective objective : objectives)
+            strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
+
+        return SimpleScoreboard.temporaryScoreboard(player, getQuest().getQuestName(), strings, 20 * 20);
     }
 
 

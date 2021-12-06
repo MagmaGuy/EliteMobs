@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
-import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,10 +35,6 @@ public class CustomFetchObjective extends Objective{
         this.customItemFilename = customItemFilename;
     }
 
-    @Override
-    public void checkProgress(EliteMobDeathEvent event, QuestObjectives questObjectives) {
-
-    }
 
     private void checkProgress(Player player){
         for (ItemStack itemStack : player.getInventory())

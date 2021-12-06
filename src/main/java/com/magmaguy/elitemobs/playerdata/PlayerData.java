@@ -273,7 +273,8 @@ public class PlayerData {
         try {
             if (!isInMemory(uuid))
                 return (List<Quest>) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "QuestStatus"));
-            return playerDataHashMap.get(uuid).quests;
+            if (playerDataHashMap.get(uuid) == null) return new ArrayList<>();
+            return playerDataHashMap.get(uuid).quests == null ? new ArrayList<>() : playerDataHashMap.get(uuid).quests;
         } catch (Exception ex) {
             return new ArrayList<>();
         }
@@ -305,7 +306,7 @@ public class PlayerData {
     }
 
     public static void resetQuests(UUID uuid) {
-        playerDataHashMap.get(uuid).quests.clear();
+        getQuests(uuid).clear();
         updateQuestStatus(uuid);
     }
 
@@ -326,7 +327,7 @@ public class PlayerData {
     }
 
     public static void updateQuestStatus(UUID uuid) {
-        List<Quest> playerQuests = playerDataHashMap.get(uuid).quests;
+        List<Quest> playerQuests = getQuests(uuid);
         try {
             setDatabaseValue(uuid, "QuestStatus", ObjectSerializer.toString((ArrayList) playerQuests));
             if (playerDataHashMap.containsKey(uuid))

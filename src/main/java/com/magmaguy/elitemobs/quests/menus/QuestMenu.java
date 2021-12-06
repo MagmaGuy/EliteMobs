@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
@@ -118,11 +119,18 @@ public class QuestMenu {
     private static TextComponent generateSummary(Quest quest) {
         TextComponent summary = new TextComponent();
         if (quest instanceof CustomQuest) {
-            for (Objective objective : quest.getQuestObjectives().getObjectives())
+            int counter = 0;
+            for (Objective objective : quest.getQuestObjectives().getObjectives()) {
+                counter++;
                 if (objective instanceof KillObjective) {
                     //todo: hover should show more boss details, command string should allow players to try to track the boss
-                    summary.addExtra(SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getKillQuestDefaultSummaryLine(objective), "", ""));
+                    summary.addExtra(SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), "", ""));
+                } else if (objective instanceof DialogObjective) {
+                    summary.addExtra(SpigotMessage.hoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), ""));
                 }
+                if (counter < quest.getQuestObjectives().getObjectives().size())
+                    summary.addExtra("\n");
+            }
         } else if (quest instanceof DynamicQuest) {
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective instanceof KillObjective) {
@@ -152,58 +160,55 @@ public class QuestMenu {
     }
 
     private static TextComponent generateAccept(Quest quest, NPCEntity npcEntity) {
-        TextComponent accept = new TextComponent();
+        //Before quest was accepted
+        if (!quest.isAccepted())
+            return initialQuestAccept(quest);
+
+        //Quest is complete, turn in placeholder
+        if (quest.getQuestObjectives().isOver() && quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename()))
+           return questAcceptComplete(quest);
+
+        //Quest has begun but is either not over or the player is not talking to the turn in npc
+        return questAcceptAlreadyAccepted(quest);
+    }
+
+    //Appears when the player hasn't accepted the quest yet
+    private static TextComponent initialQuestAccept(Quest quest) {
         if (quest instanceof CustomQuest) {
-            if (!quest.isAccepted()) {
-                accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptTextLines,
-                        CustomQuestMenuConfig.acceptHoverLines,
-                        CustomQuestMenuConfig.acceptCommandLines.replace("$questID", quest.getQuestID().toString()));
-            } else if (!quest.getQuestObjectives().isOver())
-                accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptedTextLines,
-                        CustomQuestMenuConfig.acceptedHoverLines,
-                        CustomQuestMenuConfig.acceptedCommandLines.replace("$questID", quest.getQuestID().toString()));
-            else if (quest.getQuestObjectives().isOver() && quest.getQuestObjectives().isTurnedIn() &&
-                    (npcEntity == null && quest.getTurnInNPC().isEmpty() ||
-                            npcEntity != null && quest.getTurnInNPC().isEmpty() ||
-                            npcEntity != null && !quest.getTurnInNPC().isEmpty() && quest.getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
-                accept = SpigotMessage.hoverMessage(DynamicQuestMenuConfig.getTurnedInTextLines(),
-                        DynamicQuestMenuConfig.getTurnedInHoverLines());
-            else if (quest.getQuestObjectives().isOver() &&
-                    (npcEntity == null && quest.getTurnInNPC().isEmpty() ||
-                            npcEntity != null && quest.getTurnInNPC().isEmpty() ||
-                            npcEntity != null && !quest.getTurnInNPC().isEmpty() && quest.getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
-                accept = SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.completedTextLines,
-                        CustomQuestMenuConfig.completedHoverLines,
-                        CustomQuestMenuConfig.completedCommandLines.replace("$questID", quest.getQuestID().toString()));
-            else {
-                //todo: add a way to tell players where to go before this ever runs
-                accept = SpigotMessage.simpleMessage("");
-            }
-        } else if (quest instanceof DynamicQuest) {
-            if (!quest.isAccepted())
-                accept = SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptTextLines(),
-                        DynamicQuestMenuConfig.getAcceptedHoverLines(),
-                        DynamicQuestMenuConfig.getAcceptCommandLines().replace("$questID", quest.getQuestID().toString()));
-            else if (!quest.getQuestObjectives().isOver())
-                accept = SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptedTextLines(),
-                        DynamicQuestMenuConfig.getAcceptedHoverLines(),
-                        DynamicQuestMenuConfig.getAcceptedCommandLines().replace("$questID", quest.getQuestID().toString()));
-            else if (quest.getQuestObjectives().isOver() && quest.getQuestObjectives().isTurnedIn())
-                accept = SpigotMessage.hoverMessage(DynamicQuestMenuConfig.getTurnedInTextLines(),
-                        DynamicQuestMenuConfig.getTurnedInHoverLines());
-            else if (quest.getQuestObjectives().isOver() &&
-                    (npcEntity == null && quest.getTurnInNPC().isEmpty() ||
-                            npcEntity != null && quest.getTurnInNPC().isEmpty() ||
-                            npcEntity != null && !quest.getTurnInNPC().isEmpty() && quest.getTurnInNPC().equals(npcEntity.getNpCsConfigFields().getFilename())))
-                accept = SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getCompletedTextLines(),
-                        DynamicQuestMenuConfig.getCompletedHoverLines(),
-                        DynamicQuestMenuConfig.getCompletedCommandLines().replace("$questID", quest.getQuestID().toString()));
-            else {
-                //todo: add a way to tell players where to go before this ever runs
-                accept = SpigotMessage.simpleMessage("");
-            }
+            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptTextLines,
+                    CustomQuestMenuConfig.acceptHoverLines,
+                    CustomQuestMenuConfig.acceptCommandLines.replace("$questID", quest.getQuestID().toString()));
+        } else {
+            return SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptTextLines(),
+                    DynamicQuestMenuConfig.getAcceptedHoverLines(),
+                    DynamicQuestMenuConfig.getAcceptCommandLines().replace("$questID", quest.getQuestID().toString()));
         }
-        return accept;
+    }
+
+    //Appears when the player has accepted the quest but has not completed it yet, so it is not ready for turn in
+    private static TextComponent questAcceptAlreadyAccepted(Quest quest) {
+        if (quest instanceof CustomQuest) {
+            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptedTextLines,
+                    CustomQuestMenuConfig.acceptedHoverLines,
+                    CustomQuestMenuConfig.acceptedCommandLines.replace("$questID", quest.getQuestID().toString()));
+        } else {
+            return SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptedTextLines(),
+                    DynamicQuestMenuConfig.getAcceptedHoverLines(),
+                    DynamicQuestMenuConfig.getAcceptedCommandLines().replace("$questID", quest.getQuestID().toString()));
+        }
+    }
+
+    //Appears when the player has completed the quest
+    private static TextComponent questAcceptComplete(Quest quest) {
+        if (quest instanceof CustomQuest) {
+            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.completedTextLines,
+                    CustomQuestMenuConfig.completedHoverLines,
+                    CustomQuestMenuConfig.completedCommandLines.replace("$questID", quest.getQuestID().toString()));
+        } else {
+            return SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getCompletedTextLines(),
+                    DynamicQuestMenuConfig.getCompletedHoverLines(),
+                    DynamicQuestMenuConfig.getCompletedCommandLines().replace("$questID", quest.getQuestID().toString()));
+        }
     }
 
     private static List<TextComponent> compilePages(List<TextComponent> pages, TextComponent newComponent) {
@@ -218,7 +223,7 @@ public class QuestMenu {
     }
 
     private static boolean isOverCharacterCount(TextComponent page, TextComponent newComponent) {
-        return page.getText().length() + newComponent.getText().length() > 220;
+        return page.getText().length() + newComponent.getText().length() > 200;
     }
 
     public static TextComponent[] generateQuestEntry(Player player, NPCEntity npcEntity) {

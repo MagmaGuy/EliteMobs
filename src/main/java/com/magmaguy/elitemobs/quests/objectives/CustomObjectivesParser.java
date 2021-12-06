@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 
@@ -13,24 +14,32 @@ public class CustomObjectivesParser {
      * FETCH_ITEM:filename=X.yml:amount=Y
      */
     public static List<Objective> processCustomObjectives(CustomQuest customQuest) {
+        List<Objective> objectives = new ArrayList<>();
         for (String string : customQuest.getCustomQuestsConfigFields().getCustomObjectivesList()) {
             String[] rawStrings = string.split(":");
             switch (rawStrings[0]) {
                 case "KILL_CUSTOM":
-                    return processObjectiveType(rawStrings, ObjectiveType.KILL_CUSTOM, customQuest);
+                    objectives.add(processObjectiveType(rawStrings, ObjectiveType.KILL_CUSTOM, customQuest));
+                    break;
                 case "FETCH_ITEM":
-                    return processObjectiveType(rawStrings, ObjectiveType.FETCH_ITEM, customQuest);
+                    objectives.add(processObjectiveType(rawStrings, ObjectiveType.FETCH_ITEM, customQuest));
+                    break;
+                case "DIALOG":
+                    objectives.add(processObjectiveType(rawStrings, ObjectiveType.DIALOG, customQuest));
+                    break;
                 default:
                     new WarningMessage("Entry " + string + " for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " is not valid! Check the documentation on how to create valid quest objectives on the wiki!");
                     return new ArrayList<>();
             }
         }
-        return new ArrayList<>();
+        return objectives;
     }
 
-    private static List<Objective> processObjectiveType(String[] rawStrings, ObjectiveType objectiveType, CustomQuest customQuest) {
-        List<Objective> parsedCustomQuestObjectivesBuffer = new ArrayList<>();
+    private static Objective processObjectiveType(String[] rawStrings, ObjectiveType objectiveType, CustomQuest customQuest) {
         String filename = null;
+        String location = null;
+        String dialog = null;
+        String npcName = null;
         int amount = 1;
         for (String rawString : rawStrings) {
             String[] processedStrings = rawString.split("=");
@@ -45,28 +54,40 @@ public class CustomObjectivesParser {
                         new WarningMessage("Invalid amount " + amount + " in entry " + rawString + " for Custom Quest " + filename + " . Defaulting to 1.");
                     }
                     break;
+                case "location":
+                    location = ChatColorConverter.convert(processedStrings[1]);
+                    break;
+                case "dialog":
+                    dialog = ChatColorConverter.convert(processedStrings[1]);
+                    break;
+                case "npcName":
+                    npcName = ChatColorConverter.convert(processedStrings[1]);
+                    break;
             }
         }
         if (filename == null) {
             new WarningMessage("Invalid filename for entry " + rawStrings.toString() + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
-            return new ArrayList<>();
+            return null;
         }
         try {
             if (objectiveType.equals(ObjectiveType.KILL_CUSTOM))
-                parsedCustomQuestObjectivesBuffer.add(new CustomKillObjective(filename, amount, customQuest.getQuestLevel()));
+                return new CustomKillObjective(filename, amount, customQuest.getQuestLevel());
             else if (objectiveType.equals(ObjectiveType.FETCH_ITEM))
                 //todo: not done yet
-                return new ArrayList<>();
+                return null;
+            else if (objectiveType.equals(ObjectiveType.DIALOG))
+                return new DialogObjective(filename, npcName, location, dialog);
         } catch (Exception ex) {
             new WarningMessage("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
         }
 
-        return parsedCustomQuestObjectivesBuffer;
+        return null;
 
     }
 
     private enum ObjectiveType {
         KILL_CUSTOM,
-        FETCH_ITEM
+        FETCH_ITEM,
+        DIALOG
     }
 }

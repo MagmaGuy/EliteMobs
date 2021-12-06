@@ -27,7 +27,7 @@ public class CustomQuest extends Quest {
         this.configurationFilename = customQuestsConfigFields.getFilename();
         super.questObjectives.setQuest(this);
         super.questName = customQuestsConfigFields.getQuestName();
-        super.turnInNPC = customQuestsConfigFields.getTurnInNPC();
+        super.questTaker = customQuestsConfigFields.getTurnInNPC();
     }
 
     public static CustomQuest getQuest(String questFilename, Player player) {
