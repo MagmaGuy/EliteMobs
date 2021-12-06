@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
-import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.QuestProgressionEvent;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
@@ -40,7 +39,5 @@ public abstract class Objective implements Serializable {
         if (currentAmount < targetAmount) return;
         objectiveCompleted = true;
     }
-
-    public abstract void checkProgress(EliteMobDeathEvent event, QuestObjectives questObjectives);
 
 }

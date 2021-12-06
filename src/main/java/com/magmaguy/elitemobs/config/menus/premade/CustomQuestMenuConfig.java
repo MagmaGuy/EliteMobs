@@ -4,7 +4,9 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
-import com.magmaguy.elitemobs.quests.objectives.KillObjective;
+import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
+import com.magmaguy.elitemobs.quests.objectives.CustomKillObjective;
+import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.quests.rewards.RewardEntry;
@@ -19,23 +21,29 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     public static String acceptTextLines, acceptHoverLines, acceptCommandLines;
     public static String acceptedTextLines, acceptedHoverLines, acceptedCommandLines;
     public static String completedTextLines, completedHoverLines, completedCommandLines;
-    @Getter
-    private static String turnedInTextLines, turnedInHoverLines;
     public static String ongoingColorCode, completedColorCode;
     public static String objectivesLine;
     public static String rewardsLine;
-    private static String killQuestDefaultSummaryLine, fetchQuestDefaultSummaryLine;
+    @Getter
+    private static String turnedInTextLines, turnedInHoverLines;
+    private static String killQuestDefaultSummaryLine, fetchQuestDefaultSummaryLine, dialogQuestDefaultSummaryLine;
     private static String rewardsDefaultSummaryLine;
 
     public CustomQuestMenuConfig() {
         super("custom_quest_screen", true);
     }
 
-    public static String getKillQuestDefaultSummaryLine(Objective objective) {
-        String newString = killQuestDefaultSummaryLine;
-        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(((KillObjective) objective).getObjectiveName()));
-        newString = newString.replace("$current", ((KillObjective) objective).getCurrentAmount() + "");
-        newString = newString.replace("$target", ((KillObjective) objective).getTargetAmount() + "");
+    public static String getObjectiveLine(Objective objective) {
+        String newString = "";
+        if (objective instanceof CustomKillObjective)
+            newString = killQuestDefaultSummaryLine;
+        else if (objective instanceof DialogObjective)
+            newString = dialogQuestDefaultSummaryLine.replace("$location", ((DialogObjective) objective).getTargetLocation());
+        else if (objective instanceof CustomFetchObjective)
+            newString = fetchQuestDefaultSummaryLine;
+        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$current", objective.getCurrentAmount() + "");
+        newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())
             return newString.replace("$color", ongoingColorCode);
         else
@@ -44,21 +52,26 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
 
     public static TextComponent getRewardsDefaultSummaryLine(QuestReward questReward, int questLevel, Player player) {
         TextComponent textComponent = new TextComponent();
-        for (RewardEntry rewardEntry : questReward.getRewardEntries())
+        int counter = 0;
+        for (RewardEntry rewardEntry : questReward.getRewardEntries()) {
+            counter++;
             if (rewardEntry.getItemStack() != null) {
                 textComponent.addExtra(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.getAmount() + "")
                         .replace("$rewardName", WordUtils.capitalizeFully(rewardEntry.getItemStack().getType().toString()).replace("_", " "))
                         .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
-                textComponent.addExtra("\n");
+
             } else if (rewardEntry.getCurrencyAmount() != 0) {
                 TextComponent customItemTextComponent = new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.getAmount() + "")
                         .replace("$rewardName", rewardEntry.getCurrencyAmount() + " " + EconomySettingsConfig.currencyName)
                         .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
                 textComponent.addExtra(customItemTextComponent);
-                textComponent.addExtra("\n");
+
             }
+            if (counter < questReward.getRewardEntries().size())
+                textComponent.addExtra("\n");
+        }
         return textComponent;
     }
 
@@ -86,6 +99,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
         objectivesLine = ConfigurationEngine.setString(fileConfiguration, "objectivesLine", "&c&lObjectives:");
         killQuestDefaultSummaryLine = ConfigurationEngine.setString(fileConfiguration, "killQuestDefaultSummaryLine", "&c➤Kill $name:$color$current&0/$color$target");
         fetchQuestDefaultSummaryLine = ConfigurationEngine.setString(fileConfiguration, "fetchQuestDefaultSummaryLine", "&c➤Get $name:$color&$current&0/$color$target");
+        dialogQuestDefaultSummaryLine = ConfigurationEngine.setString(fileConfiguration, "dialogQuestDefaultSummaryLine", "&c➤Go talk to $name $location");
 
         rewardsLine = ConfigurationEngine.setString(fileConfiguration, "rewardsLine", "&2&lRewards:");
         rewardsDefaultSummaryLine = ConfigurationEngine.setString(fileConfiguration, "rewardsDefaultSummaryLine", "&2➤$amountx $rewardName &8($chance%)");

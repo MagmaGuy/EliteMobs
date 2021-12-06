@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class NPCInteractions implements Listener {
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
@@ -38,7 +38,6 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            GuildRankMenuHandler guildRankMenuHandler = new GuildRankMenuHandler();
                             GuildRankMenuHandler.initializeGuildRankMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);

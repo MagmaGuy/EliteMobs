@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.utils;
 import com.magmaguy.elitemobs.MetadataHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -25,7 +26,13 @@ public class SimpleScoreboard {
         }
 
         player.setScoreboard(scoreboard);
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, (task) -> player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard()), ticksTimeout);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (player.getScoreboard().equals(scoreboard))
+                    player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, ticksTimeout);
 
         return scoreboard;
     }

@@ -2,12 +2,17 @@ package com.magmaguy.elitemobs.thirdparty.libsdisguises;
 
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import me.libraryaddict.disguise.DisguiseAPI;
+import me.libraryaddict.disguise.DisguiseConfig;
 import me.libraryaddict.disguise.disguisetypes.*;
 import me.libraryaddict.disguise.disguisetypes.watchers.PlayerWatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 public class DisguiseEntity {
+
+    public static void initialize(){
+        DisguiseConfig.setPlayerNameType(DisguiseConfig.PlayerNameType.ARMORSTANDS);
+    }
 
     /**
      * This method disguises the entity based on a config entry. It should be invoked after checking if libsdisguises

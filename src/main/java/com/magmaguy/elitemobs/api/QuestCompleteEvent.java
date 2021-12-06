@@ -62,6 +62,7 @@ public class QuestCompleteEvent extends Event {
                                     .replace("$getY", event.getPlayer().getLocation().getY() + "")
                                     .replace("$getZ", event.getPlayer().getLocation().getZ() + ""));
             }
+            //todo: add quest reward text for loot obtained
             PlayerData.removeQuest(event.getPlayer().getUniqueId(), event.getQuest());
             PlayerData.incrementQuestsCompleted(event.getPlayer().getUniqueId());
         }

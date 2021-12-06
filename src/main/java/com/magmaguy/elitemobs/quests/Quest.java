@@ -31,7 +31,11 @@ public class Quest implements Serializable {
     protected String questName;
     @Getter
     @Setter
-    protected String turnInNPC = "";
+    //NPC the quest originates from
+    protected String questGiver= "";
+    @Setter
+    //NPC the quest is turned in to
+    protected String questTaker = "";
     @Getter
     @Setter
     private UUID playerUUID;
@@ -41,6 +45,10 @@ public class Quest implements Serializable {
     @Getter
     @Setter
     private boolean accepted = false;
+
+    public String getQuestTaker() {
+        return questTaker.isEmpty() ? questGiver : questTaker;
+    }
 
     public Quest(Player player, QuestObjectives questObjectives, int questLevel) {
         this.playerUUID = player.getUniqueId();
