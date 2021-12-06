@@ -75,7 +75,6 @@ public class ChannelHealing extends CombatEnterScanPower {
                 Location rayLocation = healer.getLocation().add(new Vector(0, 1, 0)).add(toDamaged);
 
                 for (int i = 0; i < 55; i++) {
-                    //rayLocation.getWorld().spawnParticle(Particle.TOTEM, rayLocation, 5, toDamaged.getX() * .1D, toDamaged.getY() * .1D, toDamaged.getZ() * .1D);
                     rayLocation.getWorld().spawnParticle(Particle.TOTEM, rayLocation, 1, toDamaged.getX(), toDamaged.getY(), toDamaged.getZ(), .2D);
                     rayLocation.add(toDamaged);
                     if (rayLocation.distance(damagedEntity.getLocation()) < 2)

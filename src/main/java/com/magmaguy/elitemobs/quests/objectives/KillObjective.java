@@ -13,6 +13,8 @@ public abstract class KillObjective extends Objective {
         super(targetAmount, objectiveName);
     }
 
+    public abstract void checkProgress(EliteMobDeathEvent event, QuestObjectives questObjectives);
+
     public static class KillObjectiveEvents implements Listener {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
@@ -21,7 +23,7 @@ public abstract class KillObjective extends Objective {
                     if (quest != null)
                         for (Objective objective : quest.getQuestObjectives().getObjectives())
                             if (objective instanceof KillObjective)
-                                objective.checkProgress(event, quest.getQuestObjectives());
+                                ((KillObjective)objective).checkProgress(event, quest.getQuestObjectives());
             }
         }
     }

@@ -29,16 +29,14 @@ public class QuestInteractionHandler {
                     return;
                 }
 
-                if ((customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission() == null ||
-                        customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission() != null &&
-                                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission())) &&
-                        (customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission() == null ||
-                                customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission() != null &&
-                                        player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission())))
+                if (playerHasPermissionToAcceptQuest(player, customQuest)) {
                     customQuestList.add(customQuest);
+                    customQuest.setQuestGiver(npcEntity.getNpCsConfigFields().getFilename());
+                }
             }
 
         List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
+        scanQuestTakerNPC(npcEntity, quests, customQuestList);
         if (quests != null)
             for (Quest quest : quests)
                 if (quest instanceof CustomQuest &&
@@ -54,4 +52,25 @@ public class QuestInteractionHandler {
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }
+
+    private static boolean playerHasPermissionToAcceptQuest(Player player, CustomQuest customQuest) {
+        if (customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission() != null &&
+                !customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty() &&
+                player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission()))
+            return false;
+        if (customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission() != null &&
+                !customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission().isEmpty() &&
+                !player.hasPermission(customQuest.getCustomQuestsConfigFields().getQuestAcceptPermission()))
+            return false;
+        return true;
+    }
+
+    private static void scanQuestTakerNPC(NPCEntity npcEntity, List<Quest> activeQuests, List<CustomQuest> npcQuests) {
+        for (Quest quest : activeQuests)
+            if (quest instanceof CustomQuest &&
+                    !quest.getQuestTaker().equals(quest.getQuestGiver()) &&
+                    npcEntity.getNpCsConfigFields().getFilename().equals(quest.getQuestTaker()))
+                npcQuests.add((CustomQuest) quest);
+    }
+
 }
