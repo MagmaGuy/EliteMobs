@@ -8,16 +8,16 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EliteMenu implements Listener {
 
-    public static void createEliteMenu(Player player, Inventory inventory, HashMap<Player, Inventory> inventories) {
+    public static void createEliteMenu(Player player, Inventory inventory, Map<Player, Inventory> inventories) {
         inventories.put(player, inventory);
     }
 
-    public static boolean isEliteMenu(InventoryClickEvent event, HashMap<Player, Inventory> inventories) {
+    public static boolean isEliteMenu(InventoryClickEvent event, Map<Player, Inventory> inventories) {
         if (event.getCurrentItem() == null) return false;
         if (event.getCurrentItem().getType().equals(Material.AIR)) return false;
         Player player = (Player) event.getWhoClicked();
@@ -34,7 +34,7 @@ public class EliteMenu implements Listener {
         return !isTopMenu(event);
     }
 
-    public static boolean onInventoryClose(InventoryCloseEvent event, HashMap<Player, Inventory> inventories) {
+    public static boolean onInventoryClose(InventoryCloseEvent event, Map<Player, Inventory> inventories) {
         Player player = (Player) event.getPlayer();
         Inventory inventory = inventories.get(player);
         if (inventory == null) return false;
@@ -50,7 +50,7 @@ public class EliteMenu implements Listener {
             }
     }
 
-    public static void onPlayerQuit(PlayerQuitEvent event, HashMap<Player, Inventory> inventories) {
+    public static void onPlayerQuit(PlayerQuitEvent event, Map<Player, Inventory> inventories) {
         inventories.remove(event.getPlayer());
     }
 

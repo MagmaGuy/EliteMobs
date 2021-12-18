@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.quests.objectives;
 
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
 import org.bukkit.entity.Player;

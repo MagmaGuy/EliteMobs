@@ -1,17 +1,23 @@
 package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.ChatColorConverter;
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
+import com.magmaguy.elitemobs.api.QuestRewardEvent;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
+import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.permissions.PermissionAttachment;
 
 import java.util.UUID;
 
@@ -68,6 +74,38 @@ public class CustomQuest extends Quest {
             return null;
         }
         return customQuestsConfigFields;
+    }
+
+    public static class CustomQuestEvents implements Listener {
+        @EventHandler
+        public void onQuestReward(QuestRewardEvent event) {
+            if (event.getQuest() instanceof CustomQuest) {
+                CustomQuest customQuest = (CustomQuest) event.getQuest();
+                CustomQuestsConfigFields customQuestsConfigFields = customQuest.getCustomQuestsConfigFields();
+                if (!customQuest.getCustomQuestsConfigFields().getTemporaryPermissions().isEmpty()) {
+                    PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
+                    for (String permission : customQuest.getCustomQuestsConfigFields().getTemporaryPermissions())
+                        permissionAttachment.setPermission(permission, false);
+                }
+                if (!customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission().isEmpty()) {
+                    PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
+                    permissionAttachment.setPermission(customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission(), true);
+                    if (customQuest.getCustomQuestsConfigFields().getQuestLockoutMinutes() > 0)
+                        PlayerQuestCooldowns.addCooldown(event.getPlayer(),
+                                customQuest.getCustomQuestsConfigFields().getQuestLockoutPermission(),
+                                customQuest.getCustomQuestsConfigFields().getQuestLockoutMinutes());
+                }
+                if (!customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog().isEmpty())
+                    for (String dialog : customQuest.getCustomQuestsConfigFields().getQuestCompleteDialog())
+                        event.getPlayer().sendMessage(dialog);
+                for (String command : customQuestsConfigFields.getQuestCompleteCommands())
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                            command.replace("$player", event.getPlayer().getName())
+                                    .replace("$getX", event.getPlayer().getLocation().getX() + "")
+                                    .replace("$getY", event.getPlayer().getLocation().getY() + "")
+                                    .replace("$getZ", event.getPlayer().getLocation().getZ() + ""));
+            }
+        }
     }
 
 }

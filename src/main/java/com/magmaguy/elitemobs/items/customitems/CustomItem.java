@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items.customitems;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
@@ -14,15 +15,15 @@ import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class CustomItem {
 
@@ -376,6 +377,10 @@ public class CustomItem {
                         player,
                         showItemWorth,
                         customItemsConfigFields.getCustomModelID());
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        //Adds the filename to the persistent data container, useful for several things but mostly used for tracking quest keys
+        Objects.requireNonNull(itemMeta).getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, fileName), PersistentDataType.STRING, fileName);
+        itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
 

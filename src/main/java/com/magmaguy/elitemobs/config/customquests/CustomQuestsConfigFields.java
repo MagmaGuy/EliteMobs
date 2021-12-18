@@ -30,7 +30,6 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     //Required permission to accept quest
     private String questAcceptPermission = "";
     @Getter
-    @Setter
     //Permission which locks players out of a quest
     private String questLockoutPermission = "";
     @Getter
@@ -52,6 +51,9 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
     @Getter
     @Setter
     private String turnInNPC = "";
+    @Getter
+    @Setter
+    private boolean customQuestFormat = false;
 
     public CustomQuestsConfigFields(String filename,
                                     boolean isEnabled,
@@ -79,6 +81,10 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         super(filename, isEnabled);
     }
 
+    public void setQuestLockoutPermission() {
+        this.questLockoutPermission = "elitemobs." + getFilename();
+    }
+
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
@@ -94,6 +100,7 @@ public class CustomQuestsConfigFields extends CustomConfigFields implements Cust
         this.questCompleteDialog = processStringList("questCompleteMessage", questCompleteDialog, new ArrayList<>(), false);
         this.questCompleteCommands = processStringList("questCompleteCommands", questCompleteCommands, new ArrayList<>(), false);
         this.turnInNPC = processString("turnInNPC", turnInNPC, "", false);
+        this.customQuestFormat = processBoolean("customQuestFormat", customQuestFormat, false, false);
     }
 
 

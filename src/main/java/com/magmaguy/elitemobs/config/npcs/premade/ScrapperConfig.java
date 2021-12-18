@@ -23,7 +23,7 @@ public class ScrapperConfig extends NPCsConfigFields {
                 Arrays.asList(
                         "Scrappy deals!",
                         "Get your scrap here!",
-                        "50% chance to work!",
+                        "75% chance to work!",
                         "There are no refunds.",
                         "Recycle, reuse, reduce!"),
                 Arrays.asList(

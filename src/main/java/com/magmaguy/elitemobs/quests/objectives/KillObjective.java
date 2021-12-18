@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

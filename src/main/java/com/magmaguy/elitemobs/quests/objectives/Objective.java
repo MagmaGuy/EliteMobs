@@ -40,4 +40,13 @@ public abstract class Objective implements Serializable {
         objectiveCompleted = true;
     }
 
+    public void progressNonlinearObjective(QuestObjectives questObjectives) {
+        QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
+                Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
+                questObjectives.getQuest(),
+                this);
+        new EventCaller(questProgressionEvent);
+        objectiveCompleted = currentAmount >= targetAmount;
+    }
+
 }

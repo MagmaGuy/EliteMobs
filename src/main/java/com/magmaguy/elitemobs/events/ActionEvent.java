@@ -29,8 +29,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ActionEvent extends CustomEvent {
 
     private static final List<ActionEvent> blueprintEvents = new ArrayList<>();
-    private static final List<ActionEvent> actionEvents = new ArrayList<>();
-    private static HashSet<Player> playerCooldowns = new HashSet<>();
+    private static final HashSet<Player> playerCooldowns = new HashSet<>();
     private final double chance;
     private final List<Material> breakableMaterials;
     private Player player;
@@ -45,8 +44,6 @@ public class ActionEvent extends CustomEvent {
     /**
      * Initializes events directly from the configuration files, and keeps a copy to run checks over in order to instantiate
      * events for the server to run
-     *
-     * @return Instantiated ActionEvent
      */
     public static void initializeBlueprintEvents() {
         if (!EventsConfig.actionEventsEnabled) return;
@@ -95,8 +92,6 @@ public class ActionEvent extends CustomEvent {
             actionEvent.primaryEliteMobs.add(customBossEntity);
         }
 
-        actionEvents.add(actionEvent);
-
         actionEvent.start();
     }
 
@@ -113,7 +108,7 @@ public class ActionEvent extends CustomEvent {
 
     @Override
     public void endModifiers() {
-        actionEvents.remove(this);
+        //No need to track action events
     }
 
     public static class ActionEventEvents implements Listener {

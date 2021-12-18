@@ -9,9 +9,12 @@ import java.util.UUID;
 
 public class QuestCommand {
 
+    private QuestCommand() {
+    }
+
     public static void completeQuest(String questID, Player player) {
         try {
-            CustomQuest.completeQuest(UUID.fromString(questID), player);
+            Quest.completeQuest(UUID.fromString(questID), player);
         } catch (Exception ex) {
             player.sendMessage(ChatColor.RED + "[EliteMobs] Invalid quest ID!");
         }

@@ -1,10 +1,12 @@
-package com.magmaguy.elitemobs.playerdata;
+package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.elitemobs.utils.WarningMessage;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -23,14 +26,23 @@ import java.util.UUID;
 
 public class PlayerData {
 
-    public static final String database_name = "player_data.db";
-    public static final String player_data_table_name = "PlayerData";
+    @Getter
+    private static final String DATABASE_NAME = "player_data.db";
+    @Getter
+    private static final String PLAYER_DATA_TABLE_NAME = "PlayerData";
     private static final HashMap<UUID, PlayerData> playerDataHashMap = new HashMap<>();
     private static Connection connection = null;
-    private final boolean update = false;
     private double currency;
-    private int guildPrestigeLevel, maxGuildLevel, activeGuildLevel, score, kills, highestLevelKilled, deaths, questsCompleted;
+    private int guildPrestigeLevel;
+    private int maxGuildLevel;
+    private int activeGuildLevel;
+    private int score;
+    private int kills;
+    private int highestLevelKilled;
+    private int deaths;
+    private int questsCompleted;
     private List<Quest> quests = new ArrayList<>();
+    private PlayerQuestCooldowns playerQuestCooldowns = null;
 
     /**
      * Called when a player logs in, storing their data in memory
@@ -38,101 +50,23 @@ public class PlayerData {
      * @param uuid
      */
     public PlayerData(UUID uuid) {
-        PlayerData playerData = this;
         new BukkitRunnable() {
             @Override
             public void run() {
                 Statement statement = null;
                 try {
                     statement = getConnection().createStatement();
-                    ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-
+                    ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+                    //case for there being data to read
                     if (resultSet.next()) {
-                        currency = resultSet.getDouble("Currency");
-                        guildPrestigeLevel = resultSet.getInt("GuildPrestigeLevel");
-                        maxGuildLevel = resultSet.getInt("GuildMaxLevel");
-                        activeGuildLevel = resultSet.getInt("GuildActiveLevel");
-                        score = resultSet.getInt("Score");
-                        kills = resultSet.getInt("Kills");
-                        highestLevelKilled = resultSet.getInt("HighestLevelKilled");
-                        deaths = resultSet.getInt("Deaths");
-                        questsCompleted = resultSet.getInt("QuestsCompleted");
-
-                        if (resultSet.getBytes("QuestStatus") != null) {
-                            try {
-                                quests = (List<Quest>) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), "UTF-8"));
-                                //Serializes ItemStack which require specific handling, necessary recovering the rewards
-                                for (Quest quest : quests)
-                                    quest.getQuestObjectives().getQuestReward().serializeRewards();
-                            } catch (Exception ex) {
-                                new WarningMessage("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
-                                try {
-                                    resetQuests(uuid);
-                                } catch (Exception ex2) {
-                                    new WarningMessage("Failed to reset quest data! Ironic.");
-                                    ex2.printStackTrace();
-                                }
-                            }
-                        }
-
-                        playerDataHashMap.put(uuid, playerData);
-
-                        resultSet.close();
-                        statement.close();
-                        return;
+                        readExistingData(statement, uuid, resultSet);
                     } else {
-                        currency = 0;
-                        guildPrestigeLevel = 0;
-                        maxGuildLevel = 1;
-                        activeGuildLevel = 1;
-                        score = 0;
-                        kills = 0;
-                        highestLevelKilled = 0;
-                        deaths = 0;
-                        questsCompleted = 0;
-
-                        playerDataHashMap.put(uuid, playerData);
-
-                        statement = getConnection().createStatement();
-                        String sql = "INSERT INTO " + player_data_table_name +
-                                " (PlayerUUID," +
-                                " DisplayName," +
-                                " Currency," +
-                                " GuildPrestigeLevel," +
-                                " GuildMaxLevel," +
-                                " GuildActiveLevel," +
-                                " Score," +
-                                " Kills," +
-                                " HighestLevelKilled," +
-                                " Deaths," +
-                                " QuestsCompleted) " +
-                                //identifier
-                                "VALUES ('" + uuid + "'," +
-                                //display name
-                                " '" + Bukkit.getPlayer(uuid).getName() + "'," +
-                                //currency
-                                " 0," +
-                                //guild_prestige_level
-                                " 0," +
-                                //guild_max_level
-                                " 1," +
-                                //guild_active_level
-                                " 1," +
-                                //score
-                                "0," +
-                                //kills
-                                "0," +
-                                //highestLevelKilled
-                                "0," +
-                                //deaths
-                                "0," +
-                                //questsCompleted
-                                "0);";
-                        statement.executeUpdate(sql);
-
-                        statement.close();
-                        return;
+                        //case for new data to be written
+                        writeNewData(statement, uuid);
                     }
+                    resultSet.close();
+                    statement.close();
+
                 } catch (Exception e) {
                     if (statement != null) {
                         try {
@@ -143,13 +77,34 @@ public class PlayerData {
                         }
                     }
                     new WarningMessage("Something went wrong while generating a new player entry. This is bad! Tell the dev.");
-                    System.err.println(e.getClass().getName() + ": " + e.getMessage());
+                    new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
                 }
-
-                new WarningMessage("No player entry detected, generating new entry!");
-
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+    }
+
+    public static void updateQuestStatus(UUID uuid) {
+        List<Quest> playerQuests = getQuests(uuid);
+        try {
+            setDatabaseValue(uuid, "QuestStatus", ObjectSerializer.toString((ArrayList) playerQuests));
+            if (playerDataHashMap.containsKey(uuid))
+                playerDataHashMap.get(uuid).quests = playerQuests;
+        } catch (Exception ex) {
+            new WarningMessage("Failed to serialize player quest data!");
+            ex.printStackTrace();
+        }
+    }
+
+    @Nullable
+    public static PlayerQuestCooldowns getPlayerQuestCooldowns(UUID uuid){
+        try {
+            if (!isInMemory(uuid))
+                return (PlayerQuestCooldowns) ObjectSerializer.fromString((String) getDatabaseBlob(uuid, "PlayerQuestCooldowns"));
+            if (playerDataHashMap.get(uuid) == null) return PlayerQuestCooldowns.initializePlayer();
+            return playerDataHashMap.get(uuid).playerQuestCooldowns == null ? PlayerQuestCooldowns.initializePlayer(): playerDataHashMap.get(uuid).playerQuestCooldowns;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     public static void clearPlayerData(UUID uuid) {
@@ -326,14 +281,52 @@ public class PlayerData {
         updateQuestStatus(uuid);
     }
 
-    public static void updateQuestStatus(UUID uuid) {
-        List<Quest> playerQuests = getQuests(uuid);
+    public static void updatePlayerQuestCooldowns(UUID uuid){
+        try{
+            setDatabaseValue(uuid, "PlayerQuestCooldowns", ObjectSerializer.toString(getPlayerQuestCooldowns(uuid)));
+        } catch (Exception ex){
+            new WarningMessage("Failed to register player quest cooldowns!");
+            ex.printStackTrace();
+        }
+    }
+
+    public static void setDatabaseValue(UUID uuid, String key, Object value) {
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Statement statement = null;
+                try {
+                    statement = getConnection().createStatement();
+                    String sql;
+                    if (value instanceof String)
+                        sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = '" + value + "' WHERE PlayerUUID = '" + uuid.toString() + "';";
+                    else
+                        sql = "UPDATE " + PLAYER_DATA_TABLE_NAME + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
+                    statement.executeUpdate(sql);
+                    statement.close();
+
+                } catch (Exception e) {
+                    new WarningMessage("Failed to update database value.");
+                    new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+                }
+            }
+        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+
+    }
+
+    private static Object getDatabaseBlob(UUID uuid, String value) {
         try {
-            setDatabaseValue(uuid, "QuestStatus", ObjectSerializer.toString((ArrayList) playerQuests));
-            if (playerDataHashMap.containsKey(uuid))
-                playerDataHashMap.get(uuid).quests = playerQuests;
-        } catch (Exception ex) {
-            new WarningMessage("Failed to serialize player quest data!");
+            Statement statement = getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            Object blob = resultSet.getBlob(value);
+            resultSet.close();
+            statement.close();
+            return blob;
+        } catch (Exception e) {
+            new WarningMessage("Failed to get string value from database!");
+            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+            return null;
         }
     }
 
@@ -415,57 +408,17 @@ public class PlayerData {
             playerDataHashMap.get(uuid).questsCompleted += 1;
     }
 
-    public static void setDatabaseValue(UUID uuid, String key, Object value) {
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Statement statement = null;
-                try {
-                    statement = getConnection().createStatement();
-                    String sql;
-                    if (value instanceof String)
-                        sql = "UPDATE " + player_data_table_name + " SET " + key + " = '" + value + "' WHERE PlayerUUID = '" + uuid.toString() + "';";
-                    else
-                        sql = "UPDATE " + player_data_table_name + " SET " + key + " = " + value + " WHERE PlayerUUID = '" + uuid.toString() + "';";
-                    statement.executeUpdate(sql);
-                    statement.close();
-
-                } catch (Exception e) {
-                    new WarningMessage("Failed to update database value.");
-                    System.err.println(e.getClass().getName() + ": " + e.getMessage());
-                }
-            }
-        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
-
-    }
-
-    private static Object getDatabaseBlob(UUID uuid, String value) {
-        try {
-            Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
-            Object blob = resultSet.getBlob(value);
-            resultSet.close();
-            statement.close();
-            return blob;
-        } catch (Exception e) {
-            new WarningMessage("Failed to get string value from database!");
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            return null;
-        }
-    }
-
     private static String getDatabaseString(UUID uuid, String value) {
         try {
             Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
             String reply = resultSet.getString(value);
             resultSet.close();
             statement.close();
             return reply;
         } catch (Exception e) {
             new WarningMessage("Failed to get string value from database!");
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
             return null;
         }
     }
@@ -473,14 +426,14 @@ public class PlayerData {
     private static Double getDatabaseDouble(UUID uuid, String value) {
         try {
             Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
             double reply = resultSet.getDouble(value);
             resultSet.close();
             statement.close();
             return reply;
         } catch (Exception e) {
             new WarningMessage("Failed to get double value from database!");
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
             return null;
         }
     }
@@ -488,26 +441,87 @@ public class PlayerData {
     private static Integer getDatabaseInteger(UUID uuid, String value) {
         try {
             Statement statement = getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + player_data_table_name + " WHERE PlayerUUID = '" + uuid.toString() + "';");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + PLAYER_DATA_TABLE_NAME + " WHERE PlayerUUID = '" + uuid.toString() + "';");
             int reply = resultSet.getInt(value);
             resultSet.close();
             statement.close();
             return reply;
         } catch (Exception e) {
             new WarningMessage("Failed to get integer value from database!");
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
             return null;
         }
     }
 
     public static Connection getConnection() throws Exception {
-        File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + database_name);
+        File dataFolder = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + DATABASE_NAME);
         if (connection == null || connection.isClosed()) {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
             connection.setAutoCommit(true);
         }
         return connection;
+    }
+
+    public static void initializeDatabaseConnection() {
+        new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data").mkdirs();
+        Statement statement = null;
+
+        try {
+            new InfoMessage("Opened database successfully");
+
+            GenerateDatabase.generate();
+
+            for (Player player : Bukkit.getOnlinePlayers())
+                new PlayerData(player.getUniqueId());
+
+        } catch (Exception e) {
+            new WarningMessage(e.getClass().getName() + ": " + e.getMessage());
+            new WarningMessage("Failed to establish a connection to the SQLite database. This is not good.");
+        }
+
+        new PortOldData();
+    }
+
+    private void readExistingData(Statement statement, UUID uuid, ResultSet resultSet) throws Exception {
+        currency = resultSet.getDouble("Currency");
+        guildPrestigeLevel = resultSet.getInt("GuildPrestigeLevel");
+        maxGuildLevel = resultSet.getInt("GuildMaxLevel");
+        activeGuildLevel = resultSet.getInt("GuildActiveLevel");
+        score = resultSet.getInt("Score");
+        kills = resultSet.getInt("Kills");
+        highestLevelKilled = resultSet.getInt("HighestLevelKilled");
+        deaths = resultSet.getInt("Deaths");
+        questsCompleted = resultSet.getInt("QuestsCompleted");
+
+        if (resultSet.getBytes("QuestStatus") != null) {
+            try {
+                quests = (List<Quest>) ObjectSerializer.fromString(new String(resultSet.getBytes("QuestStatus"), "UTF-8"));
+                //Serializes ItemStack which require specific handling, necessary recovering the rewards
+                for (Quest quest : quests)
+                    quest.getQuestObjectives().getQuestReward().serializeRewards();
+            } catch (Exception ex) {
+                new WarningMessage("Failed to serialize quest data for player " + Bukkit.getPlayer(uuid) + " ! This player's quest data will be wiped to prevent future errors.");
+                try {
+                    resetQuests(uuid);
+                } catch (Exception ex2) {
+                    new WarningMessage("Failed to reset quest data! Ironic.");
+                    ex2.printStackTrace();
+                }
+            }
+        }
+
+        if (resultSet.getBytes("PlayerQuestCooldowns") != null) {
+            try {
+                playerQuestCooldowns = (PlayerQuestCooldowns) ObjectSerializer.fromString(new String(resultSet.getBytes("PlayerQuestCooldowns"), "UTF-8"));
+                PlayerQuestCooldowns.initializePlayer(uuid, playerQuestCooldowns);
+            } catch (Exception exception) {
+                new WarningMessage("Failed to get player quest cooldowns!");
+            }
+        }
+
+        playerDataHashMap.put(uuid, this);
+
     }
 
     public static void closeConnection() {
@@ -519,40 +533,57 @@ public class PlayerData {
         }
     }
 
-    public static void initializeDatabaseConnection() {
-        new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data").mkdirs();
-        Statement statement = null;
+    private void writeNewData(Statement statement, UUID uuid) throws Exception {
+        currency = 0;
+        guildPrestigeLevel = 0;
+        maxGuildLevel = 1;
+        activeGuildLevel = 1;
+        score = 0;
+        kills = 0;
+        highestLevelKilled = 0;
+        deaths = 0;
+        questsCompleted = 0;
 
-        try {
-            new InfoMessage("Opened database successfully");
+        playerDataHashMap.put(uuid, this);
 
-            statement = getConnection().createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS " + player_data_table_name +
-                    "(PlayerUUID             TEXT PRIMARY KEY    NOT NULL," +
-                    " DisplayName                       TEXT," +
-                    " Currency                          REAL," +
-                    " GuildPrestigeLevel                 INT," +
-                    " GuildMaxLevel                      INT," +
-                    " GuildActiveLevel                   INT," +
-                    " QuestStatus                       BLOB," +
-                    " Score                              INT," +
-                    " Kills                              INT," +
-                    " HighestLevelKilled                 INT," +
-                    " Deaths                             INT," +
-                    " QuestsCompleted                    INT);";
-            statement.executeUpdate(sql);
-            statement.close();
+        statement = getConnection().createStatement();
+        String sql = "INSERT INTO " + PLAYER_DATA_TABLE_NAME +
+                " (PlayerUUID," +
+                " DisplayName," +
+                " Currency," +
+                " GuildPrestigeLevel," +
+                " GuildMaxLevel," +
+                " GuildActiveLevel," +
+                " Score," +
+                " Kills," +
+                " HighestLevelKilled," +
+                " Deaths," +
+                " QuestsCompleted) " +
+                //identifier
+                "VALUES ('" + uuid + "'," +
+                //display name
+                " '" + Bukkit.getPlayer(uuid).getName() + "'," +
+                //currency
+                " 0," +
+                //guild_prestige_level
+                " 0," +
+                //guild_max_level
+                " 1," +
+                //guild_active_level
+                " 1," +
+                //score
+                "0," +
+                //kills
+                "0," +
+                //highestLevelKilled
+                "0," +
+                //deaths
+                "0," +
+                //questsCompleted
+                "0);";
+        statement.executeUpdate(sql);
 
-            for (Player player : Bukkit.getOnlinePlayers())
-                new PlayerData(player.getUniqueId());
-
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            new WarningMessage("Failed to establish a connection to the SQLite database. This is not good.");
-        }
-
-        new PortOldData();
-
+        new InfoMessage("No player entry detected, generating new entry!");
     }
 
     public static class PlayerDataEvents implements Listener {
