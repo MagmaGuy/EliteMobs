@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.api.QuestObjectivesCompletedEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.quests.CustomQuest;
@@ -98,7 +99,7 @@ public class QuestObjectives implements Serializable {
         for (Objective objective : objectives)
             strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
 
-        return SimpleScoreboard.temporaryScoreboard(player, getQuest().getQuestName(), strings, 20 * 20);
+        return SimpleScoreboard.temporaryScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), strings, 20 * 20);
     }
 
 

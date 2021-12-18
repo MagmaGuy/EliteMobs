@@ -1,10 +1,11 @@
 package com.magmaguy.elitemobs.quests.menus;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.config.menus.premade.CustomQuestMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -15,6 +16,7 @@ import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.elitemobs.utils.SpigotMessage;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -60,23 +62,44 @@ public class QuestMenu {
     public static TextComponent[] generateQuestEntry(Quest quest, Player player, NPCEntity npcEntity) {
 
         TextComponent header = generateHeader(quest);
-        TextComponent body = generateBody(quest);
+        List<TextComponent> body = generateBody(quest);
         TextComponent fixedSummary = generateFixedSummary(quest);
-        TextComponent summary = generateSummary(quest);
+        List<TextComponent> summary = generateSummary(quest);
         TextComponent fixedRewards = generateFixedRewards(quest);
-        TextComponent rewards = generateRewards(quest, player);
+        List<TextComponent> rewards = generateRewards(quest);
         TextComponent accept = generateAccept(quest, npcEntity);
 
-        List<TextComponent> pagesList = new ArrayList<>();
-        pagesList.add(header);
-
+        //Condense all page elements
+        List<TextComponent> elements = new ArrayList<>();
+        elements.add(header);
         if (quest instanceof CustomQuest)
-            compilePages(pagesList, body);
-        compilePages(pagesList, fixedSummary);
-        compilePages(pagesList, summary);
-        compilePages(pagesList, fixedRewards);
-        compilePages(pagesList, rewards);
-        compilePages(pagesList, accept);
+            elements.addAll(body);
+        elements.add(fixedSummary);
+        elements.addAll(summary);
+        elements.add(fixedRewards);
+        elements.addAll(rewards);
+        elements.add(accept);
+
+        //Arrange them into pages, taking character count into account
+        List<TextComponent> pagesList = new ArrayList<>();
+        int pageIndex = 0;
+        int characterCount = 0;
+        int characterLimit = 170;
+        for (TextComponent textComponent : elements) {
+            characterCount += ChatColor.stripColor(textComponent.getText()).length();
+            if (pagesList.isEmpty()) {
+                textComponent.addExtra("\n");
+                pagesList.add(textComponent);
+            } else if (characterCount > characterLimit) {
+                characterCount = 0;
+                pageIndex++;
+                textComponent.addExtra("\n");
+                pagesList.add(textComponent);
+            } else {
+                textComponent.addExtra("\n");
+                pagesList.get(pageIndex).addExtra(textComponent);
+            }
+        }
 
         TextComponent[] pages = new TextComponent[pagesList.size()];
 
@@ -89,74 +112,70 @@ public class QuestMenu {
         return pages;
     }
 
+
     private static TextComponent generateHeader(Quest quest) {
         if (quest instanceof CustomQuest)
-            return SpigotMessage.simpleMessage(CustomQuestMenuConfig.headerTextLines.replace("$questName", quest.getQuestName()));
+            return SpigotMessage.simpleMessage(CustomQuestMenuConfig.getHeaderTextLines().replace("$questName", quest.getQuestName()));
         else
             return SpigotMessage.simpleMessage(DynamicQuestMenuConfig.getHeaderTextLines().replace("$questName", quest.getQuestName()));
     }
 
-    private static TextComponent generateBody(Quest quest) {
-        TextComponent body = new TextComponent();
+    private static List<TextComponent> generateBody(Quest quest) {
+        List<TextComponent> body = new ArrayList<>();
         if (quest instanceof CustomQuest)
-            body.addExtra(((CustomQuest) quest).getCustomQuestsConfigFields().getQuestLore());
+            for (String splitString : ((CustomQuest) quest).getCustomQuestsConfigFields().getQuestLore().split("\n"))
+                body.add(new TextComponent(ChatColorConverter.convert(splitString)));
         else if (quest instanceof DynamicQuest)
-            body.addExtra(DynamicQuestMenuConfig.getDefaultLoreTextLines()
+            body.add(new TextComponent(DynamicQuestMenuConfig.getDefaultLoreTextLines()
                     .replace("$amount", quest.getQuestObjectives().getObjectives().get(0).getTargetAmount() + "")
-                    .replace("$name", EliteMobProperties.getPluginData(((DynamicKillObjective) quest.getQuestObjectives().getObjectives().get(0)).getEntityType()).getName(quest.getQuestLevel() * 10)));
+                    .replace("$name", EliteMobProperties.getPluginData(((DynamicKillObjective) quest.getQuestObjectives().getObjectives().get(0)).getEntityType()).getName(quest.getQuestLevel() * 10))));
         return body;
     }
 
     private static TextComponent generateFixedSummary(Quest quest) {
         TextComponent fixedSummary = new TextComponent();
         if (quest instanceof CustomQuest)
-            fixedSummary.setText(CustomQuestMenuConfig.objectivesLine);
+            fixedSummary.setText(CustomQuestMenuConfig.getObjectivesLine());
         else if (quest instanceof DynamicQuest)
             fixedSummary.setText(DynamicQuestMenuConfig.getObjectivesLine());
         return fixedSummary;
     }
 
-    private static TextComponent generateSummary(Quest quest) {
-        TextComponent summary = new TextComponent();
+    private static List<TextComponent> generateSummary(Quest quest) {
+        List<TextComponent> textComponents = new ArrayList<>();
         if (quest instanceof CustomQuest) {
-            int counter = 0;
             for (Objective objective : quest.getQuestObjectives().getObjectives()) {
-                counter++;
                 if (objective instanceof KillObjective) {
                     //todo: hover should show more boss details, command string should allow players to try to track the boss
-                    summary.addExtra(SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), "", ""));
+                    textComponents.add(new TextComponent(SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), "", "")));
                 } else if (objective instanceof DialogObjective) {
-                    summary.addExtra(SpigotMessage.hoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), ""));
+                    textComponents.add(new TextComponent(SpigotMessage.hoverMessage(CustomQuestMenuConfig.getObjectiveLine(objective), "")));
                 }
-                if (counter < quest.getQuestObjectives().getObjectives().size())
-                    summary.addExtra("\n");
             }
         } else if (quest instanceof DynamicQuest) {
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective instanceof KillObjective) {
                     //todo: hover should show more boss details, command string should allow players to try to track the boss
-                    summary.addExtra(SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getKillQuestDefaultSummaryLine(objective), "", ""));
+                    textComponents.add(new TextComponent(SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getKillQuestDefaultSummaryLine(objective), "", "")));
                 }
         }
-        return summary;
+        return textComponents;
     }
 
     private static TextComponent generateFixedRewards(Quest quest) {
         TextComponent questRewards = new TextComponent();
         if (quest instanceof CustomQuest)
-            questRewards.setText(CustomQuestMenuConfig.rewardsLine);
+            questRewards.setText(CustomQuestMenuConfig.getRewardsLine());
         else if (quest instanceof DynamicQuest)
             questRewards.setText(DynamicQuestMenuConfig.getRewardsLine());
         return questRewards;
     }
 
-    private static TextComponent generateRewards(Quest quest, Player player) {
-        TextComponent questRewards = null;
+    private static List<TextComponent> generateRewards(Quest quest) {
         if (quest instanceof CustomQuest)
-            questRewards = CustomQuestMenuConfig.getRewardsDefaultSummaryLine(quest.getQuestObjectives().getQuestReward(), quest.getQuestLevel(), player);
-        else if (quest instanceof DynamicQuest)
-            questRewards = DynamicQuestMenuConfig.getRewardsDefaultSummaryLine(quest.getQuestObjectives().getQuestReward(), quest.getQuestLevel(), player);
-        return questRewards;
+            return CustomQuestMenuConfig.getRewardsDefaultSummaryLine(quest.getQuestObjectives().getQuestReward());
+        else
+            return DynamicQuestMenuConfig.getRewardsDefaultSummaryLine(quest.getQuestObjectives().getQuestReward());
     }
 
     private static TextComponent generateAccept(Quest quest, NPCEntity npcEntity) {
@@ -166,7 +185,7 @@ public class QuestMenu {
 
         //Quest is complete, turn in placeholder
         if (quest.getQuestObjectives().isOver() && quest.getQuestTaker().equals(npcEntity.getNpCsConfigFields().getFilename()))
-           return questAcceptComplete(quest);
+            return questAcceptComplete(quest);
 
         //Quest has begun but is either not over or the player is not talking to the turn in npc
         return questAcceptAlreadyAccepted(quest);
@@ -175,12 +194,12 @@ public class QuestMenu {
     //Appears when the player hasn't accepted the quest yet
     private static TextComponent initialQuestAccept(Quest quest) {
         if (quest instanceof CustomQuest) {
-            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptTextLines,
-                    CustomQuestMenuConfig.acceptHoverLines,
-                    CustomQuestMenuConfig.acceptCommandLines.replace("$questID", quest.getQuestID().toString()));
+            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getAcceptTextLines(),
+                    CustomQuestMenuConfig.getAcceptHoverLines(),
+                    CustomQuestMenuConfig.getAcceptCommandLines().replace("$questID", quest.getQuestID().toString()));
         } else {
             return SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptTextLines(),
-                    DynamicQuestMenuConfig.getAcceptedHoverLines(),
+                    DynamicQuestMenuConfig.getAcceptHoverLines(),
                     DynamicQuestMenuConfig.getAcceptCommandLines().replace("$questID", quest.getQuestID().toString()));
         }
     }
@@ -188,9 +207,9 @@ public class QuestMenu {
     //Appears when the player has accepted the quest but has not completed it yet, so it is not ready for turn in
     private static TextComponent questAcceptAlreadyAccepted(Quest quest) {
         if (quest instanceof CustomQuest) {
-            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.acceptedTextLines,
-                    CustomQuestMenuConfig.acceptedHoverLines,
-                    CustomQuestMenuConfig.acceptedCommandLines.replace("$questID", quest.getQuestID().toString()));
+            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getAcceptedTextLines(),
+                    CustomQuestMenuConfig.getAcceptedHoverLines(),
+                    CustomQuestMenuConfig.getAcceptedCommandLines().replace("$questID", quest.getQuestID().toString()));
         } else {
             return SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getAcceptedTextLines(),
                     DynamicQuestMenuConfig.getAcceptedHoverLines(),
@@ -201,29 +220,14 @@ public class QuestMenu {
     //Appears when the player has completed the quest
     private static TextComponent questAcceptComplete(Quest quest) {
         if (quest instanceof CustomQuest) {
-            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.completedTextLines,
-                    CustomQuestMenuConfig.completedHoverLines,
-                    CustomQuestMenuConfig.completedCommandLines.replace("$questID", quest.getQuestID().toString()));
+            return SpigotMessage.commandHoverMessage(CustomQuestMenuConfig.getCompletedTextLines(),
+                    CustomQuestMenuConfig.getCompletedHoverLines(),
+                    CustomQuestMenuConfig.getCompletedCommandLines().replace("$questID", quest.getQuestID().toString()));
         } else {
             return SpigotMessage.commandHoverMessage(DynamicQuestMenuConfig.getCompletedTextLines(),
                     DynamicQuestMenuConfig.getCompletedHoverLines(),
                     DynamicQuestMenuConfig.getCompletedCommandLines().replace("$questID", quest.getQuestID().toString()));
         }
-    }
-
-    private static List<TextComponent> compilePages(List<TextComponent> pages, TextComponent newComponent) {
-        if (!isOverCharacterCount(pages.get(pages.size() - 1), newComponent)) {
-            pages.get(pages.size() - 1).addExtra(newComponent);
-            pages.get(pages.size() - 1).addExtra("\n");
-        } else {
-            pages.add(newComponent);
-            pages.get(pages.size() - 1).addExtra("\n");
-        }
-        return pages;
-    }
-
-    private static boolean isOverCharacterCount(TextComponent page, TextComponent newComponent) {
-        return page.getText().length() + newComponent.getText().length() > 200;
     }
 
     public static TextComponent[] generateQuestEntry(Player player, NPCEntity npcEntity) {

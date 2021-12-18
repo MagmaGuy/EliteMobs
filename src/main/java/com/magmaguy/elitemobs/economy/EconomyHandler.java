@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.economy;
 
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.Round;
 
 import java.util.UUID;

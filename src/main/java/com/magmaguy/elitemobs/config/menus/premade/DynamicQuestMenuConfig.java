@@ -11,7 +11,9 @@ import com.magmaguy.elitemobs.quests.rewards.RewardEntry;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DynamicQuestMenuConfig extends MenusConfigFields {
     @Getter
@@ -21,15 +23,31 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
     @Getter
     private static String defaultLoreTextLines;
     @Getter
-    private static String acceptTextLines, acceptHoverLines, acceptCommandLines;
+    private static String acceptTextLines;
     @Getter
-    private static String acceptedTextLines, acceptedHoverLines, acceptedCommandLines;
+    private static String acceptHoverLines;
     @Getter
-    private static String completedTextLines, completedHoverLines, completedCommandLines;
+    private static String acceptCommandLines;
     @Getter
-    private static String turnedInTextLines, turnedInHoverLines;
+    private static String acceptedTextLines;
     @Getter
-    private static String ongoingColorCode, completedColorCode;
+    private static String acceptedHoverLines;
+    @Getter
+    private static String acceptedCommandLines;
+    @Getter
+    private static String completedTextLines;
+    @Getter
+    private static String completedHoverLines;
+    @Getter
+    private static String completedCommandLines;
+    @Getter
+    private static String turnedInTextLines;
+    @Getter
+    private static String turnedInHoverLines;
+    @Getter
+    private static String ongoingColorCode;
+    @Getter
+    private static String completedColorCode;
     @Getter
     private static String objectivesLine;
     @Getter
@@ -53,8 +71,8 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
             return newString.replace("$color", completedColorCode);
     }
 
-    public static TextComponent getRewardsDefaultSummaryLine(QuestReward questReward, int questLevel, Player player) {
-        TextComponent textComponent = new TextComponent();
+    public static List<TextComponent> getRewardsDefaultSummaryLine(QuestReward questReward) {
+        List<TextComponent> textComponents = new ArrayList<>();
         for (RewardEntry rewardEntry : questReward.getRewardEntries())
             if (rewardEntry.getItemStack() != null) {
                 TextComponent customItemTextComponent = new TextComponent(rewardsDefaultSummaryLine
@@ -62,25 +80,23 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
                         .replace("$rewardName", rewardEntry.getItemStack().getItemMeta().getDisplayName())
                         .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
                 ShareItem.setItemHoverEvent(customItemTextComponent, rewardEntry.getItemStack());
-                textComponent.addExtra(customItemTextComponent);
-                textComponent.addExtra("\n");
+                textComponents.add(customItemTextComponent);
             } else if (rewardEntry.getCurrencyAmount() != 0) {
-                TextComponent customItemTextComponent = new TextComponent(rewardsDefaultSummaryLine
+                TextComponent customItemTextComponent = new TextComponent((rewardsDefaultSummaryLine)
                         .replace("$amount", rewardEntry.getAmount() + "")
                         .replace("$rewardName", rewardEntry.getCurrencyAmount() + " " + EconomySettingsConfig.currencyName)
                         .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
-                textComponent.addExtra(customItemTextComponent);
-                textComponent.addExtra("\n");
+                textComponents.add(customItemTextComponent);
             }
-        return textComponent;
+        return textComponents;
     }
 
     @Override
     public void processAdditionalFields() {
         questName = ConfigurationEngine.setString(fileConfiguration, "questName", "Slay $amount $name");
 
-        headerTextLines = ConfigurationEngine.setString(fileConfiguration, "headerTextLines",
-                ChatColorConverter.convert("&c&lGuild request!\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
+        headerTextLines = ConfigurationEngine.setString(fileConfiguration, "headerTextLines2",
+                ChatColorConverter.convert("&c&lGuild request!\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"));
 
         defaultLoreTextLines = ConfigurationEngine.setString(fileConfiguration, "defaultLoreTextLines", "&8Slay $amount $name!");
 

@@ -40,10 +40,12 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     private int respawnCoolDownInMinutes = 0;
     private boolean isRespawning = false;
     private BukkitTask leashTask;
-    private boolean temporaryRegionalBoss = false;
     @Getter
     @Setter
-    private List<TransitiveBlock> onSpawnTransitiveBlocks = new ArrayList<>(), onRemoveTransitiveBlocks = new ArrayList<>();
+    private List<TransitiveBlock> onSpawnTransitiveBlocks;
+    @Getter
+    @Setter
+    private List<TransitiveBlock> onRemoveTransitiveBlocks;
     private boolean leashIsRunning = false;
 
 
@@ -77,7 +79,6 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
         this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
         this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
-        this.temporaryRegionalBoss = !permanent;
         super.setPersistent(permanent);
         super.spawnLocation = location;
         this.leashRadius = customBossesConfigFields.getLeashRadius();
@@ -109,7 +110,7 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             public void run() {
                 save();
             }
-        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20 * 5, 20 * 5);
+        }.runTaskTimerAsynchronously(MetadataHandler.PLUGIN, 20L * 5, 20L * 5);
     }
 
     public static void save() {
@@ -232,7 +233,6 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
         if (livingEntity != null) {
             checkLeash();
             getLivingEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 3));
-            //new WarningMessage("Warning: Location " + customBossesConfigFields.getFilename() + " for boss " + customBossesConfigFields.getFilename() + " seems to be inside of a solid block!");
         }
     }
 
@@ -252,6 +252,9 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
             case DEATH:
             case BOSS_TIMEOUT:
                 respawn();
+                break;
+            default:
+                break;
         }
     }
 
@@ -262,33 +265,6 @@ public class RegionalBossEntity extends CustomBossEntity implements SimplePersis
     public void chunkLoad() {
         super.chunkLoad();
         checkLeash();
-    }
-
-    /**
-     * Runs on chunk unload. Should stop repeating tasks that rely on the boss being loaded.
-     */
-    @Override
-    public void chunkUnload() {
-        super.chunkUnload();
-        //leash is already handled in softRemove()
-    }
-
-    /**
-     * Runs on world load. Starts a new instance of the boss in-game that was previously cached in an unloaded world.
-     * This is the primary means of regional boss loading for world-based minidungeons in the dungeon packager.
-     */
-    @Override
-    public void worldLoad() {
-        super.worldLoad();
-    }
-
-    /**
-     * Runs on world unload. Removes this instance of the boss in-game.
-     * This is the primary means of removing regional bosses when a world-based minidungeons is uninstalled via the dungeon packager
-     */
-    @Override
-    public void worldUnload() {
-        super.worldUnload();
     }
 
     public static class RegionalBossEntityEvents implements Listener {

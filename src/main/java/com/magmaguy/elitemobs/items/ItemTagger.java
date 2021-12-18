@@ -18,6 +18,7 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ItemTagger {
 
@@ -147,6 +148,11 @@ public class ItemTagger {
         if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
             return true;
         return itemMeta.getPersistentDataContainer().has(enchantmentKey, PersistentDataType.INTEGER);
+    }
+
+    public static boolean hasKey(ItemStack itemStack, String key){
+        if (!itemStack.hasItemMeta()) return false;
+        return Objects.requireNonNull(itemStack.getItemMeta()).getPersistentDataContainer().has(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING);
     }
 
     public static boolean hasEnchantment(ItemMeta itemMeta, String keyString) {

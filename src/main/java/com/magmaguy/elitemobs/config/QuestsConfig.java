@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.utils.VersionChecker;
 import com.magmaguy.elitemobs.utils.WarningMessage;
 import lombok.Getter;
 import org.bukkit.ChatColor;
@@ -92,12 +93,9 @@ public class QuestsConfig {
                 EntityType.EVOKER.toString(),
                 EntityType.GHAST.toString(),
                 EntityType.GUARDIAN.toString(),
-                EntityType.HOGLIN.toString(),
                 EntityType.HUSK.toString(),
                 EntityType.ILLUSIONER.toString(),
                 EntityType.IRON_GOLEM.toString(),
-                EntityType.PIGLIN_BRUTE.toString(),
-                EntityType.PIGLIN.toString(),
                 EntityType.PILLAGER.toString(),
                 EntityType.RAVAGER.toString(),
                 EntityType.SILVERFISH.toString(),
@@ -108,10 +106,19 @@ public class QuestsConfig {
                 EntityType.WITCH.toString(),
                 EntityType.WITHER_SKELETON.toString(),
                 EntityType.WOLF.toString(),
-                EntityType.ZOGLIN.toString(),
-                EntityType.ZOMBIE.toString(),
-                EntityType.ZOMBIFIED_PIGLIN.toString()
+                EntityType.ZOMBIE.toString()
         ));
+
+        if (!VersionChecker.serverVersionOlderThan(16, 0)) {
+            entityTypes.addAll(Arrays.asList(
+                    EntityType.HOGLIN.toString(),
+                    EntityType.ZOGLIN.toString(),
+                    EntityType.PIGLIN_BRUTE.toString(),
+                    EntityType.PIGLIN.toString(),
+                    EntityType.ZOMBIFIED_PIGLIN.toString()
+            ));
+        }
+
         List<EntityType> parsedTypes = new ArrayList<>();
         for (String string : entityTypes)
             try {
@@ -147,7 +154,7 @@ public class QuestsConfig {
             newString = fetchQuestScoreboardProgressionLine;
         else if (objective instanceof DialogObjective)
             newString = dialogQuestScoreboardProgressionLine;
-        newString = newString.replace("$name", ChatColor.BLACK + ChatColor.stripColor(objective.getObjectiveName()));
+        newString = newString.replace("$name", ChatColor.WHITE + ChatColor.stripColor(objective.getObjectiveName()));
         newString = newString.replace("$current", objective.getCurrentAmount() + "");
         newString = newString.replace("$target", objective.getTargetAmount() + "");
         if (!objective.isObjectiveCompleted())

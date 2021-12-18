@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.quests;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
 import com.magmaguy.elitemobs.api.QuestLeaveEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;

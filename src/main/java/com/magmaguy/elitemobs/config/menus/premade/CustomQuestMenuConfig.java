@@ -14,19 +14,45 @@ import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomQuestMenuConfig extends MenusConfigFields {
-    public static String headerTextLines;
-    public static String acceptTextLines, acceptHoverLines, acceptCommandLines;
-    public static String acceptedTextLines, acceptedHoverLines, acceptedCommandLines;
-    public static String completedTextLines, completedHoverLines, completedCommandLines;
-    public static String ongoingColorCode, completedColorCode;
-    public static String objectivesLine;
-    public static String rewardsLine;
     @Getter
-    private static String turnedInTextLines, turnedInHoverLines;
-    private static String killQuestDefaultSummaryLine, fetchQuestDefaultSummaryLine, dialogQuestDefaultSummaryLine;
+    private static String headerTextLines;
+    @Getter
+    private static String acceptTextLines;
+    @Getter
+    private static String acceptHoverLines;
+    @Getter
+    private static String acceptCommandLines;
+    @Getter
+    private static String acceptedTextLines;
+    @Getter
+    private static String acceptedHoverLines;
+    @Getter
+    private static String acceptedCommandLines;
+    @Getter
+    private static String completedTextLines;
+    @Getter
+    private static String completedHoverLines;
+    @Getter
+    private static String completedCommandLines;
+    @Getter
+    private static String ongoingColorCode;
+    @Getter
+    private static String completedColorCode;
+    @Getter
+    private static String objectivesLine;
+    @Getter
+    private static String rewardsLine;
+    @Getter
+    private static String turnedInTextLines;
+    private static String turnedInHoverLines;
+    private static String killQuestDefaultSummaryLine;
+    private static String fetchQuestDefaultSummaryLine;
+    private static String dialogQuestDefaultSummaryLine;
     private static String rewardsDefaultSummaryLine;
 
     public CustomQuestMenuConfig() {
@@ -50,27 +76,21 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             return newString.replace("$color", completedColorCode);
     }
 
-    public static TextComponent getRewardsDefaultSummaryLine(QuestReward questReward, int questLevel, Player player) {
-        TextComponent textComponent = new TextComponent();
-        int counter = 0;
+    public static List<TextComponent> getRewardsDefaultSummaryLine(QuestReward questReward) {
+        List<TextComponent> textComponent = new ArrayList<>();
         for (RewardEntry rewardEntry : questReward.getRewardEntries()) {
-            counter++;
             if (rewardEntry.getItemStack() != null) {
-                textComponent.addExtra(rewardsDefaultSummaryLine
+                textComponent.add(new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.getAmount() + "")
                         .replace("$rewardName", WordUtils.capitalizeFully(rewardEntry.getItemStack().getType().toString()).replace("_", " "))
-                        .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
+                        .replace("$chance", (int) (rewardEntry.getChance() * 100) + "")));
 
             } else if (rewardEntry.getCurrencyAmount() != 0) {
-                TextComponent customItemTextComponent = new TextComponent(rewardsDefaultSummaryLine
+                textComponent.add(new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", rewardEntry.getAmount() + "")
                         .replace("$rewardName", rewardEntry.getCurrencyAmount() + " " + EconomySettingsConfig.currencyName)
-                        .replace("$chance", (int) (rewardEntry.getChance() * 100) + ""));
-                textComponent.addExtra(customItemTextComponent);
-
+                        .replace("$chance", (int) (rewardEntry.getChance() * 100) + "")));
             }
-            if (counter < questReward.getRewardEntries().size())
-                textComponent.addExtra("\n");
         }
         return textComponent;
     }
@@ -78,10 +98,11 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
-        headerTextLines = ConfigurationEngine.setString(fileConfiguration, "headerTextLines",
-                ChatColorConverter.convert("&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n&c&l$questName\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n"));
+        //headerTextLines = ConfigurationEngine.setString(fileConfiguration, "headerTextLines", ChatColorConverter.convert("&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n&c&l$questName\n&0&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"));
 
-        acceptTextLines = ConfigurationEngine.setString(fileConfiguration, "acceptTextLines", "&a&lAccept!");
+        headerTextLines = ConfigurationEngine.setString(fileConfiguration, "headerTextLines2", ChatColorConverter.convert("&a&l『&c&l$questName&a&l』\n"));
+
+        acceptTextLines = ConfigurationEngine.setString(fileConfiguration, "acceptTextLines", "&a&l[Accept!]");
         acceptHoverLines = ConfigurationEngine.setString(fileConfiguration, "acceptHoverLines", "&aClick to \n&aaccept quest!");
         acceptCommandLines = ConfigurationEngine.setString(fileConfiguration, "acceptCommandLines", "/em quest accept $questID");
 
