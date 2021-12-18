@@ -40,6 +40,8 @@ public class CustomObjectivesParser {
         String location = null;
         String dialog = null;
         String npcName = null;
+        String key = null;
+        String keyName = null;
         int amount = 1;
         for (String rawString : rawStrings) {
             String[] processedStrings = rawString.split("=");
@@ -63,6 +65,12 @@ public class CustomObjectivesParser {
                 case "npcName":
                     npcName = ChatColorConverter.convert(processedStrings[1]);
                     break;
+                case "key":
+                    key = processedStrings[1];
+                    break;
+                case "keyName":
+                    keyName = processedStrings[1];
+                    break;
             }
         }
         if (filename == null) {
@@ -73,8 +81,7 @@ public class CustomObjectivesParser {
             if (objectiveType.equals(ObjectiveType.KILL_CUSTOM))
                 return new CustomKillObjective(filename, amount, customQuest.getQuestLevel());
             else if (objectiveType.equals(ObjectiveType.FETCH_ITEM))
-                //todo: not done yet
-                return null;
+                return new CustomFetchObjective(amount, keyName, key);
             else if (objectiveType.equals(ObjectiveType.DIALOG))
                 return new DialogObjective(filename, npcName, location, dialog);
         } catch (Exception ex) {

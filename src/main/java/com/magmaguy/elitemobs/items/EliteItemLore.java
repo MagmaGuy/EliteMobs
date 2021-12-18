@@ -24,23 +24,23 @@ import java.util.List;
 
 public class EliteItemLore {
 
-    ItemStack itemStack;
-    ItemMeta itemMeta;
-    List<String> vanillaEnchantmentsLore = new ArrayList<>();
-    HashMap<Enchantment, Integer> eliteVanillaEnchantments = new HashMap<>();
-    ArrayList<String> eliteVanillaEnchantmentsLore = new ArrayList<>();
-    HashMap<CustomEnchantment, Integer> customEnchantments = new HashMap<>();
-    ArrayList<String> customEnchantmentLore = new ArrayList<>();
-    List<String> potionListLore = new ArrayList<>();
-    List<String> lore;
-    String soulbindInfo = null;
-    boolean showItemWorth;
-    String itemWorth = null;
-    String itemSource = null;
-    EliteEntity eliteEntity;
-    Player soulboundPlayer = null;
-    List<String> customLore = new ArrayList<>();
-    int prestigeLevel = 0;
+    private ItemStack itemStack;
+    private ItemMeta itemMeta;
+    private List<String> vanillaEnchantmentsLore = new ArrayList<>();
+    private HashMap<Enchantment, Integer> eliteVanillaEnchantments = new HashMap<>();
+    private ArrayList<String> eliteVanillaEnchantmentsLore = new ArrayList<>();
+    private HashMap<CustomEnchantment, Integer> customEnchantments = new HashMap<>();
+    private ArrayList<String> customEnchantmentLore = new ArrayList<>();
+    private List<String> potionListLore = new ArrayList<>();
+    private List<String> lore;
+    private String soulbindInfo = null;
+    private boolean showItemWorth;
+    private String itemWorth = null;
+    private String itemSource = null;
+    private EliteEntity eliteEntity;
+    private Player soulboundPlayer = null;
+    private List<String> customLore = new ArrayList<>();
+    private int prestigeLevel = 0;
 
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {

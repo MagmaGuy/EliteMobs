@@ -19,12 +19,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RefinerMenu extends EliteMenu {
 
     private static final List<Integer> inputSlots = RefinerMenuConfig.inputSlots;
 
-    public static HashMap<Player, Inventory> inventories = new HashMap<>();
+    protected static final Map<Player, Inventory> inventories = new HashMap<>();
 
     private static ArrayList<ItemStack>[] calculateOutput(Inventory inventory, Player player) {
         ArrayList<ItemStack> inputItemStacks = new ArrayList<>();
@@ -50,7 +51,7 @@ public class RefinerMenu extends EliteMenu {
 
         for (Integer scrapLevel : inputScrapLevelAndAmountHashMap.keySet()) {
             int scrapAmount = inputScrapLevelAndAmountHashMap.get(scrapLevel);
-            int newScrapAmount = (int) Math.floor(scrapAmount / 10);
+            int newScrapAmount = (int) (scrapAmount / 10d);
             int scrapRemainderAmount = scrapAmount - newScrapAmount * 10;
 
             ItemStack scrapRemainderItem = ItemConstructor.constructScrapItem(

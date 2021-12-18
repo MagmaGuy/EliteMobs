@@ -1,4 +1,4 @@
-package com.magmaguy.elitemobs.playerdata;
+package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.utils.WarningMessage;
@@ -109,7 +109,7 @@ public class PortOldData {
             try {
                 Statement statement = null;
                 statement = PlayerData.getConnection().createStatement();
-                String sql = "INSERT INTO " + PlayerData.player_data_table_name +
+                String sql = "INSERT INTO " + PlayerData.getPLAYER_DATA_TABLE_NAME() +
                         " (PlayerUUID, DisplayName, Currency, GuildPrestigeLevel, GuildMaxLevel, GuildActiveLevel) " +
                         //identifier
                         "VALUES ('" + uuid.toString() + "'," +

@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.QuestObjectives;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;

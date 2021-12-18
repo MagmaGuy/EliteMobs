@@ -130,7 +130,7 @@ public class ScrapperMenu extends EliteMenu {
                             continue;
                         int tier = ItemTierFinder.findBattleTier(itemStack);
                         for (int i = 0; i < itemStack.getAmount(); i++) {
-                            if (ThreadLocalRandom.current().nextDouble() > 0.5) {
+                            if (ThreadLocalRandom.current().nextDouble() > .75) {
                                 player.sendMessage(ChatColorConverter.convert("Scrap failed!"));
                                 continue;
                             }

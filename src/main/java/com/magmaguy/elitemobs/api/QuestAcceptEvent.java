@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
@@ -55,7 +55,7 @@ public class QuestAcceptEvent extends Event implements Cancellable {
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestAccept(QuestAcceptEvent event) {
-            event.getPlayer().sendMessage(QuestsConfig.questJoinMessage.replace("$questName", event.getQuest().getQuestName()));
+            event.getPlayer().sendMessage(QuestsConfig.questJoinMessage.replace("$questName", ChatColorConverter.convert(event.getQuest().getQuestName())));
             event.getQuest().setAccepted(true);
             if (QuestsConfig.useQuestAcceptTitles)
                 event.getPlayer().sendTitle(

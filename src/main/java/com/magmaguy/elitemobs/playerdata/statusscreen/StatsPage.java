@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.adventurersguild.GuildRank;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;

@@ -1,17 +1,25 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
-import com.magmaguy.elitemobs.api.QuestAcceptEvent;
+import com.magmaguy.elitemobs.api.QuestCompleteEvent;
+import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-public class CustomFetchObjective extends Objective{
+public class CustomFetchObjective extends Objective {
 
     @Getter
-    private String customItemFilename;
+    private String key;
     @Getter
     @Setter
     /**
@@ -23,36 +31,73 @@ public class CustomFetchObjective extends Objective{
      */
     @Getter
     private boolean requireItemTurnIn;
-    @Getter
-    /**
-     * This sets whether the looting for the items must be done while the quest is active
-     */
-    private boolean requireLootingDuringQuest;
 
-
-    public CustomFetchObjective(int targetAmount, String objectiveName, String customItemFilename){
+    public CustomFetchObjective(int targetAmount, String objectiveName, String customItemFilename) {
         super(targetAmount, objectiveName);
-        this.customItemFilename = customItemFilename;
+        this.key = customItemFilename;
     }
 
 
-    private void checkProgress(Player player){
-        for (ItemStack itemStack : player.getInventory())
-            if (itemStack != null && itemStack.hasItemMeta()){
-                //todo: yep this is still missing
-            }
-    }
-
-    public static class CustomFetchObjectiveEvents implements Listener{
-        @EventHandler
-        public void onQuestAccept(QuestAcceptEvent questAcceptEvent){
-            for (Objective objective : questAcceptEvent.getQuest().getQuestObjectives().getObjectives())
+    private static void checkEvent(@NotNull Player player, @NotNull ItemStack itemStack, boolean increment) {
+        for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
+            for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective)
-                    if (!((CustomFetchObjective) objective).requireLootingDuringQuest){
-                        //todo: yep this is still missing
-                    }
-
-        }
+                    ((CustomFetchObjective) objective).checkItem(player, itemStack, increment, quest.getQuestObjectives());
     }
+
+    private void checkItem(Player player, @NotNull ItemStack itemStack, boolean increment, QuestObjectives questObjectives) {
+        if (ItemTagger.hasKey(itemStack, this.key))
+            if (increment)
+                incrementCount(player, itemStack.getAmount(), questObjectives);
+            else
+                decrementCount(player, itemStack.getAmount(), questObjectives);
+    }
+
+    private void incrementCount(Player player, int amount, QuestObjectives questObjectives) {
+        super.currentAmount++;
+        checkProgress(player, questObjectives);
+    }
+
+    private void decrementCount(Player player, int amount, QuestObjectives questObjectives) {
+        super.currentAmount--;
+        checkProgress(player, questObjectives);
+    }
+
+    private void checkProgress(Player player, QuestObjectives questObjectives) {
+        boolean strictCheck = super.currentAmount < 0 || super.currentAmount >= super.targetAmount;
+        super.currentAmount = 0;
+        if (strictCheck)
+            for (ItemStack itemStack : player.getInventory())
+                if (ItemTagger.hasKey(itemStack, this.key))
+                    super.currentAmount += itemStack.getAmount();
+        progressNonlinearObjective(questObjectives);
+    }
+
+    public static class CustomFetchObjectiveEvents implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onItemDrop(EntityDropItemEvent event) {
+            if (event.getEntity().getType() != EntityType.PLAYER) return;
+            checkEvent((Player) event.getEntity(), event.getItemDrop().getItemStack(), false);
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onItemPickup(EntityPickupItemEvent event) {
+            if (event.getEntity().getType() != EntityType.PLAYER) return;
+            checkEvent((Player) event.getEntity(), event.getItem().getItemStack(), true);
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onQuestCompleteEvent(QuestCompleteEvent event){
+            for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
+                if (objective instanceof CustomFetchObjective){
+                    ((CustomFetchObjective) objective).checkProgress(event.getPlayer(), event.getQuest().getQuestObjectives());
+               if (objective.getCurrentAmount() < objective.getTargetAmount())
+                   event.setCancelled(true);
+                }
+        }
+
+    }
+
 
 }

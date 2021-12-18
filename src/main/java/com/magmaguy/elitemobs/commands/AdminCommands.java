@@ -321,7 +321,7 @@ public class AdminCommands {
                 .handler(commandContext -> DebugScreen.open((Player) commandContext.getSender(), commandContext.get("argument"))));
 
         ArrayList<String> events = new ArrayList<>();
-        TimedEvent.blueprintEvents.stream().forEach(event -> events.add(event.getCustomEventsConfigFields().getFilename()));
+        TimedEvent.getBlueprintEvents().stream().forEach(event -> events.add(event.getCustomEventsConfigFields().getFilename()));
 
         // /em event <eventName>
         manager.command(builder.literal("event")

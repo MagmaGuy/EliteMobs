@@ -57,7 +57,7 @@ public class ItemLootShower implements Listener {
 
         new BukkitRunnable() {
 
-            int currencyAmount = (int) (eliteMobTier / 2 * EconomySettingsConfig.currencyShowerMultiplier *
+            int currencyAmount = (int) (eliteMobTier / 2D * EconomySettingsConfig.currencyShowerMultiplier *
                     GuildRank.currencyBonusMultiplier(GuildRank.getGuildPrestigeRank(player)));
 
             @Override

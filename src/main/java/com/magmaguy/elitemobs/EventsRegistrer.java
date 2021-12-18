@@ -38,8 +38,8 @@ import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.powers.bosspowers.*;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
 import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFallDamage;
@@ -61,8 +61,10 @@ import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.powers.specialpowers.EnderCrystalLightningRod;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
+import com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective;
 import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
+import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldownsLogout;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardDungeonFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardEliteMobOnlySpawnFlag;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
@@ -84,6 +86,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new PlayerData.PlayerDataEvents(), plugin);
         pluginManager.registerEvents(new ElitePlayerInventory.ElitePlayerInventoryEvents(), plugin);
         pluginManager.registerEvents(new PlayerStatsTracker(), plugin);
+        pluginManager.registerEvents(new PlayerQuestCooldownsLogout(), plugin);
 
         pluginManager.registerEvents(new ChickenHandler(), plugin);
         pluginManager.registerEvents(new CowHandler(), plugin);
@@ -307,6 +310,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new GuildRankMenuHandler(), plugin);
         //register quests
         pluginManager.registerEvents(new KillObjective.KillObjectiveEvents(), plugin);
+        pluginManager.registerEvents(new CustomFetchObjective.CustomFetchObjectiveEvents(), plugin);
         pluginManager.registerEvents(new DialogObjective.DialogObjectiveEvents(), plugin);
         pluginManager.registerEvents(new QuestAcceptEvent.QuestAcceptEventHandler(), plugin);
         pluginManager.registerEvents(new QuestCompleteEvent.QuestCompleteEventHandler(), plugin);

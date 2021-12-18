@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -19,7 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class NPCInteractions implements Listener {
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());

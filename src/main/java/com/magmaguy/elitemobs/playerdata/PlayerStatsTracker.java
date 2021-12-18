@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

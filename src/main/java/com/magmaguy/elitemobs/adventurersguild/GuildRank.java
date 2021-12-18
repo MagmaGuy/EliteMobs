@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.adventurersguild;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
-import com.magmaguy.elitemobs.playerdata.PlayerData;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.Round;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;

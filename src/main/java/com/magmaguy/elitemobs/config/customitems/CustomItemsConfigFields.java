@@ -39,6 +39,10 @@ public class CustomItemsConfigFields extends CustomConfigFields implements Custo
     @Getter
     @Setter
     private Integer customModelID = -1;
+    @Getter
+    @Setter
+    //todo: implement
+    private List<String> nbtTags = new ArrayList<>();
 
     public CustomItemsConfigFields(String fileName,
                                    boolean isEnabled,

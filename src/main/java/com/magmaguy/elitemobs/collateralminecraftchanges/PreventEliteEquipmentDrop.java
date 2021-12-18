@@ -14,11 +14,10 @@ public class PreventEliteEquipmentDrop implements Listener {
     public void onEliteDeath(EliteMobDeathEvent event) {
         if (event.getEntityDeathEvent() == null) return;
         if (!(event.getEntity() instanceof Mob)) return;
-        if (((Mob) event.getEntity()).getEquipment().getArmorContents() == null) return;
+        if (((Mob) event.getEntity()).getEquipment() == null) return;
         for (ItemStack drop : event.getEntityDeathEvent().getDrops())
             for (ItemStack equipment : ((Mob) event.getEntity()).getEquipment().getArmorContents())
-                if (equipment != null)
-                    if (drop.equals(equipment))
+                if (equipment != null && drop != null && drop.equals(equipment))
                         drop.setType(Material.AIR);
     }
 

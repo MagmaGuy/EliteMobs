@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.mobconstructor.CustomSpawn;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.utils.InfoMessage;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,15 +20,16 @@ import java.util.List;
 
 public class TimedEvent extends CustomEvent implements Listener {
 
-    public static List<TimedEvent> blueprintEvents = new ArrayList<>();
-    public static List<TimedEvent> timedEvents = new ArrayList<>();
+    @Getter
+    protected static List<TimedEvent> blueprintEvents = new ArrayList<>();
+    protected static List<TimedEvent> timedEvents = new ArrayList<>();
     //stores the time of the last global trigger
-    private static double nextEventTrigger = System.currentTimeMillis() + 5 * 60 * 1000;
-    private double localCooldown;
+    private static double nextEventTrigger = System.currentTimeMillis() + 5D * 60D * 1000D;
+    private final double localCooldown;
     private double nextLocalEventTrigger = 0;
-    private double globalCooldown;
-    private double weight;
-    private String filename;
+    private final double globalCooldown;
+    private final double weight;
+    private final String filename;
     private CustomSpawn customSpawn;
     private boolean silentRetry = false;
 
@@ -42,11 +44,8 @@ public class TimedEvent extends CustomEvent implements Listener {
     public static void initializeBlueprintEvents() {
         if (!EventsConfig.timedEventsEnabled) return;
         for (CustomEventsConfigFields customEventsConfigFields : CustomEventsConfig.getCustomEvents().values())
-            if (customEventsConfigFields.isEnabled())
-                switch (customEventsConfigFields.getEventType()) {
-                    case TIMED:
-                        blueprintEvents.add(new TimedEvent(customEventsConfigFields));
-                }
+            if (customEventsConfigFields.isEnabled() && customEventsConfigFields.getEventType() == EventType.TIMED)
+                blueprintEvents.add(new TimedEvent(customEventsConfigFields));
         startEventPicker();
     }
 
@@ -54,31 +53,35 @@ public class TimedEvent extends CustomEvent implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (Bukkit.getServer().getOnlinePlayers().size() < 1) return;
+                if (Bukkit.getServer().getOnlinePlayers().isEmpty()) return;
                 if (System.currentTimeMillis() < nextEventTrigger) return;
-                HashMap<String, Double> weighedProbabilities = new HashMap();
-                for (TimedEvent timedEvent : blueprintEvents) {
-                    boolean isRunning = false;
-                    for (TimedEvent activeTimedEvent : timedEvents)
-                        if (activeTimedEvent != null)
-                            if (activeTimedEvent.getCustomEventsConfigFields().getFilename().equals(timedEvent.getCustomEventsConfigFields().getFilename())) {
-                                isRunning = true;
-                                break;
-                            }
-                    if (isRunning)
-                        continue;
-                    if (timedEvent.nextLocalEventTrigger < System.currentTimeMillis())
-                        weighedProbabilities.put(timedEvent.filename, timedEvent.weight);
-                }
-                String pickedEvent = WeightedProbability.pickWeighedProbability(weighedProbabilities);
-                for (TimedEvent timedEvent : blueprintEvents)
-                    if (timedEvent.filename.equals(pickedEvent)) {
-                        timedEvent.nextLocalEventTrigger = System.currentTimeMillis() + timedEvent.localCooldown * 60 * 1000;
-                        timedEvent.instantiateEvent();
-                        return;
-                    }
+                pickEvent();
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * 5, 20 * 60);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20L * 60L * 5L, 20L * 60L);
+    }
+
+    private static void pickEvent() {
+        HashMap<String, Double> weighedProbabilities = new HashMap<>();
+        for (TimedEvent timedEvent : blueprintEvents) {
+            boolean isRunning = false;
+            for (TimedEvent activeTimedEvent : timedEvents)
+                if (activeTimedEvent != null &&
+                        activeTimedEvent.getCustomEventsConfigFields().getFilename().equals(timedEvent.getCustomEventsConfigFields().getFilename())) {
+                    isRunning = true;
+                    break;
+                }
+            if (isRunning)
+                continue;
+            if (timedEvent.nextLocalEventTrigger < System.currentTimeMillis())
+                weighedProbabilities.put(timedEvent.filename, timedEvent.weight);
+        }
+        String pickedEvent = WeightedProbability.pickWeighedProbability(weighedProbabilities);
+        for (TimedEvent timedEvent : blueprintEvents)
+            if (timedEvent.filename.equals(pickedEvent)) {
+                timedEvent.nextLocalEventTrigger = System.currentTimeMillis() + timedEvent.localCooldown * 60 * 1000;
+                timedEvent.instantiateEvent();
+                return;
+            }
     }
 
     /**
@@ -145,7 +148,7 @@ public class TimedEvent extends CustomEvent implements Listener {
 
     @Override
     public void eventWatchdog() {
-
+        //No specific checks are currently required while the timed event occurs
     }
 
     @Override
